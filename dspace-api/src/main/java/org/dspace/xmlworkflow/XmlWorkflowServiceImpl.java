@@ -240,14 +240,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     //TODO: this is currently not used in our notifications. Look at the code used by the original WorkflowManager
 
-    /**
-     * Start the workflow normally, but disables
-     * notifications (useful for large imports) for the first workflow step -
-     * subsequent notifications happen normally.
-     *
-     * @param context the current DSpace session.
-     * @param wsi the submitted Item entering workflow.
-     */
     @Override
     public XmlWorkflowItem startWithoutNotify(Context context, WorkspaceItem wsi)
         throws SQLException, AuthorizeException, IOException, WorkflowException {
@@ -313,18 +305,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     protected void activateFirstStep(Context context, Workflow wf, Step firstStep, XmlWorkflowItem wfi)
             throws AuthorizeException, IOException, SQLException, WorkflowException, WorkflowConfigurationException {
         WorkflowActionConfig firstActionConfig = firstStep.getUserSelectionMethod();
-        firstActionConfig.getProcessingAction().activate(context, wfi);
-        log.info(LogManager.getHeader(context, "start_workflow",
-                firstActionConfig.getProcessingAction()
-                        + " workflow_item_id=" + wfi.getID()
-                        + "item_id=" + wfi.getItem().getID()
-                        + "collection_id=" + wfi.getCollection().getID()));
-
-        // record the start of the workflow w/provenance message
-        recordStart(context, wfi.getItem(), firstActionConfig.getProcessingAction());
-
-        //Fire an event !
-        logWorkflowEvent(context, firstStep.getWorkflow().getID(), null, null, wfi, null, firstStep, firstActionConfig);
 
         // Perform curation tasks if needed.
         if (!xmlWorkflowCuratorService.doCuration(context, wfi)) {
@@ -337,6 +317,20 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                             + ",doCuration=false"));
             return;
         }
+
+        // Activate the step.
+        firstActionConfig.getProcessingAction().activate(context, wfi);
+        log.info(LogManager.getHeader(context, "start_workflow",
+                firstActionConfig.getProcessingAction()
+                        + " workflow_item_id=" + wfi.getID()
+                        + "item_id=" + wfi.getItem().getID()
+                        + "collection_id=" + wfi.getCollection().getID()));
+
+        // record the start of the workflow w/provenance message
+        recordStart(context, wfi.getItem(), firstActionConfig.getProcessingAction());
+
+        //Fire an event !
+        logWorkflowEvent(context, firstStep.getWorkflow().getID(), null, null, wfi, null, firstStep, firstActionConfig);
 
         //If we don't have a UI then execute the action.
         if (!firstActionConfig.requiresUI()) {
@@ -395,29 +389,30 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                                                WorkflowActionConfig currentActionConfig, ActionResult currentOutcome,
                                                XmlWorkflowItem wfi, boolean enteredNewStep)
         throws IOException, AuthorizeException, SQLException, WorkflowException {
-        if (currentOutcome.getType() == ActionResult.TYPE.TYPE_PAGE || currentOutcome
-            .getType() == ActionResult.TYPE.TYPE_ERROR) {
+        if (currentOutcome.getType() == ActionResult.TYPE.TYPE_PAGE
+                || currentOutcome.getType() == ActionResult.TYPE.TYPE_ERROR) {
             //Our outcome is a page or an error, so return our current action
             c.restoreAuthSystemState();
             return currentActionConfig;
-        } else if (currentOutcome.getType() == ActionResult.TYPE.TYPE_CANCEL || currentOutcome
-            .getType() == ActionResult.TYPE.TYPE_SUBMISSION_PAGE) {
+        } else if (currentOutcome.getType() == ActionResult.TYPE.TYPE_CANCEL
+                || currentOutcome.getType() == ActionResult.TYPE.TYPE_SUBMISSION_PAGE) {
             //We either pressed the cancel button or got an order to return to the submission page, so don't return
             // an action
             //By not returning an action we ensure ourselfs that we go back to the submission page
             c.restoreAuthSystemState();
             return null;
         } else if (currentOutcome.getType() == ActionResult.TYPE.TYPE_OUTCOME) {
+            // An action was taken by a reviewer.
             Step nextStep = null;
             WorkflowActionConfig nextActionConfig = null;
             try {
-                //We have completed our action search & retrieve the next action
                 if (currentOutcome.getResult() == ActionResult.OUTCOME_COMPLETE) {
+                    //We have completed our action.  Retrieve the next action.
                     nextActionConfig = currentStep.getNextAction(currentActionConfig);
                 }
 
                 if (nextActionConfig != null) {
-                    //We remain in the current step since an action is found
+                    //We remain in the current step since another action is found.
                     nextStep = currentStep;
                     nextActionConfig.getProcessingAction().activate(c, wfi);
                     if (nextActionConfig.requiresUI() && !enteredNewStep) {
@@ -429,6 +424,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                         c.restoreAuthSystemState();
                         return null;
                     } else {
+                        // UI not required by next action.
                         ActionResult newOutcome = nextActionConfig.getProcessingAction()
                                                                   .execute(c, wfi, currentStep, null);
                         return processOutcome(c, user, workflow, currentStep, nextActionConfig, newOutcome, wfi,
@@ -487,11 +483,10 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             } catch (IOException | SQLException | AuthorizeException
                     | WorkflowException | WorkflowConfigurationException e) {
                 log.error("error while processing workflow outcome", e);
-                e.printStackTrace();
+                e.printStackTrace(); // XXX Why is this here?
             } finally {
-                if ((nextStep != null && currentStep != null && nextActionConfig != null) || (wfi.getItem()
-                                                                                                 .isArchived() &&
-                    currentStep != null)) {
+                if ((nextStep != null && currentStep != null && nextActionConfig != null)
+                        || (wfi.getItem().isArchived() && currentStep != null)) {
                     logWorkflowEvent(c, currentStep.getWorkflow().getID(), currentStep.getId(),
                                      currentActionConfig.getId(), wfi, user, nextStep, nextActionConfig);
                 }
