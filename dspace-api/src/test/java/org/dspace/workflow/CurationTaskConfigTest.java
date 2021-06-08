@@ -39,7 +39,7 @@ public class CurationTaskConfigTest {
     private static final String BAD_HANDLE = "axolotl";
     private static final String CONFIGURATION
             = "<?xml version='1.0' encoding='UTF-8'?>"
-            + "<workflow-curation>"
+            + "<workflow-curation xmlns='https://dspace.org/workflow-curation'>"
             + "  <taskset-map>"
             + "    <mapping collection-handle='default' taskset='" + TEST1 + "'/>"
             + "    <mapping collection-handle='" + COLLECTION_9_HANDLE + "' taskset='default'/>"
