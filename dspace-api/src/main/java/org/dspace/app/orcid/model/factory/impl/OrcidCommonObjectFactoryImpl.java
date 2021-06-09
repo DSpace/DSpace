@@ -212,7 +212,7 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
 
     private ContributorAttributes getContributorAttributes(MetadataValue metadataValue, ContributorRole role) {
         ContributorAttributes attributes = new ContributorAttributes();
-        attributes.setContributorRole(role);
+        attributes.setContributorRole(role != null ? role.value() : null);
         attributes.setContributorSequence(metadataValue.getPlace() == 0 ? FIRST : ADDITIONAL);
         return attributes;
     }
@@ -231,7 +231,7 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
     private FundingContributorAttributes getFundingContributorAttributes(MetadataValue metadataValue,
         FundingContributorRole role) {
         FundingContributorAttributes attributes = new FundingContributorAttributes();
-        attributes.setContributorRole(role);
+        attributes.setContributorRole(role != null ? role.value() : null);
         return attributes;
     }
 

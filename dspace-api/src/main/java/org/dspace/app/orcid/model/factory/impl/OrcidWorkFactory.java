@@ -9,24 +9,35 @@ package org.dspace.app.orcid.model.factory.impl;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
+import static org.orcid.jaxb.model.common.Relationship.FUNDED_BY;
+import static org.orcid.jaxb.model.common.Relationship.SELF;
 
 import java.io.ByteArrayOutputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.model.OrcidEntityType;
 import org.dspace.app.orcid.model.OrcidWorkFieldMapping;
 import org.dspace.app.orcid.model.factory.OrcidCommonObjectFactory;
 import org.dspace.app.orcid.model.factory.OrcidEntityFactory;
+import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.core.exception.SQLRuntimeException;
+import org.dspace.util.UUIDUtils;
 import org.orcid.jaxb.model.common.CitationType;
 import org.orcid.jaxb.model.common.ContributorRole;
 import org.orcid.jaxb.model.common.LanguageCode;
@@ -90,7 +101,6 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
 
     private Title getJournalTitle(Context context, Item item) {
         return getMetadataValue(context, item, fieldMapping.getJournalTitleField())
-            .filter(metadataValue -> isNotBlank(metadataValue.getValue()))
             .map(metadataValue -> new Title(metadataValue.getValue()))
             .orElse(null);
     }
@@ -113,7 +123,6 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
 
     private WorkTitle getWorkTitle(Context context, Item item) {
         return getMetadataValue(context, item, fieldMapping.getTitleField())
-            .filter(metadataValue -> isNotBlank(metadataValue.getValue()))
             .map(metadataValue -> getWorkTitle(context, item, metadataValue))
             .orElse(null);
     }
@@ -140,34 +149,102 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
     }
 
     private ExternalIDs getWorkExternalIds(Context context, Item item) {
-
-        Map<String, String> externalIdentifierFields = fieldMapping.getExternalIdentifierFields();
-
         ExternalIDs externalIdentifiers = new ExternalIDs();
-
-        if (externalIdentifierFields.containsKey(SIMPLE_HANDLE_PLACEHOLDER)) {
-            String handleType = externalIdentifierFields.get(SIMPLE_HANDLE_PLACEHOLDER);
-            externalIdentifiers.getExternalIdentifier().add(getExternalId(handleType, item.getHandle()));
-        }
-
-        getMetadataValues(context, item, externalIdentifierFields.keySet()).stream()
-            .map(this::getExternalId)
-            .forEach(externalIdentifiers.getExternalIdentifier()::add);
-
+        externalIdentifiers.getExternalIdentifier().addAll(getWorkSelfExternalIds(context, item));
+        externalIdentifiers.getExternalIdentifier().addAll(getWorkFundedByExternalIds(context, item));
         return externalIdentifiers;
     }
 
-    private ExternalID getExternalId(MetadataValue metadataValue) {
+    private List<ExternalID> getWorkSelfExternalIds(Context context, Item item) {
+
+        List<ExternalID> selfExternalIds = new ArrayList<ExternalID>();
+
         Map<String, String> externalIdentifierFields = fieldMapping.getExternalIdentifierFields();
-        String metadataField = metadataValue.getMetadataField().toString('.');
-        return getExternalId(externalIdentifierFields.get(metadataField), metadataValue.getValue());
+
+        if (externalIdentifierFields.containsKey(SIMPLE_HANDLE_PLACEHOLDER)) {
+            String handleType = externalIdentifierFields.get(SIMPLE_HANDLE_PLACEHOLDER);
+            selfExternalIds.add(getExternalId(handleType, item.getHandle(), SELF));
+        }
+
+        getMetadataValues(context, item, externalIdentifierFields.keySet()).stream()
+            .map(this::getSelfExternalId)
+            .forEach(selfExternalIds::add);
+
+        return selfExternalIds;
     }
 
-    private ExternalID getExternalId(String type, String value) {
+    private List<ExternalID> getWorkFundedByExternalIds(Context context, Item item) {
+
+        if (isBlank(fieldMapping.getFundingExternalIdType())) {
+            return Collections.emptyList();
+        }
+
+        return getMetadataValues(context, item, fieldMapping.getFundingField()).stream()
+            .map(metadataValue -> getWorkFundedByExternalId(context, item, metadataValue))
+            .flatMap(Optional::stream)
+            .collect(Collectors.toList());
+    }
+
+    private Optional<ExternalID> getWorkFundedByExternalId(Context context, Item work, MetadataValue fundingMetadata) {
+        return getFundedByExternalIdFromFunding(context, fundingMetadata)
+            .or(() -> getFundedByExternalIdFromWork(context, work, fundingMetadata.getPlace()));
+    }
+
+    private Optional<ExternalID> getFundedByExternalIdFromFunding(Context context, MetadataValue fundingMetadata) {
+
+        if (isAuthoritySet(fundingMetadata.getAuthority())) {
+            return findItemById(context, UUIDUtils.fromString(fundingMetadata.getAuthority()))
+                .map(funding -> getFundingExternalId(context, funding));
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<ExternalID> getFundedByExternalIdFromWork(Context context, Item work, int fundingPlace) {
+        List<MetadataValue> externalIdValues = getMetadataValues(context, work, fieldMapping.getFundingExternalId());
+
+        if (externalIdValues.size() > fundingPlace && isNotPlaceholder(externalIdValues.get(fundingPlace))) {
+            String value = externalIdValues.get(fundingPlace).getValue();
+            return Optional.of(getExternalId(fieldMapping.getFundingExternalIdType(), value, FUNDED_BY));
+        }
+
+        return Optional.empty();
+    }
+
+    private boolean isAuthoritySet(String authority) {
+        return isNotBlank(authority) && !StringUtils.startsWith(authority, AuthorityValueService.REFERENCE);
+    }
+
+    private ExternalID getSelfExternalId(MetadataValue metadataValue) {
+        Map<String, String> externalIdentifierFields = fieldMapping.getExternalIdentifierFields();
+        String metadataField = metadataValue.getMetadataField().toString('.');
+        return getExternalId(externalIdentifierFields.get(metadataField), metadataValue.getValue(), SELF);
+    }
+
+    private ExternalID getFundingExternalId(Context context, Item funding) {
+
+        String externalIdValue = getMetadataValue(context, funding, fieldMapping.getFundingEntityExternalId())
+            .map(MetadataValue::getValue)
+            .orElse(null);
+
+        if (externalIdValue == null) {
+            return null;
+        }
+
+        Optional<Url> fundingUrl = getMetadataValue(context, funding, fieldMapping.getFundingUrlField())
+            .map(fundingUrlMetadata -> new Url(fundingUrlMetadata.getValue()))
+            .or(() -> orcidCommonObjectFactory.createUrl(context, funding));
+
+        ExternalID externalId = getExternalId(fieldMapping.getFundingExternalIdType(), externalIdValue, FUNDED_BY);
+        fundingUrl.ifPresent(externalId::setUrl);
+        return externalId;
+    }
+
+    private ExternalID getExternalId(String type, String value, Relationship relationship) {
         ExternalID externalID = new ExternalID();
         externalID.setType(type);
         externalID.setValue(value);
-        externalID.setRelationship(Relationship.SELF);
+        externalID.setRelationship(relationship);
         return externalID;
     }
 
@@ -240,6 +317,18 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
         return orcidCommonObjectFactory.createUrl(context, item).orElse(null);
     }
 
+    private List<MetadataValue> getMetadataValues(Context context, Item item, String metadataField) {
+        if (isBlank(metadataField)) {
+            return Collections.emptyList();
+        }
+        return itemService.getMetadataByMetadataString(item, metadataField);
+    }
+
+    private boolean isNotPlaceholder(MetadataValue metadata) {
+        return metadata != null && metadata.getValue() != null
+            && !metadata.getValue().equals(PLACEHOLDER_PARENT_METADATA_VALUE);
+    }
+
     private List<MetadataValue> getMetadataValues(Context context, Item item, Collection<String> metadataFields) {
         return metadataFields.stream()
             .flatMap(metadataField -> itemService.getMetadataByMetadataString(item, metadataField).stream())
@@ -247,7 +336,22 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
     }
 
     private Optional<MetadataValue> getMetadataValue(Context context, Item item, String metadataField) {
-        return itemService.getMetadataByMetadataString(item, metadataField).stream().findFirst();
+
+        if (isBlank(metadataField)) {
+            return Optional.empty();
+        }
+
+        return itemService.getMetadataByMetadataString(item, metadataField).stream()
+            .filter(metadataValue -> isNotBlank(metadataValue.getValue()))
+            .findFirst();
+    }
+
+    private Optional<Item> findItemById(Context context, UUID id) {
+        try {
+            return Optional.ofNullable(itemService.find(context, id));
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
     }
 
     public ItemService getItemService() {

@@ -26,6 +26,7 @@ import static org.orcid.jaxb.model.common.SequenceType.ADDITIONAL;
 import static org.orcid.jaxb.model.common.SequenceType.FIRST;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -35,6 +36,7 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.CrisConstants;
 import org.junit.Before;
 import org.junit.Test;
 import org.orcid.jaxb.model.common.ContributorRole;
@@ -166,10 +168,184 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
         List<ExternalID> externalIds = work.getExternalIdentifiers().getExternalIdentifier();
         assertThat(externalIds, hasSize(3));
-        assertThat(externalIds, has(externalId("doi", "doi-id")));
-        assertThat(externalIds, has(externalId("eid", "scopus-id")));
-        assertThat(externalIds, has(externalId("handle", publication.getHandle())));
+        assertThat(externalIds, has(selfExternalId("doi", "doi-id")));
+        assertThat(externalIds, has(selfExternalId("eid", "scopus-id")));
+        assertThat(externalIds, has(selfExternalId("handle", publication.getHandle())));
 
+    }
+
+    @Test
+    public void testWorkWithFundingCreation() {
+        context.turnOffAuthorisationSystem();
+
+        Item publication = ItemBuilder.createItem(context, publications)
+            .withTitle("Test publication")
+            .withAuthor("Walter White")
+            .withIssueDate("2021-04-30")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::book")
+            .withRelationFunding("Test funding")
+            .withRelationGrantno("123456")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        Activity activity = entityFactoryService.createOrcidObject(context, publication);
+        assertThat(activity, instanceOf(Work.class));
+
+        Work work = (Work) activity;
+
+        List<ExternalID> externalIds = work.getExternalIdentifiers().getExternalIdentifier();
+        assertThat(externalIds, hasSize(2));
+        assertThat(externalIds, has(selfExternalId("handle", publication.getHandle())));
+        assertThat(externalIds, has(fundedByExternalId("grant_number", "123456")));
+    }
+
+    @Test
+    public void testWorkWithFundingWithoutGrantNumberCreation() {
+        context.turnOffAuthorisationSystem();
+
+        Item publication = ItemBuilder.createItem(context, publications)
+            .withTitle("Test publication")
+            .withAuthor("Walter White")
+            .withIssueDate("2021-04-30")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::book")
+            .withRelationFunding("Test funding")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        Activity activity = entityFactoryService.createOrcidObject(context, publication);
+        assertThat(activity, instanceOf(Work.class));
+
+        Work work = (Work) activity;
+
+        List<ExternalID> externalIds = work.getExternalIdentifiers().getExternalIdentifier();
+        assertThat(externalIds, hasSize(1));
+        assertThat(externalIds, has(selfExternalId("handle", publication.getHandle())));
+    }
+
+    @Test
+    public void testWorkWithFundingWithGrantNumberPlaceholderCreation() {
+        context.turnOffAuthorisationSystem();
+
+        Item publication = ItemBuilder.createItem(context, publications)
+            .withTitle("Test publication")
+            .withAuthor("Walter White")
+            .withIssueDate("2021-04-30")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::book")
+            .withRelationFunding("Test funding")
+            .withRelationGrantno(CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        Activity activity = entityFactoryService.createOrcidObject(context, publication);
+        assertThat(activity, instanceOf(Work.class));
+
+        Work work = (Work) activity;
+
+        List<ExternalID> externalIds = work.getExternalIdentifiers().getExternalIdentifier();
+        assertThat(externalIds, hasSize(1));
+        assertThat(externalIds, has(selfExternalId("handle", publication.getHandle())));
+    }
+
+    @Test
+    public void testWorkWithFundingEntityWithoutGrantNumberCreation() {
+
+        context.turnOffAuthorisationSystem();
+
+        Item funding = ItemBuilder.createItem(context, publications)
+            .withTitle("Test funding")
+            .build();
+
+        Item publication = ItemBuilder.createItem(context, publications)
+            .withTitle("Test publication")
+            .withAuthor("Walter White")
+            .withIssueDate("2021-04-30")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::book")
+            .withRelationFunding("Test funding", funding.getID().toString())
+            .withRelationGrantno("123456")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        Activity activity = entityFactoryService.createOrcidObject(context, publication);
+        assertThat(activity, instanceOf(Work.class));
+
+        Work work = (Work) activity;
+
+        List<ExternalID> externalIds = work.getExternalIdentifiers().getExternalIdentifier();
+        assertThat(externalIds, hasSize(2));
+        assertThat(externalIds, has(selfExternalId("handle", publication.getHandle())));
+        assertThat(externalIds, has(fundedByExternalId("grant_number", "123456")));
+    }
+
+    @Test
+    public void testWorkWithFundingEntityWithGrantNumberCreation() {
+
+        context.turnOffAuthorisationSystem();
+
+        Item funding = ItemBuilder.createItem(context, publications)
+            .withHandle("123456789/0001")
+            .withTitle("Test funding")
+            .withFundingIdentifier("987654")
+            .build();
+
+        Item publication = ItemBuilder.createItem(context, publications)
+            .withTitle("Test publication")
+            .withAuthor("Walter White")
+            .withIssueDate("2021-04-30")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::book")
+            .withRelationFunding("Test funding", funding.getID().toString())
+            .withRelationGrantno("123456")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        Activity activity = entityFactoryService.createOrcidObject(context, publication);
+        assertThat(activity, instanceOf(Work.class));
+
+        Work work = (Work) activity;
+
+        List<ExternalID> externalIds = work.getExternalIdentifiers().getExternalIdentifier();
+        assertThat(externalIds, hasSize(2));
+        assertThat(externalIds, has(selfExternalId("handle", publication.getHandle())));
+        assertThat(externalIds, has(fundedByExternalId("grant_number", "987654",
+            "http://localhost:4000/handle/123456789/0001")));
+    }
+
+    @Test
+    public void testWorkWithFundingEntityWithGrantNumberAndUrlCreation() {
+
+        context.turnOffAuthorisationSystem();
+
+        Item funding = ItemBuilder.createItem(context, publications)
+            .withHandle("123456789/0001")
+            .withTitle("Test funding")
+            .withFundingIdentifier("987654")
+            .withFundingAwardUrl("http://test-funding")
+            .build();
+
+        Item publication = ItemBuilder.createItem(context, publications)
+            .withTitle("Test publication")
+            .withAuthor("Walter White")
+            .withIssueDate("2021-04-30")
+            .withType("Controlled Vocabulary for Resource Type Genres::text::book")
+            .withRelationFunding("Test funding", funding.getID().toString())
+            .withRelationGrantno("123456")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        Activity activity = entityFactoryService.createOrcidObject(context, publication);
+        assertThat(activity, instanceOf(Work.class));
+
+        Work work = (Work) activity;
+
+        List<ExternalID> externalIds = work.getExternalIdentifiers().getExternalIdentifier();
+        assertThat(externalIds, hasSize(2));
+        assertThat(externalIds, has(selfExternalId("handle", publication.getHandle())));
+        assertThat(externalIds, has(fundedByExternalId("grant_number", "987654", "http://test-funding")));
     }
 
     @Test
@@ -201,7 +377,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
         List<ExternalID> externalIds = work.getExternalIdentifiers().getExternalIdentifier();
         assertThat(externalIds, hasSize(1));
-        assertThat(externalIds, has(externalId("handle", publication.getHandle())));
+        assertThat(externalIds, has(selfExternalId("handle", publication.getHandle())));
     }
 
     @Test
@@ -278,9 +454,9 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
         List<ExternalID> externalIds = funding.getExternalIdentifiers().getExternalIdentifier();
         assertThat(externalIds, hasSize(3));
-        assertThat(externalIds, has(externalId("other-id", "888-666-444")));
-        assertThat(externalIds, has(externalId("uri", "www.test.com")));
-        assertThat(externalIds, has(externalId("grant_number", "000-111-333")));
+        assertThat(externalIds, has(selfExternalId("other-id", "888-666-444")));
+        assertThat(externalIds, has(selfExternalId("uri", "www.test.com")));
+        assertThat(externalIds, has(selfExternalId("grant_number", "000-111-333")));
     }
 
     @Test
@@ -324,21 +500,35 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(funding.getExternalIdentifiers().getExternalIdentifier(), empty());
     }
 
-    private Predicate<ExternalID> externalId(String type, String value) {
-        return externalId -> externalId.getRelationship() == Relationship.SELF
+    private Predicate<ExternalID> selfExternalId(String type, String value) {
+        return externalId(type, value, Relationship.SELF);
+    }
+
+    private Predicate<ExternalID> fundedByExternalId(String type, String value) {
+        return externalId(type, value, Relationship.FUNDED_BY)
+            .and(externalId -> externalId.getUrl() == null);
+    }
+
+    private Predicate<ExternalID> fundedByExternalId(String type, String value, String url) {
+        return externalId(type, value, Relationship.FUNDED_BY)
+            .and(externalId -> externalId.getUrl() != null && Objects.equals(url, externalId.getUrl().getValue()));
+    }
+
+    private Predicate<ExternalID> externalId(String type, String value, Relationship relationship) {
+        return externalId -> externalId.getRelationship() == relationship
             && type.equals(externalId.getType())
             && value.equals(externalId.getValue());
     }
 
     private Predicate<Contributor> contributor(String name, ContributorRole role, SequenceType sequence) {
         return contributor -> contributor.getCreditName().getContent().equals(name)
-            && contributor.getContributorAttributes().getContributorRole() == role
+            && role.value().equals(contributor.getContributorAttributes().getContributorRole())
             && contributor.getContributorAttributes().getContributorSequence() == sequence;
     }
 
     private Predicate<FundingContributor> fundingContributor(String name, FundingContributorRole role) {
         return contributor -> contributor.getCreditName().getContent().equals(name)
-            && contributor.getContributorAttributes().getContributorRole() == role;
+            && role.value().equals(contributor.getContributorAttributes().getContributorRole());
     }
 
     private Predicate<FundingContributor> fundingContributor(String name, FundingContributorRole role, String email) {

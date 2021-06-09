@@ -7,6 +7,7 @@
  */
 package org.dspace.app.orcid.model.factory.impl;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Collection;
@@ -213,6 +214,9 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
     }
 
     private Optional<MetadataValue> getMetadataValue(Context context, Item item, String metadataField) {
+        if (isBlank(metadataField)) {
+            return Optional.empty();
+        }
         return itemService.getMetadataByMetadataString(item, metadataField).stream().findFirst()
             .filter(metadataValue -> isNotBlank(metadataValue.getValue()));
     }

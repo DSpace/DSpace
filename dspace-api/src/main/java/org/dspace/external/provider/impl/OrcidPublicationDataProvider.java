@@ -413,7 +413,7 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
 
     private boolean hasRole(Contributor contributor, ContributorRole role) {
         ContributorAttributes attributes = contributor.getContributorAttributes();
-        return attributes != null ? attributes.getContributorRole() == role : false;
+        return attributes != null ? role.value().equals(attributes.getContributorRole()) : false;
     }
 
     private Optional<String> getContributorName(Contributor contributor) {

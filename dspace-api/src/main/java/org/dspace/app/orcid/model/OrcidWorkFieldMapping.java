@@ -58,6 +58,16 @@ public class OrcidWorkFieldMapping {
 
     private Map<String, CSLItemDataCrosswalk> citationCrosswalks;
 
+    private String fundingField;
+
+    private String fundingExternalIdType;
+
+    private String fundingExternalId;
+
+    private String fundingEntityExternalId;
+
+    private String fundingUrlField;
+
     public String convertType(String type) {
         return typeConverter != null ? typeConverter.getValue(type) : type;
     }
@@ -160,6 +170,46 @@ public class OrcidWorkFieldMapping {
 
     public void setSubTitleField(String subTitleField) {
         this.subTitleField = subTitleField;
+    }
+
+    public String getFundingField() {
+        return fundingField;
+    }
+
+    public void setFundingField(String fundingField) {
+        this.fundingField = fundingField;
+    }
+
+    public String getFundingExternalIdType() {
+        return fundingExternalIdType;
+    }
+
+    public void setFundingExternalIdType(String fundingExternalIdType) {
+        this.fundingExternalIdType = fundingExternalIdType;
+    }
+
+    public String getFundingExternalId() {
+        return fundingExternalId;
+    }
+
+    public void setFundingExternalId(String fundingExternalId) {
+        this.fundingExternalId = fundingExternalId;
+    }
+
+    public String getFundingEntityExternalId() {
+        return fundingEntityExternalId;
+    }
+
+    public void setFundingEntityExternalId(String fundingEntityExternalId) {
+        this.fundingEntityExternalId = fundingEntityExternalId;
+    }
+
+    public String getFundingUrlField() {
+        return fundingUrlField;
+    }
+
+    public void setFundingUrlField(String fundingUrlField) {
+        this.fundingUrlField = fundingUrlField;
     }
 
     private Map<String, ContributorRole> parseContributors(String contributors) {
