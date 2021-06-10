@@ -1,0 +1,10 @@
+{
+	"only-year": "@virtual.date.dc-date-issued.yyyy@",
+	"date-without-time": "@virtual.date.dc-date-issued.yyyy-MM-dd@",
+	"another-date-without-time": "@virtual.date.dc-date-issued.yyyy/MM/dd@",
+	"date-with-time": "@virtual.date.dc-date-issued.dd-MM-yyyy HH:mm:ss@",
+	"another-date-with-time": "@virtual.date.dc-date-issued.yyyyMMdd HHmmss@",
+	"current-timestamp": "@virtual.date.timestamp.yyyy-MM-dd@",
+	"current-year": "@virtual.date.timestamp.yyyy@",
+	"repeatable-date": "@virtual.date.dcterms-dateAccepted.yyyy@",
+}
