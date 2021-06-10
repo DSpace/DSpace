@@ -28,15 +28,15 @@ import org.slf4j.LoggerFactory;
  */
 public class VirtualFieldDateFormatter implements VirtualField {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(VirtualFieldDateFormatter.class);
+
+    private final static String CURRENT_TIMESTAMP = "TIMESTAMP";
+
     private ItemService itemService;
 
     public VirtualFieldDateFormatter(ItemService itemService) {
         this.itemService = itemService;
     }
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(VirtualFieldDateFormatter.class);
-
-    private final static String CURRENT_TIMESTAMP = "TIMESTAMP";
 
     @Override
     public String[] getMetadata(Context context, Item item, String fieldName) {

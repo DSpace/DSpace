@@ -53,9 +53,9 @@ public class VirtualFieldDateFormatterIT extends AbstractIntegrationTestWithData
             .withIssueDate("2021-02-13T12:36:50Z")
             .build();
 
-        String[] dates = virtualField.getMetadata(context, item, "virtual.date.dc-date-issued.dd MMM yyyy HH:mm");
+        String[] dates = virtualField.getMetadata(context, item, "virtual.date.dc-date-issued.dd MM yyyy HH:mm");
         assertThat(dates.length, is(1));
-        assertThat(dates[0], is("13 feb 2021 12:36"));
+        assertThat(dates[0], is("13 02 2021 12:36"));
 
     }
 
@@ -66,9 +66,9 @@ public class VirtualFieldDateFormatterIT extends AbstractIntegrationTestWithData
             .withIssueDate("2021-02-13")
             .build();
 
-        String[] dates = virtualField.getMetadata(context, item, "virtual.date.dc-date-issued.dd MMM yyyy HH:mm");
+        String[] dates = virtualField.getMetadata(context, item, "virtual.date.dc-date-issued.dd MM yyyy HH:mm");
         assertThat(dates.length, is(1));
-        assertThat(dates[0], is("13 feb 2021 00:00"));
+        assertThat(dates[0], is("13 02 2021 00:00"));
 
     }
 
@@ -152,6 +152,17 @@ public class VirtualFieldDateFormatterIT extends AbstractIntegrationTestWithData
             .build();
 
         String[] dates = virtualField.getMetadata(context, item, "virtual.date.dc-date-issued.yyyy/MM/dd");
+        assertThat(dates.length, is(0));
+
+    }
+
+    @Test
+    public void testWithInvalidVirtualField() {
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .build();
+
+        String[] dates = virtualField.getMetadata(context, item, "virtual.date.dc-date-issued");
         assertThat(dates.length, is(0));
 
     }
