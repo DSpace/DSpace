@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>Divinity ANZSRC</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>anzsrc</name>
+        <namespace>https://divinity.edu.au/schema/anzsrc</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>anzsrc</schema>
+        <element>for</element>
+        <qualifier>08</qualifier>
+        <scope_note>Field of Research (2008).</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>anzsrc</schema>
+        <element>seo</element>
+        <qualifier>08</qualifier>
+        <scope_note>Socio-economic Objective (2008).</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>anzsrc</schema>
+        <element>toa</element>
+        <qualifier>08</qualifier>
+        <scope_note>Type of Activity (2008).</scope_note>
+    </dc-type>
+
+</dspace-dc-types>

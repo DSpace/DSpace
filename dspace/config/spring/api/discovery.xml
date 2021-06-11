@@ -149,6 +149,11 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <!-- DIVINITY -->
+                <ref bean="searchFilterDivinityFor08"/>
+                <ref bean="searchFilterDivinitySeo08"/>
+                <ref bean="searchFilterDivinityToa08"/>
+                <ref bean="searchFilterDcTermsSubject"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -2144,6 +2149,53 @@
         <property name="isOpenByDefault" value="false"/>
         <property name="pageSize" value="10"/>
     </bean>
+
+
+    <!-- DIVINITY -->
+    <bean id="searchFilterDivinityFor08" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="for08"/>
+        <property name="metadataFields">
+            <list>
+                <value>anzsrc.for.08</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterDivinitySeo08" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="seo08"/>
+        <property name="metadataFields">
+            <list>
+                <value>anzsrc.seo.08</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterDivinityToa08" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="toa08"/>
+        <property name="metadataFields">
+            <list>
+                <value>anzsrc.toa.08</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterDcTermsSubject" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="dcTermsSubject"/>
+        <property name="metadataFields">
+            <list>
+                <value>dcterms.subject</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+    <!-- DIVINITY -->
 
     <!--Sort properties-->
     <bean id="sortScore" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">

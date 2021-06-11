@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+https://www.abs.gov.au/ausstats/abs@.nsf/Previousproducts/1297.0Main%20Features42008?opendocument&tabname=Summary&prodno=1297.0&issue=2008&num=&view=
+-->
+
+<node id="toa08" label="Type of Activity">
+	<isComposedBy>
+		<node id="pbr" label="Pure basic research">
+			<hasNote>Pure basic research is experimental and theoretical work undertaken to acquire new knowledge without looking for long term benefits other than the advancement of knowledge.</hasNote>
+		</node>
+		<node id="sbr" label="Strategic basic research">
+			<hasNote>Strategic basic research is experimental and theoretical work undertaken to acquire new knowledge directed into specified broad areas in the expectation of practical discoveries. It provides the broad base of knowledge necessary for the solution of recognised practical problems.</hasNote>
+		</node>
+		<node id="ar" label="Applied research">
+			<hasNote>Applied research is original work undertaken primarily to acquire new knowledge with a specific application in view. It is undertaken either to determine possible uses for the findings of basic research or to determine new ways of achieving some specific and predetermined objectives.</hasNote>
+		</node>
+		<node id="ed" label="Experimental development">
+			<hasNote>Experimental development is systematic work, using existing knowledge gained from research or practical experience, which is directed to producing new materials, products, devices, policies, behaviours or outlooks; to installing new processes, systems and services; or to improving substantially those already produced or installed.</hasNote>
+		</node>
+	</isComposedBy>
+</node>

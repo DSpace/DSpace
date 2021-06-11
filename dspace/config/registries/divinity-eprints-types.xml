@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>Divinity ePrints</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>eprints</name>
+        <namespace>https://divinity.edu.au/schema/eprints</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>eprints</schema>
+        <element>id</element>
+        <scope_note>The original ePrints ID.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>eprints</schema>
+        <element>uri</element>
+        <scope_note>The original ePrints URI.</scope_note>
+    </dc-type>
+
+</dspace-dc-types>
