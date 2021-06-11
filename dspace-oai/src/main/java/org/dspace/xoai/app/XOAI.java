@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import com.lyncode.xoai.dataprovider.exceptions.ConfigurationException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
 import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
+import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -56,6 +57,7 @@ import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.SolrUtils;
+import org.dspace.utils.DSpace;
 import org.dspace.xoai.exceptions.CompilingException;
 import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
@@ -95,6 +97,8 @@ public class XOAI {
     private final static ConfigurationService configurationService = DSpaceServicesFactory
             .getInstance().getConfigurationService();
 
+    private List<XOAIExtensionItemCompilePlugin> extensionPlugins;
+
     private List<String> getFileFormats(Item item) {
         List<String> formats = new ArrayList<>();
         try {
@@ -120,6 +124,8 @@ public class XOAI {
         // Load necessary DSpace services
         this.authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         this.itemService = ContentServiceFactory.getInstance().getItemService();
+        this.extensionPlugins = new DSpace().getServiceManager()
+                .getServicesByType(XOAIExtensionItemCompilePlugin.class);
     }
 
     public XOAI(Context ctx, boolean hasOption) {
@@ -129,6 +135,8 @@ public class XOAI {
         // Load necessary DSpace services
         this.authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         this.itemService = ContentServiceFactory.getInstance().getItemService();
+        this.extensionPlugins = new DSpace().getServiceManager()
+                .getServicesByType(XOAIExtensionItemCompilePlugin.class);
     }
 
     private void println(String line) {
@@ -455,7 +463,14 @@ public class XOAI {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         XmlOutputContext xmlContext = XmlOutputContext.emptyContext(out, Second);
-        retrieveMetadata(context, item).write(xmlContext);
+        Metadata metadata = retrieveMetadata(context, item);
+
+        // Do any additional metadata element, depends on the plugins
+        for (XOAIExtensionItemCompilePlugin plugin : extensionPlugins) {
+            metadata = plugin.additionalMetadata(context, metadata, item);
+        }
+
+        metadata.write(xmlContext);
         xmlContext.getWriter().flush();
         xmlContext.getWriter().close();
         doc.addField("item.compile", out.toString());
@@ -698,4 +713,5 @@ public class XOAI {
             System.out.println("     -h Shows this text");
         }
     }
+
 }
