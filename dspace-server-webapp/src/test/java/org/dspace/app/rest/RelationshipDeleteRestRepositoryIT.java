@@ -23,6 +23,7 @@ import java.util.List;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.content.Collection;
@@ -868,10 +869,94 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
     }
 
     @Test
-    public void deleteItemCopyVirtualMetadataAllInsufficientPermissions() throws Exception {
+    public void deleteItemCopyVirtualMetadataAllAsCollectionAdmin() throws Exception {
         initPersonProjectPublication();
 
         getClient(getAuthToken(collectionAdmin.getEmail(), password)).perform(
+            delete("/api/core/items/" + personItem.getID()))
+            .andExpect(status().isNoContent());
+
+        publicationItem = itemService.find(context, publicationItem.getID());
+        List<MetadataValue> publicationAuthorList =
+            itemService.getMetadata(publicationItem, "dc", "contributor", "author", Item.ANY);
+        assertThat(publicationAuthorList.size(), equalTo(0));
+        List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
+            "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
+        assertThat(publicationRelationships.size(), equalTo(0));
+
+        projectItem = itemService.find(context, projectItem.getID());
+        List<MetadataValue> projectAuthorList =
+            itemService.getMetadata(projectItem, "dc", "contributor", "author", Item.ANY);
+        assertThat(projectAuthorList.size(), equalTo(0));
+        List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
+            "relation", "isPersonOfProject", Item.ANY, Item.ANY);
+        assertThat(projectRelationships.size(), equalTo(0));
+    }
+
+    @Test
+    public void deleteItemCopyVirtualMetadataTypeAsCollectionAdmin() throws Exception {
+        initPersonProjectPublication();
+
+        getClient(getAuthToken(collectionAdmin.getEmail(), password)).perform(
+            delete("/api/core/items/" + personItem.getID()
+                + "?copyVirtualMetadata=" + publicationPersonRelationshipType.getID()))
+            .andExpect(status().isNoContent());
+
+        publicationItem = itemService.find(context, publicationItem.getID());
+        List<MetadataValue> publicationAuthorList =
+            itemService.getMetadata(publicationItem, "dc", "contributor", "author", Item.ANY);
+        assertThat(publicationAuthorList.size(), equalTo(1));
+        assertThat(publicationAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
+        assertThat(publicationAuthorList.get(0).getAuthority(), equalTo(null));
+        List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
+            "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
+        assertThat(publicationRelationships.size(), equalTo(1));
+
+        projectItem = itemService.find(context, projectItem.getID());
+        List<MetadataValue> projectAuthorList =
+            itemService.getMetadata(projectItem, "dc", "contributor", "author", Item.ANY);
+        assertThat(projectAuthorList.size(), equalTo(0));
+        List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
+            "relation", "isPersonOfProject", Item.ANY, Item.ANY);
+        assertThat(projectRelationships.size(), equalTo(0));
+    }
+
+    /**
+     * Create a collection admin that is unrelated to {@link #collection}.
+     * @return an EPerson
+     */
+    protected EPerson createOtherCollectionAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson otherCollectionAdmin = EPersonBuilder.createEPerson(context)
+            .withNameInMetadata("other", "col admin")
+            .withCanLogin(true)
+            .withEmail("otherCollectionAdmin@email.com")
+            .withPassword(password)
+            .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+            .build();
+
+        Community otherCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Other Community")
+            .build();
+
+        CollectionBuilder.createCollection(context, otherCommunity)
+            .withName("Other Collection")
+            .withAdminGroup(otherCollectionAdmin)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        return otherCollectionAdmin;
+    }
+
+    @Test
+    public void deleteItemCopyVirtualMetadataAllInsufficientPermissions() throws Exception {
+        initPersonProjectPublication();
+
+        EPerson otherCollectionAdmin = createOtherCollectionAdmin();
+
+        getClient(getAuthToken(otherCollectionAdmin.getEmail(), password)).perform(
             delete("/api/core/items/" + personItem.getID()))
             .andExpect(status().isForbidden());
 
@@ -900,7 +985,9 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
     public void deleteItemCopyVirtualMetadataTypeInsufficientPermissions() throws Exception {
         initPersonProjectPublication();
 
-        getClient(getAuthToken(collectionAdmin.getEmail(), password)).perform(
+        EPerson otherCollectionAdmin = createOtherCollectionAdmin();
+
+        getClient(getAuthToken(otherCollectionAdmin.getEmail(), password)).perform(
             delete("/api/core/items/" + personItem.getID()
                 + "?copyVirtualMetadata=" + publicationPersonRelationshipType.getID()))
             .andExpect(status().isForbidden());
