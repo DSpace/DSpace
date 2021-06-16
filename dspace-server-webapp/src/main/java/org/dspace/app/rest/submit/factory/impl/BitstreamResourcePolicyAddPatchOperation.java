@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.rest.model.UploadBitstreamAccessConditionDTO;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.authorize.service.AuthorizeService;
@@ -57,23 +58,23 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
         Iterator<UploadConfiguration> uploadConfigs = uploadConfigsCollection.iterator();
         for (Bundle bb : bundle) {
             int idx = 0;
-            for (Bitstream b : bb.getBitstreams()) {
+            for (Bitstream bitstream : bb.getBitstreams()) {
                 if (idx == Integer.parseInt(split[1])) {
 
                     List<UploadBitstreamAccessConditionDTO> newAccessConditions =
                                                             new ArrayList<UploadBitstreamAccessConditionDTO>();
                     if (split.length == 3) {
-                        authorizeService.removePoliciesActionFilter(context, b, Constants.READ);
+                        authorizeService.removePoliciesActionFilter(context, bitstream, Constants.READ);
                         newAccessConditions = evaluateArrayObject((LateObjectEvaluator) value);
                     } else if (split.length == 4) {
                         // contains "-", call index-based accessConditions it make not sense
                         newAccessConditions.add(evaluateSingleObject((LateObjectEvaluator) value));
                     }
 
-                    for (UploadBitstreamAccessConditionDTO newAccessCondition : newAccessConditions) {
-                        // TODO manage duplicate policy
-                        BitstreamResourcePolicyUtils.findApplyResourcePolicy(context, uploadConfigs,
-                                b, newAccessCondition);
+                    // TODO manage duplicate policy
+                    if (CollectionUtils.isNotEmpty(newAccessConditions)) {
+                        BitstreamResourcePolicyUtils.findApplyResourcePolicy(context, uploadConfigs, bitstream,
+                                                                             newAccessConditions);
                     }
                 }
                 idx++;
