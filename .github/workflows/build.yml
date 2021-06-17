@@ -62,8 +62,10 @@ jobs:
           TEST_FLAGS: ${{ matrix.mvnflags }}
         run: mvn install -B -V -P-assembly -Pcoverage-report $TEST_FLAGS
 
-      # Save results of tests to downloadable artifact for this job
-      - name: Archive Results of ${{ matrix.type }}
+      # If previous step failed, save results of tests to downloadable artifact for this job
+      # (This artifact is downloadable at the bottom of any job's summary page)
+      - name: Upload Results of ${{ matrix.type }} to Artifact
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.type }} results
