@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -71,17 +72,22 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public Process create(Context context, EPerson ePerson, String scriptName,
-                          List<DSpaceCommandLineParameter> parameters) throws SQLException {
+                          List<DSpaceCommandLineParameter> parameters,
+                          final List<Group> specialGroups) throws SQLException {
 
         Process process = new Process();
         process.setEPerson(ePerson);
         process.setName(scriptName);
         process.setParameters(DSpaceCommandLineParameter.concatenate(parameters));
         process.setCreationTime(new Date());
-        Set<Group> specialGroups = new HashSet<Group>(context.getSpecialGroups());
-        for (Group group : specialGroups) {
-            process.addGroup(group);
-        }
+        Optional.ofNullable(specialGroups)
+                .ifPresent(sg -> {
+                    Set<Group> specialGroupsSet = new HashSet<Group>(sg);
+                    for (Group group : specialGroupsSet) {
+                        process.addGroup(group);
+                    }
+                });
+
         Process createdProcess = processDAO.create(context, process);
         log.info(LogManager.getHeader(context, "process_create",
                                       "Process has been created for eperson with email " + ePerson.getEmail()

@@ -9,6 +9,7 @@ package org.dspace.proccess;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -29,21 +30,22 @@ import org.junit.Test;
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class ProccessIT extends AbstractIntegrationTestWithDatabase {
+public class ProcessIT extends AbstractIntegrationTestWithDatabase {
 
     protected ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
     @Test
-    public void checkProccessGroupsTest() throws Exception {
+    public void checkProcessGroupsTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Group groupA = GroupBuilder.createGroup(context)
                                    .withName("Group A")
                                    .addMember(admin)
                                    .build();
 
-        context.setSpecialGroup(groupA.getID());
-        Process processA = ProcessBuilder.createProcess(context, admin, "mock-script", new LinkedList<>()).build();
+        Process processA = ProcessBuilder.createProcess(context, admin, "mock-script",
+                                                        new LinkedList<>(),
+                                                        Collections.singletonList(groupA)).build();
 
         context.restoreAuthSystemState();
         Process process = processService.find(context, processA.getID());
@@ -66,8 +68,9 @@ public class ProccessIT extends AbstractIntegrationTestWithDatabase {
                                    .addMember(admin).build();
 
         UUID groupUuid = groupA.getID();
-        context.setSpecialGroup(groupA.getID());
-        Process processA = ProcessBuilder.createProcess(context, admin, "mock-script", new LinkedList<>()).build();
+//        context.setSpecialGroup(groupA.getID());
+        Process processA = ProcessBuilder.createProcess(context, admin, "mock-script", new LinkedList<>(),
+                                                        Collections.singletonList(groupA)).build();
 
         context.restoreAuthSystemState();
 
