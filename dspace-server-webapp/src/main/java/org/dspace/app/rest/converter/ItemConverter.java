@@ -37,6 +37,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutFieldMetadata;
+import org.dspace.layout.CrisMetadataGroup;
 import org.dspace.layout.LayoutSecurity;
 import org.dspace.layout.service.CrisLayoutBoxAccessService;
 import org.dspace.layout.service.CrisLayoutBoxService;
@@ -234,13 +235,20 @@ public class ItemConverter
         for (CrisLayoutBox box : boxes) {
             List<CrisLayoutField> crisLayoutFields = box.getLayoutFields();
             for (CrisLayoutField field : crisLayoutFields) {
-                if (field instanceof CrisLayoutFieldMetadata && field.getMetadataField().equals(metadataField)
-                        && box.getSecurity() != LayoutSecurity.PUBLIC.getValue()) {
-                    boxesWithMetadataField.add(box);
+                checkField(metadataField, boxesWithMetadataField, box, field.getMetadataField());
+                for (CrisMetadataGroup metadataGroup : field.getCrisMetadataGroupList()) {
+                    checkField(metadataField, boxesWithMetadataField, box, metadataGroup.getMetadataField());
                 }
             }
         }
         return boxesWithMetadataField;
+    }
+
+    private void checkField(MetadataField metadataField, List<CrisLayoutBox> boxesWithMetadataField, CrisLayoutBox box,
+            MetadataField field) {
+        if (field.equals(metadataField) && box.getSecurity() != LayoutSecurity.PUBLIC.getValue()) {
+            boxesWithMetadataField.add(box);
+        }
     }
 
     private boolean isPublicMetadataField(MetadataField metadataField, List<MetadataField> allPublicMetadata) {

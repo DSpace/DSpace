@@ -2077,4 +2077,105 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
 
     }
 
+    @Test
+    public void configurationContainLayoutSecurityWithNestedFieldAdministratorTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withTitle("Public item A")
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Smith, Maria")
+                                .withPersonEducation("School")
+                                .withPersonEducationStartDate("2010-09-15")
+                                .withPersonEducationEndDate("2015-06-24")
+                                .build();
+
+        itemService.addMetadata(context, itemA, "dc", "description", "abstract", null, "A secured abstract");
+
+        MetadataField abs = mfss.findByElement(context, "dc", "description", "abstract");
+        MetadataField title = mfss.findByElement(context, "dc", "title", null);
+        MetadataField education = mfss.findByElement(context, "crisrp", "education", null);
+
+        MetadataField educationStart = mfss.findByElement(context, "crisrp", "education", "start");
+        MetadataField educationEnd = mfss.findByElement(context, "crisrp", "education", "end");
+
+        List<MetadataField> crisMetadataGroup = new ArrayList<MetadataField>();
+        crisMetadataGroup.add(educationStart);
+        crisMetadataGroup.add(educationEnd);
+
+        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+                                                 .withShortname("box-shortname-one")
+                                                 .withSecurity(LayoutSecurity.ADMINISTRATOR)
+                                                 .build();
+
+        CrisLayoutFieldBuilder.createMetadataField(context, abs, 0, 0)
+                              .withLabel("LABEL ABS")
+                              .withRendering("RENDERIGN ABS")
+                              .withStyle("STYLE")
+                              .withBox(box1)
+                              .build();
+
+        CrisLayoutFieldBuilder.createMetadataField(context, education, 0, 0)
+                              .withLabel("LABEL Education")
+                              .withRendering("RENDERIGN Education")
+                              .withStyle("STYLE")
+                              .withBox(box1)
+                              .withNestedField(crisMetadataGroup)
+                              .build();
+
+        CrisLayoutBox box2 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+                                                 .withShortname("box-shortname-two")
+                                                 .withSecurity(LayoutSecurity.PUBLIC)
+                                                 .build();
+
+        CrisLayoutFieldBuilder.createMetadataField(context, title, 0, 0)
+                              .withLabel("LABEL TITLE")
+                              .withRendering("RENDERIGN TITLE")
+                              .withStyle("STYLE")
+                              .withBox(box2)
+                              .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        // An admin can see the dc.description.abstract metadata
+        getClient(tokenAdmin).perform(get("/api/core/items/" + itemA.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.metadata['dc.description.abstract'].[0].value", is ("A secured abstract")))
+                 .andExpect(jsonPath("$.metadata['crisrp.education'].[0].value", is ("School")))
+                 .andExpect(jsonPath("$.metadata['crisrp.education.start'].[0].value", is ("2010-09-15")))
+                 .andExpect(jsonPath("$.metadata['crisrp.education.end'].[0].value", is ("2015-06-24")))
+                 .andExpect(jsonPath("$.metadata['dc.title'].[0].value", is ("Public item A")));
+
+        // An user who is not admin can not see the dc.description.abstract metadata
+        getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.metadata['dc.title'].[0].value", is ("Public item A")))
+                               .andExpect(jsonPath("$.metadata['crisrp.education']").doesNotExist())
+                               .andExpect(jsonPath("$.metadata['crisrp.education.start']").doesNotExist())
+                               .andExpect(jsonPath("$.metadata['crisrp.education.end']").doesNotExist())
+                               .andExpect(jsonPath("$.metadata['dc.description.abstract']").doesNotExist());
+
+        // An anonymous user can not see the dc.description.abstract metadata
+        getClient().perform(get("/api/core/items/" + itemA.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata['dc.title'].[0].value",is ("Public item A")))
+                   .andExpect(jsonPath("$.metadata['crisrp.education']").doesNotExist())
+                   .andExpect(jsonPath("$.metadata['crisrp.education.start']").doesNotExist())
+                   .andExpect(jsonPath("$.metadata['crisrp.education.end']").doesNotExist())
+                   .andExpect(jsonPath("$.metadata['dc.description.abstract']").doesNotExist());
+    }
+
 }
