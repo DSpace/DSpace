@@ -235,9 +235,11 @@ public class ItemConverter
         for (CrisLayoutBox box : boxes) {
             List<CrisLayoutField> crisLayoutFields = box.getLayoutFields();
             for (CrisLayoutField field : crisLayoutFields) {
-                checkField(metadataField, boxesWithMetadataField, box, field.getMetadataField());
-                for (CrisMetadataGroup metadataGroup : field.getCrisMetadataGroupList()) {
-                    checkField(metadataField, boxesWithMetadataField, box, metadataGroup.getMetadataField());
+                if (field instanceof CrisLayoutFieldMetadata) {
+                    checkField(metadataField, boxesWithMetadataField, box, field.getMetadataField());
+                    for (CrisMetadataGroup metadataGroup : field.getCrisMetadataGroupList()) {
+                        checkField(metadataField, boxesWithMetadataField, box, metadataGroup.getMetadataField());
+                    }
                 }
             }
         }
