@@ -82,6 +82,19 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         }
     }
 
+    public RestDSpaceRunnableHandler(Context context, String scriptName, List<DSpaceCommandLineParameter> parameters) {
+        try {
+            ePersonId = context.getCurrentUser().getID();
+            Process process = processService.create(context, context.getCurrentUser(), scriptName, parameters);
+            processId = process.getID();
+            this.scriptName = process.getName();
+        } catch (SQLException e) {
+            log.error("RestDSpaceRunnableHandler with ePerson: " + context.getCurrentUser().getEmail() +
+                      " for Script with name: " + scriptName +
+                      " and parameters: " + parameters + " could nto be created", e);
+        }
+    }
+
     @Override
     public void start() {
         Context context = new Context();

@@ -78,7 +78,8 @@ public class ProcessServiceImpl implements ProcessService {
         process.setName(scriptName);
         process.setParameters(DSpaceCommandLineParameter.concatenate(parameters));
         process.setCreationTime(new Date());
-        for (Group group : context.getSpecialGroups()) {
+        Set<Group> specialGroups = new HashSet<Group>(context.getSpecialGroups());
+        for (Group group : specialGroups) {
             process.addGroup(group);
         }
         Process createdProcess = processDAO.create(context, process);
