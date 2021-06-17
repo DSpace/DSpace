@@ -1877,6 +1877,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     public void createSingleWorkspaceItemWithTemplate() throws Exception {
         context.turnOffAuthorisationSystem();
 
+        EPerson user = EPersonBuilder.createEPerson(context)
+                                     .withNameInMetadata("Andrea", "Lenci")
+                                     .withEmail("andrea.lenci@test.com")
+                                     .withPassword(password)
+                                     .build();
+
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
@@ -1888,26 +1894,39 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .withEntityType("Publication")
                                            .withSubmissionDefinition("traditional")
                                            .withTemplateItem()
-                                           .withSubmitterGroup(eperson)
+                                           .withSubmitterGroup(user)
                                            .build();
+
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("Tets-Group")
+                                  .build();
 
         itemService.addMetadata(context, col1.getTemplateItem(), "dc", "title", null, null, "SimpleTitle");
         itemService.addMetadata(context, col1.getTemplateItem(), "dc", "date", "issued", null, "###DATE.yyyy-MM-dd###");
+        itemService.addMetadata(context, col1.getTemplateItem(),
+                                "cris", "policy", "eperson", null, "###CURRENTUSER###");
+        itemService.addMetadata(context, col1.getTemplateItem(),
+                                "cris", "policy", "group", null, "###GROUP.Tets-Group###");
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(user.getEmail(), password);
 
         context.restoreAuthSystemState();
 
         final String today = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now());
 
         getClient(authToken).perform(post("/api/submission/workspaceitems")
-                                         .param("owningCollection", col1.getID().toString())
-                                         .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
-                            .andExpect(status().isCreated())
-                            .andExpect(jsonPath("$._embedded.item.metadata['dc.title'][0].value", is("SimpleTitle")))
-                            .andExpect(jsonPath("$._embedded.item.metadata['dc.date.issued'][0].value",
-                                                is(today)))
-                            .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())));
+                            .param("owningCollection", col1.getID().toString())
+                            .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$._embedded.item.metadata['dc.title'][0].value", is("SimpleTitle")))
+                .andExpect(jsonPath("$._embedded.item.metadata['dc.date.issued'][0].value", is(today)))
+                .andExpect(jsonPath("$._embedded.item.metadata['cris.policy.eperson'][0].value", is(user.getEmail())))
+                .andExpect(jsonPath("$._embedded.item.metadata['cris.policy.eperson'][0].authority",
+                                 is(user.getID().toString())))
+                .andExpect(jsonPath("$._embedded.item.metadata['cris.policy.group'][0].value", is(group.getName())))
+                .andExpect(jsonPath("$._embedded.item.metadata['cris.policy.group'][0].authority",
+                                 is(group.getID().toString())))
+                .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())));
     }
 
     @Test
