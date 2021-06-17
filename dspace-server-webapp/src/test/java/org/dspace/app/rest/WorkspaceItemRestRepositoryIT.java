@@ -5247,4 +5247,56 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
     }
 
+    @Test
+    public void patchUploadAddMultiAccessConditionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                              .withTitle("Test WorkspaceItem")
+                                              .withIssueDate("2019-10-01")
+                                              .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
+                                              .build();
+
+        context.restoreAuthSystemState();
+
+        // create a list of values to use in add operation
+        List<Operation> addAccessCondition = new ArrayList<>();
+        List<Map<String, String>> values = new ArrayList<Map<String,String>>();
+        Map<String, String> value = new HashMap<>();
+        value.put("name", "openaccess");
+
+        Map<String, String> value2 = new HashMap<>();
+        value2.put("name", "administrator");
+
+        values.add(value);
+        values.add(value2);
+
+        addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions", values));
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                            .content(getPatchContent(addAccessCondition))
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name", is("openaccess")))
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[1].name", is("administrator")));
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name", is("openaccess")))
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[1].name", is("administrator")));
+
+    }
+
 }
