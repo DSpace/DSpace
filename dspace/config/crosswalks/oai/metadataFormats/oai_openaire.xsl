@@ -90,7 +90,9 @@
             <!-- oaire:citation* -->
             <xsl:apply-templates
                 select="doc:metadata/doc:element[@name='oaire']/doc:element[@name='citation']" mode="oaire"/>
-
+            <!-- CREATIVE COMMON LICENSE -->
+            <xsl:apply-templates
+                select="doc:metadata/doc:element[@name='others']/doc:element[@name='cc']" mode="oaire" />
         </oaire:resource>
     </xsl:template>
 
@@ -641,9 +643,9 @@
                 <xsl:with-param name="value" select="$rightsValue"/>
             </xsl:call-template>
         </xsl:variable>
-		<!-- We are checking to ensure that only values ending in "access" can be used as datacite:rights. 
-		This is a valid solution as we pre-normalize dc.rights values in openaire4.xsl to end in the term 
-		"access" according to COAR Controlled Vocabulary -->
+        <!-- We are checking to ensure that only values ending in "access" can be used as datacite:rights. 
+        This is a valid solution as we pre-normalize dc.rights values in openaire4.xsl to end in the term 
+        "access" according to COAR Controlled Vocabulary -->
         <xsl:if test="ends-with($lc_rightsValue,'access')">
             <datacite:rights>
                 <xsl:if test="$rightsURI">
@@ -1642,7 +1644,25 @@
         </xsl:if>
     </xsl:template>
 
-
+    <!-- Prepare data for CC License -->
+    <xsl:variable name="ccstart">
+        <xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']/doc:element/doc:field[@name='value']/text()"/>
+    </xsl:variable>
+    
+    <xsl:template
+        match="doc:element[@name='others']/doc:element[@name='cc']"
+        mode="oaire">
+        <oaire:licenseCondition>
+            <xsl:attribute name="startDate">
+                <xsl:value-of
+                    select="$ccstart"/>
+            </xsl:attribute>
+            <xsl:attribute name="uri">
+                <xsl:value-of select="./doc:field[@name='uri']/text()" />
+            </xsl:attribute>
+            <xsl:value-of select="./doc:field[@name='name']/text()" />
+        </oaire:licenseCondition>
+    </xsl:template>
 
     <!-- ignore all non specified text values or attributes -->
     <xsl:template match="text()|@*"/>
