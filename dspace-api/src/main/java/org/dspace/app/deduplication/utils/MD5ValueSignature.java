@@ -6,20 +6,30 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.deduplication.utils;
-
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
+import com.ibm.icu.text.Normalizer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 public class MD5ValueSignature implements Signature {
     public static final char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
@@ -38,7 +48,20 @@ public class MD5ValueSignature implements Signature {
 
     protected String prefix;
 
+    private String normalizationRegexp;
+
+    private boolean caseSensitive;
+
+    private boolean useCollection;
+
+    private boolean useEntityType = true;
+
     private ItemService itemService;
+
+    protected WorkflowItemService<?> workflowItemService = WorkflowServiceFactory.getInstance()
+                                                                                 .getWorkflowItemService();
+
+    protected WorkspaceItemService  wsItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
     public List<String> getSignature(DSpaceObject item, Context context) {
         List<String> result = new ArrayList<String>();
@@ -72,7 +95,59 @@ public class MD5ValueSignature implements Signature {
     }
 
     protected String normalize(DSpaceObject item, Context context, String value) {
-        return normalize(item, value);
+        if (value != null) {
+            String temp = StringUtils.EMPTY;
+            String entityType = StringUtils.EMPTY;
+            String result = value;
+            if (StringUtils.isEmpty(value)) {
+                if (StringUtils.isNotEmpty(prefix)) {
+                    result = prefix + item.getID();
+                } else {
+                    result = "entity:" + item.getID();
+                }
+            } else {
+                for (String prefix : ignorePrefix) {
+                    if (value.startsWith(prefix)) {
+                        result = value.substring(prefix.length());
+                        break;
+                    }
+                }
+                if (StringUtils.isNotEmpty(prefix)) {
+                    result = prefix + result;
+                }
+            }
+
+            if (Objects.nonNull(item) && this.useCollection) {
+                DSpaceObject parent = getParent(context, item);
+                if (Objects.nonNull(parent)) {
+                    temp = parent.getID().toString();
+                }
+                if (this.useEntityType) {
+                    entityType = getItemService().getMetadataFirstValue((Item) item, "dspace", "entity", "type", null);
+                }
+            }
+            String norm = result;
+            if (StringUtils.isNotBlank(this.normalizationRegexp)) {
+                norm = Normalizer.normalize(result, Normalizer.NFD);
+                CharsetDetector cd = new CharsetDetector();
+                cd.setText(result.getBytes());
+                CharsetMatch detect = cd.detect();
+                if (detect != null && detect.getLanguage() != null) {
+                    norm = norm.replaceAll(this.normalizationRegexp, "");
+                    if (this.caseSensitive) {
+                        norm = norm.toLowerCase(new Locale(detect.getLanguage()));
+                    }
+                } else {
+                    norm = norm.replaceAll(this.normalizationRegexp, "");
+                    if (this.caseSensitive) {
+                        norm = norm.toLowerCase();
+                    }
+                }
+            }
+            return (temp + entityType + norm).trim();
+        } else {
+            return "item:" + item.getID();
+        }
     }
 
     protected String normalize(DSpaceObject item, String value) {
@@ -96,6 +171,26 @@ public class MD5ValueSignature implements Signature {
         }
 
         return result;
+    }
+
+    private DSpaceObject getParent(Context context, DSpaceObject obj) {
+        Item item = (Item) obj;
+        try {
+            if (item.isArchived()) {
+                return getItemService().getParentObject(context, item);
+            }
+            WorkflowItem workflowItem = workflowItemService.findByItem(context, item);
+            if (Objects.nonNull(workflowItem)) {
+                return workflowItem.getCollection();
+            }
+            WorkspaceItem wsItem = wsItemService.findByItem(context, item);
+            if (Objects.nonNull(wsItem)) {
+                return wsItem.getCollection();
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return null;
     }
 
     protected String getSingleValue(DSpaceObject item, String metadata) {
@@ -137,14 +232,6 @@ public class MD5ValueSignature implements Signature {
         this.ignorePrefix = ignorePrefix;
     }
 
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
-
     public String getSignatureType() {
         return signatureType;
     }
@@ -159,4 +246,37 @@ public class MD5ValueSignature implements Signature {
         }
         return itemService;
     }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    public String getNormalizationRegexp() {
+        return normalizationRegexp;
+    }
+
+    public void setNormalizationRegexp(String normalizationRegexp) {
+        this.normalizationRegexp = normalizationRegexp;
+    }
+
+    public boolean isUseCollection() {
+        return useCollection;
+    }
+
+    public void setUseCollection(boolean useCollection) {
+        this.useCollection = useCollection;
+    }
+
+    public boolean isUseEntityType() {
+        return useEntityType;
+    }
+
+    public void setUseEntityType(boolean useEntityType) {
+        this.useEntityType = useEntityType;
+    }
+
 }
