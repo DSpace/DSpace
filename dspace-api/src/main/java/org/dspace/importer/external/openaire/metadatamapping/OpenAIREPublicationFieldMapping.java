@@ -14,15 +14,15 @@ import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping
 
 /**
  * An implementation of {@link AbstractMetadataFieldMapping} responsible for
- * defining the mapping of the OpenAIRE project metadatum fields on the DSpace
- * metadatum fields
+ * defining the mapping of the OpenAIRE metadatum fields on the DSpace metadatum
+ * fields
  * 
  * @author Mykhaylo Boychuk (4science.it)
  */
-public class OpenAIREProjectFieldMapping extends AbstractMetadataFieldMapping {
+public class OpenAIREPublicationFieldMapping extends AbstractMetadataFieldMapping {
 
     @Override
-    @Resource(name = "openaireProjectsMetadataFieldMap")
+    @Resource(name = "openairePublicationsMetadataFieldMap")
     public void setMetadataFieldMap(Map metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }

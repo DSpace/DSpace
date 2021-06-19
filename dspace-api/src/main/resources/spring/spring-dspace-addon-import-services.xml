@@ -198,9 +198,9 @@
 
     <bean id="OpenAIREService"
           class="org.dspace.importer.external.openAire.service.OpenAireProjectImportMetadataSourceServiceImpl" scope="singleton">
-          <property name="metadataFieldMapping" ref="openaireMetadataFieldMapping"/>
+          <property name="metadataFieldMapping" ref="openaireProjectMetadataFieldMapping"/>
     </bean>
-    <bean id="openaireMetadataFieldMapping"
+    <bean id="openaireProjectMetadataFieldMapping"
           class="org.dspace.importer.external.openaire.metadatamapping.OpenAIREProjectFieldMapping">
     </bean>
 
@@ -225,13 +225,16 @@
 
     <bean id="openaireImportServiceByAuthor"
           class="org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl" scope="singleton">
-        <property name="metadataFieldMapping" ref="openaireMetadataFieldMapping"/>
+        <property name="metadataFieldMapping" ref="openairePublicationMetadataFieldMapping"/>
         <property name="queryParam" value="author"/>
     </bean>
     <bean id="openaireImportServiceByTitle"
           class="org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl" scope="singleton">
-        <property name="metadataFieldMapping" ref="openaireMetadataFieldMapping"/>
+        <property name="metadataFieldMapping" ref="openairePublicationMetadataFieldMapping"/>
         <property name="queryParam" value="title"/>
+    </bean>
+    <bean id="openairePublicationMetadataFieldMapping"
+          class="org.dspace.importer.external.openaire.metadatamapping.OpenAIREPublicationFieldMapping">
     </bean>
 
     <bean id="grobidImportMetadataSourceService" class="org.dspace.submit.extraction.GrobidImportMetadataSourceServiceImpl">
