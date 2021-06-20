@@ -122,9 +122,10 @@ public class MD5ValueSignature implements Signature {
                 if (Objects.nonNull(parent)) {
                     temp = parent.getID().toString();
                 }
-                if (this.useEntityType) {
-                    entityType = getItemService().getMetadataFirstValue((Item) item, "dspace", "entity", "type", null);
-                }
+            }
+            if (Objects.nonNull(item) && this.useEntityType) {
+                entityType = getItemService().getMetadataFirstValue((Item) item, "dspace", "entity",
+                        "type", null);
             }
             String norm = result;
             if (StringUtils.isNotBlank(this.normalizationRegexp)) {
@@ -134,12 +135,12 @@ public class MD5ValueSignature implements Signature {
                 CharsetMatch detect = cd.detect();
                 if (detect != null && detect.getLanguage() != null) {
                     norm = norm.replaceAll(this.normalizationRegexp, "");
-                    if (this.caseSensitive) {
+                    if (!this.caseSensitive) {
                         norm = norm.toLowerCase(new Locale(detect.getLanguage()));
                     }
                 } else {
                     norm = norm.replaceAll(this.normalizationRegexp, "");
-                    if (this.caseSensitive) {
+                    if (!this.caseSensitive) {
                         norm = norm.toLowerCase();
                     }
                 }

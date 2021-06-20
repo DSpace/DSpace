@@ -22,7 +22,7 @@
 	</bean>
 
 	<bean class="org.dspace.app.deduplication.utils.MD5ValueSignature" name="TitleSignaturePlugin">
-		<property name="normalizationRegexp" value="[^\\p{L}]" />
+		<property name="normalizationRegexp" value="[^\p{L}]" />
 		<property name="signatureType" value="title" />
 		<property name="metadata" value="dc.title" />
 		<property name="resourceTypeID" value="2" />
