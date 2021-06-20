@@ -1,0 +1,623 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node id="oecd" label="oecd">
+  <isComposedBy>
+    <node id="1.00.00" label="Natural sciences">
+      <isComposedBy>
+        <node id="1.01.00" label="Mathematics">
+          <isComposedBy>
+            <node id="1.01.01" label="Pure mathematics">
+            </node>
+            <node id="1.01.02" label="Applied mathematics">
+            </node>
+            <node id="1.01.03" label="Statistics and probability">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="1.02.00" label="Computer and information sciences">
+          <isComposedBy>
+            <node id="1.02.01" label="Computer sciences">
+            </node>
+            <node id="1.02.02" label="Information science">
+            </node>
+            <node id="1.02.03" label="Bioinformatics">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="1.03.00" label="Physical sciences">
+          <isComposedBy>
+            <node id="1.03.01" label="Atomic, molecular and chemical physics">
+            </node>
+            <node id="1.03.02" label="Condensed matter physics">
+            </node>
+            <node id="1.03.03" label="Particles and fields physics">
+            </node>
+            <node id="1.03.04" label="Nuclear physics">
+            </node>
+            <node id="1.03.05" label="Fluids and plasma physics">
+            </node>
+            <node id="1.03.06" label="Optics">
+            </node>
+            <node id="1.03.07" label="Acoustics">
+            </node>
+            <node id="1.03.08" label="Astronomy">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="1.04.00" label="Chemical sciences">
+          <isComposedBy>
+            <node id="1.04.01" label="Organic chemistry">
+            </node>
+            <node id="1.04.02" label="Inorganic and nuclear chemistry">
+            </node>
+            <node id="1.04.03" label="Physical chemistry">
+            </node>
+            <node id="1.04.04" label="Polymer science">
+            </node>
+            <node id="1.04.05" label="Electrochemistry">
+            </node>
+            <node id="1.04.06" label="Colloid chemistry">
+            </node>
+            <node id="1.04.07" label="Analytical chemistry">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="1.05.00" label="Earth and related Environmental sciences ">
+          <isComposedBy>
+            <node id="1.05.01" label="Geosciences, multidisciplinary">
+            </node>
+            <node id="1.05.02" label="Mineralogy">
+            </node>
+            <node id="1.05.03" label="Palaeontology">
+            </node>
+            <node id="1.05.04" label="Geochemistry and geophysics">
+            </node>
+            <node id="1.05.05" label="Physical geography">
+            </node>
+            <node id="1.05.06" label="Geology">
+            </node>
+            <node id="1.05.07" label="Volcanology">
+            </node>
+            <node id="1.05.08" label="Environmental sciences">
+            </node>
+            <node id="1.05.09" label="Meteorology and atmospheric sciences">
+            </node>
+            <node id="1.05.10" label="climatic research">
+            </node>
+            <node id="1.05.11" label="Oceanography, Hydrology, Water resources">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="1.06.00" label="Biological sciences">
+          <isComposedBy>
+            <node id="1.06.01" label="Cell biology, Microbiology">
+            </node>
+            <node id="1.06.02" label="Virology">
+            </node>
+            <node id="1.06.03" label="Biochemistry and molecular biology">
+            </node>
+            <node id="1.06.04" label="Biochemical research methods">
+            </node>
+            <node id="1.06.05" label="Mycology">
+            </node>
+            <node id="1.06.06" label="Biophysics">
+            </node>
+            <node id="1.06.07" label="Genetics and heredity">
+            </node>
+            <node id="1.06.08" label="Reproductive biology">
+            </node>
+            <node id="1.06.09" label="Developmental biology">
+            </node>
+            <node id="1.06.10" label="Plant sciences, botany">
+            </node>
+            <node id="1.06.11" label="Zoology, Ornithology, Entomology, Behavioural sciences biology">
+            </node>
+            <node id="1.06.12" label="Marine biology, freshwater biology, limnology">
+            </node>
+            <node id="1.06.13" label="Ecology">
+            </node>
+            <node id="1.06.14" label="Biodiversity conservation">
+            </node>
+            <node id="1.06.15" label="Biology (theoretical, mathematical, thermal, cryobiology, biological rhythm), Evolutionary biology">
+            </node>
+            <node id="1.06.16" label="Other biological topics">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="1.07.00" label="Other natural sciences ">
+        </node>
+      </isComposedBy>
+    </node>
+    <node id="2.00.00" label="Engineering and technology">
+      <isComposedBy>
+        <node id="2.01.00" label="Civil engineering">
+          <isComposedBy>
+            <node id="2.01.01" label="Civil engineering">
+            </node>
+            <node id="2.01.02" label="Architecture engineering">
+            </node>
+            <node id="2.01.03" label="Construction engineering">
+            </node>
+            <node id="2.01.04" label="Municipal and structural engineering">
+            </node>
+            <node id="2.01.05" label="Transport engineering">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="2.02.00" label="Electrical engineering, Electronic engineering, Information engineering">
+          <isComposedBy>
+            <node id="2.02.01" label="Electrical and electronic engineering">
+            </node>
+            <node id="2.02.02" label="Robotics and automatic control">
+            </node>
+            <node id="2.02.03" label="Automation and control systems">
+            </node>
+            <node id="2.02.04" label="Communication engineering and systems">
+            </node>
+            <node id="2.02.05" label="Telecommunications">
+            </node>
+            <node id="2.02.06" label="Computer hardware and architecture">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="2.03.00" label="Mechanical engineering">
+          <isComposedBy>
+            <node id="2.03.01" label="Mechanical engineering">
+            </node>
+            <node id="2.03.02" label="Applied mechanics">
+            </node>
+            <node id="2.03.03" label="Thermodynamics">
+            </node>
+            <node id="2.03.04" label="Aerospace engineering">
+            </node>
+            <node id="2.03.05" label="Nuclear related engineering">
+            </node>
+            <node id="2.03.06" label="Audio engineering, reliability analysis">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="2.04.00" label="Chemical engineering">
+          <isComposedBy>
+            <node id="2.04.01" label="Chemical engineering (plants, products)">
+            </node>
+            <node id="2.04.02" label="Chemical process engineering">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="2.05.00" label="Materials engineering">
+          <isComposedBy>
+            <node id="2.05.01" label="Materials engineering">
+            </node>
+            <node id="2.05.02" label="Ceramics">
+            </node>
+            <node id="2.05.03" label="Coating and films">
+            </node>
+            <node id="2.05.04" label="Composites (including laminates, reinforced plastics, cermets, combined natural and synthetic fibre fabrics filled composites)">
+            </node>
+            <node id="2.05.05" label="Paper and wood">
+            </node>
+            <node id="2.05.06" label="Textiles">
+            </node>
+            <node id="2.05.07" label="Including synthetic dyes, colours, fibres">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="2.06.00" label="Medical engineering">
+          <isComposedBy>
+            <node id="2.06.01" label="Medical engineering">
+            </node>
+            <node id="2.06.02" label="Medical laboratory technology (including laboratory samples analysis diagnostic technologies)">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="2.07.00" label="Environmental engineering">
+          <isComposedBy>
+            <node id="2.07.01" label="Environmental and geological engineering">
+            </node>
+            <node id="2.07.02" label="Geotechnics">
+            </node>
+            <node id="2.07.03" label="Petroleum engineering, (fuel, oils), Energy and fuels">
+            </node>
+            <node id="2.07.04" label="Remote sensing">
+            </node>
+            <node id="2.07.05" label="Mining and mineral processing">
+            </node>
+            <node id="2.07.06" label="Marine engineering, sea vessels">
+            </node>
+            <node id="2.07.07" label="Ocean engineering">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="2.08.00" label="Environmental biotechnology">
+          <isComposedBy>
+            <node id="2.08.01" label="Environmental biotechnology">
+            </node>
+            <node id="2.08.02" label="Bioremediation, diagnostic biotechnologies (DNA chips and biosensing devices) in environmental management">
+            </node>
+            <node id="2.08.03" label="Environmental biotechnology related ethics">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="2.09.00" label="Industrial biotechnology">
+          <isComposedBy>
+            <node id="2.09.01" label="Industrial biotechnology">
+            </node>
+            <node id="2.09.02" label="Bioprocessing technologies (industrial processes relying on biological agents to drive the process) biocatalysis, fermentation">
+            </node>
+            <node id="2.09.03" label="bioproducts (products that are manufactured using biological material as feedstock) biomaterials, bioplastics, biofuels, bioderived bulk and fine chemicals, bio-derived novel materials">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="2.10.00" label="Nano-technology">
+          <isComposedBy>
+            <node id="2.10.01" label="Nano-materials [production and properties]">
+            </node>
+            <node id="2.10.02" label="Nano-processes [applications on nano-scale]">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="2.11.00" label="Other engineering and technologies">
+          <isComposedBy>
+            <node id="2.11.01" label="Food and beverages">
+            </node>
+            <node id="2.11.02" label="Other engineering and technologies">
+            </node>
+          </isComposedBy>
+        </node>
+      </isComposedBy>
+    </node>
+    <node id="3.00.00" label="Medical and Health sciences">
+      <isComposedBy>
+        <node id="3.01.00" label="Basic medicine">
+          <isComposedBy>
+            <node id="3.01.01" label="Anatomy and morphology">
+            </node>
+            <node id="3.01.02" label="Human genetics">
+            </node>
+            <node id="3.01.03" label="Immunology">
+            </node>
+            <node id="3.01.04" label="Neurosciences (including psychophysiology)">
+            </node>
+            <node id="3.01.05" label="Pharmacology and pharmacy">
+            </node>
+            <node id="3.01.06" label="Medicinal chemistry">
+            </node>
+            <node id="3.01.07" label="Toxicology">
+            </node>
+            <node id="3.01.08" label="Physiology (including cytology)">
+            </node>
+            <node id="3.01.09" label="Pathology">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="3.02.00" label="Clinical medicine">
+          <isComposedBy>
+            <node id="3.02.01" label="Andrology">
+            </node>
+            <node id="3.02.02" label="Obstetrics and gynaecology">
+            </node>
+            <node id="3.02.03" label="Paediatrics">
+            </node>
+            <node id="3.02.04" label="Cardiac and Cardiovascular systems">
+            </node>
+            <node id="3.02.05" label="Peripheral vascular disease">
+            </node>
+            <node id="3.02.06" label="Hematology">
+            </node>
+            <node id="3.02.07" label="Respiratory systems">
+            </node>
+            <node id="3.02.08" label="Critical care medicine and Emergency medicine">
+            </node>
+            <node id="3.02.09" label="Anaesthesiology">
+            </node>
+            <node id="3.02.10" label="Orthopaedics">
+            </node>
+            <node id="3.02.11" label="Surgery">
+            </node>
+            <node id="3.02.12" label="Radiology, nuclear medicine and medical imaging">
+            </node>
+            <node id="3.02.13" label="Transplantation">
+            </node>
+            <node id="3.02.14" label="Dentistry, oral surgery and medicine">
+            </node>
+            <node id="3.02.15" label="Dermatology and venereal diseases">
+            </node>
+            <node id="3.02.16" label="Allergy">
+            </node>
+            <node id="3.02.17" label="Rheumatology">
+            </node>
+            <node id="3.02.18" label="Endocrinology and metabolism (including diabetes, hormones)">
+            </node>
+            <node id="3.02.19" label="Gastroenterology and hepatology">
+            </node>
+            <node id="3.02.20" label="Urology and nephrology">
+            </node>
+            <node id="3.02.21" label="Oncology">
+            </node>
+            <node id="3.02.22" label="Ophthalmology">
+            </node>
+            <node id="3.02.23" label="Otorhinolaryngology">
+            </node>
+            <node id="3.02.24" label="Psychiatry">
+            </node>
+            <node id="3.02.25" label="Clinical neurology">
+            </node>
+            <node id="3.02.26" label="Geriatrics and gerontology">
+            </node>
+            <node id="3.02.27" label="General and internal medicine">
+            </node>
+            <node id="3.02.28" label="Other clinical medicine subjects">
+            </node>
+            <node id="3.02.29" label="Integrative and complementary medicine (alternative practice systems)">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="3.03.00" label="Health sciences">
+          <isComposedBy>
+            <node id="3.03.01" label="Health care sciences and services (including hospital administration, health care financing)">
+            </node>
+            <node id="3.03.02" label="Health policy and services">
+            </node>
+            <node id="3.03.03" label="Nursing">
+            </node>
+            <node id="3.03.04" label="Nutrition, Dietetics">
+            </node>
+            <node id="3.03.05" label="Public and environmental health">
+            </node>
+            <node id="3.03.06" label="Tropical medicine">
+            </node>
+            <node id="3.03.07" label="Parasitology">
+            </node>
+            <node id="3.03.08" label="Infectious diseases">
+            </node>
+            <node id="3.03.09" label="Epidemiology">
+            </node>
+            <node id="3.03.10" label="Occupational health">
+            </node>
+            <node id="3.03.11" label="Sport and fitness sciences">
+            </node>
+            <node id="3.03.12" label="Social biomedical sciences (includes family planning, sexual health, psycho-oncology, political and social effects of biomedical research)">
+            </node>
+            <node id="3.03.13" label="Medical ethics">
+            </node>
+            <node id="3.03.14" label="Substance abuse">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="3.04.00" label="Medical biotechnology">
+          <isComposedBy>
+            <node id="3.04.01" label="Health-related biotechnology">
+            </node>
+            <node id="3.04.02" label="Technologies involving the manipulation of cells, tissues, organs or the whole organism (assisted reproduction)">
+            </node>
+            <node id="3.04.03" label="Technologies involving identifying the functioning of DNA, proteins and enzymes and how they influence the onset of disease and maintenance of well-being (gene-based diagnostics and therapeutic interventions (pharmacogenomics, gene-based therapeutics)">
+            </node>
+            <node id="3.04.04" label="Biomaterials (as related to medical implants, devices, sensors)">
+            </node>
+            <node id="3.04.05" label="Medical biotechnology related ethics">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="3.05.00" label="Other medical sciences">
+          <isComposedBy>
+            <node id="3.05.01" label="Forensic science">
+            </node>
+            <node id="3.05.02" label="Other medical sciences">
+            </node>
+          </isComposedBy>
+        </node>
+      </isComposedBy>
+    </node>
+    <node id="4.00.00" label="Agricultural sciences">
+      <isComposedBy>
+        <node id="4.01.00" label="Agriculture, Forestry, and Fisheries ">
+          <isComposedBy>
+            <node id="4.01.01" label="Agriculture">
+            </node>
+            <node id="4.01.02" label="Forestry">
+            </node>
+            <node id="4.01.03" label="Fishery">
+            </node>
+            <node id="4.01.04" label="Soil science">
+            </node>
+            <node id="4.01.05" label="Horticulture, viticulture">
+            </node>
+            <node id="4.01.06" label="Agronomy">
+            </node>
+            <node id="4.01.07" label="plant breeding and plant protection">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="4.02.00" label="Animal and Dairy science">
+          <isComposedBy>
+            <node id="4.02.01" label="Animal and Dairy science">
+            </node>
+            <node id="4.02.02" label="Husbandry">
+            </node>
+            <node id="4.02.03" label="Pets">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="4.03.00" label="Veterinary science">
+          <isComposedBy>
+            <node id="4.03.01" label="Veterinary science">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="4.04.00" label="Agricultural biotechnology">
+          <isComposedBy>
+            <node id="4.04.01" label="Agricultural biotechnology and food biotechnology">
+            </node>
+            <node id="4.04.02" label="GM technology (crops and livestock), livestock cloning, marker assisted selection, diagnostics (DNA chips and biosensing devices for the early/accurate detection of diseases) biomass feedstock production technologies, biopharming">
+            </node>
+            <node id="4.04.03" label="Agricultural biotechnology related ethics">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="4.05.00" label="Other agricultural sciences">
+        </node>
+      </isComposedBy>
+    </node>
+    <node id="5.00.00" label="Social sciences">
+      <isComposedBy>
+        <node id="5.01.00" label="Psychology">
+          <isComposedBy>
+            <node id="5.01.01" label="Psychology (including human - machine relations)">
+            </node>
+            <node id="5.01.02" label="Psychology, special (including therapy for learning, speech, hearing, visual and other physical and mental disabilities)">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="5.02.00" label="Economics and Business">
+          <isComposedBy>
+            <node id="5.02.01" label="Economics">
+            </node>
+            <node id="5.02.02" label="Econometrics">
+            </node>
+            <node id="5.02.03" label="Industrial relations">
+            </node>
+            <node id="5.02.04" label="Business and Management">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="5.03.00" label="Educational sciences">
+          <isComposedBy>
+            <node id="5.03.01" label="Education, general (including training, pedagogy, didactics)">
+            </node>
+            <node id="5.03.02" label="Education, special (to gifted persons, those with learning disabilities)">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="5.04.00" label="Sociology">
+          <isComposedBy>
+            <node id="5.04.01" label="Sociology">
+            </node>
+            <node id="5.04.02" label="Demography">
+            </node>
+            <node id="5.04.03" label="Anthropology">
+            </node>
+            <node id="5.04.04" label="Ethnology">
+            </node>
+            <node id="5.04.05" label="Social topics (Womenís and gender studies; Social issues; Family studies, Social work)">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="5.05.00" label="Law">
+          <isComposedBy>
+            <node id="5.05.01" label="Law">
+            </node>
+            <node id="5.05.02" label="Penology">
+            </node>
+            <node id="5.05.03" label="Criminology">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="5.06.00" label="Political science">
+          <isComposedBy>
+            <node id="5.06.01" label="Political science">
+            </node>
+            <node id="5.06.02" label="Public administration;">
+            </node>
+            <node id="5.06.03" label="Organisation theory">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="5.07.00" label="Social and economic geography">
+          <isComposedBy>
+            <node id="5.07.01" label="Environmental sciences (social aspects)">
+            </node>
+            <node id="5.07.02" label="Cultural and economic geography">
+            </node>
+            <node id="5.07.03" label="Urban studies (Planning and development)">
+            </node>
+            <node id="5.07.04" label="Transport planning and social aspects of transport">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="5.08.00" label="Media and communications">
+          <isComposedBy>
+            <node id="5.08.01" label="Journalism">
+            </node>
+            <node id="5.08.02" label="Information science (social aspects)">
+            </node>
+            <node id="5.08.03" label="Library science">
+            </node>
+            <node id="5.08.04" label="Media and socio-cultural communication">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="5.09.00" label="Other social sciences">
+          <isComposedBy>
+            <node id="5.09.01" label="Social sciences, interdisciplinary">
+            </node>
+            <node id="5.09.02" label="Other social sciences">
+            </node>
+          </isComposedBy>
+        </node>
+      </isComposedBy>
+    </node>
+    <node id="6.00.00" label="Humanities">
+      <isComposedBy>
+        <node id="6.01.00" label="History and Archaeology">
+          <isComposedBy>
+            <node id="6.01.01" label="History">
+            </node>
+            <node id="6.01.02" label="Archaeology">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="6.02.00" label="Languages and Literature">
+          <isComposedBy>
+            <node id="6.02.01" label="General language studies">
+            </node>
+            <node id="6.02.02" label="Specific languages">
+            </node>
+            <node id="6.02.03" label="General literature studies">
+            </node>
+            <node id="6.02.04" label="Literary theory">
+            </node>
+            <node id="6.02.05" label="Specific literatures">
+            </node>
+            <node id="6.02.06" label="Linguistics">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="6.03.00" label="Philosophy, Ethics and Religion">
+          <isComposedBy>
+            <node id="6.03.01" label="Philosophy">
+            </node>
+            <node id="6.03.02" label="History and philosophy of science and technology">
+            </node>
+            <node id="6.03.04" label="Ethics (except ethics related to specific subfields)">
+            </node>
+            <node id="6.03.05" label="Theology">
+            </node>
+            <node id="6.03.06" label="Religious studies">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="6.04.00" label="Arts (arts, history of arts, performing arts, music)">
+          <isComposedBy>
+            <node id="6.04.01" label="Arts">
+            </node>
+            <node id="6.04.02" label="Art history">
+            </node>
+            <node id="6.04.03" label="Architectural design">
+            </node>
+            <node id="6.04.04" label="Performing arts studies (Musicology, Theater science, Dramaturgy)">
+            </node>
+            <node id="6.04.05" label="Folklore studies">
+            </node>
+            <node id="6.04.06" label="Studies on Film, Radio and Television">
+            </node>
+          </isComposedBy>
+        </node>
+        <node id="6.05.00" label="Other humanities">
+          <isComposedBy>
+            <node id="6.05.01" label="Other humanities">
+            </node>
+          </isComposedBy>
+        </node>
+      </isComposedBy>
+    </node>
+  </isComposedBy>
+</node>

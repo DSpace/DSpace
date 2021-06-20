@@ -178,7 +178,7 @@
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required />
-          <style>col-xs-12 col-md-6 col-lg-4</style>
+          <style>col-xs-12 col-md-6 col-lg-3</style>
           <hint />
         </field>
         <field>
@@ -189,7 +189,7 @@
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required>You must enter at least the organisation of your affiliation.</required>
-          <style>col-xs-12 col-md-6 col-lg-4</style>
+          <style>col-xs-12 col-md-6 col-lg-3</style>
           <hint />
         </field>
         <field>
@@ -225,7 +225,7 @@
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required>You must enter the organisation</required>
-          <style>col-xs-12 col-md-6 col-lg-4</style>
+          <style>col-xs-12 col-md-6 col-lg-3</style>
           <hint />
         </field>
         <field>
@@ -236,7 +236,7 @@
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required>You must enter the qualification title.</required>
-          <style>col-xs-12 col-md-6 col-lg-4</style>
+          <style>col-xs-12 col-md-6 col-lg-3</style>
           <hint />
         </field>
         <field>
@@ -273,7 +273,7 @@
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required>You must enter the degree/title</required>
-          <style>col-xs-12 col-md-6 col-lg-4</style>
+          <style>col-xs-12 col-md-6 col-lg-3</style>
           <hint />
         </field>
         <field>
@@ -283,7 +283,7 @@
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required>You must enter the organisation</required>
-          <style>col-xs-12 col-md-6 col-lg-4</style>
+          <style>col-xs-12 col-md-6 col-lg-3</style>
           <hint />
         </field>
         <field>
@@ -555,6 +555,19 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>true</repeatable>
           <required />
           <hint>Enter appropriate subject keywords or phrases.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>datacite</dc-schema>
+          <dc-element>subject</dc-element>
+          <dc-qualifier>fos</dc-qualifier>
+          <label>Fields of Science and Technology (OECD)</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint />
+          <vocabulary closed="true">oecd</vocabulary>
         </field>
       </row>
       <row>
@@ -937,6 +950,19 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>true</repeatable>
           <required />
           <hint>Enter appropriate subject keywords or phrases.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>datacite</dc-schema>
+          <dc-element>subject</dc-element>
+          <dc-qualifier>fos</dc-qualifier>
+          <label>Fields of Science and Technology (OECD)</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint />
+          <vocabulary closed="true">oecd</vocabulary>
         </field>
       </row>
       <row>
@@ -1418,6 +1444,19 @@ it, please enter the types and the actual numbers or codes.</hint>
       </row>
       <row>
         <field>
+          <dc-schema>datacite</dc-schema>
+          <dc-element>subject</dc-element>
+          <dc-qualifier>fos</dc-qualifier>
+          <label>Fields of Science and Technology (OECD)</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint />
+          <vocabulary closed="true">oecd</vocabulary>
+        </field>
+      </row>
+      <row>
+        <field>
           <dc-schema>person</dc-schema>
           <dc-element>identifier</dc-element>
           <dc-qualifier>orcid</dc-qualifier>
@@ -1881,6 +1920,19 @@ it, please enter the types and the actual numbers or codes.</hint>
           <repeatable>true</repeatable>
           <required />
           <hint />
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>datacite</dc-schema>
+          <dc-element>subject</dc-element>
+          <dc-qualifier>fos</dc-qualifier>
+          <label>Fields of Science and Technology (OECD)</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint />
+          <vocabulary closed="true">oecd</vocabulary>
         </field>
       </row>
       <row>
@@ -2906,6 +2958,10 @@ it, please enter the types and the actual numbers or codes.</hint>
       <pair>
         <displayed-value>Ringgold identifier</displayed-value>
         <stored-value>rin</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Legal Entity Identifier</displayed-value>
+        <stored-value>lei</stored-value>
       </pair>
       <pair>
         <displayed-value>Generic ID</displayed-value>
