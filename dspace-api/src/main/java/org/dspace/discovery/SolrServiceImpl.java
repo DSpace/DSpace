@@ -860,17 +860,18 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     protected DiscoverResult retrieveResult(Context context, DiscoverQuery query)
         throws SQLException, SolrServerException, IOException, SearchServiceException {
-        // we use valid and executeLimit to manage reload of solr query if we found some stale objects
+        // we use valid and executeLimit to decide if the solr query need to be re-run if we found some stale objects
         boolean valid = false;
         int executionCount = 0;
         DiscoverResult result = null;
         SolrQuery solrQuery = resolveToSolrQuery(context, query);
+        // how many re-run of the query are allowed other than the first run
         int maxAttempts = configurationService.getIntProperty("discovery.removestale.attempts", 3);
         do {
             executionCount++;
             result = new DiscoverResult();
-            // if we found a stale object then skip execution of the remaining code
-            boolean zombieFound = false;
+            // if we found stale objects we can decide to skip execution of the remaining code to improve performance
+            boolean skipLoadingResponse = false;
             // use zombieDocs to collect stale found objects
             List<String> zombieDocs = new ArrayList<String>();
             QueryResponse solrQueryResponse = solrSearchCore.getSolr().query(solrQuery,
@@ -897,11 +898,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         // if maxAttemps is greater than 0 cleanup the index on each step
                         if (maxAttempts >= 0) {
                             zombieDocs.add((String) doc.getFirstValue(SearchUtils.RESOURCE_UNIQUE_ID));
-                            zombieFound = true;
+                            // avoid to process the response except if we are in the last allowed execution.
+                            // When maxAttempts is 0 this will be just the first and last run as the
+                            // executionCount is increased at the start of the loop it will be equals to 1
+                            skipLoadingResponse = maxAttempts + 1 != executionCount;
                         }
                         continue;
                     }
-                    if (!zombieFound) {
+                    if (!skipLoadingResponse) {
                         DiscoverResult.SearchDocument resultDoc = new DiscoverResult.SearchDocument();
                         // Add information about our search fields
                         for (String field : searchFields) {
@@ -913,7 +917,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         }
                         result.addSearchDocument(indexableObject, resultDoc);
                     }
-                    if (solrQueryResponse.getHighlighting() != null && !zombieFound) {
+                    if (solrQueryResponse.getHighlighting() != null && !skipLoadingResponse) {
                         Map<String, List<String>> highlightedFields = solrQueryResponse.getHighlighting().get(
                             indexableObject.getUniqueIndexID());
                         if (MapUtils.isNotEmpty(highlightedFields)) {
@@ -937,7 +941,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                 //Resolve our facet field values
                 List<FacetField> facetFields = solrQueryResponse.getFacetFields();
-                if (facetFields != null && !zombieFound) {
+                if (facetFields != null && !skipLoadingResponse) {
                     for (int i = 0; i < facetFields.size(); i++) {
                         FacetField facetField = facetFields.get(i);
                         DiscoverFacetField facetFieldConfig = query.getFacetFields().get(i);
@@ -974,7 +978,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     }
                 }
 
-                if (solrQueryResponse.getFacetQuery() != null && !zombieFound) {
+                if (solrQueryResponse.getFacetQuery() != null && !skipLoadingResponse) {
                     // just retrieve the facets in the order they where requested!
                     // also for the date we ask it in proper (reverse) order
                     // At the moment facet queries are only used for dates
@@ -1006,7 +1010,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     }
                 }
 
-                if (solrQueryResponse.getSpellCheckResponse() != null && !zombieFound) {
+                if (solrQueryResponse.getSpellCheckResponse() != null && !skipLoadingResponse) {
                     String recommendedQuery = solrQueryResponse.getSpellCheckResponse().getCollatedResult();
                     if (StringUtils.isNotBlank(recommendedQuery)) {
                         result.setSpellCheckQuery(recommendedQuery);
