@@ -3730,4 +3730,142 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
     }
 
+    @Test
+    public void findWithdrawnItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // check item status
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                             .andExpect(jsonPath("$.withdrawn", Matchers.is(false)))
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+
+        // withdraw item
+        getClient(tokenAdmin).perform(patch("/api/core/items/" + item.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                             .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+
+        // admins should be able to get the full information about withdrawn items
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID())
+                 .param("projection", "full"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()))
+                 .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                 .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                 .andExpect(jsonPath("$.inArchive", Matchers.is(false)))
+                 .andExpect(jsonPath("$._links.self.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString())))
+                 .andExpect(jsonPath("$._links.bundles.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/bundles")))
+                 .andExpect(jsonPath("$._links.mappedCollections.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/mappedCollections")))
+                 .andExpect(jsonPath("$._links.owningCollection.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/owningCollection")))
+                 .andExpect(jsonPath("$._links.relationships.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/relationships")))
+                 .andExpect(jsonPath("$._links.version.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/version")))
+                 .andExpect(jsonPath("$._links.templateItemOf.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/templateItemOf")));
+
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID() + "/owningCollection")
+                             .param("projection", "full"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntryFullProjection(
+                                        col1.getName(), col1.getID(), col1.getHandle())));;
+
+        // try to spoof information as a logged in eperson using embedding, verify that no embedds are included
+        getClient(tokenEperson).perform(get("/api/core/items/" + item.getID())
+                 .param("projection", "full"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                 .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                 .andExpect(jsonPath("$.name", Matchers.is(item.getName())))
+                 .andExpect(jsonPath("$.handle", Matchers.is(item.getHandle())))
+                 .andExpect(jsonPath("$.metadata").isEmpty())
+                 .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                 .andExpect(jsonPath("$.inArchive", Matchers.is(false)))
+                 .andExpect(jsonPath("$._links.self.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString())))
+                 .andExpect(jsonPath("$._links.bundles.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/bundles")))
+                 .andExpect(jsonPath("$._links.mappedCollections.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/mappedCollections")))
+                 .andExpect(jsonPath("$._links.owningCollection.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/owningCollection")))
+                 .andExpect(jsonPath("$._links.relationships.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/relationships")))
+                 .andExpect(jsonPath("$._links.version.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/version")))
+                 .andExpect(jsonPath("$._links.templateItemOf.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/templateItemOf")));
+
+
+        // access to linked resources should be denied
+        getClient(tokenEperson).perform(get("/api/core/items/" + item.getID() + "/owningCollection"))
+                               .andExpect(status().isForbidden());
+
+        // try to spoof information as anonymous user using embedding, verify that no embedds are included
+        getClient().perform(get("/api/core/items/" + item.getID())
+                   .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                   .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                   .andExpect(jsonPath("$.name", Matchers.is(item.getName())))
+                   .andExpect(jsonPath("$.handle", Matchers.is(item.getHandle())))
+                   .andExpect(jsonPath("$.metadata").isEmpty())
+                   .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                   .andExpect(jsonPath("$.inArchive", Matchers.is(false)))
+                   .andExpect(jsonPath("$._links.self.href",
+                       Matchers.containsString("/api/core/items/" + item.getID().toString())))
+                   .andExpect(jsonPath("$._links.self.href",
+                       Matchers.containsString("/api/core/items/" + item.getID().toString())))
+                   .andExpect(jsonPath("$._links.bundles.href",
+                       Matchers.containsString("/api/core/items/" + item.getID().toString() + "/bundles")))
+                   .andExpect(jsonPath("$._links.mappedCollections.href",
+                       Matchers.containsString("/api/core/items/" + item.getID().toString() + "/mappedCollections")))
+                   .andExpect(jsonPath("$._links.owningCollection.href",
+                       Matchers.containsString("/api/core/items/" + item.getID().toString() + "/owningCollection")))
+                   .andExpect(jsonPath("$._links.relationships.href",
+                       Matchers.containsString("/api/core/items/" + item.getID().toString() + "/relationships")))
+                   .andExpect(jsonPath("$._links.version.href",
+                       Matchers.containsString("/api/core/items/" + item.getID().toString() + "/version")))
+                   .andExpect(jsonPath("$._links.templateItemOf.href",
+                       Matchers.containsString("/api/core/items/" + item.getID().toString() + "/templateItemOf")));
+
+        // access to linked resources should be denied
+        getClient().perform(get("/api/core/items/" + item.getID() + "/owningCollection"))
+                   .andExpect(status().isUnauthorized());
+
+    }
+
 }
