@@ -7,7 +7,10 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -60,6 +63,8 @@ public class ItemRest extends DSpaceObjectRest {
     private Date lastModified = new Date();
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String entityType = null;
+    // TODO ignore if null?
+    private List<UUID> relatedItems = null;
 
     @Override
     public String getCategory() {
@@ -111,4 +116,16 @@ public class ItemRest extends DSpaceObjectRest {
     public void setEntityType(String entityType) {
         this.entityType = entityType;
     }
+
+    public void initRelatedItems() {
+        if (relatedItems == null) {
+            this.relatedItems = new ArrayList<>();
+        }
+    }
+
+    public void addRelatedItem(UUID itemUUID) {
+        initRelatedItems();
+        relatedItems.add(itemUUID);
+    }
+
 }
