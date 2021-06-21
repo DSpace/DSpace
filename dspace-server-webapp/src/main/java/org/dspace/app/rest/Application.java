@@ -16,6 +16,7 @@ import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
 import org.dspace.app.rest.model.hateoas.DSpaceLinkRelationProvider;
 import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
 import org.dspace.app.rest.utils.ApplicationConfig;
+import org.dspace.app.rest.utils.DSpaceAPIRequestLoggingFilter;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
 import org.dspace.app.sitemap.GenerateSitemaps;
@@ -122,6 +123,18 @@ public class Application extends SpringBootServletInitializer {
     @Order(2)
     protected Filter dspaceRequestContextFilter() {
         return new DSpaceRequestContextFilter();
+    }
+
+    /**
+     * Register the DSpaceAPIRequestLoggingFilter, a Filter that provides Mapped
+     * Diagnostic Context for the DSpace Server Webapp
+     *
+     * @return DSpaceRequestContextFilter
+     */
+    @Bean
+    @Order(3)
+    protected Filter dspaceApiLoggingRequest() {
+        return new DSpaceAPIRequestLoggingFilter();
     }
 
     @Bean
