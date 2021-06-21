@@ -100,7 +100,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
+    @PreAuthorize("hasPermission(#id, 'ITEM', 'STATUS') || hasPermission(#id, 'ITEM', 'READ')")
     public ItemRest findOne(Context context, UUID id) {
         Item item = null;
         try {
