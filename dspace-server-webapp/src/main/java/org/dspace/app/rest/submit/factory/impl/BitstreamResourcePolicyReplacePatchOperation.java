@@ -79,15 +79,17 @@ public class BitstreamResourcePolicyReplacePatchOperation extends ReplacePatchOp
                     }
 
                     if (split.length == 4) {
-                        ResourcePolicyRest newAccessCondition = evaluateSingleObject((LateObjectEvaluator) value);
+                        while (uploadConfigs.hasNext()) {
+                            ResourcePolicyRest newAccessCondition = evaluateSingleObject((LateObjectEvaluator) value);
 
-                        String name = newAccessCondition.getName();
-                        String description = newAccessCondition.getDescription();
-                        Date startDate = newAccessCondition.getStartDate();
-                        Date endDate = newAccessCondition.getEndDate();
-                        // TODO manage duplicate policy
-                        BitstreamResourcePolicyUtils.findApplyResourcePolicy(context, uploadConfigs,
-                                b, name, description, startDate, endDate);
+                            String name = newAccessCondition.getName();
+                            String description = newAccessCondition.getDescription();
+                            Date startDate = newAccessCondition.getStartDate();
+                            Date endDate = newAccessCondition.getEndDate();
+                            // TODO manage duplicate policy
+                            BitstreamResourcePolicyUtils.findApplyResourcePolicy(context, uploadConfigs.next(), b, name,
+                                    description, startDate, endDate);
+                        }
                     } else {
                         // "path":
                         // "/sections/upload/files/0/accessConditions/0/startDate"
