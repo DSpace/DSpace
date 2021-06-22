@@ -21,6 +21,10 @@
     <!-- Acquires reference to EventService --> 
     <bean id="dspace.eventService" factory-bean="dspace" factory-method="getEventService"/>
 
+    <!-- Acquires reference to ConfigurationService -->
+    <bean id="dspace.configurationService" factory-bean="dspace" factory-method="getConfigurationService"/>
+
+
     <!-- Inject the Default LoggerUsageEventListener into the EventService  -->
     <bean class="org.dspace.usage.LoggerUsageEventListener">
     	<property name="eventService" >
@@ -36,10 +40,9 @@
     </bean>
 
     <!-- Google Analytics recording  -->
-    <bean class="org.dspace.google.GoogleRecorderEventListener">
-        <property name="eventService" >
-            <ref bean="dspace.eventService"/>
-        </property>
+    <bean class="org.dspace.google.GoogleAsyncEventListener" destroy-method="destroy">
+        <property name="eventService" ref="dspace.eventService"/>
+        <constructor-arg ref="dspace.configurationService"/>
     </bean>
 
     <!-- 
