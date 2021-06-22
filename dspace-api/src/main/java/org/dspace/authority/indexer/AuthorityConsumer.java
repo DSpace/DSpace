@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityService;
 import org.dspace.content.DSpaceObject;
@@ -33,7 +33,7 @@ import org.dspace.event.Event;
  */
 public class AuthorityConsumer implements Consumer {
 
-    private final Logger log = Logger.getLogger(AuthorityConsumer.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(AuthorityConsumer.class);
 
     /**
      * A set of all item IDs installed which need their authority updated

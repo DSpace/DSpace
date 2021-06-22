@@ -12,22 +12,22 @@ import java.net.URL;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.taskdefs.Get;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
 
 /**
- * Class to load intermediate statistics files into solr
+ * Class to load intermediate statistics files into Solr.
  *
  * @author Stuart Lewis
  */
 public class StatisticsClient {
-    private static final Logger log = Logger.getLogger(StatisticsClient.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(StatisticsClient.class);
 
     /**
      * Default constructor
@@ -54,7 +54,7 @@ public class StatisticsClient {
      * @throws Exception If something goes wrong
      */
     public static void main(String[] args) throws Exception {
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
 
         Options options = new Options();
 

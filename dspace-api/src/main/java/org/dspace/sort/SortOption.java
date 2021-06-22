@@ -15,10 +15,12 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Class to mediate with the sort configuration
@@ -26,13 +28,13 @@ import org.dspace.core.ConfigurationManager;
  * @author Richard Jones
  */
 public class SortOption {
-    private static final Logger log = Logger.getLogger(SortOption.class);
+    private static final Logger log = LogManager.getLogger(SortOption.class);
 
     public static final String ASCENDING = "ASC";
     public static final String DESCENDING = "DESC";
 
     /**
-     * the number of the sort option as given in the config file
+     * the number of the sort option as given in the configuration file
      */
     private int number;
 
@@ -77,7 +79,9 @@ public class SortOption {
             int idx = 1;
             String option;
 
-            while (((option = ConfigurationManager.getProperty("webui.itemlist.sort-option." + idx))) != null) {
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+            while (((option = configurationService.getProperty("webui.itemlist.sort-option." + idx))) != null) {
                 SortOption so = new SortOption(idx, option);
                 newSortOptionsSet.add(so);
                 idx++;

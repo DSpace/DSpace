@@ -9,6 +9,7 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -18,7 +19,7 @@ import org.dspace.eperson.EPerson;
  * @author Robert Tansley
  * @version $Revision$
  */
-public interface InProgressSubmission {
+public interface InProgressSubmission extends ReloadableEntity<Integer> {
     /**
      * Get the internal ID of this submission
      *
@@ -46,7 +47,7 @@ public interface InProgressSubmission {
      * @return the submitting e-person
      * @throws SQLException if database error
      */
-    EPerson getSubmitter() throws SQLException;
+    EPerson getSubmitter();
 
     /**
      * Find out if the submission has (or is intended to have) more than one

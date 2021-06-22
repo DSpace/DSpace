@@ -11,7 +11,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -33,7 +34,7 @@ public class BrowseEngine {
     /**
      * the logger for this class
      */
-    private static final Logger log = Logger.getLogger(BrowseEngine.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(BrowseEngine.class);
 
     /**
      * the browse scope which is the basis for our browse
@@ -380,6 +381,7 @@ public class BrowseEngine {
             // this is the distinct table constrained to either community or collection
             dao.setTable(browseIndex.getDistinctTableName());
 
+            dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
             // remind the DAO that this is a distinct value browse, so it knows what sort
             // of query to build
             dao.setDistinct(true);
@@ -430,15 +432,7 @@ public class BrowseEngine {
             int offset = scope.getOffset();
             String rawFocusValue = null;
             if (offset < 1 && scope.hasJumpToValue() || scope.hasStartsWith()) {
-                String focusValue = getJumpToValue();
-
-                // store the value to tell the Browse Info object which value we are browsing on
-                rawFocusValue = focusValue;
-
-                // make sure the incoming value is normalised
-                focusValue = normalizeJumpToValue(focusValue);
-
-                offset = getOffsetForDistinctValue(focusValue);
+                rawFocusValue = getJumpToValue();
             }
 
 

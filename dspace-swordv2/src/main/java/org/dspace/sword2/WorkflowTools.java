@@ -15,8 +15,9 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowItemService;
@@ -32,6 +33,9 @@ public class WorkflowTools {
 
     protected WorkflowService workflowService =
         WorkflowServiceFactory.getInstance().getWorkflowService();
+
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Is the given item in the DSpace workflow?
@@ -127,8 +131,8 @@ public class WorkflowTools {
             WorkspaceItem wsi = this.getWorkspaceItem(context, item);
 
             // kick off the workflow
-            boolean notify = ConfigurationManager
-                .getBooleanProperty("swordv2-server", "workflow.notify");
+            boolean notify = configurationService
+                .getBooleanProperty("swordv2-server.workflow.notify");
             if (notify) {
                 workflowService.start(context, wsi);
             } else {

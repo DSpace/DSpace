@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -27,6 +27,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.event.Event;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
-    private static final Logger log = Logger.getLogger(WorkspaceItemServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemServiceImpl.class);
 
     @Autowired(required = true)
     protected WorkspaceItemDAO workspaceItemDAO;
@@ -130,6 +131,9 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                                           + "item_id=" + item.getID() + "collection_id="
                                           + collection.getID()));
 
+        context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(), null,
+                itemService.getIdentifiers(context, item)));
+
         return workspaceItem;
     }
 
@@ -145,6 +149,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     @Override
     public List<WorkspaceItem> findByEPerson(Context context, EPerson ep) throws SQLException {
         return workspaceItemDAO.findByEPerson(context, ep);
+    }
+
+    @Override
+    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep, Integer limit, Integer offset)
+        throws SQLException {
+        return workspaceItemDAO.findByEPerson(context, ep, limit, offset);
     }
 
     @Override
@@ -202,9 +212,8 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
          */
         Item item = workspaceItem.getItem();
         if (!authorizeService.isAdmin(context)
-            && ((context.getCurrentUser() == null) || (context
-            .getCurrentUser().getID() != item.getSubmitter()
-                                             .getID()))) {
+            && (item.getSubmitter() == null || (context.getCurrentUser() == null)
+                || (context.getCurrentUser().getID() != item.getSubmitter().getID()))) {
             // Not an admit, not the submitter
             throw new AuthorizeException("Must be an administrator or the "
                                              + "original submitter to delete a workspace item");
@@ -232,6 +241,11 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
+    public int countByEPerson(Context context, EPerson ep) throws SQLException {
+        return workspaceItemDAO.countRows(context, ep);
+    }
+
+    @Override
     public List<Map.Entry<Integer, Long>> getStageReachedCounts(Context context) throws SQLException {
         return workspaceItemDAO.getStageReachedCounts(context);
     }
@@ -250,7 +264,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
         // Need to delete the workspaceitem row first since it refers
         // to item ID
-        workspaceItem.getSupervisorGroups().clear();
+        try {
+            workspaceItem.getSupervisorGroups().clear();
+        } catch (Exception e) {
+            log.error("failed to clear supervisor group", e);
+        }
+
         workspaceItemDAO.delete(context, workspaceItem);
 
     }

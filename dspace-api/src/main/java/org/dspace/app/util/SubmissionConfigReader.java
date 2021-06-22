@@ -19,7 +19,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
@@ -71,7 +71,7 @@ public class SubmissionConfigReader {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(SubmissionConfigReader.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionConfigReader.class);
 
     /**
      * The fully qualified pathname of the directory containing the Item Submission Configuration file
@@ -377,7 +377,7 @@ public class SubmissionConfigReader {
         for (int i = 0; i < len; i++) {
             Node nd = nl.item(i);
             // process each step definition
-            if (nd.getNodeName().equals("step")) {
+            if (StringUtils.equalsIgnoreCase(nd.getNodeName(), "step-definition")) {
                 String stepID = getAttribute(nd, "id");
                 if (stepID == null) {
                     throw new SAXException(

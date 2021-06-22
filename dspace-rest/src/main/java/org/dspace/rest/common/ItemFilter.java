@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.rest.filter.ItemFilterDefs;
@@ -32,7 +32,7 @@ import org.dspace.rest.filter.ItemFilterTest;
  */
 @XmlRootElement(name = "item-filter")
 public class ItemFilter {
-    static Logger log = Logger.getLogger(ItemFilter.class);
+    static Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemFilter.class);
 
     private ItemFilterTest itemFilterTest = null;
     private String filterName = "";

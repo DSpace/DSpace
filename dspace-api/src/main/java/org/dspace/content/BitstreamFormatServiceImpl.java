@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.BitstreamFormatDAO;
@@ -33,7 +33,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(BitstreamFormat.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamFormat.class);
 
     @Autowired(required = true)
     protected BitstreamFormatDAO bitstreamFormatDAO;
@@ -153,7 +153,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
         // If the exception was thrown, unknown will == null so goahead and
         // load s. If not, check that the unknown's registry's name is not
         // being reset.
-        if (unknown == null || unknown.getID() != bitstreamFormat.getID()) {
+        if (unknown == null || !unknown.getID().equals(bitstreamFormat.getID())) {
             bitstreamFormat.setShortDescriptionInternal(shortDescription);
         }
     }
@@ -208,7 +208,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
         // Find "unknown" type
         BitstreamFormat unknown = findUnknown(context);
 
-        if (unknown.getID() == bitstreamFormat.getID()) {
+        if (unknown.getID().equals(bitstreamFormat.getID())) {
             throw new IllegalArgumentException("The Unknown bitstream format may not be deleted.");
         }
 

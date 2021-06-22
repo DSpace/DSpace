@@ -27,6 +27,20 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public interface XmlWorkflowItemDAO extends GenericDAO<XmlWorkflowItem> {
 
+    /**
+     * Find all the workflow items in a specific collection using the pagination parameters (offset, limit)
+     * 
+     * @param context
+     *            dspace context
+     * @param offset
+     *            the first record to return
+     * @param limit
+     *            the max number of records to return
+     * @param collection
+     *            the collection where the workflowitem has been submitted
+     * @return all the workflow items respecting the parameters conditions
+     * @throws SQLException
+     */
     public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset, Integer limit,
                                                      Collection collection) throws SQLException;
 
@@ -39,4 +53,32 @@ public interface XmlWorkflowItemDAO extends GenericDAO<XmlWorkflowItem> {
     public List<XmlWorkflowItem> findByCollection(Context context, Collection collection) throws SQLException;
 
     public XmlWorkflowItem findByItem(Context context, Item item) throws SQLException;
+
+    /**
+     * Return all the workflow items from a specific submitter respecting the pagination parameters
+     * 
+     * @param context
+     *            The relevant DSpace Context.
+     * @param ep
+     *            the eperson that has submitted the item
+     * @param offset
+     *            the first record to return
+     * @param limit
+     *            the max number of records to return
+     * @return
+     */
+    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep, Integer offset, Integer limit)
+            throws SQLException;
+
+    /**
+     * Count the number of workflow items from a specific submitter
+     * 
+     * @param context
+     *            The relevant DSpace Context.
+     * @param ep
+     *            the eperson that has submitted the item
+     * @return
+     * @throws SQLException
+     */
+    public int countBySubmitter(Context context, EPerson ep) throws SQLException;
 }

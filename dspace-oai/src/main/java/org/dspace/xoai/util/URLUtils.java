@@ -9,8 +9,8 @@ package org.dspace.xoai.util;
 
 import java.io.UnsupportedEncodingException;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.core.Constants;
 

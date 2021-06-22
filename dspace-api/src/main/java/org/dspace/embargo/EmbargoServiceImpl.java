@@ -13,11 +13,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -51,7 +51,7 @@ public class EmbargoServiceImpl implements EmbargoService {
     /**
      * log4j category
      */
-    private final Logger log = Logger.getLogger(EmbargoServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(EmbargoServiceImpl.class);
 
     // Metadata field components for user-supplied embargo terms
     // set from the DSpace configuration by init()
@@ -153,8 +153,8 @@ public class EmbargoServiceImpl implements EmbargoService {
         itemService.clearMetadata(context, item, lift_schema, lift_element, lift_qualifier, Item.ANY);
 
         // set the dc.date.available value to right now
-        itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "available", Item.ANY);
-        itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "available", null,
+        itemService.clearMetadata(context, item, MetadataSchemaEnum.DC.getName(), "date", "available", Item.ANY);
+        itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "date", "available", null,
                                 DCDate.getCurrent().toString());
 
         log.info("Lifting embargo on Item " + item.getHandle());

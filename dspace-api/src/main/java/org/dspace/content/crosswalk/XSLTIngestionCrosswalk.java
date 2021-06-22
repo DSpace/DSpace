@@ -15,18 +15,19 @@ import java.util.List;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.packager.PackageUtils;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
@@ -55,7 +56,7 @@ public class XSLTIngestionCrosswalk
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(XSLTIngestionCrosswalk.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(XSLTIngestionCrosswalk.class);
 
     private static final String DIRECTION = "submission";
 
@@ -167,7 +168,7 @@ public class XSLTIngestionCrosswalk
                 "Failed to initialize transformer, probably error loading stylesheet.");
         }
         try {
-            JDOMSource source = new JDOMSource(new Document((Element) root.cloneContent()));
+            JDOMSource source = new JDOMSource(new Document((Element) root.clone()));
             JDOMResult result = new JDOMResult();
             xform.transform(source, result);
             Document dimDoc = result.getDocument();
@@ -180,15 +181,11 @@ public class XSLTIngestionCrosswalk
     }
 
     // return coll/comm "metadata" label corresponding to a DIM field.
-    private static String getMetadataForDIM(Element field) {
+    private static MetadataFieldName getMetadataForDIM(Element field) {
         // make up fieldname, then look for it in xwalk
         String element = field.getAttributeValue("element");
         String qualifier = field.getAttributeValue("qualifier");
-        String fname = "dc." + element;
-        if (qualifier != null) {
-            fname += "." + qualifier;
-        }
-        return PackageUtils.dcToContainerMetadata(fname);
+        return new MetadataFieldName(MetadataSchemaEnum.DC.getName(), element, qualifier);
     }
 
     /**
@@ -234,16 +231,18 @@ public class XSLTIngestionCrosswalk
                 } else if ("field".equals(field.getName()) &&
                     DIM_NS.equals(field.getNamespace()) &&
                     schema != null && "dc".equals(schema)) {
-                    String md = getMetadataForDIM(field);
+                    MetadataFieldName md = getMetadataForDIM(field);
                     if (md == null) {
                         log.warn("Cannot map to Coll/Comm metadata field, DIM element=" +
                                      field.getAttributeValue("element") + ", qualifier=" + field
                             .getAttributeValue("qualifier"));
                     } else {
                         if (type == Constants.COLLECTION) {
-                            collectionService.setMetadata(context, (Collection) dso, md, field.getText());
+                            collectionService.setMetadataSingleValue(context,
+                                    (Collection) dso, md, null, field.getText());
                         } else {
-                            communityService.setMetadata(context, (Community) dso, md, field.getText());
+                            communityService.setMetadataSingleValue(context,
+                                    (Community) dso, md, null, field.getText());
                         }
                     }
                 } else {

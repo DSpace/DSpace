@@ -9,7 +9,7 @@ package org.dspace.event;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 
@@ -29,7 +29,7 @@ public class BasicDispatcher extends Dispatcher {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(BasicDispatcher.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicDispatcher.class);
 
     @Override
     public void addConsumerProfile(ConsumerProfile cp)

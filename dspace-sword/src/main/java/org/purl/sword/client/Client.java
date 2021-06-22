@@ -31,7 +31,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpParams;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.purl.sword.base.ChecksumUtils;
 import org.purl.sword.base.DepositResponse;
 import org.purl.sword.base.HttpHeaders;
@@ -96,7 +96,7 @@ public class Client implements SWORDClient {
     /**
      * Logger.
      */
-    private static final Logger log = Logger.getLogger(Client.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Client.class);
 
     /**
      * Create a new Client. The client will not use authentication by default.

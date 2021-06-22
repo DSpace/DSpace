@@ -17,7 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.rest.common.ItemFilter;
 
 /**
@@ -27,7 +27,7 @@ import org.dspace.rest.common.ItemFilter;
  */
 @Path("/filters")
 public class FiltersResource {
-    private static Logger log = Logger.getLogger(FiltersResource.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(FiltersResource.class);
 
     /**
      * Return all Use Case Item Filters in DSpace.

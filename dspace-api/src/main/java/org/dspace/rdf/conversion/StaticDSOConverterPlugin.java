@@ -16,7 +16,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.util.FileUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class StaticDSOConverterPlugin
     implements ConverterPlugin {
-    private static final Logger log = Logger.getLogger(StaticDSOConverterPlugin.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(StaticDSOConverterPlugin.class);
 
     public static final String CONSTANT_DATA_FILENAME_KEY_PREFIX = "rdf.constant.data.";
     public static final String CONSTANT_DATA_GENERAL_KEY_SUFFIX = "GENERAL";

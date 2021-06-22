@@ -20,8 +20,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Date;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -46,7 +46,7 @@ public class DepositManager {
     /**
      * Log4j logger
      */
-    public static final Logger log = Logger.getLogger(DepositManager.class);
+    public static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DepositManager.class);
 
     /**
      * The SWORD service implementation
@@ -245,6 +245,8 @@ public class DepositManager {
 
         String filenameBase =
             "sword-" + deposit.getUsername() + "-" + (new Date()).getTime();
+        // No dots or slashes allowed in filename
+        filenameBase = filenameBase.replaceAll("\\.", "").replaceAll("/", ""). replaceAll("\\\\", "");
 
         File packageFile = new File(path, filenameBase);
         File headersFile = new File(path, filenameBase + "-headers");

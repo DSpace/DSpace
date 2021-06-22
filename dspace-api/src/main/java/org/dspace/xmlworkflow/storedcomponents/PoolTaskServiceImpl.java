@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -45,6 +45,11 @@ public class PoolTaskServiceImpl implements PoolTaskService {
 
     protected PoolTaskServiceImpl() {
 
+    }
+
+    @Override
+    public List<PoolTask> findAll(Context context) throws SQLException {
+        return poolTaskDAO.findAll(context, PoolTask.class);
     }
 
     @Override
@@ -121,8 +126,26 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     @Override
+    public void deleteByEperson(Context context, EPerson ePerson)
+        throws SQLException, AuthorizeException, IOException {
+        List<PoolTask> tasks = findByEperson(context, ePerson);
+        //Use an iterator to remove the tasks !
+        Iterator<PoolTask> iterator = tasks.iterator();
+        while (iterator.hasNext()) {
+            PoolTask poolTask = iterator.next();
+            iterator.remove();
+            delete(context, poolTask);
+        }
+    }
+
+    @Override
     public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException {
         return poolTaskDAO.findByEPerson(context, ePerson);
+    }
+
+    @Override
+    public List<PoolTask> findByGroup(Context context, Group group) throws SQLException {
+        return poolTaskDAO.findByGroup(context, group);
     }
 
     @Override

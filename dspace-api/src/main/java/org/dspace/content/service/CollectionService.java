@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.MissingResourceException;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -20,17 +19,18 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.Group;
 
 /**
  * Service interface class for the Collection object.
- * The implementation of this class is responsible for all business logic calls for the Collection object and is
- * autowired by spring
+ * The implementation of this class is responsible for all business logic calls
+ * for the Collection object and is autowired by Spring.
  *
  * @author kevinvandevelde at atmire.com
  */
 public interface CollectionService
-    extends DSpaceObjectService<Collection>, DSpaceObjectLegacySupportService<Collection> {
+        extends DSpaceObjectService<Collection>, DSpaceObjectLegacySupportService<Collection> {
 
     /**
      * Create a new collection with a new ID.
@@ -92,20 +92,6 @@ public interface CollectionService
     public List<Collection> findGroupMapped(Context context, int actionID) throws java.sql.SQLException;
 
     /**
-     * Set a metadata value
-     *
-     * @param context    DSpace Context
-     * @param collection Collection
-     * @param field      the name of the metadata field to get
-     * @param value      value to set the field to
-     * @throws MissingResourceException if resource missing
-     * @throws SQLException             if database error
-     */
-    @Deprecated
-    public void setMetadata(Context context, Collection collection, String field, String value)
-        throws MissingResourceException, SQLException;
-
-    /**
      * Give the collection a logo. Passing in <code>null</code> removes any
      * existing logo. You will need to set the format of the new logo bitstream
      * before it will work, for example to "JPEG". Note that
@@ -147,9 +133,12 @@ public interface CollectionService
      * <code>null</code> can be passed in if there should be no associated
      * group for that workflow step; any existing group is NOT deleted.
      *
+     * @param context    current DSpace session.
      * @param collection Collection
      * @param step       the workflow step (1-3)
      * @param group      the new workflow group, or <code>null</code>
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
      */
     public void setWorkflowGroup(Context context, Collection collection, int step, Group group)
         throws SQLException, AuthorizeException;
@@ -159,11 +148,12 @@ public interface CollectionService
      * This returns <code>null</code> if there is no group associated with
      * this collection for the given step.
      *
+     * @param context    DSpace Context
      * @param collection Collection
      * @param step       the workflow step (1-3)
      * @return the group of reviewers or <code>null</code>
      */
-    public Group getWorkflowGroup(Collection collection, int step);
+    public Group getWorkflowGroup(Context context, Collection collection, int step);
 
     /**
      * Create a default submitters group if one does not already exist. Returns
@@ -317,6 +307,13 @@ public interface CollectionService
     public List<Collection> findAuthorized(Context context, Community community, int actionID)
         throws java.sql.SQLException;
 
+    /**
+     * 
+     * @param context DSpace Context
+     * @param group EPerson Group
+     * @return the collection, if any, that has the specified group as administrators or submitters
+     * @throws SQLException
+     */
     public Collection findByGroup(Context context, Group group) throws SQLException;
 
     List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException;
@@ -331,4 +328,57 @@ public interface CollectionService
      * @throws SQLException if database error
      */
     List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException;
+
+    /**
+     * This method will create a default read group for the given Collection. It'll create either a defaultItemRead or
+     * a defaultBitstreamRead group depending on the given parameters
+     *
+     * @param context           The relevant DSpace context
+     * @param collection        The collection for which it'll be created
+     * @param typeOfGroupString The type of group to be made, item or bitstream
+     * @param defaultRead       The defaultRead int, item or bitstream
+     * @return                  The created Group
+     * @throws SQLException     If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
+    Group createDefaultReadGroup(Context context, Collection collection, String typeOfGroupString, int defaultRead)
+        throws SQLException, AuthorizeException;
+
+    /**
+     * Returns Collections for which the current user has 'submit' privileges.
+     * NOTE: for better performance, this method retrieves its results from an
+     *       index (cache) and does not query the database directly.
+     *       This means that results may be stale or outdated until DS-4524 is resolved"
+     * 
+     * @param q                limit the returned collection to those with metadata values matching the query terms.
+     *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
+     *                         an autosuggest feature over the collection name
+     * @param context          DSpace Context
+     * @param community        parent community
+     * @param offset           the position of the first result to return
+     * @param limit            paging limit
+     * @return                 discovery search result objects
+     * @throws SQLException              if something goes wrong
+     * @throws SearchServiceException    if search error
+     */
+    public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community,
+        int offset, int limit) throws SQLException, SearchServiceException;
+
+    /**
+     * Counts the number of Collection for which the current user has 'submit' privileges.
+     * NOTE: for better performance, this method retrieves its results from an index (cache)
+     *       and does not query the database directly.
+     *       This means that results may be stale or outdated until DS-4524 is resolved."
+     * 
+     * @param q                limit the returned collection to those with metadata values matching the query terms.
+     *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
+     *                         an autosuggest feature over the collection name
+     * @param context          DSpace Context
+     * @param community        parent community
+     * @return                 total collections found
+     * @throws SQLException              if something goes wrong
+     * @throws SearchServiceException    if search error
+     */
+    public int countCollectionsWithSubmit(String q, Context context, Community community)
+        throws SQLException, SearchServiceException;
 }

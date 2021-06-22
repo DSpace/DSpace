@@ -50,6 +50,11 @@ public class CollectionRoleServiceImpl implements CollectionRoleService {
     }
 
     @Override
+    public List<CollectionRole> findByGroup(Context context, Group group) throws SQLException {
+        return collectionRoleDAO.findByGroup(context, group);
+    }
+
+    @Override
     public CollectionRole create(Context context, Collection collection, String roleId, Group group)
         throws SQLException {
         CollectionRole collectionRole = collectionRoleDAO.create(context, new CollectionRole());

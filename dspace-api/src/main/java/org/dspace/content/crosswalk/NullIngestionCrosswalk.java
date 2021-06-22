@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
@@ -43,7 +43,7 @@ public class NullIngestionCrosswalk
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(NullIngestionCrosswalk.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(NullIngestionCrosswalk.class);
 
     private static XMLOutputter outputPretty = new XMLOutputter(Format.getPrettyFormat());
 

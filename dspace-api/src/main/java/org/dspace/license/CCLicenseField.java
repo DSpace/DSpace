@@ -7,8 +7,7 @@
  */
 package org.dspace.license;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Wrapper class for representation of a license field declaration.
@@ -22,7 +21,7 @@ public class CCLicenseField {
     private String description = "";
     private String type = "";
 
-    private HashMap fieldEnum = null;
+    private List<CCLicenseFieldEnum> fieldEnum = null;
 
     /**
      * Construct a new LicenseField class.  Note that after construction,
@@ -31,13 +30,11 @@ public class CCLicenseField {
      * @param id    The unique identifier for this field; this value will be used in constructing the answers XML.
      * @param label The label to use when generating the user interface.
      */
-    public CCLicenseField(String id, String label) {
-        super();
-
-        this.fieldEnum = new HashMap();
-
+    public CCLicenseField(String id, String label, String description, List<CCLicenseFieldEnum> fieldEnum) {
         this.id = id;
         this.label = label;
+        this.description = description;
+        this.fieldEnum = fieldEnum;
     }
 
     /**
@@ -90,16 +87,12 @@ public class CCLicenseField {
     }
 
     /**
-     * @return Returns an instance implementing the Map interface;
-     * the instance contains a mapping from identifiers to
-     * labels for the enumeration values.
-     * @see Map
+     * Returns the list of enums of this field
+     * @return the list of enums of this field
      */
-    public Map<String, String> getEnum() {
-        return this.fieldEnum;
+    public List<CCLicenseFieldEnum> getFieldEnum() {
+        return fieldEnum;
     }
-
-
 }
 
 

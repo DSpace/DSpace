@@ -13,7 +13,7 @@ import java.util.Properties;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.purl.sword.base.Namespaces;
 import org.purl.sword.base.SwordElementInterface;
 import org.purl.sword.base.SwordValidationInfo;
@@ -51,7 +51,7 @@ public class Content extends XmlElement implements SwordElementInterface {
     /**
      * The log.
      */
-    private static Logger log = Logger.getLogger(Content.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Content.class);
 
     /**
      *

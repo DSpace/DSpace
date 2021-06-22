@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.UUID;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -37,6 +37,8 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.service.IdentifierService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -51,7 +53,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(CommunityServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CommunityServiceImpl.class);
 
     @Autowired(required = true)
     protected CommunityDAO communityDAO;
@@ -69,6 +71,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
     protected SiteService siteService;
+    @Autowired(required = true)
+    protected IdentifierService identifierService;
 
     protected CommunityServiceImpl() {
         super();
@@ -90,17 +94,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         Community newCommunity = communityDAO.create(context, new Community());
 
-        try {
-            if (handle == null) {
-                handleService.createHandle(context, newCommunity);
-            } else {
-                handleService.createHandle(context, newCommunity, handle);
-            }
-        } catch (IllegalStateException ie) {
-            //If an IllegalStateException is thrown, then an existing object is already using this handle
-            throw ie;
-        }
-
         if (parent != null) {
             parent.addSubCommunity(newCommunity);
             newCommunity.addParentCommunity(parent);
@@ -115,14 +108,24 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         communityDAO.save(context, newCommunity);
 
+        try {
+            if (handle == null) {
+                identifierService.register(context, newCommunity);
+            } else {
+                identifierService.register(context, newCommunity, handle);
+            }
+        }  catch (IllegalStateException | IdentifierException ex) {
+            throw new IllegalStateException(ex);
+        }
+
         context.addEvent(new Event(Event.CREATE, Constants.COMMUNITY, newCommunity.getID(), newCommunity.getHandle(),
-                                   getIdentifiers(context, newCommunity)));
+                getIdentifiers(context, newCommunity)));
 
         // if creating a top-level Community, simulate an ADD event at the Site.
         if (parent == null) {
             context.addEvent(new Event(Event.ADD, Constants.SITE, siteService.findSite(context).getID(),
-                                       Constants.COMMUNITY, newCommunity.getID(), newCommunity.getHandle(),
-                                       getIdentifiers(context, newCommunity)));
+                    Constants.COMMUNITY, newCommunity.getID(), newCommunity.getHandle(),
+                    getIdentifiers(context, newCommunity)));
         }
 
         log.info(LogManager.getHeader(context, "create_community",
@@ -139,10 +142,11 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public List<Community> findAll(Context context) throws SQLException {
-        MetadataField sortField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        MetadataField sortField = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
+                                                                     "title", null);
         if (sortField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
         return communityDAO.findAll(context, sortField);
@@ -150,10 +154,11 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public List<Community> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
+                                                                     "title", null);
         if (nameField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
         return communityDAO.findAll(context, nameField, limit, offset);
@@ -162,27 +167,21 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     @Override
     public List<Community> findAllTop(Context context) throws SQLException {
         // get all communities that are not children
-        MetadataField sortField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        MetadataField sortField = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
+                                                                     "title", null);
         if (sortField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
         return communityDAO.findAllNoParent(context, sortField);
     }
 
     @Override
-    public String getMetadata(Community community, String field) {
-        String[] MDValue = getMDValueByLegacyField(field);
-        String value = getMetadataFirstValue(community, MDValue[0], MDValue[1], MDValue[2], Item.ANY);
-        return value == null ? "" : value;
-    }
-
-    @Override
-    public void setMetadata(Context context, Community community, String field, String value)
-        throws MissingResourceException, SQLException {
-        if ((field.trim()).equals("name")
-            && (value == null || value.trim().equals(""))) {
+    public void setMetadataSingleValue(Context context, Community community,
+            MetadataFieldName field, String language, String value)
+            throws MissingResourceException, SQLException {
+        if (field.equals(MD_NAME) && (value == null || value.trim().equals(""))) {
             try {
                 value = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
             } catch (MissingResourceException e) {
@@ -190,19 +189,19 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             }
         }
 
-        String[] MDValue = getMDValueByLegacyField(field);
-
         /*
          * Set metadata field to null if null
          * and trim strings to eliminate excess
          * whitespace.
          */
         if (value == null) {
-            clearMetadata(context, community, MDValue[0], MDValue[1], MDValue[2], Item.ANY);
+            clearMetadata(context, community, field.SCHEMA, field.ELEMENT, field.QUALIFIER, Item.ANY);
+            community.setMetadataModified();
         } else {
-            setMetadataSingleValue(context, community, MDValue[0], MDValue[1], MDValue[2], null, value);
+            super.setMetadataSingleValue(context, community, field, null, value);
         }
-        community.addDetails(field);
+
+        community.addDetails(field.toString());
     }
 
     @Override
@@ -257,7 +256,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         if (community.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, community.getID(), null,
                                        getIdentifiers(context, community)));
-            community.setModified();
+            community.clearModified();
         }
         if (community.isMetadataModified()) {
             context.addEvent(
@@ -307,7 +306,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public List<Community> getAllParents(Context context, Community community) throws SQLException {
-        List<Community> parentList = new ArrayList<Community>();
+        List<Community> parentList = new ArrayList<>();
         Community parent = (Community) getParentObject(context, community);
         while (parent != null) {
             parentList.add(parent);
@@ -329,7 +328,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public List<Collection> getAllCollections(Context context, Community community) throws SQLException {
-        List<Collection> collectionList = new ArrayList<Collection>();
+        List<Collection> collectionList = new ArrayList<>();
         List<Community> subCommunities = community.getSubcommunities();
         for (Community subCommunity : subCommunities) {
             addCollectionList(subCommunity, collectionList);
@@ -452,9 +451,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         rawDelete(context, childCommunity);
 
-        childCommunity.removeParentCommunity(parentCommunity);
-        parentCommunity.removeSubCommunity(childCommunity);
-
         log.info(LogManager.getHeader(context, "remove_subcommunity",
                                       "parent_comm_id=" + parentCommunity.getID() + ",child_comm_id=" + childCommunity
                                           .getID()));
@@ -511,7 +507,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         return Constants.COMMUNITY;
     }
 
-
     /**
      * Internal method to remove the community and all its children from the
      * database, and perform any pre/post-cleanup
@@ -552,6 +547,13 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         // Remove any Handle
         handleService.unbindHandle(context, community);
+
+        // Remove the parent-child relationship for the community we want to delete
+        Community parent = (Community) getParentObject(context, community);
+        if (parent != null) {
+            community.removeParentCommunity(parent);
+            parent.removeSubCommunity(community);
+        }
 
         Group g = community.getAdministrators();
 
@@ -623,6 +625,10 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             case Constants.DELETE:
                 if (AuthorizeConfiguration.canCommunityAdminPerformSubelementDeletion()) {
                     adminObject = getParentObject(context, community);
+                    if (adminObject == null) {
+                        //top-level community, has to be admin of the current community
+                        adminObject = community;
+                    }
                 }
                 break;
             case Constants.ADD:

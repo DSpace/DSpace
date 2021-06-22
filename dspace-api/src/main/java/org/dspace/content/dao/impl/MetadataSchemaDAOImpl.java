@@ -8,15 +8,18 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchema_;
 import org.dspace.content.dao.MetadataSchemaDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.criterion.Order;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the MetadataSchema object.
@@ -33,7 +36,7 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
     /**
      * Get the schema object corresponding to this namespace URI.
      *
-     * @param context   DSpace context
+     * @param context DSpace context
      * @param namespace namespace URI to match
      * @return metadata schema object or null if none found.
      * @throws SQLException if database error
@@ -46,28 +49,34 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
                                       "WHERE ms.namespace = :namespace ");
 
         query.setParameter("namespace", namespace);
+        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
-        query.setCacheable(true);
         return singleResult(query);
     }
 
     @Override
     public List<MetadataSchema> findAll(Context context, Class clazz) throws SQLException {
         // Get all the metadataschema rows
-        Criteria criteria = createCriteria(context, MetadataSchema.class);
-        criteria.addOrder(Order.asc("id"));
-        criteria.setCacheable(true);
 
-        return list(criteria);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, MetadataSchema.class);
+        Root<MetadataSchema> metadataSchemaRoot = criteriaQuery.from(MetadataSchema.class);
+        criteriaQuery.select(metadataSchemaRoot);
+
+        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(metadataSchemaRoot.get(MetadataSchema_.id)));
+        criteriaQuery.orderBy(orderList);
+
+        return list(context, criteriaQuery, true, MetadataSchema.class, -1, -1);
     }
 
     /**
      * Return true if and only if the passed name appears within the allowed
      * number of times in the current schema.
      *
-     * @param context          DSpace context
+     * @param context DSpace context
      * @param metadataSchemaId schema id
-     * @param namespace        namespace URI to match
+     * @param namespace namespace URI to match
      * @return true of false
      * @throws SQLException if database error
      */
@@ -80,16 +89,16 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
         query.setParameter("namespace", namespace);
         query.setParameter("id", metadataSchemaId);
 
-        query.setCacheable(true);
+        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
         return singleResult(query) == null;
     }
 
     /**
      * Return true if and only if the passed name is unique.
      *
-     * @param context          DSpace context
+     * @param context DSpace context
      * @param metadataSchemaId schema id
-     * @param name             short name of schema
+     * @param name  short name of schema
      * @return true of false
      * @throws SQLException if database error
      */
@@ -102,15 +111,17 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
         query.setParameter("name", name);
         query.setParameter("id", metadataSchemaId);
 
-        query.setCacheable(true);
+        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
         return singleResult(query) == null;
     }
 
     /**
      * Get the schema corresponding with this short name.
      *
-     * @param context   context, in case we need to read it in from DB
-     * @param shortName the short name for the schema
+     * @param context
+     *            context, in case we need to read it in from DB
+     * @param shortName
+     *            the short name for the schema
      * @return the metadata schema object
      * @throws SQLException if database error
      */
@@ -122,7 +133,7 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
 
         query.setParameter("name", shortName);
 
-        query.setCacheable(true);
+        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
         return singleResult(query);
     }
 }

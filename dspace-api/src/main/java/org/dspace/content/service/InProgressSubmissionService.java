@@ -48,4 +48,5 @@ public interface InProgressSubmissionService<T extends InProgressSubmission> {
 
     public void move(Context context, T inProgressSubmission, Collection fromCollection, Collection toCollection)
         throws DCInputsReaderException;
+
 }

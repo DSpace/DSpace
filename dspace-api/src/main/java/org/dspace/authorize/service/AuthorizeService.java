@@ -14,8 +14,10 @@ import java.util.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -209,10 +211,6 @@ public interface AuthorizeService {
      */
     public boolean isAdmin(Context c, EPerson e) throws SQLException;
 
-    public boolean isCommunityAdmin(Context c) throws SQLException;
-
-    public boolean isCollectionAdmin(Context c) throws SQLException;
-
     ///////////////////////////////////////////////
     // policy manipulation methods
     ///////////////////////////////////////////////
@@ -312,6 +310,18 @@ public interface AuthorizeService {
      */
     public List<ResourcePolicy> getPoliciesActionFilter(Context c, DSpaceObject o, int actionID) throws SQLException;
 
+    /**
+     * Return a list of policies for an object that match the action except the record labeled with the rpType
+     *
+     * @param c        context
+     * @param o        DSpaceObject policies relate to
+     * @param actionID action (defined in class Constants)
+     * @param rpType   the resource policy type
+     * @return list of resource policies
+     * @throws SQLException if there's a database problem
+     */
+    public List<ResourcePolicy> getPoliciesActionFilterExceptRpType(Context c, DSpaceObject o, int actionID,
+                                                                    String rpType) throws SQLException;
     /**
      * Add policies to an object to match those from a previous object
      *
@@ -418,6 +428,16 @@ public interface AuthorizeService {
     public void removeEPersonPolicies(Context c, DSpaceObject o, EPerson e) throws SQLException, AuthorizeException;
 
     /**
+     * Removes all policies from an eperson that belong to an EPerson.
+     *
+     * @param c current context
+     * @param e the eperson
+     * @throws SQLException if there's a database problem
+     * @throws AuthorizeException if authorization error
+     */
+    public void removeAllEPersonPolicies(Context c, EPerson e) throws SQLException, AuthorizeException;
+
+    /**
      * Returns all groups authorized to perform an action on an object. Returns
      * empty array if no matches.
      *
@@ -494,4 +514,82 @@ public interface AuthorizeService {
     void switchPoliciesAction(Context context, DSpaceObject dso, int fromAction, int toAction)
         throws SQLException, AuthorizeException;
 
+    /**
+     * Checks that the context's current user is a community admin in the site by querying the solr database.
+     *
+     * @param context   context with the current user
+     * @return          true if the current user is a community admin in the site
+     *                  false when this is not the case, or an exception occurred
+     */
+    boolean isCommunityAdmin(Context context) throws SQLException;
+
+    /**
+     * Checks that the context's current user is a collection admin in the site by querying the solr database.
+     *
+     * @param context   context with the current user
+     * @return          true if the current user is a collection admin in the site
+     *                  false when this is not the case, or an exception occurred
+     */
+    boolean isCollectionAdmin(Context context) throws SQLException;
+
+    /**
+     * Checks that the context's current user is a community or collection admin in the site.
+     *
+     * @param context   context with the current user
+     * @return          true if the current user is a community or collection admin in the site
+     *                  false when this is not the case, or an exception occurred
+     */
+    boolean isComColAdmin(Context context) throws SQLException;
+
+    /**
+     * Finds communities for which the current user is admin, AND which match the query.
+     *
+     * @param context   context with the current user
+     * @param query     the query for which to filter the results more
+     * @param offset    used for pagination of the results
+     * @param limit     used for pagination of the results
+     * @return          the number of matching communities
+     * @throws SearchServiceException
+     * @throws SQLException
+     */
+    List<Community> findAdminAuthorizedCommunity(Context context, String query, int offset, int limit)
+        throws SearchServiceException, SQLException;
+
+    /**
+     * Counts communities for which the current user is admin, AND which match the query.
+     *
+     * @param context   context with the current user
+     * @param query     the query for which to filter the results more
+     * @return          the matching communities
+     * @throws SearchServiceException
+     * @throws SQLException
+     */
+    long countAdminAuthorizedCommunity(Context context, String query)
+        throws SearchServiceException, SQLException;
+
+    /**
+     * Finds collections for which the current user is admin, AND which match the query.
+     *
+     * @param context   context with the current user
+     * @param query     the query for which to filter the results more
+     * @param offset    used for pagination of the results
+     * @param limit     used for pagination of the results
+     * @return          the matching collections
+     * @throws SearchServiceException
+     * @throws SQLException
+     */
+    List<Collection> findAdminAuthorizedCollection(Context context, String query, int offset, int limit)
+        throws SearchServiceException, SQLException;
+
+    /**
+     * Counts collections for which the current user is admin, AND which match the query.
+     *
+     * @param context   context with the current user
+     * @param query     the query for which to filter the results more
+     * @return          the number of matching collections
+     * @throws SearchServiceException
+     * @throws SQLException
+     */
+    long countAdminAuthorizedCollection(Context context, String query)
+        throws SearchServiceException, SQLException;
 }

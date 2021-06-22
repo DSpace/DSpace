@@ -13,7 +13,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -40,7 +40,7 @@ public class BasicLinkChecker extends AbstractCurationTask {
     private List<String> results = null;
 
     // The log4j logger for this class
-    private static Logger log = Logger.getLogger(BasicLinkChecker.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicLinkChecker.class);
 
 
     /**

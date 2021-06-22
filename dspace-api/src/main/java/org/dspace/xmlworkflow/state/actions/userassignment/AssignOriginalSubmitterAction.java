@@ -9,7 +9,9 @@ package org.dspace.xmlworkflow.state.actions.userassignment;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -72,20 +74,22 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction {
     @Override
     public void alertUsersOnActivation(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers)
         throws IOException, SQLException {
-        try {
-            XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
-            xmlWorkflowService.alertUsersOnTaskActivation(c, wfi, "submit_task", Arrays.asList(wfi.getSubmitter()),
-                                                          //The arguments
-                                                          wfi.getItem().getName(),
-                                                          wfi.getCollection().getName(),
-                                                          wfi.getSubmitter().getFullName(),
-                                                          //TODO: message
-                                                          "New task available.",
-                                                          xmlWorkflowService.getMyDSpaceLink()
-            );
-        } catch (MessagingException e) {
-            log.info(LogManager.getHeader(c, "error emailing user(s) for claimed task",
+        if (wfi.getSubmitter() != null) {
+            try {
+                XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+                xmlWorkflowService.alertUsersOnTaskActivation(c, wfi, "submit_task", Arrays.asList(wfi.getSubmitter()),
+                        //The arguments
+                        wfi.getItem().getName(),
+                        wfi.getCollection().getName(),
+                        wfi.getSubmitter().getFullName(),
+                        //TODO: message
+                        "New task available.",
+                        xmlWorkflowService.getMyDSpaceLink()
+                );
+            } catch (MessagingException e) {
+                log.info(LogManager.getHeader(c, "error emailing user(s) for claimed task",
                                           "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
+            }
         }
     }
 
@@ -105,11 +109,16 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction {
                 .getId() + " to assign a submitter to. Aborting the action.");
             throw new IllegalStateException();
         }
-
-        createTaskForEPerson(c, wfi, step, nextAction, submitter);
-
+        if (submitter != null) {
+            createTaskForEPerson(c, wfi, step, nextAction, submitter);
+        }
         //It is important that we return to the submission page since we will continue our actions with the submitter
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
+    }
+
+    @Override
+    public List<String> getOptions() {
+        return new ArrayList<>();
     }
 
     /**

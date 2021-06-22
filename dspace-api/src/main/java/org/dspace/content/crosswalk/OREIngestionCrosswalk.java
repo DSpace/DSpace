@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -54,7 +54,7 @@ public class OREIngestionCrosswalk
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(OREDisseminationCrosswalk.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OREDisseminationCrosswalk.class);
 
     /* Namespaces */
     public static final Namespace ATOM_NS =

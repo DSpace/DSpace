@@ -10,7 +10,7 @@ package org.dspace.harvest;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -25,7 +25,7 @@ import org.dspace.harvest.service.HarvestedCollectionService;
  */
 public class HarvestThread extends Thread {
 
-    private static final Logger log = Logger.getLogger(HarvestThread.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(HarvestThread.class);
     protected UUID collectionId;
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected HarvestedCollectionService harvestedCollectionService =

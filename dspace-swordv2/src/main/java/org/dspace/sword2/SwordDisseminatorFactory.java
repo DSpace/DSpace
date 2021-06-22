@@ -10,7 +10,7 @@ package org.dspace.sword2;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;

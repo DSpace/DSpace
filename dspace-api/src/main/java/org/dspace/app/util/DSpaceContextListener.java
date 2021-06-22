@@ -16,14 +16,14 @@ import java.util.Enumeration;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Class to initialize / cleanup resources used by DSpace when the web application
  * is started or stopped.
  */
 public class DSpaceContextListener implements ServletContextListener {
-    private static Logger log = Logger.getLogger(DSpaceContextListener.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceContextListener.class);
 
     /**
      * Initialize any resources required by the application.

@@ -16,7 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
@@ -59,7 +59,7 @@ public abstract class AbstractPackageIngester
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(AbstractPackageIngester.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractPackageIngester.class);
 
     protected final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();

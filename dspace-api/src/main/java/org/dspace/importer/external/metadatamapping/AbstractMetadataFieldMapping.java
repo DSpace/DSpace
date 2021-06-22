@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
 import org.dspace.importer.external.metadatamapping.transform.MetadataProcessorService;
 
@@ -30,7 +30,7 @@ public abstract class AbstractMetadataFieldMapping<RecordType>
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(AbstractMetadataFieldMapping.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractMetadataFieldMapping.class);
 
     /* A map containing what processing has to be done on a given metadataFieldConfig.
      * The processing of a value is used to determine the actual value that will be returned used.
@@ -117,16 +117,13 @@ public abstract class AbstractMetadataFieldMapping<RecordType>
     public Collection<MetadatumDTO> resultToDCValueMapping(RecordType record) {
         List<MetadatumDTO> values = new LinkedList<MetadatumDTO>();
 
-
         for (MetadataContributor<RecordType> query : getMetadataFieldMap().values()) {
             try {
                 values.addAll(query.contributeMetadata(record));
             } catch (Exception e) {
                 log.error("Error", e);
             }
-
         }
         return values;
-
     }
 }

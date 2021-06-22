@@ -27,6 +27,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -52,6 +54,12 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Entity
 @Table(name = "item")
 public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
+
+    /**
+     * log4j logger
+     */
+    private static final Logger log = LogManager.getLogger();
+
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
      */
@@ -104,6 +112,16 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     @Transient
     private transient ItemService itemService;
+
+    /**
+     * True if anything else was changed since last metadata retrieval()
+     * (to drive metadata cache)
+     */
+    @Transient
+    private boolean modifiedMetadataCache = true;
+
+    @Transient
+    private List<MetadataValue> cachedMetadata = new ArrayList<>();
 
     /**
      * Protected constructor, create object using:
@@ -271,6 +289,26 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     }
 
     /**
+     * Get the bundles matching a bundle name (name corresponds roughly to type)
+     *
+     * @param name
+     *            name of bundle (ORIGINAL/TEXT/THUMBNAIL)
+     *
+     * @return the bundles in an unordered array
+     */
+    public List<Bundle> getBundles(String name) {
+        List<Bundle> matchingBundles = new ArrayList<Bundle>();
+         // now only keep bundles with matching names
+        List<Bundle> bunds = getBundles();
+        for (Bundle bundle : bunds) {
+            if (name.equals(bundle.getName())) {
+                matchingBundles.add(bundle);
+            }
+        }
+        return matchingBundles;
+    }
+
+    /**
      * Add a bundle to the item, should not be made public since we don't want to skip business logic
      *
      * @param bundle the bundle to be added
@@ -309,7 +347,6 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
         if (!this.getID().equals(otherItem.getID())) {
             return false;
         }
-
         return true;
     }
 
@@ -333,7 +370,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     @Override
     public String getName() {
-        return getItemService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        return getItemService().getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
     }
 
     @Override
@@ -346,5 +383,24 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
             itemService = ContentServiceFactory.getInstance().getItemService();
         }
         return itemService;
+    }
+
+    @Override
+    protected void setMetadataModified() {
+        super.setMetadataModified();
+        modifiedMetadataCache = true;
+    }
+
+    public boolean isModifiedMetadataCache() {
+        return modifiedMetadataCache;
+    }
+
+    protected List<MetadataValue> getCachedMetadata() {
+        return cachedMetadata;
+    }
+
+    protected void setCachedMetadata(List<MetadataValue> cachedMetadata) {
+        this.cachedMetadata = cachedMetadata;
+        modifiedMetadataCache = false;
     }
 }

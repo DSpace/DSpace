@@ -19,7 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 
@@ -30,7 +30,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @author richardrodgers
  */
 public class FileTaskQueue implements TaskQueue {
-    private static Logger log = Logger.getLogger(TaskQueue.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(TaskQueue.class);
     // base directory for curation task queues
     protected String tqDir;
 

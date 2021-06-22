@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Properties;
 
 import nu.xom.Element;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Represents a text construct in the ATOM elements. This is a superclass of
@@ -25,7 +25,7 @@ public abstract class BasicContentElement extends XmlElement
     /**
      * The log.
      */
-    private static Logger log = Logger.getLogger(BasicContentElement.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicContentElement.class);
 
     public BasicContentElement(String prefix, String name, String namespaceUri) {
         super(prefix, name, namespaceUri);

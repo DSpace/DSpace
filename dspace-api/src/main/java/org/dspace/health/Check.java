@@ -7,7 +7,7 @@
  */
 package org.dspace.health;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Abstract check interface.
@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 
 public abstract class Check {
 
-    protected static Logger log = Logger.getLogger(Check.class);
+    protected static Logger log = org.apache.logging.log4j.LogManager.getLogger(Check.class);
     long took_ = -1L;
     String report_ = null;
     private String errors_ = "";

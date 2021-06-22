@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -23,6 +23,7 @@ import org.dspace.discovery.DiscoverResult.FacetResult;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -36,7 +37,7 @@ public class ItemCountDAOSolr implements ItemCountDAO {
     /**
      * Log4j logger
      */
-    private static Logger log = Logger.getLogger(ItemCountDAOSolr.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemCountDAOSolr.class);
 
     /**
      * DSpace context
@@ -122,13 +123,13 @@ public class ItemCountDAOSolr implements ItemCountDAO {
         query.addFacetField(new DiscoverFacetField("location.coll",
                                                    DiscoveryConfigurationParameters.TYPE_STANDARD, -1,
                                                    DiscoveryConfigurationParameters.SORT.COUNT));
-        query.addFilterQueries("search.resourcetype:2");    // count only items
+        query.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);    // count only items
         query.addFilterQueries("NOT(discoverable:false)");  // only discoverable
         query.setMaxResults(0);
 
         DiscoverResult sResponse = null;
         try {
-            sResponse = searcher.search(context, query, false);
+            sResponse = searcher.search(context, query);
             List<FacetResult> commCount = sResponse.getFacetResult("location.comm");
             List<FacetResult> collCount = sResponse.getFacetResult("location.coll");
             for (FacetResult c : commCount) {

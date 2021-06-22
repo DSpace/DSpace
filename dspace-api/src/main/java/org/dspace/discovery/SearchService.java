@@ -7,13 +7,12 @@
  */
 package org.dspace.discovery;
 
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
@@ -27,8 +26,8 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 public interface SearchService {
 
     /**
-     * Convenient method to call @see #search(Context, DSpaceObject,
-     * DiscoverQuery) with a null DSpace Object as scope (i.e. all the
+     * Convenient method to call {@link #search(Context, DSpaceObject,
+     * DiscoverQuery)} with a null DSpace Object as scope (i.e. all the
      * repository)
      *
      * @param context DSpace Context object.
@@ -50,43 +49,12 @@ public interface SearchService {
      * @return discovery search result object
      * @throws SearchServiceException if search error
      */
-    DiscoverResult search(Context context, DSpaceObject dso, DiscoverQuery query)
-        throws SearchServiceException;
-
-    /**
-     * @param context          DSpace Context object.
-     * @param query            the discovery query object.
-     * @param includeWithdrawn use <code>true</code> to include in the results also withdrawn
-     *                         items that match the query.
-     * @return discovery search result object
-     * @throws SearchServiceException if search error
-     */
-    DiscoverResult search(Context context, DiscoverQuery query,
-                          boolean includeWithdrawn) throws SearchServiceException;
-
-    /**
-     * @param context          DSpace Context object
-     * @param dso              a DSpace Object to use as scope of the search (only results
-     *                         within this object)
-     * @param query            the discovery query object
-     * @param includeWithdrawn use <code>true</code> to include in the results also withdrawn
-     *                         items that match the query
-     * @return discovery search result object
-     * @throws SearchServiceException if search error
-     */
-    DiscoverResult search(Context context, DSpaceObject dso, DiscoverQuery query, boolean includeWithdrawn)
+    DiscoverResult search(Context context, IndexableObject dso, DiscoverQuery query)
         throws SearchServiceException;
 
 
-    InputStream searchJSON(Context context, DiscoverQuery query, String jsonIdentifier) throws SearchServiceException;
-
-    InputStream searchJSON(Context context, DiscoverQuery query, DSpaceObject dso, String jsonIdentifier)
-        throws SearchServiceException;
-
-
-    List<DSpaceObject> search(Context context, String query, String orderfield, boolean ascending, int offset, int max,
-                              String... filterquery);
-
+    List<IndexableObject> search(Context context, String query, String orderfield, boolean ascending, int offset,
+            int max, String... filterquery);
 
     /**
      * Transforms the given string field and value into a filter query
@@ -95,11 +63,14 @@ public interface SearchService {
      * @param field    the field of the filter query
      * @param operator equals/notequals/notcontains/authority/notauthority
      * @param value    the filter query value
+     * @param config   (nullable) the discovery configuration (if not null, field's corresponding facet.type checked to
+     *                be standard so suffix is not added for equals operator)
      * @return a filter query
      * @throws SQLException if database error
      *                      An exception that provides information on a database access error or other errors.
      */
-    DiscoverFilterQuery toFilterQuery(Context context, String field, String operator, String value) throws SQLException;
+    DiscoverFilterQuery toFilterQuery(Context context, String field, String operator, String value,
+        DiscoveryConfiguration config) throws SQLException;
 
     List<Item> getRelatedItems(Context context, Item item,
                                DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration);
@@ -138,6 +109,24 @@ public interface SearchService {
      */
     String escapeQueryChars(String query);
 
-    FacetYearRange getFacetYearRange(Context context, DSpaceObject scope, DiscoverySearchFilterFacet facet,
-                                     List<String> filterQueries) throws SearchServiceException;
+    FacetYearRange getFacetYearRange(Context context, IndexableObject scope, DiscoverySearchFilterFacet facet,
+            List<String> filterQueries, DiscoverQuery parentQuery)
+                    throws SearchServiceException;
+
+    /**
+     * This method returns us either the highest or lowest value for the field that we give to it
+     * depending on what sortOrder we give this method.
+     *
+     * @param context       The relevant DSpace context
+     * @param valueField    The field in solr for which we'll calculate the extreme value
+     * @param sortField     The field in solr for which we'll sort the calculated extreme value on
+     *                      This is typically the valueField appended with "_sort"
+     * @param sortOrder     Entering ascending will return the minimum value
+     *                      Entering descending will return the maximum value
+     * @return              Returns the min or max value based on the field in the parameters.
+     * @throws SearchServiceException
+     */
+    String calculateExtremeValue(Context context, String valueField,
+                                 String sortField, DiscoverQuery.SORT_ORDER sortOrder)
+        throws SearchServiceException;
 }

@@ -8,10 +8,9 @@
     http://www.dspace.org/license/
 
 -->
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://java.sun.com/xml/ns/javaee"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-         id="WebApp_ID" version="2.5">
+<web-app id="DSpace-RESTv6" version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
 
     <filter>
         <filter-name>dspace.request</filter-name>
@@ -36,7 +35,7 @@
 
 
     <servlet>
-        <servlet-name>DSpace REST API</servlet-name>
+        <servlet-name>DSpace REST API (Deprecated)</servlet-name>
         <servlet-class>
             org.glassfish.jersey.servlet.ServletContainer
         </servlet-class>
@@ -48,7 +47,7 @@
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>DSpace REST API</servlet-name>
+        <servlet-name>DSpace REST API (Deprecated)</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
@@ -60,7 +59,7 @@
     <!-- Security settings and mapping -->
     <security-constraint>
         <web-resource-collection>
-            <web-resource-name>DSpace REST API</web-resource-name>
+            <web-resource-name>DSpace REST API (Deprecated)</web-resource-name>
             <url-pattern>/*</url-pattern>
         </web-resource-collection>
         <user-data-constraint>
@@ -75,6 +74,14 @@
         </description>
         <param-name>dspace.dir</param-name>
         <param-value>${dspace.dir}</param-value>
+    </context-param>
+
+    <context-param>
+        <description>
+	    The location of the Log4J configuration
+        </description>
+        <param-name>log4jConfiguration</param-name>
+        <param-value>${dspace.dir}/config/log4j2.xml</param-value>
     </context-param>
 
     <context-param>

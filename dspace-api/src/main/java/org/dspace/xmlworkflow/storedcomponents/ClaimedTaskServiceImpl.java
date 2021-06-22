@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -44,6 +44,11 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService {
     @Override
     public ClaimedTask find(Context context, int id) throws SQLException {
         return claimedTaskDAO.findByID(context, ClaimedTask.class, id);
+    }
+
+    @Override
+    public List<ClaimedTask> findAll(Context context) throws SQLException {
+        return claimedTaskDAO.findAll(context, ClaimedTask.class);
     }
 
     @Override

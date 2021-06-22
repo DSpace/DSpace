@@ -16,7 +16,7 @@ import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.ParsingException;
 import nu.xom.Serializer;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Represents a deposit response. This holds the SWORD Entry element.
@@ -43,7 +43,7 @@ public class DepositResponse {
     /**
      * Logger
      */
-    private static Logger log = Logger.getLogger(DepositResponse.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DepositResponse.class);
 
     /**
      * Create a new response with the specified http code.

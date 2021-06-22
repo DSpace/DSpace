@@ -30,7 +30,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.LocalSchemaFilenameFilter;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -47,7 +47,7 @@ import org.w3c.dom.Document;
  * Encapsulates the Item in the context of the DSpace Archive Format
  */
 public class ItemArchive {
-    private static final Logger log = Logger.getLogger(ItemArchive.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemArchive.class);
 
     public static final String DUBLIN_CORE_XML = "dublin_core.xml";
 
