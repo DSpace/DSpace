@@ -7,7 +7,6 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
-import java.sql.SQLException;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -23,9 +22,9 @@ import javax.persistence.Table;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 
 /**
  * Class representing an item going through the workflow process in DSpace
@@ -37,7 +36,7 @@ import org.dspace.workflow.WorkflowItem;
  */
 @Entity
 @Table(name = "cwf_workflowitem")
-public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer> {
+public class XmlWorkflowItem implements WorkflowItem {
 
     @Id
     @Column(name = "workflowitem_id")
@@ -64,7 +63,7 @@ public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer> 
 
     /**
      * Protected constructor, create object using:
-     * {@link org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService#create(Context, Item, Collection)}
+     * {@link XmlWorkflowItemService#create(Context, Item, Collection)}
      */
     protected XmlWorkflowItem() {
 
@@ -100,7 +99,7 @@ public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer> 
     }
 
     @Override
-    public EPerson getSubmitter() throws SQLException {
+    public EPerson getSubmitter() {
         return item.getSubmitter();
     }
 
@@ -133,5 +132,4 @@ public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer> 
     public void setPublishedBefore(boolean b) {
         this.publishedBefore = b;
     }
-
 }

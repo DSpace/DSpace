@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * List of options that are parsed from the command line.
@@ -117,7 +117,7 @@ public class ClientOptions {
     /**
      * Logger.
      */
-    private static Logger log = Logger.getLogger(ClientOptions.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ClientOptions.class);
 
     /**
      * List of multiple destination items. Used if the mode is set to multipost.

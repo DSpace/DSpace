@@ -15,12 +15,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverQuery;
@@ -28,9 +27,11 @@ import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.DiscoverResult.FacetResult;
 import org.dspace.discovery.DiscoverResult.SearchDocument;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -67,7 +68,7 @@ public class SolrBrowseDAO implements BrowseDAO {
     /**
      * Log4j log
      */
-    private static final Logger log = Logger.getLogger(SolrBrowseDAO.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrBrowseDAO.class);
 
     /**
      * The DSpace context
@@ -90,6 +91,8 @@ public class SolrBrowseDAO implements BrowseDAO {
      * value to start browse from in focus field
      */
     private String focusValue = null;
+
+    private String startsWith = null;
 
     /**
      * field to look for value in
@@ -166,9 +169,6 @@ public class SolrBrowseDAO implements BrowseDAO {
 
     private DiscoverResult sResponse = null;
 
-    private boolean itemsWithdrawn = false;
-    private boolean itemsDiscoverable = true;
-
     private boolean showFrequencies;
 
     private DiscoverResult getSolrResponse() throws BrowseException {
@@ -177,9 +177,16 @@ public class SolrBrowseDAO implements BrowseDAO {
             addLocationScopeFilter(query);
             addStatusFilter(query);
             if (distinct) {
-                DiscoverFacetField dff = new DiscoverFacetField(facetField,
-                                                                DiscoveryConfigurationParameters.TYPE_TEXT, -1,
-                                                                DiscoveryConfigurationParameters.SORT.VALUE);
+                DiscoverFacetField dff;
+                if (StringUtils.isNotBlank(startsWith)) {
+                    dff = new DiscoverFacetField(facetField,
+                        DiscoveryConfigurationParameters.TYPE_TEXT, -1,
+                        DiscoveryConfigurationParameters.SORT.VALUE, startsWith);
+                } else {
+                    dff = new DiscoverFacetField(facetField,
+                        DiscoveryConfigurationParameters.TYPE_TEXT, -1,
+                        DiscoveryConfigurationParameters.SORT.VALUE);
+                }
                 query.addFacetField(dff);
                 query.setFacetMinCount(1);
                 query.setMaxResults(0);
@@ -200,15 +207,14 @@ public class SolrBrowseDAO implements BrowseDAO {
                 }
                 // filter on item to be sure to don't include any other object
                 // indexed in the Discovery Search core
-                query.addFilterQueries("search.resourcetype:" + Constants.ITEM);
+                query.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);
                 if (orderField != null) {
                     query.setSortField("bi_" + orderField + "_sort",
                                        ascending ? SORT_ORDER.asc : SORT_ORDER.desc);
                 }
             }
             try {
-                sResponse = searcher.search(context, query, itemsWithdrawn
-                    || !itemsDiscoverable);
+                sResponse = searcher.search(context, query);
             } catch (SearchServiceException e) {
                 throw new BrowseException(e);
             }
@@ -217,21 +223,14 @@ public class SolrBrowseDAO implements BrowseDAO {
     }
 
     private void addStatusFilter(DiscoverQuery query) {
-        if (itemsWithdrawn) {
-            query.addFilterQueries("withdrawn:true");
-        } else if (!itemsDiscoverable) {
-            query.addFilterQueries("discoverable:false");
-            // TODO
-
-            try {
-                if (!authorizeService.isAdmin(context)
-                    && (authorizeService.isCommunityAdmin(context)
-                    || authorizeService.isCollectionAdmin(context))) {
-                    query.addFilterQueries(searcher.createLocationQueryForAdministrableItems(context));
-                }
-            } catch (SQLException ex) {
-                log.error(ex);
+        try {
+            if (!authorizeService.isAdmin(context)
+                && (authorizeService.isCommunityAdmin(context)
+                || authorizeService.isCollectionAdmin(context))) {
+                query.addFilterQueries(searcher.createLocationQueryForAdministrableItems(context));
             }
+        } catch (SQLException ex) {
+            log.error("Error looking up authorization rights of current user", ex);
         }
     }
 
@@ -298,10 +297,10 @@ public class SolrBrowseDAO implements BrowseDAO {
         DiscoverResult resp = getSolrResponse();
 
         List<Item> bitems = new ArrayList<>();
-        for (DSpaceObject solrDoc : resp.getDspaceObjects()) {
+        for (IndexableObject solrDoc : resp.getIndexableObjects()) {
             // FIXME introduce project, don't retrieve Item immediately when
             // processing the query...
-            Item item = (Item) solrDoc;
+            Item item = ((IndexableItem) solrDoc).getIndexedObject();
             bitems.add(item);
         }
         return bitems;
@@ -312,7 +311,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         throws BrowseException {
         DiscoverQuery query = new DiscoverQuery();
         query.setQuery("search.resourceid:" + itemID
-                           + " AND search.resourcetype:" + Constants.ITEM);
+                           + " AND search.resourcetype:" + IndexableItem.TYPE);
         query.setMaxResults(1);
         DiscoverResult resp = null;
         try {
@@ -322,7 +321,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         }
         if (resp.getTotalSearchResults() > 0) {
             SearchDocument doc = resp.getSearchDocument(
-                resp.getDspaceObjects().get(0)).get(0);
+                resp.getIndexableObjects().get(0)).get(0);
             return (String) doc.getSearchFieldValues(column).get(0);
         }
         return null;
@@ -335,7 +334,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         addLocationScopeFilter(query);
         addStatusFilter(query);
         query.setMaxResults(0);
-        query.addFilterQueries("search.resourcetype:" + Constants.ITEM);
+        query.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);
 
         // We need to take into account the fact that we may be in a subset of the items
         if (authority != null) {
@@ -353,10 +352,9 @@ public class SolrBrowseDAO implements BrowseDAO {
             query.setQuery("bi_" + column + "_sort" + ": {\"" + value + "\" TO *]");
             query.addFilterQueries("-(bi_" + column + "_sort" + ":" + value + "*)");
         }
-        boolean includeUnDiscoverable = itemsWithdrawn || !itemsDiscoverable;
         DiscoverResult resp = null;
         try {
-            resp = searcher.search(context, query, includeUnDiscoverable);
+            resp = searcher.search(context, query);
         } catch (SearchServiceException e) {
             throw new BrowseException(e);
         }
@@ -445,7 +443,17 @@ public class SolrBrowseDAO implements BrowseDAO {
         return focusValue;
     }
 
-    /*
+    @Override
+    public void setStartsWith(String startsWith) {
+        this.startsWith = startsWith;
+    }
+
+    @Override
+    public String getStartsWith() {
+        return startsWith;
+    }
+
+     /*
      * (non-Javadoc)
      *
      * @see org.dspace.browse.BrowseDAO#getLimit()
@@ -673,11 +681,6 @@ public class SolrBrowseDAO implements BrowseDAO {
      */
     @Override
     public void setTable(String table) {
-        if (table.equals(BrowseIndex.getWithdrawnBrowseIndex().getTableName())) {
-            itemsWithdrawn = true;
-        } else if (table.equals(BrowseIndex.getPrivateBrowseIndex().getTableName())) {
-            itemsDiscoverable = false;
-        }
         facetField = table;
     }
 

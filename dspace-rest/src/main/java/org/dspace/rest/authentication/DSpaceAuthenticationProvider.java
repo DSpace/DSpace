@@ -13,7 +13,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
@@ -40,7 +40,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
  */
 public class DSpaceAuthenticationProvider implements AuthenticationProvider {
 
-    private static Logger log = Logger.getLogger(DSpaceAuthenticationProvider.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceAuthenticationProvider.class);
 
     protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance()
                                                                                       .getAuthenticationService();

@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -15,7 +16,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
@@ -34,7 +35,7 @@ public class ThumbnailTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(ThumbnailTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ThumbnailTest.class);
 
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
@@ -47,11 +48,6 @@ public class ThumbnailTest extends AbstractUnitTest {
      * Bitstream instance for the tests, original copy
      */
     private Bitstream orig;
-
-    /**
-     * Thumbnail instance for the tests, original copy
-     */
-    private Thumbnail t;
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -69,7 +65,9 @@ public class ThumbnailTest extends AbstractUnitTest {
             File f = new File(testProps.get("test.bitstream").toString());
             thumb = bitstreamService.create(context, new FileInputStream(f));
             orig = bitstreamService.create(context, new FileInputStream(f));
-            t = new Thumbnail(thumb, orig);
+            Thumbnail t = new Thumbnail(thumb, orig);
+            assertEquals(orig, t.getOriginal());
+            assertEquals(thumb, t.getThumb());
         } catch (IOException ex) {
             log.error("IO Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
@@ -89,9 +87,16 @@ public class ThumbnailTest extends AbstractUnitTest {
     @After
     @Override
     public void destroy() {
-        thumb = null;
-        orig = null;
-        t = null;
+        try {
+            context.turnOffAuthorisationSystem();
+            bitstreamService.delete(context, thumb);
+            bitstreamService.delete(context, orig);
+            context.restoreAuthSystemState();
+            thumb = null;
+            orig = null;
+        } catch (Exception e) {
+            throw new AssertionError("Error in destroy()", e);
+        }
         super.destroy();
     }
 

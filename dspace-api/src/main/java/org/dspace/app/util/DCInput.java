@@ -12,9 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import javax.annotation.Nullable;
 
-import org.apache.commons.lang.StringUtils;
-import org.dspace.content.MetadataSchema;
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,12 @@ public class DCInput {
     private String label = null;
 
     /**
+     * a style instruction to apply to the input. The exact way to use the style value is UI depending that receive the
+     * value from the REST API as is
+     */
+    private String style = null;
+
+    /**
      * the input type
      */
     private String inputType = null;
@@ -82,6 +89,11 @@ public class DCInput {
      * is input repeatable?
      */
     private boolean repeatable = false;
+
+    /**
+     * should name-variants be used?
+     */
+    private boolean nameVariants = false;
 
     /**
      * 'hint' text to display
@@ -128,6 +140,13 @@ public class DCInput {
      */
     private List<String> typeBind = null;
 
+    private boolean isRelationshipField = false;
+    private boolean isMetadataField = false;
+    private String relationshipType = null;
+    private String searchConfiguration = null;
+    private String filter;
+    private List<String> externalSources;
+
     /**
      * The scope of the input sets, this restricts hidden metadata fields from
      * view during workflow processing.
@@ -154,7 +173,7 @@ public class DCInput {
         // Default the schema to dublin core
         dcSchema = fieldMap.get("dc-schema");
         if (dcSchema == null) {
-            dcSchema = MetadataSchema.DC_SCHEMA;
+            dcSchema = MetadataSchemaEnum.DC.getName();
         }
 
         //check if the input have a language tag
@@ -171,6 +190,9 @@ public class DCInput {
         String repStr = fieldMap.get("repeatable");
         repeatable = "true".equalsIgnoreCase(repStr)
             || "yes".equalsIgnoreCase(repStr);
+        String nameVariantsString = fieldMap.get("name-variants");
+        nameVariants = (StringUtils.isNotBlank(nameVariantsString)) ?
+                nameVariantsString.equalsIgnoreCase("true") : false;
         label = fieldMap.get("label");
         inputType = fieldMap.get("input-type");
         // these types are list-controlled
@@ -197,6 +219,20 @@ public class DCInput {
             String[] types = typeBindDef.split(",");
             for (String type : types) {
                 typeBind.add(type.trim());
+            }
+        }
+        style = fieldMap.get("style");
+        isRelationshipField = fieldMap.containsKey("relationship-type");
+        isMetadataField = fieldMap.containsKey("dc-schema");
+        relationshipType = fieldMap.get("relationship-type");
+        searchConfiguration = fieldMap.get("search-configuration");
+        filter = fieldMap.get("filter");
+        externalSources = new ArrayList<>();
+        String externalSourcesDef = fieldMap.get("externalsources");
+        if (StringUtils.isNotBlank(externalSourcesDef)) {
+            String[] sources = StringUtils.split(externalSourcesDef, ",");
+            for (String source: sources) {
+                externalSources.add(StringUtils.trim(source));
             }
         }
 
@@ -253,16 +289,25 @@ public class DCInput {
     }
 
     /**
+     * Get the nameVariants flag for this row
+     *
+     * @return the nameVariants flag
+     */
+    public boolean areNameVariantsAllowed() {
+        return nameVariants;
+    }
+
+    /**
      * Get the input type for this row
      *
      * @return the input type
      */
-    public String getInputType() {
+    public @Nullable String getInputType() {
         return inputType;
     }
 
     /**
-     * Get the DC element for this form row.
+     * Get the DC element for this form field.
      *
      * @return the DC element
      */
@@ -271,7 +316,7 @@ public class DCInput {
     }
 
     /**
-     * Get the DC namespace prefix for this form row.
+     * Get the DC namespace prefix for this form field.
      *
      * @return the DC namespace prefix
      */
@@ -290,7 +335,7 @@ public class DCInput {
     }
 
     /**
-     * Is there a required string for this form row?
+     * Is there a required string for this form field?
      *
      * @return true if a required string is set
      */
@@ -299,7 +344,7 @@ public class DCInput {
     }
 
     /**
-     * Get the DC qualifier for this form row.
+     * Get the DC qualifier for this form field.
      *
      * @return the DC qualifier
      */
@@ -308,7 +353,7 @@ public class DCInput {
     }
 
     /**
-     * Get the language for this form row.
+     * Get the language for this form field.
      *
      * @return the language state
      */
@@ -317,7 +362,7 @@ public class DCInput {
     }
 
     /**
-     * Get the hint for this form row, formatted for an HTML table
+     * Get the hint for this form field
      *
      * @return the hints
      */
@@ -326,12 +371,21 @@ public class DCInput {
     }
 
     /**
-     * Get the label for this form row.
+     * Get the label for this form field.
      *
      * @return the label
      */
     public String getLabel() {
         return label;
+    }
+
+    /**
+     * Get the style for this form field
+     * 
+     * @return the style
+     */
+    public String getStyle() {
+        return style;
     }
 
     /**
@@ -466,6 +520,22 @@ public class DCInput {
         return Utils.standardize(this.getSchema(), this.getElement(), this.getQualifier(), ".");
     }
 
+    public String getRelationshipType() {
+        return relationshipType;
+    }
+
+    public String getSearchConfiguration() {
+        return searchConfiguration;
+    }
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public List<String> getExternalSources() {
+        return externalSources;
+    }
+
     public boolean isQualdropValue() {
         if ("qualdrop_value".equals(getInputType())) {
             return true;
@@ -489,5 +559,23 @@ public class DCInput {
         }
 
         return true;
+    }
+
+    /**
+     * Verify whether the current field contains an entity relationship
+     * This also implies a relationship type is defined for this field
+     * The field can contain both an entity relationship and a metadata field simultaneously
+     */
+    public boolean isRelationshipField() {
+        return isRelationshipField;
+    }
+
+    /**
+     * Verify whether the current field contains a metadata field
+     * This also implies a field type is defined for this field
+     * The field can contain both an entity relationship and a metadata field simultaneously
+     */
+    public boolean isMetadataField() {
+        return isMetadataField;
     }
 }

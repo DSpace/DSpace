@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -46,7 +46,7 @@ public class HandleDAOImplTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(HandleDAOImplTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(HandleDAOImplTest.class);
 
     /**
      * Item instances for the tests
@@ -71,10 +71,10 @@ public class HandleDAOImplTest extends AbstractUnitTest {
     private Community owningCommunity;
 
     private static final String HANDLE_PREFIX = "123456789";
-    private static final String SUFFIX_1 = "11";
-    private static final String SUFFIX_2 = "11.2";
-    private static final String SUFFIX_3 = "33";
-    private static final String SUFFIX_4 = "44";
+    private static final String SUFFIX_1 = "101";
+    private static final String SUFFIX_2 = "101.2";
+    private static final String SUFFIX_3 = "303";
+    private static final String SUFFIX_4 = "404";
 
     @Before
     @Override
@@ -128,12 +128,8 @@ public class HandleDAOImplTest extends AbstractUnitTest {
             owningCommunity = context.reloadEntity(owningCommunity);
             ContentServiceFactory.getInstance().getCommunityService().delete(context, owningCommunity);
             owningCommunity = null;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (AuthorizeException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new AssertionError("Error occurred in destroy()", e);
         }
         item1 = null;
         item2 = null;

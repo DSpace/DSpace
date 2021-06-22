@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -40,7 +40,7 @@ public abstract class AbstractTranslator extends AbstractCurationTask {
 
     protected String apiKey = "";
 
-    private static Logger log = Logger.getLogger(AbstractTranslator.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractTranslator.class);
 
     protected List<String> results = new ArrayList<String>();
 

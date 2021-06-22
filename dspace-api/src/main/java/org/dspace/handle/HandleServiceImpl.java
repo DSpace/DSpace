@@ -10,10 +10,12 @@ package org.dspace.handle;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
@@ -41,7 +43,7 @@ public class HandleServiceImpl implements HandleService {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(HandleServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(HandleServiceImpl.class);
 
     /**
      * Prefix registered to no one
@@ -56,6 +58,13 @@ public class HandleServiceImpl implements HandleService {
 
     @Autowired
     protected SiteService siteService;
+
+    private static final Pattern[] IDENTIFIER_PATTERNS = {
+        Pattern.compile("^hdl:(.*)$"),
+        Pattern.compile("^info:hdl/(.*)$"),
+        Pattern.compile("^https?://hdl\\.handle\\.net/(.*)$"),
+        Pattern.compile("^https?://.+/handle/(.*)$")
+    };
 
     /**
      * Public Constructor
@@ -72,7 +81,7 @@ public class HandleServiceImpl implements HandleService {
             return null;
         }
 
-        String url = configurationService.getProperty("dspace.url")
+        String url = configurationService.getProperty("dspace.ui.url")
             + "/handle/" + handle;
 
         if (log.isDebugEnabled()) {
@@ -85,7 +94,7 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public String resolveUrlToHandle(Context context, String url)
         throws SQLException {
-        String dspaceUrl = configurationService.getProperty("dspace.url")
+        String dspaceUrl = configurationService.getProperty("dspace.ui.url")
             + "/handle/";
         String handleResolver = configurationService.getProperty("handle.canonical.prefix");
 
@@ -113,8 +122,7 @@ public class HandleServiceImpl implements HandleService {
     }
 
     @Override
-    public String getCanonicalForm(String handle) {
-
+    public String getCanonicalPrefix() {
         // Let the admin define a new prefix, if not then we'll use the
         // CNRI default. This allows the admin to use "hdl:" if they want to or
         // use a locally branded prefix handle.myuni.edu.
@@ -123,7 +131,12 @@ public class HandleServiceImpl implements HandleService {
             handlePrefix = "http://hdl.handle.net/";
         }
 
-        return handlePrefix + handle;
+        return handlePrefix;
+    }
+
+    @Override
+    public String getCanonicalForm(String handle) {
+        return getCanonicalPrefix() + handle;
     }
 
     @Override
@@ -371,5 +384,40 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public int countTotal(Context context) throws SQLException {
         return handleDAO.countRows(context);
+    }
+
+    @Override
+    public String parseHandle(String identifier) {
+        if (identifier == null) {
+            return null;
+        }
+        if (identifier.startsWith(getPrefix() + "/")) {
+            // prefix is the equivalent of 123456789 in 123456789/???; don't strip
+            return identifier;
+        }
+
+        String canonicalPrefix = configurationService.getProperty("handle.canonical.prefix");
+        if (identifier.startsWith(canonicalPrefix + "/")) {
+            // prefix is the equivalent of https://hdl.handle.net/ in https://hdl.handle.net/123456789/???; strip
+            return StringUtils.stripStart(identifier, canonicalPrefix);
+        }
+
+        for (Pattern pattern : IDENTIFIER_PATTERNS) {
+            Matcher matcher = pattern.matcher(identifier);
+            if (matcher.matches()) {
+                return matcher.group(1);
+            }
+        }
+
+        // Check additional prefixes supported in the config file
+        String[] additionalPrefixes = configurationService.getArrayProperty("handle.additional.prefixes");
+        for (String additionalPrefix : additionalPrefixes) {
+            if (identifier.startsWith(additionalPrefix + "/")) {
+                // prefix is the equivalent of 123456789 in 123456789/???; don't strip
+                return identifier;
+            }
+        }
+
+        return null;
     }
 }

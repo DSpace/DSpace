@@ -7,7 +7,7 @@
  */
 package org.dspace.content.authority;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Record class to hold a set of Choices returned by an authority in response

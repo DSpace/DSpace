@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -28,7 +28,7 @@ import org.dspace.rdf.negotiation.Negotiator;
 public class LocalURIRedirectionServlet extends HttpServlet {
     public static final String ACCEPT_HEADER_NAME = "Accept";
 
-    private final static Logger log = Logger.getLogger(LocalURIRedirectionServlet.class);
+    private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(LocalURIRedirectionServlet.class);
 
     protected final transient HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
@@ -86,7 +86,8 @@ public class LocalURIRedirectionServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-
+        // use object's reported handle for redirect (just in case user provided handle had odd characters)
+        handle = dso.getHandle();
         // close the context and send forward.
         context.abort();
         Negotiator.sendRedirect(response, handle, "", requestedMimeType, true);

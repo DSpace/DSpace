@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Class representing a single Item Submission config definition, organized into
@@ -44,7 +44,7 @@ public class SubmissionConfig implements Serializable {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(SubmissionConfig.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionConfig.class);
 
     /**
      * Constructs a new Submission Configuration object, based on the XML

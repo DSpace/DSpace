@@ -17,8 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -33,7 +33,7 @@ public class DataProviderServlet extends HttpServlet {
 
     protected static final String DEFAULT_LANG = "TURTLE";
 
-    private static final Logger log = Logger.getLogger(DataProviderServlet.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DataProviderServlet.class);
 
     protected final transient HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
@@ -61,7 +61,7 @@ public class DataProviderServlet extends HttpServlet {
         log.debug("lang = " + lang + ", cType = " + cType + " and pathInfo: " + pathInfo);
         if (StringUtils.isEmpty(pathInfo) || StringUtils.countMatches(pathInfo, "/") < 2) {
             String dspaceURI =
-                DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url");
+                DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.ui.url");
             this.serveNamedGraph(dspaceURI, lang, cType, response);
             return;
         }

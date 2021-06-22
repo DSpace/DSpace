@@ -13,9 +13,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -25,9 +26,10 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
@@ -41,27 +43,29 @@ import org.jdom.Namespace;
  * specification for both ingest and dissemination.
  *
  * @author Larry Stone
- * @version $Revision$
  */
 public class PREMISCrosswalk
     implements IngestionCrosswalk, DisseminationCrosswalk {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(PREMISCrosswalk.class);
+    private static final Logger log = LogManager.getLogger(PREMISCrosswalk.class);
 
     private static final Namespace PREMIS_NS =
         Namespace.getNamespace("premis", "http://www.loc.gov/standards/premis");
 
     // XML schemaLocation fragment for this crosswalk, from config.
-    private String schemaLocation =
+    private final String schemaLocation =
         PREMIS_NS.getURI() + " http://www.loc.gov/standards/premis/PREMIS-v1-0.xsd";
 
     private static final Namespace namespaces[] = {PREMIS_NS};
 
-    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
-                                                                                   .getBitstreamFormatService();
+    protected BitstreamService bitstreamService
+            = ContentServiceFactory.getInstance().getBitstreamService();
+    protected BitstreamFormatService bitstreamFormatService
+            = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /*----------- Submission functions -------------------*/
 
@@ -108,9 +112,9 @@ public class PREMISCrosswalk
                     if (ssize != null) {
                         try {
                             int size = Integer.parseInt(ssize);
-                            if (bitstream.getSize() != size) {
+                            if (bitstream.getSizeBytes() != size) {
                                 throw new MetadataValidationException(
-                                    "Bitstream size (" + String.valueOf(bitstream.getSize()) +
+                                    "Bitstream size (" + String.valueOf(bitstream.getSizeBytes()) +
                                         ") does not match size in PREMIS (" + ssize + "), rejecting it.");
                             }
                         } catch (NumberFormatException ne) {
@@ -219,7 +223,7 @@ public class PREMISCrosswalk
         //  b. name of bitstream, if any
         //  c. made-up name based on sequence ID and extension.
         String sid = String.valueOf(bitstream.getSequenceID());
-        String baseUrl = ConfigurationManager.getProperty("dspace.url");
+        String baseUrl = configurationService.getProperty("dspace.ui.url");
         String handle = null;
         // get handle of parent Item of this bitstream, if there is one:
         List<Bundle> bn = bitstream.getBundles();
@@ -274,7 +278,7 @@ public class PREMISCrosswalk
 
         // size
         Element size = new Element("size", PREMIS_NS);
-        size.setText(String.valueOf(bitstream.getSize()));
+        size.setText(String.valueOf(bitstream.getSizeBytes()));
         ochar.addContent(size);
 
         //  Punt and set formatName to the MIME type; the best we can
@@ -308,7 +312,7 @@ public class PREMISCrosswalk
     public List<Element> disseminateList(Context context, DSpaceObject dso)
         throws CrosswalkException,
         IOException, SQLException, AuthorizeException {
-        List<Element> result = new ArrayList<Element>(1);
+        List<Element> result = new ArrayList<>(1);
         result.add(disseminateElement(context, dso));
         return result;
     }

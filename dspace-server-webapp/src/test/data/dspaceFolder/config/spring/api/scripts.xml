@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <bean id="dspaceRunnableThreadExecutor" class="org.springframework.core.task.SyncTaskExecutor"/>
+
+
+    <bean id="index-discovery" class="org.dspace.discovery.IndexDiscoveryScriptConfiguration">
+        <property name="description" value="Update Discovery Solr Search Index"/>
+        <property name="dspaceRunnableClass" value="org.dspace.discovery.IndexClient"/>
+    </bean>
+
+    <bean id="metadata-import" class="org.dspace.app.bulkedit.MetadataImportCliScriptConfiguration">
+        <property name="description" value="Import metadata after batch editing" />
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataImportCLI"/>
+    </bean>
+
+    <bean id="metadata-export" class="org.dspace.app.bulkedit.MetadataExportScriptConfiguration">
+        <property name="description" value="Export metadata for batch editing"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExport"/>
+    </bean>
+
+    <bean id="curate" class="org.dspace.curate.CurationScriptConfiguration">
+        <property name="description" value="Curation tasks"/>
+        <property name="dspaceRunnableClass" value="org.dspace.curate.CurationCli"/>
+    </bean>
+
+    <!-- Keep as last script; for test ScriptRestRepository#findOneScriptByNameTest -->
+    <bean id="mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
+        <property name="description" value="Mocking a script for testing purposes" />
+        <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
+    </bean>
+</beans>

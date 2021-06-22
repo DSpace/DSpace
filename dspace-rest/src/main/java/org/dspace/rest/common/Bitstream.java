@@ -14,7 +14,7 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bundle;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
@@ -35,7 +35,7 @@ public class Bitstream extends DSpaceObject {
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
 
-    Logger log = Logger.getLogger(Bitstream.class);
+    Logger log = org.apache.logging.log4j.LogManager.getLogger(Bitstream.class);
 
     private String bundleName;
     private String description;
@@ -77,7 +77,7 @@ public class Bitstream extends DSpaceObject {
 
         description = bitstream.getDescription();
         format = bitstreamService.getFormatDescription(context, bitstream);
-        sizeBytes = bitstream.getSize();
+        sizeBytes = bitstream.getSizeBytes();
         String path = new DSpace().getRequestService().getCurrentRequest().getHttpServletRequest().getContextPath();
         retrieveLink = path + "/bitstreams/" + bitstream.getID() + "/retrieve";
         mimeType = bitstreamService.getFormat(context, bitstream).getMIMEType();

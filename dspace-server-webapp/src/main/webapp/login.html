@@ -1,0 +1,229 @@
+<!--
+* Customized version of the HAL Browser login.html provided from https://github.com/mikekelly/hal-browser
+* Copyright (c) 2012 Mike Kelly, http://stateless.co/
+* MIT LICENSE: https://github.com/mikekelly/hal-browser/blob/master/MIT-LICENSE.txt)
+*
+* This DSpace version has be customized to include:
+*     * Shibboleth login functionality
+*     * Other customization to use DSpace's login endpoint
+*     * Upgraded third party dependencies (JQuery)
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Sign in - HAL Browser</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="webjars/toastr/build/toastr.min.css" rel="stylesheet"/>
+    <link href="browser/vendor/css/bootstrap.css" rel="stylesheet">
+    <link href="browser/vendor/css/bootstrap-responsive.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #f5f5f5;
+        }
+        .form-signin {
+            max-width: 300px;
+            padding: 19px 29px 29px;
+            margin: 0 auto 20px;
+            background-color: #fff;
+            border: 1px solid #e5e5e5;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+        }
+        .form-signin .form-signin-heading, .form-signin .checkbox {
+            margin-bottom: 10px;
+        }
+        .form-signin input[type="text"], .form-signin input[type="password"] {
+            font-size: 16px;
+            height: auto;
+            margin-bottom: 15px;
+            padding: 7px 9px;
+        }
+
+        .alternative-login {
+            margin-bottom: 10px;
+        }
+    </style>
+    <script src="webjars/jquery/dist/jquery.min.js"></script>
+    <script src="browser/vendor/js/bootstrap.js"></script>
+    <script src="webjars/toastr/build/toastr.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <form id="login-form" class="form-signin">
+        <h2 class="form-signin-heading">HAL Browser</h2>
+        <input type="text" class="input-block-level" placeholder="Username" id="username">
+        <input type="password" class="input-block-level" placeholder="Password" id="password">
+        <button type="submit" class="btn btn-large btn-primary" id="login">Sign in</button>
+        <div class="other-login-methods hidden">
+            <h3>Other login methods:</h3>
+
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function() {
+        var successHandler = function(result, status, xhr) {
+            // look for Authorization header & save to a MyHalBrowserToken cookie
+            document.cookie = "MyHalBrowserToken=" + xhr.getResponseHeader('Authorization').split(" ")[1];
+            // Check for an update to the CSRF Token & save to a MyHalBrowserCsrfToken cookie (if found)
+            checkForUpdatedCSRFTokenInResponse(xhr);
+            toastr.success('You are now logged in. Please wait while we redirect you...', 'Login Successful');
+            setTimeout(function() {
+                window.location.href = window.location.pathname.replace("login.html", "");
+            }, 2000);
+        };
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-top-center",
+            "preventDuplicates": false,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "3000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut",
+            "onclick" : function() { toastr.remove(); }
+        }
+
+        // When the login page loads, we do *two* AJAX requests.
+        // (1) Call GET /api/authn/status. This call has two purposes. First, it checks to see if you are logged in,
+        //     (if not, WWW-Authenticate will return login options). Second, it retrieves the CSRF token, if a
+        //     new one has been assigned (as a valid CSRF token is required for the POST call).
+        // (2) If that /api/authn/status call finds authentication data, call POST /api/authn/login.
+        //     This scenario occurs when you login via an external authentication system (e.g. Shibboleth)...
+        //     in which case the main role of /api/authn/login is to simply ensure the "Authorization" header
+        //     is sent back to the client (based on your authentication data).
+        $.ajax({
+          url : window.location.href.replace("login.html", "") + 'api/authn/status',
+          type : 'GET',
+          success : function(result, status, xhr) {
+            // Check for an update to the CSRF Token & save to a MyHalBrowserCsrfToken cookie (if found)
+            checkForUpdatedCSRFTokenInResponse(xhr);
+
+            // Check for WWW-Authenticate header. If found, this means we are not yet authenticated, and
+            // therefore we need to display available authentication options.
+            var authenticate = xhr.getResponseHeader("WWW-Authenticate");
+            if (authenticate !== null) {
+                var element = $('div.other-login-methods');
+                var realms = authenticate.match(/(\w+ (\w+=((".*?")|[^,]*)(, )?)*)/g);
+                if (realms.length == 1){
+                    var loc = /location="([^,]*)"/.exec(authenticate);
+                    if (loc !== null && loc.length === 2) {
+                        document.location = loc[1];
+                    }
+                } else if (realms.length > 1){
+                    for (var i = 0; i < realms.length; i++){
+                        addLocationButton(realms[i], element);
+                    }
+                }
+            } else {
+                // If Authentication data was found, do a POST /api/authn/login to ensure that data's JWT
+                // is sent back in the "Authorization" header. This simply completes an external authentication
+                // process (e.g. Shibboleth)
+                $.ajax({
+                  url : window.location.href.replace("login.html", "") + 'api/authn/login',
+                  type : 'POST',
+                  beforeSend: function (xhr, settings) {
+                       // If CSRF token found in cookie, send it back as X-XSRF-Token header
+                       var csrfToken = getCSRFToken();
+                       if (csrfToken != null) {
+                           xhr.setRequestHeader('X-XSRF-Token', csrfToken);
+                       }
+                  },
+                  success : successHandler,
+                  error : function(xhr, textStatus, errorThrown) {
+                      // Check for an update to the CSRF Token & save to a MyHalBrowserCsrfToken cookie (if found)
+                      checkForUpdatedCSRFTokenInResponse(xhr);
+                      toastr.error('Failed to logged in. Please check for errors in Javascript console.', 'Login Failed');
+                  }
+                });
+            }
+          },
+          error : function(xhr, textStatus, errorThrown) {
+            toastr.error('Failed to connect with backend. Please check for errors in Javascript console.', 'Could Not Load');
+          }
+        });
+
+        function addLocationButton(realm, element){
+            element.removeClass("hidden");
+            var loc = /location="([^,]*)"/.exec(realm);
+            var name = /(\w+) (\w+=((".*?")|[^,]*)(, )?)*/.exec(realm);
+            if (loc !== null && loc.length === 2) {
+                element.append('<a href="' + loc[1] + '" class="btn btn-large btn-primary alternative-login">' + capitalizeFirstLetter(name[1]) + '</a>');
+            }
+        }
+
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+       /**
+        * Check current response headers to see if the CSRF Token has changed. If a new value is found in headers,
+        * save the new value into our "MyHalBrowserCsrfToken" cookie.
+        **/
+        function checkForUpdatedCSRFTokenInResponse(jqxhr) {
+            // look for DSpace-XSRF-TOKEN header & save to our MyHalBrowserCsrfToken cookie (if found)
+            var updatedCsrfToken = jqxhr.getResponseHeader('DSPACE-XSRF-TOKEN');
+            if (updatedCsrfToken != null) {
+               document.cookie = "MyHalBrowserCsrfToken=" + updatedCsrfToken;
+            }
+        }
+
+       /**
+        * Get CSRF Token by parsing it out of the "MyHalBrowserCsrfToken" cookie.
+        * This cookie is set in login.html after a successful login occurs.
+        **/
+        function getCSRFToken() {
+            var cookie = document.cookie.match('(^|;)\\s*' + 'MyHalBrowserCsrfToken' + '\\s*=\\s*([^;]+)');
+            if (cookie != null) {
+                return cookie.pop();
+            } else {
+                return null;
+            }
+        }
+
+        // When the Username/Password Login form is submitted, POST that data directly to /api/authn/login.
+        // This logs the user in and ensures the "Authorization" header is set with the JWT.
+        $("#login-form").submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                //This depends on this file to be called login.html
+                url : window.location.href.replace("login.html", "") + 'api/authn/login',
+                type : 'POST',
+                async : false,
+                data: {
+                    user: $("#username").val(),
+                    password: $("#password").val()
+                },
+                beforeSend: function (xhr, settings) {
+                    // If CSRF token found in cookie, send it back as X-XSRF-Token header
+                    var csrfToken = getCSRFToken();
+                    if (csrfToken != null) {
+                       xhr.setRequestHeader('X-XSRF-Token', csrfToken);
+                    }
+                },
+                success : successHandler,
+                error : function(xhr) {
+                    // Check for an update to the CSRF Token & save to a MyHalBrowserCsrfToken cookie (if found)
+                    checkForUpdatedCSRFTokenInResponse(xhr);
+                    toastr.error('The credentials you entered are invalid. Please try again.', 'Login Failed');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

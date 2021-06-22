@@ -10,7 +10,9 @@ package org.dspace.app.mediafilter;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.dspace.content.Item;
 
@@ -25,6 +27,8 @@ import org.dspace.content.Item;
  * @author Jason Sherman jsherman@usao.edu
  */
 public class PDFBoxThumbnail extends MediaFilter {
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(PDFBoxThumbnail.class);
+
     @Override
     public String getFilteredName(String oldFilename) {
         return oldFilename + ".jpg";
@@ -64,12 +68,18 @@ public class PDFBoxThumbnail extends MediaFilter {
     @Override
     public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
         throws Exception {
-        PDDocument doc = PDDocument.load(source);
-        PDFRenderer renderer = new PDFRenderer(doc);
-        BufferedImage buf = renderer.renderImage(0);
-//        ImageIO.write(buf, "PNG", new File("custom-render.png"));
-        doc.close();
+        BufferedImage buf;
 
+        // Render the page image.
+        try ( PDDocument doc = PDDocument.load(source); ) {
+            PDFRenderer renderer = new PDFRenderer(doc);
+            buf = renderer.renderImage(0);
+        } catch (InvalidPasswordException ex) {
+            log.error("PDF is encrypted. Cannot create thumbnail (item: {})", currentItem::getHandle);
+            return null;
+        }
+
+        // Generate thumbnail derivative and return as IO stream.
         JPEGFilter jpegFilter = new JPEGFilter();
         return jpegFilter.getThumb(currentItem, buf, verbose);
     }

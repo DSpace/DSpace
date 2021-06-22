@@ -9,13 +9,13 @@ package org.dspace.authenticate;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -49,7 +49,7 @@ public class PasswordAuthentication
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(PasswordAuthentication.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(PasswordAuthentication.class);
 
 
     /**
@@ -151,7 +151,7 @@ public class PasswordAuthentication
                                                       "password_specialgroup",
                                                       "Group defined in modules/authentication-password.cfg login" +
                                                           ".specialgroup does not exist"));
-                        return ListUtils.EMPTY_LIST;
+                        return Collections.EMPTY_LIST;
                     } else {
                         return Arrays.asList(specialGroup);
                     }
@@ -160,7 +160,7 @@ public class PasswordAuthentication
         } catch (Exception e) {
             log.error(LogManager.getHeader(context, "getSpecialGroups", ""), e);
         }
-        return ListUtils.EMPTY_LIST;
+        return Collections.EMPTY_LIST;
     }
 
     /**

@@ -21,8 +21,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.content.Item;
@@ -141,7 +141,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
             return false;
         }
         final EPerson other = (EPerson) obj;
-        if (this.getID() != other.getID()) {
+        if (!this.getID().equals(other.getID())) {
             return false;
         }
         if (!StringUtils.equals(this.getEmail(), other.getEmail())) {

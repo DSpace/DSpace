@@ -21,6 +21,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -28,9 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
@@ -105,7 +105,7 @@ public class X509Authentication implements AuthenticationMethod {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(X509Authentication.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(X509Authentication.class);
 
     /**
      * public key of CA to check client certs against.
@@ -442,7 +442,7 @@ public class X509Authentication implements AuthenticationMethod {
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request)
         throws SQLException {
         if (request == null) {
-            return ListUtils.EMPTY_LIST;
+            return Collections.EMPTY_LIST;
         }
 
         Boolean authenticated = false;
@@ -472,7 +472,7 @@ public class X509Authentication implements AuthenticationMethod {
             return groups;
         }
 
-        return ListUtils.EMPTY_LIST;
+        return Collections.EMPTY_LIST;
     }
 
     /**

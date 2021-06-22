@@ -10,6 +10,8 @@ package org.dspace.app.util;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.core.Utils;
 /**
  * Class representing all DC inputs required for a submission, organized into pages
  *
@@ -25,25 +27,26 @@ public class DCInputSet {
     /**
      * the inputs ordered by row position
      */
-    private DCInput[] inputs = null;
+    private DCInput[][] inputs = null;
 
     /**
      * constructor
      *
      * @param formName       form name
-     * @param headings
      * @param mandatoryFlags
-     * @param fields         fields
+     * @param rows           the rows
      * @param listMap        map
      */
-    public DCInputSet(String formName,
-                      List<Map<String, String>> fields, Map<String, List<String>> listMap) {
+    public DCInputSet(String formName, List<List<Map<String, String>>> rows, Map<String, List<String>> listMap) {
         this.formName = formName;
-        this.inputs = new DCInput[fields.size()];
+        this.inputs = new DCInput[rows.size()][];
         for (int i = 0; i < inputs.length; i++) {
-            Map<String, String> field = fields.get(i);
-            inputs[i] = new DCInput(field, listMap);
-
+            List<Map<String, String>> fields = rows.get(i);
+            inputs[i] = new DCInput[fields.size()];
+            for (int j = 0; j < inputs[i].length; j++) {
+                Map<String, String> field = rows.get(i).get(j);
+                inputs[i][j] = new DCInput(field, listMap);
+            }
         }
     }
 
@@ -71,7 +74,7 @@ public class DCInputSet {
      * @return an array containing the fields
      */
 
-    public DCInput[] getFields() {
+    public DCInput[][] getFields() {
         return inputs;
     }
 
@@ -104,10 +107,24 @@ public class DCInputSet {
      */
     public boolean isFieldPresent(String fieldName) {
         for (int i = 0; i < inputs.length; i++) {
-            DCInput field = inputs[i];
-            String fullName = field.getFieldName();
-            if (fullName.equals(fieldName)) {
-                return true;
+            for (int j = 0; j < inputs[i].length; j++) {
+                DCInput field = inputs[i][j];
+                // If this is a "qualdrop_value" field, then the full field name is the field + dropdown qualifier
+                if (StringUtils.equals(field.getInputType(), "qualdrop_value")) {
+                    List<String> pairs = field.getPairs();
+                    for (int k = 0; k < pairs.size(); k += 2) {
+                        String qualifier = pairs.get(k + 1);
+                        String fullName = Utils.standardize(field.getSchema(), field.getElement(), qualifier, ".");
+                        if (fullName.equals(fieldName)) {
+                            return true;
+                        }
+                    }
+                } else {
+                    String fullName = field.getFieldName();
+                    if (fullName.equals(fieldName)) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -127,11 +144,13 @@ public class DCInputSet {
             documentType = "";
         }
         for (int i = 0; i < inputs.length; i++) {
-            DCInput field = inputs[i];
-            String fullName = field.getFieldName();
-            if (fullName.equals(fieldName)) {
-                if (field.isAllowedFor(documentType)) {
-                    return true;
+            for (int j = 0; j < inputs[i].length; j++) {
+                DCInput field = inputs[i][j];
+                String fullName = field.getFieldName();
+                if (fullName.equals(fieldName)) {
+                    if (field.isAllowedFor(documentType)) {
+                        return true;
+                    }
                 }
             }
         }

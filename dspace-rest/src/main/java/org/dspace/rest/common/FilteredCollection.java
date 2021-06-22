@@ -16,7 +16,7 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -34,7 +34,7 @@ public class FilteredCollection extends DSpaceObject {
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    Logger log = Logger.getLogger(FilteredCollection.class);
+    Logger log = org.apache.logging.log4j.LogManager.getLogger(FilteredCollection.class);
 
     //Relationships
     private Community parentCommunity;

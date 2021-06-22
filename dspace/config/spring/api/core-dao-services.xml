@@ -28,6 +28,11 @@
     <bean class="org.dspace.content.dao.impl.MetadataValueDAOImpl"/>
     <bean class="org.dspace.content.dao.impl.SiteDAOImpl"/>
     <bean class="org.dspace.content.dao.impl.WorkspaceItemDAOImpl"/>
+    <bean class="org.dspace.content.dao.impl.RelationshipDAOImpl"/>
+    <bean class="org.dspace.content.dao.impl.EntityTypeDAOImpl"/>
+    <bean class="org.dspace.content.dao.impl.RelationshipTypeDAOImpl"/>
+
+    <bean class="org.dspace.content.dao.impl.ProcessDAOImpl"/>
 
     <bean class="org.dspace.eperson.dao.impl.EPersonDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.Group2GroupCacheDAOImpl"/>
@@ -48,15 +53,13 @@
     <bean class="org.dspace.versioning.dao.impl.VersionDAOImpl"/>
     <bean class="org.dspace.versioning.dao.impl.VersionHistoryDAOImpl"/>
 
-    <bean class="org.dspace.workflowbasic.dao.impl.BasicWorkflowItemDAOImpl"/>
-    <bean class="org.dspace.workflowbasic.dao.impl.TaskListItemDAOImpl"/>
-
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.ClaimedTaskDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.CollectionRoleDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.InProgressUserDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.PoolTaskDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.WorkflowItemRoleDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.XmlWorkflowItemDAOImpl"/>
+    <bean class="org.dspace.statistics.export.dao.impl.OpenURLTrackerDAOImpl"/>
 
 
 

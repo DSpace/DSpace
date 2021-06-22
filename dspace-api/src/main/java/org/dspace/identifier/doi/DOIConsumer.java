@@ -7,7 +7,7 @@
  */
 package org.dspace.identifier.doi;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -28,7 +28,7 @@ public class DOIConsumer implements Consumer {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(DOIConsumer.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DOIConsumer.class);
 
     @Override
     public void initialize() throws Exception {

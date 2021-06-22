@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -46,7 +46,7 @@ public class CitationPage extends AbstractCurationTask {
     /**
      * Class Logger
      */
-    private static Logger log = Logger.getLogger(CitationPage.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CitationPage.class);
 
     protected int status = Curator.CURATE_UNSET;
     protected String result = null;

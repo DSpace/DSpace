@@ -10,7 +10,7 @@ package org.dspace.authenticate;
 import java.net.Inet6Address;
 import java.net.UnknownHostException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * <p>
@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
  * @version $Revision$
  */
 public class IPMatcher {
-    private static Logger log = Logger.getLogger(IPMatcher.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IPMatcher.class);
 
     /**
      * Network to match
@@ -87,13 +87,16 @@ public class IPMatcher {
                                                          + ipSpec);
                     }
 
-                    int maskBytes = maskBits / 8;
-                    for (int i = 0; i < maskBytes; i++) {
-                        netmask[i] = (byte) 0Xff;
-                    }
-                    netmask[maskBytes] = (byte) ((byte) 0Xff << 8 - (maskBits % 8)); // FIXME test!
-                    for (int i = maskBytes + 1; i < (128 / 8); i++) {
-                        netmask[i] = 0;
+                    for (int i = 0; i < netmask.length; i++) {
+                        if (maskBits <= 0) {
+                            netmask[i] = 0;
+                        } else if (maskBits > 8) {
+                            netmask[i] = (byte) 0Xff;
+                        } else {
+                            netmask[i] = (byte) ((byte) 0Xff << 8 - maskBits);
+                        }
+
+                        maskBits = maskBits - 8;
                     }
                     break;
                 case 1: // No explicit mask:  fill the mask with 1s

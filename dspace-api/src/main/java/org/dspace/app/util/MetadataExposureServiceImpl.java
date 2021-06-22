@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -58,7 +58,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @version $Revision: 3734 $
  */
 public class MetadataExposureServiceImpl implements MetadataExposureService {
-    protected Logger log = Logger.getLogger(MetadataExposureServiceImpl.class);
+    protected Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataExposureServiceImpl.class);
 
     protected Map<String, Set<String>> hiddenElementSets = null;
     protected Map<String, Map<String, Set<String>>> hiddenElementMaps = null;

@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -51,6 +51,16 @@ public class WorkflowItemRoleServiceImpl implements WorkflowItemRoleService {
     public void deleteForWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem)
         throws SQLException, AuthorizeException {
         Iterator<WorkflowItemRole> workflowItemRoles = findByWorkflowItem(context, xmlWorkflowItem).iterator();
+        while (workflowItemRoles.hasNext()) {
+            WorkflowItemRole workflowItemRole = workflowItemRoles.next();
+            workflowItemRoles.remove();
+            delete(context, workflowItemRole);
+        }
+    }
+
+    @Override
+    public void deleteByEPerson(Context context, EPerson ePerson) throws SQLException, AuthorizeException {
+        Iterator<WorkflowItemRole> workflowItemRoles = findByEPerson(context, ePerson).iterator();
         while (workflowItemRoles.hasNext()) {
             WorkflowItemRole workflowItemRole = workflowItemRoles.next();
             workflowItemRoles.remove();

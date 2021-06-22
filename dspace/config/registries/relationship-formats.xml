@@ -1,0 +1,138 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Entity Relationships</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>relation</name>
+        <namespace>http://dspace.org/relation</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isAuthorOfPublication</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfAuthor</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProjectOfPublication</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfProject</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isOrgUnitOfPublication</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfOrgUnit</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProjectOfPerson</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPersonOfProject</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isOrgUnitOfPerson</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPersonOfOrgUnit</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isOrgUnitOfProject</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProjectOfOrgUnit</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isVolumeOfJournal</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isJournalOfVolume</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isIssueOfJournalVolume</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isJournalVolumeOfIssue</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isJournalOfPublication</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isJournalIssueOfPublication</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfJournalIssue</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <!--
+      OpenAIRE4 Guidelines
+      required relationships -->
+    <dc-type>
+        <schema>relation</schema>
+        <element>isContributorOfPublication</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfContributor</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isFundingAgencyOfProject</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProjectOfFundingAgency</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+</dspace-dc-types>

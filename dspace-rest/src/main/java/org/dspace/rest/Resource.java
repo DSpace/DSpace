@@ -16,7 +16,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -40,7 +40,7 @@ public class Resource {
     @javax.ws.rs.core.Context
     public ServletContext servletContext;
 
-    private static Logger log = Logger.getLogger(Resource.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Resource.class);
 
     private static final boolean writeStatistics;
 

@@ -7,6 +7,11 @@
  */
 package org.dspace.rest.common;
 
+import static org.dspace.content.service.DSpaceObjectService.MD_COPYRIGHT_TEXT;
+import static org.dspace.content.service.DSpaceObjectService.MD_INTRODUCTORY_TEXT;
+import static org.dspace.content.service.DSpaceObjectService.MD_SHORT_DESCRIPTION;
+import static org.dspace.content.service.DSpaceObjectService.MD_SIDEBAR_TEXT;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +21,7 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -28,7 +33,6 @@ import org.dspace.core.Context;
  * User: peterdietz
  * Date: 5/22/13
  * Time: 9:41 AM
- * To change this template use File | Settings | File Templates.
  */
 @XmlRootElement(name = "collection")
 public class Collection extends DSpaceObject {
@@ -36,14 +40,14 @@ public class Collection extends DSpaceObject {
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
-    Logger log = Logger.getLogger(Collection.class);
+    Logger log = org.apache.logging.log4j.LogManager.getLogger(Collection.class);
 
     //Relationships
     private Bitstream logo;
     private Community parentCommunity;
-    private List<Community> parentCommunityList = new ArrayList<Community>();
+    private List<Community> parentCommunityList = new ArrayList<>();
 
-    private List<Item> items = new ArrayList<Item>();
+    private List<Item> items = new ArrayList<>();
 
     //Collection-Metadata
     private String license;
@@ -68,17 +72,19 @@ public class Collection extends DSpaceObject {
     private void setup(org.dspace.content.Collection collection, ServletContext servletContext, String expand,
                        Context context, Integer limit, Integer offset)
         throws SQLException {
-        List<String> expandFields = new ArrayList<String>();
+        List<String> expandFields = new ArrayList<>();
         if (expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
 
-        this.setCopyrightText(collectionService.getMetadata(collection, org.dspace.content.Collection.COPYRIGHT_TEXT));
-        this.setIntroductoryText(
-            collectionService.getMetadata(collection, org.dspace.content.Collection.INTRODUCTORY_TEXT));
-        this.setShortDescription(
-            collectionService.getMetadata(collection, org.dspace.content.Collection.SHORT_DESCRIPTION));
-        this.setSidebarText(collectionService.getMetadata(collection, org.dspace.content.Collection.SIDEBAR_TEXT));
+        this.setCopyrightText(collectionService.getMetadataFirstValue(collection,
+                MD_COPYRIGHT_TEXT, org.dspace.content.Item.ANY));
+        this.setIntroductoryText(collectionService.getMetadataFirstValue(collection,
+                MD_INTRODUCTORY_TEXT, org.dspace.content.Item.ANY));
+        this.setShortDescription(collectionService.getMetadataFirstValue(collection,
+                MD_SHORT_DESCRIPTION, org.dspace.content.Item.ANY));
+        this.setSidebarText(collectionService.getMetadataFirstValue(collection,
+                MD_SIDEBAR_TEXT, org.dspace.content.Item.ANY));
 
         if (expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
             List<org.dspace.content.Community> parentCommunities = communityService.getAllParents(context, collection);
@@ -104,7 +110,7 @@ public class Collection extends DSpaceObject {
             Iterator<org.dspace.content.Item> childItems =
                 itemService.findByCollection(context, collection, limit, offset);
 
-            items = new ArrayList<Item>();
+            items = new ArrayList<>();
             while (childItems.hasNext()) {
                 org.dspace.content.Item item = childItems.next();
 

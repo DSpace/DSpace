@@ -184,21 +184,6 @@ public interface ItemImportService {
     public void deleteItems(Context c, String mapfile) throws Exception;
 
     /**
-     * Add items
-     *
-     * @param c             DSpace Context
-     * @param mycollections List of Collections
-     * @param sourcedir     source directory
-     * @param mapfile       map file
-     * @param template      whether to use template item
-     * @param bteInputType  The input type of the data (bibtex, csv, etc.), in case of local file
-     * @param workingDir    working directory
-     * @throws Exception if error
-     */
-    public void addBTEItems(Context c, List<Collection> mycollections, String sourcedir, String mapfile,
-                            boolean template, String bteInputType, String workingDir) throws Exception;
-
-    /**
      * Get temporary work directory
      *
      * @return directory as string

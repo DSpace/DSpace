@@ -45,7 +45,7 @@
   <bitstream-type>
     <mimetype>text/plain; charset=utf-8</mimetype>
     <short_description>License</short_description>
-    <description>Item-specific license agreed upon to submission</description>
+    <description>Item-specific license agreed to upon submission</description>
     <support_level>1</support_level>
     <internal>true</internal>
   </bitstream-type>
@@ -54,7 +54,7 @@
   <bitstream-type>
     <mimetype>text/html; charset=utf-8</mimetype>
     <short_description>CC License</short_description>
-    <description>Item-specific Creative Commons license agreed upon to submission</description>
+    <description>Item-specific Creative Commons license agreed to upon submission</description>
     <support_level>1</support_level>
     <internal>true</internal>
   </bitstream-type>

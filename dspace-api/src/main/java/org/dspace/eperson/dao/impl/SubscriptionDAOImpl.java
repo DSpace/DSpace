@@ -8,18 +8,20 @@
 package org.dspace.eperson.dao.impl;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.dspace.content.Collection;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
+import org.dspace.eperson.Subscription_;
 import org.dspace.eperson.dao.SubscriptionDAO;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Subscription object.
@@ -35,27 +37,28 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
 
     @Override
     public List<Subscription> findByEPerson(Context context, EPerson eperson) throws SQLException {
-        Criteria criteria = createCriteria(context, Subscription.class);
-        criteria.add(
-            Restrictions.and(
-                Restrictions.eq("ePerson", eperson)
-            )
-        );
-        return list(criteria);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        javax.persistence.criteria.CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
+        Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
+        criteriaQuery.select(subscriptionRoot);
+        criteriaQuery.where(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.ePerson), eperson));
+        return list(context, criteriaQuery, false, Subscription.class, -1, -1);
 
     }
 
     @Override
     public Subscription findByCollectionAndEPerson(Context context, EPerson eperson, Collection collection)
         throws SQLException {
-        Criteria criteria = createCriteria(context, Subscription.class);
-        criteria.add(
-            Restrictions.and(
-                Restrictions.eq("ePerson", eperson),
-                Restrictions.eq("collection", collection)
-            )
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        javax.persistence.criteria.CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
+        Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
+        criteriaQuery.select(subscriptionRoot);
+        criteriaQuery
+            .where(criteriaBuilder.and(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.ePerson), eperson),
+                                       criteriaBuilder.equal(subscriptionRoot.get(Subscription_.collection), collection)
+                   )
         );
-        return singleResult(criteria);
+        return singleResult(context, criteriaQuery);
     }
 
 
@@ -87,8 +90,17 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
 
     @Override
     public List<Subscription> findAllOrderedByEPerson(Context context) throws SQLException {
-        Criteria criteria = createCriteria(context, Subscription.class);
-        criteria.addOrder(Order.asc("eperson.id"));
-        return list(criteria);
+
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
+        Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
+        criteriaQuery.select(subscriptionRoot);
+
+        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.ePerson)));
+        criteriaQuery.orderBy(orderList);
+
+        return list(context, criteriaQuery, false, Subscription.class, -1, -1);
     }
 }

@@ -20,7 +20,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -64,7 +64,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class TaskResolver {
     // logging service
-    private static Logger log = Logger.getLogger(TaskResolver.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(TaskResolver.class);
 
     // base directory of task scripts & catalog name
     protected static final String CATALOG = "task.catalog";

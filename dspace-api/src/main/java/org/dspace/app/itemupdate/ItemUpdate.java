@@ -24,18 +24,19 @@ import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * Provides some batch editing capabilities for items in DSpace:
@@ -78,6 +79,7 @@ public class ItemUpdate {
 
     protected static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     static {
         filterAliases.put("ORIGINAL", "org.dspace.app.itemupdate.OriginalBitstreamFilter");
@@ -107,7 +109,7 @@ public class ItemUpdate {
 
     // instance variables
     protected ActionManager actionMgr = new ActionManager();
-    protected List<String> undoActionList = new ArrayList<String>();
+    protected List<String> undoActionList = new ArrayList<>();
     protected String eperson;
 
     /**
@@ -115,7 +117,7 @@ public class ItemUpdate {
      */
     public static void main(String[] argv) {
         // create an options object and populate it
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
 
         Options options = new Options();
 
@@ -273,7 +275,8 @@ public class ItemUpdate {
                         Class<?> cfilter = Class.forName(filterClassname);
                         pr("BitstreamFilter class to instantiate: " + cfilter.toString());
 
-                        filter = (BitstreamFilter) cfilter.newInstance();  //unfortunate cast, an erasure consequence
+                        filter = (BitstreamFilter) cfilter.getDeclaredConstructor()
+                                .newInstance();  //unfortunate cast, an erasure consequence
                     } catch (Exception e) {
                         pr("Error:  Failure instantiating bitstream filter class: " + filterClassname);
                         System.exit(1);
@@ -330,10 +333,7 @@ public class ItemUpdate {
             iu.setEPerson(context, iu.eperson);
             context.turnOffAuthorisationSystem();
 
-            HANDLE_PREFIX = ConfigurationManager.getProperty("handle.canonical.prefix");
-            if (HANDLE_PREFIX == null || HANDLE_PREFIX.length() == 0) {
-                HANDLE_PREFIX = "http://hdl.handle.net/";
-            }
+            HANDLE_PREFIX = handleService.getCanonicalPrefix();
 
             iu.processArchive(context, sourcedir, itemField, metadataIndexName, alterProvenance, isTest);
 

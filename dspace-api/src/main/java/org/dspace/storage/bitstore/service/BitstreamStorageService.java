@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -140,6 +141,19 @@ public interface BitstreamStorageService {
      */
     public void cleanup(boolean deleteDbRecords, boolean verbose) throws SQLException, IOException, AuthorizeException;
 
+    /**
+     * Clone the given bitstream to a new bitstream with a new ID.
+     * Metadata of the given bitstream are also copied to the new bitstream.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param bitstream
+     *            the bitstream to be cloned
+     * @return id of the clone bitstream.
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
+     */
     public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException;
 
     /**
@@ -168,11 +182,13 @@ public interface BitstreamStorageService {
 
 
     /**
-     * Get the last modified timestamp of the file linked to the given bitstream
+     * Gets the last modified timestamp of the the given bitstream's content, if known.
      *
-     * @param bitstream The bitstream for which to get the last modified timestamp
-     * @return The last modified timestamp in milliseconds
+     * @param bitstream the bitstream.
+     * @return the timestamp in milliseconds, or {@code null} if unknown.
+     * @throws IOException if an unexpected io error occurs.
      */
-    public Long getLastModified(Bitstream bitstream);
+    @Nullable
+    Long getLastModified(Bitstream bitstream) throws IOException;
 
 }

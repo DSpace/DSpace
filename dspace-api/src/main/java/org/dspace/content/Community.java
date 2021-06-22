@@ -23,8 +23,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
@@ -52,7 +52,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(Community.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Community.class);
 
     @Column(name = "community_id", insertable = false, updatable = false)
     private Integer legacyId;
@@ -63,13 +63,13 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         joinColumns = {@JoinColumn(name = "parent_comm_id")},
         inverseJoinColumns = {@JoinColumn(name = "child_comm_id")}
     )
-    private Set<Community> subCommunities = new HashSet<>();
+    private final Set<Community> subCommunities = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "subCommunities")
-    private Set<Community> parentCommunities = new HashSet<>();
+    private final Set<Community> parentCommunities = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "communities", cascade = {CascadeType.PERSIST})
-    private Set<Collection> collections = new HashSet<>();
+    private final Set<Collection> collections = new HashSet<>();
 
     @OneToOne
     @JoinColumn(name = "admin")
@@ -82,12 +82,6 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     @OneToOne
     @JoinColumn(name = "logo_bitstream_id")
     private Bitstream logo = null;
-
-    // Keys for accessing Community metadata
-    public static final String COPYRIGHT_TEXT = "copyright_text";
-    public static final String INTRODUCTORY_TEXT = "introductory_text";
-    public static final String SHORT_DESCRIPTION = "short_description";
-    public static final String SIDEBAR_TEXT = "side_bar_text";
 
     @Transient
     protected transient CommunityService communityService;
@@ -107,7 +101,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         setModified();
     }
 
-    void removeSubCommunity(Community subCommunity) {
+    public void removeSubCommunity(Community subCommunity) {
         subCommunities.remove(subCommunity);
         setModified();
     }
@@ -254,7 +248,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     @Override
     public String getName() {
         String value = getCommunityService()
-            .getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+            .getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
         return value == null ? "" : value;
     }
 
@@ -269,4 +263,5 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         }
         return communityService;
     }
+
 }

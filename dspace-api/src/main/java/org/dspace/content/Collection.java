@@ -7,11 +7,14 @@
  */
 package org.dspace.content;
 
+import static org.dspace.content.service.DSpaceObjectService.MD_LICENSE;
+
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -46,7 +49,6 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * effect.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 @Entity
 @Table(name = "collection")
@@ -71,23 +73,6 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     @JoinColumn(name = "template_item_id")
     private Item template;
 
-    /**
-     * Groups corresponding to workflow steps - NOTE these start from one, so
-     * workflowGroups[0] corresponds to workflow_step_1.
-     */
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_step_1")
-    private Group workflowStep1;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_step_2")
-    private Group workflowStep2;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_step_3")
-    private Group workflowStep3;
-
-
     @OneToOne
     @JoinColumn(name = "submitter")
     /** The default group of administrators */
@@ -104,22 +89,10 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         joinColumns = {@JoinColumn(name = "collection_id")},
         inverseJoinColumns = {@JoinColumn(name = "community_id")}
     )
-    private Set<Community> communities = new HashSet<>();
+    private final Set<Community> communities = new HashSet<>();
 
     @Transient
     private transient CollectionService collectionService;
-
-    // Keys for accessing Collection metadata
-    @Transient
-    public static final String COPYRIGHT_TEXT = "copyright_text";
-    @Transient
-    public static final String INTRODUCTORY_TEXT = "introductory_text";
-    @Transient
-    public static final String SHORT_DESCRIPTION = "short_description";
-    @Transient
-    public static final String SIDEBAR_TEXT = "side_bar_text";
-    @Transient
-    public static final String PROVENANCE_TEXT = "provenance_description";
 
     /**
      * Protected constructor, create object using:
@@ -134,7 +107,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     @Override
     public String getName() {
         String value = getCollectionService()
-            .getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+            .getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
         return value == null ? "" : value;
     }
 
@@ -202,41 +175,39 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         setModified();
     }
 
-    public Group getWorkflowStep1() {
-        return workflowStep1;
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
+    public Group getWorkflowStep1(Context context) {
+        return getCollectionService().getWorkflowGroup(context, this, 1);
     }
 
-    public Group getWorkflowStep2() {
-        return workflowStep2;
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
+    public Group getWorkflowStep2(Context context) {
+        return getCollectionService().getWorkflowGroup(context, this, 2);
     }
 
-    public Group getWorkflowStep3() {
-        return workflowStep3;
-    }
-
-    void setWorkflowStep1(Group workflowStep1) {
-        this.workflowStep1 = workflowStep1;
-        setModified();
-    }
-
-    void setWorkflowStep2(Group workflowStep2) {
-        this.workflowStep2 = workflowStep2;
-        setModified();
-    }
-
-    void setWorkflowStep3(Group workflowStep3) {
-        this.workflowStep3 = workflowStep3;
-        setModified();
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
+    public Group getWorkflowStep3(Context context) {
+        return getCollectionService().getWorkflowGroup(context, this, 3);
     }
 
     /**
      * Get the license that users must grant before submitting to this
      * collection.
      *
-     * @return the license for this collection
+     * @return the license for this collection. Never null.
      */
+    @Nonnull
     public String getLicenseCollection() {
-        return getCollectionService().getMetadata(this, "license");
+        String license = getCollectionService()
+                .getMetadataFirstValue(this, CollectionService.MD_LICENSE, Item.ANY);
+        if (null == license) {
+            return "";
+        } else {
+            return license;
+        }
     }
 
     /**
@@ -248,7 +219,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * @throws SQLException if database error
      */
     public void setLicense(Context context, String license) throws SQLException {
-        getCollectionService().setMetadata(context, this, "license", license);
+        getCollectionService().setMetadataSingleValue(context, this, MD_LICENSE, Item.ANY, license);
     }
 
     /**
@@ -353,4 +324,5 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         }
         return collectionService;
     }
+
 }

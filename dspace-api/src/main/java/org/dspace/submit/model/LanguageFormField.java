@@ -7,10 +7,22 @@
  */
 package org.dspace.submit.model;
 
+/**
+ * A simple POJO to store information about the available languages for a field
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ *
+ */
 public class LanguageFormField {
-
+    /**
+     * The value to present to the user
+     */
     private String display;
 
+    /**
+     * The internal iso code to store in the database
+     */
     private String code;
 
     public LanguageFormField(String code, String display) {

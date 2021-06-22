@@ -8,6 +8,7 @@
 package org.dspace.app.itemimport;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,9 +16,9 @@ import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.content.Collection;
@@ -67,12 +68,11 @@ public class ItemImportCLITool {
 
         try {
             // create an options object and populate it
-            CommandLineParser parser = new PosixParser();
+            CommandLineParser parser = new DefaultParser();
 
             Options options = new Options();
 
             options.addOption("a", "add", false, "add items to DSpace");
-            options.addOption("b", "add-bte", false, "add items to DSpace via Biblio-Transformation-Engine (BTE)");
             options.addOption("r", "replace", false, "replace items in mapfile");
             options.addOption("d", "delete", false,
                               "delete items listed in mapfile");
@@ -387,8 +387,6 @@ public class ItemImportCLITool {
                     myloader.replaceItems(c, mycollections, sourcedir, mapfile, template);
                 } else if ("delete".equals(command)) {
                     myloader.deleteItems(c, mapfile);
-                } else if ("add-bte".equals(command)) {
-                    myloader.addBTEItems(c, mycollections, sourcedir, mapfile, template, bteInputType, null);
                 }
 
                 // complete all transactions
@@ -408,7 +406,7 @@ public class ItemImportCLITool {
                         "Deleting temporary zip directory: " + myloader.getTempWorkDirFile().getAbsolutePath());
                     myloader.cleanupZipTemp();
                 }
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 System.out.println("Unable to delete temporary zip archive location: " + myloader.getTempWorkDirFile()
                                                                                                  .getAbsolutePath());
             }

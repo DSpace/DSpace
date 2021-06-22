@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Represents a deposit.
@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
  * @author Stuart Lewis
  */
 public class Deposit {
-    private static final Logger log = Logger.getLogger(Deposit.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Deposit.class);
 
     /**
      * The File deposited

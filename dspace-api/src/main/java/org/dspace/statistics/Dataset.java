@@ -17,9 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import au.com.bytecode.opencsv.CSVWriter;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import com.opencsv.CSVWriterBuilder;
+import com.opencsv.ICSVWriter;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author kevinvandevelde at atmire.com
@@ -54,8 +55,8 @@ public class Dataset {
         initRowLabels(rows);
     }
 
-    public Dataset(float[][] matrix) {
-        this.matrix = (String[][]) ArrayUtils.clone(matrix);
+    public Dataset(String[][] matrix) {
+        this.matrix = ArrayUtils.clone(matrix);
         nbRows = matrix.length;
         if (0 < matrix.length && 0 < matrix[0].length) {
             nbCols = matrix[0].length;
@@ -232,7 +233,7 @@ public class Dataset {
 
     public ByteArrayOutputStream exportAsCSV() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        CSVWriter ecsvp = new CSVWriter(new OutputStreamWriter(baos), ';');
+        ICSVWriter ecsvp = new CSVWriterBuilder(new OutputStreamWriter(baos)).withSeparator(';').build();
         //Generate the item row
         List<String> colLabels = getColLabels();
         colLabels.add(0, "");

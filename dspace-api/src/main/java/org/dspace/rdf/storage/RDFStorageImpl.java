@@ -25,12 +25,12 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 import com.hp.hpl.jena.update.GraphStore;
 import com.hp.hpl.jena.update.GraphStoreFactory;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.atlas.web.auth.HttpAuthenticator;
 import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
 import org.apache.jena.web.DatasetGraphAccessor;
 import org.apache.jena.web.DatasetGraphAccessorHTTP;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.rdf.RDFUtil;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class RDFStorageImpl
     implements RDFStorage {
-    private static final Logger log = Logger.getLogger(RDFStorageImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RDFStorageImpl.class);
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;

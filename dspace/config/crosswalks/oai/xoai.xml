@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration indented="false" maxListIdentifiersSize="100" maxListRecordsSize="100"
-               maxListSetsSize="100" stylesheet="static/style.xsl"
-               xmlns="http://www.lyncode.com/XOAIConfiguration">
+    maxListSetsSize="100" stylesheet="static/style.xsl" xmlns="http://www.lyncode.com/XOAIConfiguration">
 
     <Contexts>
         <Context baseurl="request" name="Default Context">
@@ -29,9 +28,7 @@
         <!--
             Driver Guidelines:
 
-            - http://www.driver-support.eu/documents/DRIVER_Guidelines_v2_Final_2008-11-13.pdf
-
-            Page 57 - 58
+            - https://guidelines.openaire.eu/en/latest/literature/use_of_oai_pmh.html
          -->
         <Context baseurl="driver" name="Driver Context">
             <!-- Date format, field prefixes, etc are ensured by the transformer -->
@@ -72,6 +69,28 @@
                 This contexts complies with OpenAIRE Guidelines for Literature Repositories v3.0.
             </Description>
         </Context>
+
+        <!--
+            OpenAIRE Guidelines 4.0:
+
+            - https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/
+
+            There is a limitation over the embargoedEndDate parameter:
+
+            - Predefined DSpace fields don't allow to set this up with a default.
+         -->
+        <Context baseurl="openaire4" name="OpenAIRE 4 Context">
+            <!-- Date format, field prefixes, etc are ensured by the transformer -->
+            <Transformer ref="openaire4Transformer"/>
+            <!-- OpenAIRE filter -->
+            <Filter ref="openAIRE4Filter"/>
+            <!-- Metadata Formats -->
+            <Format ref="oaiopenaire"/>
+            <Description>
+                This contexts complies with OpenAIRE Guidelines for Literature Repositories v4.0.
+            </Description>
+        </Context>
+
     </Contexts>
 
 
@@ -157,6 +176,15 @@
             <Namespace>http://irdb.nii.ac.jp/oai</Namespace>
             <SchemaLocation>http://irdb.nii.ac.jp/oai/junii2-3-1.xsd</SchemaLocation>
         </Format>
+        <!-- Metadata format based on the OpenAIRE 4.0 guidelines
+             https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/use_of_oai_pmh.html
+        -->
+        <Format id="oaiopenaire">
+            <Prefix>oai_openaire</Prefix>
+            <XSLT>metadataFormats/oai_openaire.xsl</XSLT>
+            <Namespace>http://namespace.openaire.eu/schema/oaire/</Namespace>
+            <SchemaLocation>https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd</SchemaLocation>
+        </Format>
     </Formats>
 
     <Transformers>
@@ -165,6 +193,9 @@
         </Transformer>
         <Transformer id="openaireTransformer">
             <XSLT>transformers/openaire.xsl</XSLT>
+        </Transformer>
+        <Transformer id="openaire4Transformer">
+            <XSLT>transformers/openaire4.xsl</XSLT>
         </Transformer>
     </Transformers>
 
@@ -288,22 +319,83 @@
             </Definition>
         </Filter>
 
-        <!-- Default filter for records returned by OAI-PMH. 
+        <!-- OpenAIRE4 filter for records returned by OAI-PMH.
              By default, return an Item record:
                 * If it is publicly accessible
-                * OR it has been withdrawn (in order to display a tombstone record).
+                * * OR it has been withdrawn (in order to display a tombstone record).
+                * AND doesn't have a dspace.entity.type field
+                * * OR the dspace.entity.type is a Publication
+                * limiting the results only to Publications as expected
+             This filter is used by the default context ([oai]/request).
+        -->
+        <Filter id="openAIRE4Filter">
+            <Definition>
+                <And>
+                    <LeftCondition>
+                        <Or>
+                            <LeftCondition>
+                                <Custom ref="itemAccessCondition"/>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="itemWithdrawnCondition"/>
+                            </RightCondition>
+                        </Or>
+                    </LeftCondition>
+                    <RightCondition>
+                        <Or>
+                            <LeftCondition>
+                                <Not>
+                                    <Condition>
+                                        <Custom ref="relationshipTypeExistsCondition"/>
+                                    </Condition>
+                                </Not>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="isPublicationEntityCondition"/>
+                            </RightCondition>
+                        </Or>
+                    </RightCondition>
+                </And>
+            </Definition>
+        </Filter>
+
+        <!-- Default filter for records returned by OAI-PMH.
+             By default, return an Item record:
+                * If it is publicly accessible
+                * * OR it has been withdrawn (in order to display a tombstone record).
+                * AND doesn't have a dspace.entity.type field
+                * * OR the dspace.entity.type is a Publication
+                * limiting the results only to Publications as expected
              This filter is used by the default context ([oai]/request).
         -->
         <Filter id="defaultFilter">
             <Definition>
-                <Or>
+                <And>
                     <LeftCondition>
-                        <Custom ref="itemAccessCondition"/>
+                        <Or>
+                            <LeftCondition>
+                                <Custom ref="itemAccessCondition"/>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="itemWithdrawnCondition"/>
+                            </RightCondition>
+                        </Or>
                     </LeftCondition>
                     <RightCondition>
-                        <Custom ref="itemWithdrawnCondition"/>
+                        <Or>
+                            <LeftCondition>
+                                <Not>
+                                    <Condition>
+                                        <Custom ref="relationshipTypeExistsCondition"/>
+                                    </Condition>
+                                </Not>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="isPublicationEntityCondition"/>
+                            </RightCondition>
+                        </Or>
                     </RightCondition>
-                </Or>
+                </And>
             </Definition>
         </Filter>
 
@@ -400,6 +492,30 @@
                 <string name="value">info:eu-repo/grantAgreement/</string>
             </Configuration>
         </CustomCondition>
+
+        <!-- This condition determines if an Item has a "dspace.entity.type" -->
+        <CustomCondition id="relationshipTypeExistsCondition">
+            <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+            <Configuration>
+                <string name="field">dspace.entity.type</string>
+            </Configuration>
+        </CustomCondition>
+
+        <!-- This condition determines if an Item has a "dspace.entity.type" field
+             specifying one of the valid DRIVER document types. -->
+        <CustomCondition id="isPublicationEntityCondition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dspace.entity.type</string>
+                <string name="operator">equal</string>
+                <list name="values">
+                    <string>Publication</string>
+                    <string>publication</string>
+                    <!-- and other alternative names for publications types -->
+                </list>
+            </Configuration>
+        </CustomCondition>
+
     </Filters>
 
     <Sets>

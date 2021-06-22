@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -35,7 +35,7 @@ public class HandleDispatcher implements BitstreamDispatcher {
     /**
      * Log 4j logger.
      */
-    private static final Logger LOG = Logger.getLogger(HandleDispatcher.class);
+    private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(HandleDispatcher.class);
 
     protected Context context;
 

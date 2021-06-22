@@ -14,7 +14,7 @@ import java.util.Properties;
 
 import nu.xom.Element;
 import nu.xom.Elements;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.purl.sword.atom.ContentType;
 import org.purl.sword.atom.Title;
 
@@ -37,7 +37,7 @@ public class Workspace extends XmlElement implements SwordElementInterface {
     /**
      * The logger.
      */
-    private static Logger log = Logger.getLogger(Workspace.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Workspace.class);
 
     /**
      * Local name part of this element.

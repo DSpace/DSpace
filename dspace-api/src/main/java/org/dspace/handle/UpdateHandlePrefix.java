@@ -12,12 +12,12 @@ import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexClient;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
@@ -33,7 +33,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class UpdateHandlePrefix {
 
-    private static final Logger log = Logger.getLogger(UpdateHandlePrefix.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UpdateHandlePrefix.class);
     private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
                                                                                           .getConfigurationService();
 
@@ -98,7 +98,7 @@ public class UpdateHandlePrefix {
                         MetadataValueService metadataValueService = ContentServiceFactory.getInstance()
                                                                                          .getMetadataValueService();
 
-                        String handlePrefix = configurationService.getProperty("handle.canonical.prefix");
+                        String handlePrefix = handleService.getCanonicalPrefix();
                         Iterator<MetadataValue> metadataValues = metadataValueService
                             .findByValueLike(context, handlePrefix + oldH);
 
@@ -139,7 +139,7 @@ public class UpdateHandlePrefix {
 
                     try {
                         // Reinitialise the search and browse system
-                        IndexClient.main(new String[] {"-b"});
+                        ScriptLauncher.main(new String[] {"index-discovery", "-b"});
                         System.out.println("Browse and search indexes are ready now.");
                         // All done
                         System.out.println("\nAll done successfully. Please check the DSpace logs!\n");

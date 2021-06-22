@@ -47,4 +47,6 @@ public interface ClaimedTaskService extends DSpaceCRUDService<ClaimedTask> {
 
     public void deleteByWorkflowItem(Context context, XmlWorkflowItem workflowItem)
         throws SQLException, AuthorizeException;
+
+    List<ClaimedTask> findAll(Context context) throws SQLException;
 }
