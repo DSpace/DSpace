@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -63,7 +64,8 @@ public class ItemRest extends DSpaceObjectRest {
     private Date lastModified = new Date();
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String entityType = null;
-    // TODO ignore if null?
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<UUID> relatedItems = null;
 
     @Override
@@ -126,6 +128,10 @@ public class ItemRest extends DSpaceObjectRest {
     public void addRelatedItem(UUID itemUUID) {
         initRelatedItems();
         relatedItems.add(itemUUID);
+    }
+
+    public List<UUID> getRelatedItems() {
+        return relatedItems;
     }
 
 }

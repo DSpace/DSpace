@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.projection;
 
 import java.sql.SQLException;
@@ -19,7 +26,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * TODO
+ * Check if one or more item uuids are related to the requested item.
+ *
+ * Example request: {{url}}/api/core/items/{{requested-item}}?projection=CheckRelatedItem
+ *                  &checkRelatedItem={{related-item}}&checkRelatedItem={{unrelated-item}}
+ *
+ * In the example above, the response will contain a relatedItems list that contains {{related-item}}.
+ *
+ * If this projection is not requested, then relatedItems is not present in the response.
+ * If this projection is requested but no related items are found, an empty array is returned in the response.
  */
 @Component
 public class CheckRelatedItemProjection extends AbstractProjection {
@@ -50,7 +65,7 @@ public class CheckRelatedItemProjection extends AbstractProjection {
             Context context = ContextUtil.obtainContext(servletRequest);
             ItemRest itemRest = (ItemRest) restObject;
 
-            // TODO
+            // ensure that relatedItems is present in the response
             itemRest.initRelatedItems();
 
             String[] uuidStrs = servletRequest.getParameterValues(PARAM_NAME);
