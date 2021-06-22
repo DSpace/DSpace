@@ -46,7 +46,7 @@ import org.dspace.usage.UsageEvent;
  * Notifies Google Analytics of Bitstream VIEW events. These events are stored in memory and then
  * asynchronously processed by a single seperate thread.
  *
- * @author Chris Herron
+ * @author April Herron
  */
 public class GoogleAsyncEventListener extends AbstractUsageEventListener {
 

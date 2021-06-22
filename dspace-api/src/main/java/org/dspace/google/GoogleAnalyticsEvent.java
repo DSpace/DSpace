@@ -10,7 +10,7 @@ package org.dspace.google;
 /**
  * This is a dataholder class for an individual event to be sent to Google Analaytics
  *
- * @author Chris Herron
+ * @author April Herron
  */
 public class GoogleAnalyticsEvent {
 
