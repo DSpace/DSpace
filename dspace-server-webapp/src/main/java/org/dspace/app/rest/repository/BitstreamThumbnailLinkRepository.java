@@ -25,23 +25,23 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * Link repository for the thumbnail Bitstream of an Item
+ * Link repository for the thumbnail Bitstream of a Bitstream
  */
 @Component(BitstreamRest.CATEGORY + "." + BitstreamRest.NAME + "." + BitstreamRest.THUMBNAIL)
 public class BitstreamThumbnailLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
     @Autowired
     BitstreamService bitstreamService;
 
-    @PreAuthorize("hasPermission(#itemId, 'ITEM', 'READ')")
+    @PreAuthorize("hasPermission(#bitstreamId, 'BITSTREAM', 'READ')")
     public BitstreamRest getThumbnail(@Nullable HttpServletRequest request,
-                                      UUID itemId,
+                                      UUID bitstreamId,
                                       @Nullable Pageable optionalPageable,
                                       Projection projection) {
         try {
             Context context = obtainContext();
-            Bitstream bitstream = bitstreamService.find(context, itemId);
+            Bitstream bitstream = bitstreamService.find(context, bitstreamId);
             if (bitstream == null) {
-                throw new ResourceNotFoundException("No such item: " + itemId);
+                throw new ResourceNotFoundException("No such bitstream: " + bitstreamId);
             }
             Bitstream thumbnail = bitstreamService.getThumbnail(context, bitstream);
             if (thumbnail == null) {
@@ -53,3 +53,4 @@ public class BitstreamThumbnailLinkRepository extends AbstractDSpaceRestReposito
         }
     }
 }
+//
