@@ -3871,6 +3871,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void thumbnailEndpointTest() throws Exception {
+        // Given an Item
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -3895,19 +3896,29 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         InputStream is = IOUtils.toInputStream("dummy", "utf-8");
 
+        // With two ORIGINAL Bitstreams with matching THUMBNAIL Bitstreams
         BitstreamBuilder.createBitstream(context, originalBundle, is)
-                        .withName("test.pdf")
+                        .withName("test1.pdf")
+                        .withMimeType("application/pdf")
+                        .build();
+        BitstreamBuilder.createBitstream(context, originalBundle, is)
+                        .withName("test2.pdf")
                         .withMimeType("application/pdf")
                         .build();
         Bitstream thumbnail = BitstreamBuilder.createBitstream(context, thumbnailBundle, is)
-                                              .withName("test.pdf.jpg")
+                                              .withName("test1.pdf.jpg")
                                               .withMimeType("image/jpeg")
                                               .build();
+        BitstreamBuilder.createBitstream(context, thumbnailBundle, is)
+                        .withName("test2.pdf.jpg")
+                        .withMimeType("image/jpeg")
+                        .build();
 
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
+        // Item's thumbnail endpoint should return the first ORIGINAL Bitstream's thumbnail
         getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID() + "/thumbnail"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.uuid", Matchers.is(thumbnail.getID().toString())))
@@ -3916,6 +3927,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void thumbnailEndpointMultipleThumbnailsWithPrimaryBitstreamTest() throws Exception {
+        // Given an Item
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -3940,6 +3952,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         InputStream is = IOUtils.toInputStream("dummy", "utf-8");
 
+        // With two ORIGINAL Bitstreams with matching THUMBNAIL Bitstreams
         BitstreamBuilder.createBitstream(context, originalBundle, is)
                         .withName("test1.pdf")
                         .withMimeType("application/pdf")
@@ -3952,7 +3965,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                      .withName("test3.pdf")
                                                      .withMimeType("application/pdf")
                                                      .build();
-        originalBundle.setPrimaryBitstreamID(primaryBitstream);
 
         BitstreamBuilder.createBitstream(context, thumbnailBundle, is)
                                               .withName("test1.pdf.jpg")
@@ -3966,9 +3978,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                      .withName("test3.pdf.jpg")
                                                      .withMimeType("image/jpeg")
                                                      .build();
+        // and a primary Bitstream (not the first)
+        originalBundle.setPrimaryBitstreamID(primaryBitstream);
 
         context.restoreAuthSystemState();
 
+        // Item's thumbnail endpoint should link to the primary Bitstream's thumbnail
         getClient().perform(get("/api/core/items/" + item.getID() + "/thumbnail"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.uuid", Matchers.is(primaryThumbnail.getID().toString())))
@@ -3977,6 +3992,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void thumbnailEndpointItemWithoutThumbnailsTest() throws Exception {
+        // Given an Item
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -3995,7 +4011,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Bundle originalBundle = BundleBuilder.createBundle(context, item)
                                              .withName(Constants.DEFAULT_BUNDLE_NAME)
                                              .build();
-        BundleBuilder.createBundle(context, item)
+
+        // With an Empty THUMBNAIL Bundle
+        Bundle thumbnailBundle = BundleBuilder.createBundle(context, item)
                                               .withName("THUMBNAIL")
                                               .build();
 
@@ -4008,6 +4026,19 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
+        // Should fail with HTTP 204
+        getClient().perform(get("/api/core/items/" + item.getID() + "/thumbnail"))
+                   .andExpect(status().isNoContent());
+
+        // With a THUMBNAIL bitstream that doesn't match the ORIGINAL Bitstream's name
+        context.turnOffAuthorisationSystem();
+        BitstreamBuilder.createBitstream(context, thumbnailBundle, is)
+                        .withName("random.pdf.jpg")
+                        .withMimeType("image/jpeg")
+                        .build();
+        context.restoreAuthSystemState();
+
+        // Should still fail with HTTP 204
         getClient().perform(get("/api/core/items/" + item.getID() + "/thumbnail"))
                    .andExpect(status().isNoContent());
     }
