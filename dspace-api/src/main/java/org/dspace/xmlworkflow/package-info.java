@@ -15,7 +15,9 @@
  * {@link XmlWorkflowService#start}.  This causes the wrapped Item to be
  * unwrapped and re-wrapped into a new {@link WorkflowItem}, and links the
  * WorkflowItem to objects which represent its state of progress through the
- * workflow of its owning Collection.
+ * workflow of its owning Collection.  This unwrapping/re-wrapping removes the
+ * Item from the user's workspace and places it into the target Collection's
+ * workflow.
  * 
  * <p>The WorkflowItem proceeds through a sequence of
  * {@link org.dspace.xmlworkflow.state.Step "steps"}.  Each step is configured
@@ -28,6 +30,9 @@
  * configured {@link org.dspace.curate.CurationTask Curation Task}s.  See
  * {@link org.dspace.curate.service.XmlWorkflowCuratorService the workflow
  * curation service}.
+ * 
+ * <p>An Item which has completed all "steps" in the target Collection's
+ * workflow is removed from the workflow and installed in the archive.
  */
 
 package org.dspace.xmlworkflow;
