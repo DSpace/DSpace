@@ -306,7 +306,15 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             throws AuthorizeException, IOException, SQLException, WorkflowException, WorkflowConfigurationException {
         WorkflowActionConfig firstActionConfig = firstStep.getUserSelectionMethod();
 
-        // Perform curation tasks if needed.
+        // Check for curation tasks at the start of this step.
+        //
+        // If doCuration returns true, either no curation tasks are mapped to
+        // this step, or they were run and succeeded.  In this scenario, we
+        // continue with the current step.
+        //
+        // If doCuration returns false, either curation tasks were queued, or
+        // they resulted in rejection of the item.  In this scenario, the
+        // current step cannot be completed and we must exit immediately.
         if (!xmlWorkflowCuratorService.doCuration(context, wfi)) {
             // don't proceed - either curation tasks queued, or item rejected
             log.info(LogManager.getHeader(context, "start_workflow",
@@ -347,7 +355,15 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             MessagingException, WorkflowException {
         XmlWorkflowItem wi = xmlWorkflowItemService.find(c, workflowItemId);
 
-        // Perform curation tasks if needed.
+        // Check for curation tasks.
+        //
+        // If doCuration returns true, either no curation tasks are mapped to
+        // this step, or they were run and succeeded.  In this scenario, we
+        // continue with the current step.
+        //
+        // If doCuration returns false, either curation tasks were queued, or
+        // they resulted in rejection of the item.  In this scenario, the
+        // current step cannot be completed and we must exit immediately.
         if (!xmlWorkflowCuratorService.doCuration(c, wi)) {
             // don't proceed - either curation tasks queued, or item rejected
             log.info(LogManager.getHeader(c, "advance_workflow",
@@ -483,7 +499,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             } catch (IOException | SQLException | AuthorizeException
                     | WorkflowException | WorkflowConfigurationException e) {
                 log.error("error while processing workflow outcome", e);
-                e.printStackTrace(); // XXX Why is this here?
             } finally {
                 if ((nextStep != null && currentStep != null && nextActionConfig != null)
                         || (wfi.getItem().isArchived() && currentStep != null)) {

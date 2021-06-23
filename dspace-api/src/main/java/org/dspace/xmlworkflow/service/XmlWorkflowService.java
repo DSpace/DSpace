@@ -120,10 +120,10 @@ public interface XmlWorkflowService extends WorkflowService<XmlWorkflowItem> {
     public void deleteAllPooledTasks(Context c, XmlWorkflowItem wi) throws SQLException, AuthorizeException;
 
     /**
-     * Deletes an EPerson from the task pool of a step.
+     * Deletes a pooled (uncompleted) task from the task pool of a step.
      * @param context current DSpace session.
-     * @param wi      the workflow item from which to remove the EPerson.
-     * @param task    the task from which to remove the EPerson.
+     * @param wi      the workflow item associated with the task.
+     * @param task    the task to be removed.
      * @throws SQLException       passed through.
      * @throws AuthorizeException passed through.
      */
@@ -133,8 +133,8 @@ public interface XmlWorkflowService extends WorkflowService<XmlWorkflowItem> {
     /**
      * Deletes a completed task of a step.
      * @param c    current DSpace session.
-     * @param wi   the workflow item from which to remove the EPerson.
-     * @param task the task from which to remove the EPerson.
+     * @param wi   the workflow item associated with the task.
+     * @param task the task to be removed.
      * @throws SQLException       passed through.
      * @throws AuthorizeException passed through.
      */
