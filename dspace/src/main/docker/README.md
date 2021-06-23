@@ -1,5 +1,9 @@
 # Docker images supporting DSpace
 
+***
+:warning: **NOT PRODUCTION READY**  The below Docker images/resources are not guaranteed "production ready" at this time. They have been built for development/testing only. Therefore, DSpace Docker images may not be fully secured or up-to-date. While you are welcome to base your own images on these DSpace images/resources, these should not be used "as is" in any production scenario.
+***
+
 ## Dockerfile.dependencies
 
 This Dockerfile is used to pre-cache Maven dependency downloads that will be used in subsequent DSpace docker builds.
