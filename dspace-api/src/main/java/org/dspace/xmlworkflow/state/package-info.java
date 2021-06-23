@@ -6,7 +6,7 @@
  * http://www.dspace.org/license/
  */
 /**
- * A workflow contains a sequence of steps.
+ * A workflow consists of a sequence of steps.
  * A {@link org.dspace.workflow.WorkflowItem WorkflowItem} advances through the
  * sequence until it is either rejected or accepted.
  * 
