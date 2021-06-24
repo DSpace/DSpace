@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean class="org.dspace.xmlworkflow.XmlWorkflowFactoryImpl">
         <property name="workflowMapping">
@@ -13,6 +16,11 @@
 <!--                <entry key="123456789/5" value-ref="scoreReview"/>-->
             </util:map>
         </property>
+    </bean>
+
+    <bean class='org.dspace.workflow.CurationTaskConfig'>
+        <constructor-arg name='configurationDocument'
+                         value='file:${dspace.dir}/config/workflow-curation.xml'/>
     </bean>
 
     <!--Standard DSpace workflow-->
@@ -49,7 +57,6 @@
         <property name="description"
                   value="The people responsible for this step are able to edit the metadata of incoming submissions, and then accept or reject them."/>
     </bean>
-
 
     <bean name="editstep" class="org.dspace.xmlworkflow.state.Step">
         <property name="userSelectionMethod" ref="claimaction"/>
@@ -135,7 +142,8 @@
         </property>
         <property name="outcomes">
             <util:map>
-                <entry key="#{ T(org.dspace.xmlworkflow.state.actions.processingaction.SingleUserReviewAction).OUTCOME_REJECT}" value-ref="selectReviewerStep"/>
+                <entry key="#{ T(org.dspace.xmlworkflow.state.actions.processingaction.SingleUserReviewAction).OUTCOME_REJECT}"
+                       value-ref="selectReviewerStep"/>
             </util:map>
         </property>
     </bean>
