@@ -5,9 +5,10 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.sherpa;
+package org.dspace.app.sherpa.v1;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * POJO representation for a SHERPA Publisher record
@@ -15,6 +16,7 @@ import java.util.List;
  * @author Andrea Bollini
  * 
  */
+@Deprecated
 public class SHERPAPublisher
 {
     private String name;
@@ -50,6 +52,12 @@ public class SHERPAPublisher
     private String dateadded;
 
     private String dateupdated;
+
+    private Map<String, List<String>> conditionMap;
+
+    public SHERPAPublisher() {
+
+    }
 
     public SHERPAPublisher(String name, String alias, String homeurl,
             String prearchiving, List<String> prerestriction,
@@ -180,4 +188,79 @@ public class SHERPAPublisher
         return dateupdated;
     }
 
+    public Map<String, List<String>> getConditionMap() {
+        return this.conditionMap;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public void setHomeurl(String homeurl) {
+        this.homeurl = homeurl;
+    }
+
+    public void setPrearchiving(String prearchiving) {
+        this.prearchiving = prearchiving;
+    }
+
+    public void setPrerestriction(List<String> prerestriction) {
+        this.prerestriction = prerestriction;
+    }
+
+    public void setPostarchiving(String postarchiving) {
+        this.postarchiving = postarchiving;
+    }
+
+    public void setPostrestriction(List<String> postrestriction) {
+        this.postrestriction = postrestriction;
+    }
+
+    public void setPubarchiving(String pubarchiving) {
+        this.pubarchiving = pubarchiving;
+    }
+
+    public void setPubrestriction(List<String> pubrestriction) {
+        this.pubrestriction = pubrestriction;
+    }
+
+    public void setCondition(List<String> condition) {
+        this.condition = condition;
+    }
+
+    public void setPaidaccessurl(String paidaccessurl) {
+        this.paidaccessurl = paidaccessurl;
+    }
+
+    public void setPaidaccessname(String paidaccessname) {
+        this.paidaccessname = paidaccessname;
+    }
+
+    public void setPaidaccessnotes(String paidaccessnotes) {
+        this.paidaccessnotes = paidaccessnotes;
+    }
+
+    public void setCopyright(List<String[]> copyright) {
+        this.copyright = copyright;
+    }
+
+    public void setRomeocolour(String romeocolour) {
+        this.romeocolour = romeocolour;
+    }
+
+    public void setDateadded(String dateadded) {
+        this.dateadded = dateadded;
+    }
+
+    public void setDateupdated(String dateupdated) {
+        this.dateupdated = dateupdated;
+    }
+
+    public void setConditionMap(Map<String, List<String>> conditionMap) {
+        this.conditionMap = conditionMap;
+    }
 }
