@@ -147,9 +147,9 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * @param cacheable
      *         Whether or not this query should be cacheable
      * @param clazz
-     *         The clazz for which this CriteriaQuery will be executed on
+     *         The class for which this CriteriaQuery will be executed on
      * @param maxResults
-     *         The maxmimum amount of results that will be returned for this CriteriaQuery
+     *         The maximum amount of results that will be returned for this CriteriaQuery
      * @param offset
      *         The offset to be used for the CriteriaQuery
      * @return A list of distinct results as depicted by the CriteriaQuery and parameters
@@ -206,10 +206,18 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
     /**
      * Retrieve a unique result from the query.  If multiple results CAN be
-     * retrieved an exception will be thrown,
-     * so only use when the criteria state uniqueness in the database.
+     * retrieved an exception will be thrown, so only use when the criteria
+     * state uniqueness in the database.
+     * @param context current DSpace session.
      * @param criteriaQuery JPA criteria
-     * @return a DAO specified by the criteria
+     * @param cacheable whether or not this query should be cacheable.
+     * @param clazz type of object that should match the query.
+     * @param maxResults return at most this many results.
+     * @param offset skip this many leading results.
+     * @return the single model object specified by the criteria,
+     *          or {@code null} if none match.
+     * @throws java.sql.SQLException passed through.
+     * @throws IllegalArgumentException if multiple objects match.
      */
     public T uniqueResult(Context context, CriteriaQuery criteriaQuery, boolean cacheable, Class<T> clazz,
                           int maxResults, int offset) throws SQLException {
@@ -228,8 +236,10 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * Retrieve a single result from the query.  Best used if you expect a
      * single result, but this isn't enforced on the database.
+     * @param context current DSpace session
      * @param criteriaQuery JPA criteria
      * @return a DAO specified by the criteria
+     * @throws java.sql.SQLException passed through.
      */
     public T singleResult(Context context, CriteriaQuery criteriaQuery) throws SQLException {
         Query query = this.getHibernateSession(context).createQuery(criteriaQuery);
@@ -300,7 +310,7 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * @param criteriaQuery
      *         The CriteriaQuery for which this result will be retrieved
      * @param criteriaBuilder
-     *         The CriteriaBuilder that accompagnies the CriteriaQuery
+     *         The CriteriaBuilder that accompanies the CriteriaQuery
      * @param root
      *         The root that'll determine on which class object we need to calculate the result
      * @return The amount of results that would be found by this CriteriaQuery as an integer value
