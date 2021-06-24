@@ -19,8 +19,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * A class that that extends the action to support the common
- * isAuthorized method
+ * Represent an action that can be offered to a workflow step's user(s).
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -34,6 +33,8 @@ public abstract class ProcessingAction extends Action {
     @Autowired(required = true)
     protected ItemService itemService;
 
+    public static final String SUBMIT_EDIT_METADATA = "submit_edit_metadata";
+    public static final String SUBMIT_CANCEL = "submit_cancel";
 
     @Override
     public boolean isAuthorized(Context context, HttpServletRequest request, XmlWorkflowItem wfi) throws SQLException {

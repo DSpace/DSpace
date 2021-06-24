@@ -106,7 +106,8 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
     public void getAllRelationshipTypesTest() throws Exception {
         List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context);
 
-        getClient().perform(get("/api/core/relationshiptypes"))
+        getClient().perform(get("/api/core/relationshiptypes")
+                .param("projection", "full"))
 
                 //We expect a 200 OK status
                 .andExpect(status().isOk())
@@ -155,7 +156,8 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
         // made for the comparison between the REST response and we expect to have happened through the script
         RelationshipType alteredRelationshipType = relationshipTypes.get(0);
         alteredRelationshipType.setLeftMinCardinality(10);
-        getClient().perform(get("/api/core/relationshiptypes"))
+        getClient().perform(get("/api/core/relationshiptypes")
+                   .param("projection", "full"))
 
                    //We expect a 200 OK status
                    .andExpect(status().isOk())

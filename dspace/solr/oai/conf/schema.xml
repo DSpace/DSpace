@@ -143,14 +143,17 @@
    <dynamicField name="*_f"  type="float"   indexed="true"  stored="true"/>
    <dynamicField name="*_d"  type="double"  indexed="true"  stored="true"/>
    <dynamicField name="*_dt" type="date"    indexed="true"  stored="true"/>
+
    <dynamicField name="*_ti" type="int"     indexed="true"  stored="true"/>
    <dynamicField name="*_tl" type="long"    indexed="true"  stored="true"/>
    <dynamicField name="*_tf" type="float"   indexed="true"  stored="true"/>
    <dynamicField name="*_td" type="double"  indexed="true"  stored="true"/>
-   <dynamicField name="*_tdt" type="date"   indexed="true"  stored="true"/>
-   <dynamicField name="*_pi"  type="pint"   indexed="true"  stored="true"/>
+
+   <dynamicField name="*_pi" type="pint"    indexed="true"  stored="true"/>
+
    <dynamicField name="ignored_*" type="ignored" multiValued="true"/>
    <dynamicField name="attr_*" type="textgen" indexed="true" stored="true" multiValued="true"/>
+
    <dynamicField name="random_*" type="random" />
    
  </fields>

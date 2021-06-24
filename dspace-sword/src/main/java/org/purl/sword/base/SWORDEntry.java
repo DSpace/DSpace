@@ -380,7 +380,7 @@ public class SWORDEntry extends Entry {
                                                                      SwordValidationInfoType.WARNING));
             }
         } else if (swordUserAgent != null && validateAll) {
-            info.addValidationInfo(swordUserAgent.validate(validationContext));
+            swordEntry.addValidationInfo(swordUserAgent.validate(validationContext));
         }
 
         // additional rules for sword elements
@@ -393,7 +393,7 @@ public class SWORDEntry extends Entry {
                                                                      "dereferences to such a description.",
                                                                  SwordValidationInfoType.ERROR));
         } else if (swordTreatment != null && validateAll) {
-            info.addValidationInfo(swordTreatment.validate(validationContext));
+            swordEntry.addValidationInfo(swordTreatment.validate(validationContext));
         }
 
         // additional rules for sword elements
@@ -409,7 +409,7 @@ public class SWORDEntry extends Entry {
                                                                      SwordValidationInfoType.WARNING));
             }
         } else if (swordVerboseDescription != null && validateAll) {
-            info.addValidationInfo(swordVerboseDescription.validate(validationContext));
+            swordEntry.addValidationInfo(swordVerboseDescription.validate(validationContext));
         }
 
         if (swordNoOp == null) {
@@ -428,7 +428,7 @@ public class SWORDEntry extends Entry {
                                                                      SwordValidationInfoType.WARNING));
             }
         } else if (swordNoOp != null && validateAll) {
-            info.addValidationInfo(swordNoOp.validate(validationContext));
+            swordEntry.addValidationInfo(swordNoOp.validate(validationContext));
         }
 
         if (swordPackaging == null) {
@@ -440,7 +440,7 @@ public class SWORDEntry extends Entry {
                                                                      "it SHOULD take a value from [SWORD-TYPES].",
                                                                  SwordValidationInfoType.INFO));
         } else if (swordPackaging != null && validateAll) {
-            info.addValidationInfo(swordPackaging.validate(validationContext));
+            swordEntry.addValidationInfo(swordPackaging.validate(validationContext));
         }
 
         return swordEntry;

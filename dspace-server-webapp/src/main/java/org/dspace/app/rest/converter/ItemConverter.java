@@ -11,25 +11,20 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.RelationshipRest;
-import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
+import org.dspace.app.rest.model.MetadataValueList;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.Relationship;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
-import org.dspace.services.RequestService;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,91 +36,65 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ItemConverter
-    extends DSpaceObjectConverter<org.dspace.content.Item, org.dspace.app.rest.model.ItemRest>
-    implements IndexableObjectConverter<Item, ItemRest> {
+        extends DSpaceObjectConverter<Item, ItemRest>
+        implements IndexableObjectConverter<Item, ItemRest> {
 
-    @Autowired(required = true)
-    private CollectionConverter collectionConverter;
-    @Autowired(required = true)
-    private BitstreamConverter bitstreamConverter;
-    @Autowired
-    private RequestService requestService;
-    @Autowired
-    private RelationshipService relationshipService;
-    @Autowired
-    private RelationshipConverter relationshipConverter;
     @Autowired
     private ItemService itemService;
-    @Autowired
-    private MetadataConverter metadataConverter;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
 
     @Override
-    public ItemRest fromModel(org.dspace.content.Item obj) {
-        ItemRest item = super.fromModel(obj);
+    public ItemRest convert(Item obj, Projection projection) {
+        ItemRest item = super.convert(obj, projection);
         item.setInArchive(obj.isArchived());
         item.setDiscoverable(obj.isDiscoverable());
         item.setWithdrawn(obj.isWithdrawn());
         item.setLastModified(obj.getLastModified());
-        try {
-            Collection c = obj.getOwningCollection();
-            if (c != null) {
-                item.setOwningCollection(collectionConverter.fromModel(c));
-            }
-        } catch (Exception e) {
-            log.error("Error setting owning collection for item" + item.getHandle(), e);
-        }
-        try {
-            Collection c = obj.getTemplateItemOf();
-            if (c != null) {
-                item.setTemplateItemOf(collectionConverter.fromModel(c));
-            }
-        } catch (Exception e) {
-            log.error("Error setting template item of for item " + item.getHandle(), e);
-        }
-        List<BitstreamRest> bitstreams = new ArrayList<BitstreamRest>();
-        for (Bundle bun : obj.getBundles()) {
-            for (Bitstream bit : bun.getBitstreams()) {
-                BitstreamRest bitrest = bitstreamConverter.fromModel(bit);
-                bitstreams.add(bitrest);
-            }
-        }
-        item.setBitstreams(bitstreams);
-        List<Relationship> relationships = new LinkedList<>();
-        try {
-            Context context;
-            Request currentRequest = requestService.getCurrentRequest();
-            if (currentRequest != null) {
-                HttpServletRequest request = currentRequest.getHttpServletRequest();
-                context = ContextUtil.obtainContext(request);
-            } else {
-                context = new Context();
-            }
-            relationships = relationshipService.findByItem(context, obj);
-        } catch (SQLException e) {
-            log.error("Error retrieving relationships for item " + item.getHandle(), e);
-        }
-        List<RelationshipRest> relationshipRestList = new LinkedList<>();
-        for (Relationship relationship : relationships) {
-            RelationshipRest relationshipRest = relationshipConverter.fromModel(relationship);
-            relationshipRestList.add(relationshipRest);
-        }
-        item.setRelationships(relationshipRestList);
 
-        List<MetadataValue> fullList = new LinkedList<>();
-        fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
-
-        item.setMetadata(metadataConverter.convert(fullList));
-
+        List<MetadataValue> entityTypes =
+            itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
+        if (CollectionUtils.isNotEmpty(entityTypes) && StringUtils.isNotBlank(entityTypes.get(0).getValue())) {
+            item.setEntityType(entityTypes.get(0).getValue());
+        }
 
         return item;
     }
 
+    /**
+     * Retrieves the metadata list filtered according to the hidden metadata configuration
+     * When the context is null, it will return the metadatalist as for an anonymous user
+     * Overrides the parent method to include virtual metadata
+     * @param context The context
+     * @param obj     The object of which the filtered metadata will be retrieved
+     * @return A list of object metadata (including virtual metadata) filtered based on the the hidden metadata
+     * configuration
+     */
     @Override
-    public org.dspace.content.Item toModel(ItemRest obj) {
-        // TODO Auto-generated method stub
-        return null;
+    public MetadataValueList getPermissionFilteredMetadata(Context context, Item obj) {
+        List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
+        List<MetadataValue> returnList = new LinkedList<>();
+        try {
+            if (obj.isWithdrawn() && (Objects.isNull(context) ||
+                                      Objects.isNull(context.getCurrentUser()) || !authorizeService.isAdmin(context))) {
+                return new MetadataValueList(new ArrayList<MetadataValue>());
+            }
+            if (context != null && authorizeService.isAdmin(context)) {
+                return new MetadataValueList(fullList);
+            }
+            for (MetadataValue mv : fullList) {
+                MetadataField metadataField = mv.getMetadataField();
+                if (!metadataExposureService
+                        .isHidden(context, metadataField.getMetadataSchema().getName(),
+                                  metadataField.getElement(),
+                                  metadataField.getQualifier())) {
+                    returnList.add(mv);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error filtering item metadata based on permissions", e);
+        }
+        return new MetadataValueList(returnList);
     }
 
     @Override
@@ -134,12 +103,12 @@ public class ItemConverter
     }
 
     @Override
-    protected Class<Item> getModelClass() {
+    public Class<Item> getModelClass() {
         return Item.class;
     }
 
     @Override
     public boolean supportsModel(IndexableObject idxo) {
-        return idxo instanceof Item;
+        return idxo.getIndexedObject() instanceof Item;
     }
 }

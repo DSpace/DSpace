@@ -11,13 +11,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class provides a single point of contact for
@@ -30,10 +32,12 @@ public class CollectionLocation {
     /**
      * Log4j logger
      */
-    public static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionLocation.class);
+    public static final Logger log = LogManager.getLogger(CollectionLocation.class);
 
     protected HandleService handleService = HandleServiceFactory.getInstance()
                                                                 .getHandleService();
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Obtain the deposit URL for the given collection.  These URLs
@@ -97,24 +101,24 @@ public class CollectionLocation {
      * If the configuration sword.deposit.url is set, this will be returned,
      * but if not, it will construct the url as follows:
      *
-     * [dspace.baseUrl]/sword/deposit
+     * [dspace.server.url]/sword/deposit
      *
-     * where dspace.baseUrl is also in the configuration file.
+     * where dspace.server.url is also in the configuration file.
      *
      * @return the base URL for sword deposit
      * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     private String getBaseUrl()
         throws DSpaceSWORDException {
-        String depositUrl = ConfigurationManager.getProperty(
-            "sword-server", "deposit.url");
+        String depositUrl = configurationService.getProperty(
+            "sword-server.deposit.url");
         if (depositUrl == null || "".equals(depositUrl)) {
-            String dspaceUrl = ConfigurationManager
-                .getProperty("dspace.baseUrl");
+            String dspaceUrl = configurationService
+                .getProperty("dspace.server.url");
             if (dspaceUrl == null || "".equals(dspaceUrl)) {
                 throw new DSpaceSWORDException(
                     "Unable to construct deposit urls, due to missing/invalid config in sword.deposit.url and/or " +
-                        "dspace.baseUrl");
+                        "dspace.server.url");
             }
 
             try {
@@ -123,7 +127,7 @@ public class CollectionLocation {
                                      url.getPort(), "/sword/deposit").toString();
             } catch (MalformedURLException e) {
                 throw new DSpaceSWORDException(
-                    "Unable to construct deposit urls, due to invalid dspace.baseUrl " +
+                    "Unable to construct deposit urls, due to invalid dspace.server.url " +
                         e.getMessage(), e);
             }
 

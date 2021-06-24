@@ -7,16 +7,9 @@
  */
 package org.dspace.app.rest.converter;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.discovery.IndexableObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,49 +20,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CommunityConverter
-    extends DSpaceObjectConverter<org.dspace.content.Community, org.dspace.app.rest.model.CommunityRest>
-    implements IndexableObjectConverter<Community, CommunityRest> {
-
-    @Autowired
-    private BitstreamConverter bitstreamConverter;
-
-    @Autowired
-    private CollectionConverter collectionConverter;
-
-    @Override
-    public org.dspace.content.Community toModel(org.dspace.app.rest.model.CommunityRest obj) {
-        return (org.dspace.content.Community) super.toModel(obj);
-    }
-
-    @Override
-    public CommunityRest fromModel(org.dspace.content.Community obj) {
-        CommunityRest com = (CommunityRest) super.fromModel(obj);
-        Bitstream logo = obj.getLogo();
-        if (logo != null) {
-            com.setLogo(bitstreamConverter.convert(logo));
-        }
-        List<Collection> collections = obj.getCollections();
-        List<CollectionRest> collectionsRest = new ArrayList<CollectionRest>();
-        if (collections != null) {
-            for (Collection col : collections) {
-                CollectionRest colrest = collectionConverter.fromModel(col);
-                collectionsRest.add(colrest);
-            }
-        }
-        com.setCollections(collectionsRest);
-
-        List<Community> subCommunities = obj.getSubcommunities();
-        List<CommunityRest> communityRest = new ArrayList<CommunityRest>();
-        if (subCommunities != null) {
-            for (Community scom : subCommunities) {
-                CommunityRest scomrest = this.fromModel(scom);
-                communityRest.add(scomrest);
-            }
-        }
-        com.setSubCommunities(communityRest);
-
-        return com;
-    }
+    extends DSpaceObjectConverter<Community, CommunityRest>
+        implements IndexableObjectConverter<Community, CommunityRest> {
 
     @Override
     protected CommunityRest newInstance() {
@@ -77,12 +29,12 @@ public class CommunityConverter
     }
 
     @Override
-    protected Class<org.dspace.content.Community> getModelClass() {
-        return org.dspace.content.Community.class;
+    public Class<Community> getModelClass() {
+        return Community.class;
     }
 
     @Override
     public boolean supportsModel(IndexableObject idxo) {
-        return idxo instanceof Community;
+        return idxo.getIndexedObject() instanceof Community;
     }
 }

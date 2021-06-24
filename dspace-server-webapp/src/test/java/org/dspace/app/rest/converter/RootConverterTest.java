@@ -12,13 +12,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import org.dspace.app.rest.model.RootRest;
+import org.dspace.app.util.Util;
 import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * This class' purpose is to test the RootConvertor class.
@@ -34,9 +35,9 @@ public class RootConverterTest {
 
     @Before
     public void setUp() throws Exception {
-        when(configurationService.getProperty("dspace.url")).thenReturn("dspaceurl");
+        when(configurationService.getProperty("dspace.ui.url")).thenReturn("dspaceurl");
         when(configurationService.getProperty("dspace.name")).thenReturn("dspacename");
-        when(configurationService.getProperty("dspace.restUrl")).thenReturn("rest");
+        when(configurationService.getProperty("dspace.server.url")).thenReturn("rest");
     }
 
     @Test
@@ -48,9 +49,10 @@ public class RootConverterTest {
     public void testCorrectPropertiesSetFromConfigurationService() throws Exception {
         String restUrl = "rest";
         RootRest rootRest = rootConverter.convert();
-        assertEquals("dspaceurl", rootRest.getDspaceURL());
+        assertEquals("dspaceurl", rootRest.getDspaceUI());
         assertEquals("dspacename", rootRest.getDspaceName());
-        assertEquals(restUrl, rootRest.getDspaceRest());
+        assertEquals(restUrl, rootRest.getDspaceServer());
+        assertEquals("DSpace " + Util.getSourceVersion(), rootRest.getDspaceVersion());
     }
 
     @Test

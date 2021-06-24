@@ -189,16 +189,19 @@ ALTER TABLE item2bundle add primary key (item_id,bundle_id);
 --Migrate Bundle2Bitsteam
 ALTER TABLE bundle2bitstream ALTER COLUMN bundle_id rename to bundle_legacy_id;
 ALTER TABLE bundle2bitstream ALTER COLUMN bitstream_id rename to bitstream_legacy_id;
+ALTER TABLE bundle2bitstream ALTER COLUMN bitstream_order rename to bitstream_order_legacy;
 ALTER TABLE bundle2bitstream ADD COLUMN bundle_id UUID NOT NULL;
 ALTER TABLE bundle2bitstream ADD CONSTRAINT bundle2bitstream_bundle_id_fk FOREIGN KEY (bundle_id) REFERENCES bundle;
 ALTER TABLE bundle2bitstream ADD COLUMN bitstream_id UUID NOT NULL;
 ALTER TABLE bundle2bitstream ADD CONSTRAINT bundle2bitstream_bitstream_id_fk FOREIGN KEY (bitstream_id) REFERENCES bitstream;
+ALTER TABLE bundle2bitstream ADD COLUMN bitstream_order INTEGER NOT NULL;
 UPDATE bundle2bitstream SET bundle_id = (SELECT bundle.uuid FROM bundle WHERE bundle2bitstream.bundle_legacy_id = bundle.bundle_id);
 UPDATE bundle2bitstream SET bitstream_id = (SELECT bitstream.uuid FROM bitstream WHERE bundle2bitstream.bitstream_legacy_id = bitstream.bitstream_id);
 ALTER TABLE bundle2bitstream DROP COLUMN bundle_legacy_id;
 ALTER TABLE bundle2bitstream DROP COLUMN bitstream_legacy_id;
+ALTER TABLE bundle2bitstream DROP COLUMN bitstream_order_legacy;
 ALTER TABLE bundle2bitstream DROP COLUMN id;
-ALTER TABLE bundle2bitstream add primary key (bitstream_id,bundle_id);
+ALTER TABLE bundle2bitstream add primary key (bitstream_id,bundle_id,bitstream_order);
 
 
 -- Migrate item

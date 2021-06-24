@@ -9,6 +9,7 @@ package org.dspace.xoai.services.impl.xoai;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,6 +23,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
+import org.dspace.core.Utils;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.config.ConfigurationService;
@@ -132,13 +134,13 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration {
     @Override
     public List<String> getDescription() {
         List<String> result = new ArrayList<String>();
-        String descriptionFile = configurationService.getProperty("oai", "description.file");
+        String descriptionFile = configurationService.getProperty("oai.description.file");
         if (descriptionFile == null) {
             // Try indexed
             boolean stop = false;
             List<String> descriptionFiles = new ArrayList<String>();
             for (int i = 0; !stop; i++) {
-                String tmp = configurationService.getProperty("oai", "description.file." + i);
+                String tmp = configurationService.getProperty("oai.description.file." + i);
                 if (tmp == null) {
                     stop = true;
                 } else {
@@ -150,7 +152,10 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration {
                 try {
                     File f = new File(path);
                     if (f.exists()) {
-                        result.add(FileUtils.readFileToString(f));
+                        String fileAsString = FileUtils.readFileToString(f, StandardCharsets.UTF_8);
+                        // replace any configuration placeholders (e.g. ${variable}) in string
+                        fileAsString = Utils.interpolateConfigsInString(fileAsString);
+                        result.add(fileAsString);
                     }
                 } catch (IOException e) {
                     log.debug(e.getMessage(), e);
@@ -161,7 +166,10 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration {
             try {
                 File f = new File(descriptionFile);
                 if (f.exists()) {
-                    result.add(FileUtils.readFileToString(f));
+                    String fileAsString = FileUtils.readFileToString(f, StandardCharsets.UTF_8);
+                    // replace any configuration placeholders (e.g. ${variable}) in string
+                    fileAsString = Utils.interpolateConfigsInString(fileAsString);
+                    result.add(fileAsString);
                 }
             } catch (IOException e) {
                 log.debug(e.getMessage(), e);

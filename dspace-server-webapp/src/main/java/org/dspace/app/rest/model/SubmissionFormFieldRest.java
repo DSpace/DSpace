@@ -13,8 +13,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import org.dspace.app.rest.model.submit.SelectableMetadata;
+import org.dspace.app.rest.model.submit.SelectableRelationship;
 import org.dspace.submit.model.LanguageFormField;
-import org.dspace.submit.model.SelectableMetadata;
 
 /**
  * The SubmissionFormField REST Resource. It is not addressable directly, only used
@@ -70,6 +71,7 @@ public class SubmissionFormFieldRest {
      */
     private String style;
 
+    private SelectableRelationship selectableRelationship;
     /**
      * The list of metadata, often a single element, to offer for the storage of the information. This map the DSpace <
      * 7 concepts of qualdrop
@@ -264,4 +266,11 @@ public class SubmissionFormFieldRest {
         }
     }
 
+    public SelectableRelationship getSelectableRelationship() {
+        return selectableRelationship;
+    }
+
+    public void setSelectableRelationship(SelectableRelationship selectableRelationship) {
+        this.selectableRelationship = selectableRelationship;
+    }
 }

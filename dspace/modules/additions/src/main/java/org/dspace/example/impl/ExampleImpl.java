@@ -10,9 +10,7 @@ package org.dspace.example.impl;
 import org.dspace.example.Example;
 
 /**
- * TODO: Add Description
- *
- * @author mdiggory @ atmire.com
+ * This class serves as an example of how & where to add local customizations to the DSpace REST API.
  */
 public class ExampleImpl implements Example {
 }

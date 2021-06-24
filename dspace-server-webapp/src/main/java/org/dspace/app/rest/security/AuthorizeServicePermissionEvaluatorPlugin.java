@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Constants;
@@ -64,28 +65,44 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
         Context context = ContextUtil.obtainContext(request.getServletRequest());
         EPerson ePerson = null;
         try {
-            UUID dsoId = UUIDUtils.fromString(targetId.toString());
-            DSpaceObjectService<DSpaceObject> dSpaceObjectService;
-            try {
-                dSpaceObjectService =
+            if (targetId != null) {
+                UUID dsoId = UUIDUtils.fromString(targetId.toString());
+                DSpaceObjectService<DSpaceObject> dSpaceObjectService;
+                try {
+                    dSpaceObjectService =
                         contentServiceFactory.getDSpaceObjectService(Constants.getTypeID(targetType));
-            } catch (UnsupportedOperationException e) {
-                // ok not a dspace object
-                return false;
-            }
-
-            ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
-
-            if (dSpaceObjectService != null && dsoId != null) {
-                DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
-
-                //If the dso is null then we give permission so we can throw another status code instead
-                if (dSpaceObject == null) {
-                    return true;
+                } catch (UnsupportedOperationException e) {
+                    // ok not a dspace object
+                    return false;
                 }
 
-                return authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,
-                        restPermission.getDspaceApiActionId(), false);
+                ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
+
+                if (dSpaceObjectService != null && dsoId != null) {
+                    DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
+
+                    //If the dso is null then we give permission so we can throw another status code instead
+                    if (dSpaceObject == null) {
+                        return true;
+                    }
+
+
+                    if (dSpaceObject instanceof Item) {
+                        Item item = (Item) dSpaceObject;
+                        if (DSpaceRestPermission.STATUS.equals(restPermission) && item.isWithdrawn()) {
+                            return true;
+                        }
+                        // If the item is still inprogress we can process here only the READ permission.
+                        // Other actions need to be evaluated against the wrapper object (workspace or workflow item)
+                        if (!DSpaceRestPermission.READ.equals(restPermission) &&
+                                   !item.isArchived() && !item.isWithdrawn()) {
+                            return false;
+                        }
+                    }
+
+                    return authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,
+                        restPermission.getDspaceApiActionId(), true);
+                }
             }
 
         } catch (SQLException e) {

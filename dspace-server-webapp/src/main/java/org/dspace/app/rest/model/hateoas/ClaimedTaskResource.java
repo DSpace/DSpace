@@ -19,7 +19,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(ClaimedTaskRest.NAME)
 public class ClaimedTaskResource extends DSpaceResource<ClaimedTaskRest> {
-    public ClaimedTaskResource(ClaimedTaskRest witem, Utils utils, String... rels) {
-        super(witem, utils, rels);
+    public ClaimedTaskResource(ClaimedTaskRest witem, Utils utils) {
+        super(witem, utils);
     }
 }

@@ -65,7 +65,7 @@ public class Curator {
      */
     public static final int CURATE_SKIP = 2;
 
-    // invocation modes - used by Suspendable tasks
+    /** invocation modes - used by {@link Suspendable} tasks */
     public static enum Invoked {
         INTERACTIVE, BATCH, ANY
     }
@@ -98,6 +98,7 @@ public class Curator {
         communityService = ContentServiceFactory.getInstance().getCommunityService();
         itemService = ContentServiceFactory.getInstance().getItemService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
+        resolver = new TaskResolver();
     }
 
     /**
@@ -142,10 +143,10 @@ public class Curator {
                 // performance order currently FIFO - to be revisited
                 perfList.add(taskName);
             } catch (IOException ioE) {
-                log.error("Task: '" + taskName + "' initialization failure: " + ioE.getMessage());
+                System.out.println("Task: '" + taskName + "' initialization failure: " + ioE.getMessage());
             }
         } else {
-            log.error("Task: '" + taskName + "' does not resolve");
+            System.out.println("Task: '" + taskName + "' does not resolve");
         }
         return this;
     }
@@ -259,13 +260,6 @@ public class Curator {
     /**
      * Performs all configured tasks upon DSpace object
      * (Community, Collection or Item).
-     * <P>
-     * Note: Site-wide tasks will default to running as
-     * an Anonymous User unless you call the Site-wide task
-     * via the {@link curate(Context,String)} or
-     * {@link #curate(Context, DSpaceObject)} method with an
-     * authenticated Context object.
-     *
      * @param dso the DSpace object
      * @throws IOException if IO error
      */
@@ -325,7 +319,7 @@ public class Curator {
             taskQ.enqueue(queueId, new TaskQueueEntry(c.getCurrentUser().getName(),
                                                       System.currentTimeMillis(), perfList, id));
         } else {
-            log.error("curate - no TaskQueue implemented");
+            System.out.println("curate - no TaskQueue implemented");
         }
     }
 
@@ -343,10 +337,15 @@ public class Curator {
      * @param message the message to output to the reporting stream.
      */
     public void report(String message) {
+        if (null == reporter) {
+            log.warn("report called with no Reporter set:  {}", message);
+            return;
+        }
+
         try {
             reporter.append(message);
         } catch (IOException ex) {
-            log.error("Task reporting failure", ex);
+            System.out.println("Task reporting failure: " +  ex);
         }
     }
 
@@ -552,7 +551,7 @@ public class Curator {
                 return !suspend(statusCode);
             } catch (IOException ioe) {
                 //log error & pass exception upwards
-                log.error("Error executing curation task '" + task.getName() + "'", ioe);
+                System.out.println("Error executing curation task '" + task.getName() + "'; " + ioe);
                 throw ioe;
             }
         }
@@ -568,7 +567,7 @@ public class Curator {
                 return !suspend(statusCode);
             } catch (IOException ioe) {
                 //log error & pass exception upwards
-                log.error("Error executing curation task '" + task.getName() + "'", ioe);
+                System.out.println("Error executing curation task '" + task.getName() + "'; " + ioe);
                 throw ioe;
             }
         }

@@ -181,4 +181,15 @@ public interface HandleService {
     public void modifyHandleDSpaceObject(Context context, String handle, DSpaceObject newOwner) throws SQLException;
 
     int countTotal(Context context) throws SQLException;
+
+    /**
+     * Format a handle ~
+     *   - hdl:123456789/1                     -> 123456789/1
+     *   - info:hdl/123456789/1                -> 123456789/1
+     *   - https://hdl.handle.net/123456789/1  -> 123456789/1
+     *
+     * @param identifier
+     * @return
+     */
+    String parseHandle(String identifier);
 }

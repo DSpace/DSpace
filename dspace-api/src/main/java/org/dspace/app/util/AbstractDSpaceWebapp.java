@@ -14,8 +14,9 @@ import java.util.Date;
 
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.WebAppService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,16 +51,18 @@ abstract public class AbstractDSpaceWebapp
     /**
      * Construct a particular kind of DSpace application.
      *
-     * @param kind what kind of application is this?  (XMLUI, JSPUI, etc.)
+     * @param kind what kind of application is this?
      */
     public AbstractDSpaceWebapp(String kind) {
         this.kind = kind;
 
         started = new Date();
 
-        url = ConfigurationManager.getProperty("dspace.url");
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        url = configurationService.getProperty("dspace.ui.url");
         if (null == url) {
-            throw new IllegalStateException("dspace.url is undefined");
+            throw new IllegalStateException("dspace.ui.url is undefined");
         }
     }
 

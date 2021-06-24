@@ -24,7 +24,6 @@ import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * @author Fabio Bolognesi (fabio at atmire dot com)
@@ -47,7 +46,7 @@ public class VersioningServiceImpl implements VersioningService {
 
     private DefaultItemVersionProvider provider;
 
-    @Required
+    @Autowired(required = true)
     public void setProvider(DefaultItemVersionProvider provider) {
         this.provider = provider;
     }
@@ -56,7 +55,7 @@ public class VersioningServiceImpl implements VersioningService {
 
     }
 
-    /**
+    /*
      * Service Methods
      */
     @Override

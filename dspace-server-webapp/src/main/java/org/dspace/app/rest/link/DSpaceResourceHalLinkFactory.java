@@ -21,8 +21,8 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
@@ -46,28 +46,29 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
                 Method readMethod = pd.getReadMethod();
                 String name = pd.getName();
                 if (readMethod != null && !"class".equals(name)) {
-                    LinkRest linkAnnotation = AnnotationUtils.findAnnotation(readMethod, LinkRest.class);
+                    LinkRest linkRest = utils.findLinkAnnotation(readMethod);
 
-                    if (linkAnnotation != null) {
-                        if (StringUtils.isNotBlank(linkAnnotation.name())) {
-                            name = linkAnnotation.name();
+                    if (linkRest != null) {
+                        if (StringUtils.isNotBlank(linkRest.name())) {
+                            name = linkRest.name();
                         }
 
                         Link linkToSubResource = utils.linkToSubResource(data, name);
                         // no method is specified to retrieve the linked object(s) so check if it is already here
-                        if (StringUtils.isBlank(linkAnnotation.method())) {
+                        if (StringUtils.isBlank(linkRest.method())) {
                             Object linkedObject = readMethod.invoke(data);
 
-                            if (linkedObject instanceof RestAddressableModel
-                                    && linkAnnotation.linkClass().isAssignableFrom(linkedObject.getClass())) {
+                            if (linkedObject instanceof RestAddressableModel) {
 
                                 linkToSubResource = utils
                                     .linkToSingleResource((RestAddressableModel) linkedObject, name);
                             }
 
-                            if (linkedObject != null || !linkAnnotation.optional()) {
-                                halResource.add(linkToSubResource);
+                            if (!halResource.getContent().getProjection().allowLinking(halResource, linkRest)) {
+                                continue; // projection disallows this optional method-level link
                             }
+
+                            halResource.add(linkToSubResource);
                         }
 
                     } else if (RestModel.class.isAssignableFrom(readMethod.getReturnType())) {
@@ -80,7 +81,7 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
             e.printStackTrace();
         }
 
-        halResource.add(utils.linkToSingleResource(data, Link.REL_SELF));
+        halResource.add(utils.linkToSingleResource(data, IanaLinkRelations.SELF.value()));
     }
 
     protected Class<RestResourceController> getControllerClass() {

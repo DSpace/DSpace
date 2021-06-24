@@ -10,6 +10,8 @@ package org.dspace.app.rest.model;
 
 import java.util.Objects;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * The SubmissionVisibility REST Resource. It is not addressable directly, only
  * used as inline object in the SubmissionPanel resource and SubmissionForm's fields
@@ -48,5 +50,13 @@ public class SubmissionVisibilityRest {
             return Objects.equals(main, vis2.getMain()) && Objects.equals(other, vis2.getOther());
         }
         return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(5, 31)
+            .append(this.getMain())
+            .append(this.getOther())
+            .toHashCode();
     }
 }

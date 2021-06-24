@@ -13,15 +13,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.RelationshipBuilder;
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.RelationshipMatcher;
 import org.dspace.app.rest.matcher.RelationshipTypeMatcher;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RelationshipBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
@@ -72,21 +72,22 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
         EntityType journalIssueEntityType = entityTypeService.findByEntityType(context, "journalIssue");
 
         RelationshipType relationshipType1 = relationshipTypeService
-            .findbyTypesAndLabels(context, publicationEntityType, personEntityType, "isAuthorOfPublication",
+            .findbyTypesAndTypeName(context, publicationEntityType, personEntityType, "isAuthorOfPublication",
                                   "isPublicationOfAuthor");
         RelationshipType relationshipType2 = relationshipTypeService
-            .findbyTypesAndLabels(context, publicationEntityType, projectEntityType, "isProjectOfPublication",
+            .findbyTypesAndTypeName(context, publicationEntityType, projectEntityType, "isProjectOfPublication",
                                   "isPublicationOfProject");
         RelationshipType relationshipType3 = relationshipTypeService
-            .findbyTypesAndLabels(context, publicationEntityType, orgunitEntityType, "isOrgUnitOfPublication",
+            .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isOrgUnitOfPublication",
                                   "isPublicationOfOrgUnit");
         RelationshipType relationshipType4 = relationshipTypeService
-            .findbyTypesAndLabels(context, journalIssueEntityType, publicationEntityType, "isPublicationOfJournalIssue",
-                                  "isJournalIssueOfPublication");
+            .findbyTypesAndTypeName(context, journalIssueEntityType, publicationEntityType,
+                    "isPublicationOfJournalIssue", "isJournalIssueOfPublication");
         RelationshipType relationshipType5 = relationshipTypeService
-            .findbyTypesAndLabels(context, publicationEntityType, orgunitEntityType, "isAuthorOfPublication",
+            .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isAuthorOfPublication",
                                   "isPublicationOfAuthor");
-        getClient().perform(get("/api/core/entitytypes/" + publicationEntityType.getID() + "/relationshiptypes"))
+        getClient().perform(get("/api/core/entitytypes/" + publicationEntityType.getID() + "/relationshiptypes")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType1),
@@ -117,60 +118,60 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
                                   .withTitle("Author1")
                                   .withIssueDate("2017-10-17")
                                   .withAuthor("Smith, Donald")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
                                   .withTitle("Author2")
                                   .withIssueDate("2016-02-13")
                                   .withAuthor("Smith, Maria")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
                                   .withTitle("Author3")
                                   .withIssueDate("2016-02-13")
                                   .withAuthor("Maybe, Maybe")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item orgUnit1 = ItemBuilder.createItem(context, col3)
                                    .withTitle("OrgUnit1")
                                    .withAuthor("Testy, TEst")
                                    .withIssueDate("2015-01-01")
-                                   .withRelationshipType("OrgUnit")
+                                   .withEntityType("OrgUnit")
                                    .build();
 
         Item project1 = ItemBuilder.createItem(context, col3)
                                    .withTitle("Project1")
                                    .withAuthor("Testy, TEst")
                                    .withIssueDate("2015-01-01")
-                                   .withRelationshipType("Project")
+                                   .withEntityType("Project")
                                    .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
                                       .withTitle("Publication1")
                                       .withAuthor("Testy, TEst")
                                       .withIssueDate("2015-01-01")
-                                      .withRelationshipType("Publication")
+                                      .withEntityType("Publication")
                                       .build();
 
         Item publication2 = ItemBuilder.createItem(context, col3)
                                        .withTitle("Publication2")
                                        .withIssueDate("2015-01-01")
-                                       .withRelationshipType("Publication")
+                                       .withEntityType("Publication")
                                        .build();
 
         RelationshipType isOrgUnitOfPersonRelationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Person"),
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Person"),
                                   entityTypeService.findByEntityType(context, "OrgUnit"),
                                   "isOrgUnitOfPerson", "isPersonOfOrgUnit");
         RelationshipType isOrgUnitOfProjectRelationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Project"),
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Project"),
                                   entityTypeService.findByEntityType(context, "OrgUnit"),
                                   "isOrgUnitOfProject", "isProjectOfOrgUnit");
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
                                   entityTypeService.findByEntityType(context, "Person"),
                                   "isAuthorOfPublication", "isPublicationOfAuthor");
 
@@ -184,7 +185,9 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
             .createRelationshipBuilder(context, publication2, author3, isAuthorOfPublicationRelationshipType).build();
 
         context.restoreAuthSystemState();
-        getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication"))
+        //verify results
+        getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship1),
@@ -193,20 +196,42 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
                        RelationshipMatcher.matchRelationship(relationship4)
                    )));
 
+        //verify paging
+        getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication&size=2"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(4)));
+
+        //verify results
         getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication&dso="
-                                    + publication.getID()))
+                                    + publication.getID())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship1),
                        RelationshipMatcher.matchRelationship(relationship2)
                    )));
 
+        //verify paging
         getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication&dso="
-                                    + publication2.getID()))
+                                    + publication.getID() + "&size=1"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        //verify results
+        getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication&dso="
+                                    + publication2.getID())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship3),
                        RelationshipMatcher.matchRelationship(relationship4)
                    )));
+
+        //verify paging
+        getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication&dso="
+                                    + publication2.getID() + "&size=1"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
+
     }
 }

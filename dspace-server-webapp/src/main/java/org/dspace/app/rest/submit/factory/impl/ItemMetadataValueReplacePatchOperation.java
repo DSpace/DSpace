@@ -8,6 +8,7 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
@@ -16,7 +17,6 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
  * must return an error.
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /sections/traditionalpageone/dc.title/0", "value": {"value": "Add new
  * title", "language": "en"}}]'
@@ -37,7 +37,7 @@ import org.springframework.util.Assert;
  * It is also possible to change only a single attribute of the {@link MetadataValueRest} (except the "place").
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /sections/traditionalpageone/dc.title/0/language", "value": "it"}]'
  * </code>
@@ -50,8 +50,8 @@ public class ItemMetadataValueReplacePatchOperation extends MetadataValueReplace
     ItemService itemService;
 
     @Override
-    void replace(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-        throws Exception {
+    void replace(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
+            Object value) throws Exception {
         String[] split = getAbsolutePath(path).split("/");
 
         List<MetadataValue> metadataByMetadataString = itemService.getMetadataByMetadataString(source.getItem(),

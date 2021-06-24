@@ -36,7 +36,6 @@ public class ClaimedTaskMatcher {
      */
     public static Matcher matchClaimedTask(ClaimedTask cTask, String step) {
         return allOf(
-                hasJsonPath("$.step", is(step)),
                 // Check workflowitem properties
                 matchProperties(cTask),
                 // Check links

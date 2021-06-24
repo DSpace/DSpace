@@ -17,12 +17,14 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
+import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.sort.OrderFormat;
 import org.dspace.sort.SortException;
@@ -56,13 +58,13 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
     protected ChoiceAuthorityService choiceAuthorityService;
 
     @Override
-    public void additionalIndex(Context context, IndexableObject dso, SolrInputDocument document) {
+    public void additionalIndex(Context context, IndexableObject indexableObject, SolrInputDocument document) {
         // Only works for Items
-        if (!(dso instanceof Item)) {
+        if (!(indexableObject instanceof IndexableItem)) {
             return;
         }
-        Item item = (Item) dso;
-
+        Item item = ((IndexableItem) indexableObject).getIndexedObject();
+        Collection collection = item.getOwningCollection();
         // Get the currently configured browse indexes
         BrowseIndex[] bis;
         try {
@@ -86,13 +88,13 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                 bi.generateMdBits();
 
                 // values to show in the browse list
-                Set<String> distFValues = new HashSet<String>();
+                Set<String> distFValues = new HashSet<>();
                 // value for lookup without authority
-                Set<String> distFVal = new HashSet<String>();
+                Set<String> distFVal = new HashSet<>();
                 // value for lookup with authority
-                Set<String> distFAuths = new HashSet<String>();
+                Set<String> distFAuths = new HashSet<>();
                 // value for lookup when partial search (the item mapper tool use it)
-                Set<String> distValuesForAC = new HashSet<String>();
+                Set<String> distValuesForAC = new HashSet<>();
 
                 // now index the new details - but only if it's archived or
                 // withdrawn
@@ -116,9 +118,8 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                                        DSpaceServicesFactory.getInstance()
                                                                             .getConfigurationService()
                                                                             .getPropertyAsType(
-                                                                                "discovery.browse.authority.ignore",
-                                                                                new Boolean(false)
-                                                                            ),
+                                                                                    "discovery.browse.authority.ignore",
+                                                                                    Boolean.FALSE),
                                                        true);
 
                             for (int x = 0; x < values.size(); x++) {
@@ -170,11 +171,11 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                                                        .getConfigurationService()
                                                                        .getPropertyAsType(
                                                                            "discovery.browse.authority.ignore-prefered",
-                                                                           new Boolean(false)),
+                                                                           Boolean.FALSE),
                                                                    true);
                                         if (!ignorePrefered) {
                                             preferedLabel = choiceAuthorityService
-                                                .getLabel(values.get(x), values.get(x).getLanguage());
+                                                .getLabel(values.get(x), collection, values.get(x).getLanguage());
                                         }
                                         List<String> variants = null;
 
@@ -189,12 +190,12 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                                                        .getConfigurationService()
                                                                        .getPropertyAsType(
                                                                            "discovery.browse.authority.ignore-variants",
-                                                                           new Boolean(false)),
+                                                                           Boolean.FALSE),
                                                                    true);
                                         if (!ignoreVariants) {
                                             variants = choiceAuthorityService
                                                 .getVariants(
-                                                    values.get(x));
+                                                    values.get(x), collection);
                                         }
 
                                         if (StringUtils
@@ -206,9 +207,9 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                                     bi.getDataType());
                                             distFValues
                                                 .add(nLabel
-                                                         + SolrServiceImpl.FILTER_SEPARATOR
+                                                         + SearchUtils.FILTER_SEPARATOR
                                                          + preferedLabel
-                                                         + SolrServiceImpl.AUTHORITY_SEPARATOR
+                                                         + SearchUtils.AUTHORITY_SEPARATOR
                                                          + values.get(x).getAuthority());
                                             distValuesForAC.add(preferedLabel);
                                         }
@@ -222,9 +223,9 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                                         bi.getDataType());
                                                 distFValues
                                                     .add(nVal
-                                                             + SolrServiceImpl.FILTER_SEPARATOR
+                                                             + SearchUtils.FILTER_SEPARATOR
                                                              + var
-                                                             + SolrServiceImpl.AUTHORITY_SEPARATOR
+                                                             + SearchUtils.AUTHORITY_SEPARATOR
                                                              + values.get(x).getAuthority());
                                                 distValuesForAC.add(var);
                                             }
@@ -241,7 +242,7 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                                 bi.getDataType());
                                         distFValues
                                             .add(nVal
-                                                     + SolrServiceImpl.FILTER_SEPARATOR
+                                                     + SearchUtils.FILTER_SEPARATOR
                                                      + values.get(x).getValue());
                                         distFVal.add(values.get(x).getValue());
                                         distValuesForAC.add(values.get(x).getValue());

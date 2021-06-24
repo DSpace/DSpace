@@ -59,7 +59,9 @@ public class RestIndex {
         // TODO Better graphics, add arguments to all methods. (limit, offset, item and so on)
         return "<html><title>DSpace REST - index</title>" +
             "<body>"
-            + "<h1>DSpace REST API</h1>" +
+            + "<h1>DSpace REST API (Deprecated)</h1>" +
+            "<em>This REST API is deprecated and will be removed in v8." +
+            " Please use the new Server API webapp instead.</em><br/>" +
             "Server path: " + servletContext.getContextPath() +
             "<h2>Index</h2>" +
             "<ul>" +

@@ -19,8 +19,8 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(BrowseIndexRest.NAME)
 public class BrowseIndexResource extends DSpaceResource<BrowseIndexRest> {
-    public BrowseIndexResource(BrowseIndexRest bix, Utils utils, String... rels) {
-        super(bix, utils, rels);
+    public BrowseIndexResource(BrowseIndexRest bix, Utils utils) {
+        super(bix, utils);
         // TODO: the following code will force the embedding of items and
         // entries in the browseIndex we need to find a way to populate the rels
         // array from the request/projection right now it is always null

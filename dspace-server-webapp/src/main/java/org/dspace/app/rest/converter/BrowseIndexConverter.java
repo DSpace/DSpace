@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.app.rest.model.BrowseIndexRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
@@ -24,9 +25,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BrowseIndexConverter implements DSpaceConverter<BrowseIndex, BrowseIndexRest> {
+
     @Override
-    public BrowseIndexRest fromModel(BrowseIndex obj) {
+    public BrowseIndexRest convert(BrowseIndex obj, Projection projection) {
         BrowseIndexRest bir = new BrowseIndexRest();
+        bir.setProjection(projection);
         bir.setId(obj.getName());
         bir.setOrder(obj.getDefaultOrder());
         bir.setMetadataBrowse(obj.isMetadataIndex());
@@ -53,7 +56,7 @@ public class BrowseIndexConverter implements DSpaceConverter<BrowseIndex, Browse
     }
 
     @Override
-    public BrowseIndex toModel(BrowseIndexRest obj) {
-        return null;
+    public Class<BrowseIndex> getModelClass() {
+        return BrowseIndex.class;
     }
 }

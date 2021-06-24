@@ -19,7 +19,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(AuthenticationStatusRest.NAME)
 public class AuthenticationStatusResource extends DSpaceResource<AuthenticationStatusRest> {
-    public AuthenticationStatusResource(AuthenticationStatusRest data, Utils utils, String... rels) {
-        super(data, utils, rels);
+    public AuthenticationStatusResource(AuthenticationStatusRest data, Utils utils) {
+        super(data, utils);
     }
 }

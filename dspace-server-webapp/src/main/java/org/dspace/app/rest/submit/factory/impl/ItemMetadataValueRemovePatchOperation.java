@@ -7,11 +7,12 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -21,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * "/sections/<:name-of-the-form>/<:metadata>/<:idx-zero-based>"
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
  * Content-Type: application/json" -d '[{ "op": "remove", "path": "
  * /sections/traditionalpageone/dc.title/1"}]'
  * </code>
@@ -30,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * "/sections/<:name-of-the-form>/<:metadata>"
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
  * Content-Type: application/json" -d '[{ "op": "remove", "path": "
  * /sections/traditionalpageone/dc.title"}]'
  * </code>
@@ -43,8 +44,8 @@ public class ItemMetadataValueRemovePatchOperation extends MetadataValueRemovePa
     ItemService itemService;
 
     @Override
-    void remove(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-        throws Exception {
+    void remove(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
+            Object value) throws Exception {
         String[] split = getAbsolutePath(path).split("/");
         if (split.length == 1) {
             deleteValue(context, source.getItem(), split[0], -1);

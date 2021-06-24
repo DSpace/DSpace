@@ -25,8 +25,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * An abstract class representing the processing side of
- * a user selection action.
+ * An action that associates workflow users with tasks.
  * All the user selection actions must inherit from this action
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
@@ -76,16 +75,14 @@ public abstract class UserSelectionAction extends Action {
         throws SQLException, AuthorizeException, IOException;
 
     /**
-     * Verifies if the user selection action is valid
-     * User constraints will be checked (enough users, group exists, ...)
+     * Check user constraints (enough users, group exists, ...).
      *
      * @param context the dspace context
      * @param wfi     the workflow item
-     * @param hasUI   boolean indicating whether or not the action has a user interface
+     * @param hasUI   whether or not the Step has a user interface
      * @return if the action is valid
-     * @throws WorkflowConfigurationException occurs if there is a configuration error in the workflow
-     * @throws SQLException                   An exception that provides information on a database access error or
-     *                                        other errors.
+     * @throws WorkflowConfigurationException if there is an error in the workflow configuration.
+     * @throws SQLException                   passed through.
      */
     public abstract boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI)
         throws WorkflowConfigurationException, SQLException;

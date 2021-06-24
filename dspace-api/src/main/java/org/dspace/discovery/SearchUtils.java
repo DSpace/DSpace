@@ -10,9 +10,9 @@ package org.dspace.discovery;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
@@ -32,6 +32,15 @@ import org.dspace.workflow.WorkflowItem;
  * @author Ben Bosman (ben at atmire dot com)
  */
 public class SearchUtils {
+
+    public static final String AUTHORITY_SEPARATOR = "###";
+    public static final String LAST_INDEXED_FIELD = "SolrIndexer.lastIndexed";
+    public static final String RESOURCE_UNIQUE_ID = "search.uniqueid";
+    public static final String RESOURCE_TYPE_FIELD = "search.resourcetype";
+    public static final String RESOURCE_ID_FIELD = "search.resourceid";
+    public static final String NAMED_RESOURCE_TYPE = "namedresourcetype";
+    public static final String FILTER_SEPARATOR = "\n|||\n";
+
     /**
      * Cached search service
      **/
@@ -140,26 +149,25 @@ public class SearchUtils {
     private static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(String prefix,
                                                                               List<Collection> collections, Item item)
         throws SQLException {
-        Map<String, DiscoveryConfiguration> result = new HashMap<String, DiscoveryConfiguration>();
+        Set<DiscoveryConfiguration> result = new HashSet<>();
 
         for (Collection collection : collections) {
             DiscoveryConfiguration configuration = getDiscoveryConfiguration(prefix, collection);
-            if (!result.containsKey(configuration.getId())) {
-                result.put(configuration.getId(), configuration);
-            }
+            result.add(configuration);
         }
+
+        //Add alwaysIndex configurations
+        DiscoveryConfigurationService configurationService = getConfigurationService();
+        result.addAll(configurationService.getIndexAlwaysConfigurations());
 
         //Also add one for the default
         addConfigurationIfExists(result, prefix);
 
-        return Arrays.asList(result.values().toArray(new DiscoveryConfiguration[result.size()]));
+        return Arrays.asList(result.toArray(new DiscoveryConfiguration[result.size()]));
     }
 
-    private static void addConfigurationIfExists(Map<String, DiscoveryConfiguration> result, String confName) {
+    private static void addConfigurationIfExists(Set<DiscoveryConfiguration> result, String confName) {
         DiscoveryConfiguration configurationExtra = getDiscoveryConfigurationByName(confName);
-        if (!result.containsKey(configurationExtra.getId())) {
-            result.put(configurationExtra.getId(), configurationExtra);
-        }
+        result.add(configurationExtra);
     }
-
 }
