@@ -7,19 +7,16 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.dspace.app.rest.converter.BrowseIndexConverter;
 import org.dspace.app.rest.model.BrowseIndexRest;
-import org.dspace.app.rest.model.hateoas.BrowseIndexResource;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.core.Context;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,10 +26,9 @@ import org.springframework.stereotype.Component;
  */
 @Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.NAME)
 public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexRest, String> {
-    @Autowired
-    BrowseIndexConverter converter;
 
     @Override
+    @PreAuthorize("permitAll()")
     public BrowseIndexRest findOne(Context context, String name) {
         BrowseIndexRest bi = null;
         BrowseIndex bix;
@@ -42,37 +38,23 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
             throw new RuntimeException(e.getMessage(), e);
         }
         if (bix != null) {
-            bi = converter.convert(bix);
+            bi = converter.toRest(bix, utils.obtainProjection());
         }
         return bi;
     }
 
     @Override
     public Page<BrowseIndexRest> findAll(Context context, Pageable pageable) {
-        List<BrowseIndexRest> it = null;
-        List<BrowseIndex> indexesList = new ArrayList<BrowseIndex>();
-        int total = 0;
         try {
-            BrowseIndex[] indexes = BrowseIndex.getBrowseIndices();
-            total = indexes.length;
-            for (BrowseIndex bix : indexes) {
-                indexesList.add(bix);
-            }
+            List<BrowseIndex> indexes = Arrays.asList(BrowseIndex.getBrowseIndices());
+            return converter.toRestPage(indexes, pageable, indexes.size(), utils.obtainProjection());
         } catch (BrowseException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<BrowseIndexRest> page = new PageImpl<BrowseIndex>(indexesList, pageable, total).map(converter);
-        return page;
     }
 
     @Override
     public Class<BrowseIndexRest> getDomainClass() {
         return BrowseIndexRest.class;
     }
-
-    @Override
-    public BrowseIndexResource wrapResource(BrowseIndexRest bix, String... rels) {
-        return new BrowseIndexResource(bix, utils, rels);
-    }
-
 }

@@ -9,8 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -18,34 +19,57 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.CollectionConverter;
-import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.app.rest.model.hateoas.CollectionResource;
+import org.dspace.app.rest.model.GroupRest;
+import org.dspace.app.rest.model.MetadataRest;
+import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.TemplateItemRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
+import org.dspace.app.rest.model.wrapper.TemplateItem;
 import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.util.UUIDUtils;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.workflow.WorkflowException;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.WorkflowUtils;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
+import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * This is the repository responsible to manage Item Rest object
@@ -56,25 +80,43 @@ import org.springframework.stereotype.Component;
 @Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME)
 public class CollectionRestRepository extends DSpaceObjectRestRepository<Collection, CollectionRest> {
 
-    private final CollectionService cs;
+    public static Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionRestRepository.class);
 
     @Autowired
     CommunityService communityService;
 
     @Autowired
-    CollectionConverter converter;
-
-    @Autowired
-    MetadataConverter metadataConverter;
-
-    @Autowired
     CollectionRestEqualityUtils collectionRestEqualityUtils;
 
+    @Autowired
+    private CollectionService cs;
 
-    public CollectionRestRepository(CollectionService dsoService,
-                                    CollectionConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<CollectionRest>() {});
-        this.cs = dsoService;
+    @Autowired
+    private BitstreamService bitstreamService;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private GroupService groupService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
+
+    @Autowired
+    private WorkflowService workflowService;
+
+    @Autowired
+    private PoolTaskService poolTaskService;
+
+    @Autowired
+    private CollectionRoleService collectionRoleService;
+
+    @Autowired
+    SearchService searchService;
+
+    public CollectionRestRepository(CollectionService dsoService) {
+        super(dsoService);
     }
 
     @Override
@@ -89,66 +131,89 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         if (collection == null) {
             return null;
         }
-        return dsoConverter.fromModel(collection);
+        return converter.toRest(collection, utils.obtainProjection());
     }
 
     @Override
     public Page<CollectionRest> findAll(Context context, Pageable pageable) {
-        List<Collection> it = null;
-        List<Collection> collections = new ArrayList<Collection>();
-        int total = 0;
         try {
-            total = cs.countTotal(context);
-            it = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
-            for (Collection c : it) {
-                collections.add(c);
+            if (authorizeService.isAdmin(context)) {
+                long total = cs.countTotal(context);
+                List<Collection> collections = cs.findAll(context, pageable.getPageSize(),
+                    Math.toIntExact(pageable.getOffset()));
+                return converter.toRestPage(collections, pageable, total, utils.obtainProjection());
+            } else {
+                List<Collection> collections = new LinkedList<Collection>();
+                // search for all the collections and let the SOLR security plugins to limit
+                // what is returned to what the user can see
+                DiscoverQuery discoverQuery = new DiscoverQuery();
+                discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+                discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
+                discoverQuery.setMaxResults(pageable.getPageSize());
+                DiscoverResult resp = searchService.search(context, discoverQuery);
+                long tot = resp.getTotalSearchResults();
+                for (IndexableObject solrCollections : resp.getIndexableObjects()) {
+                    Collection c = ((IndexableCollection) solrCollections).getIndexedObject();
+                    collections.add(c);
+                }
+                return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
             }
-        } catch (SQLException e) {
+        } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CollectionRest> page = new PageImpl<Collection>(collections, pageable, total).map(dsoConverter);
-        return page;
     }
 
-    @SearchRestMethod(name = "findAuthorizedByCommunity")
-    public Page<CollectionRest> findAuthorizedByCommunity(
-            @Parameter(value = "uuid", required = true) UUID communityUuid, Pageable pageable) {
-        Context context = obtainContext();
-        List<Collection> it = null;
-        List<Collection> collections = new ArrayList<Collection>();
+    @SearchRestMethod(name = "findSubmitAuthorizedByCommunity")
+    public Page<CollectionRest> findSubmitAuthorizedByCommunity(
+        @Parameter(value = "uuid", required = true) UUID communityUuid, Pageable pageable,
+        @Parameter(value = "query") String q) {
         try {
+            Context context = obtainContext();
             Community com = communityService.find(context, communityUuid);
             if (com == null) {
                 throw new ResourceNotFoundException(
-                        CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
+                    CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
                         + " not found");
             }
-            it = cs.findAuthorized(context, com, Constants.ADD);
-            for (Collection c : it) {
-                collections.add(c);
-            }
-        } catch (SQLException e) {
+            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, com,
+                                              Math.toIntExact(pageable.getOffset()),
+                                              Math.toIntExact(pageable.getPageSize()));
+            int tot = cs.countCollectionsWithSubmit(q, context, com);
+            return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
+        } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CollectionRest> page = utils.getPage(collections, pageable).map(dsoConverter);
-        return page;
     }
 
-    @SearchRestMethod(name = "findAuthorized")
-    public Page<CollectionRest> findAuthorized(Pageable pageable) {
-        Context context = obtainContext();
-        List<Collection> it = null;
-        List<Collection> collections = new ArrayList<Collection>();
+    @SearchRestMethod(name = "findSubmitAuthorized")
+    public Page<CollectionRest> findSubmitAuthorized(@Parameter(value = "query") String q,
+                                                Pageable pageable) throws SearchServiceException {
         try {
-            it = cs.findAuthorizedOptimized(context, Constants.ADD);
-            for (Collection c : it) {
-                collections.add(c);
-            }
+            Context context = obtainContext();
+            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, null,
+                                              Math.toIntExact(pageable.getOffset()),
+                                              Math.toIntExact(pageable.getPageSize()));
+            int tot = cs.countCollectionsWithSubmit(q, context, null);
+            return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<CollectionRest> page = utils.getPage(collections, pageable).map(dsoConverter);
-        return page;
+    }
+
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "findAdminAuthorized")
+    public Page<CollectionRest> findAdminAuthorized (
+        Pageable pageable, @Parameter(value = "query") String query) {
+        try {
+            Context context = obtainContext();
+            List<Collection> collections = authorizeService.findAdminAuthorizedCollection(context, query,
+                Math.toIntExact(pageable.getOffset()),
+                Math.toIntExact(pageable.getPageSize()));
+            long tot = authorizeService.countAdminAuthorizedCollection(context, query);
+            return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
+        } catch (SearchServiceException | SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Override
@@ -164,13 +229,19 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     }
 
     @Override
-    public CollectionResource wrapResource(CollectionRest collection, String... rels) {
-        return new CollectionResource(collection, utils, rels);
+    protected CollectionRest createAndReturn(Context context) throws AuthorizeException {
+        throw new DSpaceBadRequestException("Cannot create a Collection without providing a parent Community.");
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
-    protected CollectionRest createAndReturn(Context context) throws AuthorizeException {
+    @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'ADD')")
+    protected CollectionRest createAndReturn(Context context, UUID id) throws AuthorizeException {
+
+        if (id == null) {
+            throw new DSpaceBadRequestException("Parent Community UUID is null. " +
+                "Cannot create a Collection without providing a parent Community");
+        }
+
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest;
@@ -178,47 +249,30 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             ServletInputStream input = req.getInputStream();
             collectionRest = mapper.readValue(input, CollectionRest.class);
         } catch (IOException e1) {
-            throw new UnprocessableEntityException("Error parsing request body: " + e1.toString());
+            throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
 
         Collection collection;
-
-
-        String parentCommunityString = req.getParameter("parent");
         try {
-            Community parent = null;
-            if (StringUtils.isNotBlank(parentCommunityString)) {
-
-                UUID parentCommunityUuid = UUIDUtils.fromString(parentCommunityString);
-                if (parentCommunityUuid == null) {
-                    throw new DSpaceBadRequestException("The given parent was invalid: "
-                            + parentCommunityString);
-                }
-
-                parent = communityService.find(context, parentCommunityUuid);
-                if (parent == null) {
-                    throw new UnprocessableEntityException("Parent community for id: "
-                            + parentCommunityUuid + " not found");
-                }
-            } else {
-                throw new DSpaceBadRequestException("The parent parameter cannot be left empty," +
-                                                  "collections require a parent community.");
+            Community parent = communityService.find(context, id);
+            if (parent == null) {
+                throw new UnprocessableEntityException("Parent community for id: "
+                    + id + " not found");
             }
             collection = cs.create(context, parent);
             cs.update(context, collection);
-            metadataConverter.setMetadata(context, collection, collectionRest.getMetadata());
+            metadataConverter.mergeMetadata(context, collection, collectionRest.getMetadata());
         } catch (SQLException e) {
-            throw new RuntimeException("Unable to create new Collection under parent Community " +
-                                           parentCommunityString, e);
+            throw new RuntimeException("Unable to create new Collection under parent Community " + id, e);
         }
-        return converter.convert(collection);
+        return converter.toRest(collection, utils.obtainProjection());
     }
 
 
     @Override
     @PreAuthorize("hasPermission(#id, 'COLLECTION', 'WRITE')")
     protected CollectionRest put(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
-                                JsonNode jsonNode)
+                                 JsonNode jsonNode)
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
         CollectionRest collectionRest;
         try {
@@ -230,35 +284,358 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         if (collection == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        CollectionRest originalCollectionRest = converter.fromModel(collection);
+        CollectionRest originalCollectionRest = converter.toRest(collection, utils.obtainProjection());
         if (collectionRestEqualityUtils.isCollectionRestEqualWithoutMetadata(originalCollectionRest, collectionRest)) {
             metadataConverter.setMetadata(context, collection, collectionRest.getMetadata());
         } else {
             throw new IllegalArgumentException("The UUID in the Json and the UUID in the url do not match: "
-                                                   + id + ", "
-                                                   + collectionRest.getId());
+                + id + ", "
+                + collectionRest.getId());
         }
-        return converter.fromModel(collection);
+        return converter.toRest(collection, utils.obtainProjection());
     }
+
     @Override
     @PreAuthorize("hasPermission(#id, 'COLLECTION', 'DELETE')")
     protected void delete(Context context, UUID id) throws AuthorizeException {
-        Collection collection = null;
         try {
-            collection = cs.find(context, id);
+            Collection collection = cs.find(context, id);
             if (collection == null) {
                 throw new ResourceNotFoundException(
                     CollectionRest.CATEGORY + "." + CollectionRest.NAME + " with id: " + id + " not found");
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Unable to find Collection with id = " + id, e);
-        }
-        try {
             cs.delete(context, collection);
         } catch (SQLException e) {
             throw new RuntimeException("Unable to delete Collection with id = " + id, e);
         } catch (IOException e) {
             throw new RuntimeException("Unable to delete collection because the logo couldn't be deleted", e);
         }
+    }
+
+    /**
+     * Method to install a logo on a Collection which doesn't have a logo
+     * Called by request mappings in CollectionLogoController
+     *
+     * @param context
+     * @param collection The collection on which to install the logo
+     * @param uploadfile The new logo
+     * @return The created bitstream containing the new logo
+     * @throws IOException
+     * @throws AuthorizeException
+     * @throws SQLException
+     */
+    public BitstreamRest setLogo(Context context, Collection collection, MultipartFile uploadfile)
+        throws IOException, AuthorizeException, SQLException {
+
+        if (collection.getLogo() != null) {
+            throw new UnprocessableEntityException(
+                "The collection with the given uuid already has a logo: " + collection.getID());
+        }
+        Bitstream bitstream = cs.setLogo(context, collection, uploadfile.getInputStream());
+        cs.update(context, collection);
+        bitstreamService.update(context, bitstream);
+        return converter.toRest(context.reloadEntity(bitstream), utils.obtainProjection());
+    }
+
+    /**
+     * This method creates a new Item to be used as a template in a Collection
+     *
+     * @param context
+     * @param collection    The collection for which to make the item
+     * @param inputItemRest The new item
+     * @return The created TemplateItem
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public TemplateItemRest createTemplateItem(Context context, Collection collection, TemplateItemRest inputItemRest)
+        throws SQLException, AuthorizeException {
+        if (collection.getTemplateItem() != null) {
+            throw new UnprocessableEntityException("Collection with ID " + collection.getID()
+                + " already contains a template item");
+        }
+        cs.createTemplateItem(context, collection);
+        Item item = collection.getTemplateItem();
+        metadataConverter.setMetadata(context, item, inputItemRest.getMetadata());
+        item.setDiscoverable(false);
+
+        cs.update(context, collection);
+        itemService.update(context, item);
+
+        return converter.toRest(new TemplateItem(item), utils.obtainProjection());
+    }
+
+    /**
+     * This method looks up the template Item associated with a Collection
+     *
+     * @param collection The Collection for which to find the template
+     * @return The template Item from the Collection
+     * @throws SQLException
+     */
+    public TemplateItemRest getTemplateItem(Collection collection) throws SQLException {
+        Item item = collection.getTemplateItem();
+        if (item == null) {
+            throw new ResourceNotFoundException(
+                "TemplateItem from " + CollectionRest.CATEGORY + "." + CollectionRest.NAME + " with id: "
+                    + collection.getID() + " not found");
+        }
+
+        try {
+            return converter.toRest(new TemplateItem(item), utils.obtainProjection());
+        } catch (IllegalArgumentException e) {
+            throw new UnprocessableEntityException("The item with id " + item.getID() + " is not a template item");
+        }
+    }
+
+    /**
+     * This method will create an AdminGroup for the given Collection with the given Information through JSON
+     * @param context   The current context
+     * @param request   The current request
+     * @param collection The collection for which we'll create an admingroup
+     * @return          The created AdminGroup's REST object
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
+    public GroupRest createAdminGroup(Context context, HttpServletRequest request, Collection collection)
+        throws SQLException, AuthorizeException {
+
+        Group group = cs.createAdministrators(context, collection);
+        return populateGroupInformation(context, request, group);
+    }
+
+    /**
+     * This method will delete the AdminGroup for the given Collection
+     * @param context       The current context
+     * @param collection     The community for which we'll delete the admingroup
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
+    public void deleteAdminGroup(Context context, Collection collection)
+        throws SQLException, AuthorizeException, IOException {
+        Group adminGroup = collection.getAdministrators();
+        cs.removeAdministrators(context, collection);
+        groupService.delete(context, adminGroup);
+    }
+
+    /**
+     * This method will create a SubmitterGroup for the given Collection with the given Information through JSON
+     * @param context   The current context
+     * @param request   The current request
+     * @param collection The collection for which we'll create a submittergroup
+     * @return          The created SubmitterGroup's REST object
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
+    public GroupRest createSubmitterGroup(Context context, HttpServletRequest request, Collection collection)
+        throws SQLException, AuthorizeException {
+
+        Group group = cs.createSubmitters(context, collection);
+        return populateGroupInformation(context, request, group);
+    }
+
+    /**
+     * This method will delete the SubmitterGroup for the given Collection
+     * @param context       The current context
+     * @param collection     The community for which we'll delete the submittergroup
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
+    public void deleteSubmitterGroup(Context context, Collection collection)
+        throws SQLException, AuthorizeException, IOException {
+        Group submitters = collection.getSubmitters();
+        cs.removeSubmitters(context, collection);
+        groupService.delete(context, submitters);
+    }
+
+    /**
+     * This method will create an ItemReadGroup for the given Collection with the given Information through JSON
+     * @param context   The current context
+     * @param request   The current request
+     * @param collection The collection for which we'll create an ItemReadGroup
+     * @return          The created ItemReadGroup's REST object
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
+    public GroupRest createItemReadGroup(Context context, HttpServletRequest request, Collection collection)
+        throws SQLException, AuthorizeException {
+
+        AuthorizeUtil.authorizeManageDefaultReadGroup(context, collection);
+
+        context.turnOffAuthorisationSystem();
+        Group role = cs.createDefaultReadGroup(context, collection, "ITEM", Constants.DEFAULT_ITEM_READ);
+        context.restoreAuthSystemState();
+        return populateGroupInformation(context, request, role);
+    }
+
+    /**
+     * This method will delete the ItemReadGroup for the given Collection
+     * @param context       The current context
+     * @param collection     The community for which we'll delete the ItemReadGroup
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
+    public void deleteItemReadGroup(Context context, Collection collection)
+        throws SQLException, AuthorizeException, IOException {
+        List<Group> itemGroups = authorizeService
+            .getAuthorizedGroups(context, collection, Constants.DEFAULT_ITEM_READ);
+        Group itemReadGroup = itemGroups.get(0);
+        groupService.delete(context, itemReadGroup);
+        authorizeService.addPolicy(context, collection, Constants.DEFAULT_ITEM_READ,
+                                   groupService.findByName(context, Group.ANONYMOUS));
+    }
+
+    /**
+     * This method will create an BitstreamReadGroup for the given Collection with the given Information through JSON
+     * @param context   The current context
+     * @param request   The current request
+     * @param collection The collection for which we'll create an BitstreamReadGroup
+     * @return          The created BitstreamReadGroup's REST object
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
+    public GroupRest createBitstreamReadGroup(Context context, HttpServletRequest request, Collection collection)
+        throws SQLException, AuthorizeException {
+        AuthorizeUtil.authorizeManageDefaultReadGroup(context, collection);
+
+        context.turnOffAuthorisationSystem();
+        Group role = cs.createDefaultReadGroup(context, collection, "BITSTREAM", Constants.DEFAULT_BITSTREAM_READ);
+        context.restoreAuthSystemState();
+        return populateGroupInformation(context, request, role);
+    }
+
+    /**
+     * This method will delete the BitstreamReadGroup for the given Collection
+     * @param context       The current context
+     * @param collection     The community for which we'll delete the BitstreamReadGroup
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
+    public void deleteBitstreamReadGroup(Context context, Collection collection)
+        throws SQLException, AuthorizeException, IOException {
+        List<Group> itemGroups = authorizeService
+            .getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
+        Group itemReadGroup = itemGroups.get(0);
+        groupService.delete(context, itemReadGroup);
+        authorizeService.addPolicy(context, collection, Constants.DEFAULT_BITSTREAM_READ,
+                                   groupService.findByName(context, Group.ANONYMOUS));
+    }
+
+
+
+    private GroupRest populateGroupInformation(Context context, HttpServletRequest request, Group group)
+        throws SQLException, AuthorizeException {
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        try {
+            ServletInputStream input = request.getInputStream();
+            groupRest = mapper.readValue(input, GroupRest.class);
+            if (groupRest.isPermanent() || StringUtils.isNotBlank(groupRest.getName())) {
+                throw new UnprocessableEntityException("The given GroupRest object has to be non-permanent and can't" +
+                                                           " contain a name");
+            }
+            MetadataRest metadata = groupRest.getMetadata();
+            SortedMap<String, List<MetadataValueRest>> map = metadata.getMap();
+            if (map != null) {
+                List<MetadataValueRest> dcTitleMetadata = map.get("dc.title");
+                if (dcTitleMetadata != null) {
+                    if (!dcTitleMetadata.isEmpty()) {
+                        throw new UnprocessableEntityException("The given GroupRest can't contain a dc.title mdv");
+                    }
+                }
+            }
+            metadataConverter.setMetadata(context, group, metadata);
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("Error parsing request body.", e1);
+        }
+        return converter.toRest(group, utils.obtainProjection());
+    }
+
+    /**
+     * This method will retrieve the GroupRest object for the workflowGroup for the given Collection and workflowRole
+     * @param context       The relevant DSpace context
+     * @param collection    The given collection
+     * @param workflowRole  The given workflowRole
+     * @return              The GroupRest for the WorkflowGroup for the given Collection and workflowRole
+     * @throws SQLException If something goes wrong
+     * @throws IOException  If something goes wrong
+     * @throws WorkflowConfigurationException   If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws WorkflowException    If something goes wrong
+     */
+    public GroupRest getWorkflowGroupForRole(Context context, Collection collection, String workflowRole)
+        throws SQLException, IOException, WorkflowConfigurationException, AuthorizeException, WorkflowException {
+
+        if (WorkflowUtils.getCollectionAndRepositoryRoles(collection).get(workflowRole) == null) {
+            throw new ResourceNotFoundException("Couldn't find role for: " + workflowRole +
+                                                    " in the collection with UUID: " + collection.getID());
+        }
+        Group group = workflowService.getWorkflowRoleGroup(context, collection, workflowRole, null);
+        if (group == null) {
+            return null;
+        }
+        return converter.toRest(group, utils.obtainProjection());
+    }
+
+    /**
+     * This method will create the WorkflowGroup for the given Collection and workflowRole
+     * @param context       The relevant DSpace context
+     * @param request       The current request
+     * @param collection    The given collection
+     * @param workflowRole  The given workflowRole
+     * @return              The created WorkflowGroup for the given Collection and workflowRole
+     * @throws SQLException If something goes wrong
+     * @throws WorkflowConfigurationException   If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws WorkflowException    If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
+    public GroupRest createWorkflowGroupForRole(Context context, HttpServletRequest request, Collection collection,
+                                                String workflowRole)
+        throws SQLException, WorkflowConfigurationException, AuthorizeException, WorkflowException, IOException {
+        AuthorizeUtil.authorizeManageWorkflowsGroup(context, collection);
+        context.turnOffAuthorisationSystem();
+        Group group = workflowService.createWorkflowRoleGroup(context, collection, workflowRole);
+        context.restoreAuthSystemState();
+        populateGroupInformation(context, request, group);
+        return converter.toRest(group, utils.obtainProjection());
+    }
+
+    /**
+     * This method will delete the WorkflowGroup for a given Collection and workflowRole
+     * @param context       The relevant DSpace context
+     * @param request       The current DSpace request
+     * @param collection    The given Collection
+     * @param workflowRole  The given WorkflowRole
+     * @throws SQLException    If something goes wrong
+     * @throws WorkflowConfigurationException   If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws WorkflowException    If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
+    public void deleteWorkflowGroupForRole(Context context, HttpServletRequest request, Collection collection,
+                                           String workflowRole)
+        throws SQLException, WorkflowConfigurationException, AuthorizeException, WorkflowException, IOException {
+        Group group = workflowService.getWorkflowRoleGroup(context, collection, workflowRole, null);
+        if (!poolTaskService.findByGroup(context, group).isEmpty()) {
+            throw new UnprocessableEntityException("The Group that was attempted to be deleted " +
+                                                       "still has Pooltasks open");
+        }
+        if (group == null) {
+            throw new ResourceNotFoundException("The requested Group was not found");
+        }
+        List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
+        if (!collectionRoles.isEmpty()) {
+            collectionRoles.stream().forEach(collectionRole -> {
+                try {
+                    collectionRoleService.delete(context, collectionRole);
+                } catch (SQLException e) {
+                    log.error(e.getMessage(), e);
+                }
+            });
+        }
+        groupService.delete(context, group);
     }
 }

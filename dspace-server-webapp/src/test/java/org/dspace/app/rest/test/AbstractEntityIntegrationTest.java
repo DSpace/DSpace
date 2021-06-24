@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.test;
 
-import org.dspace.app.rest.builder.EntityTypeBuilder;
-import org.dspace.app.rest.builder.RelationshipTypeBuilder;
+import org.dspace.builder.EntityTypeBuilder;
+import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
 import org.junit.Before;
@@ -37,6 +37,7 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
      * in relationship-types.xml
      */
     @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 
@@ -58,19 +59,19 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
                                                               "isPublicationOfAuthor", 0, null, 0,
-                                                              null).build();
+                                                              null).withCopyToLeft(false).withCopyToRight(true).build();
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, project, "isProjectOfPublication",
                                                               "isPublicationOfProject", 0, null, 0,
-                                                              null).build();
+                                                              null).withCopyToRight(true).build();
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, orgUnit, "isOrgUnitOfPublication",
                                                               "isPublicationOfOrgUnit", 0, null, 0,
-                                                              null).build();
+                                                              null).withCopyToLeft(false).build();
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, person, project, "isProjectOfPerson",
                                                               "isPersonOfProject", 0, null, 0,
-                                                              null).build();
+                                                              null).withCopyToLeft(true).withCopyToRight(true).build();
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, person, orgUnit, "isOrgUnitOfPerson",
                                                               "isPersonOfOrgUnit", 0, null, 0,
@@ -82,12 +83,17 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, journal, journalVolume, "isVolumeOfJournal",
                                                               "isJournalOfVolume", 0, null, 1,
-                                                              null).build();
+                                                              null).withCopyToLeft(true).build();
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, journalVolume, journalIssue,
                                                               "isIssueOfJournalVolume", "isJournalVolumeOfIssue", 0,
                                                               null, 1,
                                                               1).build();
+
+        RelationshipTypeBuilder.createRelationshipTypeBuilder(context, journalIssue, journalVolume,
+                                                                "isJournalVolumeOfIssue", "isIssueOfJournalVolume",
+                                                                null, null, null,
+                                                                null).build();
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, orgUnit, "isAuthorOfPublication",
                                                               "isPublicationOfAuthor", 0, null, 0,
@@ -97,6 +103,11 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
                                                               "isPublicationOfJournalIssue",
                                                               "isJournalIssueOfPublication", 0, null, 0,
                                                               1).build();
+
+        RelationshipTypeBuilder.createRelationshipTypeBuilder(context, orgUnit, orgUnit, "isParentOrgUnitOf",
+                                                              "isChildOrgUnitOf", null,
+                                                              1, null, null)
+                               .build();
 
         context.restoreAuthSystemState();
     }

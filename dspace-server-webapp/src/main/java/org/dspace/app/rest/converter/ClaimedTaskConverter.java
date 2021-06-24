@@ -8,7 +8,9 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.ClaimedTaskRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.discovery.IndexableObject;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,35 +24,33 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ClaimedTaskConverter
-    implements IndexableObjectConverter<ClaimedTask, org.dspace.app.rest.model.ClaimedTaskRest> {
+        implements IndexableObjectConverter<ClaimedTask, ClaimedTaskRest> {
 
     @Autowired
-    private WorkflowItemConverter workflowItemConverter;
+    private ConverterService converter;
 
     @Autowired
-    private EPersonConverter epersonConverter;
+    protected XmlWorkflowFactory xmlWorkflowFactory;
 
     @Override
-    public ClaimedTaskRest fromModel(ClaimedTask obj) {
+    public ClaimedTaskRest convert(ClaimedTask obj, Projection projection) {
         ClaimedTaskRest taskRest = new ClaimedTaskRest();
-
+        taskRest.setProjection(projection);
         XmlWorkflowItem witem = obj.getWorkflowItem();
         taskRest.setId(obj.getID());
-        taskRest.setWorkflowitem(workflowItemConverter.convert(witem));
-        taskRest.setAction(obj.getActionID());
-        taskRest.setStep(obj.getStepID());
-        taskRest.setOwner(epersonConverter.convert(obj.getOwner()));
+        taskRest.setWorkflowitem(converter.toRest(witem, projection));
+        taskRest.setAction(converter.toRest(xmlWorkflowFactory.getActionByName(obj.getActionID()), projection));
+        taskRest.setOwner(converter.toRest(obj.getOwner(), projection));
         return taskRest;
     }
 
     @Override
-    public ClaimedTask toModel(ClaimedTaskRest obj) {
-        return null;
+    public Class<ClaimedTask> getModelClass() {
+        return ClaimedTask.class;
     }
 
     @Override
-    public boolean supportsModel(IndexableObject object) {
-        return object instanceof ClaimedTask;
+    public boolean supportsModel(IndexableObject idxo) {
+        return idxo.getIndexedObject() instanceof ClaimedTask;
     }
-
 }

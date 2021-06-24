@@ -21,7 +21,7 @@ import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Pubmed specific implementation of {@link MetadataContributor}
@@ -43,7 +43,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
         return dateFormatsToAttempt;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setDateFormatsToAttempt(List<String> dateFormatsToAttempt) {
         this.dateFormatsToAttempt = dateFormatsToAttempt;
     }
@@ -130,15 +130,18 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
                     } catch (ParseException e) {
                         // Multiple dateformats can be configured, we don't want to print the entire stacktrace every
                         // time one of those formats fails.
-                        log.info(
+                        log.debug(
                             "Failed parsing " + dateString + " using the following format: " + dateFormat + ", check " +
                                 "the configured dataformats in config/spring/api/pubmed-integration.xml");
                     }
                     j++;
                 }
-
                 if (dcDate != null) {
                     values.add(metadataFieldMapping.toDCValue(field, dcDate.toString()));
+                } else {
+                    log.info(
+                            "Failed parsing " + dateString + ", check " +
+                                "the configured dataformats in config/spring/api/pubmed-integration.xml");
                 }
             }
         } catch (Exception e) {

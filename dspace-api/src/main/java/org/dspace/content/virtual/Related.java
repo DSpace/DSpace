@@ -18,9 +18,7 @@ import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.EntityService;
-import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.RelationshipService;
-import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,13 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class Related implements VirtualMetadataConfiguration {
 
     @Autowired
-    private RelationshipTypeService relationshipTypeService;
-
-    @Autowired
     private RelationshipService relationshipService;
-
-    @Autowired
-    private EntityTypeService entityTypeService;
 
     @Autowired
     private EntityService entityService;
@@ -120,6 +112,7 @@ public class Related implements VirtualMetadataConfiguration {
      * Generic setter for the useForPlace property
      * @param useForPlace   The boolean value that the useForPlace property will be set to
      */
+    @Override
     public void setUseForPlace(boolean useForPlace) {
         this.useForPlace = useForPlace;
     }
@@ -128,8 +121,17 @@ public class Related implements VirtualMetadataConfiguration {
      * Generic getter for the useForPlace property
      * @return  The useForPlace to be used by this bean
      */
+    @Override
     public boolean getUseForPlace() {
         return useForPlace;
+    }
+
+    @Override
+    public void setPopulateWithNameVariant(boolean populateWithNameVariant) { }
+
+    @Override
+    public boolean getPopulateWithNameVariant() {
+        return false;
     }
 
     /**
@@ -137,11 +139,12 @@ public class Related implements VirtualMetadataConfiguration {
      * and pass this along to the next VirtualBean that's stored in this class.
      * @param context   The relevant DSpace context
      * @param item      The item that will be used to find the related item through its relationships
-     * @return          The String value of the metadata fields concatened with a seperator as defined
-     *                  in the deepest Concatened bean in the chain
+     * @return          The String value of the metadata fields concatenated with a separator as defined
+     *                  in the deepest Concatenated bean in the chain
      *                  Will return an empty list if no relationships are found
      * @throws SQLException If something goes wrong
      */
+    @Override
     public List<String> getValues(Context context, Item item) throws SQLException {
         Entity entity = entityService.findByItemId(context, item.getID());
         EntityType entityType = entityService.getType(context, entity);
@@ -149,8 +152,8 @@ public class Related implements VirtualMetadataConfiguration {
         List<RelationshipType> relationshipTypes = entityService.getAllRelationshipTypes(context, entity);
         List<RelationshipType> possibleRelationshipTypes = new LinkedList<>();
         for (RelationshipType relationshipType : relationshipTypes) {
-            if (StringUtils.equals(relationshipType.getLeftLabel(), relationshipTypeString) || StringUtils
-                .equals(relationshipType.getRightLabel(), relationshipTypeString)) {
+            if (StringUtils.equals(relationshipType.getLeftwardType(), relationshipTypeString) || StringUtils
+                .equals(relationshipType.getRightwardType(), relationshipTypeString)) {
                 possibleRelationshipTypes.add(relationshipType);
             }
         }
@@ -161,13 +164,13 @@ public class Related implements VirtualMetadataConfiguration {
         }
 
         for (Relationship relationship : relationships) {
-            if (relationship.getRelationshipType().getLeftType() == entityType) {
-                if (relationship.getLeftPlace() == place) {
+            if (relationship.getRelationshipType().getLeftType().equals(entityType)) {
+                if (place == null || relationship.getLeftPlace() == place) {
                     Item otherItem = relationship.getRightItem();
                     return virtualMetadataConfiguration.getValues(context, otherItem);
                 }
-            } else if (relationship.getRelationshipType().getRightType() == entityType) {
-                if (relationship.getRightPlace() == place) {
+            } else if (relationship.getRelationshipType().getRightType().equals(entityType)) {
+                if (place == null || relationship.getRightPlace() == place) {
                     Item otherItem = relationship.getLeftItem();
                     return virtualMetadataConfiguration.getValues(context, otherItem);
                 }

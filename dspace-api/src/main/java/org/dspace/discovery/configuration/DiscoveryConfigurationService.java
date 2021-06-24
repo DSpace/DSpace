@@ -7,13 +7,14 @@
  */
 package org.dspace.discovery.configuration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.content.DSpaceObject;
 import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.indexobject.IndexableDSpaceObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -43,9 +44,9 @@ public class DiscoveryConfigurationService {
     public DiscoveryConfiguration getDiscoveryConfiguration(IndexableObject dso) {
         String name;
         if (dso == null) {
-            name = "site";
-        } else if (dso instanceof DSpaceObject) {
-            name = ((DSpaceObject) dso).getHandle();
+            name = "default";
+        } else if (dso instanceof IndexableDSpaceObject) {
+            name = ((IndexableDSpaceObject) dso).getIndexedObject().getHandle();
         } else {
             name = dso.getUniqueIndexID();
         }
@@ -73,6 +74,22 @@ public class DiscoveryConfigurationService {
         } else {
             return getDiscoveryConfiguration(dso);
         }
+    }
+
+    /**
+     * Retrieves a list of all DiscoveryConfiguration objects where
+     * {@link org.dspace.discovery.configuration.DiscoveryConfiguration#isIndexAlways()} is true
+     * These configurations should always be included when indexing
+     */
+    public List<DiscoveryConfiguration> getIndexAlwaysConfigurations() {
+        List<DiscoveryConfiguration> configs = new ArrayList<>();
+        for (String key : map.keySet()) {
+            DiscoveryConfiguration config = map.get(key);
+            if (config.isIndexAlways()) {
+                configs.add(config);
+            }
+        }
+        return configs;
     }
 
     public static void main(String[] args) {

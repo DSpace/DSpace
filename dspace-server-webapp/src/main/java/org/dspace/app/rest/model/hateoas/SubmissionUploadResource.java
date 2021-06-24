@@ -19,7 +19,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(SubmissionUploadRest.NAME)
 public class SubmissionUploadResource extends DSpaceResource<SubmissionUploadRest> {
-    public SubmissionUploadResource(SubmissionUploadRest sd, Utils utils, String... rels) {
-        super(sd, utils, rels);
+    public SubmissionUploadResource(SubmissionUploadRest sd, Utils utils) {
+        super(sd, utils);
     }
 }

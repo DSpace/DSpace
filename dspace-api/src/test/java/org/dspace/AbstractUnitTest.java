@@ -17,7 +17,6 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
-import org.dspace.discovery.MockIndexEventConsumer;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
@@ -73,11 +72,6 @@ public class AbstractUnitTest extends AbstractDSpaceTest {
      */
     @BeforeClass
     public static void initDatabase() {
-        // Clear our old flyway object. Because this DB is in-memory, its
-        // data is lost when the last connection is closed. So, we need
-        // to (re)start Flyway from scratch for each Unit Test class.
-        DatabaseUtils.clearFlywayDBCache();
-
         try {
             // Update/Initialize the database to latest version (via Flyway)
             DatabaseUtils.updateDatabase();
@@ -86,9 +80,6 @@ public class AbstractUnitTest extends AbstractDSpaceTest {
             fail("Error initializing database: " + se.getMessage()
                      + (se.getCause() == null ? "" : ": " + se.getCause().getMessage()));
         }
-
-        // Initialize mock indexer (which does nothing, since Solr isn't running)
-        new MockIndexEventConsumer();
     }
 
     /**
@@ -127,6 +118,13 @@ public class AbstractUnitTest extends AbstractDSpaceTest {
             EPersonServiceFactory.getInstance().getGroupService().initDefaultGroupNames(context);
 
             context.restoreAuthSystemState();
+
+            // Ensure all tests run with Solr indexing disabled
+            // we turn this off because
+            // Solr is NOT used in the OLD dspace-api test framework. Instead, Solr/Discovery indexing is
+            // exercised in the new Integration Tests (which use an embedded Solr) and extends
+            // org.dspace.AbstractIntegrationTestWithDatabase
+            context.setDispatcher("exclude-discovery");
         } catch (AuthorizeException ex) {
             log.error("Error creating initial eperson or default groups", ex);
             fail("Error creating initial eperson or default groups in AbstractUnitTest init()");
@@ -160,7 +158,7 @@ public class AbstractUnitTest extends AbstractDSpaceTest {
     protected void cleanupContext(Context c) throws SQLException {
         // If context still valid, abort it
         if (c != null && c.isValid()) {
-            c.complete();
+            c.abort();
         }
 
         // Cleanup Context object by setting it to null
@@ -168,4 +166,5 @@ public class AbstractUnitTest extends AbstractDSpaceTest {
             c = null;
         }
     }
+
 }

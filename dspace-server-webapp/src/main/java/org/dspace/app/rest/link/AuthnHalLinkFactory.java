@@ -35,7 +35,7 @@ public class AuthnHalLinkFactory extends HalLinkFactory<AuthnResource, Authentic
             .logout()));
 
         list.add(buildLink("status", methodOn
-            .status(null)));
+            .status(null, null)));
     }
 
     @Override

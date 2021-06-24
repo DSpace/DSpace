@@ -17,7 +17,9 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.dspace.app.rest.model.MetadataRest;
+import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -26,39 +28,33 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
  * Converter to translate between lists of domain {@link MetadataValue}s and {@link MetadataRest} representations.
  */
 @Component
-public class MetadataConverter implements Converter<List<MetadataValue>, MetadataRest> {
+public class MetadataConverter implements DSpaceConverter<MetadataValueList, MetadataRest> {
 
     @Autowired
     private ContentServiceFactory contentServiceFactory;
 
     @Autowired
-    private MetadataValueConverter valueConverter;
+    private ConverterService converter;
 
-    /**
-     * Gets a rest representation of the given list of domain metadata values.
-     *
-     * @param metadataValueList the domain values.
-     * @return the rest representation.
-     */
     @Override
-    public MetadataRest convert(List<MetadataValue> metadataValueList) {
+    public MetadataRest convert(MetadataValueList metadataValues,
+                                Projection projection) {
         // Convert each value to a DTO while retaining place order in a map of key -> SortedSet
         Map<String, SortedSet<MetadataValueRest>> mapOfSortedSets = new HashMap<>();
-        for (MetadataValue metadataValue : metadataValueList) {
+        for (MetadataValue metadataValue : metadataValues) {
             String key = metadataValue.getMetadataField().toString('.');
             SortedSet<MetadataValueRest> set = mapOfSortedSets.get(key);
             if (set == null) {
                 set = new TreeSet<>(Comparator.comparingInt(MetadataValueRest::getPlace));
                 mapOfSortedSets.put(key, set);
             }
-            set.add(valueConverter.convert(metadataValue));
+            set.add(converter.toRest(metadataValue, projection));
         }
 
         MetadataRest metadataRest = new MetadataRest();
@@ -72,8 +68,14 @@ public class MetadataConverter implements Converter<List<MetadataValue>, Metadat
         return metadataRest;
     }
 
+    @Override
+    public Class<MetadataValueList> getModelClass() {
+        return MetadataValueList.class;
+    }
+
     /**
      * Sets a DSpace object's domain metadata values from a rest representation.
+     * Any existing metadata value is deleted or overwritten.
      *
      * @param context the context to use.
      * @param dso the DSpace object.
@@ -81,10 +83,52 @@ public class MetadataConverter implements Converter<List<MetadataValue>, Metadat
      * @throws SQLException if a database error occurs.
      * @throws AuthorizeException if an authorization error occurs.
      */
-    public void setMetadata(Context context, DSpaceObject dso, MetadataRest metadataRest)
+    public <T extends DSpaceObject> void setMetadata(Context context, T dso, MetadataRest metadataRest)
             throws SQLException, AuthorizeException {
-        DSpaceObjectService dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+        DSpaceObjectService<T> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
         dsoService.clearMetadata(context, dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        persistMetadataRest(context, dso, metadataRest, dsoService);
+    }
+
+    /**
+     * Add to a DSpace object's domain metadata values from a rest representation.
+     * Any existing metadata value is preserved.
+     *
+     * @param context the context to use.
+     * @param dso the DSpace object.
+     * @param metadataRest the rest representation of the new metadata.
+     * @throws SQLException if a database error occurs.
+     * @throws AuthorizeException if an authorization error occurs.
+     */
+    public <T extends DSpaceObject> void addMetadata(Context context, T dso, MetadataRest metadataRest)
+            throws SQLException, AuthorizeException {
+        DSpaceObjectService<T> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+        persistMetadataRest(context, dso, metadataRest, dsoService);
+    }
+
+    /**
+     * Merge into a DSpace object's domain metadata values from a rest representation.
+     * Any existing metadata value is preserved or overwritten with the new ones
+     *
+     * @param context the context to use.
+     * @param dso the DSpace object.
+     * @param metadataRest the rest representation of the new metadata.
+     * @throws SQLException if a database error occurs.
+     * @throws AuthorizeException if an authorization error occurs.
+     */
+    public <T extends DSpaceObject> void mergeMetadata(Context context, T dso, MetadataRest metadataRest)
+            throws SQLException, AuthorizeException {
+        DSpaceObjectService<T> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+        for (Map.Entry<String, List<MetadataValueRest>> entry: metadataRest.getMap().entrySet()) {
+            List<MetadataValue> metadataByMetadataString = dsoService.getMetadataByMetadataString(dso, entry.getKey());
+            dsoService.removeMetadataValues(context, dso, metadataByMetadataString);
+        }
+        persistMetadataRest(context, dso, metadataRest, dsoService);
+    }
+
+    private <T extends DSpaceObject> void persistMetadataRest(Context context, T dso, MetadataRest metadataRest,
+            DSpaceObjectService<T> dsoService)
+                    throws SQLException, AuthorizeException {
         for (Map.Entry<String, List<MetadataValueRest>> entry: metadataRest.getMap().entrySet()) {
             String[] seq = entry.getKey().split("\\.");
             String schema = seq[0];
@@ -97,4 +141,5 @@ public class MetadataConverter implements Converter<List<MetadataValue>, Metadat
         }
         dsoService.update(context, dso);
     }
+
 }

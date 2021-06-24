@@ -24,8 +24,6 @@ SELECT setval('bitstreamformatregistry_seq', max(bitstream_format_id)) FROM bits
 SELECT setval('fileextension_seq', max(file_extension_id)) FROM fileextension;
 SELECT setval('resourcepolicy_seq', max(policy_id)) FROM resourcepolicy;
 SELECT setval('workspaceitem_seq', max(workspace_item_id)) FROM workspaceitem;
-SELECT setval('workflowitem_seq', max(workflow_id)) FROM workflowitem;
-SELECT setval('tasklistitem_seq', max(tasklist_id)) FROM tasklistitem;
 SELECT setval('registrationdata_seq', max(registrationdata_id)) FROM registrationdata;
 SELECT setval('subscription_seq', max(subscription_id)) FROM subscription;
 SELECT setval('metadatafieldregistry_seq', max(metadata_field_id)) FROM metadatafieldregistry;

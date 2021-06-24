@@ -14,9 +14,10 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.swordapp.server.Deposit;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.UriRegistry;
@@ -27,29 +28,38 @@ import org.swordapp.server.UriRegistry;
  * performed on items which are in the deposit phase.
  */
 public class WorkflowManagerDefault implements WorkflowManager {
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    @Override
     public void retrieveServiceDoc(Context context) throws SwordError {
         // do nothing - operation allowed
     }
 
+    @Override
     public void listCollectionContents(Context context, Collection collection)
         throws SwordError {
         // do nothing - operation allowed
     }
 
+    @Override
     public void createResource(Context context, Collection collection)
         throws SwordError {
         // do nothing - operation allowed
     }
 
+    @Override
     public void retrieveContent(Context context, Item item) throws SwordError {
         // do nothing - operation allowed
     }
 
+    @Override
     public void retrieveBitstream(Context context, Bitstream bitstream)
         throws SwordError, DSpaceSwordException {
         // do nothing - operation allowed
     }
 
+    @Override
     public void replaceResourceContent(Context context, Item item)
         throws SwordError, DSpaceSwordException {
         WorkflowTools wft = new WorkflowTools();
@@ -64,11 +74,11 @@ public class WorkflowManagerDefault implements WorkflowManager {
         }
     }
 
+    @Override
     public void replaceMetadata(Context context, Item item)
         throws SwordError, DSpaceSwordException {
-        boolean allowUpdate = ConfigurationManager
-            .getBooleanProperty("swordv2-server",
-                                "workflowmanagerdefault.always-update-metadata");
+        boolean allowUpdate = configurationService
+            .getBooleanProperty("swordv2-server.workflowmanagerdefault.always-update-metadata");
         if (allowUpdate) {
             // all updates are allowed
             return;
@@ -87,12 +97,14 @@ public class WorkflowManagerDefault implements WorkflowManager {
         }
     }
 
+    @Override
     public void replaceMetadataAndMediaResource(Context context, Item item)
         throws SwordError, DSpaceSwordException {
         this.replaceResourceContent(context, item);
         this.replaceMetadata(context, item);
     }
 
+    @Override
     public void deleteMediaResource(Context context, Item item)
         throws SwordError, DSpaceSwordException {
         WorkflowTools wft = new WorkflowTools();
@@ -107,6 +119,7 @@ public class WorkflowManagerDefault implements WorkflowManager {
         }
     }
 
+    @Override
     public void deleteBitstream(Context context, Bitstream bitstream)
         throws SwordError, DSpaceSwordException {
         // this is equivalent to asking whether the media resource in the item can be deleted
@@ -130,14 +143,14 @@ public class WorkflowManagerDefault implements WorkflowManager {
         }
     }
 
+    @Override
     public void replaceBitstream(Context context, Bitstream bitstream)
         throws SwordError, DSpaceSwordException {
         // File replace with DSpace actually violates the RESTful environment, so it is
         // turned off by default, and strongly advised against.  Nonetheless, it is used
         // by some DepositMO aware extensions, so must be supported (as shown below)
-        boolean fileReplace = ConfigurationManager
-            .getBooleanProperty("swordv2-server",
-                                "workflowmanagerdefault.file-replace.enable");
+        boolean fileReplace = configurationService
+            .getBooleanProperty("swordv2-server.workflowmanagerdefault.file-replace.enable");
         if (!fileReplace) {
             throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED,
                                  "DSpace does not support file replace; you should DELETE the original file and PUT " +
@@ -164,6 +177,7 @@ public class WorkflowManagerDefault implements WorkflowManager {
         }
     }
 
+    @Override
     public void addResourceContent(Context context, Item item)
         throws SwordError, DSpaceSwordException {
         WorkflowTools wft = new WorkflowTools();
@@ -178,11 +192,11 @@ public class WorkflowManagerDefault implements WorkflowManager {
         }
     }
 
+    @Override
     public void addMetadata(Context context, Item item)
         throws SwordError, DSpaceSwordException {
-        boolean allowUpdate = ConfigurationManager
-            .getBooleanProperty("swordv2-server",
-                                "workflowmanagerdefault.always-update-metadata");
+        boolean allowUpdate = configurationService
+            .getBooleanProperty("swordv2-server.workflowmanagerdefault.always-update-metadata");
         if (allowUpdate) {
             // all updates are allowed
             return;
@@ -201,6 +215,7 @@ public class WorkflowManagerDefault implements WorkflowManager {
         }
     }
 
+    @Override
     public void deleteItem(Context context, Item item)
         throws SwordError, DSpaceSwordException {
         WorkflowTools wft = new WorkflowTools();
@@ -215,11 +230,13 @@ public class WorkflowManagerDefault implements WorkflowManager {
         }
     }
 
+    @Override
     public void retrieveStatement(Context context, Item item)
         throws SwordError, DSpaceSwordException {
         // do nothing - operation allowed
     }
 
+    @Override
     public void modifyState(Context context, Item item)
         throws SwordError, DSpaceSwordException {
         WorkflowTools wft = new WorkflowTools();
@@ -234,12 +251,14 @@ public class WorkflowManagerDefault implements WorkflowManager {
         }
     }
 
+    @Override
     public void resolveState(Context context, Deposit deposit,
                              DepositResult result, VerboseDescription verboseDescription)
         throws DSpaceSwordException {
         this.resolveState(context, deposit, result, verboseDescription, true);
     }
 
+    @Override
     public void resolveState(Context context, Deposit deposit,
                              DepositResult result, VerboseDescription verboseDescription,
                              boolean containerOperation)

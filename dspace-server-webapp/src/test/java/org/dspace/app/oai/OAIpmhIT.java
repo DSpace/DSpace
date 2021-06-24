@@ -9,7 +9,8 @@
 package org.dspace.app.oai;
 
 import static org.hamcrest.Matchers.startsWith;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -18,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import com.lyncode.xoai.dataprovider.core.XOAIManager;
@@ -26,17 +28,16 @@ import com.lyncode.xoai.dataprovider.services.api.ResourceResolver;
 import com.lyncode.xoai.dataprovider.services.impl.BaseDateProvider;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.Configuration;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.ContextConfiguration;
-
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
+import org.apache.commons.lang3.time.DateUtils;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Community;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.config.XOAIManagerResolver;
 import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
-
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +76,7 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
     private EarliestDateResolver earliestDateResolver;
 
     // XOAI's BaseDateProvider (used for date-based testing below)
-    private static BaseDateProvider baseDateProvider = new BaseDateProvider();
+    private static final BaseDateProvider baseDateProvider = new BaseDateProvider();
 
     // Spy on the current XOAIManagerResolver bean, to allow us to change behavior of XOAIManager in tests
     // See also: createMockXOAIManager() method
@@ -142,10 +143,11 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
     @Test
     public void requestForIdentifyShouldReturnTheConfiguredValues() throws Exception {
 
-        // Get current date/time and store as "now"
+        // Get current date/time and store as "now", then round to nearest second (as OAI-PMH ignores milliseconds)
         Date now = new Date();
-        // Return "now" when "getEarliestDate()" is called for the currently loaded EarliestDateResolver bean
-        doReturn(now).when(earliestDateResolver).getEarliestDate(context);
+        Date nowToNearestSecond = DateUtils.round(now, Calendar.SECOND);
+        // Return "nowToNearestSecond" when "getEarliestDate()" is called for currently loaded EarliestDateResolver bean
+        doReturn(nowToNearestSecond).when(earliestDateResolver).getEarliestDate(any());
 
         // Attempt to make an Identify request to root context
         getClient().perform(get(DEFAULT_CONTEXT).param("verb", "Identify"))
@@ -168,7 +170,7 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
                                   .string(configurationService.getProperty("oai.url") + "/" + DEFAULT_CONTEXT_PATH))
                    // Expect earliestDatestamp to be "now", i.e. current date, (as mocked above)
                    .andExpect(xpath("OAI-PMH/Identify/earliestDatestamp")
-                                  .string(baseDateProvider.format(now)))
+                                  .string(baseDateProvider.format(nowToNearestSecond)))
         ;
     }
 
@@ -276,6 +278,6 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
      * @throws ConfigurationException
      */
     private XOAIManager createMockXOAIManager(Configuration xoaiConfig) throws ConfigurationException {
-      return new XOAIManager(filterResolver, resourceResolver, xoaiConfig);
+        return new XOAIManager(filterResolver, resourceResolver, xoaiConfig);
     }
 }

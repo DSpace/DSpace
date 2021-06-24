@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.SearchConfigurationRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
@@ -24,34 +26,25 @@ import org.springframework.stereotype.Component;
  * to the convert method.
  */
 @Component
-public class DiscoverConfigurationConverter {
-    public SearchConfigurationRest convert(DiscoveryConfiguration configuration) {
+public class DiscoverConfigurationConverter
+        implements DSpaceConverter<DiscoveryConfiguration, SearchConfigurationRest> {
+
+    @Override
+    public SearchConfigurationRest convert(DiscoveryConfiguration configuration, Projection projection) {
         SearchConfigurationRest searchConfigurationRest = new SearchConfigurationRest();
+        searchConfigurationRest.setProjection(projection);
         if (configuration != null) {
             addSearchFilters(searchConfigurationRest,
                              configuration.getSearchFilters(), configuration.getSidebarFacets());
             addSortOptions(searchConfigurationRest, configuration.getSearchSortConfiguration());
-            setDefaultSortOption(configuration, searchConfigurationRest);
         }
         return searchConfigurationRest;
     }
 
-    private void setDefaultSortOption(DiscoveryConfiguration configuration,
-                                      SearchConfigurationRest searchConfigurationRest) {
-        String defaultSort = configuration.getSearchSortConfiguration().SCORE;
-        if (configuration.getSearchSortConfiguration() != null) {
-            DiscoverySortFieldConfiguration discoverySortFieldConfiguration = configuration.getSearchSortConfiguration()
-                                                                                           .getSortFieldConfiguration(
-                                                                                               defaultSort);
-            if (discoverySortFieldConfiguration != null) {
-                SearchConfigurationRest.SortOption sortOption = new SearchConfigurationRest.SortOption();
-                sortOption.setName(discoverySortFieldConfiguration.getMetadataField());
-                sortOption.setActualName(discoverySortFieldConfiguration.getType());
-                searchConfigurationRest.addSortOption(sortOption);
-            }
-        }
+    @Override
+    public Class<DiscoveryConfiguration> getModelClass() {
+        return DiscoveryConfiguration.class;
     }
-
 
     public void addSearchFilters(SearchConfigurationRest searchConfigurationRest,
                                  List<DiscoverySearchFilter> searchFilterList,
@@ -78,8 +71,13 @@ public class DiscoverConfigurationConverter {
             for (DiscoverySortFieldConfiguration discoverySearchSortConfiguration : CollectionUtils
                 .emptyIfNull(searchSortConfiguration.getSortFields())) {
                 SearchConfigurationRest.SortOption sortOption = new SearchConfigurationRest.SortOption();
-                sortOption.setName(discoverySearchSortConfiguration.getMetadataField());
+                if (StringUtils.isBlank(discoverySearchSortConfiguration.getMetadataField())) {
+                    sortOption.setName(DiscoverySortConfiguration.SCORE);
+                } else {
+                    sortOption.setName(discoverySearchSortConfiguration.getMetadataField());
+                }
                 sortOption.setActualName(discoverySearchSortConfiguration.getType());
+                sortOption.setSortOrder(discoverySearchSortConfiguration.getDefaultSortOrder().name());
                 searchConfigurationRest.addSortOption(sortOption);
             }
         }

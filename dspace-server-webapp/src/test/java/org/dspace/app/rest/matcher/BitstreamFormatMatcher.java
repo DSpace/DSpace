@@ -75,5 +75,4 @@ public class BitstreamFormatMatcher {
             hasJsonPath("$.type", is("bitstreamformat"))
         );
     }
-
 }

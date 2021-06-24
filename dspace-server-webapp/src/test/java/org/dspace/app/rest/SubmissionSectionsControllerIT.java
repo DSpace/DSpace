@@ -33,7 +33,7 @@ public class SubmissionSectionsControllerIT extends AbstractControllerIntegratio
                    .andExpect(status().isUnauthorized());
 
 
-        String token = getAuthToken(admin.getEmail(), password);
+        String token = getAuthToken(eperson.getEmail(), password);
 
         //When we call the root endpoint
         getClient(token).perform(get("/api/config/submissionsections"))

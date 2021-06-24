@@ -7,19 +7,21 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import org.springframework.hateoas.Resource;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 
 /**
  * The abstract, generic class for the HalResources
  */
-public abstract class HALResource<T> extends Resource<T> {
+public abstract class HALResource<T> extends EntityModel<T> {
 
     public HALResource(T content) {
         super(content);
@@ -37,18 +39,28 @@ public abstract class HALResource<T> extends Resource<T> {
         return embedded;
     }
 
-    public void embedResource(String relationship, HALResource resource) {
-        embedded.put(relationship, resource);
-    }
-    public void embedResource(String relationship, EmbeddedPage embeddedPage) {
-        embedded.put(relationship, embeddedPage);
-    }
-    public void embedResource(String relationship, Collection<? extends HALResource> resource) {
-        embedded.put(relationship, resource);
+    public void embedResource(String rel, Object object) {
+        embedded.put(rel, object);
     }
 
     public void setPageHeader(EmbeddedPageHeader page) {
         this.pageHeader = page;
     }
 
+    @Override
+    public EntityModel<T> add(Link link) {
+        if (!hasLink(link.getRel())) {
+            return super.add(link);
+        } else {
+            String name = link.getName();
+            if (StringUtils.isNotBlank(name)) {
+                List<Link> list = this.getLinks(link.getRel());
+                // If a link of this name doesn't already exist in the list, add it
+                if (!list.stream().anyMatch((l -> StringUtils.equalsIgnoreCase(l.getName(), name)))) {
+                    super.add(link);
+                }
+            }
+        }
+        return this;
+    }
 }

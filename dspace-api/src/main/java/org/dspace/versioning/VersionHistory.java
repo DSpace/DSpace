@@ -93,12 +93,12 @@ public class VersionHistory implements ReloadableEntity<Integer> {
             return true;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(o);
-        if (getClass() != objClass) {
+        if (!getClass().equals(objClass)) {
             return false;
         }
 
         final VersionHistory that = (VersionHistory) o;
-        if (this.getID() != that.getID()) {
+        if (!this.getID().equals(that.getID())) {
             return false;
         }
 

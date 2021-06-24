@@ -38,38 +38,43 @@ public class RelationshipTypeMatcher {
         String rightEntityTypeLabel) {
 
         return matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(relationshipType.getID(),
-                                                                              relationshipType.getLeftLabel(),
-                                                                              relationshipType.getRightLabel(),
+                                                                              relationshipType.getLeftwardType(),
+                                                                              relationshipType.getRightwardType(),
                                                                               relationshipType.getLeftMinCardinality(),
                                                                               relationshipType.getLeftMaxCardinality(),
                                                                               relationshipType.getRightMinCardinality(),
                                                                               relationshipType.getRightMaxCardinality(),
                                                                               leftEntityTypeId, leftEntityTypeLabel,
-                                                                              rightEntityTypeId, rightEntityTypeLabel);
+                                                                              rightEntityTypeId, rightEntityTypeLabel,
+                                                                              relationshipType.isCopyToLeft(),
+                                                                              relationshipType.isCopyToRight());
     }
 
     private static Matcher<? super Object> matchExplicitRelationshipTypeValuesAndExplicitEntityType(int id,
-        String leftLabel, String rightLabel, Integer leftMinCardinality, Integer leftMaxCardinality,
+        String leftwardType, String rightwardType, Integer leftMinCardinality, Integer leftMaxCardinality,
         Integer rightMinCardinality, Integer rightMaxCardinality,
-        EntityType leftEntityType, EntityType rightEntityType) {
-        return matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(id, leftLabel, rightLabel,
+        EntityType leftEntityType, EntityType rightEntityType, boolean copyToLeft, boolean copyToRight) {
+        return matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(id, leftwardType, rightwardType,
                                                                               leftMinCardinality, leftMaxCardinality,
                                                                               rightMinCardinality,
                                                                               rightMaxCardinality,
                                                                               leftEntityType.getID(),
                                                                               leftEntityType.getLabel(),
                                                                               rightEntityType.getID(),
-                                                                              rightEntityType.getLabel());
+                                                                              rightEntityType.getLabel(),
+                                                                              copyToLeft, copyToRight);
     }
 
     private static Matcher<? super Object> matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(int id,
-        String leftLabel, String rightLabel, Integer leftMinCardinality, Integer leftMaxCardinality,
+        String leftwardType, String rightwardType, Integer leftMinCardinality, Integer leftMaxCardinality,
         Integer rightMinCardinality, Integer rightMaxCardinality, int leftEntityTypeId, String leftEntityTypeLabel,
-        int rightEntityTypeId, String rightEntityTypeLabel) {
+        int rightEntityTypeId, String rightEntityTypeLabel, boolean copyToLeft, boolean copyToRight) {
         return allOf(
             hasJsonPath("$.id", is(id)),
-            hasJsonPath("$.leftLabel", is(leftLabel)),
-            hasJsonPath("$.rightLabel", is(rightLabel)),
+            hasJsonPath("$.leftwardType", is(leftwardType)),
+            hasJsonPath("$.rightwardType", is(rightwardType)),
+            hasJsonPath("$.copyToLeft", is(copyToLeft)),
+            hasJsonPath("$.copyToRight", is(copyToRight)),
             hasJsonPath("$.leftMinCardinality", is(leftMinCardinality)),
             hasJsonPath("$.leftMaxCardinality", is(leftMaxCardinality)),
             hasJsonPath("$.rightMinCardinality", is(rightMinCardinality)),

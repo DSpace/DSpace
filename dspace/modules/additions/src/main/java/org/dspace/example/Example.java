@@ -8,9 +8,7 @@
 package org.dspace.example;
 
 /**
- * TODO: Add Description
- *
- * @author mdiggory @ atmire.com
+ * This interface serves as an example of how & where to add local customizations to the DSpace REST API.
  */
 public interface Example {
 }

@@ -13,11 +13,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
+import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.submit.DataProcessingStep;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReaderException;
@@ -47,18 +48,29 @@ public class SubmissionDefinitionConverter implements DSpaceConverter<Submission
     private RequestService requestService;
 
     @Autowired
-    private CollectionConverter collectionConverter;
+    private ConverterService converter;
 
     @Override
-    public SubmissionDefinitionRest fromModel(SubmissionConfig obj) {
+    public SubmissionDefinitionRest convert(SubmissionConfig obj, Projection projection) {
         SubmissionDefinitionRest sd = new SubmissionDefinitionRest();
+        sd.setProjection(projection);
         sd.setName(obj.getSubmissionName());
         sd.setDefaultConf(obj.isDefaultConf());
         List<SubmissionSectionRest> panels = new LinkedList<SubmissionSectionRest>();
         for (int idx = 0; idx < obj.getNumberOfSteps(); idx++) {
             SubmissionStepConfig step = obj.getStep(idx);
-            SubmissionSectionRest sp = panelConverter.convert(step);
-            panels.add(sp);
+            try {
+                // only the step that process data must be included in the panels list
+                if (DataProcessingStep.class.isAssignableFrom(Class.forName(step.getProcessingClassName()))) {
+                    SubmissionSectionRest sp = converter.toRest(step, projection);
+                    panels.add(sp);
+                }
+            } catch (ClassNotFoundException e) {
+                throw new IllegalStateException(
+                        "The submission configration is invalid the processing class for the step " + step.getId()
+                                + " is not found",
+                        e);
+            }
         }
 
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
@@ -68,8 +80,9 @@ public class SubmissionDefinitionConverter implements DSpaceConverter<Submission
             List<Collection> collections = panelConverter.getSubmissionConfigReader()
                                                          .getCollectionsBySubmissionConfig(context,
                                                                                            obj.getSubmissionName());
-            List<CollectionRest> collectionsRest = collections.stream().map(
-                (collection) -> collectionConverter.convert(collection)).collect(Collectors.toList());
+            DSpaceConverter<Collection, CollectionRest> cc = converter.getConverter(Collection.class);
+            List<CollectionRest> collectionsRest = collections.stream().map((collection) ->
+                    cc.convert(collection, projection)).collect(Collectors.toList());
             sd.setCollections(collectionsRest);
         } catch (SQLException | IllegalStateException | SubmissionConfigReaderException e) {
             log.error(e.getMessage(), e);
@@ -79,7 +92,7 @@ public class SubmissionDefinitionConverter implements DSpaceConverter<Submission
     }
 
     @Override
-    public SubmissionConfig toModel(SubmissionDefinitionRest obj) {
-        throw new NotImplementedException("Method not implemented");
+    public Class<SubmissionConfig> getModelClass() {
+        return SubmissionConfig.class;
     }
 }

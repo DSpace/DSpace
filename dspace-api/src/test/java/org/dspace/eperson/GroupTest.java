@@ -9,8 +9,8 @@ package org.dspace.eperson;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -171,7 +171,6 @@ public class GroupTest extends AbstractUnitTest {
     public void findAll() throws SQLException {
         List<Group> groups = groupService.findAll(context, null);
         assertThat("findAll 1", groups, notNullValue());
-        System.out.println("TEST GROUP OUTPUT " + groups);
         assertTrue("findAll 2", 0 < groups.size());
     }
 

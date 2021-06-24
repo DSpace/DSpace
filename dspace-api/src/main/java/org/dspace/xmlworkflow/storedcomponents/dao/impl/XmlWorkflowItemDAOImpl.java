@@ -9,7 +9,6 @@ package org.dspace.xmlworkflow.storedcomponents.dao.impl;
 
 import java.sql.SQLException;
 import java.util.List;
-
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;

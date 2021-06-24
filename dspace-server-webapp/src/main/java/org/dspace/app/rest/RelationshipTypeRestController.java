@@ -8,16 +8,14 @@
 package org.dspace.app.rest;
 
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dspace.app.rest.converter.RelationshipTypeConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.RelationshipTypeRest;
-import org.dspace.app.rest.model.RelationshipTypeRestWrapper;
-import org.dspace.app.rest.model.hateoas.RelationshipTypeResourceWrapper;
+import org.dspace.app.rest.model.hateoas.RelationshipTypeResource;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.EntityType;
@@ -26,6 +24,10 @@ import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,7 +50,7 @@ public class RelationshipTypeRestController {
     private EntityTypeService entityTypeService;
 
     @Autowired
-    private RelationshipTypeConverter relationshipTypeConverter;
+    private ConverterService converter;
 
     @Autowired
     private Utils utils;
@@ -63,31 +65,30 @@ public class RelationshipTypeRestController {
      * @param id        The ID of the EntityType objects that we'll use to retrieve the RelationshipTypes
      * @param response  The response object
      * @param request   The request object
-     * @return          The wrapped resource containing the list of RelationshipType objects as defined above
+     * @param pageable  The pagination object
+     * @param assembler The assembler object
+     * @return The wrapped resource containing the list of RelationshipType objects as defined above
      * @throws SQLException If something goes wrong
      */
     @RequestMapping(method = RequestMethod.GET)
-    public RelationshipTypeResourceWrapper retrieve(@PathVariable Integer id, HttpServletResponse response,
-                                                    HttpServletRequest request) throws SQLException {
+    public PagedModel<RelationshipTypeResource> retrieve(@PathVariable Integer id,
+                                                             HttpServletResponse response,
+                                                             HttpServletRequest request,
+                                                             Pageable pageable,
+                                                             PagedResourcesAssembler assembler) throws SQLException {
         Context context = ContextUtil.obtainContext(request);
         EntityType entityType = entityTypeService.find(context, id);
-        List<RelationshipType> list = relationshipTypeService.findByEntityType(context, entityType);
+        List<RelationshipType> list = relationshipTypeService.findByEntityType(context, entityType, -1, -1);
 
-        List<RelationshipTypeRest> relationshipTypeRests = new LinkedList<>();
+        Page<RelationshipTypeRest> relationshipTypeRestPage = converter
+            .toRestPage(list, pageable, utils.obtainProjection());
 
-        for (RelationshipType relationshipType : list) {
-            relationshipTypeRests.add(relationshipTypeConverter.fromModel(relationshipType));
-        }
+        Page<RelationshipTypeResource> relationshipTypeResources = relationshipTypeRestPage
+            .map(relationshipTypeRest -> new RelationshipTypeResource(relationshipTypeRest, utils));
+        relationshipTypeResources.forEach(halLinkService::addLinks);
+        PagedModel<RelationshipTypeResource> result = assembler.toModel(relationshipTypeResources);
+        return result;
 
 
-        RelationshipTypeRestWrapper relationshipTypeRestWrapper = new RelationshipTypeRestWrapper();
-        relationshipTypeRestWrapper.setEntityTypeId(id);
-        relationshipTypeRestWrapper.setEntityTypeLabel(entityType.getLabel());
-        relationshipTypeRestWrapper.setRelationshipTypeRestList(relationshipTypeRests);
-
-        RelationshipTypeResourceWrapper relationshipTypeResourceWrapper = new RelationshipTypeResourceWrapper(
-            relationshipTypeRestWrapper, utils);
-        halLinkService.addLinks(relationshipTypeResourceWrapper);
-        return relationshipTypeResourceWrapper;
     }
 }

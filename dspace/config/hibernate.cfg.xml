@@ -48,6 +48,8 @@
         <mapping class="org.dspace.content.RelationshipType"/>
         <mapping class="org.dspace.content.EntityType"/>
 
+        <mapping class="org.dspace.scripts.Process"/>
+
         <mapping class="org.dspace.content.MetadataField"/>
         <mapping class="org.dspace.content.MetadataSchema"/>
         <mapping class="org.dspace.content.MetadataValue"/>
@@ -79,6 +81,8 @@
         <mapping class="org.dspace.xmlworkflow.storedcomponents.PoolTask"/>
         <mapping class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole"/>
         <mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>
+
+        <mapping class="org.dspace.statistics.export.OpenURLTracker"/>
 
     </session-factory>
 </hibernate-configuration>

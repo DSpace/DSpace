@@ -14,6 +14,7 @@ import java.util.TreeMap;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * Rest representation of a map of metadata keys to ordered lists of values.
@@ -65,5 +66,12 @@ public class MetadataRest {
     @Override
     public boolean equals(Object object) {
         return object instanceof MetadataRest && ((MetadataRest) object).getMap().equals(map);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(7, 37)
+            .append(this.getMap())
+            .toHashCode();
     }
 }

@@ -42,17 +42,17 @@ public class VirtualMetadataPopulator {
 
     /**
      * This method will return a boolean indicating whether the useForPlace is true or false for the given
-     * RelationshipType for the left or right label as indicated by the second parameter.
+     * RelationshipType for the left or right type as indicated by the second parameter.
      * @param relationshipType  The relationshipType for which this should be checked
-     * @param isLeft            The boolean indicating whether to check the left or the right label
+     * @param isLeft            The boolean indicating whether to check the left or the right type
      * @return                  A boolean indicating whether the useForPlace is true or not for the given parameters
      */
     public boolean isUseForPlaceTrueForRelationshipType(RelationshipType relationshipType, boolean isLeft) {
         HashMap<String, VirtualMetadataConfiguration> hashMaps;
         if (isLeft) {
-            hashMaps = this.getMap().get(relationshipType.getLeftLabel());
+            hashMaps = this.getMap().get(relationshipType.getLeftwardType());
         } else {
-            hashMaps = this.getMap().get(relationshipType.getRightLabel());
+            hashMaps = this.getMap().get(relationshipType.getRightwardType());
         }
         if (hashMaps != null) {
             for (Map.Entry<String, VirtualMetadataConfiguration> entry : hashMaps.entrySet()) {

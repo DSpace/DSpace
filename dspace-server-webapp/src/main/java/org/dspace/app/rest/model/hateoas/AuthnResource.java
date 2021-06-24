@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import java.sql.SQLException;
-
 import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
@@ -22,7 +20,7 @@ import org.dspace.app.rest.utils.Utils;
 @RelNameDSpaceResource(AuthnRest.NAME)
 public class AuthnResource extends DSpaceResource<AuthnRest> {
 
-    public AuthnResource(AuthnRest data, Utils utils, String... rels) throws SQLException {
-        super(data, utils, rels);
+    public AuthnResource(AuthnRest data, Utils utils) {
+        super(data, utils);
     }
 }

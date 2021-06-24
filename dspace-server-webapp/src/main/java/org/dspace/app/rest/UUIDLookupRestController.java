@@ -2,29 +2,29 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * 
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.io.IOException;
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.GenericDSpaceObjectConverter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.rest.utils.DSpaceObjectUtils;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.springframework.beans.factory.InitializingBean;
@@ -55,16 +55,18 @@ public class UUIDLookupRestController implements InitializingBean {
     public static final String PARAM = "uuid";
 
     @Autowired
-    private ContentServiceFactory contentServiceFactory;
+    private DSpaceObjectUtils dspaceObjectUtil;
 
-    private static final Logger log =
-            Logger.getLogger(UUIDLookupRestController.class);
+    @Autowired
+    private Utils utils;
+
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private DiscoverableEndpointsService discoverableEndpointsService;
 
     @Autowired
-    private GenericDSpaceObjectConverter converter;
+    private ConverterService converter;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -88,17 +90,14 @@ public class UUIDLookupRestController implements InitializingBean {
         Context context = null;
         try {
             context = ContextUtil.obtainContext(request);
-            for (DSpaceObjectService<? extends DSpaceObject> dSpaceObjectService : contentServiceFactory
-                    .getDSpaceObjectServices()) {
-                DSpaceObject dso = dSpaceObjectService.find(context, uuid);
-                if (dso != null) {
-                    DSpaceObjectRest dsor = converter.convert(dso);
-                    URI link = linkTo(dsor.getController(), dsor.getCategory(), dsor.getTypePlural())
-                            .slash(dsor.getId()).toUri();
-                    response.setStatus(HttpServletResponse.SC_FOUND);
-                    response.sendRedirect(link.toString());
-                    return;
-                }
+            DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuid);
+            if (dso != null) {
+                DSpaceObjectRest dsor = converter.toRest(dso, utils.obtainProjection());
+                URI link = linkTo(dsor.getController(), dsor.getCategory(), dsor.getTypePlural()).slash(dsor.getId())
+                        .toUri();
+                response.setStatus(HttpServletResponse.SC_FOUND);
+                response.sendRedirect(link.toString());
+                return;
             }
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } finally {

@@ -18,7 +18,7 @@ public class AuthenticationStatusRest extends BaseObjectRest<Integer> {
     private boolean authenticated;
 
     public static final String NAME = "status";
-    public static final String CATEGORY = "authn";
+    public static final String CATEGORY = RestAddressableModel.AUTHENTICATION;
 
     @Override
     public String getCategory() {
@@ -56,7 +56,7 @@ public class AuthenticationStatusRest extends BaseObjectRest<Integer> {
         }
     }
 
-    @LinkRest(linkClass = EPersonRest.class, name = "eperson", optional = true)
+    @LinkRest(name = "eperson")
     @JsonIgnore
     public EPersonRest getEPersonRest() {
         return ePersonRest;

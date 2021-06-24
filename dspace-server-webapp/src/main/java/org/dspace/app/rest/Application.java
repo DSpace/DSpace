@@ -7,15 +7,18 @@
  */
 package org.dspace.app.rest;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.Filter;
 
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
-import org.dspace.app.rest.model.hateoas.DSpaceRelProvider;
+import org.dspace.app.rest.model.hateoas.DSpaceLinkRelationProvider;
 import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
+import org.dspace.app.sitemap.GenerateSitemaps;
 import org.dspace.app.util.DSpaceContextListener;
 import org.dspace.utils.servlet.DSpaceWebappServletFilter;
 import org.slf4j.Logger;
@@ -23,16 +26,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
-import org.springframework.hateoas.RelProvider;
+import org.springframework.hateoas.server.LinkRelationProvider;
+import org.springframework.lang.NonNull;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
  * Define the Spring Boot Application settings itself. This class takes the place
@@ -48,12 +54,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  * @author Tim Donohue
  */
 @SpringBootApplication
+@EnableScheduling
 public class Application extends SpringBootServletInitializer {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
     @Autowired
     private ApplicationConfig configuration;
+
+    @Scheduled(cron = "${sitemap.cron:-}")
+    public void generateSitemap() throws IOException, SQLException {
+        GenerateSitemaps.generateSitemapsScheduled();
+    }
 
     /**
      * Override the default SpringBootServletInitializer.configure() method,
@@ -118,27 +130,49 @@ public class Application extends SpringBootServletInitializer {
     }
 
     @Bean
-    protected RelProvider dspaceRelProvider() {
-        return new DSpaceRelProvider();
+    protected LinkRelationProvider dspaceLinkRelationProvider() {
+        return new DSpaceLinkRelationProvider();
     }
 
     @Bean
     public WebMvcConfigurer webMvcConfigurer() {
-        return new WebMvcConfigurerAdapter() {
+
+        return new WebMvcConfigurer() {
+            /**
+             * Create a custom CORS mapping for the DSpace REST API (/api/ paths), based on configured allowed origins.
+             * @param registry CorsRegistry
+             */
             @Override
-            public void addCorsMappings(CorsRegistry registry) {
+            public void addCorsMappings(@NonNull CorsRegistry registry) {
                 String[] corsAllowedOrigins = configuration.getCorsAllowedOrigins();
+                boolean corsAllowCredentials = configuration.getCorsAllowCredentials();
                 if (corsAllowedOrigins != null) {
                     registry.addMapping("/api/**").allowedMethods(CorsConfiguration.ALL)
-                        .allowedOrigins(corsAllowedOrigins).allowedHeaders("Authorization", "Content-Type",
-                            "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method",
-                            "Access-Control-Request-Headers")
-                        .exposedHeaders("Access-Control-Allow-Origin", "Authorization");
+                            // Set Access-Control-Allow-Credentials to "true" and specify which origins are valid
+                            // for our Access-Control-Allow-Origin header
+                            .allowCredentials(corsAllowCredentials).allowedOrigins(corsAllowedOrigins)
+                            // Allow list of request preflight headers allowed to be sent to us from the client
+                            .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
+                                            "X-Requested-With", "X-XSRF-TOKEN")
+                            // Allow list of response headers allowed to be sent by us (the server) to the client
+                            .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
                 }
             }
 
+            /**
+             * Add a new ResourceHandler to allow us to use WebJars.org to pull in web dependencies
+             * dynamically for HAL Browser, and access them off the /webjars path.
+             * @param registry ResourceHandlerRegistry
+             */
             @Override
-            public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+            public void addResourceHandlers(ResourceHandlerRegistry registry) {
+                registry
+                    .addResourceHandler("/webjars/**")
+                    .addResourceLocations("/webjars/");
+            }
+
+            @Override
+            public void addArgumentResolvers(@NonNull List<HandlerMethodArgumentResolver> argumentResolvers) {
                 argumentResolvers.add(new SearchFilterResolver());
             }
         };

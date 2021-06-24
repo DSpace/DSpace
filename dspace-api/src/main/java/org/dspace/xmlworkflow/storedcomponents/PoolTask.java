@@ -19,10 +19,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
-import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -36,7 +34,7 @@ import org.dspace.eperson.Group;
  */
 @Entity
 @Table(name = "cwf_pooltask")
-public class PoolTask implements ReloadableEntity<Integer>, IndexableObject<Integer> {
+public class PoolTask implements ReloadableEntity<Integer> {
 
     @Id
     @Column(name = "pooltask_id")
@@ -131,10 +129,4 @@ public class PoolTask implements ReloadableEntity<Integer>, IndexableObject<Inte
     public String getActionID() {
         return this.actionId;
     }
-
-    @Override
-    public int getType() {
-        return Constants.POOLTASK;
-    }
-
 }

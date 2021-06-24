@@ -8,23 +8,19 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.model.SiteRest;
-import org.dspace.app.rest.model.hateoas.SiteResource;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -41,13 +37,13 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
     private final SiteService sitesv;
 
     @Autowired
-    public SiteRestRepository(SiteService dsoService,
-                              SiteConverter dsoConverter) {
-        super(dsoService, dsoConverter, new DSpaceObjectPatch<SiteRest>() {});
+    public SiteRestRepository(SiteService dsoService) {
+        super(dsoService);
         this.sitesv = dsoService;
     }
 
     @Override
+    @PreAuthorize("permitAll()")
     public SiteRest findOne(Context context, UUID id) {
         Site site = null;
         try {
@@ -58,20 +54,17 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
         if (site == null) {
             return null;
         }
-        return dsoConverter.fromModel(site);
+        return converter.toRest(site, utils.obtainProjection());
     }
 
     @Override
     public Page<SiteRest> findAll(Context context, Pageable pageable) {
-        List<Site> sites = new ArrayList<Site>();
-        int total = 1;
         try {
-            sites.add(sitesv.findSite(context));
+            List<Site> sites = Arrays.asList(sitesv.findSite(context));
+            return converter.toRestPage(sites, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<SiteRest> page = new PageImpl<Site>(sites, pageable, total).map(dsoConverter);
-        return page;
     }
 
     @Override
@@ -85,10 +78,4 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
     public Class<SiteRest> getDomainClass() {
         return SiteRest.class;
     }
-
-    @Override
-    public SiteResource wrapResource(SiteRest site, String... rels) {
-        return new SiteResource(site, utils, rels);
-    }
-
 }

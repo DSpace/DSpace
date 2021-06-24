@@ -1,0 +1,173 @@
+<PubmedArticleSet>
+<PubmedArticle>
+<MedlineCitation Status="MEDLINE" Owner="NLM">
+<PMID Version="1">18926410</PMID>
+<DateCompleted>
+<Year>2009</Year>
+<Month>02</Month>
+<Day>13</Day>
+</DateCompleted>
+<DateRevised>
+<Year>2008</Year>
+<Month>10</Month>
+<Day>17</Day>
+</DateRevised>
+<Article PubModel="Print-Electronic">
+<Journal>
+<ISSN IssnType="Electronic">1557-3117</ISSN>
+<JournalIssue CitedMedium="Internet">
+<Volume>27</Volume>
+<Issue>10</Issue>
+<PubDate>
+<Year>2008</Year>
+<Month>Oct</Month>
+</PubDate>
+</JournalIssue>
+<Title>The Journal of heart and lung transplantation : the official publication of the International Society for Heart Transplantation</Title>
+<ISOAbbreviation>J Heart Lung Transplant</ISOAbbreviation>
+</Journal>
+<ArticleTitle>Transfer of peanut allergy from the donor to a lung transplant recipient.</ArticleTitle>
+<Pagination>
+<MedlinePgn>1162-4</MedlinePgn>
+</Pagination>
+<ELocationID EIdType="doi" ValidYN="Y">10.1016/j.healun.2008.07.015</ELocationID>
+<Abstract>
+<AbstractText>Among solid organs, transfer of peanut allergy from donor to recipient has been implicated after liver transplantation. We report the first case in which such transfer occurred after a lung transplant. A 42-year-old woman with history of sarcoidosis underwent a successful bilateral lung transplant from a donor who died from anaphylactic shock after eating peanut-related food. Seven months later, she ate a peanut butter cookie at a transplant support group meeting. Immediately thereafter, she developed an anaphylactic reaction, but survived with prompt treatment. During subsequent follow-up, she could recall three prior episodes of wheezing and difficulty breathing after eating peanut-related foods. The first episode occurred 4 days after the transplant. Prior to her transplant, she never had problems eating peanuts. Skin-prick testing confirmed peanut sensitization. She avoided peanuts and, although her skin-prick test became negative, she still manifested peanut allergy when formally challenged orally with the food. She was advised to continue abstaining from all peanut-related foods. This case emphasizes the importance of considering donor allergy transfer when caring for all solid-organ transplant recipients in order to avoid a life-threatening event.</AbstractText>
+</Abstract>
+<AuthorList CompleteYN="Y">
+<Author ValidYN="Y">
+<LastName>Khalid</LastName>
+<ForeName>Imran</ForeName>
+<Initials>I</Initials>
+<AffiliationInfo>
+<Affiliation>Department of Pulmonary and Critical Care Medicine, Henry Ford Health System, Detroit, Michigan 48202, USA. doc_ik@yahoo.com</Affiliation>
+</AffiliationInfo>
+</Author>
+<Author ValidYN="Y">
+<LastName>Zoratti</LastName>
+<ForeName>Edward</ForeName>
+<Initials>E</Initials>
+</Author>
+<Author ValidYN="Y">
+<LastName>Stagner</LastName>
+<ForeName>Lisa</ForeName>
+<Initials>L</Initials>
+</Author>
+<Author ValidYN="Y">
+<LastName>Betensley</LastName>
+<ForeName>Alan D</ForeName>
+<Initials>AD</Initials>
+</Author>
+<Author ValidYN="Y">
+<LastName>Nemeh</LastName>
+<ForeName>Hasan</ForeName>
+<Initials>H</Initials>
+</Author>
+<Author ValidYN="Y">
+<LastName>Allenspach</LastName>
+<ForeName>Lisa</ForeName>
+<Initials>L</Initials>
+</Author>
+</AuthorList>
+<Language>eng</Language>
+<PublicationTypeList>
+<PublicationType UI="D002363">Case Reports</PublicationType>
+<PublicationType UI="D016428">Journal Article</PublicationType>
+</PublicationTypeList>
+<ArticleDate DateType="Electronic">
+<Year>2008</Year>
+<Month>08</Month>
+<Day>27</Day>
+</ArticleDate>
+</Article>
+<MedlineJournalInfo>
+<Country>United States</Country>
+<MedlineTA>J Heart Lung Transplant</MedlineTA>
+<NlmUniqueID>9102703</NlmUniqueID>
+<ISSNLinking>1053-2498</ISSNLinking>
+</MedlineJournalInfo>
+<CitationSubset>IM</CitationSubset>
+<MeshHeadingList>
+<MeshHeading>
+<DescriptorName UI="D000328" MajorTopicYN="N">Adult</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName UI="D000707" MajorTopicYN="N">Anaphylaxis</DescriptorName>
+<QualifierName UI="Q000401" MajorTopicYN="N">mortality</QualifierName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName UI="D002648" MajorTopicYN="N">Child</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName UI="D017809" MajorTopicYN="N">Fatal Outcome</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName UI="D005260" MajorTopicYN="N">Female</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName UI="D005500" MajorTopicYN="N">Follow-Up Studies</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName UI="D006801" MajorTopicYN="N">Humans</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName UI="D016040" MajorTopicYN="N">Lung Transplantation</DescriptorName>
+<QualifierName UI="Q000276" MajorTopicYN="Y">immunology</QualifierName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName UI="D021183" MajorTopicYN="N">Peanut Hypersensitivity</DescriptorName>
+<QualifierName UI="Q000209" MajorTopicYN="Y">etiology</QualifierName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName UI="D014019" MajorTopicYN="Y">Tissue Donors</DescriptorName>
+</MeshHeading>
+</MeshHeadingList>
+</MedlineCitation>
+<PubmedData>
+<History>
+<PubMedPubDate PubStatus="received">
+<Year>2008</Year>
+<Month>05</Month>
+<Day>08</Day>
+</PubMedPubDate>
+<PubMedPubDate PubStatus="revised">
+<Year>2008</Year>
+<Month>07</Month>
+<Day>02</Day>
+</PubMedPubDate>
+<PubMedPubDate PubStatus="accepted">
+<Year>2008</Year>
+<Month>07</Month>
+<Day>17</Day>
+</PubMedPubDate>
+<PubMedPubDate PubStatus="pubmed">
+<Year>2008</Year>
+<Month>10</Month>
+<Day>18</Day>
+<Hour>9</Hour>
+<Minute>0</Minute>
+</PubMedPubDate>
+<PubMedPubDate PubStatus="medline">
+<Year>2009</Year>
+<Month>2</Month>
+<Day>14</Day>
+<Hour>9</Hour>
+<Minute>0</Minute>
+</PubMedPubDate>
+<PubMedPubDate PubStatus="entrez">
+<Year>2008</Year>
+<Month>10</Month>
+<Day>18</Day>
+<Hour>9</Hour>
+<Minute>0</Minute>
+</PubMedPubDate>
+</History>
+<PublicationStatus>ppublish</PublicationStatus>
+<ArticleIdList>
+<ArticleId IdType="pubmed">18926410</ArticleId>
+<ArticleId IdType="pii">S1053-2498(08)00562-7</ArticleId>
+<ArticleId IdType="doi">10.1016/j.healun.2008.07.015</ArticleId>
+</ArticleIdList>
+</PubmedData>
+</PubmedArticle>
+</PubmedArticleSet>

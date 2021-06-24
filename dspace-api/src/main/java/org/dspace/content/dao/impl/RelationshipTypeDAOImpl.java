@@ -23,39 +23,55 @@ import org.dspace.core.Context;
 public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipType> implements RelationshipTypeDAO {
 
     @Override
-    public RelationshipType findByTypesAndLabels(Context context, EntityType leftType, EntityType rightType,
-                                                 String leftLabel, String rightLabel)
+    public RelationshipType findbyTypesAndTypeName(Context context, EntityType leftType, EntityType rightType,
+                                                 String leftwardType, String rightwardType)
         throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
         Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
         criteriaQuery.select(relationshipTypeRoot);
         criteriaQuery.where(
-            criteriaBuilder.and(criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftType), leftType),
-                                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightType), rightType),
-                                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftLabel), leftLabel),
-                                criteriaBuilder
-                                    .equal(relationshipTypeRoot.get(RelationshipType_.rightLabel), rightLabel)));
+            criteriaBuilder.and(
+                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftType), leftType),
+                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightType), rightType),
+                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftwardType), leftwardType),
+                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightwardType), rightwardType)));
         return uniqueResult(context, criteriaQuery, false, RelationshipType.class, -1, -1);
     }
 
     @Override
-    public List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException {
+    public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String type) throws SQLException {
+
+        return findByLeftwardOrRightwardTypeName(context, type, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String type, Integer limit,
+                                                                    Integer offset)
+            throws SQLException {
+
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
         Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
         criteriaQuery.select(relationshipTypeRoot);
         criteriaQuery.where(
             criteriaBuilder.or(
-                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftLabel), label),
-                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightLabel), label)
+                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftwardType), type),
+                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightwardType), type)
             )
         );
-        return list(context, criteriaQuery, true, RelationshipType.class, -1, -1);
+        return list(context, criteriaQuery, true, RelationshipType.class, limit, offset);
     }
 
     @Override
     public List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException {
+        return findByEntityType(context, entityType, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> findByEntityType(Context context, EntityType entityType,
+                                                   Integer limit, Integer offset) throws SQLException {
+
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
         Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
@@ -67,7 +83,32 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
                                    .equal(relationshipTypeRoot.get(RelationshipType_.rightType), entityType)
             )
         );
-        return list(context, criteriaQuery, false, RelationshipType.class, -1, -1);
+        return list(context, criteriaQuery, false, RelationshipType.class, limit, offset);
     }
 
+    @Override
+    public List<RelationshipType> findByEntityType(Context context, EntityType entityType, Boolean isLeft)
+            throws SQLException {
+        return findByEntityType(context, entityType, isLeft, -1, -1);
+    }
+
+    @Override
+    public List<RelationshipType> findByEntityType(Context context, EntityType entityType, Boolean isLeft,
+                                                   Integer limit, Integer offset) throws SQLException {
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
+        Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
+        criteriaQuery.select(relationshipTypeRoot);
+        if (isLeft) {
+            criteriaQuery.where(
+                    criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftType), entityType)
+            );
+        } else {
+            criteriaQuery.where(
+                    criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightType), entityType)
+            );
+        }
+        return list(context, criteriaQuery, false, RelationshipType.class, limit, offset);
+    }
 }

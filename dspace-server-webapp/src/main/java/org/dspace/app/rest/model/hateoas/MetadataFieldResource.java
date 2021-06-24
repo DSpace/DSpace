@@ -19,7 +19,7 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(MetadataFieldRest.NAME)
 public class MetadataFieldResource extends DSpaceResource<MetadataFieldRest> {
-    public MetadataFieldResource(MetadataFieldRest ms, Utils utils, String... rels) {
-        super(ms, utils, rels);
+    public MetadataFieldResource(MetadataFieldRest ms, Utils utils) {
+        super(ms, utils);
     }
 }

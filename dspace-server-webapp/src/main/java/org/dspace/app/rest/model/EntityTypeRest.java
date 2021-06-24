@@ -17,6 +17,7 @@ import org.dspace.app.rest.RestResourceController;
 public class EntityTypeRest extends BaseObjectRest<Integer> {
 
     public static final String NAME = "entitytype";
+    public static final String NAME_PLURAL = "entitytypes";
     public static final String CATEGORY = "core";
 
     public String getCategory() {

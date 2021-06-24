@@ -20,7 +20,7 @@ import org.dspace.app.rest.utils.Utils;
 @RelNameDSpaceResource(SubmissionSectionRest.NAME)
 public class SubmissionSectionResource extends DSpaceResource<SubmissionSectionRest> {
 
-    public SubmissionSectionResource(SubmissionSectionRest sd, Utils utils, String... rels) {
-        super(sd, utils, rels);
+    public SubmissionSectionResource(SubmissionSectionRest sd, Utils utils) {
+        super(sd, utils);
     }
 }

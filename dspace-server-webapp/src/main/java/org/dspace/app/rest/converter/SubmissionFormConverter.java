@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.ScopeEnum;
 import org.dspace.app.rest.model.SubmissionFormFieldRest;
@@ -20,12 +20,14 @@ import org.dspace.app.rest.model.SubmissionFormRest;
 import org.dspace.app.rest.model.SubmissionFormRowRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
+import org.dspace.app.rest.model.submit.SelectableMetadata;
+import org.dspace.app.rest.model.submit.SelectableRelationship;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.SubmissionFormRestRepository;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.submit.model.LanguageFormField;
-import org.dspace.submit.model.SelectableMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -50,8 +52,9 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     private SubmissionFormRestRepository submissionFormRestRepository;
 
     @Override
-    public SubmissionFormRest fromModel(DCInputSet obj) {
+    public SubmissionFormRest convert(DCInputSet obj, Projection projection) {
         SubmissionFormRest sd = new SubmissionFormRest();
+        sd.setProjection(projection);
         sd.setName(obj.getFormName());
         DCInput[][] step = obj.getFields();
         List<SubmissionFormRowRest> rows = getPage(step, obj.getFormName());
@@ -77,7 +80,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     private SubmissionFormFieldRest getField(DCInput dcinput, String formName) {
         SubmissionFormFieldRest inputField = new SubmissionFormFieldRest();
         List<SelectableMetadata> selectableMetadata = new ArrayList<SelectableMetadata>();
-
+        SelectableRelationship selectableRelationship;
         inputField.setLabel(dcinput.getLabel());
         inputField.setHints(dcinput.getHints());
         inputField.setStyle(dcinput.getStyle());
@@ -105,45 +108,77 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
 
         inputRest.setRegex(dcinput.getRegex());
 
-        if (!StringUtils.equalsIgnoreCase(dcinput.getInputType(), "qualdrop_value")) {
-            // value-pair and vocabulary are a special kind of authorities
-            String inputType = dcinput.getInputType();
+        if (dcinput.isMetadataField()) {
+            // only try to process the metadata input type if there's a metadata field
+            if (!StringUtils.equalsIgnoreCase(dcinput.getInputType(), "qualdrop_value")) {
 
-            SelectableMetadata selMd = new SelectableMetadata();
-            if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
-                inputRest.setType(
-                        getPresentation(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), inputType));
-                selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
-                        dcinput.getPairsType(), dcinput.getVocabulary()));
-                selMd.setClosed(
-                        authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
-            } else {
-                inputRest.setType(inputType);
-            }
-            selMd.setMetadata(org.dspace.core.Utils
-                .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "."));
-            selectableMetadata.add(selMd);
+                // value-pair and vocabulary are a special kind of authorities
+                String inputType = dcinput.getInputType();
 
-        } else {
-            inputRest.setType(INPUT_TYPE_ONEBOX);
-            List<String> pairs = dcinput.getPairs();
-            for (int idx = 0; idx < pairs.size(); idx += 2) {
                 SelectableMetadata selMd = new SelectableMetadata();
-                selMd.setLabel((String) pairs.get(idx));
-                selMd.setMetadata(org.dspace.core.Utils
-                    .standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
-                if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
-                    selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1),
-                        dcinput.getPairsType(), dcinput.getVocabulary()));
+                if (isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
+                        dcinput.getPairsType(), dcinput.getVocabulary())) {
+                    inputRest.setType(getPresentation(dcinput.getSchema(), dcinput.getElement(),
+                                                      dcinput.getQualifier(), inputType));
+                    selMd.setControlledVocabulary(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
+                                                        dcinput.getQualifier(), dcinput.getPairsType(),
+                                                        dcinput.getVocabulary()));
                     selMd.setClosed(
-                        authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+                            isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
+                                    dcinput.getPairsType(), dcinput.getVocabulary()));
+                } else {
+                    inputRest.setType(inputType);
                 }
+                selMd.setMetadata(org.dspace.core.Utils
+                    .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "."));
                 selectableMetadata.add(selMd);
+            } else {
+                // if the field is a qualdrop_value
+                inputRest.setType(INPUT_TYPE_ONEBOX);
+                List<String> pairs = dcinput.getPairs();
+                for (int idx = 0; idx < pairs.size(); idx += 2) {
+                    SelectableMetadata selMd = new SelectableMetadata();
+                    selMd.setLabel((String) pairs.get(idx));
+                    selMd.setMetadata(org.dspace.core.Utils
+                            .standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
+                    if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
+                        selMd.setControlledVocabulary(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
+                                pairs.get(idx + 1), dcinput.getPairsType(), dcinput.getVocabulary()));
+                        selMd.setClosed(isClosed(dcinput.getSchema(), dcinput.getElement(),
+                                dcinput.getQualifier(), null, dcinput.getVocabulary()));
+                    }
+                    selectableMetadata.add(selMd);
+                }
             }
         }
+
         inputField.setInput(inputRest);
-        inputField.setSelectableMetadata(selectableMetadata);
+        if (dcinput.isMetadataField()) {
+            inputField.setSelectableMetadata(selectableMetadata);
+        }
+        if (dcinput.isRelationshipField()) {
+            selectableRelationship = getSelectableRelationships(dcinput);
+            inputField.setSelectableRelationship(selectableRelationship);
+        }
         return inputField;
+    }
+
+    /**
+     * This method will create a SelectableRelationship object
+     * The DCInput will be used to define all the properties of the SelectableRelationship object
+     * @param dcinput                   The parsed input from submission-forms.xml
+     * @return                          The SelectableRelationship object based on the dcinput
+     */
+    private SelectableRelationship getSelectableRelationships(DCInput dcinput) {
+        SelectableRelationship selectableRelationship = new SelectableRelationship();
+        selectableRelationship.setRelationshipType(dcinput.getRelationshipType());
+        selectableRelationship.setFilter(dcinput.getFilter());
+        selectableRelationship.setSearchConfiguration(dcinput.getSearchConfiguration());
+        selectableRelationship.setNameVariants(String.valueOf(dcinput.areNameVariantsAllowed()));
+        if (CollectionUtils.isNotEmpty(dcinput.getExternalSources())) {
+            selectableRelationship.setExternalSources(dcinput.getExternalSources());
+        }
+        return selectableRelationship;
     }
 
     private String getPresentation(String schema, String element, String qualifier, String inputType) {
@@ -156,7 +191,8 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                     return INPUT_TYPE_LOOKUP;
                 }
             } else if (INPUT_TYPE_NAME.equals(inputType)) {
-                if (AuthorityUtils.PRESENTATION_TYPE_LOOKUP.equals(presentation)) {
+                if (AuthorityUtils.PRESENTATION_TYPE_LOOKUP.equals(presentation) ||
+                        AuthorityUtils.PRESENTATION_TYPE_AUTHORLOOKUP.equals(presentation)) {
                     return INPUT_TYPE_LOOKUP_NAME;
                 }
             }
@@ -174,8 +210,24 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
         return authorityUtils.getAuthorityName(schema, element, qualifier);
     }
 
+    private boolean isClosed(String schema, String element, String qualifier, String valuePairsName,
+            String vocabularyName) {
+        if (StringUtils.isNotBlank(valuePairsName) || StringUtils.isNotBlank(vocabularyName)) {
+            return true;
+        }
+        return authorityUtils.isClosed(schema, element, qualifier);
+    }
+
+    private boolean isChoice(String schema, String element, String qualifier, String valuePairsName,
+            String vocabularyName) {
+        if (StringUtils.isNotBlank(valuePairsName) || StringUtils.isNotBlank(vocabularyName)) {
+            return true;
+        }
+        return authorityUtils.isChoice(schema, element, qualifier);
+    }
+
     @Override
-    public DCInputSet toModel(SubmissionFormRest obj) {
-        throw new NotImplementedException("Method not implemented");
+    public Class<DCInputSet> getModelClass() {
+        return DCInputSet.class;
     }
 }

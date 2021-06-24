@@ -7,7 +7,6 @@
  */
 package org.dspace.content;
 
-import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.junit.After;
 import org.junit.Before;
@@ -22,11 +21,6 @@ import org.junit.Test;
  * @author pvillega
  */
 public class InProgressSubmissionTest extends AbstractUnitTest {
-
-    /**
-     * log4j category
-     */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(InProgressSubmissionTest.class);
 
     /**
      * This method will be run before every test as per @Before. It will

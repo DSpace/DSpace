@@ -7,11 +7,12 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -21,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * instance to put the 3rd author as 1st author you need to run:
  *
  * <code>
- * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
  * Content-Type: application/json" -d '[{ "op": "move", "from": "
  * /sections/traditionalpageone/dc.contributor.author/2", "path": "
  * /sections/traditionalpageone/dc.contributor.author/0"}]'
@@ -35,7 +36,7 @@ public class ItemMetadataValueMovePatchOperation extends MetadataValueMovePatchO
     ItemService itemService;
 
     @Override
-    void move(Context context, Request currentRequest, InProgressSubmission source, String path, String from)
+    void move(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, String from)
         throws Exception {
         String[] splitTo = getAbsolutePath(path).split("/");
 

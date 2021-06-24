@@ -7,18 +7,17 @@
  */
 package org.dspace.content;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.logging.log4j.Logger;
 import org.dspace.content.dao.RelationshipTypeDAO;
 import org.dspace.core.Context;
 import org.junit.Before;
@@ -26,13 +25,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RelationshipTypeTest {
-
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RelationshipTypeTest.class);
-
     @InjectMocks
     private RelationshipTypeServiceImpl relationshipTypeService;
 
@@ -51,8 +47,8 @@ public class RelationshipTypeTest {
         firstRelationshipType.setId(1);
         firstRelationshipType.setLeftType(mock(EntityType.class));
         firstRelationshipType.setRightType(mock(EntityType.class));
-        firstRelationshipType.setLeftLabel("isAuthorOfPublication");
-        firstRelationshipType.setRightLabel("isPublicationOfAuthor");
+        firstRelationshipType.setLeftwardType("isAuthorOfPublication");
+        firstRelationshipType.setRightwardType("isPublicationOfAuthor");
         firstRelationshipType.setLeftMinCardinality(0);
         firstRelationshipType.setLeftMaxCardinality(null);
         firstRelationshipType.setRightMinCardinality(0);
@@ -63,8 +59,8 @@ public class RelationshipTypeTest {
         secondRelationshipType.setId(new Random().nextInt());
         secondRelationshipType.setLeftType(mock(EntityType.class));
         secondRelationshipType.setRightType(mock(EntityType.class));
-        secondRelationshipType.setLeftLabel("isProjectOfPerson");
-        secondRelationshipType.setRightLabel("isPersonOfProject");
+        secondRelationshipType.setLeftwardType("isProjectOfPerson");
+        secondRelationshipType.setRightwardType("isPersonOfProject");
         secondRelationshipType.setLeftMinCardinality(0);
         secondRelationshipType.setLeftMaxCardinality(null);
         secondRelationshipType.setRightMinCardinality(0);
@@ -87,11 +83,11 @@ public class RelationshipTypeTest {
     @Test
     public void testRelationshipTypeFindByTypesAndLabels() throws Exception {
         // Mock DAO to return our firstRelationshipType
-        when(relationshipTypeDAO.findByTypesAndLabels(any(), any(), any(), any(), any()))
+        when(relationshipTypeDAO.findbyTypesAndTypeName(any(), any(), any(), any(), any()))
                 .thenReturn(firstRelationshipType);
 
         // Declare objects utilized for this test
-        RelationshipType found = relationshipTypeService.findbyTypesAndLabels(context, mock(EntityType.class),
+        RelationshipType found = relationshipTypeService.findbyTypesAndTypeName(context, mock(EntityType.class),
                 mock(EntityType.class),
                 "mock", "mock");
 
@@ -102,12 +98,12 @@ public class RelationshipTypeTest {
     @Test
     public void testRelationshipTypeFindAll() throws Exception {
         // Declare objects utilized for this test
-        List<RelationshipType> mockedList = new LinkedList<>();
+        List<RelationshipType> mockedList = new ArrayList<>();
         mockedList.add(firstRelationshipType);
         mockedList.add(secondRelationshipType);
 
         // Mock DAO to return our mockedList
-        when(relationshipTypeDAO.findAll(context, RelationshipType.class)).thenReturn(mockedList);
+        when(relationshipTypeDAO.findAll(context, RelationshipType.class, -1, -1)).thenReturn(mockedList);
 
         // Invoke findAll()
         List<RelationshipType> foundRelationshipTypes = relationshipTypeService.findAll(context);
@@ -118,16 +114,16 @@ public class RelationshipTypeTest {
     }
 
     @Test
-    public void testRelationshipTypeFindByLeftOrRightLabel() throws Exception {
+    public void testRelationshipTypeFindByLeftOrRightwardType() throws Exception {
         // Declare objects utilized for this test
-        List<RelationshipType> mockedList = new LinkedList<>();
+        List<RelationshipType> mockedList = new ArrayList<>();
         mockedList.add(firstRelationshipType);
 
         // Mock DAO to return our mockedList
-        when(relationshipTypeDAO.findByLeftOrRightLabel(any(), any())).thenReturn(mockedList);
+        when(relationshipTypeDAO.findByLeftwardOrRightwardTypeName(context, "mock", -1, -1)).thenReturn(mockedList);
 
-        // Invoke findByLeftOrRightLabel()
-        List<RelationshipType> found = relationshipTypeService.findByLeftOrRightLabel(context, "mock");
+        // Invoke findByLeftwardOrRightwardTypeName()
+        List<RelationshipType> found = relationshipTypeService.findByLeftwardOrRightwardTypeName(context, "mock");
 
         // Assert that our expected list contains our expected RelationshipType and nothing more
         assertThat(found, notNullValue());
@@ -138,14 +134,15 @@ public class RelationshipTypeTest {
     @Test
     public void testRelationshipTypefindByEntityType() throws Exception {
         // Declare objects utilized for this test
-        List<RelationshipType> mockedList = new LinkedList<>();
+        List<RelationshipType> mockedList = new ArrayList<>();
         mockedList.add(firstRelationshipType);
 
         // Mock DAO to return our mockedList
-        when(relationshipTypeDAO.findByEntityType(any(), any())).thenReturn(mockedList);
+        when(relationshipTypeDAO.findByEntityType(any(), any(), any(), any())).thenReturn(mockedList);
 
         // Invoke findByEntityType()
-        List<RelationshipType> found = relationshipTypeService.findByEntityType(context, mock(EntityType.class));
+        List<RelationshipType> found = relationshipTypeService
+                .findByEntityType(context, mock(EntityType.class), -1, -1);
 
         // Assert that our expected list contains our expected RelationshipType and nothing more
         assertThat(found, notNullValue());
@@ -160,8 +157,8 @@ public class RelationshipTypeTest {
      */
     private void checkRelationshipTypeValues(RelationshipType found, RelationshipType original) {
         assertThat(found, notNullValue());
-        assertThat(found.getLeftLabel(), equalTo(original.getLeftLabel()));
-        assertThat(found.getRightLabel(), equalTo(original.getRightLabel()));
+        assertThat(found.getLeftwardType(), equalTo(original.getLeftwardType()));
+        assertThat(found.getRightwardType(), equalTo(original.getRightwardType()));
         assertThat(found.getLeftType(), equalTo(original.getLeftType()));
         assertThat(found.getRightType(), equalTo(original.getRightType()));
         assertThat(found.getLeftMinCardinality(), equalTo(original.getLeftMinCardinality()));

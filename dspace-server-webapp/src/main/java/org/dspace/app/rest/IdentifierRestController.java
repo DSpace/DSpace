@@ -2,26 +2,27 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * 
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.io.IOException;
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.Arrays;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.atteo.evo.inflector.English;
-import org.dspace.app.rest.converter.GenericDSpaceObjectConverter;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.identifier.IdentifierNotFoundException;
@@ -49,11 +50,13 @@ public class IdentifierRestController implements InitializingBean {
 
     public static final String PARAM = "id";
 
-    private static final Logger log =
-            Logger.getLogger(IdentifierRestController.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
-    private GenericDSpaceObjectConverter converter;
+    private ConverterService converter;
+
+    @Autowired
+    private Utils utils;
 
     @Autowired
     private DiscoverableEndpointsService discoverableEndpointsService;
@@ -84,7 +87,7 @@ public class IdentifierRestController implements InitializingBean {
         try {
             dso = identifierService.resolve(context, id);
             if (dso != null) {
-                DSpaceObjectRest dsor = converter.convert(dso);
+                DSpaceObjectRest dsor = converter.toRest(dso, utils.obtainProjection());
                 URI link = linkTo(dsor.getController(), dsor.getCategory(),
                         English.plural(dsor.getType()))
                         .slash(dsor.getId()).toUri();

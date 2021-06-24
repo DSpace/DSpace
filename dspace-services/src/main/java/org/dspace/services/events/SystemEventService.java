@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.dspace.kernel.mixins.ShutdownService;
 import org.dspace.services.CachingService;
 import org.dspace.services.EventService;
 import org.dspace.services.RequestService;
@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Aaron Zeckoski (azeckoski@gmail.com) - azeckoski - 4:02:31 PM Nov 19, 2008
  */
-public final class SystemEventService implements EventService, ShutdownService {
+public final class SystemEventService implements EventService {
 
     private final Logger log = LoggerFactory.getLogger(SystemEventService.class);
 
@@ -45,7 +45,7 @@ public final class SystemEventService implements EventService, ShutdownService {
     /**
      * Map for holding onto the listeners which is ClassLoader safe.
      */
-    private Map<String, EventListener> listenersMap = new ConcurrentHashMap<String, EventListener>();
+    private final Map<String, EventListener> listenersMap = new ConcurrentHashMap<>();
 
     private final RequestService requestService;
     private final CachingService cachingService;
@@ -64,9 +64,7 @@ public final class SystemEventService implements EventService, ShutdownService {
         this.requestService.registerRequestInterceptor(this.requestInterceptor);
     }
 
-    /* (non-Javadoc)
-     * @see org.dspace.kernel.mixins.ShutdownService#shutdown()
-     */
+    @PreDestroy
     public void shutdown() {
         this.requestInterceptor = null; // clear the interceptor
         this.listenersMap.clear();
@@ -76,6 +74,7 @@ public final class SystemEventService implements EventService, ShutdownService {
     /* (non-Javadoc)
      * @see org.dspace.services.EventService#fireEvent(org.dspace.services.model.Event)
      */
+    @Override
     public void fireEvent(Event event) {
         validateEvent(event);
         // check scopes for this event
@@ -97,6 +96,7 @@ public final class SystemEventService implements EventService, ShutdownService {
     /* (non-Javadoc)
      * @see org.dspace.services.EventService#queueEvent(org.dspace.services.model.Event)
      */
+    @Override
     public void queueEvent(Event event) {
         validateEvent(event);
 
@@ -118,6 +118,7 @@ public final class SystemEventService implements EventService, ShutdownService {
     /* (non-Javadoc)
      * @see org.dspace.services.EventService#registerEventListener(org.dspace.services.model.EventListener)
      */
+    @Override
     public void registerEventListener(EventListener listener) {
         if (listener == null) {
             throw new IllegalArgumentException("Cannot register a listener that is null");
@@ -293,7 +294,7 @@ public final class SystemEventService implements EventService, ShutdownService {
         return allowName && allowResource;
     }
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     /**
      * Generate an event ID used to identify and track this event uniquely.
@@ -316,6 +317,7 @@ public final class SystemEventService implements EventService, ShutdownService {
          * @see org.dspace.services.model.RequestInterceptor#onStart(java.lang.String, org.dspace.services.model
          * .Session)
          */
+        @Override
         public void onStart(String requestId) {
             // nothing to really do here unless we decide we should purge out any existing events? -AZ
         }
@@ -324,6 +326,7 @@ public final class SystemEventService implements EventService, ShutdownService {
          * @see org.dspace.services.model.RequestInterceptor#onEnd(java.lang.String, org.dspace.services.model
          * .Session, boolean, java.lang.Exception)
          */
+        @Override
         public void onEnd(String requestId, boolean succeeded, Exception failure) {
             if (succeeded) {
                 int fired = fireQueuedEvents();
@@ -338,6 +341,7 @@ public final class SystemEventService implements EventService, ShutdownService {
         /* (non-Javadoc)
          * @see org.dspace.kernel.mixins.OrderedService#getOrder()
          */
+        @Override
         public int getOrder() {
             return 20; // this should fire pretty late
         }

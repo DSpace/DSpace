@@ -13,8 +13,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,13 +27,13 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 import org.hibernate.proxy.HibernateProxyHelper;
 
@@ -55,12 +53,12 @@ import org.hibernate.proxy.HibernateProxyHelper;
  */
 @Entity
 @Table(name = "item")
-public class Item extends DSpaceObject implements DSpaceObjectLegacySupport, IndexableObject<UUID> {
+public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(Item.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
@@ -114,6 +112,16 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport, Ind
 
     @Transient
     private transient ItemService itemService;
+
+    /**
+     * True if anything else was changed since last metadata retrieval()
+     * (to drive metadata cache)
+     */
+    @Transient
+    private boolean modifiedMetadataCache = true;
+
+    @Transient
+    private List<MetadataValue> cachedMetadata = new ArrayList<>();
 
     /**
      * Protected constructor, create object using:
@@ -378,8 +386,21 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport, Ind
     }
 
     @Override
-    public String getTypeText() {
-        return getItemService().getTypeText(this);
+    protected void setMetadataModified() {
+        super.setMetadataModified();
+        modifiedMetadataCache = true;
     }
 
+    public boolean isModifiedMetadataCache() {
+        return modifiedMetadataCache;
+    }
+
+    protected List<MetadataValue> getCachedMetadata() {
+        return cachedMetadata;
+    }
+
+    protected void setCachedMetadata(List<MetadataValue> cachedMetadata) {
+        this.cachedMetadata = cachedMetadata;
+        modifiedMetadataCache = false;
+    }
 }

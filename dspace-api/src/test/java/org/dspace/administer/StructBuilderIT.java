@@ -15,9 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -47,7 +45,6 @@ import org.xmlunit.diff.ComparisonFormatter;
 import org.xmlunit.diff.DefaultComparisonFormatter;
 import org.xmlunit.diff.Diff;
 import org.xmlunit.diff.Difference;
-import org.xmlunit.util.Predicate;
 
 /**
  * Tests of {@link StructBuilder}.
@@ -102,18 +99,34 @@ public class StructBuilderIT
             "<import_structure>\n" +
             "  <community>\n" +
             "    <name>Top Community 0</name>\n" +
-            "    <description/><intro/><copyright/><sidebar/>" +
+            "    <description>A top level community</description>\n" +
+            "    <intro>Testing 1 2 3</intro>\n" +
+            "    <copyright>1969</copyright>\n" +
+            "    <sidebar>A sidebar</sidebar>\n" +
             "    <community>\n" +
             "      <name>Sub Community 0.0</name>\n" +
-            "      <description/><intro/><copyright/><sidebar/>" +
+            "      <description>A sub community</description>\n" +
+            "      <intro>Live from New York....</intro>\n" +
+            "      <copyright>1957</copyright>\n" +
+            "      <sidebar>Another sidebar</sidebar>\n" +
             "      <collection>\n" +
             "        <name>Collection 0.0.0</name>\n" +
-            "        <description/><intro/><copyright/><sidebar/><license/><provenance/>" +
+            "        <description>A collection</description>\n" +
+            "        <intro>Our next guest needs no introduction</intro>\n" +
+            "        <copyright>1776</copyright>\n" +
+            "        <sidebar>Yet another sidebar</sidebar>\n" +
+            "        <license>MIT</license>\n" +
+            "        <provenance>Testing</provenance>\n" +
             "      </collection>\n" +
             "    </community>\n" +
             "    <collection>\n" +
             "      <name>Collection 0.1</name>\n" +
-            "      <description/><intro/><copyright/><sidebar/><license/><provenance/>" +
+            "      <description>Another collection</description>\n" +
+            "      <intro>Fourscore and seven years ago</intro>\n" +
+            "      <copyright>1863</copyright>\n" +
+            "      <sidebar>No sidebar</sidebar>\n" +
+            "      <license>Public domain</license>\n" +
+            "      <provenance>Testing again</provenance>\n" +
             "    </collection>\n" +
             "  </community>\n" +
             "</import_structure>\n";
@@ -122,29 +135,14 @@ public class StructBuilderIT
             "<?xml version='1.0' encoding='UTF-8'?>\n" +
             "<import_structure>\n" +
             "  <community>\n" +
-            "    <name>Top Community 0</name>" +
-            "    <description/><intro/><copyright/><sidebar/>" +
+            "    <name>Top Community 0</name>\n" +
+            "    <description/><intro/><copyright/><sidebar/>\n" +
             "    <collection>\n" +
-            "      <name>Collection 0.0</name>" +
-            "      <description/><intro/><copyright/><sidebar/><license/>" +
+            "      <name>Collection 0.0</name>\n" +
+            "      <description/><intro/><copyright/><sidebar/><license/>\n" +
             "    </collection>\n" +
             "  </community>\n" +
             "</import_structure>\n";
-
-    /**
-     * Test of main method, of class StructBuilder.
-     * @throws java.lang.Exception
-/*
-    @Test
-    public void testMain()
-            throws Exception {
-        System.out.println("main");
-        String[] argv = null;
-        StructBuilder.main(argv);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
 
     /**
      * Test of importStructure method, of class StructBuilder.
@@ -314,9 +312,9 @@ public class StructBuilderIT
     }
 
     /**
-     * Reject uninteresting nodes.
+     * Reject uninteresting nodes. (currently commented out of tests above)
      */
-    private static class MyNodeFilter implements Predicate<Node> {
+    /*private static class MyNodeFilter implements Predicate<Node> {
         private static final List<String> dontCare = Arrays.asList(
             "description",
             "intro",
@@ -330,5 +328,5 @@ public class StructBuilderIT
             String type = node.getLocalName();
             return ! dontCare.contains(type);
         }
-    }
+    }*/
 }

@@ -7,13 +7,15 @@
  */
 package org.dspace.app.rest.converter;
 
+import static org.dspace.app.util.Util.getSourceVersion;
+
 import org.dspace.app.rest.model.RootRest;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * This class converts the restUrl and constructs a RootRest instance to return
+ * This class read the core configuration properties and constructs a RootRest instance to return
  */
 @Component
 public class RootConverter {
@@ -24,8 +26,9 @@ public class RootConverter {
     public RootRest convert() {
         RootRest rootRest = new RootRest();
         rootRest.setDspaceName(configurationService.getProperty("dspace.name"));
-        rootRest.setDspaceURL(configurationService.getProperty("dspace.url"));
-        rootRest.setDspaceRest(configurationService.getProperty("dspace.restUrl"));
+        rootRest.setDspaceUI(configurationService.getProperty("dspace.ui.url"));
+        rootRest.setDspaceServer(configurationService.getProperty("dspace.server.url"));
+        rootRest.setDspaceVersion("DSpace " + getSourceVersion());
         return rootRest;
     }
 }

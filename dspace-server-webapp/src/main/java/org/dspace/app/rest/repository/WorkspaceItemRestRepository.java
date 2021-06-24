@@ -14,25 +14,21 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
-import gr.ekt.bte.core.TransformationEngine;
-import gr.ekt.bte.core.TransformationSpec;
-import gr.ekt.bte.exceptions.BadTransformationSpec;
-import gr.ekt.bte.exceptions.MalformedSourceException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
-import org.dspace.app.rest.model.hateoas.WorkspaceItemResource;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
 import org.dspace.app.rest.utils.Utils;
@@ -41,7 +37,10 @@ import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -53,29 +52,29 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonServiceImpl;
 import org.dspace.event.Event;
+import org.dspace.importer.external.datamodel.ImportRecord;
+import org.dspace.importer.external.exception.FileMultipleOccurencesException;
+import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import org.dspace.importer.external.service.ImportService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.submit.AbstractProcessingStep;
-import org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator;
-import org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader;
-import org.dspace.submit.lookup.SubmissionItemDataLoader;
-import org.dspace.submit.lookup.SubmissionLookupOutputGenerator;
-import org.dspace.submit.lookup.SubmissionLookupService;
-import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.rest.webmvc.json.patch.PatchException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
 
 /**
  * This is the repository responsible to manage WorkspaceItem Rest object
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Pasquale Cavallo (pasquale.cavallo at 4science.it)
  */
 @Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME)
-public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer> {
+public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer>
+    implements ReloadableEntityObjectRepository<WorkspaceItem, Integer> {
 
     public static final String OPERATION_PATH_SECTIONS = "sections";
 
@@ -83,28 +82,39 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Autowired
     WorkspaceItemService wis;
+
     @Autowired
     ItemService itemService;
+
     @Autowired
     BitstreamService bitstreamService;
+
     @Autowired
     BitstreamFormatService bitstreamFormatService;
+
     @Autowired
     ConfigurationService configurationService;
 
     @Autowired
-    WorkspaceItemConverter converter;
+    WorkspaceItemConverter workspaceItemConverter;
 
     @Autowired
     SubmissionService submissionService;
+
     @Autowired
     EPersonServiceImpl epersonService;
 
     @Autowired
-    SubmissionLookupService submissionLookupService;
+    CollectionService collectionService;
 
     @Autowired
-    CollectionService collectionService;
+    AuthorizeService authorizeService;
+
+    @Autowired
+    ImportService importService;
+
+    @Autowired
+    private UriListHandlerService uriListHandlerService;
 
     private SubmissionConfigReader submissionConfigReader;
 
@@ -112,7 +122,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         submissionConfigReader = new SubmissionConfigReader();
     }
 
-    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'READ')")
+    @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'READ')")
     @Override
     public WorkspaceItemRest findOne(Context context, Integer id) {
         WorkspaceItem witem = null;
@@ -124,86 +134,42 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         if (witem == null) {
             return null;
         }
-        return converter.fromModel(witem);
+        return converter.toRest(witem, utils.obtainProjection());
     }
 
-    //TODO @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Override
     public Page<WorkspaceItemRest> findAll(Context context, Pageable pageable) {
-        List<WorkspaceItem> witems = null;
-        int total = 0;
         try {
-            total = wis.countTotal(context);
-            witems = wis.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            long total = wis.countTotal(context);
+            List<WorkspaceItem> witems = wis.findAll(context, pageable.getPageSize(),
+                    Math.toIntExact(pageable.getOffset()));
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<WorkspaceItemRest> page = new PageImpl<WorkspaceItem>(witems, pageable, total).map(converter);
-        return page;
     }
 
-    //TODO @PreAuthorize("hasPermission(#submitterID, 'EPERSON', 'READ')")
+    @PreAuthorize("hasPermission(#submitterID, 'EPERSON', 'READ')")
     @SearchRestMethod(name = "findBySubmitter")
     public Page<WorkspaceItemRest> findBySubmitter(@Parameter(value = "uuid", required = true) UUID submitterID,
             Pageable pageable) {
-        List<WorkspaceItem> witems = null;
-        int total = 0;
         try {
             Context context = obtainContext();
             EPerson ep = epersonService.find(context, submitterID);
-            witems = wis.findByEPerson(context, ep, pageable.getPageSize(), pageable.getOffset());
-            total = wis.countByEPerson(context, ep);
+            long total = wis.countByEPerson(context, ep);
+            List<WorkspaceItem> witems = wis.findByEPerson(context, ep, pageable.getPageSize(),
+                    Math.toIntExact(pageable.getOffset()));
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<WorkspaceItemRest> page = new PageImpl<WorkspaceItem>(witems, pageable, total).map(converter);
-        return page;
     }
 
     @Override
     protected WorkspaceItemRest createAndReturn(Context context) throws SQLException, AuthorizeException {
         WorkspaceItem source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());
-        return converter.convert(source);
-    }
-
-    @Override
-    protected WorkspaceItemRest save(Context context, WorkspaceItemRest wsi) {
-        SubmissionConfig submissionConfig = submissionConfigReader
-            .getSubmissionConfigByName(submissionConfigReader.getDefaultSubmissionConfigName());
-        WorkspaceItem source = converter.toModel(wsi);
-        for (int stepNum = 0; stepNum < submissionConfig.getNumberOfSteps(); stepNum++) {
-
-            SubmissionStepConfig stepConfig = submissionConfig.getStep(stepNum);
-            /*
-             * First, load the step processing class (using the current
-             * class loader)
-             */
-            ClassLoader loader = this.getClass().getClassLoader();
-            Class stepClass;
-            try {
-                stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-
-                Object stepInstance = stepClass.newInstance();
-
-                if (stepInstance instanceof AbstractProcessingStep) {
-                    // load the JSPStep interface for this step
-                    AbstractProcessingStep stepProcessing = (AbstractProcessingStep) stepClass
-                        .newInstance();
-                    stepProcessing.doPreProcessing(context, source);
-                } else {
-                    throw new Exception("The submission step class specified by '"
-                                            + stepConfig.getProcessingClassName()
-                                            + "' does not extend the class org.dspace.submit.AbstractProcessingStep!"
-                                            + " Therefore it cannot be used by the Configurable Submission as the " +
-                                            "<processing-class>!");
-                }
-
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-        submissionService.saveWorkspaceItem(context, source);
-        return wsi;
+        return converter.toRest(source, utils.obtainProjection());
     }
 
     @Override
@@ -211,52 +177,17 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return WorkspaceItemRest.class;
     }
 
-    @Override
-    public WorkspaceItemResource wrapResource(WorkspaceItemRest witem, String... rels) {
-        return new WorkspaceItemResource(witem, utils, rels);
-    }
-
-    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
+    @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
     public WorkspaceItemRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
-                                    MultipartFile file) throws Exception {
+                                    MultipartFile file) throws SQLException {
 
         Context context = obtainContext();
-        WorkspaceItemRest wsi = findOne(id);
+        WorkspaceItemRest wsi = findOne(context, id);
         WorkspaceItem source = wis.find(context, id);
-        List<ErrorRest> errors = new ArrayList<ErrorRest>();
-        SubmissionConfig submissionConfig =
-            submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
-        for (int i = 0; i < submissionConfig.getNumberOfSteps(); i++) {
-            SubmissionStepConfig stepConfig = submissionConfig.getStep(i);
-
-            /*
-             * First, load the step processing class (using the current
-             * class loader)
-             */
-            ClassLoader loader = this.getClass().getClassLoader();
-            Class stepClass;
-            try {
-                stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-
-                Object stepInstance = stepClass.newInstance();
-                if (UploadableStep.class.isAssignableFrom(stepClass)) {
-                    UploadableStep uploadableStep = (UploadableStep) stepInstance;
-                    uploadableStep.doPreProcessing(context, source);
-                    ErrorRest err =
-                        uploadableStep.upload(context, submissionService, stepConfig, source, file);
-                    uploadableStep.doPostProcessing(context, source);
-                    if (err != null) {
-                        errors.add(err);
-                    }
-                }
-
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-
-        }
-        wsi = converter.convert(source);
+        List<ErrorRest> errors = submissionService.uploadFileToInprogressSubmission(context, request, wsi, source,
+                file);
+        wsi = converter.toRest(source, utils.obtainProjection());
 
         if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);
@@ -266,19 +197,19 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return wsi;
     }
 
-    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
+    @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
                       Patch patch) throws SQLException, AuthorizeException {
         List<Operation> operations = patch.getOperations();
-        WorkspaceItemRest wsi = findOne(id);
+        WorkspaceItemRest wsi = findOne(context, id);
         WorkspaceItem source = wis.find(context, id);
         for (Operation op : operations) {
             //the value in the position 0 is a null value
             String[] path = op.getPath().substring(1).split("/", 3);
             if (OPERATION_PATH_SECTIONS.equals(path[0])) {
                 String section = path[1];
-                evaluatePatch(context, request, source, wsi, section, op);
+                submissionService.evaluatePatchToInprogressSubmission(context, request, source, wsi, section, op);
             } else {
                 throw new DSpaceBadRequestException(
                     "Patch path operation need to starts with '" + OPERATION_PATH_SECTIONS + "'");
@@ -287,49 +218,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         wis.update(context, source);
     }
 
-    private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi,
-                               String section, Operation op) {
-        SubmissionConfig submissionConfig = submissionConfigReader
-            .getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
-        for (int stepNum = 0; stepNum < submissionConfig.getNumberOfSteps(); stepNum++) {
-
-            SubmissionStepConfig stepConfig = submissionConfig.getStep(stepNum);
-
-            if (section.equals(stepConfig.getId())) {
-                /*
-                 * First, load the step processing class (using the current
-                 * class loader)
-                 */
-                ClassLoader loader = this.getClass().getClassLoader();
-                Class stepClass;
-                try {
-                    stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-
-                    Object stepInstance = stepClass.newInstance();
-
-                    if (stepInstance instanceof AbstractRestProcessingStep) {
-                        // load the JSPStep interface for this step
-                        AbstractRestProcessingStep stepProcessing =
-                            (AbstractRestProcessingStep) stepClass.newInstance();
-                        stepProcessing.doPreProcessing(context, source);
-                        stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, op);
-                        stepProcessing.doPostProcessing(context, source);
-                    } else {
-                        throw new DSpaceBadRequestException(
-                            "The submission step class specified by '" + stepConfig.getProcessingClassName() +
-                            "' does not extend the class org.dspace.submit.AbstractProcessingStep!" +
-                            " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
-                    }
-
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    throw new PatchException("Error processing the patch request", e);
-                }
-            }
-        }
-    }
-
-    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'DELETE')")
+    @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'DELETE')")
     @Override
     protected void delete(Context context, Integer id) throws AuthorizeException {
         WorkspaceItem witem = null;
@@ -345,149 +234,158 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Override
     public Iterable<WorkspaceItemRest> upload(Context context, HttpServletRequest request,
-            MultipartFile uploadfile)
+            List<MultipartFile> uploadfiles)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
-        File file = Utils.getFile(uploadfile, "upload-loader", "filedataloader");
         List<WorkspaceItemRest> results = new ArrayList<>();
 
+        String uuid = request.getParameter("owningCollection");
+        if (StringUtils.isBlank(uuid)) {
+            uuid = configurationService.getProperty("submission.default.collection");
+        }
+        Collection collection = null;
+        if (StringUtils.isNotBlank(uuid)) {
+            collection = collectionService.find(context, UUID.fromString(uuid));
+        } else {
+            collection = collectionService.findAuthorizedOptimized(context, Constants.ADD).get(0);
+        }
+
+        SubmissionConfig submissionConfig =
+            submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle());
+        List<WorkspaceItem> result = null;
+        List<ImportRecord> records = new ArrayList<>();
         try {
-            String uuid = request.getParameter("collection");
-            if (StringUtils.isBlank(uuid)) {
-                uuid = configurationService.getProperty("submission.default.collection");
-            }
-
-            Collection collection = null;
-            if (StringUtils.isNotBlank(uuid)) {
-                collection = collectionService.find(context, UUID.fromString(uuid));
-            } else {
-                collection = collectionService.findAuthorizedOptimized(context, Constants.ADD).get(0);
-            }
-
-            SubmissionConfig submissionConfig =
-                submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle());
-
-
-            List<ItemSubmissionLookupDTO> tmpResult = new ArrayList<ItemSubmissionLookupDTO>();
-
-            TransformationEngine transformationEngine1 = submissionLookupService.getPhase1TransformationEngine();
-            TransformationSpec spec = new TransformationSpec();
-            // FIXME this is mostly due to the need to test. The BTE framework has an assert statement that check if the
-            // number of found record is less than the requested and treat 0 as is, instead, the implementation assume
-            // 0=unlimited this lead to test failure.
-            // It is unclear if BTE really respect values other than 0/MAX allowing us to put a protection against heavy
-            // load
-            spec.setNumberOfRecords(Integer.MAX_VALUE);
-            if (transformationEngine1 != null) {
-                MultipleSubmissionLookupDataLoader dataLoader =
-                    (MultipleSubmissionLookupDataLoader) transformationEngine1.getDataLoader();
-
-                List<String> fileDataLoaders = submissionLookupService.getFileProviders();
-                for (String fileDataLoader : fileDataLoaders) {
-                    dataLoader.setFile(file.getAbsolutePath(), fileDataLoader);
-
-                    try {
-                        SubmissionLookupOutputGenerator outputGenerator =
-                            (SubmissionLookupOutputGenerator) transformationEngine1.getOutputGenerator();
-                        outputGenerator.setDtoList(new ArrayList<ItemSubmissionLookupDTO>());
-                        log.debug("BTE transformation is about to start!");
-                        transformationEngine1.transform(spec);
-                        log.debug("BTE transformation finished!");
-                        tmpResult.addAll(outputGenerator.getDtoList());
-                        if (!tmpResult.isEmpty()) {
-                            //exit with the results founded on the first data provided
-                            break;
-                        }
-                    } catch (BadTransformationSpec e1) {
-                        log.error(e1.getMessage(), e1);
-                    } catch (MalformedSourceException e1) {
-                        log.error(e1.getMessage(), e1);
+            for (MultipartFile mpFile : uploadfiles) {
+                File file = Utils.getFile(mpFile, "upload-loader", "filedataloader");
+                try {
+                    ImportRecord record = importService.getRecord(file, mpFile.getOriginalFilename());
+                    if (record != null) {
+                        records.add(record);
+                        break;
                     }
+                } catch (Exception e) {
+                    log.error("Error processing data", e);
+                    throw e;
+                } finally {
+                    file.delete();
                 }
             }
+        } catch (FileMultipleOccurencesException e) {
+            throw new UnprocessableEntityException("Too many entries in file");
+        } catch (Exception e) {
+            log.error("Error importing metadata", e);
+        }
+        WorkspaceItem source = submissionService.
+            createWorkspaceItem(context, getRequestService().getCurrentRequest());
+        merge(context, records, source);
+        result = new ArrayList<>();
+        result.add(source);
 
-            List<WorkspaceItem> result = null;
-
-            //try to ingest workspaceitems
-            if (!tmpResult.isEmpty()) {
-                TransformationEngine transformationEngine2 = submissionLookupService.getPhase2TransformationEngine();
-                if (transformationEngine2 != null) {
-                    SubmissionItemDataLoader dataLoader =
-                        (SubmissionItemDataLoader) transformationEngine2.getDataLoader();
-                    dataLoader.setDtoList(tmpResult);
-                    // dataLoader.setProviders()
-
-                    DSpaceWorkspaceItemOutputGenerator outputGenerator =
-                        (DSpaceWorkspaceItemOutputGenerator) transformationEngine2.getOutputGenerator();
-                    outputGenerator.setCollection(collection);
-                    outputGenerator.setContext(context);
-                    outputGenerator.setFormName(submissionConfig.getSubmissionName());
-                    outputGenerator.setDto(tmpResult.get(0));
-
-                    try {
-                        transformationEngine2.transform(spec);
-                        result = outputGenerator.getWitems();
-                    } catch (BadTransformationSpec e1) {
-                        e1.printStackTrace();
-                    } catch (MalformedSourceException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-
-            //we have to create the workspaceitem to push the file also if nothing found before
-            if (result == null) {
-                WorkspaceItem source =
-                    submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());
-                result = new ArrayList<>();
-                result.add(source);
-            }
-
-            //perform upload of bitstream if there is exact one result and convert workspaceitem to entity rest
-            if (result != null && !result.isEmpty()) {
-                for (WorkspaceItem wi : result) {
-
-                    List<ErrorRest> errors = new ArrayList<ErrorRest>();
-
-                    //load bitstream into bundle ORIGINAL only if there is one result (approximately this is the
-                    // right behaviour for pdf file but not for other bibliographic format e.g. bibtex)
-                    if (result.size() == 1) {
-
-                        for (int i = 0; i < submissionConfig.getNumberOfSteps(); i++) {
-                            SubmissionStepConfig stepConfig = submissionConfig.getStep(i);
-
-                            ClassLoader loader = this.getClass().getClassLoader();
-                            Class stepClass;
-                            try {
-                                stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-
-                                Object stepInstance = stepClass.newInstance();
-                                if (UploadableStep.class.isAssignableFrom(stepClass)) {
-                                    UploadableStep uploadableStep = (UploadableStep) stepInstance;
-                                    ErrorRest err = uploadableStep.upload(context, submissionService, stepConfig, wi,
-                                            uploadfile);
+        //perform upload of bitstream if there is exact one result and convert workspaceitem to entity rest
+        if (!result.isEmpty()) {
+            for (WorkspaceItem wi : result) {
+                List<ErrorRest> errors = new ArrayList<ErrorRest>();
+                wi.setMultipleFiles(uploadfiles.size() > 1);
+                //load bitstream into bundle ORIGINAL only if there is one result (approximately this is the
+                // right behaviour for pdf file but not for other bibliographic format e.g. bibtex)
+                if (result.size() == 1) {
+                    for (int i = 0; i < submissionConfig.getNumberOfSteps(); i++) {
+                        SubmissionStepConfig stepConfig = submissionConfig.getStep(i);
+                        ClassLoader loader = this.getClass().getClassLoader();
+                        Class stepClass;
+                        try {
+                            stepClass = loader.loadClass(stepConfig.getProcessingClassName());
+                            Object stepInstance = stepClass.newInstance();
+                            if (UploadableStep.class.isAssignableFrom(stepClass)) {
+                                UploadableStep uploadableStep = (UploadableStep) stepInstance;
+                                for (MultipartFile mpFile : uploadfiles) {
+                                    ErrorRest err = uploadableStep.upload(context,
+                                        submissionService, stepConfig, wi, mpFile);
                                     if (err != null) {
                                         errors.add(err);
                                     }
                                 }
-
-                            } catch (Exception e) {
-                                log.error(e.getMessage(), e);
                             }
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
                         }
                     }
-                    WorkspaceItemRest wsi = converter.convert(wi);
-                    if (result.size() == 1) {
-                        if (!errors.isEmpty()) {
-                            wsi.getErrors().addAll(errors);
-                        }
-                    }
-                    results.add(wsi);
                 }
+                WorkspaceItemRest wsi = converter.toRest(wi, utils.obtainProjection());
+                if (result.size() == 1) {
+                    if (!errors.isEmpty()) {
+                        wsi.getErrors().addAll(errors);
+                    }
+                }
+                results.add(wsi);
             }
-        } finally {
-            file.delete();
         }
         return results;
     }
 
+    @Override
+    protected WorkspaceItemRest createAndReturn(Context context, List<String> stringList)
+        throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
+
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        WorkspaceItem workspaceItem = uriListHandlerService.handle(context, req, stringList, WorkspaceItem.class);
+        return converter.toRest(workspaceItem, utils.obtainProjection());
+    }
+
+    /**
+     * This is a search method that will return the WorkspaceItemRest object found through the UUID of an item. It'll
+     * find the Item through the given UUID and try to resolve the WorkspaceItem relevant for that item and return it.
+     * It'll return a 401/403 if the current user isn't allowed to view the WorkspaceItem.
+     * It'll return a 204 if nothing was found
+     * @param itemUuid  The UUID for the Item to be used
+     * @param pageable  The pageable if present
+     * @return          The resulting WorkspaceItem object
+     */
+    @SearchRestMethod(name = "item")
+    public WorkspaceItemRest findByItemUuid(@Parameter(value = "uuid", required = true) UUID itemUuid,
+                                            Pageable pageable) {
+        try {
+            Context context = obtainContext();
+            Item item = itemService.find(context, itemUuid);
+            WorkspaceItem workspaceItem = wis.findByItem(context, item);
+            if (workspaceItem == null) {
+                return null;
+            }
+            if (!authorizeService.authorizeActionBoolean(context, workspaceItem.getItem(), Constants.READ)) {
+                throw new AccessDeniedException("The current user does not have rights to view the WorkflowItem");
+            }
+            return converter.toRest(workspaceItem, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public WorkspaceItem findDomainObjectByPk(Context context, Integer id) throws SQLException {
+        return wis.find(context, id);
+    }
+
+    @Override
+    public Class<Integer> getPKClass() {
+        return Integer.class;
+    }
+
+    private void merge(Context context, List<ImportRecord> records, WorkspaceItem item) throws SQLException {
+        for (MetadataValue metadataValue : itemService.getMetadata(
+            item.getItem(), Item.ANY, Item.ANY, Item.ANY, Item.ANY)) {
+            itemService.clearMetadata(context, item.getItem(),
+                metadataValue.getMetadataField().getMetadataSchema().getNamespace(),
+                metadataValue.getMetadataField().getElement(),
+                metadataValue.getMetadataField().getQualifier(),
+                metadataValue.getLanguage());
+        }
+        for (ImportRecord record : records) {
+            if (record != null && record.getValueList() != null) {
+                for (MetadatumDTO metadataValue : record.getValueList()) {
+                    itemService.addMetadata(context, item.getItem(), metadataValue.getSchema(),
+                        metadataValue.getElement(), metadataValue.getQualifier(), null,
+                        metadataValue.getValue());
+                }
+            }
+        }
+    }
 }

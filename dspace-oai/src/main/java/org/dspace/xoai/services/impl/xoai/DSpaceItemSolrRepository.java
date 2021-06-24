@@ -7,13 +7,15 @@
  */
 package org.dspace.xoai.services.impl.xoai;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Function;
-import com.lyncode.builder.ListBuilder;
 import com.lyncode.xoai.dataprovider.core.ListItemIdentifiersResult;
 import com.lyncode.xoai.dataprovider.core.ListItemsResults;
 import com.lyncode.xoai.dataprovider.data.Item;
@@ -71,14 +73,14 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository {
         List<ScopedFilter> filters, int offset, int length) {
         try {
             QueryResult queryResult = retrieveItems(filters, offset, length);
-            List<ItemIdentifier> identifierList = new ListBuilder<Item>()
-                .add(queryResult.getResults())
-                .build(new Function<Item, ItemIdentifier>() {
+            // transform results list from a list of Items to a list of ItemIdentifiers
+            List<ItemIdentifier> identifierList =
+                newArrayList(transform(queryResult.getResults(), new Function<Item, ItemIdentifier>() {
                     @Override
                     public ItemIdentifier apply(Item elem) {
                         return elem;
                     }
-                });
+                }));
             return new ListItemIdentifiersResult(queryResult.hasMore(), identifierList, queryResult.getTotal());
         } catch (DSpaceSolrException | IOException ex) {
             log.error(ex.getMessage(), ex);
