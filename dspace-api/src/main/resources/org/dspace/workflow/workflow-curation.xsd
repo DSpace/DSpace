@@ -1,0 +1,275 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<xsd:schema targetNamespace='https://dspace.org/workflow-curation'
+            elementFormDefault='qualified'
+            xmlns:xsd='http://www.w3.org/2001/XMLSchema'
+            xmlns:jaxb='http://java.sun.com/xml/ns/jaxb'
+            xmlns='https://dspace.org/workflow-curation'
+            jaxb:version='2.1'>
+    <xsd:annotation>
+	<xsd:documentation>
+	    Workflow curation enables curation tasks to be assigned to
+	    DSpace workflow steps.
+
+	    Thus, a recap of the sample taskset below would be:  upon
+	    entering workflow step 'step1', run a virus scan on every
+	    submitted item; reject infected submissions; notify the
+	    reviewer's group and collection administrators of same, or
+	    the site administrator if the task encounters an error in
+	    processing.
+
+	    <![CDATA[
+	    <tasksets>
+
+		<taskset name="cautious">
+		    <flowstep name="step1">
+			<task name="vscan">
+			    <workflow>reject</workflow>
+			    <notify on="fail">$flowgroup</notify>
+			    <notify on="fail">$colladmin</notify>
+			    <notify on="error">$siteadmin</notify>
+			</task>
+		    </flowstep>
+		</taskset>
+
+	    </tasksets>
+	    ]]>
+	</xsd:documentation>
+    </xsd:annotation>
+
+    <xsd:element name='workflow-curation'>
+        <xsd:complexType>
+            <xsd:all>
+                <xsd:element name='taskset-map'
+                             type='taskset-map-type'/>
+                <xsd:element name='tasksets'
+                             type='tasksets-type'/>
+            </xsd:all>
+        </xsd:complexType>	
+    </xsd:element>
+
+    <xsd:complexType name='taskset-map-type'>
+	<xsd:annotation>
+	    <xsd:documentation>
+		The taskset-map element maps collection handles to
+		tasksets enumerated in the 'tasksets' element.  The
+		special collection-handle 'default' is matched when a
+		collection is not otherwise mapped.  The special
+		taskset name 'none' indicates no taskset to perform.
+	    </xsd:documentation>
+	</xsd:annotation>
+	<xsd:sequence>
+	    <xsd:element name='mapping'
+                         type='mapping-type'
+			 minOccurs='0'
+			 maxOccurs='unbounded'>
+	    </xsd:element>
+	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name='mapping-type'>
+		<xsd:attribute name='collection-handle'
+			       type='collection-handle-type'
+                               use='required'/>
+		<xsd:attribute name='taskset'
+			       type='xsd:IDREF'
+                               use='required'>
+                    <xsd:annotation>
+                        <xsd:appinfo>
+                            <jaxb:property><jaxb:baseType name="TasksetType"/></jaxb:property>
+                        </xsd:appinfo>
+                    </xsd:annotation>
+                </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name='tasksets-type'>
+	<xsd:annotation>
+	    <xsd:documentation>
+		Tasksets specify tasks to be automatically performed
+		at specific stages of workflow. The taskset 'name'
+		attribute should match the 'taskset' attribute in the
+		task-set mapping above.
+	    </xsd:documentation>
+	</xsd:annotation>
+	<xsd:sequence>
+	    <xsd:element name='taskset'
+                         type='taskset-type'
+			 minOccurs='0'
+			 maxOccurs='unbounded'/>
+	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name='taskset-type'>
+	<xsd:sequence>
+	    <xsd:element name='flowstep'
+                         type='flowstep-type'
+                         minOccurs='0'
+			 maxOccurs='unbounded'/>
+	</xsd:sequence>
+	<xsd:attribute name='name'
+		       type='xsd:ID'
+                       use='required'/>
+    </xsd:complexType>
+
+    <xsd:complexType name='flowstep-type'>
+	<xsd:annotation>
+	    <xsd:documentation>
+		Tasksets are organized into elements called
+		'flowsteps' which correspond by name to DSpace workflow
+		steps. Thus, to cause a task to be performed in the
+		workflow step 'edit', place a 'task' element in the
+		'edit' flowstep.
+
+		You may define a flowstep element in a taskset for each
+                step in the workflow, since the flowstep action occurs
+                before its workflow step.  Use 'archive' for tasks to run
+                just before the item is installed in archive.
+
+		Each flowstep also allows an optional 'queue'
+		attribute, which controls whether and where the tasks
+		are placed on a queue for deferred performance. If the
+		attribute is not present, the tasks are all performed
+		immediately. Otherwise, the tasks are placed on a
+		queue named by the attribute's value.
+
+		You may add any number of tasks to a flowstep.
+	    </xsd:documentation>
+	</xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name='task'
+                         type='task-type'
+                         maxOccurs='unbounded'/>
+        </xsd:sequence>
+	<xsd:attribute name='name'
+		       type='xsd:NCName'
+                       use='required'/>
+	<xsd:attribute name='queue'
+		       type='xsd:NCName'
+		       use='optional'/>
+    </xsd:complexType>
+
+    <xsd:complexType name='task-type'>
+	<xsd:annotation>
+	    <xsd:documentation>
+		Each task element has a mandatory name attribute and two
+		optional, repeatable children. The task name attribute
+		must match the plugin manager name given the task in
+		dspace.cfg.
+	    </xsd:documentation>
+	</xsd:annotation>
+	<xsd:choice minOccurs='0'
+		    maxOccurs='unbounded'>
+	    <xsd:element name='workflow'
+                         type='workflow-type'/>
+	    <xsd:element name='notify'
+			 type='notify-type'/>
+	</xsd:choice>
+	<xsd:attribute name='name'
+		       type='xsd:NCName'
+                       use='required'/>
+    </xsd:complexType>
+
+    <xsd:complexType name='notify-type'>
+	<xsd:annotation>
+	    <xsd:documentation>
+		The 'notify' element allows you use the workflow
+		system of notifications (email) whenever a task is
+		performed and returns the designated status code (in
+		the 'on' attribute): 'fail', 'success' or 'error'.
+
+		The content of each 'notify' element must be one of the
+		following types:
+		o  an eperson name;
+		o  an eperson group;
+		o  or one of the special literals:
+		   - '$flowgroup' = the workflow group of the step (if
+		     any).
+                   - '$colladmin' = the collection administrator's
+		     group (if any).
+		   - '$siteadmin' = the site administrator.
+	    </xsd:documentation>
+	</xsd:annotation>
+	<xsd:simpleContent>
+	    <xsd:extension base='recipient-type'>
+                <xsd:attribute name='on'
+                               type='condition-type'
+                               use='required'/>
+            </xsd:extension>
+	</xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name='workflow-type'>
+	<xsd:annotation>
+	    <xsd:documentation>
+		The 'workflow' element describes what workflow actions
+		can be taken upon completion of the task. In the
+		example above, the vscan (virus scan) task has been
+		given the power to 'reject': meaning that if the task
+		fails - viz. a virus is detected - the item will be
+		rejected like a reviewer would reject it.
+
+		The other 'workflow' value is 'approve', which skips
+		any further tasks and advances the item.
+	    </xsd:documentation>
+	</xsd:annotation>
+	<xsd:simpleContent>
+	    <xsd:extension base='action-type'/>
+	</xsd:simpleContent>
+    </xsd:complexType>
+
+    <!-- ******************************************************* -->
+
+    <xsd:simpleType name='collection-handle-type'>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base='xsd:string'>
+                    <xsd:pattern value='\d+(\.\d+)*/\S+'/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base='xsd:token'>
+                    <xsd:enumeration value='default'/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+    <xsd:simpleType name='recipient-type'>
+	<xsd:union>
+	    <xsd:simpleType>
+		<xsd:restriction base='xsd:NCName'/>
+	    </xsd:simpleType>
+	    <xsd:simpleType>
+		<xsd:restriction base='xsd:token'>
+		    <xsd:enumeration value='$flowgroup'/>
+		    <xsd:enumeration value='$colladmin'/>
+		    <xsd:enumeration value='$siteadmin'/>
+		</xsd:restriction>
+	    </xsd:simpleType>
+	</xsd:union>
+    </xsd:simpleType>
+
+    <xsd:simpleType name='condition-type'>
+	<xsd:restriction base='xsd:token'>
+	    <xsd:enumeration value='success'/>
+	    <xsd:enumeration value='fail'/>
+	    <xsd:enumeration value='error'/>
+	</xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name='action-type'>
+	<xsd:restriction base='xsd:token'>
+	    <xsd:enumeration value='reject'/>
+	    <xsd:enumeration value='approve'/>
+	</xsd:restriction>
+    </xsd:simpleType>
+
+</xsd:schema>

@@ -7,12 +7,14 @@
  */
 package org.dspace.app.rest;
 
+import static com.google.common.net.UrlEscapers.urlPathSegmentEscaper;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -1138,6 +1140,58 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
+    }
+
+    @Test
+    public void discoverSearchObjectsWithSpecialCharacterTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity).build();
+        ItemBuilder.createItem(context, collection)
+                .withAuthor("DSpace & friends")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(
+                get("/api/discover/search/objects")
+                        .param("sort", "score,DESC")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.facets", hasItem(allOf(
+                        hasJsonPath("$.name", is("author")),
+                        hasJsonPath("$._embedded.values", hasItem(
+                                hasJsonPath("$._links.search.href", containsString("DSpace%20%26%20friends"))
+                        ))
+                ))));
+    }
+
+    @Test
+    public void discoverSearchBrowsesWithSpecialCharacterTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity).build();
+        ItemBuilder.createItem(context, collection)
+                .withAuthor("DSpace & friends")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(
+                get("/api/discover/browses/author/entries")
+                        .param("sort", "default,ASC")
+                        .param("page", "0")
+                        .param("size", "20"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.entries", hasItem(allOf(
+                        hasJsonPath("$.value", is("DSpace & friends")),
+                        hasJsonPath("$._links.items.href", containsString("DSpace%20%26%20friends"))
+                ))));
     }
 
     @Test
@@ -5711,7 +5765,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$._embedded.values[0].label", is("Smith, Donald")))
                    .andExpect(jsonPath("$._embedded.values[0].count", is(1)))
                    .andExpect(jsonPath("$._embedded.values[0]._links.search.href",
-                        containsString("api/discover/search/objects?query=Donald&f.author=Smith, Donald,equals")))
+                        containsString("api/discover/search/objects?query=Donald&f.author=" +
+                                urlPathSegmentEscaper().escape("Smith, Donald,equals")
+                        )))
                    .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
 
     }
@@ -5764,7 +5820,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$._embedded.values[0].label", is("2017 - 2020")))
                    .andExpect(jsonPath("$._embedded.values[0].count", is(3)))
                    .andExpect(jsonPath("$._embedded.values[0]._links.search.href",
-                        containsString("api/discover/search/objects?dsoType=Item&f.dateIssued=[2017 TO 2020],equals")))
+                        containsString("api/discover/search/objects?dsoType=Item&f.dateIssued=" +
+                                urlPathSegmentEscaper().escape("[2017 TO 2020],equals")
+                        )))
                    .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
 
     }
