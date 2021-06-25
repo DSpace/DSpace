@@ -22,6 +22,7 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -45,6 +46,7 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
+import org.dspace.curate.service.XmlWorkflowCuratorService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
@@ -74,9 +76,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * When an item is submitted and is somewhere in a workflow, it has a row in the
- * cwf_workflowitem table pointing to it.
+ * {@code cwf_workflowitem} table pointing to it.
  *
- * Once the item has completed the workflow it will be archived
+ * Once the item has completed the workflow it will be archived.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -124,6 +126,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
     protected ConfigurationService configurationService;
+    @Autowired(required = true)
+    protected XmlWorkflowCuratorService xmlWorkflowCuratorService;
 
     protected XmlWorkflowServiceImpl() {
 
@@ -236,13 +240,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     //TODO: this is currently not used in our notifications. Look at the code used by the original WorkflowManager
 
-    /**
-     * startWithoutNotify() starts the workflow normally, but disables
-     * notifications (useful for large imports,) for the first workflow step -
-     * subsequent notifications happen normally.
-     * @param context the current DSpace session.
-     * @param wsi the submitted Item entering workflow.
-     */
     @Override
     public XmlWorkflowItem startWithoutNotify(Context context, WorkspaceItem wsi)
         throws SQLException, AuthorizeException, IOException, WorkflowException {
@@ -291,15 +288,51 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         }
     }
 
-
+    /**
+     * Activate the first step in a workflow for a WorkflowItem.
+     * If the step has no UI then execute it as well.
+     *
+     * @param context current DSpace session.
+     * @param wf workflow being traversed.
+     * @param firstStep the step to be activated.
+     * @param wfi the item upon which to activate the step.
+     * @throws AuthorizeException passed through.
+     * @throws IOException passed through.
+     * @throws SQLException passed through.
+     * @throws WorkflowException passed through.
+     * @throws WorkflowConfigurationException unused.
+     */
     protected void activateFirstStep(Context context, Workflow wf, Step firstStep, XmlWorkflowItem wfi)
-        throws AuthorizeException, IOException, SQLException, WorkflowException, WorkflowConfigurationException {
+            throws AuthorizeException, IOException, SQLException, WorkflowException, WorkflowConfigurationException {
         WorkflowActionConfig firstActionConfig = firstStep.getUserSelectionMethod();
+
+        // Check for curation tasks at the start of this step.
+        //
+        // If doCuration returns true, either no curation tasks are mapped to
+        // this step, or they were run and succeeded.  In this scenario, we
+        // continue with the current step.
+        //
+        // If doCuration returns false, either curation tasks were queued, or
+        // they resulted in rejection of the item.  In this scenario, the
+        // current step cannot be completed and we must exit immediately.
+        if (!xmlWorkflowCuratorService.doCuration(context, wfi)) {
+            // don't proceed - either curation tasks queued, or item rejected
+            log.info(LogManager.getHeader(context, "start_workflow",
+                    "workflow_item_id=" + wfi.getID()
+                            + ",item_id=" + wfi.getItem().getID()
+                            + ",collection_id=" + wfi.getCollection().getID()
+                            + ",current_action=" + firstActionConfig.getId()
+                            + ",doCuration=false"));
+            return;
+        }
+
+        // Activate the step.
         firstActionConfig.getProcessingAction().activate(context, wfi);
         log.info(LogManager.getHeader(context, "start_workflow",
-                                      firstActionConfig.getProcessingAction() + " workflow_item_id="
-                                          + wfi.getID() + "item_id=" + wfi.getItem().getID() + "collection_id="
-                                          + wfi.getCollection().getID()));
+                firstActionConfig.getProcessingAction()
+                        + " workflow_item_id=" + wfi.getID()
+                        + "item_id=" + wfi.getItem().getID()
+                        + "collection_id=" + wfi.getCollection().getID()));
 
         // record the start of the workflow w/provenance message
         recordStart(context, wfi.getItem(), firstActionConfig.getProcessingAction());
@@ -307,22 +340,42 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         //Fire an event !
         logWorkflowEvent(context, firstStep.getWorkflow().getID(), null, null, wfi, null, firstStep, firstActionConfig);
 
-        //If we don't have a UI activate it
+        //If we don't have a UI then execute the action.
         if (!firstActionConfig.requiresUI()) {
             ActionResult outcome = firstActionConfig.getProcessingAction().execute(context, wfi, firstStep, null);
             processOutcome(context, null, wf, firstStep, firstActionConfig, outcome, wfi, true);
         }
     }
 
-    /*
-     * Executes an action and returns the next.
-     */
     @Override
-    public WorkflowActionConfig doState(Context c, EPerson user, HttpServletRequest request, int workflowItemId,
-                                        Workflow workflow, WorkflowActionConfig currentActionConfig)
-        throws SQLException, AuthorizeException, IOException, WorkflowException {
+    public WorkflowActionConfig doState(Context c, EPerson user,
+            HttpServletRequest request, int workflowItemId, Workflow workflow,
+            WorkflowActionConfig currentActionConfig)
+            throws SQLException, AuthorizeException, IOException,
+            MessagingException, WorkflowException {
+        XmlWorkflowItem wi = xmlWorkflowItemService.find(c, workflowItemId);
+
+        // Check for curation tasks.
+        //
+        // If doCuration returns true, either no curation tasks are mapped to
+        // this step, or they were run and succeeded.  In this scenario, we
+        // continue with the current step.
+        //
+        // If doCuration returns false, either curation tasks were queued, or
+        // they resulted in rejection of the item.  In this scenario, the
+        // current step cannot be completed and we must exit immediately.
+        if (!xmlWorkflowCuratorService.doCuration(c, wi)) {
+            // don't proceed - either curation tasks queued, or item rejected
+            log.info(LogManager.getHeader(c, "advance_workflow",
+                    "workflow_item_id=" + wi.getID()
+                            + ",item_id=" + wi.getItem().getID()
+                            + ",collection_id=" + wi.getCollection().getID()
+                            + ",current_action=" + currentActionConfig.getId()
+                            + ",doCuration=false"));
+            return currentActionConfig;
+        }
+
         try {
-            XmlWorkflowItem wi = xmlWorkflowItemService.find(c, workflowItemId);
             Step currentStep = currentActionConfig.getStep();
             if (currentActionConfig.getProcessingAction().isAuthorized(c, request, wi)) {
                 ActionResult outcome = currentActionConfig.getProcessingAction().execute(c, wi, currentStep, request);
@@ -339,8 +392,9 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             }
         } catch (WorkflowConfigurationException e) {
             log.error(LogManager.getHeader(c, "error while executing state",
-                                           "workflow:  " + workflow.getID() + " action: " + currentActionConfig
-                                               .getId() + " workflowItemId: " + workflowItemId), e);
+                    "workflow:  " + workflow.getID()
+                            + " action: " + currentActionConfig.getId()
+                            + " workflowItemId: " + workflowItemId), e);
             WorkflowUtils.sendAlert(request, e);
             throw new WorkflowException(e);
         }
@@ -351,29 +405,30 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                                                WorkflowActionConfig currentActionConfig, ActionResult currentOutcome,
                                                XmlWorkflowItem wfi, boolean enteredNewStep)
         throws IOException, AuthorizeException, SQLException, WorkflowException {
-        if (currentOutcome.getType() == ActionResult.TYPE.TYPE_PAGE || currentOutcome
-            .getType() == ActionResult.TYPE.TYPE_ERROR) {
+        if (currentOutcome.getType() == ActionResult.TYPE.TYPE_PAGE
+                || currentOutcome.getType() == ActionResult.TYPE.TYPE_ERROR) {
             //Our outcome is a page or an error, so return our current action
             c.restoreAuthSystemState();
             return currentActionConfig;
-        } else if (currentOutcome.getType() == ActionResult.TYPE.TYPE_CANCEL || currentOutcome
-            .getType() == ActionResult.TYPE.TYPE_SUBMISSION_PAGE) {
+        } else if (currentOutcome.getType() == ActionResult.TYPE.TYPE_CANCEL
+                || currentOutcome.getType() == ActionResult.TYPE.TYPE_SUBMISSION_PAGE) {
             //We either pressed the cancel button or got an order to return to the submission page, so don't return
             // an action
             //By not returning an action we ensure ourselfs that we go back to the submission page
             c.restoreAuthSystemState();
             return null;
         } else if (currentOutcome.getType() == ActionResult.TYPE.TYPE_OUTCOME) {
+            // An action was taken by a reviewer.
             Step nextStep = null;
             WorkflowActionConfig nextActionConfig = null;
             try {
-                //We have completed our action search & retrieve the next action
                 if (currentOutcome.getResult() == ActionResult.OUTCOME_COMPLETE) {
+                    //We have completed our action.  Retrieve the next action.
                     nextActionConfig = currentStep.getNextAction(currentActionConfig);
                 }
 
                 if (nextActionConfig != null) {
-                    //We remain in the current step since an action is found
+                    //We remain in the current step since another action is found.
                     nextStep = currentStep;
                     nextActionConfig.getProcessingAction().activate(c, wfi);
                     if (nextActionConfig.requiresUI() && !enteredNewStep) {
@@ -385,6 +440,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                         c.restoreAuthSystemState();
                         return null;
                     } else {
+                        // UI not required by next action.
                         ActionResult newOutcome = nextActionConfig.getProcessingAction()
                                                                   .execute(c, wfi, currentStep, null);
                         return processOutcome(c, user, workflow, currentStep, nextActionConfig, newOutcome, wfi,
@@ -443,11 +499,9 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             } catch (IOException | SQLException | AuthorizeException
                     | WorkflowException | WorkflowConfigurationException e) {
                 log.error("error while processing workflow outcome", e);
-                e.printStackTrace();
             } finally {
-                if ((nextStep != null && currentStep != null && nextActionConfig != null) || (wfi.getItem()
-                                                                                                 .isArchived() &&
-                    currentStep != null)) {
+                if ((nextStep != null && currentStep != null && nextActionConfig != null)
+                        || (wfi.getItem().isArchived() && currentStep != null)) {
                     logWorkflowEvent(c, currentStep.getWorkflow().getID(), currentStep.getId(),
                                      currentActionConfig.getId(), wfi, user, nextStep, nextActionConfig);
                 }
@@ -610,7 +664,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                     .getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
                 String title = "";
                 try {
-                    title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
+                    title = I18nUtil.getMessage("org.dspace.xmlworkflow.XMLWorkflowService.untitled");
                 } catch (MissingResourceException e) {
                     title = "Untitled";
                 }
@@ -631,18 +685,62 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         }
     }
 
+    // send notices of curation activity
+    @Override
+    public void notifyOfCuration(Context c, XmlWorkflowItem wi,
+            List<EPerson> ePeople, String taskName, String action, String message)
+            throws SQLException, IOException {
+        try {
+            // Get the item title
+            String title = getItemTitle(wi);
+
+            // Get the submitter's name
+            String submitter = getSubmitterName(wi);
+
+            // Get the collection
+            Collection coll = wi.getCollection();
+
+            for (EPerson epa : ePeople) {
+                Locale supportedLocale = I18nUtil.getEPersonLocale(epa);
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "flowtask_notify"));
+                email.addArgument(title);
+                email.addArgument(coll.getName());
+                email.addArgument(submitter);
+                email.addArgument(taskName);
+                email.addArgument(message);
+                email.addArgument(action);
+                email.addRecipient(epa.getEmail());
+                email.send();
+            }
+        } catch (MessagingException e) {
+            log.warn(LogManager.getHeader(c, "notifyOfCuration",
+                    "cannot email users of workflow_item_id " + wi.getID()
+                            + ":  " + e.getMessage()));
+        }
+    }
+
+    protected String getItemTitle(XmlWorkflowItem wi) throws SQLException {
+        Item myitem = wi.getItem();
+        String title = myitem.getName();
+
+        // only return the first element, or "Untitled"
+        if (StringUtils.isNotBlank(title)) {
+            return title;
+        } else {
+            return I18nUtil.getMessage("org.dspace.xmlworkflow.XMLWorkflowService.untitled ");
+        }
+    }
+
+    protected String getSubmitterName(XmlWorkflowItem wi) throws SQLException {
+        EPerson e = wi.getSubmitter();
+
+        return getEPersonName(e);
+    }
+
     /***********************************
      * WORKFLOW TASK MANAGEMENT
      **********************************/
-    /**
-     * Deletes all tasks from this workflowflowitem
-     *
-     * @param context the dspace context
-     * @param wi      the workflow item for which we are to delete the tasks
-     * @throws SQLException       An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
-     */
+
     @Override
     public void deleteAllTasks(Context context, XmlWorkflowItem wi) throws SQLException, AuthorizeException {
         deleteAllPooledTasks(context, wi);
@@ -665,9 +763,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         }
     }
 
-    /*
-     * Deletes an eperson from the taskpool of a step
-     */
     @Override
     public void deletePooledTask(Context context, XmlWorkflowItem wi, PoolTask task)
         throws SQLException, AuthorizeException {
@@ -692,9 +787,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 itemService.getIdentifiers(c, wi.getItem())));
     }
 
-    /*
-     * Creates a task pool for a given step
-     */
     @Override
     public void createPoolTasks(Context context, XmlWorkflowItem wi, RoleMembers assignees, Step step,
                                 WorkflowActionConfig action)
@@ -724,9 +816,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         }
     }
 
-    /*
-     * Claims an action for a given eperson
-     */
     @Override
     public void createOwnedTask(Context context, XmlWorkflowItem wi, Step step, WorkflowActionConfig action, EPerson e)
         throws SQLException, AuthorizeException {
@@ -900,7 +989,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     }
 
     @Override
-   public WorkspaceItem sendWorkflowItemBackSubmission(Context context, XmlWorkflowItem wi, EPerson e,
+    public WorkspaceItem sendWorkflowItemBackSubmission(Context context, XmlWorkflowItem wi, EPerson e,
                                                         String provenance,
                                                         String rejection_message)
         throws SQLException, AuthorizeException,
