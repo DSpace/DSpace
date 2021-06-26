@@ -22,6 +22,7 @@ jobs:
           # NOTE: Unit Tests include deprecated REST API v6 (as it has unit tests)
           - type: "Unit Tests"
             mvnflags: "-DskipUnitTests=false -Pdspace-rest"
+            resultsdir: "**/target/surefire-reports/**"
           # NOTE: ITs skip all code validation checks, as they are already done by Unit Test job.
           #  - enforcer.skip     => Skip maven-enforcer-plugin rules
           #  - checkstyle.skip   => Skip all checkstyle checks by maven-checkstyle-plugin
@@ -29,6 +30,7 @@ jobs:
           #  - xml.skip          => Skip all XML/XSLT validation by xml-maven-plugin
           - type: "Integration Tests"
             mvnflags: "-DskipIntegrationTests=false -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true"
+            resultsdir: "**/target/failsafe-reports/**"
       # Do NOT exit immediately if one matrix job fails
       # This ensures ITs continue running even if Unit Tests fail, or visa versa
       fail-fast: false
@@ -59,6 +61,16 @@ jobs:
         env:
           TEST_FLAGS: ${{ matrix.mvnflags }}
         run: mvn install -B -V -P-assembly -Pcoverage-report $TEST_FLAGS
+
+      # If previous step failed, save results of tests to downloadable artifact for this job
+      # (This artifact is downloadable at the bottom of any job's summary page)
+      - name: Upload Results of ${{ matrix.type }} to Artifact
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.type }} results
+          path: ${{ matrix.resultsdir }}
+          retention-days: 7
 
       # https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
