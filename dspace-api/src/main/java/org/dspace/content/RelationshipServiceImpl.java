@@ -268,7 +268,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     public Relationship find(Context context, int id) throws SQLException {
         Relationship relationship = relationshipDAO.findByID(context, Relationship.class, id);
-        return relationship;
+        return relationship;    
     }
 
     @Override
@@ -707,4 +707,17 @@ public class RelationshipServiceImpl implements RelationshipService {
             throws SQLException {
         return relationshipDAO.countByTypeName(context, typeName);
     }
+
+    @Override
+    public int countByRelatedItems(Context context, Item item1, Item item2) throws SQLException {
+        return relationshipDAO.countByRelatedItems(context, item1, item2);
+    }
+
+    @Override
+    public int countByRelatedItems(
+        Context context, Item item1, Item item2, RelationshipType relationshipType, boolean isLeft
+    ) throws SQLException {
+        return relationshipDAO.countByRelatedItems(context, item1, item2, relationshipType, isLeft);
+    }
+
 }

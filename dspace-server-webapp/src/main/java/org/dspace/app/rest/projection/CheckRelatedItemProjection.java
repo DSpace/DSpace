@@ -8,17 +8,22 @@
 package org.dspace.app.rest.projection;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.servlet.ServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.Item;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.dspace.util.UUIDUtils;
@@ -43,6 +48,7 @@ public class CheckRelatedItemProjection extends AbstractProjection {
 
     public static final String PROJECTION_NAME = "CheckRelatedItem";
     public static final String PARAM_NAME = "checkRelatedItem";
+    public static final String RELATIONSHIP_UUID_SEPARATOR = "\"";
 
     @Autowired
     RequestService requestService;
@@ -53,6 +59,9 @@ public class CheckRelatedItemProjection extends AbstractProjection {
     @Autowired
     RelationshipService relationshipService;
 
+    @Autowired
+    RelationshipTypeService relationshipTypeService;
+
     @Override
     public String getName() {
         return PROJECTION_NAME;
@@ -60,46 +69,142 @@ public class CheckRelatedItemProjection extends AbstractProjection {
 
     @Override
     public <T extends RestModel> T transformRest(T restObject) {
-        if (restObject instanceof ItemRest) {
-            ServletRequest servletRequest = requestService.getCurrentRequest().getServletRequest();
-            Context context = ContextUtil.obtainContext(servletRequest);
-            ItemRest itemRest = (ItemRest) restObject;
-
-            // ensure that relatedItems is present in the response
-            itemRest.initRelatedItems();
-
-            String[] uuidStrs = servletRequest.getParameterValues(PARAM_NAME);
-            if (uuidStrs != null) {
-                for (String uuidStr : uuidStrs) {
-                    try {
-                        handleParameterValue(context, itemRest, uuidStr);
-                    } catch (SQLException e) {
-                        log.error("Something went wrong when processing a parameter value", e);
-                    }
-                }
-            }
+        try {
+            transformRestInternal(restObject);
+        } catch (SQLException e) {
+            log.error(String.format("Something went wrong in %s", CheckRelatedItemProjection.class), e);
         }
 
         return super.transformRest(restObject);
     }
 
-    protected void handleParameterValue(Context context, ItemRest itemRest, String uuidStr) throws SQLException {
-        UUID uuid = UUIDUtils.fromString(uuidStr);
-        if (uuid == null) {
+    protected void transformRestInternal(RestModel restObject) throws SQLException {
+        ServletRequest servletRequest = requestService.getCurrentRequest().getServletRequest();
+        Context context = ContextUtil.obtainContext(servletRequest);
+
+        // this projection only applies to ItemRest
+        if (!(restObject instanceof ItemRest)) {
+            return;
+        }
+        ItemRest itemRest = (ItemRest) restObject;
+
+        // ensure that relatedItems is present in the response
+        itemRest.initRelatedItems();
+
+        // item 1
+        Item item1 = getItem(context, itemRest.getId());
+        if (item1 == null) {
             return;
         }
 
-        Item item = itemService.find(context, uuid);
-        if (item == null) {
+        // get checkRelatedItem values from url
+        String[] inputs = servletRequest.getParameterValues(PARAM_NAME);
+        if (inputs == null) {
             return;
         }
 
-        int count = relationshipService.countByItem(context, item);
-        if (count <= 0) {
-            return;
+        for (String input : inputs) {
+            // item 2
+            Item item2 = getItemFromInput(context, input);
+            if (item2 == null) {
+                continue;
+            }
+
+            // relationship type
+            String relationshipTypeName = getRelationshipTypeNameFromInput(input);
+            RelationshipType relationshipType = getRelationship(context, relationshipTypeName, item1, item2);
+
+            // count related items
+            int count;
+            if (relationshipType == null) {
+                count = relationshipService.countByRelatedItems(context, item1, item2);
+            } else {
+                boolean isLeft = StringUtils.equals(relationshipType.getLeftwardType(), relationshipTypeName);
+                count = relationshipService.countByRelatedItems(context, item1, item2, relationshipType, isLeft);
+            }
+            if (count <= 0) {
+                continue;
+            }
+
+            // item 2 is related to item 1
+            itemRest.addRelatedItem(item2.getID());
+        }
+    }
+
+    protected Item getItem(Context context, String uuidStr) throws SQLException {
+        if (StringUtils.isBlank(uuidStr)) {
+            return null;
         }
 
-        itemRest.addRelatedItem(UUID.fromString(uuidStr));
+        UUID item1Uuid = UUIDUtils.fromString(uuidStr);
+        if (item1Uuid == null) {
+            return null;
+        }
+
+        return itemService.find(context, item1Uuid);
+    }
+
+    protected Item getItemFromInput(Context context, String input) throws SQLException {
+        if (StringUtils.isBlank(input)) {
+            return null;
+        }
+
+        String uuidStr = input;
+        if (StringUtils.contains(input, RELATIONSHIP_UUID_SEPARATOR)) {
+            String[] fragments = StringUtils.split(input, RELATIONSHIP_UUID_SEPARATOR, 2);
+            uuidStr = fragments[1];
+        }
+
+        return getItem(context, uuidStr);
+    }
+
+    protected String getRelationshipTypeNameFromInput(String input) {
+        if (
+            StringUtils.isBlank(input) ||
+            !StringUtils.contains(input, RELATIONSHIP_UUID_SEPARATOR)
+        ) {
+            return null;
+        }
+
+        return StringUtils.split(input, RELATIONSHIP_UUID_SEPARATOR, 2)[0];
+    }
+
+    protected RelationshipType getRelationship(
+        Context context, String relationshipTypeName, Item item1, Item item2
+    ) throws SQLException {
+        if (StringUtils.isBlank(relationshipTypeName)) {
+            return null;
+        }
+
+        List<RelationshipType> relationshipTypes = relationshipTypeService
+            .findByLeftwardOrRightwardTypeName(context, relationshipTypeName).stream()
+            .filter(relationshipType -> {
+                if (
+                    StringUtils.equals(relationshipType.getLeftwardType(), relationshipTypeName) // TODO
+                ) {
+                    return true;
+                }
+
+                if (
+                    StringUtils.equals(relationshipType.getRightwardType(), relationshipTypeName) // TODO
+                ) {
+                    return true;
+                }
+
+                return false;
+            })
+            .collect(Collectors.toList());
+
+        if (relationshipTypes.size() <= 0) {
+            return null;
+        }
+
+        if (relationshipTypes.size() > 1) {
+            log.warn("found multiple relationship types");
+            return null;
+        }
+
+        return relationshipTypes.get(0);
     }
 
 }

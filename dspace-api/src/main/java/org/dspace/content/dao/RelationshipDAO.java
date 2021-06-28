@@ -215,4 +215,13 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      */
     int countByTypeName(Context context, String typeName)
             throws SQLException;
+
+    // TODO
+    int countByRelatedItems(Context context, Item item1, Item item2) throws SQLException;
+
+    // TODO
+    int countByRelatedItems(
+        Context context, Item item1, Item item2, RelationshipType relationshipType, boolean isLeft
+    ) throws SQLException;
+
 }

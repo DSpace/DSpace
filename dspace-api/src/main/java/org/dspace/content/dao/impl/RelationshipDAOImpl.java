@@ -264,4 +264,49 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
     }
 
+    @Override
+    public int countByRelatedItems(Context context, Item item1, Item item2) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Relationship> criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
+        criteriaQuery.select(relationshipRoot);
+        criteriaQuery.where(
+            criteriaBuilder.or(
+                criteriaBuilder.and(
+                    criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item1),
+                    criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item2)
+                ),
+                criteriaBuilder.and(
+                    criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item2),
+                    criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item1)
+                )
+            )
+        );
+        return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
+    }
+
+    @Override
+    public int countByRelatedItems(
+        Context context, Item item1, Item item2, RelationshipType relationshipType, boolean isLeft
+    ) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Relationship> criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
+        criteriaQuery.select(relationshipRoot);
+        if (isLeft) {
+            criteriaQuery.where(
+                criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item1),
+                criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item2),
+                criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType)
+            );
+        } else {
+            criteriaQuery.where(
+                criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item2),
+                criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item1),
+                criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType)
+            );
+        }
+        return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
+    }
+
 }

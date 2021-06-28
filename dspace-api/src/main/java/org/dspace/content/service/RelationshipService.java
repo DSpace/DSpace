@@ -311,6 +311,14 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     int countByTypeName(Context context, String typeName)
             throws SQLException;
 
+    // TODO
+    int countByRelatedItems(Context context, Item item1, Item item2) throws SQLException;
+
+    // TODO
+    int countByRelatedItems(
+        Context context, Item item1, Item item2, RelationshipType relationshipType, boolean isLeft
+    ) throws SQLException;
+
     /**
      * This method is used to delete a Relationship whilst given the possibility to copy the Virtual Metadata created
      * by this relationship to the left and/or right item
