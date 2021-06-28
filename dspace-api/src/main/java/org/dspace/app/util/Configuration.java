@@ -8,6 +8,7 @@
 
 package org.dspace.app.util;
 
+import java.lang.reflect.Array;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -39,6 +40,9 @@ public class Configuration
      * @param argv
      *            command-line arguments
      */
+
+    private Configuration() { }
+
     public static void main(String[] argv)
     {
         // Build a description of the command line
@@ -48,6 +52,7 @@ public class Configuration
                 "optional name of the module in which 'property' exists");
         options.addOption("r", "raw", false,
                 "do not do property substitution on the value");
+        options.addOption("a", "all", false, "display all values of an array property");
         options.addOption("?", "Get help");
         options.addOption("h", "help", false, "Get help");
 
@@ -92,24 +97,34 @@ public class Configuration
         propNameBuilder.append(cmd.getOptionValue('p'));
         String propName = propNameBuilder.toString();
 
-        // Print the property's value, if it exists
+        // Print the property's value(s), if it exists
         ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
-        if (!cfg.hasProperty(propName))
-        {
+        if (!cfg.hasProperty(propName)) {
             System.out.println();
-        }
-        else
-        {
-            String val;
-            if (cmd.hasOption('r'))
-            {
-                val = cfg.getPropertyValue(propName).toString();
+        } else {
+            if (cmd.hasOption('r')) {
+                // Print "raw" values (without property substitutions)
+                Object rawValue = cfg.getPropertyValue(propName);
+                if (rawValue.getClass().isArray()) {
+                    for (Object value : (Object[]) rawValue) {
+                        System.out.println(value.toString());
+                        if (!cmd.hasOption('a')) {
+                            break; // Unless --all print only one value
+                        }
+                    }
+                } else { // Not an array
+                    System.out.println(rawValue.toString());
+                }
+            } else {
+                // Print values with property substitutions
+                String[] values = cfg.getArrayProperty(propName);
+                for (String value : values) {
+                    System.out.println(value);
+                    if (!cmd.hasOption('a')) {
+                        break; // Unless --all print only one value
+                    }
+                }
             }
-            else
-            {
-                val = cfg.getProperty(propName);
-            }
-            System.out.println(val);
         }
         System.exit(0);
     }
