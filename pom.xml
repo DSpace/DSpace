@@ -1564,7 +1564,7 @@
     <repositories>
         <repository>
           <id>maven-snapshots</id>
-          <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
           <layout>default</layout>
             <releases>
               <enabled>false</enabled>
@@ -1572,6 +1572,10 @@
           <snapshots>
             <enabled>true</enabled>
           </snapshots>
+        </repository>
+        <repository>
+            <id>maven-restlet</id>
+            <url>https://maven.restlet.com</url>
         </repository>
     </repositories>
 
