@@ -20,6 +20,7 @@ import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
@@ -48,7 +49,7 @@ public class CheckRelatedItemProjection extends AbstractProjection {
 
     public static final String PROJECTION_NAME = "CheckRelatedItem";
     public static final String PARAM_NAME = "checkRelatedItem";
-    public static final String RELATIONSHIP_UUID_SEPARATOR = "\"";
+    public static final String RELATIONSHIP_UUID_SEPARATOR = "=";
 
     @Autowired
     RequestService requestService;
@@ -159,10 +160,7 @@ public class CheckRelatedItemProjection extends AbstractProjection {
     }
 
     protected String getRelationshipTypeNameFromInput(String input) {
-        if (
-            StringUtils.isBlank(input) ||
-            !StringUtils.contains(input, RELATIONSHIP_UUID_SEPARATOR)
-        ) {
+        if (StringUtils.isBlank(input) || !StringUtils.contains(input, RELATIONSHIP_UUID_SEPARATOR)) {
             return null;
         }
 
@@ -176,17 +174,31 @@ public class CheckRelatedItemProjection extends AbstractProjection {
             return null;
         }
 
+        String item1EntityType = getEntityType(item1);
+        if (item1EntityType == null) {
+            return null;
+        }
+
+        String item2EntityType = getEntityType(item2);
+        if (item2EntityType == null) {
+            return null;
+        }
+
         List<RelationshipType> relationshipTypes = relationshipTypeService
             .findByLeftwardOrRightwardTypeName(context, relationshipTypeName).stream()
             .filter(relationshipType -> {
                 if (
-                    StringUtils.equals(relationshipType.getLeftwardType(), relationshipTypeName) // TODO
+                    StringUtils.equals(relationshipType.getLeftwardType(), relationshipTypeName) &&
+                    StringUtils.equals(relationshipType.getLeftType().getLabel(), item1EntityType) &&
+                    StringUtils.equals(relationshipType.getRightType().getLabel(), item2EntityType)
                 ) {
                     return true;
                 }
 
                 if (
-                    StringUtils.equals(relationshipType.getRightwardType(), relationshipTypeName) // TODO
+                    StringUtils.equals(relationshipType.getRightwardType(), relationshipTypeName) &&
+                    StringUtils.equals(relationshipType.getLeftType().getLabel(), item2EntityType) &&
+                    StringUtils.equals(relationshipType.getRightType().getLabel(), item1EntityType)
                 ) {
                     return true;
                 }
@@ -205,6 +217,18 @@ public class CheckRelatedItemProjection extends AbstractProjection {
         }
 
         return relationshipTypes.get(0);
+    }
+
+    protected String getEntityType(Item item) {
+        List<MetadataValue> mdvs = itemService.getMetadata(
+            item, "dspace", "entity", "type", Item.ANY, false
+        );
+
+        if (mdvs.isEmpty()) {
+            return null;
+        }
+
+        return mdvs.get(0).getValue();
     }
 
 }

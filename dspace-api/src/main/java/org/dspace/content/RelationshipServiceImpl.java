@@ -268,7 +268,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     public Relationship find(Context context, int id) throws SQLException {
         Relationship relationship = relationshipDAO.findByID(context, Relationship.class, id);
-        return relationship;    
+        return relationship;
     }
 
     @Override
