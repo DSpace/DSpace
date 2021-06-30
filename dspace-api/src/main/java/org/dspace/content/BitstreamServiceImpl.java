@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -406,6 +407,25 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
                 return bitstreams.get(0);
             }
         }
+        return null;
+    }
+
+    @Override
+    public Bitstream getThumbnail(Context context, Bitstream bitstream) throws SQLException {
+        Pattern pattern = Pattern.compile("^" + bitstream.getName() + ".([^.]+)$");
+
+        for (Bundle bundle : bitstream.getBundles()) {
+            for (Item item : bundle.getItems()) {
+                for (Bundle thumbnails : itemService.getBundles(item, "THUMBNAIL")) {
+                    for (Bitstream thumbnail : thumbnails.getBitstreams()) {
+                        if (pattern.matcher(thumbnail.getName()).matches()) {
+                            return thumbnail;
+                        }
+                    }
+                }
+            }
+        }
+
         return null;
     }
 
