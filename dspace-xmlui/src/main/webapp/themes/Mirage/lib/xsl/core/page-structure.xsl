@@ -29,6 +29,7 @@
     xmlns:mods="http://www.loc.gov/mods/v3"
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:confman="org.dspace.core.ConfigurationManager"
+    xmlns:jstring="java.lang.String"
     xmlns="http://www.w3.org/1999/xhtml"
     exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
 
@@ -313,7 +314,12 @@
                 <xsl:text disable-output-escaping="yes">&lt;meta name="</xsl:text>
                 <xsl:value-of select="@element" />
                 <xsl:text disable-output-escaping="yes">" content="</xsl:text>
-                <xsl:value-of select="." disable-output-escaping="yes" />
+                <xsl:variable name="content_escaped">
+                    <xsl:call-template name="escape-content-metatag">
+                        <xsl:with-param name="content" select="." />
+                    </xsl:call-template>
+                </xsl:variable>
+                <xsl:value-of select="$content_escaped" disable-output-escaping="yes" />
                 <xsl:text disable-output-escaping="yes">" /&gt;&#xa;</xsl:text>
             </xsl:for-each>
 
@@ -337,6 +343,14 @@
         </head>
     </xsl:template>
 
+    <xsl:template name="escape-content-metatag">
+        <xsl:param name="content" />
+        <xsl:variable name="contentTmp0" select="jstring:replaceAll(string($content), '&amp;', '&amp;amp;')" />
+        <xsl:variable name="contentTmp1" select="jstring:replaceAll(string($contentTmp0), '&quot;', '&amp;quot;')" />
+        <xsl:variable name="contentTmp2" select="jstring:replaceAll(string($contentTmp1), '&gt;', '&amp;gt;')" />
+        <xsl:variable name="contentTmp3" select="jstring:replaceAll(string($contentTmp2), '&lt;', '&amp;lt;')" />
+        <xsl:value-of select="$contentTmp3" />
+    </xsl:template>
 
     <!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
         placeholders for header images -->
