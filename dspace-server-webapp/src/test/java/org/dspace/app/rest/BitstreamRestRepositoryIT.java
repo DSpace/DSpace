@@ -11,6 +11,7 @@ import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -46,6 +47,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
+import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1513,6 +1515,182 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         //Get bundle should contain an empty response
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
                 .andExpect(status().isNoContent());
+    }
+
+
+    @Test
+    public void thumbnailEndpointTest() throws Exception {
+        // Given an Item
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Test item -- thumbnail")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                               .build();
+
+        Bundle originalBundle = BundleBuilder.createBundle(context, item)
+                                             .withName(Constants.DEFAULT_BUNDLE_NAME)
+                                             .build();
+        Bundle thumbnailBundle = BundleBuilder.createBundle(context, item)
+                                              .withName("THUMBNAIL")
+                                              .build();
+
+        InputStream is = IOUtils.toInputStream("dummy", "utf-8");
+
+        // With an ORIGINAL Bitstream & matching THUMBNAIL Bitstream
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, originalBundle, is)
+                                              .withName("test.pdf")
+                                              .withMimeType("application/pdf")
+                                              .build();
+        Bitstream thumbnail = BitstreamBuilder.createBitstream(context, thumbnailBundle, is)
+                                              .withName("test.pdf.jpg")
+                                              .withMimeType("image/jpeg")
+                                              .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        getClient(tokenAdmin).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/thumbnail"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.uuid", Matchers.is(thumbnail.getID().toString())))
+                             .andExpect(jsonPath("$.type", is("bitstream")));
+    }
+
+    @Test
+    public void thumbnailEndpointMultipleThumbnailsWithPrimaryBitstreamTest() throws Exception {
+        // Given an Item
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Test item -- thumbnail")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                               .build();
+
+        Bundle originalBundle = BundleBuilder.createBundle(context, item)
+                                             .withName(Constants.DEFAULT_BUNDLE_NAME)
+                                             .build();
+        Bundle thumbnailBundle = BundleBuilder.createBundle(context, item)
+                                              .withName("THUMBNAIL")
+                                              .build();
+
+        InputStream is = IOUtils.toInputStream("dummy", "utf-8");
+
+        // With multiple ORIGINAL Bitstreams & matching THUMBNAIL Bitstreams
+        Bitstream bitstream1 = BitstreamBuilder.createBitstream(context, originalBundle, is)
+                                               .withName("test1.pdf")
+                                               .withMimeType("application/pdf")
+                                               .build();
+        Bitstream bitstream2 = BitstreamBuilder.createBitstream(context, originalBundle, is)
+                                               .withName("test2.pdf")
+                                               .withMimeType("application/pdf")
+                                               .build();
+        Bitstream primaryBitstream = BitstreamBuilder.createBitstream(context, originalBundle, is)
+                                                     .withName("test3.pdf")
+                                                     .withMimeType("application/pdf")
+                                                     .build();
+
+        Bitstream thumbnail1 = BitstreamBuilder.createBitstream(context, thumbnailBundle, is)
+                                               .withName("test1.pdf.jpg")
+                                               .withMimeType("image/jpeg")
+                                               .build();
+        Bitstream thumbnail2 = BitstreamBuilder.createBitstream(context, thumbnailBundle, is)
+                                               .withName("test2.pdf.jpg")
+                                               .withMimeType("image/jpeg")
+                                               .build();
+        Bitstream primaryThumbnail = BitstreamBuilder.createBitstream(context, thumbnailBundle, is)
+                                                     .withName("test3.pdf.jpg")
+                                                     .withMimeType("image/jpeg")
+                                                     .build();
+
+        // and a primary Bitstream
+        originalBundle.setPrimaryBitstreamID(primaryBitstream);
+
+        context.restoreAuthSystemState();
+
+        // Bitstream thumbnail endpoints should link to the right thumbnail Bitstreams
+        getClient().perform(get("/api/core/bitstreams/" + primaryBitstream.getID() + "/thumbnail"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.uuid", Matchers.is(primaryThumbnail.getID().toString())))
+                   .andExpect(jsonPath("$.type", is("bitstream")));
+
+        getClient().perform(get("/api/core/bitstreams/" + bitstream1.getID() + "/thumbnail"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.uuid", Matchers.is(thumbnail1.getID().toString())))
+                   .andExpect(jsonPath("$.type", is("bitstream")));
+
+        getClient().perform(get("/api/core/bitstreams/" + bitstream2.getID() + "/thumbnail"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.uuid", Matchers.is(thumbnail2.getID().toString())))
+                   .andExpect(jsonPath("$.type", is("bitstream")));
+    }
+
+    @Test
+    public void thumbnailEndpointItemWithoutThumbnailsTest() throws Exception {
+        // Given an Item
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Test item -- thumbnail")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                               .build();
+
+        Bundle originalBundle = BundleBuilder.createBundle(context, item)
+                                             .withName(Constants.DEFAULT_BUNDLE_NAME)
+                                             .build();
+        // With an empty THUMBNAIL bundle
+        Bundle thumbnailBundle = BundleBuilder.createBundle(context, item)
+                                              .withName("THUMBNAIL")
+                                              .build();
+
+        InputStream is = IOUtils.toInputStream("dummy", "utf-8");
+
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, originalBundle, is)
+                        .withName("test.pdf")
+                        .withMimeType("application/pdf")
+                        .build();
+
+        context.restoreAuthSystemState();
+
+        // Should fail with HTTP 204
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/thumbnail"))
+                   .andExpect(status().isNoContent());
+
+        // With a THUMBNAIL bitstream that doesn't match the ORIGINAL Bitstream's name
+        context.turnOffAuthorisationSystem();
+        BitstreamBuilder.createBitstream(context, thumbnailBundle, is)
+                        .withName("random.pdf.jpg")
+                        .withMimeType("image/jpeg")
+                        .build();
+        context.restoreAuthSystemState();
+
+        // Should still fail with HTTP 204
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/thumbnail"))
+                   .andExpect(status().isNoContent());
     }
 
 }
