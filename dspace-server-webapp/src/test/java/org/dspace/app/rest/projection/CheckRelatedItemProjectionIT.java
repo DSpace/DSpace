@@ -339,50 +339,48 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        // TODO fix
         // search publications with projection -> 2 items with property relatedItems
-        // getClient().perform(
-        //     get("/api/discover/search/objects")
-        //         .param("f.entityType", "Publication,equals")
-        //         .param("projection", "CheckRelatedItem")
-        //         .param("checkRelatedItem", author1.getID().toString())
-        // )
-        //     .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-        //         hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
-        //             ItemMatcher.matchItemProperties(publication1),
-        //             hasJsonPath("$.relatedItems", Matchers.contains(
-        //                 Matchers.is(author1.getID().toString()) // TODO response currently none
-        //             ))
-        //         )),
-        //         hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
-        //             ItemMatcher.matchItemProperties(publication2),
-        //             hasJsonPath("$.relatedItems", Matchers.empty())
-        //         ))
-        //     )));
+        getClient().perform(
+            get("/api/discover/search/objects")
+                .param("f.entityType", "Publication,equals")
+                .param("projection", "CheckRelatedItem")
+                .param("checkRelatedItem", author1.getID().toString())
+        )
+            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
+                    ItemMatcher.matchItemProperties(publication1),
+                    hasJsonPath("$.relatedItems", Matchers.contains(
+                        Matchers.is(author1.getID().toString())
+                    ))
+                )),
+                hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
+                    ItemMatcher.matchItemProperties(publication2),
+                    hasJsonPath("$.relatedItems", Matchers.empty())
+                ))
+            )));
 
-        // TODO fix
         // search publications with projection -> 2 items with property relatedItems
-        // getClient().perform(
-        //     get("/api/discover/search/objects")
-        //         .param("f.entityType", "Publication,equals")
-        //         .param("projection", "CheckRelatedItem")
-        //         .param(
-        //             "checkRelatedItem",
-        //             "isPublicationOfAuthor" + RELATIONSHIP_UUID_SEPARATOR + author1.getID().toString()
-        //         )
-        // )
-        //     .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-        //         hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
-        //             ItemMatcher.matchItemProperties(publication1),
-        //             hasJsonPath("$.relatedItems", Matchers.contains(
-        //                 Matchers.is(author1.getID().toString()) // TODO response currently none
-        //             ))
-        //         )),
-        //         hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
-        //             ItemMatcher.matchItemProperties(publication2),
-        //             hasJsonPath("$.relatedItems", Matchers.empty())
-        //         ))
-        //     )));
+        getClient().perform(
+            get("/api/discover/search/objects")
+                .param("f.entityType", "Publication,equals")
+                .param("projection", "CheckRelatedItem")
+                .param(
+                    "checkRelatedItem",
+                    "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + author1.getID().toString()
+                )
+        )
+            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
+                    ItemMatcher.matchItemProperties(publication1),
+                    hasJsonPath("$.relatedItems", Matchers.contains(
+                        Matchers.is(author1.getID().toString())
+                    ))
+                )),
+                hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
+                    ItemMatcher.matchItemProperties(publication2),
+                    hasJsonPath("$.relatedItems", Matchers.empty())
+                ))
+            )));
 
         // search publications with projection -> 2 items with property relatedItems
         getClient().perform(
@@ -406,31 +404,30 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
                 ))
             )));
 
-        // TODO fix
         // search publications with projection -> 2 items with property relatedItems
-        // getClient().perform(
-        //     get("/api/discover/search/objects")
-        //         .param("f.entityType", "Publication,equals")
-        //         .param("projection", "CheckRelatedItem")
-        //         .param(
-        //             "checkRelatedItem",
-        //             "isPublicationOfAuthor" + RELATIONSHIP_UUID_SEPARATOR + author2.getID().toString()
-        //         )
-        // )
-        //     .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-        //         hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
-        //             ItemMatcher.matchItemProperties(publication1),
-        //             hasJsonPath("$.relatedItems", Matchers.contains(
-        //                 Matchers.is(author2.getID().toString()) // TODO response currently none
-        //             ))
-        //         )),
-        //         hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
-        //             ItemMatcher.matchItemProperties(publication2),
-        //             hasJsonPath("$.relatedItems", Matchers.contains(
-        //                 Matchers.is(author2.getID().toString()) // TODO response currently none
-        //             ))
-        //         ))
-        //     )));
+        getClient().perform(
+            get("/api/discover/search/objects")
+                .param("f.entityType", "Publication,equals")
+                .param("projection", "CheckRelatedItem")
+                .param(
+                    "checkRelatedItem",
+                    "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + author2.getID().toString()
+                )
+        )
+            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
+                    ItemMatcher.matchItemProperties(publication1),
+                    hasJsonPath("$.relatedItems", Matchers.contains(
+                        Matchers.is(author2.getID().toString())
+                    ))
+                )),
+                hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
+                    ItemMatcher.matchItemProperties(publication2),
+                    hasJsonPath("$.relatedItems", Matchers.contains(
+                        Matchers.is(author2.getID().toString())
+                    ))
+                ))
+            )));
 
         // search publications with projection -> 2 items with property relatedItems
         getClient().perform(
@@ -506,36 +503,35 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
                 ))
             )));
 
-        // TODO fix
         // search publications with projection -> 2 items with property relatedItems
-        // getClient().perform(
-        //     get("/api/discover/search/objects")
-        //         .param("f.entityType", "Publication,equals")
-        //         .param("projection", "CheckRelatedItem")
-        //         .param(
-        //             "checkRelatedItem",
-        //             "isPublicationOfAuthor" + RELATIONSHIP_UUID_SEPARATOR + author2.getID().toString()
-        //         )
-        //         .param(
-        //             "checkRelatedItem",
-        //             "isPublicationOfProject" + RELATIONSHIP_UUID_SEPARATOR + project1.getID().toString()
-        //         )
-        // )
-        //     .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-        //         hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
-        //             ItemMatcher.matchItemProperties(publication1),
-        //             hasJsonPath("$.relatedItems", Matchers.contains(
-        //                 Matchers.is(author2.getID().toString()), // TODO response currently none
-        //                 Matchers.is(project1.getID().toString())
-        //             ))
-        //         )),
-        //         hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
-        //             ItemMatcher.matchItemProperties(publication2),
-        //             hasJsonPath("$.relatedItems", Matchers.contains(
-        //                 Matchers.is(author2.getID().toString()) // TODO response currently none
-        //             ))
-        //         ))
-        //     )));
+        getClient().perform(
+            get("/api/discover/search/objects")
+                .param("f.entityType", "Publication,equals")
+                .param("projection", "CheckRelatedItem")
+                .param(
+                    "checkRelatedItem",
+                    "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + author2.getID().toString()
+                )
+                .param(
+                    "checkRelatedItem",
+                    "isProjectOfPublication" + RELATIONSHIP_UUID_SEPARATOR + project1.getID().toString()
+                )
+        )
+            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
+                    ItemMatcher.matchItemProperties(publication1),
+                    hasJsonPath("$.relatedItems", Matchers.contains(
+                        Matchers.is(author2.getID().toString()),
+                        Matchers.is(project1.getID().toString())
+                    ))
+                )),
+                hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
+                    ItemMatcher.matchItemProperties(publication2),
+                    hasJsonPath("$.relatedItems", Matchers.contains(
+                        Matchers.is(author2.getID().toString())
+                    ))
+                ))
+            )));
 
         // search publications with projection -> 2 items with property relatedItems
         getClient().perform(
