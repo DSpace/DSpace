@@ -111,18 +111,11 @@ public class CheckRelatedItemProjection extends AbstractProjection {
                 continue;
             }
 
-            // relationship type
+            // relationship type name
             String relationshipTypeName = getRelationshipTypeNameFromInput(input);
-            RelationshipType relationshipType = getRelationship(context, relationshipTypeName, item1, item2);
 
             // count related items
-            int count;
-            if (relationshipType == null) {
-                count = relationshipService.countByRelatedItems(context, item1, item2);
-            } else {
-                boolean isLeft = StringUtils.equals(relationshipType.getLeftwardType(), relationshipTypeName);
-                count = relationshipService.countByRelatedItems(context, item1, item2, relationshipType, isLeft);
-            }
+            int count = countByRelatedItems(context, relationshipTypeName, item1, item2);
             if (count <= 0) {
                 continue;
             }
@@ -165,6 +158,25 @@ public class CheckRelatedItemProjection extends AbstractProjection {
         }
 
         return StringUtils.split(input, RELATIONSHIP_UUID_SEPARATOR, 2)[0];
+    }
+
+    protected int countByRelatedItems(
+        Context context, String relationshipTypeName, Item item1, Item item2
+    ) throws SQLException {
+        // if the user did not specify a relationship type, count all connections regardless of type
+        if (relationshipTypeName == null) {
+            return relationshipService.countByRelatedItems(context, item1, item2);
+        }
+
+        // if the relationship type does not exist, there are by definition zero connections between the items
+        RelationshipType relationshipType = getRelationship(context, relationshipTypeName, item1, item2);
+        if (relationshipType == null) {
+            return 0;
+        }
+
+        // count all connections of the given type
+        boolean isLeft = StringUtils.equals(relationshipType.getLeftwardType(), relationshipTypeName);
+        return relationshipService.countByRelatedItems(context, item1, item2, relationshipType, isLeft);
     }
 
     protected RelationshipType getRelationship(
