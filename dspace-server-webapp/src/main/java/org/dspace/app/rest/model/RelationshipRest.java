@@ -10,6 +10,7 @@ package org.dspace.app.rest.model;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
@@ -32,6 +33,14 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
     private int rightPlace;
     private String leftwardValue;
     private String rightwardValue;
+
+    // TODO
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Boolean relatedItemLeft = null;
+
+    // TODO
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Boolean relatedItemRight = null;
 
     @Override
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -103,5 +112,32 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
 
     public void setLeftwardValue(String leftwardValue) {
         this.leftwardValue = leftwardValue;
+    }
+
+    public Boolean getRelatedItemLeft() {
+        return relatedItemLeft;
+    }
+
+    public void initProjectionCheckSideItemInRelationship() {
+        if (relatedItemLeft == null) {
+            relatedItemLeft = false;
+        }
+        if (relatedItemRight == null) {
+            relatedItemRight = false;
+        }
+    }
+
+    public void setRelatedItemLeft() {
+        initProjectionCheckSideItemInRelationship();
+        relatedItemLeft = true;
+    }
+
+    public Boolean getRelatedItemRight() {
+        return relatedItemRight;
+    }
+
+    public void setRelatedItemRight() {
+        initProjectionCheckSideItemInRelationship();
+        relatedItemRight = true;
     }
 }
