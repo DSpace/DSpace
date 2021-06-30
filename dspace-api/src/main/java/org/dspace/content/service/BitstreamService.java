@@ -209,6 +209,8 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
 
     public Bitstream getFirstBitstream(Item item, String bundleName) throws SQLException;
 
+    public Bitstream getThumbnail(Context context, Bitstream bitstream) throws SQLException;
+
     public BitstreamFormat getFormat(Context context, Bitstream bitstream) throws SQLException;
 
     public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException;
