@@ -8,6 +8,8 @@
 package org.dspace.app.rest.projection;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.projection.CheckRelatedItemProjection.PARAM_NAME;
+import static org.dspace.app.rest.projection.CheckRelatedItemProjection.PROJECTION_NAME;
 import static org.dspace.app.rest.projection.CheckRelatedItemProjection.RELATIONSHIP_UUID_SEPARATOR;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -147,7 +149,7 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         // get publication 1 with projection => property relatedItems should be empty because no uuids to check
         getClient().perform(
             get("/api/core/items/{item-uuid}", publication1.getID().toString())
-                .param("projection", "CheckRelatedItem")
+                .param("projection", PROJECTION_NAME)
         )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.relatedItems").isEmpty());
@@ -155,7 +157,7 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         // get publication 2 with projection => property relatedItems should be empty because no uuids to check
         getClient().perform(
             get("/api/core/items/{item-uuid}", publication2.getID().toString())
-                .param("projection", "CheckRelatedItem")
+                .param("projection", PROJECTION_NAME)
         )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.relatedItems").isEmpty());
@@ -163,7 +165,7 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         // get author 1 with projection => property relatedItems should be empty because no uuids to check
         getClient().perform(
             get("/api/core/items/{item-uuid}", author1.getID().toString())
-                .param("projection", "CheckRelatedItem")
+                .param("projection", PROJECTION_NAME)
         )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.relatedItems").isEmpty());
@@ -171,8 +173,8 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         // get publication 1 with projection and check author 1 -> property relatedItems contains uuid of author 1
         getClient().perform(
             get("/api/core/items/{item-uuid}", publication1.getID().toString())
-                .param("projection", "CheckRelatedItem")
-                .param("checkRelatedItem", author1.getID().toString())
+                .param("projection", PROJECTION_NAME)
+                .param(PARAM_NAME, author1.getID().toString())
         )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.relatedItems", Matchers.contains(
@@ -182,8 +184,8 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         // get publication 2 with projection and check author 1 -> property relatedItems should be empty
         getClient().perform(
             get("/api/core/items/{item-uuid}", publication2.getID().toString())
-                .param("projection", "CheckRelatedItem")
-                .param("checkRelatedItem", author1.getID().toString())
+                .param("projection", PROJECTION_NAME)
+                .param(PARAM_NAME, author1.getID().toString())
         )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.relatedItems").isEmpty());
@@ -191,8 +193,8 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         // get author 1 with projection and check author 1 -> property relatedItems should be empty
         getClient().perform(
             get("/api/core/items/{item-uuid}", author1.getID().toString())
-                .param("projection", "CheckRelatedItem")
-                .param("checkRelatedItem", author1.getID().toString())
+                .param("projection", PROJECTION_NAME)
+                .param(PARAM_NAME, author1.getID().toString())
         )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.relatedItems").isEmpty());
@@ -200,8 +202,8 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         // get publication 1 with projection and check publication 1 -> property relatedItems should be empty
         getClient().perform(
             get("/api/core/items/{item-uuid}", publication1.getID().toString())
-                .param("projection", "CheckRelatedItem")
-                .param("checkRelatedItem", publication1.getID().toString())
+                .param("projection", PROJECTION_NAME)
+                .param(PARAM_NAME, publication1.getID().toString())
         )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.relatedItems").isEmpty());
@@ -209,8 +211,8 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         // get publication 2 with projection and check publication 1 -> property relatedItems should be empty
         getClient().perform(
             get("/api/core/items/{item-uuid}", publication2.getID().toString())
-                .param("projection", "CheckRelatedItem")
-                .param("checkRelatedItem", publication1.getID().toString())
+                .param("projection", PROJECTION_NAME)
+                .param(PARAM_NAME, publication1.getID().toString())
         )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.relatedItems").isEmpty());
@@ -218,8 +220,8 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         // get author 1 with projection and check publication 1 -> property relatedItems contains uuid of publication 1
         getClient().perform(
             get("/api/core/items/{item-uuid}", author1.getID().toString())
-                .param("projection", "CheckRelatedItem")
-                .param("checkRelatedItem", publication1.getID().toString())
+                .param("projection", PROJECTION_NAME)
+                .param(PARAM_NAME, publication1.getID().toString())
         )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.relatedItems", Matchers.contains(
@@ -230,10 +232,9 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         // -> property relatedItems should be empty
         getClient().perform(
             get("/api/core/items/{item-uuid}", publication1.getID().toString())
-                .param("projection", "CheckRelatedItem")
+                .param("projection", PROJECTION_NAME)
                 .param(
-                    "checkRelatedItem",
-                    "isPublicationOfAuthor" + RELATIONSHIP_UUID_SEPARATOR + author1.getID().toString()
+                    PARAM_NAME, "isPublicationOfAuthor" + RELATIONSHIP_UUID_SEPARATOR + author1.getID().toString()
                 )
         )
             .andExpect(status().isOk())
@@ -243,10 +244,9 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         // -> property relatedItems should be empty
         getClient().perform(
             get("/api/core/items/{item-uuid}", publication2.getID().toString())
-                .param("projection", "CheckRelatedItem")
+                .param("projection", PROJECTION_NAME)
                 .param(
-                    "checkRelatedItem",
-                    "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + author1.getID().toString()
+                    PARAM_NAME, "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + author1.getID().toString()
                 )
         )
             .andExpect(status().isOk())
@@ -256,10 +256,9 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         // -> property relatedItems should be empty
         getClient().perform(
             get("/api/core/items/{item-uuid}", author1.getID().toString())
-                .param("projection", "CheckRelatedItem")
+                .param("projection", PROJECTION_NAME)
                 .param(
-                    "checkRelatedItem",
-                    "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + publication1.getID().toString()
+                    PARAM_NAME, "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + publication1.getID().toString()
                 )
         )
             .andExpect(status().isOk())
@@ -269,10 +268,9 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         // -> property relatedItems contains uuid of author 1
         getClient().perform(
             get("/api/core/items/{item-uuid}", publication1.getID().toString())
-                .param("projection", "CheckRelatedItem")
+                .param("projection", PROJECTION_NAME)
                 .param(
-                    "checkRelatedItem",
-                    "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + author1.getID().toString()
+                    PARAM_NAME, "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + author1.getID().toString()
                 )
         )
             .andExpect(status().isOk())
@@ -284,10 +282,9 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         // -> property relatedItems contains uuid of publication 1
         getClient().perform(
             get("/api/core/items/{item-uuid}", author1.getID().toString())
-                .param("projection", "CheckRelatedItem")
+                .param("projection", PROJECTION_NAME)
                 .param(
-                    "checkRelatedItem",
-                    "isPublicationOfAuthor" + RELATIONSHIP_UUID_SEPARATOR + publication1.getID().toString()
+                    PARAM_NAME, "isPublicationOfAuthor" + RELATIONSHIP_UUID_SEPARATOR + publication1.getID().toString()
                 )
         )
             .andExpect(status().isOk())
@@ -343,8 +340,8 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         getClient().perform(
             get("/api/discover/search/objects")
                 .param("f.entityType", "Publication,equals")
-                .param("projection", "CheckRelatedItem")
-                .param("checkRelatedItem", author1.getID().toString())
+                .param("projection", PROJECTION_NAME)
+                .param(PARAM_NAME, author1.getID().toString())
         )
             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                 hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
@@ -363,10 +360,9 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         getClient().perform(
             get("/api/discover/search/objects")
                 .param("f.entityType", "Publication,equals")
-                .param("projection", "CheckRelatedItem")
+                .param("projection", PROJECTION_NAME)
                 .param(
-                    "checkRelatedItem",
-                    "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + author1.getID().toString()
+                    PARAM_NAME, "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + author1.getID().toString()
                 )
         )
             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
@@ -386,8 +382,8 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         getClient().perform(
             get("/api/discover/search/objects")
                 .param("f.entityType", "Publication,equals")
-                .param("projection", "CheckRelatedItem")
-                .param("checkRelatedItem", author2.getID().toString())
+                .param("projection", PROJECTION_NAME)
+                .param(PARAM_NAME, author2.getID().toString())
         )
             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                 hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
@@ -408,10 +404,9 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         getClient().perform(
             get("/api/discover/search/objects")
                 .param("f.entityType", "Publication,equals")
-                .param("projection", "CheckRelatedItem")
+                .param("projection", PROJECTION_NAME)
                 .param(
-                    "checkRelatedItem",
-                    "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + author2.getID().toString()
+                    PARAM_NAME, "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + author2.getID().toString()
                 )
         )
             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
@@ -433,9 +428,9 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         getClient().perform(
             get("/api/discover/search/objects")
                 .param("f.entityType", "Publication,equals")
-                .param("projection", "CheckRelatedItem")
-                .param("checkRelatedItem", author2.getID().toString())
-                .param("checkRelatedItem", author3.getID().toString())
+                .param("projection", PROJECTION_NAME)
+                .param(PARAM_NAME, author2.getID().toString())
+                .param(PARAM_NAME, author3.getID().toString())
         )
             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                 hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
@@ -457,8 +452,8 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         getClient().perform(
             get("/api/discover/search/objects")
                 .param("f.entityType", "Person,equals")
-                .param("projection", "CheckRelatedItem")
-                .param("checkRelatedItem", publication1.getID().toString())
+                .param("projection", PROJECTION_NAME)
+                .param(PARAM_NAME, publication1.getID().toString())
         )
             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                 hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
@@ -483,9 +478,9 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         getClient().perform(
             get("/api/discover/search/objects")
                 .param("f.entityType", "Publication,equals")
-                .param("projection", "CheckRelatedItem")
-                .param("checkRelatedItem", author2.getID().toString())
-                .param("checkRelatedItem", project1.getID().toString())
+                .param("projection", PROJECTION_NAME)
+                .param(PARAM_NAME, author2.getID().toString())
+                .param(PARAM_NAME, project1.getID().toString())
         )
             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                 hasJsonPath("$._embedded.indexableObject", Matchers.allOf(
@@ -507,14 +502,12 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         getClient().perform(
             get("/api/discover/search/objects")
                 .param("f.entityType", "Publication,equals")
-                .param("projection", "CheckRelatedItem")
+                .param("projection", PROJECTION_NAME)
                 .param(
-                    "checkRelatedItem",
-                    "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + author2.getID().toString()
+                    PARAM_NAME, "isAuthorOfPublication" + RELATIONSHIP_UUID_SEPARATOR + author2.getID().toString()
                 )
                 .param(
-                    "checkRelatedItem",
-                    "isProjectOfPublication" + RELATIONSHIP_UUID_SEPARATOR + project1.getID().toString()
+                    PARAM_NAME, "isProjectOfPublication" + RELATIONSHIP_UUID_SEPARATOR + project1.getID().toString()
                 )
         )
             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
@@ -537,14 +530,12 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
         getClient().perform(
             get("/api/discover/search/objects")
                 .param("f.entityType", "Publication,equals")
-                .param("projection", "CheckRelatedItem")
+                .param("projection", PROJECTION_NAME)
                 .param(
-                    "checkRelatedItem",
-                    "isPublicationOfProject" + RELATIONSHIP_UUID_SEPARATOR + author2.getID().toString()
+                    PARAM_NAME, "isPublicationOfProject" + RELATIONSHIP_UUID_SEPARATOR + author2.getID().toString()
                 )
                 .param(
-                    "checkRelatedItem",
-                    "isPublicationOfAuthor" + RELATIONSHIP_UUID_SEPARATOR + project1.getID().toString()
+                    PARAM_NAME, "isPublicationOfAuthor" + RELATIONSHIP_UUID_SEPARATOR + project1.getID().toString()
                 )
         )
             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
