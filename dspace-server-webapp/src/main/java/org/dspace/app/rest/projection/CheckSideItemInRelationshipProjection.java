@@ -1,21 +1,30 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.projection;
 
 import java.sql.SQLException;
 import java.util.UUID;
-
 import javax.servlet.ServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.RelationshipRest;
 import org.dspace.app.rest.model.RestModel;
-import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-// TODO
+/**
+ * Check if an item is on the left or right side of a relationship.
+ */
+@Component
 public class CheckSideItemInRelationshipProjection extends AbstractProjection {
 
     private static final Logger log = LogManager.getLogger(CheckSideItemInRelationshipProjection.class);
@@ -42,21 +51,21 @@ public class CheckSideItemInRelationshipProjection extends AbstractProjection {
         return super.transformRest(restObject);
     }
 
-    protected void transformRestInternal(RestModel restObject) throws SQLException {
+    protected void transformRestInternal(RestModel restObject) throws SQLException, DSpaceBadRequestException {
         // this projection only applies to RelationshipRest
         if (!(restObject instanceof RelationshipRest)) {
             return;
         }
         RelationshipRest relationshipRest = (RelationshipRest) restObject;
 
+        // ensure that relatedItemLeft and relatedItemRight are present in the response
+        relationshipRest.initProjectionCheckSideItemInRelationship();
+
         // get uuid from request param checkSideItemInRelationship
         UUID uuid = getUuidFromRequest();
         if (uuid == null) {
             return;
         }
-
-        // ensure that relatedItemLeft and relatedItemRight are present in the response
-        relationshipRest.initProjectionCheckSideItemInRelationship();
 
         // check if the requested uuid is the left item
         if (uuid.equals(relationshipRest.getLeftId())) {
@@ -69,7 +78,7 @@ public class CheckSideItemInRelationshipProjection extends AbstractProjection {
         }
     }
 
-    protected UUID getUuidFromRequest() {
+    protected UUID getUuidFromRequest() throws DSpaceBadRequestException {
         ServletRequest servletRequest = requestService.getCurrentRequest().getServletRequest();
 
         String[] uuids = servletRequest.getParameterValues(PARAM_NAME);
@@ -79,8 +88,9 @@ public class CheckSideItemInRelationshipProjection extends AbstractProjection {
         }
 
         if (uuids.length != 1) {
-            log.warn(String.format("Expected one value for url parameter %s, got %s values", PARAM_NAME, uuids.length));
-            return null;
+            throw new DSpaceBadRequestException(String.format(
+                "Expected one value for url parameter %s, got %s values", PARAM_NAME, uuids.length
+            ));
         }
 
         return UUIDUtils.fromString(uuids[0]);

@@ -34,11 +34,17 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
     private String leftwardValue;
     private String rightwardValue;
 
-    // TODO
+    /**
+     * See {@link org.dspace.app.rest.projection.CheckSideItemInRelationshipProjection}.
+     * True when the uuid (provided to the projection) is on the left side of the relationship, false otherwise.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean relatedItemLeft = null;
 
-    // TODO
+    /**
+     * See {@link org.dspace.app.rest.projection.CheckSideItemInRelationshipProjection}.
+     * True when the uuid (provided to the projection) is on the right side of the relationship, false otherwise.
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean relatedItemRight = null;
 
