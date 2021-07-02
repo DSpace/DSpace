@@ -188,6 +188,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
                 return null;
             }
 
+            // Returns the first matching bitstream the user has READ access to
             for (Bitstream bitstream : matchedBitstreams) {
                 if (bitstreamMetadataReadPermissionEvaluatorPlugin
                     .metadataReadPermissionOnBitstream(context, bitstream)) {
