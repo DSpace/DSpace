@@ -162,27 +162,62 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         return this;
     }
 
+    /**
+     * Set the person who submitted the Item.
+     *
+     * @param ePerson the submitter.
+     * @return this builder.
+     */
     public WorkflowItemBuilder withSubmitter(EPerson ePerson) {
         workspaceItem.getItem().setSubmitter(ePerson);
         return this;
     }
 
+    /**
+     * Set the dc.title field.
+     *
+     * @param title The Item's title.
+     * @return this builder.
+     */
     public WorkflowItemBuilder withTitle(final String title) {
         return setMetadataSingleValue(MetadataSchemaEnum.DC.getName(), "title", null, title);
     }
 
+    /**
+     * Set the dc.date.issued field.
+     *
+     * @param issueDate ISO-8601 date without timezone.
+     * @return this builder.
+     */
     public WorkflowItemBuilder withIssueDate(final String issueDate) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "date", "issued", new DCDate(issueDate).toString());
     }
 
+    /**
+     * Set the dc.contributor.author field.
+     *
+     * @param authorName Author's full name.
+     * @return this builder.
+     */
     public WorkflowItemBuilder withAuthor(final String authorName) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }
 
+    /**
+     * Set the dc.subject field.
+     *
+     * @param subject the subject of the Item.
+     * @return this builder.
+     */
     public WorkflowItemBuilder withSubject(final String subject) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, subject);
     }
 
+    /**
+     * Grant the owning Collection's license to the Item.
+     *
+     * @return this builder.
+     */
     public WorkflowItemBuilder grantLicense() {
         Item item = workspaceItem.getItem();
         String license;
@@ -198,6 +233,14 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         return this;
     }
 
+    /**
+     * Add to the Item a Bitstream in the ORIGINAL Bundle.
+     *
+     * @param name name of the Bitstream.
+     * @param source source of the content.
+     * @param is the content of the Bitstream.
+     * @return this builder.
+     */
     public WorkflowItemBuilder withFulltext(String name, String source, InputStream is) {
         try {
             Item item = workspaceItem.getItem();

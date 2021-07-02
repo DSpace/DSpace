@@ -67,13 +67,15 @@
     <bean class="org.dspace.core.LegacyPluginServiceImpl" init-method="init"/>
     <bean class="org.dspace.core.LicenseServiceImpl"/>
     <bean class="org.dspace.core.NewsServiceImpl">
-   		<property name="acceptableFilenames">
-			<list>
-				<value>news-top.html</value>
-				<value>news-side.html</value>
-			</list>
-		</property>
-	</bean>
+        <property name="acceptableFilenames">
+            <list>
+                <value>news-top.html</value>
+                <value>news-side.html</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean class='org.dspace.curate.XmlWorkflowCuratorServiceImpl'/>
 
     <bean class="org.dspace.disseminate.CitationDocumentServiceImpl"/>
 

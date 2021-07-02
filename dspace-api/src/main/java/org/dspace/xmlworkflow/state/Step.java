@@ -24,7 +24,7 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * A class that contains all the data of an xlworkflow step
+ * A class that contains all the data of a {@link Workflow} step.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -86,20 +86,36 @@ public class Step implements BeanNameAware {
         return outcomes.get(outcome);
     }
 
-
+    /**
+     * Is this step "valid"?
+     *
+     * @param context current DSpace session.
+     * @param wfi the current workflow item in this step.
+     * @return true if the user selection is "valid".
+     * @throws WorkflowConfigurationException passed through.
+     * @throws SQLException passed through.
+     */
     public boolean isValidStep(Context context, XmlWorkflowItem wfi)
         throws WorkflowConfigurationException, SQLException {
         //Check if our next step has a UI, if not then the step is valid, no need for a group
         return !(getUserSelectionMethod() == null || getUserSelectionMethod()
             .getProcessingAction() == null) && getUserSelectionMethod().getProcessingAction()
                                                                        .isValidUserSelection(context, wfi, hasUI());
-
     }
 
+    /**
+     * Getter for the step's configured user selection method.
+     * @return the configured user selection method for this step.
+     */
     public UserSelectionActionConfig getUserSelectionMethod() {
         return userSelectionMethod;
     }
 
+    /**
+     * Look up the action which follows a given action.
+     * @param currentAction the action in question.
+     * @return the next action in sequence.
+     */
     public WorkflowActionConfig getNextAction(WorkflowActionConfig currentAction) {
         int index = actions.indexOf(currentAction);
         if (index < actions.size() - 1) {
@@ -129,16 +145,24 @@ public class Step implements BeanNameAware {
         return inProgressUserService.getNumberOfFinishedUsers(c, wfi) == requiredUsers;
     }
 
+    /**
+     * Getter for the number of required reviews.
+     * @return the number of users required to review this step.
+     */
     public int getRequiredUsers() {
         return requiredUsers;
     }
 
+    /**
+     * Get the configured {@link Role} for this step.
+     * @return the configured role.
+     */
     public Role getRole() {
         return role;
     }
 
     /**
-     * Set the user selection configuration, this is required as every step requires one
+     * Set the user selection configuration.  Every step requires one.
      * @param userSelectionMethod the user selection method configuration
      */
     @Autowired(required = true)
@@ -148,7 +172,8 @@ public class Step implements BeanNameAware {
     }
 
     /**
-     * Set the outcomes as a map, if no outcomes are configured this step will be last step in the workflow
+     * Set the outcomes as a map.  If no outcomes are configured, this step will
+     * be last step in the workflow.
      * @param outcomes the map containing the outcomes.
      */
     public void setOutcomes(Map<Integer, Step> outcomes) {

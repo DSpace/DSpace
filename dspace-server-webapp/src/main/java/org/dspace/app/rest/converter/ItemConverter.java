@@ -8,8 +8,10 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -73,6 +75,10 @@ public class ItemConverter
         List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
         List<MetadataValue> returnList = new LinkedList<>();
         try {
+            if (obj.isWithdrawn() && (Objects.isNull(context) ||
+                                      Objects.isNull(context.getCurrentUser()) || !authorizeService.isAdmin(context))) {
+                return new MetadataValueList(new ArrayList<MetadataValue>());
+            }
             if (context != null && authorizeService.isAdmin(context)) {
                 return new MetadataValueList(fullList);
             }
