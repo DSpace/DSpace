@@ -10,6 +10,7 @@ package org.dspace.statistics.content;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -263,20 +264,27 @@ public class StatisticsDatasetDisplay {
         query.append("{!join from=search.resourceid to=id fromIndex=");
         query.append(configurationService.getProperty("solr.multicorePrefix"));
         query.append("search} ");
+        boolean isFirstDefaultQuery = true;
         for (String default_query : default_queries) {
-            String[] parts = default_query.split(":");
-            if (parts.length > 0) {
-                // remove ' from default_query that comes from configurations
-                query.append(parts[0].replace("'", ""));
-                query.append(":");
-                if (dSpaceObject != null) {
-                    query.append(dSpaceObject.getID());
-                }
+            if (!isFirstDefaultQuery) {
+                query.append(" AND ");
             }
-            //to consider only related items
-            query.append(" AND archived:true AND -withdrawn:true");
+            if (dSpaceObject != null) {
+                query.append(replacePlaceholderIfPresent(default_query, dSpaceObject));
+            } else {
+                query.append(default_query);
+            }
+            isFirstDefaultQuery = false;
         }
+
+        // to consider only related items
+        query.append(" AND archived:true AND -withdrawn:true");
+
         return query.toString();
+    }
+
+    private String replacePlaceholderIfPresent(String defaultQuery, DSpaceObject dSpaceObject) {
+        return new MessageFormat(defaultQuery).format(new String[] { dSpaceObject.getID().toString() });
     }
     // create filter in string format for start date and end date
     public String setStartDateEndDateFilterQuery(String startDate, String endDate) {
