@@ -8,6 +8,7 @@
 package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -30,6 +31,22 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
     private Integer rightMaxCardinality;
     private EntityTypeRest leftType;
     private EntityTypeRest rightType;
+
+    /**
+     * See {@link org.dspace.app.rest.projection.CheckSideEntityInRelationshipTypeProjection}.
+     * True when the entity type (provided to the projection) is on the left side of this relationship type,
+     * false otherwise.
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Boolean relatedTypeLeft = null;
+
+    /**
+     * See {@link org.dspace.app.rest.projection.CheckSideEntityInRelationshipTypeProjection}.
+     * True when the entity type (provided to the projection) is on the right side of this relationship type,
+     * false otherwise.
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Boolean relatedTypeRight = null;
 
     public String getType() {
         return NAME;
@@ -142,4 +159,32 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
     public void setRightType(EntityTypeRest rightType) {
         this.rightType = rightType;
     }
+
+    public void initProjectionCheckSideEntityInRelationshipType() {
+        if (relatedTypeLeft == null) {
+            relatedTypeLeft = false;
+        }
+        if (relatedTypeRight == null) {
+            relatedTypeRight = false;
+        }
+    }
+
+    public Boolean getRelatedTypeLeft() {
+        return relatedTypeLeft;
+    }
+
+    public void setRelatedTypeLeft() {
+        initProjectionCheckSideEntityInRelationshipType();
+        this.relatedTypeLeft = true;
+    }
+
+    public Boolean getRelatedTypeRight() {
+        return relatedTypeRight;
+    }
+
+    public void setRelatedTypeRight() {
+        initProjectionCheckSideEntityInRelationshipType();
+        this.relatedTypeRight = true;
+    }
+
 }
