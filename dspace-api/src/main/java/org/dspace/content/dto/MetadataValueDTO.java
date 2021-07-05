@@ -29,6 +29,7 @@ public class MetadataValueDTO {
     private String value;
     private String authority;
     private int confidence = Choices.CF_UNSET;
+    private Integer securityLevel;
 
     public MetadataValueDTO(MetadataValue metadataValue) {
         MetadataField metadataField = metadataValue.getMetadataField();
@@ -143,5 +144,13 @@ public class MetadataValueDTO {
 
     public void setConfidence(int confidence) {
         this.confidence = confidence;
+    }
+
+    public Integer getSecurityLevel() {
+        return securityLevel;
+    }
+
+    public void setSecurityLevel(int securityLevel) {
+        this.securityLevel = securityLevel;
     }
 }

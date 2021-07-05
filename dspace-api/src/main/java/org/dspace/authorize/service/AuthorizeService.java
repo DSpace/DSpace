@@ -608,4 +608,5 @@ public interface AuthorizeService {
      */
     long countAdminAuthorizedCollection(Context context, String query)
         throws SearchServiceException, SQLException;
+    public boolean isPartOfTheGroup(Context c, String egroup) throws SQLException;
 }

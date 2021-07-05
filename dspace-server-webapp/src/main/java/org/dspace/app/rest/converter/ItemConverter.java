@@ -9,8 +9,10 @@ package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.ss.formula.functions.T;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.projection.Projection;
@@ -30,6 +33,8 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataSecurityEvaluation;
+import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
@@ -45,6 +50,8 @@ import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+
 /**
  * This is the converter from/to the Item in the DSpace API data model and the
  * REST data model
@@ -58,7 +65,8 @@ public class ItemConverter
 
     @Autowired
     private ItemService itemService;
-
+    @Resource(name = "securityLevelsMap")
+    Map<String, MetadataSecurityEvaluation> securityLevelsMap = new HashMap<>();
     @Autowired
     private CrisLayoutBoxService crisLayoutBoxService;
 
@@ -76,6 +84,8 @@ public class ItemConverter
 
     @Autowired
     private RequestService requestService;
+    @Autowired
+    private MetadataValueService metadataValueService;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
 
@@ -88,7 +98,7 @@ public class ItemConverter
         item.setLastModified(obj.getLastModified());
 
         List<MetadataValue> entityTypes =
-            itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
+                itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
         if (CollectionUtils.isNotEmpty(entityTypes) && StringUtils.isNotBlank(entityTypes.get(0).getValue())) {
             item.setEntityType(entityTypes.get(0).getValue());
         }
@@ -131,14 +141,13 @@ public class ItemConverter
                     returnList.add(metadataValue);
                 }
             }
-        } catch (SQLException e ) {
+        } catch (SQLException e) {
             log.error("Error filtering item metadata based on permissions", e);
         }
         return new MetadataValueList(returnList);
     }
 
-    public boolean checkMetadataFieldVisibility(Context context, Item item,
-            MetadataField metadataField) throws SQLException {
+    public boolean checkMetadataFieldVisibility(Context context, Item item, MetadataField metadataField) throws SQLException {
         String entityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
         List<CrisLayoutBox> boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 1000, 0);
         return checkMetadataFieldVisibility(context, boxes, item, metadataField);
@@ -146,7 +155,7 @@ public class ItemConverter
 
     private Optional<List<DCInputSet>> submissionDefinitionInputs() {
         return Optional.ofNullable(requestService.getCurrentRequest())
-                .map(rq -> (String )rq.getAttribute("submission-name"))
+                .map(rq -> (String) rq.getAttribute("submission-name"))
                 .map(this::dcInputsSet);
     }
 
@@ -163,7 +172,7 @@ public class ItemConverter
     }
 
     private MetadataValueList fromSubmissionDefinition(Context context, List<CrisLayoutBox> boxes, Item item,
-            final List<DCInputSet> dcInputSets, final List<MetadataValue> fullList) {
+                                                       final List<DCInputSet> dcInputSets, final List<MetadataValue> fullList) {
 
         Predicate<MetadataValue> inDcInputs = mv -> dcInputSets.stream()
                 .anyMatch((dc) -> {
@@ -176,33 +185,53 @@ public class ItemConverter
                 });
 
         List<MetadataValue> metadataFields = fullList.stream()
-                                                     .filter(inDcInputs)
-                                                     .collect(Collectors.toList());
+                .filter(inDcInputs)
+                .collect(Collectors.toList());
 
         return new MetadataValueList(metadataFields);
     }
 
     private boolean checkMetadataFieldVisibility(Context context, List<CrisLayoutBox> boxes, Item item,
-            MetadataField metadataField) throws SQLException {
+                                                 MetadataField metadataField) throws SQLException {
+        MetadataSecurityEvaluation metadataSecurityEvaluation = null;
+        //first find the level of security for the metadata value generated by couple <metadataField, item>
+        Integer securityLevel = checkTheSecurityLevel(metadataField, item);
+        if (securityLevel != null) {
+            // find proper metadataSecurityEvaluation implementation for this level of security
+            metadataSecurityEvaluation = mapBetweenSecurityLevelAndClassSecurityLevel(securityLevel);
+        }
         if (boxes.size() == 0) {
             if (context != null && authorizeService.isAdmin(context)) {
-                return true;
+                if (metadataSecurityEvaluation != null) {
+                    return metadataSecurityEvaluation.allowMetadataFieldReturn(context, item, metadataField);
+                }
+                else return true;
             } else {
                 if (!metadataExposureService
                         .isHidden(context, metadataField.getMetadataSchema().getName(),
-                                  metadataField.getElement(),
-                                  metadataField.getQualifier())) {
-                    return true;
+                                metadataField.getElement(),
+                                metadataField.getQualifier())) {
+                    if (metadataSecurityEvaluation != null) {
+                        return metadataSecurityEvaluation.allowMetadataFieldReturn(context, item, metadataField);
+                    } else {
+                        // TODO check if no security what happens??????
+                        return true;
+                    }
                 }
             }
         } else {
-            return checkMetadataFieldVisibilityByBoxes(context, boxes, item, metadataField);
+            if (metadataSecurityEvaluation != null) {
+                return metadataSecurityEvaluation.allowMetadataFieldReturn(context, item, metadataField) && checkMetadataFieldVisibilityByBoxes(context, boxes, item, metadataField);
+            } else {
+                // TODO check if no security what happens??????
+                checkMetadataFieldVisibilityByBoxes(context, boxes, item, metadataField);
+            }
         }
         return false;
     }
 
     private boolean checkMetadataFieldVisibilityByBoxes(Context context, List<CrisLayoutBox> boxes, Item item,
-            MetadataField metadataField) throws SQLException {
+                                                        MetadataField metadataField) throws SQLException {
         List<MetadataField> allPublicMetadata = getPublicMetadata(boxes);
         List<CrisLayoutBox> boxesWithMetadataFieldExcludedPublic = getBoxesWithMetadataFieldExcludedPublic(
                 metadataField, boxes);
@@ -220,8 +249,8 @@ public class ItemConverter
         if (boxesWithMetadataFieldExcludedPublic.size() == 0) {
             if (!metadataExposureService
                     .isHidden(context, metadataField.getMetadataSchema().getName(),
-                              metadataField.getElement(),
-                              metadataField.getQualifier())) {
+                            metadataField.getElement(),
+                            metadataField.getQualifier())) {
                 return true;
             }
         }
@@ -230,7 +259,7 @@ public class ItemConverter
     }
 
     private List<CrisLayoutBox> getBoxesWithMetadataFieldExcludedPublic(MetadataField metadataField,
-            List<CrisLayoutBox> boxes) {
+                                                                        List<CrisLayoutBox> boxes) {
         List<CrisLayoutBox> boxesWithMetadataField = new LinkedList<CrisLayoutBox>();
         for (CrisLayoutBox box : boxes) {
             List<CrisLayoutField> crisLayoutFields = box.getLayoutFields();
@@ -247,7 +276,7 @@ public class ItemConverter
     }
 
     private void checkField(MetadataField metadataField, List<CrisLayoutBox> boxesWithMetadataField, CrisLayoutBox box,
-            MetadataField field) {
+                            MetadataField field) {
         if (field.equals(metadataField) && box.getSecurity() != LayoutSecurity.PUBLIC.getValue()) {
             boxesWithMetadataField.add(box);
         }
@@ -290,5 +319,24 @@ public class ItemConverter
     @Override
     public boolean supportsModel(IndexableObject idxo) {
         return idxo.getIndexedObject() instanceof Item;
+    }
+
+    private Integer checkTheSecurityLevel(MetadataField metadataField, Item item) {
+        List<MetadataValue> metadataValues = item.getMetadata();
+        for (MetadataValue metadataValue : metadataValues) {
+            if (metadataValue.getMetadataField().equals(metadataField)) {
+                Integer securityLevel = metadataValue.getSecurity_level();
+                if (securityLevel != null) {
+                    return securityLevel;
+                } else {
+                    return null;
+                }
+            } else return null;
+        }
+        return null;
+    }
+
+    public MetadataSecurityEvaluation mapBetweenSecurityLevelAndClassSecurityLevel(int securityValue) {
+        return securityLevelsMap.get(securityValue + "");
     }
 }

@@ -26,6 +26,7 @@ public class MetadataValueRest {
 
     int place = -1;
 
+    Integer securityLevel;
     public MetadataValueRest() {
     }
 
@@ -71,5 +72,13 @@ public class MetadataValueRest {
 
     public void setPlace(int place) {
         this.place = place;
+    }
+
+    public Integer getSecurityLevel() {
+        return securityLevel;
+    }
+
+    public void setSecurityLevel(Integer securityLevel) {
+        this.securityLevel = securityLevel;
     }
 }

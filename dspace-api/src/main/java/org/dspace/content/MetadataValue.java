@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import javax.annotation.Nullable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -86,6 +87,14 @@ public class MetadataValue implements ReloadableEntity<Integer> {
      */
     @Column(name = "confidence")
     private int confidence = -1;
+
+    /**
+     * Security level valye
+     */
+
+    @Nullable
+    @Column(name = "security_level")
+    private Integer securityLevel;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "dspace_object_id")
@@ -276,4 +285,11 @@ public class MetadataValue implements ReloadableEntity<Integer> {
         return getMetadataField().getQualifier();
     }
 
+    public Integer getSecurity_level() {
+        return securityLevel;
+    }
+
+    public void setSecurity_level(Integer security_level) {
+        this.securityLevel = security_level;
+    }
 }

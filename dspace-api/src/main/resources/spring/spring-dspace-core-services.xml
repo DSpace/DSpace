@@ -10,8 +10,11 @@
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
 
 
     <!-- Identifier Service Application Interface.  Will be autowired with
@@ -37,7 +40,8 @@
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
     </bean>
 
-    <bean name="org.dspace.core.DBConnection" class="org.dspace.core.HibernateDBConnection" lazy-init="true" scope="prototype"/>
+    <bean name="org.dspace.core.DBConnection" class="org.dspace.core.HibernateDBConnection" lazy-init="true"
+          scope="prototype"/>
 
     <!-- Register all our Flyway callback classes (which run before/after database migrations) -->
     <bean class="org.dspace.storage.rdbms.RegistryUpdater"/>
@@ -58,25 +62,34 @@
         <constructor-arg>
             <map>
                 <entry key="submitter">
-                    <bean class="org.dspace.content.template.generator.SubmitterValueGenerator" />
+                    <bean class="org.dspace.content.template.generator.SubmitterValueGenerator"/>
                 </entry>
                 <entry key="date">
-                    <bean class="org.dspace.content.template.generator.DateValueGenerator" />
+                    <bean class="org.dspace.content.template.generator.DateValueGenerator"/>
                 </entry>
                 <entry key="identifier">
-                    <bean class="org.dspace.content.template.generator.IdentifierValueGenerator" />
+                    <bean class="org.dspace.content.template.generator.IdentifierValueGenerator"/>
                 </entry>
                 <entry key="group">
-                    <bean class="org.dspace.content.template.generator.GroupValueGenerator" />
+                    <bean class="org.dspace.content.template.generator.GroupValueGenerator"/>
                 </entry>
                 <entry key="eperson">
-                    <bean class="org.dspace.content.template.generator.EPersonValueGenerator" />
+                    <bean class="org.dspace.content.template.generator.EPersonValueGenerator"/>
                 </entry>
                 <entry key="currentuser">
-                    <bean class="org.dspace.content.template.generator.CurrentUserValueGenerator" />
+                    <bean class="org.dspace.content.template.generator.CurrentUserValueGenerator"/>
                 </entry>
             </map>
         </constructor-arg>
     </bean>
-
+    <util:map id="securityLevelsMap">
+        <entry key="0" value-ref="level0Security"/>
+        <entry key="1" value-ref="level1Security"/>
+        <entry key="2" value-ref="level2Security"/>
+    </util:map>
+    <bean id ="level0Security" name="level0Security" class="org.dspace.content.MetadataSecurityEvaluationLevel0"/>
+    <bean id ="level1Security" name="level1Security" class="org.dspace.content.MetadataSecurityEvaluationLevel1">
+        <property name="egroup" value="Trusted"/>
+    </bean>
+    <bean  id ="level2Security" name="level2Security" class="org.dspace.content.MetadataSecurityEvaluationLevel2"/>
 </beans>
