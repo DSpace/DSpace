@@ -6,13 +6,11 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.authorization.impl;
-
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -66,12 +64,23 @@ public class CanManageMappingsFeature implements AuthorizationFeature {
         }
         if (object instanceof ItemRest) {
             Item item = itemService.find(context, UUID.fromString(((ItemRest) object).getUuid()));
+            if (!authorizeService.authorizeActionBoolean(context, item, Constants.WRITE)) {
+                return false;
+            }
             try {
-                List<Collection> collections = collectionService.findCollectionsWithSubmit("", context, null, 0, 2)
+                Optional<Collection> collections = collectionService.findCollectionsWithSubmit(StringUtils.EMPTY,
+                                                 context, null, 0, Integer.MAX_VALUE)
                                                 .stream()
                                                 .filter(c -> !c.getID().equals(item.getOwningCollection().getID()))
-                                                .collect(Collectors.toList());
-                return CollectionUtils.isNotEmpty(collections);
+                                                .filter(c -> {
+                                                    try {
+                                                        return collectionService.canEditBoolean(context, c);
+                                                    } catch (SQLException e) {
+                                                        throw new RuntimeException(e.getMessage(), e);
+                                                    }
+                                                })
+                                                .findFirst();
+                return collections.isPresent();
             } catch (SearchServiceException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
