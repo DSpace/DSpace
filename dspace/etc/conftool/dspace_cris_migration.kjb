@@ -310,12 +310,12 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>112</xloc>
+      <xloc>80</xloc>
       <yloc>176</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>Trasformazione</name>
+      <name>project migration</name>
       <description/>
       <type>TRANS</type>
       <attributes/>
@@ -349,7 +349,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>304</xloc>
+      <xloc>336</xloc>
       <yloc>176</yloc>
       <attributes_kjc/>
     </entry>
@@ -361,7 +361,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>544</xloc>
+      <xloc>656</xloc>
       <yloc>176</yloc>
       <attributes_kjc/>
     </entry>
@@ -369,7 +369,7 @@
   <hops>
     <hop>
       <from>Start</from>
-      <to>Trasformazione</to>
+      <to>project migration</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -377,7 +377,7 @@
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>Trasformazione</from>
+      <from>project migration</from>
       <to>Successo</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
