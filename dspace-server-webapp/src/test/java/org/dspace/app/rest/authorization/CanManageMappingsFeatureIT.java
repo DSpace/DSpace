@@ -244,8 +244,7 @@ public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTes
                  .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(admin2ItemA))));
 
         getClient(tokenAUser).perform(get("/api/authz/authorizations/" + userA2ItemA.getID()))
-                 .andExpect(status().isOk())
-                 .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(userA2ItemA))));
+                             .andExpect(status().isNotFound());
 
         getClient(tokenEPerson).perform(get("/api/authz/authorizations/" + eperson2ItemA.getID()))
                                .andExpect(status().isNotFound());
