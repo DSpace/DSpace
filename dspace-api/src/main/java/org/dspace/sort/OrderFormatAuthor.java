@@ -20,7 +20,7 @@ import org.dspace.sort.AbstractTextFilterOFD;
 public class OrderFormatAuthor extends AbstractTextFilterOFD
 {
 	{
-		filters = new TextFilter[] {
+		filters = new TextFilter[] { new DecomposeDiactritics(),
 				                     new LowerCaseAndTrim() };
 	}
 }

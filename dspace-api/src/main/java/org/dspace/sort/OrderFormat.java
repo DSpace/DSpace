@@ -77,7 +77,10 @@ public class OrderFormat
             // No delegates found, so apply defaults
             if (type.equalsIgnoreCase(OrderFormat.AUTHOR) && authorDelegate != null)
             {
-              return authorDelegate.makeSortString(value, language);
+                value = value.replaceFirst("^Å", "/001");
+                value = authorDelegate.makeSortString(value, language);
+                value = value.replace("/001", "Å");
+                return value;
             }
 
             if (type.equalsIgnoreCase(OrderFormat.TITLE) && titleDelegate != null)
