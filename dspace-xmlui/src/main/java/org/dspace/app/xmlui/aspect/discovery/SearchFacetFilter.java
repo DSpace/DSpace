@@ -444,11 +444,11 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
             linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH +  "=" + Character.toString(c).toLowerCase();
             jumpList.addItemXref(linkUrl, Character
                     .toString(c));
-            c = 'Å';
+            c = 'Ø';
             linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH +  "=" + Character.toString(c).toLowerCase();
             jumpList.addItemXref(linkUrl, Character
                     .toString(c));
-            c = 'Ø';
+            c = 'Å';
             linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH +  "=" + Character.toString(c).toLowerCase();
             jumpList.addItemXref(linkUrl, Character
                     .toString(c));
