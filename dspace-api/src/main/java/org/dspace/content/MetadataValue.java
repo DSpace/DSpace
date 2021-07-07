@@ -89,9 +89,8 @@ public class MetadataValue implements ReloadableEntity<Integer> {
     private int confidence = -1;
 
     /**
-     * Security level valye
+     * Security level value
      */
-
     @Nullable
     @Column(name = "security_level")
     private Integer securityLevel;

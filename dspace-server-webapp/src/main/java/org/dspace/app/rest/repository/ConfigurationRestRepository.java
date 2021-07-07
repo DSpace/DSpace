@@ -55,11 +55,10 @@ public class ConfigurationRestRepository extends DSpaceRestRepository<PropertyRe
     @PreAuthorize("permitAll()")
     public PropertyRest findOne(Context context, String property) {
         if (!exposedProperties.contains(property) || !configurationService.hasProperty(property)) {
+            // TODO for the moment let the configurations of metadatas not exposed
             throw new ResourceNotFoundException("No such configuration property: " + property);
         }
-
         String[] propertyValues = configurationService.getArrayProperty(property);
-
         PropertyRest propertyRest = new PropertyRest();
         propertyRest.setName(property);
         propertyRest.setValues(Arrays.asList(propertyValues));
@@ -75,5 +74,20 @@ public class ConfigurationRestRepository extends DSpaceRestRepository<PropertyRe
     @Override
     public Class<PropertyRest> getDomainClass() {
         return PropertyRest.class;
+    }
+    public PropertyRest findEntityMetadataSecurity(Context context, String entityType) {
+        String defaultConfiguration = configurationService.getProperty("metadatavalue.visibility.settings");
+        List<String> fallbackConfigurations = configurationService.getPropertyKeys("metadatavalue.visibility." + entityType);
+        for (int i = 0; i < fallbackConfigurations.size(); i++) {
+            fallbackConfigurations.set(i, fallbackConfigurations.get(i) + ":" + configurationService.getProperty(fallbackConfigurations.get(i)));
+        }
+        if (defaultConfiguration == null && fallbackConfigurations.size() == 0) {
+            throw new ResourceNotFoundException("No such configuration property for entity: " + entityType);
+        }
+        PropertyRest propertyRest = new PropertyRest();
+        propertyRest.setName("metadatavalue.visibility." + entityType + ".settings");
+        fallbackConfigurations.add("metadatavalue.visibility.settings:" + defaultConfiguration);
+        propertyRest.setValues(fallbackConfigurations);
+        return propertyRest;
     }
 }

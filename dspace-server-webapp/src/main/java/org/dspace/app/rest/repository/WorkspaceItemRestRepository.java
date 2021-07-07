@@ -144,6 +144,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'READ')")
     @Override
     public WorkspaceItemRest findOne(Context context, Integer id) {
+        System.out.println(id);
         WorkspaceItem witem = null;
         try {
             witem = wis.find(context, id);

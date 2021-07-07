@@ -47,6 +47,9 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.LayoutSecurity;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -59,10 +62,15 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Mykhaylo Boychuk (4science.it)
  */
 public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
-
+    @Autowired(required = true)
+    protected EPersonService ePersonService;
     @Autowired
     private ItemService itemService;
 
+    @Autowired
+    private GroupService groupService;
+    @Autowired(required = true)
+    protected RegistrationDataService registrationDataService;
     @Autowired
     private MetadataFieldService mfss;
 
@@ -2076,7 +2084,6 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                      )));
 
     }
-
     @Test
     public void configurationContainLayoutSecurityWithNestedFieldAdministratorTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -2177,5 +2184,157 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$.metadata['crisrp.education.end']").doesNotExist())
                    .andExpect(jsonPath("$.metadata['dc.description.abstract']").doesNotExist());
     }
+    //testing the view
+    @Test
+    public void configurationContainMetadataSecurityThirdLevel() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withEntityType("Publication")
+                .withName("Collection 1")
+                .build();
+        Item itemA = ItemBuilder.createItem(context, col1).build();
+        itemService.addSecuredMetadata(context, itemA,  "dc", "description", "provenance", null, "Metadata Secured", null, 0, 2);
+        itemService.addMetadata(context, itemA,  "cris", "owner", "", null, "Owner of the item", admin.getID().toString(), 0, 1);
+        MetadataField description = mfss.findByElement(context, "dc", "description", "provenance");
+
+        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+                .withShortname("box-shortname-one")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .build();
+
+        CrisLayoutFieldBuilder.createMetadataField(context, description, 0, 0)
+                .withLabel("LABEL ABS")
+                .withRendering("RENDERIGN ABS")
+                .withStyle("STYLE")
+                .withBox(box1)
+                .build();
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+          // An admin can see the dc.description.abstract metadata
+        getClient(tokenAdmin).perform(get("/api/core/items/" + itemA.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Publication")))
+                .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].value", is ("Metadata Secured")))
+                .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].securityLevel", is (2)));
+
+//        // An user who is not admin can not see the dc.description.abstract metadata
+        getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Publication")))
+                .andExpect(jsonPath("$.metadata['dc.description.provenance']").doesNotExist());
+//
+        // An anonymous user can not see the dc.description.abstract metadata
+        getClient().perform(get("/api/core/items/" + itemA.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Publication")));
 
 }
+    //testing the view
+    @Test
+    public void configurationContainMetadataSecurityFirstLevel() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withEntityType("Person")
+                .withName("Collection 1")
+                .build();
+        Item itemA = ItemBuilder.createItem(context, col1).build();
+        itemService.addSecuredMetadata(context, itemA,  "dc", "description", "provenance", null, "Metadata Secured", null, 0, 0);
+        itemService.addMetadata(context, itemA,  "cris", "owner", "", null, "Owner of the item", admin.getID().toString(), 0, 1);
+        MetadataField description = mfss.findByElement(context, "dc", "description", "provenance");
+
+        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+                .withShortname("box-shortname-one")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .build();
+
+        CrisLayoutFieldBuilder.createMetadataField(context, description, 0, 0)
+                .withLabel("LABEL ABS")
+                .withRendering("RENDERIGN ABS")
+                .withStyle("STYLE")
+                .withBox(box1)
+                .build();
+        context.restoreAuthSystemState();
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        // An admin can see the dc.description.abstract metadata
+        getClient(tokenAdmin).perform(get("/api/core/items/" + itemA.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")))
+                .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].value", is ("Metadata Secured")))
+                .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].securityLevel", is (0)));
+
+//        // An user who is not admin can not see the dc.description.abstract metadata
+        getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")))
+                .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].value", is ("Metadata Secured")))
+                .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].securityLevel", is (0)));
+//
+        // An anonymous user can not see the dc.description.abstract metadata
+        getClient().perform(get("/api/core/items/" + itemA.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")))
+                .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].value", is ("Metadata Secured")))
+                .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].securityLevel", is (0)));
+
+    }
+    //testing the view
+    @Test
+    public void configurationContainMetadataSecuritySecondLevel() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withEntityType("Person")
+                .withName("Collection 1")
+                .build();
+        Item itemA = ItemBuilder.createItem(context, col1).build();
+        itemService.addSecuredMetadata(context, itemA,  "dc", "description", "provenance", null, "Metadata Secured", null, 0, 1);
+        itemService.addMetadata(context, itemA,  "cris", "owner", "", null, "Owner of the item", admin.getID().toString(), 0, 1);
+        MetadataField description = mfss.findByElement(context, "dc", "description", "provenance");
+
+        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+                .withShortname("box-shortname-one")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .build();
+
+        CrisLayoutFieldBuilder.createMetadataField(context, description, 0, 0)
+                .withLabel("LABEL ABS")
+                .withRendering("RENDERIGN ABS")
+                .withStyle("STYLE")
+                .withBox(box1)
+                .build();
+        Group group = groupService.create(context);
+        groupService.setName(group, "Trusted");
+        eperson.getGroups().add(group);
+        ePersonService.update(context, eperson);
+        context.restoreAuthSystemState();
+        String tokenEperson = getAuthToken(ePersonService.find(context, eperson.getID()).getEmail(), password);
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        // An admin can see the dc.description.abstract metadata
+        getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")));
+
+        getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")));
+//
+        // An anonymous user can not see the dc.description.abstract metadata
+        getClient().perform(get("/api/core/items/" + itemA.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")));
+
+    }}
