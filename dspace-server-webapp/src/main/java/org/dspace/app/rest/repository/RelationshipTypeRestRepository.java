@@ -9,9 +9,15 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.List;
+import javax.persistence.EntityNotFoundException;
 
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.model.MetadataFieldRest;
 import org.dspace.app.rest.model.RelationshipTypeRest;
+import org.dspace.content.EntityType;
 import org.dspace.content.RelationshipType;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +34,9 @@ public class RelationshipTypeRestRepository extends DSpaceRestRepository<Relatio
 
     @Autowired
     private RelationshipTypeService relationshipTypeService;
+
+    @Autowired
+    private EntityTypeService entityTypeService;
 
     @Override
     @PreAuthorize("permitAll()")
@@ -47,6 +56,48 @@ public class RelationshipTypeRestRepository extends DSpaceRestRepository<Relatio
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    @SearchRestMethod(name = "byEntityTypeId")
+    public Page<MetadataFieldRest> findByEntityTypeId(@Parameter(value = "id", required = true) int entityTypeId,
+        Pageable pageable) {
+
+        try {
+            Context context = obtainContext();
+            EntityType entityType = entityTypeService.find(context, entityTypeId);
+            if (entityType == null) {
+                throw new EntityNotFoundException(
+                    String.format("There was no entityType found with id %s", entityTypeId));
+            }
+            return this.findByEntityTypeWithPagination(context, entityType, pageable);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @SearchRestMethod(name = "byEntityType")
+    public Page<MetadataFieldRest> findByEntityType(@Parameter(value = "type", required = true) String entityTypeLabel,
+        Pageable pageable) {
+
+        try {
+            Context context = obtainContext();
+            EntityType entityType = entityTypeService.findByEntityType(context, entityTypeLabel);
+            if (entityType == null) {
+                throw new EntityNotFoundException(
+                    String.format("There was no entityType found with label %s", entityTypeLabel));
+            }
+            return this.findByEntityTypeWithPagination(context, entityType, pageable);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private Page<MetadataFieldRest> findByEntityTypeWithPagination(Context context, EntityType entityType,
+        Pageable pageable) throws SQLException {
+
+        List<RelationshipType> pageLimitedMatchingRelationshipTypes =
+            relationshipTypeService.findByEntityType(context, entityType);
+        return converter.toRestPage(pageLimitedMatchingRelationshipTypes, pageable, utils.obtainProjection());
     }
 
     @Override
