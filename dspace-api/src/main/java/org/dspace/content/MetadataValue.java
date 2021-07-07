@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.content;
@@ -25,6 +25,8 @@ import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.proxy.HibernateProxyHelper;
+
+import java.text.MessageFormat;
 
 /**
  * Database access class representing a Dublin Core metadata value.
@@ -289,6 +291,9 @@ public class MetadataValue implements ReloadableEntity<Integer> {
     }
 
     public void setSecurity_level(Integer security_level) {
+        if (!(security_level == null || security_level == 0 || security_level == 1 || security_level == 2)) {
+            throw new IllegalArgumentException("Wrong value of security_level");
+        }
         this.securityLevel = security_level;
     }
 }
