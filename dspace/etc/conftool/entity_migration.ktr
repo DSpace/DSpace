@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>project_migration</name>
+    <name>entity_migration</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -513,18 +513,8 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>cris_projects</from>
-      <to>Join rows</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Join rows</from>
       <to>calculate imp record id</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>collections config</from>
-      <to>filter by entity type</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -543,21 +533,6 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>eperson</from>
-      <to>Join rows</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Add insert operation</from>
-      <to>insert into imp_record</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>project metadata</from>
-      <to>Join rows 2</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>insert into imp_record</from>
       <to>Select values</to>
       <enabled>Y</enabled>
@@ -565,16 +540,6 @@
     <hop>
       <from>Select values</from>
       <to>Join rows 2</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>metadata configuration</from>
-      <to>filter by entity type 2</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>filter by entity type 2</from>
-      <to>Join rows 3</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -605,11 +570,6 @@
     <hop>
       <from>valid metadata field</from>
       <to>add order</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>add order</from>
-      <to>Select values 2</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -655,11 +615,6 @@
     <hop>
       <from>Select values 2</from>
       <to>Append streams</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Append streams</from>
-      <to>insert into imp_metadatavalue</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -712,6 +667,96 @@
       <to>Database join</to>
       <enabled>Y</enabled>
     </hop>
+    <hop>
+      <from>calculate imp metadata value id 2</from>
+      <to>Select values 2 3 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>add order</from>
+      <to>Modified JavaScript value 3</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Modified JavaScript value 3</from>
+      <to>Select values 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Database join</from>
+      <to>Database join 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Database join 2</from>
+      <to>add order 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>add order 2</from>
+      <to>calculate imp metadata value id 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Append streams</from>
+      <to>Append streams 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Append streams 2</from>
+      <to>insert into imp_metadatavalue</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Select values 2 3 2</from>
+      <to>Append streams 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>collections config</from>
+      <to>Get variables</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Get variables 2</from>
+      <to>filter by entity type 3</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>metadata configuration</from>
+      <to>Get variables 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>filter by entity type 3</from>
+      <to>Join rows 3</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>entities</from>
+      <to>Join rows</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Add insert operation</from>
+      <to>insert into imp_record</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Get variables</from>
+      <to>filter by entity type</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>eperson</from>
+      <to>Join rows</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>entities metadata</from>
+      <to>Join rows 2</to>
+      <enabled>Y</enabled>
+    </hop>
   </order>
   <step>
     <name>1 if id is null</name>
@@ -748,8 +793,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>208</xloc>
-      <yloc>640</yloc>
+      <xloc>224</xloc>
+      <yloc>624</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -964,7 +1009,34 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>944</xloc>
+      <xloc>912</xloc>
+      <yloc>640</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Append streams 2</name>
+    <type>Append</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <head_name>Append streams</head_name>
+    <tail_name>Select values 2 3 2</tail_name>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1040</xloc>
       <yloc>640</yloc>
       <draw>Y</draw>
     </GUI>
@@ -995,8 +1067,148 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>576</xloc>
+      <xloc>624</xloc>
       <yloc>80</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Database join</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>openstarts</connection>
+    <rowlimit>1</rowlimit>
+    <sql>SELECT subquery.crisid as pointer_crisid
+from (
+SELECT ou.id, ou.crisid, 'old_cris_orgunit' table_name FROM old_cris_orgunit ou
+UNION ALL
+SELECT pj.id, pj.crisid, 'old_cris_project' table_name FROM old_cris_project pj	 
+UNION ALL
+SELECT d.id, d.crisid, 'old_cris_do' table_name FROM old_cris_do d	 
+UNION ALL
+SELECT rp.id, rp.crisid, 'old_cris_rpage' table_name FROM old_cris_rpage rp	 
+) as subquery
+WHERE subquery.table_name = ? AND subquery.id = ?;</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>Y</replace_vars>
+    <parameter>
+      <field>
+        <name>pointer_table</name>
+        <type>String</type>
+      </field>
+      <field>
+        <name>pointer_id</name>
+        <type>String</type>
+      </field>
+    </parameter>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>48</xloc>
+      <yloc>944</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Database join 2</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>openstarts</connection>
+    <rowlimit>1</rowlimit>
+    <sql>SELECT values.textvalue as metadata_value
+FROM old_cris_project entity,
+     old_cris_pj_prop properties, 
+	 old_cris_pj_pdef property_def,
+	 old_jdyna_values values
+WHERE property_def.id = properties.typo_id
+  AND values.id = properties.value_id
+  AND properties.parent_id = entity.id  
+  AND entity.crisid = ? 
+  AND property_def.shortname = 'title'
+UNION ALL
+SELECT values.textvalue as metadata_value
+FROM old_cris_orgunit entity,
+     old_cris_ou_prop properties, 
+	 old_cris_ou_pdef property_def,
+	 old_jdyna_values values
+WHERE property_def.id = properties.typo_id
+  AND values.id = properties.value_id
+  AND properties.parent_id = entity.id  
+  AND entity.crisid = ?  
+  AND property_def.shortname = 'name'
+UNION ALL
+SELECT values.textvalue as metadata_value
+FROM old_cris_rpage entity,
+     old_cris_rp_prop properties, 
+	 old_cris_rp_pdef property_def,
+	 old_jdyna_values values
+WHERE property_def.id = properties.typo_id
+  AND values.id = properties.value_id
+  AND properties.parent_id = entity.id  
+  AND entity.crisid = ? 
+  AND property_def.shortname = 'fullName'
+UNION ALL
+SELECT values.textvalue as metadata_value
+FROM old_cris_do entity,
+     old_cris_do_prop properties, 
+	 old_cris_do_pdef property_def,
+	 old_jdyna_values values
+WHERE property_def.id = properties.typo_id
+  AND values.id = properties.value_id
+  AND properties.parent_id = entity.id  
+  AND entity.crisid = ?
+  AND property_def.shortname = 'title';</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>Y</replace_vars>
+    <parameter>
+      <field>
+        <name>pointer_crisid</name>
+        <type>String</type>
+      </field>
+      <field>
+        <name>pointer_crisid</name>
+        <type>String</type>
+      </field>
+      <field>
+        <name>pointer_crisid</name>
+        <type>String</type>
+      </field>
+      <field>
+        <name>pointer_crisid</name>
+        <type>String</type>
+      </field>
+    </parameter>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>176</xloc>
+      <yloc>944</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1106,7 +1318,7 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>400</xloc>
+      <xloc>464</xloc>
       <yloc>400</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1143,8 +1355,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>400</xloc>
-      <yloc>544</yloc>
+      <xloc>464</xloc>
+      <yloc>528</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1209,7 +1421,8 @@
         <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>var metadata_value = crisid;
-var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;</jsScript_script>
+var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;
+var metadata_authority = null;</jsScript_script>
       </jsScript>
     </jsScripts>
     <fields>
@@ -1229,6 +1442,14 @@ var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;</jsScript_scri
         <precision>2</precision>
         <replace>N</replace>
       </field>
+      <field>
+        <name>metadata_authority</name>
+        <rename>metadata_authority</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -1241,6 +1462,115 @@ var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;</jsScript_scri
     <GUI>
       <xloc>944</xloc>
       <yloc>896</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Modified JavaScript value 2</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var entityPrefix = dtype.replace("pointer", "");
+if(entityPrefix == 'ou'){
+	var pointer_id = ouvalue;
+	var pointer_table = 'old_cris_orgunit';
+} else if(entityPrefix == 'do'){
+	var pointer_id = dovalue;
+	var pointer_table = 'old_cris_do';
+} else if(entityPrefix == 'project'){
+	var pointer_id = projectvalue;
+	var pointer_table = 'old_cris_project';
+}  else if(entityPrefix == 'rp'){
+	var pointer_id = rpvalue;
+	var pointer_table = 'old_cris_rpage';
+} </jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>pointer_id</name>
+        <rename>pointer_id</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>pointer_table</name>
+        <rename>pointer_table</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>176</xloc>
+      <yloc>832</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Modified JavaScript value 3</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var metadata_authority = null;</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>metadata_authority</name>
+        <rename>metadata_authority</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>928</xloc>
+      <yloc>544</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1341,6 +1671,9 @@ var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;</jsScript_scri
       <field>
         <name>crisid</name>
       </field>
+      <field>
+        <name>metadata_authority</name>
+      </field>
       <select_unspecified>N</select_unspecified>
     </fields>
     <attributes/>
@@ -1352,7 +1685,7 @@ var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;</jsScript_scri
       </output>
     </remotesteps>
     <GUI>
-      <xloc>768</xloc>
+      <xloc>720</xloc>
       <yloc>640</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1427,6 +1760,9 @@ var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;</jsScript_scri
       <field>
         <name>crisid</name>
       </field>
+      <field>
+        <name>metadata_authority</name>
+      </field>
       <select_unspecified>N</select_unspecified>
     </fields>
     <attributes/>
@@ -1440,6 +1776,61 @@ var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;</jsScript_scri
     <GUI>
       <xloc>944</xloc>
       <yloc>784</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Select values 2 3 2</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>schema</name>
+      </field>
+      <field>
+        <name>element</name>
+      </field>
+      <field>
+        <name>qualifier</name>
+      </field>
+      <field>
+        <name>imp_record_id</name>
+      </field>
+      <field>
+        <name>imp_metadatavalue_id</name>
+      </field>
+      <field>
+        <name>metadata_value</name>
+      </field>
+      <field>
+        <name>metadata_order</name>
+      </field>
+      <field>
+        <name>crisid</name>
+      </field>
+      <field>
+        <name>metadata_authority</name>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>448</xloc>
+      <yloc>832</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1598,6 +1989,48 @@ var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;</jsScript_scri
     </GUI>
   </step>
   <step>
+    <name>add order 2</name>
+    <type>FieldsChangeSequence</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <start>0</start>
+    <increment>1</increment>
+    <resultfieldName>metadata_order</resultfieldName>
+    <fields>
+      <field>
+        <name>schema</name>
+      </field>
+      <field>
+        <name>element</name>
+      </field>
+      <field>
+        <name>qualifier</name>
+      </field>
+      <field>
+        <name>parent_id</name>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>320</xloc>
+      <yloc>944</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
     <name>calculate imp metadata value id</name>
     <type>ScriptValueMod</type>
     <description/>
@@ -1637,8 +2070,62 @@ var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;</jsScript_scri
       </output>
     </remotesteps>
     <GUI>
-      <xloc>400</xloc>
+      <xloc>416</xloc>
       <yloc>736</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>calculate imp metadata value id 2</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;
+var metadata_authority = 'will be referenced::LEGACY_ID::' + pointer_crisid;
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>imp_metadatavalue_id</name>
+        <rename>imp_metadatavalue_id</rename>
+        <type>Integer</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>metadata_authority</name>
+        <rename>metadata_authority</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>448</xloc>
+      <yloc>944</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1730,8 +2217,8 @@ var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;</jsScript_scri
       </output>
     </remotesteps>
     <GUI>
-      <xloc>560</xloc>
-      <yloc>624</yloc>
+      <xloc>512</xloc>
+      <yloc>640</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1834,13 +2321,13 @@ var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;</jsScript_scri
       </output>
     </remotesteps>
     <GUI>
-      <xloc>80</xloc>
-      <yloc>80</yloc>
+      <xloc>64</xloc>
+      <yloc>16</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>cris_projects</name>
+    <name>entities</name>
     <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -1852,12 +2339,12 @@ var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;</jsScript_scri
     </partitioning>
     <connection>openstarts</connection>
     <sql>SELECT *, row_number() OVER () as row_number
-FROM "public".old_cris_project
+FROM "public".${ENTITY_TABLE}
 </sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
+    <variables_active>Y</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
     <cached_row_meta_active>N</cached_row_meta_active>
     <row-meta>
@@ -2084,6 +2571,549 @@ FROM "public".old_cris_project
     </GUI>
   </step>
   <step>
+    <name>entities metadata</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>openstarts</connection>
+    <sql>SELECT properties.parent_id, 
+property_def.shortname,
+values.dtype, 
+values.sortvalue, 
+values.datevalue, 
+values.textvalue, 
+values.linkdescription, 
+values.linkvalue, 
+values.fileextension, 
+values.filefolder, 
+values.filemime, 
+values.filename, 
+values.doublevalue, 
+values.rpvalue, 
+values.projectvalue, 
+values.ouvalue, 
+values.dovalue, 
+values.booleanvalue, 
+values.classificationvalue, 
+values.custompointer,
+row_number() OVER () as row_number
+FROM "public".${ENTITY_PROP} properties, 
+	 "public".${ENTITY_PROP_DEF} property_def,
+	 "public".old_jdyna_values values
+WHERE property_def.id = properties.typo_id
+  AND values.id = properties.value_id;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>Y</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <cached_row_meta_active>N</cached_row_meta_active>
+    <row-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>parent_id</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>entities metadata</origin>
+        <comments>parent_id</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>shortname</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>entities metadata</origin>
+        <comments>shortname</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>dtype</name>
+        <length>31</length>
+        <precision>-1</precision>
+        <origin>entities metadata</origin>
+        <comments>dtype</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>sortvalue</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>entities metadata</origin>
+        <comments>sortvalue</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Timestamp</type>
+        <storagetype>normal</storagetype>
+        <name>datevalue</name>
+        <length>6</length>
+        <precision>-1</precision>
+        <origin>entities metadata</origin>
+        <comments>datevalue</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>textvalue</name>
+        <length>2147483647</length>
+        <precision>-1</precision>
+        <origin>entities metadata</origin>
+        <comments>textvalue</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>linkdescription</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>entities metadata</origin>
+        <comments>linkdescription</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>linkvalue</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>entities metadata</origin>
+        <comments>linkvalue</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>fileextension</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>entities metadata</origin>
+        <comments>fileextension</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>filefolder</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>entities metadata</origin>
+        <comments>filefolder</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>filemime</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>entities metadata</origin>
+        <comments>filemime</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>filename</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>entities metadata</origin>
+        <comments>filename</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Number</type>
+        <storagetype>normal</storagetype>
+        <name>doublevalue</name>
+        <length>-1</length>
+        <precision>-1</precision>
+        <origin>entities metadata</origin>
+        <comments>doublevalue</comments>
+        <conversion_Mask>####0.0#########;-####0.0#########</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>rpvalue</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>entities metadata</origin>
+        <comments>rpvalue</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>projectvalue</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>entities metadata</origin>
+        <comments>projectvalue</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>ouvalue</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>entities metadata</origin>
+        <comments>ouvalue</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>dovalue</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>entities metadata</origin>
+        <comments>dovalue</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Boolean</type>
+        <storagetype>normal</storagetype>
+        <name>booleanvalue</name>
+        <length>-1</length>
+        <precision>-1</precision>
+        <origin>entities metadata</origin>
+        <comments>booleanvalue</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>classificationvalue</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>entities metadata</origin>
+        <comments>classificationvalue</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>custompointer</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>entities metadata</origin>
+        <comments>custompointer</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>row_number</name>
+        <length>15</length>
+        <precision>0</precision>
+        <origin>entities metadata</origin>
+        <comments>row_number</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+    </row-meta>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>80</xloc>
+      <yloc>400</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
     <name>eperson</name>
     <type>TableInput</type>
     <description/>
@@ -2139,7 +3169,7 @@ WHERE email = '${eperson_email}'
       </output>
     </remotesteps>
     <GUI>
-      <xloc>240</xloc>
+      <xloc>384</xloc>
       <yloc>304</yloc>
       <draw>Y</draw>
     </GUI>
@@ -2165,16 +3195,7 @@ WHERE email = '${eperson_email}'
             <negated>N</negated>
             <leftvalue>entity_type</leftvalue>
             <function>=</function>
-            <rightvalue/>
-            <value>
-              <name>constant</name>
-              <type>String</type>
-              <text>Project</text>
-              <length>-1</length>
-              <precision>-1</precision>
-              <isnull>N</isnull>
-              <mask/>
-            </value>
+            <rightvalue>entity_type_var</rightvalue>
           </condition>
         </conditions>
       </condition>
@@ -2188,52 +3209,8 @@ WHERE email = '${eperson_email}'
       </output>
     </remotesteps>
     <GUI>
-      <xloc>224</xloc>
-      <yloc>80</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>filter by entity type 2</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <send_true_to>Join rows 3</send_true_to>
-    <send_false_to/>
-    <compare>
-      <condition>
-        <negated>N</negated>
-        <leftvalue>entity_type</leftvalue>
-        <function>=</function>
-        <rightvalue/>
-        <value>
-          <name>constant</name>
-          <type>String</type>
-          <text>Project</text>
-          <length>-1</length>
-          <precision>-1</precision>
-          <isnull>N</isnull>
-          <mask/>
-        </value>
-      </condition>
-    </compare>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>240</xloc>
-      <yloc>544</yloc>
+      <xloc>208</xloc>
+      <yloc>96</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2264,7 +3241,7 @@ WHERE email = '${eperson_email}'
     </remotesteps>
     <GUI>
       <xloc>384</xloc>
-      <yloc>80</yloc>
+      <yloc>96</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2325,6 +3302,10 @@ WHERE email = '${eperson_email}'
         <column_name>metadata_order</column_name>
         <stream_name>metadata_order</stream_name>
       </field>
+      <field>
+        <column_name>imp_authority</column_name>
+        <stream_name>metadata_authority</stream_name>
+      </field>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -2335,8 +3316,8 @@ WHERE email = '${eperson_email}'
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1120</xloc>
-      <yloc>640</yloc>
+      <xloc>1072</xloc>
+      <yloc>720</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2413,6 +3394,120 @@ WHERE email = '${eperson_email}'
     </GUI>
   </step>
   <step>
+    <name>is date or text</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>calculate imp metadata value id</send_true_to>
+    <send_false_to>is pointer</send_false_to>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <conditions>
+          <condition>
+            <negated>N</negated>
+            <leftvalue>dtype</leftvalue>
+            <function>=</function>
+            <rightvalue/>
+            <value>
+              <name>constant</name>
+              <type>String</type>
+              <text>text</text>
+              <length>-1</length>
+              <precision>-1</precision>
+              <isnull>N</isnull>
+              <mask/>
+            </value>
+          </condition>
+          <condition>
+            <negated>N</negated>
+            <operator>OR</operator>
+            <leftvalue>dtype</leftvalue>
+            <function>=</function>
+            <rightvalue/>
+            <value>
+              <name>constant</name>
+              <type>String</type>
+              <text>date</text>
+              <length>-1</length>
+              <precision>-1</precision>
+              <isnull>N</isnull>
+              <mask/>
+            </value>
+          </condition>
+        </conditions>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>208</xloc>
+      <yloc>736</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>is pointer</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Modified JavaScript value 2</send_true_to>
+    <send_false_to/>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <conditions>
+          <condition>
+            <negated>N</negated>
+            <leftvalue>dtype</leftvalue>
+            <function>ENDS WITH</function>
+            <rightvalue/>
+            <value>
+              <name>constant</name>
+              <type>String</type>
+              <text>pointer</text>
+              <length>-1</length>
+              <precision>-1</precision>
+              <isnull>N</isnull>
+              <mask/>
+            </value>
+          </condition>
+        </conditions>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>48</xloc>
+      <yloc>736</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
     <name>max imp_metadatavalue id</name>
     <type>TableInput</type>
     <description/>
@@ -2467,8 +3562,8 @@ FROM "public".imp_metadatavalue
       </output>
     </remotesteps>
     <GUI>
-      <xloc>64</xloc>
-      <yloc>640</yloc>
+      <xloc>80</xloc>
+      <yloc>624</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2527,7 +3622,7 @@ FROM "public".imp_record
       </output>
     </remotesteps>
     <GUI>
-      <xloc>80</xloc>
+      <xloc>64</xloc>
       <yloc>192</yloc>
       <draw>Y</draw>
     </GUI>
@@ -2663,527 +3758,7 @@ FROM "public".imp_record
     </remotesteps>
     <GUI>
       <xloc>80</xloc>
-      <yloc>544</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>project metadata</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>openstarts</connection>
-    <sql>SELECT properties.parent_id, 
-property_def.shortname,
-values.dtype, 
-values.sortvalue, 
-values.datevalue, 
-values.textvalue, 
-values.linkdescription, 
-values.linkvalue, 
-values.fileextension, 
-values.filefolder, 
-values.filemime, 
-values.filename, 
-values.doublevalue, 
-values.rpvalue, 
-values.projectvalue, 
-values.ouvalue, 
-values.dovalue, 
-values.booleanvalue, 
-values.classificationvalue, 
-values.custompointer,
-row_number() OVER () as row_number
-FROM old_cris_pj_prop properties, 
-	 old_cris_pj_pdef property_def,
-	 old_jdyna_values values
-WHERE property_def.id = properties.typo_id
-  AND values.id = properties.value_id;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-    <cached_row_meta_active>N</cached_row_meta_active>
-    <row-meta>
-      <value-meta>
-        <type>Integer</type>
-        <storagetype>normal</storagetype>
-        <name>parent_id</name>
-        <length>9</length>
-        <precision>0</precision>
-        <origin>project metadata</origin>
-        <comments>parent_id</comments>
-        <conversion_Mask>####0;-####0</conversion_Mask>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>shortname</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>project metadata</origin>
-        <comments>shortname</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>dtype</name>
-        <length>31</length>
-        <precision>-1</precision>
-        <origin>project metadata</origin>
-        <comments>dtype</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>sortvalue</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>project metadata</origin>
-        <comments>sortvalue</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Timestamp</type>
-        <storagetype>normal</storagetype>
-        <name>datevalue</name>
-        <length>6</length>
-        <precision>-1</precision>
-        <origin>project metadata</origin>
-        <comments>datevalue</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>textvalue</name>
-        <length>2147483647</length>
-        <precision>-1</precision>
-        <origin>project metadata</origin>
-        <comments>textvalue</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>linkdescription</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>project metadata</origin>
-        <comments>linkdescription</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>linkvalue</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>project metadata</origin>
-        <comments>linkvalue</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>fileextension</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>project metadata</origin>
-        <comments>fileextension</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>filefolder</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>project metadata</origin>
-        <comments>filefolder</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>filemime</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>project metadata</origin>
-        <comments>filemime</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>filename</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>project metadata</origin>
-        <comments>filename</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Number</type>
-        <storagetype>normal</storagetype>
-        <name>doublevalue</name>
-        <length>-1</length>
-        <precision>-1</precision>
-        <origin>project metadata</origin>
-        <comments>doublevalue</comments>
-        <conversion_Mask>####0.0#########;-####0.0#########</conversion_Mask>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Integer</type>
-        <storagetype>normal</storagetype>
-        <name>rpvalue</name>
-        <length>9</length>
-        <precision>0</precision>
-        <origin>project metadata</origin>
-        <comments>rpvalue</comments>
-        <conversion_Mask>####0;-####0</conversion_Mask>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Integer</type>
-        <storagetype>normal</storagetype>
-        <name>projectvalue</name>
-        <length>9</length>
-        <precision>0</precision>
-        <origin>project metadata</origin>
-        <comments>projectvalue</comments>
-        <conversion_Mask>####0;-####0</conversion_Mask>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Integer</type>
-        <storagetype>normal</storagetype>
-        <name>ouvalue</name>
-        <length>9</length>
-        <precision>0</precision>
-        <origin>project metadata</origin>
-        <comments>ouvalue</comments>
-        <conversion_Mask>####0;-####0</conversion_Mask>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Integer</type>
-        <storagetype>normal</storagetype>
-        <name>dovalue</name>
-        <length>9</length>
-        <precision>0</precision>
-        <origin>project metadata</origin>
-        <comments>dovalue</comments>
-        <conversion_Mask>####0;-####0</conversion_Mask>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Boolean</type>
-        <storagetype>normal</storagetype>
-        <name>booleanvalue</name>
-        <length>-1</length>
-        <precision>-1</precision>
-        <origin>project metadata</origin>
-        <comments>booleanvalue</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Integer</type>
-        <storagetype>normal</storagetype>
-        <name>classificationvalue</name>
-        <length>9</length>
-        <precision>0</precision>
-        <origin>project metadata</origin>
-        <comments>classificationvalue</comments>
-        <conversion_Mask>####0;-####0</conversion_Mask>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Integer</type>
-        <storagetype>normal</storagetype>
-        <name>custompointer</name>
-        <length>9</length>
-        <precision>0</precision>
-        <origin>project metadata</origin>
-        <comments>custompointer</comments>
-        <conversion_Mask>####0;-####0</conversion_Mask>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-    </row-meta>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>80</xloc>
-      <yloc>400</yloc>
+      <yloc>528</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3235,8 +3810,8 @@ WHERE property_def.id = properties.typo_id
     </GUI>
   </step>
   <step>
-    <name>is date or text</name>
-    <type>FilterRows</type>
+    <name>Get variables</name>
+    <type>GetVariable</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -3245,158 +3820,18 @@ WHERE property_def.id = properties.typo_id
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <send_true_to>calculate imp metadata value id</send_true_to>
-    <send_false_to>is pointer</send_false_to>
-    <compare>
-      <condition>
-        <negated>N</negated>
-        <conditions>
-          <condition>
-            <negated>N</negated>
-            <leftvalue>dtype</leftvalue>
-            <function>=</function>
-            <rightvalue/>
-            <value>
-              <name>constant</name>
-              <type>String</type>
-              <text>text</text>
-              <length>-1</length>
-              <precision>-1</precision>
-              <isnull>N</isnull>
-              <mask/>
-            </value>
-          </condition>
-          <condition>
-            <negated>N</negated>
-            <operator>OR</operator>
-            <leftvalue>dtype</leftvalue>
-            <function>=</function>
-            <rightvalue/>
-            <value>
-              <name>constant</name>
-              <type>String</type>
-              <text>date</text>
-              <length>-1</length>
-              <precision>-1</precision>
-              <isnull>N</isnull>
-              <mask/>
-            </value>
-          </condition>
-        </conditions>
-      </condition>
-    </compare>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>224</xloc>
-      <yloc>736</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>is pointer</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <send_true_to>Modified JavaScript value 2</send_true_to>
-    <send_false_to/>
-    <compare>
-      <condition>
-        <negated>N</negated>
-        <conditions>
-          <condition>
-            <negated>N</negated>
-            <leftvalue>dtype</leftvalue>
-            <function>ENDS WITH</function>
-            <rightvalue/>
-            <value>
-              <name>constant</name>
-              <type>String</type>
-              <text>pointer</text>
-              <length>-1</length>
-              <precision>-1</precision>
-              <isnull>N</isnull>
-              <mask/>
-            </value>
-          </condition>
-        </conditions>
-      </condition>
-    </compare>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>112</xloc>
-      <yloc>864</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Modified JavaScript value 2</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>var entityPrefix = dtype.replace("pointer", "");
-if(entityPrefix == 'ou'){
-	var pointer_id = ouvalue;
-	var pointer_table = 'old_cris_orgunit';
-} else if(entityPrefix == 'do'){
-	var pointer_id = dovalue;
-	var pointer_table = 'old_cris_do';
-} else if(entityPrefix == 'project'){
-	var pointer_id = projectvalue;
-	var pointer_table = 'old_cris_project';
-}  else if(entityPrefix == 'rp'){
-	var pointer_id = rpvalue;
-	var pointer_table = 'old_cris_rpage';
-} </jsScript_script>
-      </jsScript>
-    </jsScripts>
     <fields>
       <field>
-        <name>pointer_id</name>
-        <rename>pointer_id</rename>
+        <name>entity_type_var</name>
+        <variable>${ENTITY_TYPE}</variable>
         <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
         <length>-1</length>
         <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-      <field>
-        <name>pointer_table</name>
-        <rename>pointer_table</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
+        <trim_type>none</trim_type>
       </field>
     </fields>
     <attributes/>
@@ -3408,14 +3843,14 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>112</xloc>
-      <yloc>992</yloc>
+      <xloc>64</xloc>
+      <yloc>96</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Database join</name>
-    <type>DBJoin</type>
+    <name>filter by entity type 3</name>
+    <type>FilterRows</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -3424,31 +3859,21 @@ if(entityPrefix == 'ou'){
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>openstarts</connection>
-    <rowlimit>1</rowlimit>
-    <sql>SELECT subquery.crisid
-from (
-SELECT ou.id, ou.crisid, 'old_cris_orgunit' table_name FROM old_cris_orgunit ou
-UNION ALL
-SELECT pj.id, pj.crisid, 'old_cris_project' table_name FROM old_cris_project pj	 
-UNION ALL
-SELECT d.id, d.crisid, 'old_cris_do' table_name FROM old_cris_do d	 
-UNION ALL
-SELECT rp.id, rp.crisid, 'old_cris_rpage' table_name FROM old_cris_rpage rp	 
-) as subquery
-WHERE subquery.table_name = ? AND subquery.id = ?;</sql>
-    <outer_join>N</outer_join>
-    <replace_vars>Y</replace_vars>
-    <parameter>
-      <field>
-        <name>pointer_table</name>
-        <type>String</type>
-      </field>
-      <field>
-        <name>pointer_id</name>
-        <type>String</type>
-      </field>
-    </parameter>
+    <send_true_to>Join rows 3</send_true_to>
+    <send_false_to/>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <conditions>
+          <condition>
+            <negated>N</negated>
+            <leftvalue>entity_type</leftvalue>
+            <function>=</function>
+            <rightvalue>entity_type_var</rightvalue>
+          </condition>
+        </conditions>
+      </condition>
+    </compare>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -3458,8 +3883,47 @@ WHERE subquery.table_name = ? AND subquery.id = ?;</sql>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>272</xloc>
-      <yloc>992</yloc>
+      <xloc>288</xloc>
+      <yloc>528</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Get variables 2</name>
+    <type>GetVariable</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>entity_type_var</name>
+        <variable>${ENTITY_TYPE}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>192</xloc>
+      <yloc>448</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
