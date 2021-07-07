@@ -122,14 +122,16 @@
                 <div class="col-sm-8">
                     <xsl:choose>
                         <xsl:when test="//mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE']/mets:file">
-                            <xsl:call-template name="itemSummaryView-DIM-description"/>
                             <xsl:call-template name="itemSummaryView-DIM-citation"/>
                             <xsl:call-template name="itemSummaryView-DIM-abstract"/>
+                            <xsl:call-template name="itemSummaryView-DIM-description"/>
+                            <xsl:text> has file </xsl:text>
                         </xsl:when>
                         <xsl:otherwise>
+                            <xsl:call-template name="itemSummaryView-DIM-description"/>
                             <xsl:call-template name="itemSummaryView-DIM-citation"/>
                             <xsl:call-template name="itemSummaryView-DIM-abstract"/>
-                            <xsl:call-template name="itemSummaryView-DIM-description"/>
+                            <xsl:text> no file </xsl:text>
                         </xsl:otherwise>
                     </xsl:choose>
                     <xsl:call-template name="itemSummaryView-DIM-hasparts"/>
