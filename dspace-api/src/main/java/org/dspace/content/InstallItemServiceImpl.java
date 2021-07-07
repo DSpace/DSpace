@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -22,6 +23,8 @@ import org.dspace.embargo.service.EmbargoService;
 import org.dspace.event.Event;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -73,6 +76,8 @@ public class InstallItemServiceImpl implements InstallItemService
         } catch (IdentifierException e) {
             throw new RuntimeException("Can't create an Identifier!", e);
         }
+
+        cleanHtmlOnItem(item);
 
         populateMetadata(c, item);
 
@@ -259,5 +264,30 @@ public class InstallItemServiceImpl implements InstallItemService
         }
 
         return myMessage.toString();
+    }
+
+    private void cleanHtmlOnItem(Item item) {
+        List<MetadataValue> titleList = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        for (MetadataValue metadata : titleList) {
+            String cleanedString = Jsoup.clean(metadata.getValue(), Whitelist.basic());
+            cleanedString = StringUtils.replace(cleanedString, "&amp;", "&");
+            cleanedString = StringUtils.replace(cleanedString, "&gt;", ">");
+            cleanedString = StringUtils.replace(cleanedString, "&lt;", "<");
+            metadata.setValue(cleanedString);
+        }
+        item.setMetadata(titleList);
+        cleanHtmlOnMetadataValue(item, "contributor", "author");
+        cleanHtmlOnMetadataValue(item, "contributor", "editor");
+        cleanHtmlOnMetadataValue(item, "contributor", "advisor");
+        cleanHtmlOnMetadataValue(item, "author", null);
+    }
+
+    private void cleanHtmlOnMetadataValue(Item item, String element, String qualifier) {
+        List<MetadataValue> metadataValueList = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, element, qualifier, Item.ANY);
+        for (MetadataValue metadata : metadataValueList) {
+            String cleanedString = Jsoup.clean(metadata.getValue(), Whitelist.basic());
+            metadata.setValue(cleanedString);
+        }
+        item.setMetadata(metadataValueList);
     }
 }
