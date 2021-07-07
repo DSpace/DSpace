@@ -39,15 +39,15 @@ pipeline {
                         timeout(activity: true, time: 120, unit: 'SECONDS') {
                             inputResult = input(id: 'phaseInput', message: 'Velg parametre', parameters: [
                                     choice(choices: ["produksjon", "utvikle", "test"], name: 'devstep', description: 'Utviklingsfase:'),
-                                    choice(choices: kunder, name: 'kunde', description: "Kunde:")
+                                    choice(choices: kunder, name: 'kunde', description: "Kunde:"),
+                                    choice(choices: ["#brage", "#sandbox_playground"], name: 'slackchannel', description: "Slack kanal for output:")
                             ])
                         }
                     } catch (err) {
                         echo "Release aborted"
                         throw err
                     }
-					if ( inputResult.devstep == 'produksjon' )
-						SLACK_CHANNEL = '#brage'
+					SLACK_CHANNEL = inputResult.slackchannel
 					slackSend channel: SLACK_CHANNEL, iconEmoji: ':information_source:', message: 'Deployment av Brage-instans `' + inputResult.kunde + '` på *' + inputResult.devstep + '* starter', username: 'BrageDeployment', tokenCredentialId: 'brage_slack', teamDomain: 'unit-norge'
                 }
             }
