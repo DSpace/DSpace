@@ -499,7 +499,7 @@
   <order>
     <hop>
       <from>max imp_record id</from>
-      <to>1 if null</to>
+      <to>0 if null</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -508,18 +508,13 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>1 if null</from>
+      <from>0 if null</from>
       <to>Join rows</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
       <from>Join rows</from>
       <to>calculate imp record id</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>filter by entity type</from>
-      <to>get only collection uuid</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -549,7 +544,7 @@
     </hop>
     <hop>
       <from>max imp_metadatavalue id</from>
-      <to>1 if id is null</to>
+      <to>0 if null (2)</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -558,7 +553,7 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>1 if id is null</from>
+      <from>0 if null (2)</from>
       <to>Join rows 3</to>
       <enabled>Y</enabled>
     </hop>
@@ -570,11 +565,6 @@
     <hop>
       <from>valid metadata field</from>
       <to>add order</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Select values 2</from>
-      <to>Select values 2 2</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -620,16 +610,6 @@
     <hop>
       <from>Modified JavaScript value</from>
       <to>Select values 2 3</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Select values 2 3</from>
-      <to>Append streams</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Select values 2</from>
-      <to>Select values 2 4</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -708,16 +688,6 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Select values 2 3 2</from>
-      <to>Append streams 2</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>collections config</from>
-      <to>Get variables</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Get variables 2</from>
       <to>filter by entity type 3</to>
       <enabled>Y</enabled>
@@ -757,49 +727,79 @@
       <to>Join rows 2</to>
       <enabled>Y</enabled>
     </hop>
+    <hop>
+      <from>Select values 2 3 2</from>
+      <to>Append streams</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Append streams</from>
+      <to>Select values 2 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Append streams</from>
+      <to>Select values 2 4</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Select values 2 3</from>
+      <to>Append streams 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>is pointer</from>
+      <to>is file</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>is file</from>
+      <to>Calculate file path</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>max imp_bitstream id</from>
+      <to>0 if null (3)</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Calculate file path</from>
+      <to>Join rows 4</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>0 if null (3)</from>
+      <to>Join rows 4</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>calculate imp bitstream id</from>
+      <to>insert into imp_bitstream</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Join rows 4</from>
+      <to>Add row number 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Add row number 2</from>
+      <to>calculate imp bitstream id</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>filter by entity type</from>
+      <to>get only collection uuid</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>collections config</from>
+      <to>Get variables</to>
+      <enabled>Y</enabled>
+    </hop>
   </order>
   <step>
-    <name>1 if id is null</name>
-    <type>IfNull</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <replaceAllByValue/>
-    <replaceAllMask/>
-    <selectFields>Y</selectFields>
-    <selectValuesType>N</selectValuesType>
-    <setEmptyStringAll>N</setEmptyStringAll>
-    <valuetypes>
-      </valuetypes>
-    <fields>
-      <field>
-        <name>max_imp_metadatavalue_id</name>
-        <value>0</value>
-        <mask/>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>224</xloc>
-      <yloc>624</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>1 if null</name>
+    <name>0 if null</name>
     <type>IfNull</type>
     <description/>
     <distribute>Y</distribute>
@@ -835,6 +835,86 @@
     <GUI>
       <xloc>224</xloc>
       <yloc>192</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>0 if null (2)</name>
+    <type>IfNull</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <replaceAllByValue/>
+    <replaceAllMask/>
+    <selectFields>Y</selectFields>
+    <selectValuesType>N</selectValuesType>
+    <setEmptyStringAll>N</setEmptyStringAll>
+    <valuetypes>
+      </valuetypes>
+    <fields>
+      <field>
+        <name>max_imp_metadatavalue_id</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>256</xloc>
+      <yloc>624</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>0 if null (3)</name>
+    <type>IfNull</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <replaceAllByValue/>
+    <replaceAllMask/>
+    <selectFields>Y</selectFields>
+    <selectValuesType>N</selectValuesType>
+    <setEmptyStringAll>N</setEmptyStringAll>
+    <valuetypes>
+      </valuetypes>
+    <fields>
+      <field>
+        <name>max_imp_bitstream_id</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>256</xloc>
+      <yloc>1120</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -908,7 +988,7 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>944</xloc>
+      <xloc>1168</xloc>
       <yloc>992</yloc>
       <draw>Y</draw>
     </GUI>
@@ -982,14 +1062,14 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>608</xloc>
+      <xloc>800</xloc>
       <yloc>992</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Append streams</name>
-    <type>Append</type>
+    <name>Add row number 2</name>
+    <type>Sequence</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -998,8 +1078,43 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
+    <valuename>row_number</valuename>
+    <use_database>N</use_database>
+    <connection>openstarts</connection>
+    <schema/>
+    <seqname>SEQ_</seqname>
+    <use_counter>Y</use_counter>
+    <counter_name/>
+    <start_at>1</start_at>
+    <increment_by>1</increment_by>
+    <max_value>999999999</max_value>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>608</xloc>
+      <yloc>1024</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Append streams</name>
+    <type>Append</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <head_name>Select values 2</head_name>
-    <tail_name>Select values 2 3</tail_name>
+    <tail_name>Select values 2 3 2</tail_name>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -1026,7 +1141,7 @@
       <schema_name/>
     </partitioning>
     <head_name>Append streams</head_name>
-    <tail_name>Select values 2 3 2</tail_name>
+    <tail_name>Select values 2 3</tail_name>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -1036,8 +1151,62 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1040</xloc>
+      <xloc>1168</xloc>
       <yloc>640</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Calculate file path</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>
+var file_main_dir = 'do-files';
+if(entity_type_var == 'OrgUnit'){
+   file_main_dir = 'ou-files';
+} else if(entity_type_var == 'Project'){
+   file_main_dir = 'pj-files';
+} else if(entity_type_var == 'Person'){
+   file_main_dir = 'rp-files';
+}
+
+var file_path = getVariable('file_root','') + '/' + file_main_dir + '/' + filefolder + '/' + filename + '.' + fileextension;</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>file_path</name>
+        <rename>file_path</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>272</xloc>
+      <yloc>1024</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1067,8 +1236,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>624</xloc>
-      <yloc>80</yloc>
+      <xloc>608</xloc>
+      <yloc>32</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1117,8 +1286,8 @@ WHERE subquery.table_name = ? AND subquery.id = ?;</sql>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>48</xloc>
-      <yloc>944</yloc>
+      <xloc>336</xloc>
+      <yloc>832</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1207,8 +1376,86 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>176</xloc>
-      <yloc>944</yloc>
+      <xloc>336</xloc>
+      <yloc>928</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Get variables</name>
+    <type>GetVariable</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>entity_type_var</name>
+        <variable>${ENTITY_TYPE}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>192</xloc>
+      <yloc>96</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Get variables 2</name>
+    <type>GetVariable</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>entity_type_var</name>
+        <variable>${ENTITY_TYPE}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>256</xloc>
+      <yloc>464</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1281,7 +1528,7 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>768</xloc>
+      <xloc>960</xloc>
       <yloc>992</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1319,7 +1566,7 @@ WHERE property_def.id = properties.typo_id
     </remotesteps>
     <GUI>
       <xloc>464</xloc>
-      <yloc>400</yloc>
+      <yloc>384</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1356,7 +1603,44 @@ WHERE property_def.id = properties.typo_id
     </remotesteps>
     <GUI>
       <xloc>464</xloc>
-      <yloc>528</yloc>
+      <yloc>544</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Join rows 4</name>
+    <type>JoinRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <cache_size>500</cache_size>
+    <main>cris_projects</main>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue/>
+        <function>=</function>
+        <rightvalue/>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>432</xloc>
+      <yloc>1024</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1398,8 +1682,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>768</xloc>
-      <yloc>880</yloc>
+      <xloc>960</xloc>
+      <yloc>864</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1460,7 +1744,7 @@ var metadata_authority = null;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>944</xloc>
+      <xloc>1168</xloc>
       <yloc>896</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1631,7 +1915,7 @@ if(entityPrefix == 'ou'){
     </remotesteps>
     <GUI>
       <xloc>848</xloc>
-      <yloc>400</yloc>
+      <yloc>384</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1719,7 +2003,7 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>608</xloc>
+      <xloc>800</xloc>
       <yloc>752</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1774,7 +2058,7 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>944</xloc>
+      <xloc>1168</xloc>
       <yloc>784</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1829,8 +2113,8 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>448</xloc>
-      <yloc>832</yloc>
+      <xloc>624</xloc>
+      <yloc>736</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1860,7 +2144,7 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>768</xloc>
+      <xloc>960</xloc>
       <yloc>752</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1902,7 +2186,7 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>608</xloc>
+      <xloc>800</xloc>
       <yloc>832</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1941,7 +2225,7 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>608</xloc>
+      <xloc>800</xloc>
       <yloc>912</yloc>
       <draw>Y</draw>
     </GUI>
@@ -2025,8 +2309,53 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>320</xloc>
-      <yloc>944</yloc>
+      <xloc>512</xloc>
+      <yloc>928</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>calculate imp bitstream id</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var imp_bitstream_id = max_imp_bitstream_id + row_number;
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>imp_bitstream_id</name>
+        <rename>imp_bitstream_id</rename>
+        <type>Integer</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>608</xloc>
+      <yloc>1120</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2124,8 +2453,8 @@ var metadata_authority = 'will be referenced::LEGACY_ID::' + pointer_crisid;
       </output>
     </remotesteps>
     <GUI>
-      <xloc>448</xloc>
-      <yloc>944</yloc>
+      <xloc>512</xloc>
+      <yloc>832</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2322,7 +2651,7 @@ var metadata_authority = 'will be referenced::LEGACY_ID::' + pointer_crisid;
     </remotesteps>
     <GUI>
       <xloc>64</xloc>
-      <yloc>16</yloc>
+      <yloc>96</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2340,6 +2669,7 @@ var metadata_authority = 'will be referenced::LEGACY_ID::' + pointer_crisid;
     <connection>openstarts</connection>
     <sql>SELECT *, row_number() OVER () as row_number
 FROM "public".${ENTITY_TABLE}
+WHERE ${ENTITY_FILTER}
 </sql>
     <limit>0</limit>
     <lookup/>
@@ -2565,8 +2895,8 @@ FROM "public".${ENTITY_TABLE}
       </output>
     </remotesteps>
     <GUI>
-      <xloc>80</xloc>
-      <yloc>304</yloc>
+      <xloc>64</xloc>
+      <yloc>288</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3108,8 +3438,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>80</xloc>
-      <yloc>400</yloc>
+      <xloc>64</xloc>
+      <yloc>384</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3209,8 +3539,48 @@ WHERE email = '${eperson_email}'
       </output>
     </remotesteps>
     <GUI>
-      <xloc>208</xloc>
-      <yloc>96</yloc>
+      <xloc>192</xloc>
+      <yloc>16</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>filter by entity type 3</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Join rows 3</send_true_to>
+    <send_false_to/>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <conditions>
+          <condition>
+            <negated>N</negated>
+            <leftvalue>entity_type</leftvalue>
+            <function>=</function>
+            <rightvalue>entity_type_var</rightvalue>
+          </condition>
+        </conditions>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>256</xloc>
+      <yloc>544</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3241,7 +3611,67 @@ WHERE email = '${eperson_email}'
     </remotesteps>
     <GUI>
       <xloc>384</xloc>
-      <yloc>96</yloc>
+      <yloc>16</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>insert into imp_bitstream</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>openstarts</connection>
+    <schema>public</schema>
+    <table>imp_bitstream</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+      <field>
+        <column_name>imp_id</column_name>
+        <stream_name>imp_record_id</stream_name>
+      </field>
+      <field>
+        <column_name>filepath</column_name>
+        <stream_name>file_path</stream_name>
+      </field>
+      <field>
+        <column_name>imp_bitstream_id</column_name>
+        <stream_name>imp_bitstream_id</stream_name>
+      </field>
+      <field>
+        <column_name>name</column_name>
+        <stream_name>filename</stream_name>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>800</xloc>
+      <yloc>1120</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3316,8 +3746,8 @@ WHERE email = '${eperson_email}'
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1072</xloc>
-      <yloc>720</yloc>
+      <xloc>1344</xloc>
+      <yloc>640</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3453,8 +3883,57 @@ WHERE email = '${eperson_email}'
       </output>
     </remotesteps>
     <GUI>
-      <xloc>208</xloc>
+      <xloc>224</xloc>
       <yloc>736</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>is file</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Calculate file path</send_true_to>
+    <send_false_to/>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <conditions>
+          <condition>
+            <negated>N</negated>
+            <leftvalue>dtype</leftvalue>
+            <function>=</function>
+            <rightvalue/>
+            <value>
+              <name>constant</name>
+              <type>String</type>
+              <text>file</text>
+              <length>-1</length>
+              <precision>-1</precision>
+              <isnull>N</isnull>
+              <mask/>
+            </value>
+          </condition>
+        </conditions>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>64</xloc>
+      <yloc>1024</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3470,7 +3949,7 @@ WHERE email = '${eperson_email}'
       <schema_name/>
     </partitioning>
     <send_true_to>Modified JavaScript value 2</send_true_to>
-    <send_false_to/>
+    <send_false_to>is file</send_false_to>
     <compare>
       <condition>
         <negated>N</negated>
@@ -3502,8 +3981,68 @@ WHERE email = '${eperson_email}'
       </output>
     </remotesteps>
     <GUI>
-      <xloc>48</xloc>
+      <xloc>64</xloc>
       <yloc>736</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>max imp_bitstream id</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>openstarts</connection>
+    <sql>SELECT max(imp_bitstream_id) as max_imp_bitstream_id
+FROM "public".imp_bitstream
+</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <cached_row_meta_active>N</cached_row_meta_active>
+    <row-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>max_imp_bitstream_id</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>max imp_metadatavalue id 3</origin>
+        <comments>max_imp_bitstream_id</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+    </row-meta>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>64</xloc>
+      <yloc>1120</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3562,7 +4101,7 @@ FROM "public".imp_metadatavalue
       </output>
     </remotesteps>
     <GUI>
-      <xloc>80</xloc>
+      <xloc>64</xloc>
       <yloc>624</yloc>
       <draw>Y</draw>
     </GUI>
@@ -3757,8 +4296,8 @@ FROM "public".imp_record
       </output>
     </remotesteps>
     <GUI>
-      <xloc>80</xloc>
-      <yloc>528</yloc>
+      <xloc>64</xloc>
+      <yloc>464</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3806,124 +4345,6 @@ FROM "public".imp_record
     <GUI>
       <xloc>592</xloc>
       <yloc>544</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Get variables</name>
-    <type>GetVariable</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <name>entity_type_var</name>
-        <variable>${ENTITY_TYPE}</variable>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>64</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>filter by entity type 3</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <send_true_to>Join rows 3</send_true_to>
-    <send_false_to/>
-    <compare>
-      <condition>
-        <negated>N</negated>
-        <conditions>
-          <condition>
-            <negated>N</negated>
-            <leftvalue>entity_type</leftvalue>
-            <function>=</function>
-            <rightvalue>entity_type_var</rightvalue>
-          </condition>
-        </conditions>
-      </condition>
-    </compare>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>288</xloc>
-      <yloc>528</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Get variables 2</name>
-    <type>GetVariable</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <name>entity_type_var</name>
-        <variable>${ENTITY_TYPE}</variable>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>192</xloc>
-      <yloc>448</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
