@@ -115,6 +115,11 @@ public class Utils {
      */
     private static final int EMBED_MAX_LEVELS = 10;
 
+    /**
+     * The key for the query parameter for projection
+     */
+    public static final String PROJECTION_PARAM_NAME = "projection";
+
     @Autowired
     ApplicationContext applicationContext;
 
@@ -551,7 +556,7 @@ public class Utils {
      */
     public Projection obtainProjection() {
         ServletRequest servletRequest = requestService.getCurrentRequest().getServletRequest();
-        List<String> projectionNames = getValues(servletRequest, "projection");
+        List<String> projectionNames = getValues(servletRequest, PROJECTION_PARAM_NAME);
         Set<String> embedRels = new HashSet<>(getValues(servletRequest, "embed"));
 
         List<Projection> projections = new ArrayList<>();

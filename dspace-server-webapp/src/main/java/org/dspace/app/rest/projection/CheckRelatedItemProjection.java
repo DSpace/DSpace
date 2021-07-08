@@ -7,8 +7,14 @@
  */
 package org.dspace.app.rest.projection;
 
+import static org.dspace.app.rest.utils.Utils.PROJECTION_PARAM_NAME;
+
+import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.servlet.ServletRequest;
@@ -18,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -241,6 +248,19 @@ public class CheckRelatedItemProjection extends AbstractProjection {
         }
 
         return mdvs.get(0).getValue();
+    }
+
+    @Override
+    public Map<String, List<String>> getProjectionParametersForHalLink(LinkRestRepository linkRestRepository,
+        Method method) {
+
+        Map<String, List<String>> mapProjectionParams = new HashMap<>();
+        // Projection section of links ex:
+        // projection=CheckRelatedItem&checkRelatedItem=isAuthorOfPublication=b1b2c768-bda1-448a-a073-fc541e8b24d9
+        mapProjectionParams.put(PROJECTION_PARAM_NAME, Arrays.asList(PROJECTION_NAME));
+        ServletRequest servletRequest = requestService.getCurrentRequest().getServletRequest();
+        mapProjectionParams.put(PARAM_NAME, Arrays.asList(servletRequest.getParameterValues(PARAM_NAME)));
+        return mapProjectionParams;
     }
 
 }

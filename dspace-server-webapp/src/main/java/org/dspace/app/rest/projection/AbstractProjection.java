@@ -7,10 +7,16 @@
  */
 package org.dspace.app.rest.projection;
 
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.app.rest.repository.LinkRestRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.Link;
 
@@ -51,6 +57,12 @@ public abstract class AbstractProjection implements Projection {
     public PageRequest getPagingOptions(String rel, HALResource<? extends RestAddressableModel> resource,
                                         Link... oldLinks) {
         return null;
+    }
+
+    @Override
+    public Map<String, List<String>> getProjectionParametersForHalLink(LinkRestRepository linkRestRepository,
+        Method method) {
+        return new HashMap<>();
     }
 
 }
