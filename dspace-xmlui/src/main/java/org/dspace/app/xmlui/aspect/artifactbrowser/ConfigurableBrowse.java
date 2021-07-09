@@ -492,11 +492,11 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
             jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), Character
                     .toString(c));
-            c = 'Ø';
+            c = 'Å';
             letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
             jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), Character
                     .toString(c));
-            c = 'Å';
+            c = 'Ø';
             letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
             jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), Character
                     .toString(c));
