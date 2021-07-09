@@ -11,6 +11,8 @@ pipeline {
 		SLACK_CHANNEL = '#sandbox_playground'
     }
 
+    options { buildDiscarder(logRotator(numToKeepStr: '5')) }
+
     stages {
 
         stage('Checkout Brage6 customizations') {
