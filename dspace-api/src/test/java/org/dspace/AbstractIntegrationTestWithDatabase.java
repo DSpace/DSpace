@@ -124,6 +124,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                 eperson.setCanLogIn(true);
                 eperson.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
                 ePersonService.setPassword(eperson, password);
+
                 // actually save the eperson to unit testing DB
                 ePersonService.update(context, eperson);
             }

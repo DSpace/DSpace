@@ -291,9 +291,6 @@ public class MetadataValue implements ReloadableEntity<Integer> {
     }
 
     public void setSecurity_level(Integer security_level) {
-        if (!(security_level == null || security_level == 0 || security_level == 1 || security_level == 2)) {
-            throw new IllegalArgumentException("Wrong value of security_level");
-        }
         this.securityLevel = security_level;
     }
 }

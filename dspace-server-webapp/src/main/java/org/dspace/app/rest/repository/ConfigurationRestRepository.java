@@ -52,7 +52,7 @@ public class ConfigurationRestRepository extends DSpaceRestRepository<PropertyRe
      * @return
      */
     @Override
-    @PreAuthorize("permitAll()")
+//    @PreAuthorize("permitAll()")
     public PropertyRest findOne(Context context, String property) {
         if (!exposedProperties.contains(property) || !configurationService.hasProperty(property)) {
             // TODO for the moment let the configurations of metadatas not exposed

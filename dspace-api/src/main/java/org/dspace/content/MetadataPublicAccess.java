@@ -7,7 +7,7 @@ import org.dspace.core.Context;
  * @author Alba Aliu
  */
 
-public class MetadataSecurityEvaluationLevel0 implements MetadataSecurityEvaluation {
+public class MetadataPublicAccess implements MetadataSecurityEvaluation {
     /**
      *
      * @return true/false if the user can/'t see the metadata

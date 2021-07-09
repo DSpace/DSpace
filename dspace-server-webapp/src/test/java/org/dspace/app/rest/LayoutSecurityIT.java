@@ -14,7 +14,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 
@@ -2160,7 +2163,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         // An admin can see the dc.description.abstract metadata
         getClient(tokenAdmin).perform(get("/api/core/items/" + itemA.getID()))
                  .andExpect(status().isOk())
-                 .andExpect(jsonPath("$.metadata['dc.description.abstract'].[0].value", is ("A secured abstract")))
+                 .andExpect(jsonPath("$.metadata['dc.date.accessioned'].[0].value", is ("A secured abstract")))
                  .andExpect(jsonPath("$.metadata['crisrp.education'].[0].value", is ("School")))
                  .andExpect(jsonPath("$.metadata['crisrp.education.start'].[0].value", is ("2010-09-15")))
                  .andExpect(jsonPath("$.metadata['crisrp.education.end'].[0].value", is ("2015-06-24")))
@@ -2292,6 +2295,12 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
     @Test
     public void configurationContainMetadataSecuritySecondLevel() throws Exception {
         context.turnOffAuthorisationSystem();
+        Group group = groupService.create(context);
+        groupService.setName(group, "Trusted");
+        eperson.getGroups().add(group);
+        ePersonService.update(context, eperson);
+        context.getCurrentUser().getGroups().add(group);
+
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
@@ -2316,11 +2325,8 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                 .withStyle("STYLE")
                 .withBox(box1)
                 .build();
-        Group group = groupService.create(context);
-        groupService.setName(group, "Trusted");
-        eperson.getGroups().add(group);
-        ePersonService.update(context, eperson);
-        context.restoreAuthSystemState();
+
+//        context.restoreAuthSystemState();
         String tokenEperson = getAuthToken(ePersonService.find(context, eperson.getID()).getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         // An admin can see the dc.description.abstract metadata

@@ -65,7 +65,7 @@ public class ItemConverter
     private ItemService itemService;
 
     @Resource(name = "securityLevelsMap")
-    Map<String, MetadataSecurityEvaluation> securityLevelsMap = new HashMap<>();
+    private final Map<String, MetadataSecurityEvaluation> securityLevelsMap = new HashMap<>();
 
     @Autowired
     private CrisLayoutBoxService crisLayoutBoxService;

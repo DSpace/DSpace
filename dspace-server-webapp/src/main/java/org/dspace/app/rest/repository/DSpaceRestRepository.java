@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -123,7 +122,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      *            the rest object id
      * @return the REST object identified by its ID
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PreAuthorize("hasAuthority('ADMIN')")
     public abstract T findOne(Context context, ID id);
 
     @Override
