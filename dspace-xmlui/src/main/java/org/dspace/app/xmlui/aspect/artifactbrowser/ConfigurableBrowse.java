@@ -488,18 +488,15 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), Character
                         .toString(c));
             }
-            char c = 'Æ';
-            letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
-            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), Character
-                    .toString(c));
-            c = 'Ø';
-            letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
-            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), Character
-                    .toString(c));
-            c = 'Å';
-            letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
-            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), Character
-                    .toString(c));
+            String c = "Æ";
+            letterQuery.put(BrowseParams.STARTS_WITH, c);
+            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), c);
+            c = "Ø";
+            letterQuery.put(BrowseParams.STARTS_WITH, c);
+            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), c);
+            c = "Å";
+            letterQuery.put(BrowseParams.STARTS_WITH, c);
+            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), c);
 
             // Create a free text field for the initial characters
             Para jumpForm = jump.addPara();

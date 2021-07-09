@@ -248,9 +248,13 @@
                     <repeatable>true</repeatable>
                     <label>Prosjekt</label>
                     <input-type>onebox</input-type>
-                    <hint>Finansieringskilde og prosjektkode. EU-prosjekter må registreres slik: EC/[program]/[prosjektreferanse] hvor
-                        H2020 må brukes for Horisont 2020 og FP7 for 7. rammeprogram. F.eks: EC/H2020/641918 eller EC/FP7/266213.
-                        Andre prosjekt kan registreres slik: [Finanisieringskilde]: [projektreferanse]. F.eks. Norges forskningsråd: 227607.</hint>
+                    <hint>Hvis Horisont Europa: EC/HEU/[nummer]/EU/[navn]/[akronym]
+
+                        Hvis Horisont 2020: EC/H2020/[nummer]
+
+                        Hvis EUs 7. rammeprogram: EC/FP7/[nummer]
+
+                        Hvis andre: [Finansieringskilde]: [nummer], f.eks. Norges forskningsråd: 295704</hint>
                     <required></required>
                 </field>
 

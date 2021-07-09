@@ -54,7 +54,7 @@
     <!-- dc.relation -->
     <xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='relation']/doc:element[@name='project']/doc:element/doc:field/text()">
         <xsl:choose>
-            <xsl:when test="starts-with(.,'EC/FP') or starts-with(.,'EC/H2020')">
+            <xsl:when test="starts-with(.,'EC/FP') or starts-with(.,'EC/H2020') or starts-with(.,'EC/HEU')">
                 <xsl:value-of select="concat('info:eu-repo/grantAgreement/',.)"/>
             </xsl:when>
             <xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>

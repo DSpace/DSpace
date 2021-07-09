@@ -276,18 +276,6 @@ public class InstallItemServiceImpl implements InstallItemService
             metadata.setValue(cleanedString);
         }
         item.setMetadata(titleList);
-        cleanHtmlOnMetadataValue(item, "contributor", "author");
-        cleanHtmlOnMetadataValue(item, "contributor", "editor");
-        cleanHtmlOnMetadataValue(item, "contributor", "advisor");
-        cleanHtmlOnMetadataValue(item, "author", null);
     }
 
-    private void cleanHtmlOnMetadataValue(Item item, String element, String qualifier) {
-        List<MetadataValue> metadataValueList = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, element, qualifier, Item.ANY);
-        for (MetadataValue metadata : metadataValueList) {
-            String cleanedString = Jsoup.clean(metadata.getValue(), Whitelist.basic());
-            metadata.setValue(cleanedString);
-        }
-        item.setMetadata(metadataValueList);
-    }
 }
