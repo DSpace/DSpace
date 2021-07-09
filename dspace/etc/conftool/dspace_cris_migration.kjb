@@ -13,7 +13,7 @@
   <parameters>
     <parameter>
       <name>eperson_email</name>
-      <default_value>lihua.fang@phd.units.it</default_value>
+      <default_value>4science.it+noreply@gmail.com</default_value>
       <description/>
     </parameter>
     <parameter>
@@ -320,7 +320,7 @@
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>project migration</name>
+      <name>funding migration</name>
       <description/>
       <type>TRANS</type>
       <attributes/>
@@ -371,7 +371,7 @@
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>set project variables</name>
+      <name>set funding variables</name>
       <description/>
       <type>SET_VARIABLES</type>
       <attributes/>
@@ -381,7 +381,7 @@
       <fields>
         <field>
           <variable_name>ENTITY_TYPE</variable_name>
-          <variable_value>Project</variable_value>
+          <variable_value>Funding</variable_value>
           <variable_type>JVM</variable_type>
         </field>
         <field>
@@ -696,7 +696,7 @@
   <hops>
     <hop>
       <from>Start</from>
-      <to>set project variables</to>
+      <to>set funding variables</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -704,8 +704,8 @@
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>set project variables</from>
-      <to>project migration</to>
+      <from>set funding variables</from>
+      <to>funding migration</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -713,7 +713,7 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>project migration</from>
+      <from>funding migration</from>
       <to>set orgUnit variables</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
