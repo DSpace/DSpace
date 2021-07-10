@@ -11,9 +11,12 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.projection.CheckRelatedItemProjection.PARAM_NAME;
 import static org.dspace.app.rest.projection.CheckRelatedItemProjection.PROJECTION_NAME;
 import static org.dspace.app.rest.projection.CheckRelatedItemProjection.RELATIONSHIP_UUID_SEPARATOR;
+import static org.dspace.app.rest.utils.Utils.PROJECTION_PARAM_NAME;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.sql.SQLException;
 
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
@@ -118,18 +121,7 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
 
     @Test
     public void testSingleRelationship() throws Exception {
-        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService.findbyTypesAndTypeName(
-            context, entityTypeService.findByEntityType(context, "Publication"),
-            entityTypeService.findByEntityType(context, "Person"),
-            "isAuthorOfPublication", "isPublicationOfAuthor"
-        );
-
-        // add a relationship between publication 1 and author 1
-        context.turnOffAuthorisationSystem();
-        RelationshipBuilder.createRelationshipBuilder(
-            context, publication1, author1, isAuthorOfPublicationRelationshipType
-        ).build();
-        context.restoreAuthSystemState();
+        initSingleRelationship();
 
         // get publication 1 => property relatedItems should not exist because the projection was not requested
         getClient().perform(get("/api/core/items/{item-uuid}", publication1.getID().toString()))
@@ -548,6 +540,61 @@ public class CheckRelatedItemProjectionIT extends AbstractEntityIntegrationTest 
                     hasJsonPath("$.relatedItems", Matchers.empty())
                 ))
             )));
+    }
+
+    @Test
+    public void checkLinksContainProjectionQueryParamsTest() throws Exception {
+        initSingleRelationship();
+        // SelfLink of the returned item contains the projection query params
+        getClient().perform(
+            get("/api/core/items/{item-uuid}", author1.getID().toString())
+                .param(PROJECTION_PARAM_NAME, PROJECTION_NAME)
+                .param(PARAM_NAME,
+                    "isPublicationOfAuthor" + RELATIONSHIP_UUID_SEPARATOR + publication1.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._links.self.href",
+                       Matchers.containsString(PROJECTION_PARAM_NAME + "=" + PROJECTION_NAME)))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString(
+                       PARAM_NAME + "=" + "isPublicationOfAuthor" + RELATIONSHIP_UUID_SEPARATOR +
+                       publication1.getID().toString())))
+        ;
+
+        // Links of the left/rightItem of the embedded relationships contain the projection query params
+        getClient().perform(
+            get("/api/core/items/{item-uuid}", author1.getID().toString())
+                .param(PROJECTION_PARAM_NAME, PROJECTION_NAME)
+                .param("embed", "relationships")
+                .param(PARAM_NAME,
+                    "isPublicationOfAuthor" + RELATIONSHIP_UUID_SEPARATOR + publication1.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationships._embedded.relationships[0]._links.rightItem.href",
+                       Matchers.containsString(PROJECTION_PARAM_NAME + "=" + PROJECTION_NAME)))
+                   .andExpect(jsonPath("$._embedded.relationships._embedded.relationships[0]._links.rightItem.href",
+                       Matchers.containsString(
+                           PARAM_NAME + "=" + "isPublicationOfAuthor" + RELATIONSHIP_UUID_SEPARATOR +
+                           publication1.getID().toString())))
+                   .andExpect(jsonPath("$._embedded.relationships._embedded.relationships[0]._links.leftItem.href",
+                       Matchers.containsString(PROJECTION_PARAM_NAME + "=" + PROJECTION_NAME)))
+                   .andExpect(jsonPath("$._embedded.relationships._embedded.relationships[0]._links.leftItem.href",
+                       Matchers.containsString(
+                           PARAM_NAME + "=" + "isPublicationOfAuthor" + RELATIONSHIP_UUID_SEPARATOR +
+                           publication1.getID().toString())))
+        ;
+    }
+
+    private void initSingleRelationship() throws SQLException {
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService.findbyTypesAndTypeName(
+            context, entityTypeService.findByEntityType(context, "Publication"),
+            entityTypeService.findByEntityType(context, "Person"),
+            "isAuthorOfPublication", "isPublicationOfAuthor"
+                                                                                                               );
+
+        // add a relationship between publication 1 and author 1
+        context.turnOffAuthorisationSystem();
+        RelationshipBuilder.createRelationshipBuilder(
+            context, publication1, author1, isAuthorOfPublicationRelationshipType
+                                                     ).build();
+        context.restoreAuthSystemState();
     }
 
 }

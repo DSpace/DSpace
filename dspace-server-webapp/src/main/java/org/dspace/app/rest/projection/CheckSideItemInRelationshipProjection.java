@@ -15,29 +15,30 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.RelationshipRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
-import org.dspace.services.RequestService;
 import org.dspace.util.UUIDUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
  * Check if an item is on the left or right side of a relationship.
  */
 @Component
-public class CheckSideItemInRelationshipProjection extends AbstractProjection {
+public class CheckSideItemInRelationshipProjection extends PropertyProjection {
 
     private static final Logger log = LogManager.getLogger(CheckSideItemInRelationshipProjection.class);
 
     public static final String PROJECTION_NAME = "CheckSideItemInRelationship";
     public static final String PARAM_NAME = "checkSideItemInRelationship";
 
-    @Autowired
-    RequestService requestService;
-
     @Override
     public String getName() {
         return PROJECTION_NAME;
+    }
+
+    @Override
+    public String getParamName() {
+        return PARAM_NAME;
     }
 
     @Override
@@ -79,7 +80,7 @@ public class CheckSideItemInRelationshipProjection extends AbstractProjection {
     }
 
     protected UUID getUuidFromRequest() throws DSpaceBadRequestException {
-        ServletRequest servletRequest = requestService.getCurrentRequest().getServletRequest();
+        ServletRequest servletRequest = super.requestService.getCurrentRequest().getServletRequest();
 
         String[] uuids = servletRequest.getParameterValues(PARAM_NAME);
 
@@ -96,4 +97,8 @@ public class CheckSideItemInRelationshipProjection extends AbstractProjection {
         return UUIDUtils.fromString(uuids[0]);
     }
 
+    @Override
+    public boolean supportsRestAddressableModelClasses(Class<RestAddressableModel> restAddressableModelClass) {
+        return restAddressableModelClass.isAssignableFrom(RelationshipRest.class);
+    }
 }

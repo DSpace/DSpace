@@ -8,7 +8,6 @@
 package org.dspace.app.rest.projection;
 
 import java.sql.SQLException;
-
 import javax.servlet.ServletRequest;
 
 import org.apache.commons.lang3.StringUtils;

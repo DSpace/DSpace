@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.projection;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.Entity;
@@ -17,7 +16,6 @@ import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
-import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.Link;
@@ -155,9 +153,9 @@ public interface Projection {
     /**
      * Get the query parameters map to be added to the HAL link for this projection
      *
-     * @param linkRestRepository TODO
-     * @param method             TODO
+     * @param restAddressableModelClass The class of the object of the link we're optionally adding projection query
+     *                                  parameters to
      * @return The query parameters map to be added to the HAL link for this projection
      */
-    Map<String, List<String>> getProjectionParametersForHalLink(LinkRestRepository linkRestRepository, Method method);
+    Map<String, List<String>> getProjectionParametersForHalLink(Class<RestAddressableModel> restAddressableModelClass);
 }

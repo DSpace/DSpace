@@ -7,14 +7,8 @@
  */
 package org.dspace.app.rest.projection;
 
-import static org.dspace.app.rest.utils.Utils.PROJECTION_PARAM_NAME;
-
-import java.lang.reflect.Method;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.servlet.ServletRequest;
@@ -23,8 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
-import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -33,7 +27,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
-import org.dspace.services.RequestService;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -50,16 +43,13 @@ import org.springframework.stereotype.Component;
  * If this projection is requested but no related items are found, an empty array is returned in the response.
  */
 @Component
-public class CheckRelatedItemProjection extends AbstractProjection {
+public class CheckRelatedItemProjection extends PropertyProjection {
 
     private static final Logger log = LogManager.getLogger(CheckRelatedItemProjection.class);
 
     public static final String PROJECTION_NAME = "CheckRelatedItem";
     public static final String PARAM_NAME = "checkRelatedItem";
     public static final String RELATIONSHIP_UUID_SEPARATOR = "=";
-
-    @Autowired
-    RequestService requestService;
 
     @Autowired
     ItemService itemService;
@@ -76,6 +66,11 @@ public class CheckRelatedItemProjection extends AbstractProjection {
     }
 
     @Override
+    public String getParamName() {
+        return PARAM_NAME;
+    }
+
+    @Override
     public <T extends RestModel> T transformRest(T restObject) {
         try {
             transformRestInternal(restObject);
@@ -87,7 +82,7 @@ public class CheckRelatedItemProjection extends AbstractProjection {
     }
 
     protected void transformRestInternal(RestModel restObject) throws SQLException {
-        ServletRequest servletRequest = requestService.getCurrentRequest().getServletRequest();
+        ServletRequest servletRequest = super.requestService.getCurrentRequest().getServletRequest();
         Context context = ContextUtil.obtainContext(servletRequest);
 
         // this projection only applies to ItemRest
@@ -251,16 +246,7 @@ public class CheckRelatedItemProjection extends AbstractProjection {
     }
 
     @Override
-    public Map<String, List<String>> getProjectionParametersForHalLink(LinkRestRepository linkRestRepository,
-        Method method) {
-
-        Map<String, List<String>> mapProjectionParams = new HashMap<>();
-        // Projection section of links ex:
-        // projection=CheckRelatedItem&checkRelatedItem=isAuthorOfPublication=b1b2c768-bda1-448a-a073-fc541e8b24d9
-        mapProjectionParams.put(PROJECTION_PARAM_NAME, Arrays.asList(PROJECTION_NAME));
-        ServletRequest servletRequest = requestService.getCurrentRequest().getServletRequest();
-        mapProjectionParams.put(PARAM_NAME, Arrays.asList(servletRequest.getParameterValues(PARAM_NAME)));
-        return mapProjectionParams;
+    public boolean supportsRestAddressableModelClasses(Class<RestAddressableModel> restAddressableModelClass) {
+        return (restAddressableModelClass != null && restAddressableModelClass.isAssignableFrom(ItemRest.class));
     }
-
 }

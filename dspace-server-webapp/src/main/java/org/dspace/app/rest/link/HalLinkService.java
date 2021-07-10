@@ -8,11 +8,13 @@
 package org.dspace.app.rest.link;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -31,6 +33,7 @@ import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Links;
@@ -100,36 +103,56 @@ public class HalLinkService {
     /**
      * - Links of the give HALResource are removed
      * - For each link the query parameters (if any) linked to the projection of this request are added to the link href
-     * and the link is added back to the resource
+     * - Which (if any) projection query params to be added is determined by checking
+     * {@link Projection#getProjectionParametersForHalLink(Class)}
+     * - The link with possible added projection query params is added back to the resource
      * - If anything goes wrong the original link is added back to the resource and error is logged
      *
      * @param halResource Resource to update the links of with the projection query parameters
      */
-    private void addProjectionParamsToLinks(HALResource halResource) {
-        // Removed original links and replace them with the links with the added projection query params
+    private void addProjectionParamsToLinks(HALResource<? extends RestAddressableModel> halResource) {
+        // Remove original links and replace them with the links with the optional added projection query params
         Links originalLinks = halResource.getLinks();
         halResource.removeLinks();
+        Projection projection = halResource.getContent().getProjection();
+        List<LinkRest> linkRests = utils.getLinkRests(halResource.getContent().getClass());
         for (Link link : originalLinks) {
             try {
-                HALResource<? extends RestAddressableModel> resource = (HALResource<RestAddressableModel>) halResource;
-                Projection projection = resource.getContent().getProjection();
                 LinkRestRepository linkRepository = null;
                 Method method = null;
+                Class<RestAddressableModel> restAddressableModelClass = null;
                 try {
-                    linkRepository = utils.getLinkResourceRepository(resource.getContent().getCategory(),
-                        resource.getContent().getType(), link.getRel().value());
-                    DSpaceRestRepository repository =
-                        utils.getResourceRepository(resource.getContent().getCategory(),
-                            resource.getContent().getType());
-                    Class<RestAddressableModel> domainClass = repository.getDomainClass();
-                    LinkRest linkRest = utils.getClassLevelLinkRest(link.getRel().value(), domainClass);
-                    method = utils.requireMethod(linkRepository.getClass(), linkRest.method());
+                    Optional<LinkRest> matchingLinkRest =
+                        linkRests.stream().filter(linkRest -> linkRest.name().equals(link.getRel().value())).findAny();
+                    if (matchingLinkRest.isPresent()) {
+                        LinkRest linkRest = matchingLinkRest.get();
+                        linkRepository = utils
+                            .getLinkResourceRepository(halResource.getContent().getCategory(),
+                                halResource.getContent().getType(), linkRest.name());
+                        // Retrieve the corresponding method and REST model class
+                        method = utils.requireMethod(linkRepository.getClass(), linkRest.method());
+                        restAddressableModelClass = (Class<RestAddressableModel>) method.getReturnType();
+                        // If the found restAddressableModelClass was a Page, determine the REST model class of paged
+                        // objects
+                        if (restAddressableModelClass != null &&
+                            restAddressableModelClass.isAssignableFrom(Page.class) ) {
+                            method = utils.requireMethod((Class) linkRepository.getClass().getGenericSuperclass(),
+                                linkRest.method());
+                            ParameterizedType type = (ParameterizedType) method.getGenericReturnType();
+                            restAddressableModelClass = (Class<RestAddressableModel>) type.getActualTypeArguments()[0];
+                        }
+                    } else {
+                        // If the object of the link is not connected to the resource with a @LinkRest annotation
+                        // then determine the repository and thus corresponding domainClass by parsing the uri of link
+                        DSpaceRestRepository repository = utils.getRepositoryFromUri(link.getHref());
+                        restAddressableModelClass = repository.getDomainClass();
+                    }
                 } catch (RepositoryNotFoundException e) {
                     log.debug("Couldn't find the LinkRestRepository or DSpaceRestRepository corresponding to this " +
                               "link ({}) \n {}", link, e.getMessage());
                 }
                 Map<String, List<String>> projectionParameters =
-                    projection.getProjectionParametersForHalLink(linkRepository, method);
+                    projection.getProjectionParametersForHalLink(restAddressableModelClass);
                 halResource.add(this.buildNewHrefWithProjectionQueryParams(link, projectionParameters));
             } catch (Exception e) {
                 log.error("Something went wrong trying to add projection query params to this link ({}) \n {}",

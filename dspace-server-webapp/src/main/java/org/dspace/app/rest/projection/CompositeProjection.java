@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.projection;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,6 @@ import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
-import org.dspace.app.rest.repository.LinkRestRepository;
 import org.springframework.hateoas.Link;
 
 /**
@@ -87,12 +85,13 @@ public class CompositeProjection extends AbstractProjection {
     }
 
     @Override
-    public Map<String, List<String>> getProjectionParametersForHalLink(LinkRestRepository linkRestRepository,
-        Method method) {
+    public Map<String, List<String>> getProjectionParametersForHalLink(
+        Class<RestAddressableModel> restAddressableModelClass) {
 
         Map<String, List<String>> mapProjectionParams = new HashMap<>();
         for (Projection projection : projections) {
-            mapProjectionParams.putAll(projection.getProjectionParametersForHalLink(linkRestRepository, method));
+            mapProjectionParams.putAll(
+                projection.getProjectionParametersForHalLink(restAddressableModelClass));
         }
         return mapProjectionParams;
     }
