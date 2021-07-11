@@ -39,7 +39,7 @@ import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 
 /**
- * Utilty methods for the xml workflow
+ * Utility methods for the xml workflow
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
