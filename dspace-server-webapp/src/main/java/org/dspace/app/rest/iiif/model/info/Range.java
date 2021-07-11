@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.iiif.model.info;
 
-public class RangeModel {
+public class Range {
 
     private String label;
     private int start;

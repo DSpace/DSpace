@@ -11,8 +11,8 @@ import java.util.List;
 
 public class Info {
 
-    private List<CanvasModel> canvases;
-    private List<RangeModel> structures;
+    private List<Canvas> canvases;
+    private List<Range> structures;
     private GlobalDefaults globalDefaults;
 
     public GlobalDefaults getGlobalDefaults() {
@@ -23,19 +23,19 @@ public class Info {
         this.globalDefaults = globalDefaults;
     }
 
-    public void setCanvases(List<CanvasModel> canvases) {
+    public void setCanvases(List<Canvas> canvases) {
         this.canvases = canvases;
     }
 
-    public List<CanvasModel> getCanvases() {
+    public List<Canvas> getCanvases() {
         return this.canvases;
     }
 
-    public void setStructures(List<RangeModel> structures) {
+    public void setStructures(List<Range> structures) {
         this.structures = structures;
     }
 
-    public List<RangeModel> getStructures() {
+    public List<Range> getStructures() {
         return structures;
     }
 

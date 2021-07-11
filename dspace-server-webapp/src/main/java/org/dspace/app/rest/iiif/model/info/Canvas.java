@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.iiif.model.info;
 
-public class CanvasModel {
+public class Canvas {
 
     private String label;
     private int width;
