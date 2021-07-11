@@ -20,7 +20,7 @@ import org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator;
 import org.dspace.app.rest.iiif.model.generator.ManifestGenerator;
 import org.dspace.app.rest.iiif.model.generator.RangeGenerator;
 import org.dspace.app.rest.iiif.model.info.Info;
-import org.dspace.app.rest.iiif.model.info.RangeModel;
+import org.dspace.app.rest.iiif.model.info.Range;
 import org.dspace.app.rest.iiif.service.util.IIIFUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -299,7 +299,7 @@ public class ManifestService extends AbstractResourceService {
      * @param identifier
      */
     private void addRanges(Info info, String identifier) {
-        List<RangeModel> rangesFromConfig = utils.getRangesFromInfoObject(info);
+        List<Range> rangesFromConfig = utils.getRangesFromInfoObject(info);
         if (rangesFromConfig != null) {
             for (int pos = 0; pos < rangesFromConfig.size(); pos++) {
                 setRange(identifier, rangesFromConfig.get(pos), pos);
@@ -314,7 +314,7 @@ public class ManifestService extends AbstractResourceService {
      * @param range range from info.json configuration
      * @param pos list position of the range
      */
-    private void setRange(String identifier, RangeModel range, int pos) {
+    private void setRange(String identifier, Range range, int pos) {
         String id = IIIF_ENDPOINT + identifier + "/r" + pos;
         String label = range.getLabel();
         rangeGenerator.setIdentifier(id);

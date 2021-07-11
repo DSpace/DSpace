@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.iiif.model.info;
 
-public class AnnotationModel {
+public class Annotation {
 
     private String motivation;
     private String id;

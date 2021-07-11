@@ -16,10 +16,18 @@ public class ObjectMapperFactory {
 
     private ObjectMapperFactory() {}
 
+    /**
+     * Gets the jackson ObjectMapper with iiif configuration.
+     * @return
+     */
     public static ObjectMapper getIiifObjectMapper() {
         return new IiifObjectMapper();
     }
 
+    /**
+     * Gets the jackson SimpleModule with iiif configuration.
+     * @return
+     */
     public static SimpleModule getIiifModule() {
         return new IiifModule();
     }

@@ -21,7 +21,7 @@ import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.iiif.model.ObjectMapperFactory;
 import org.dspace.app.rest.iiif.model.info.Info;
-import org.dspace.app.rest.iiif.model.info.RangeModel;
+import org.dspace.app.rest.iiif.model.info.Range;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -192,7 +192,7 @@ public class IIIFUtils {
      * @param info the parameters model
      * @return list of range models
      */
-    public List<RangeModel> getRangesFromInfoObject(Info info) {
+    public List<Range> getRangesFromInfoObject(Info info) {
         if (info != null) {
             return info.getStructures();
         }
