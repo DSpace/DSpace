@@ -7,6 +7,7 @@
  */
 package org.dspace.app.util.factory;
 
+import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.app.util.service.WebAppService;
@@ -26,6 +27,8 @@ public class UtilServiceFactoryImpl extends UtilServiceFactory {
     private OpenSearchService openSearchService;
     @Autowired(required = true)
     private WebAppService webAppService;
+    @Autowired(required = true)
+    private DSpaceObjectUtils dSpaceObjectUtils;
 
     @Override
     public WebAppService getWebAppService() {
@@ -40,5 +43,10 @@ public class UtilServiceFactoryImpl extends UtilServiceFactory {
     @Override
     public MetadataExposureService getMetadataExposureService() {
         return metadataExposureService;
+    }
+
+    @Override
+    public DSpaceObjectUtils getDSpaceObjectUtils() {
+        return dSpaceObjectUtils;
     }
 }

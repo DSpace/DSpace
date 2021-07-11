@@ -5,9 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-
 /**
- * Pluggable alternatives for some core functions.
+ * Curation tasks for testing.
  */
-
-package org.dspace.providers;
+package org.dspace.ctask.testing;
