@@ -197,6 +197,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("ExtraEntry")
                                       .build();
 
+        // Create a Workspace Item (which in turn creates an Item with "in_archive=false")
+        // This is only created to prove that WorkspaceItems are NOT counted/listed in this endpoint
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+                .withTitle("In Progress Item")
+                .withIssueDate("2018-02-05")
+                .withAuthor("Doe, Jane").withAuthor("Smith, Jennifer")
+                .build();
+        Item itemInWorkspace = workspaceItem.getItem();
+
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -212,7 +221,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$._embedded.items", Matchers.not(
                            Matchers.contains(
                                ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
-                                       "Public item 3", "2016-02-13")
+                                       "Public item 3", "2016-02-13"),
+                               ItemMatcher.matchItemWithTitleAndDateIssued(itemInWorkspace,
+                                       "In Progress Item", "2018-02-05")
                            )
                    )))
                    .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
@@ -245,7 +256,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                            ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
                                    "Public item 1", "2017-10-17"),
                            ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
-                                   "Public item 2", "2016-02-13")
+                                   "Public item 2", "2016-02-13"),
+                           ItemMatcher.matchItemWithTitleAndDateIssued(itemInWorkspace,
+                                   "In Progress Item", "2018-02-05")
                        )
                    )))
                    .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
