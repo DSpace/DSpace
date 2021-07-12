@@ -61,7 +61,7 @@ public class DOIOrganiser {
     protected ItemService itemService;
     protected DOIService doiService;
     protected ConfigurationService configurationService;
-    protected Boolean skipFilter;
+    protected boolean skipFilter;
 
     /**
      * Constructor to be called within the main() method
@@ -398,7 +398,7 @@ public class DOIOrganiser {
      * @throws SQLException
      * @throws DOIIdentifierException
      */
-    public void register(DOI doiRow, Boolean skipFilter) throws SQLException, DOIIdentifierException {
+    public void register(DOI doiRow, boolean skipFilter) throws SQLException, DOIIdentifierException {
         DSpaceObject dso = doiRow.getDSpaceObject();
         if (Constants.ITEM != dso.getType()) {
             throw new IllegalArgumentException("Currenty DSpace supports DOIs for Items only.");
@@ -497,7 +497,7 @@ public class DOIOrganiser {
      * @throws SQLException
      * @throws DOIIdentifierException
      */
-    public void reserve(DOI doiRow, Boolean skipFilter) {
+    public void reserve(DOI doiRow, boolean skipFilter) {
         DSpaceObject dso = doiRow.getDSpaceObject();
         if (Constants.ITEM != dso.getType()) {
             throw new IllegalArgumentException("Currently DSpace supports DOIs for Items only.");
