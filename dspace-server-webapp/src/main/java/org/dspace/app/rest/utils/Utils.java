@@ -935,38 +935,20 @@ public class Utils {
      * @throws IllegalArgumentException if the uri is not valid
      */
     public DSpaceRestRepository getRepositoryFromUri(String uri) {
-        String dspaceUrl = configurationService.getProperty("dspace.server.url");
+        String[] uriParts = this.getUriParts(uri);
+        return this.getRepositoryFromUriParts(uriParts, uri);
+    }
 
-        // Convert strings to URL objects.
-        // Do this early to check that inputs are well-formed.
-        URL dspaceUrlObject;
-        URL requestUrlObject;
-        try {
-            dspaceUrlObject = new URL(dspaceUrl);
-            requestUrlObject = new URL(uri);
-        } catch (MalformedURLException ex) {
-            throw new IllegalArgumentException(
-                String.format("Configuration '%s' or request '%s' is malformed", dspaceUrl, uri));
-        }
-
-        // Check whether the URI could be valid.
-        if (!urlIsPrefixOf(dspaceUrl, uri)) {
-            throw new IllegalArgumentException("the supplied uri is not ours: " + uri);
-        }
-
-        // Extract from the URI the category, model and id components.
-        // They start after the dspaceUrl/api/{apiCategory}/{apiModel}/{id}
-        int dspacePathLength = StringUtils.split(dspaceUrlObject.getPath(), '/').length;
-        String[] requestPath = StringUtils.split(requestUrlObject.getPath(), '/');
-        String[] uriParts = Arrays.copyOfRange(requestPath, dspacePathLength,
-                requestPath.length);
-        if ("api".equalsIgnoreCase(uriParts[0])) {
-            uriParts = Arrays.copyOfRange(uriParts, 1, uriParts.length);
-        }
-        if (uriParts.length != 3) {
-            throw new IllegalArgumentException("the supplied uri lacks required path elements: " + uri);
-        }
-
+    /**
+     * Get the {@link DSpaceRestRepository} associated with the given URI (with uriParts already determined)
+     *
+     * @param uri The uri of a {@link BaseObjectRest}
+     * @param uri The uri already split into parts
+     * @return The {@link DSpaceRestRepository} corresponding to the provided uri
+     * @throws IllegalArgumentException if the uri is not for a repository of type ReloadableEntityObjectRepository
+     * or if the there was no repository found for this uri
+     */
+    private DSpaceRestRepository getRepositoryFromUriParts(String[] uriParts, String uri) {
         DSpaceRestRepository repository;
         try {
             repository = getResourceRepository(uriParts[0], uriParts[1]);
@@ -988,6 +970,32 @@ public class Utils {
     * @throws IllegalArgumentException if the uri is not valid
     */
     public BaseObjectRest getBaseObjectRestFromUri(Context context, String uri) {
+        String[] uriParts = this.getUriParts(uri);
+
+        DSpaceRestRepository repository = getRepositoryFromUri(uri);
+        Serializable pk;
+        try {
+            // cast the string id in the uriParts to the real pk class
+            pk = castToPKClass((ReloadableEntityObjectRepository) repository, uriParts[2]);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("the supplied uri could not be cast to a Primary Key class: " + uri, e);
+        }
+        try {
+            // disable the security as we only need to retrieve the object to further process the authorization
+            context.turnOffAuthorisationSystem();
+            return (BaseObjectRest) repository.findOne(context, pk);
+        } finally {
+            context.restoreAuthSystemState();
+        }
+    }
+
+    /**
+     * Splits the given URI into parts: category, modal and id (stats after the dspaceUrl/api)
+     *
+     * @param uri The URI to be split into parts
+     * @return The relevant parts of the URI: category, modal and id
+     */
+    private String[] getUriParts(String uri) {
         String dspaceUrl = configurationService.getProperty("dspace.server.url");
 
         // Convert strings to URL objects.
@@ -1013,21 +1021,15 @@ public class Utils {
         String[] requestPath = StringUtils.split(requestUrlObject.getPath(), '/');
         String[] uriParts = Arrays.copyOfRange(requestPath, dspacePathLength,
             requestPath.length);
-
-        DSpaceRestRepository repository = getRepositoryFromUri(uri);
-        Serializable pk;
-        try {
-            // cast the string id in the uriParts to the real pk class
-            pk = castToPKClass((ReloadableEntityObjectRepository) repository, uriParts[2]);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("the supplied uri could not be cast to a Primary Key class: " + uri, e);
+        if ("api".equalsIgnoreCase(uriParts[0])) {
+            uriParts = Arrays.copyOfRange(uriParts, 1, uriParts.length);
         }
-        try {
-            // disable the security as we only need to retrieve the object to further process the authorization
-            context.turnOffAuthorisationSystem();
-            return (BaseObjectRest) repository.findOne(context, pk);
-        } finally {
-            context.restoreAuthSystemState();
+        if ("api".equalsIgnoreCase(uriParts[0])) {
+            uriParts = Arrays.copyOfRange(uriParts, 1, uriParts.length);
         }
+        if (uriParts.length != 3) {
+            throw new IllegalArgumentException("the supplied uri lacks required path elements: " + uri);
+        }
+        return uriParts;
     }
 }
