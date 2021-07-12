@@ -198,4 +198,11 @@
         <scope_note></scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>cris</schema>
+        <element>legacyId</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
 </dspace-dc-types>
