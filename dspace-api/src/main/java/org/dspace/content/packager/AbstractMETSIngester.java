@@ -16,6 +16,7 @@ import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -409,6 +410,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // get handle from manifest
             handle = getObjectHandle(manifest);
         }
+        UUID uuid = getObjectID(manifest);
 
         // -- Step 2 --
         // Create our DSpace Object based on info parsed from manifest, and
@@ -416,7 +418,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         DSpaceObject dso;
         try {
             dso = PackageUtils.createDSpaceObject(context, parent,
-                                                  type, handle, params);
+                                                  type, handle, uuid, params);
         } catch (SQLException sqle) {
             throw new PackageValidationException("Exception while ingesting "
                                                      + pkgFile.getPath(), sqle);
@@ -727,7 +729,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
 
             // retrieve path/name of file in manifest
             String path = METSManifest.getFileName(mfile);
-
             // extract the file input stream from package (or retrieve
             // externally, if it is an externally referenced file)
             InputStream fileStream = getFileInputStream(pkgFile, params, path);
@@ -1505,5 +1506,23 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
      * @return name
      */
     public abstract String getConfigurationName();
+
+    public UUID getObjectID(METSManifest manifest)
+            throws PackageValidationException {
+        Element mets = manifest.getMets();
+        String idStr = mets.getAttributeValue("ID");
+        if (idStr == null || idStr.length() == 0) {
+            throw new PackageValidationException("Manifest is missing the required mets@ID attribute.");
+        }
+        if (idStr.contains("DB-ID-")) {
+            idStr = idStr.substring(idStr.lastIndexOf("DB-ID-") + 6, idStr.length());
+        }
+        try {
+            return UUID.fromString(idStr);
+        } catch (IllegalArgumentException ignored) {
+            //do nothing
+        }
+        return null;
+    }
 
 }

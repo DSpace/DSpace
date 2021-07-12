@@ -38,8 +38,8 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "dspaceobject")
 public abstract class DSpaceObject implements Serializable, ReloadableEntity<java.util.UUID> {
     @Id
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid2")
+    @GeneratedValue(generator = "check-existing-uuid")
+    @GenericGenerator(name = "check-existing-uuid", strategy = "org.dspace.content.CheckExistingUUIDGenerator")
     @Column(name = "uuid", unique = true, nullable = false, insertable = true, updatable = false)
     protected java.util.UUID id;
 
@@ -75,6 +75,12 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
      */
     @Transient
     private boolean modified = false;
+
+    @Transient
+    protected UUID predefinedUUID;
+    public UUID getPredefinedUUID() {
+        return predefinedUUID;
+    }
 
     protected DSpaceObject() {
 

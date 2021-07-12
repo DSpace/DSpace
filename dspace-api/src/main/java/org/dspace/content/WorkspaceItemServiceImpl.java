@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
@@ -80,6 +81,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
     @Override
     public WorkspaceItem create(Context context, Collection collection, boolean template)
+            throws AuthorizeException, SQLException {
+        return create(context, collection, null, template);
+    }
+
+    @Override
+    public WorkspaceItem create(Context context, Collection collection, UUID uuid, boolean template)
         throws AuthorizeException, SQLException {
         // Check the user has permission to ADD to the collection
         authorizeService.authorizeAction(context, collection, Constants.ADD);
@@ -89,7 +96,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
 
         // Create an item
-        Item item = itemService.create(context, workspaceItem);
+        Item item;
+        if (uuid != null) {
+            item = itemService.create(context, workspaceItem, uuid);
+        } else {
+            item = itemService.create(context, workspaceItem);
+        }
         item.setSubmitter(context.getCurrentUser());
 
         // Now create the policies for the submitter to modify item and contents
