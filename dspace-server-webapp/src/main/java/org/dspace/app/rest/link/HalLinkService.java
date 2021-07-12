@@ -111,11 +111,12 @@ public class HalLinkService {
      * @param halResource Resource to update the links of with the projection query parameters
      */
     private void addProjectionParamsToLinks(HALResource<? extends RestAddressableModel> halResource) {
+        HALResource<? extends RestAddressableModel> resource = (HALResource<RestAddressableModel>) halResource;
         // Remove original links and replace them with the links with the optional added projection query params
-        Links originalLinks = halResource.getLinks();
-        halResource.removeLinks();
-        Projection projection = halResource.getContent().getProjection();
-        List<LinkRest> linkRests = utils.getLinkRests(halResource.getContent().getClass());
+        Links originalLinks = resource.getLinks();
+        resource.removeLinks();
+        Projection projection = resource.getContent().getProjection();
+        List<LinkRest> linkRests = utils.getLinkRests(resource.getContent().getClass());
         for (Link link : originalLinks) {
             try {
                 LinkRestRepository linkRepository = null;
@@ -127,8 +128,8 @@ public class HalLinkService {
                     if (matchingLinkRest.isPresent()) {
                         LinkRest linkRest = matchingLinkRest.get();
                         linkRepository = utils
-                            .getLinkResourceRepository(halResource.getContent().getCategory(),
-                                halResource.getContent().getType(), linkRest.name());
+                            .getLinkResourceRepository(resource.getContent().getCategory(),
+                                resource.getContent().getType(), linkRest.name());
                         // Retrieve the corresponding method and REST model class
                         method = utils.requireMethod(linkRepository.getClass(), linkRest.method());
                         restAddressableModelClass = (Class<RestAddressableModel>) method.getReturnType();
@@ -153,12 +154,12 @@ public class HalLinkService {
                 }
                 Map<String, List<String>> projectionParameters =
                     projection.getProjectionParametersForHalLink(restAddressableModelClass);
-                halResource.add(this.buildNewHrefWithProjectionQueryParams(link, projectionParameters));
+                resource.add(this.buildNewHrefWithProjectionQueryParams(link, projectionParameters));
             } catch (Exception e) {
                 log.error("Something went wrong trying to add projection query params to this link ({}) \n {}",
                     link, e.getMessage(), e);
                 // If anything else goes wrong, add the original link back in
-                halResource.add(link);
+                resource.add(link);
             }
         }
     }
