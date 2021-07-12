@@ -514,12 +514,12 @@
     </hop>
     <hop>
       <from>Select values</from>
-      <to>Join rows 2</to>
+      <to>Join rows 3</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Join rows 2</from>
-      <to>Join rows 3</to>
+      <from>Join rows 3</from>
+      <to>Join rows 6</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -533,32 +533,32 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Select values 2 2</from>
-      <to>Sort rows</to>
+      <from>select imp record id and crisid</from>
+      <to>Sort by imp record id</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Sort rows</from>
-      <to>Unique rows</to>
+      <from>Sort by imp record id</from>
+      <to>Unique rows by imp_record id and crisid</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Add constants</from>
-      <to>Modified JavaScript value</to>
+      <from>add legacy id metadata field</from>
+      <to>calculate metadata value and authority</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
       <from>Select values 2</from>
-      <to>Append streams</to>
+      <to>append metadata</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Modified JavaScript value</from>
-      <to>Select values 2 3</to>
+      <from>calculate metadata value and authority</from>
+      <to>select metadata attributes</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Join rows 3</from>
+      <from>Join rows 6</from>
       <to>is date or text</to>
       <enabled>Y</enabled>
     </hop>
@@ -569,52 +569,52 @@
     </hop>
     <hop>
       <from>is pointer</from>
-      <to>Modified JavaScript value 2</to>
+      <to>Calculate pointer id and table</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Modified JavaScript value 2</from>
-      <to>Database join</to>
+      <from>Calculate pointer id and table</from>
+      <to>Get pointer cris id</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
       <from>add order</from>
-      <to>Modified JavaScript value 3</to>
+      <to>set null metadata authority</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Modified JavaScript value 3</from>
+      <from>set null metadata authority</from>
       <to>Select values 2</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Database join</from>
-      <to>Database join 2</to>
+      <from>Get pointer cris id</from>
+      <to>Get related entity title</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Database join 2</from>
-      <to>add order 2</to>
+      <from>Get related entity title</from>
+      <to>add order 3</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Append streams</from>
-      <to>Append streams 2</to>
+      <from>append metadata</from>
+      <to>Append legacy ids</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Get variables 2</from>
-      <to>filter by entity type 3</to>
+      <from>Get ENTITY_TYPE from variables</from>
+      <to>filter by entity type 2</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
       <from>metadata configuration</from>
-      <to>Get variables 2</to>
+      <to>Get ENTITY_TYPE from variables</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>filter by entity type 3</from>
-      <to>Join rows 3</to>
+      <from>filter by entity type 2</from>
+      <to>Join rows 6</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -623,7 +623,7 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Get variables</from>
+      <from>Get ENTITY_TYPE from variables 2</from>
       <to>filter by entity type</to>
       <enabled>Y</enabled>
     </hop>
@@ -634,22 +634,22 @@
     </hop>
     <hop>
       <from>entities metadata</from>
-      <to>Join rows 2</to>
+      <to>Join rows 3</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Select values 2 3 2</from>
-      <to>Append streams</to>
+      <from>Select values 3</from>
+      <to>append metadata</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Append streams</from>
-      <to>Select values 2 2</to>
+      <from>append metadata</from>
+      <to>select imp record id and crisid</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Select values 2 3</from>
-      <to>Append streams 2</to>
+      <from>select metadata attributes</from>
+      <to>Append legacy ids</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -699,7 +699,7 @@
     </hop>
     <hop>
       <from>collections config</from>
-      <to>Get variables</to>
+      <to>Get ENTITY_TYPE from variables 2</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -713,27 +713,22 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Append streams 2</from>
-      <to>Join rows 5</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Unique rows</from>
-      <to>Add constants</to>
+      <from>Unique rows by imp_record id and crisid</from>
+      <to>add legacy id metadata field</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
       <from>Join rows 5</from>
-      <to>Add row number 2 2</to>
+      <to>Add row number 3</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Add row number 2 2</from>
-      <to>calculate imp bitstream id 2</to>
+      <from>Add row number 3</from>
+      <to>calculate imp metadatavalue id </to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>calculate imp bitstream id 2</from>
+      <from>calculate imp metadatavalue id </from>
       <to>insert into imp_metadatavalue</to>
       <enabled>Y</enabled>
     </hop>
@@ -743,13 +738,13 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>add order 2</from>
-      <to>Modified JavaScript value 4</to>
+      <from>add order 3</from>
+      <to>Calculate will be referenced authority</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Modified JavaScript value 4</from>
-      <to>Select values 2 3 2</to>
+      <from>Calculate will be referenced authority</from>
+      <to>Select values 3</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -758,17 +753,17 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Join rows 5 2</from>
-      <to>Add row number 2 2 2</to>
+      <from>Join rows 2</from>
+      <to>Add row number</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
       <from>Add insert operation</from>
-      <to>Join rows 5 2</to>
+      <to>Join rows 2</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Add row number 2 2 2</from>
+      <from>Add row number</from>
       <to>calculate imp record id</to>
       <enabled>Y</enabled>
     </hop>
@@ -779,7 +774,7 @@
     </hop>
     <hop>
       <from>0 if null</from>
-      <to>Join rows 5 2</to>
+      <to>Join rows 2</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -787,7 +782,132 @@
       <to>Add insert operation</to>
       <enabled>Y</enabled>
     </hop>
+    <hop>
+      <from>Unique rows by imp_record id and crisid</from>
+      <to>Get ENTITY_TYPE from variables 3</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Get ENTITY_TYPE from variables 3</from>
+      <to>is Person</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>is Person</from>
+      <to>Get eperson</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Get eperson</from>
+      <to>owner not null</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>add cris owner metadata field</from>
+      <to>select metadata attributes 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Append legacy ids</from>
+      <to>Append cris owner</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Append cris owner</from>
+      <to>Join rows 5</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>select metadata attributes 2</from>
+      <to>Append cris owner</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>owner not null</from>
+      <to>add cris owner metadata field</to>
+      <enabled>Y</enabled>
+    </hop>
   </order>
+  <step>
+    <name>0 if null</name>
+    <type>IfNull</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <replaceAllByValue/>
+    <replaceAllMask/>
+    <selectFields>Y</selectFields>
+    <selectValuesType>N</selectValuesType>
+    <setEmptyStringAll>N</setEmptyStringAll>
+    <valuetypes>
+      </valuetypes>
+    <fields>
+      <field>
+        <name>max_imp_record_id</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>704</xloc>
+      <yloc>48</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>0 if null (2)</name>
+    <type>IfNull</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <replaceAllByValue/>
+    <replaceAllMask/>
+    <selectFields>Y</selectFields>
+    <selectValuesType>N</selectValuesType>
+    <setEmptyStringAll>N</setEmptyStringAll>
+    <valuetypes>
+      </valuetypes>
+    <fields>
+      <field>
+        <name>max_imp_metadatavalue_id</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1648</xloc>
+      <yloc>384</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
   <step>
     <name>0 if null (3)</name>
     <type>IfNull</type>
@@ -829,7 +949,7 @@
     </GUI>
   </step>
   <step>
-    <name>Add constants</name>
+    <name>add legacy id metadata field</name>
     <type>Constant</type>
     <description/>
     <distribute>Y</distribute>
@@ -899,7 +1019,7 @@
     </remotesteps>
     <GUI>
       <xloc>1168</xloc>
-      <yloc>1008</yloc>
+      <yloc>896</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -973,12 +1093,82 @@
     </remotesteps>
     <GUI>
       <xloc>608</xloc>
-      <yloc>1024</yloc>
+      <yloc>1120</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Append streams</name>
+    <name>Add row number 3</name>
+    <type>Sequence</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <valuename>row_number</valuename>
+    <use_database>N</use_database>
+    <connection>dspacefvg</connection>
+    <schema/>
+    <seqname>SEQ_</seqname>
+    <use_counter>Y</use_counter>
+    <counter_name/>
+    <start_at>1</start_at>
+    <increment_by>1</increment_by>
+    <max_value>999999999</max_value>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1648</xloc>
+      <yloc>672</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Add row number</name>
+    <type>Sequence</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <valuename>row_number</valuename>
+    <use_database>N</use_database>
+    <connection>dspacefvg</connection>
+    <schema/>
+    <seqname>SEQ_</seqname>
+    <use_counter>Y</use_counter>
+    <counter_name/>
+    <start_at>1</start_at>
+    <increment_by>1</increment_by>
+    <max_value>999999999</max_value>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>832</xloc>
+      <yloc>224</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>append metadata</name>
     <type>Append</type>
     <description/>
     <distribute>N</distribute>
@@ -989,7 +1179,7 @@
       <schema_name/>
     </partitioning>
     <head_name>Select values 2</head_name>
-    <tail_name>Select values 2 3 2</tail_name>
+    <tail_name>Select values 3</tail_name>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -1000,12 +1190,12 @@
     </remotesteps>
     <GUI>
       <xloc>912</xloc>
-      <yloc>640</yloc>
+      <yloc>528</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Append streams 2</name>
+    <name>Append legacy ids</name>
     <type>Append</type>
     <description/>
     <distribute>Y</distribute>
@@ -1015,8 +1205,8 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <head_name>Append streams</head_name>
-    <tail_name>Select values 2 3</tail_name>
+    <head_name>append metadata</head_name>
+    <tail_name>select metadata attributes</tail_name>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -1027,7 +1217,7 @@
     </remotesteps>
     <GUI>
       <xloc>1168</xloc>
-      <yloc>640</yloc>
+      <yloc>528</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1117,7 +1307,7 @@ var file_path = getVariable('file_root','') + '/' + file_main_dir + '/' + filefo
     </GUI>
   </step>
   <step>
-    <name>Database join</name>
+    <name>Get pointer cris id</name>
     <type>DBJoin</type>
     <description/>
     <distribute>Y</distribute>
@@ -1161,13 +1351,13 @@ WHERE subquery.table_name = ? AND subquery.id = ?;</sql>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>336</xloc>
+      <xloc>368</xloc>
       <yloc>832</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Database join 2</name>
+    <name>Get related entity title</name>
     <type>DBJoin</type>
     <description/>
     <distribute>Y</distribute>
@@ -1251,52 +1441,13 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>336</xloc>
+      <xloc>368</xloc>
       <yloc>928</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Get variables</name>
-    <type>GetVariable</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <name>entity_type_var</name>
-        <variable>${ENTITY_TYPE}</variable>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>208</xloc>
-      <yloc>16</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Get variables 2</name>
+    <name>Get ENTITY_TYPE from variables 2</name>
     <type>GetVariable</type>
     <description/>
     <distribute>Y</distribute>
@@ -1330,6 +1481,45 @@ WHERE property_def.id = properties.typo_id
     </remotesteps>
     <GUI>
       <xloc>256</xloc>
+      <yloc>16</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Get ENTITY_TYPE from variables</name>
+    <type>GetVariable</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>entity_type_var</name>
+        <variable>${ENTITY_TYPE}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>288</xloc>
       <yloc>464</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1366,13 +1556,13 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>384</xloc>
+      <xloc>400</xloc>
       <yloc>224</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Join rows 2</name>
+    <name>Join rows 3</name>
     <type>JoinRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -1384,7 +1574,7 @@ WHERE property_def.id = properties.typo_id
     </partitioning>
     <directory>%%java.io.tmpdir%%</directory>
     <prefix>out</prefix>
-    <cache_size>500</cache_size>
+    <cache_size>50000</cache_size>
     <main>project metadata</main>
     <compare>
       <condition>
@@ -1409,7 +1599,7 @@ WHERE property_def.id = properties.typo_id
     </GUI>
   </step>
   <step>
-    <name>Join rows 3</name>
+    <name>Join rows 6</name>
     <type>JoinRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -1478,12 +1668,86 @@ WHERE property_def.id = properties.typo_id
     </remotesteps>
     <GUI>
       <xloc>432</xloc>
-      <yloc>1024</yloc>
+      <yloc>1120</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Modified JavaScript value</name>
+    <name>Join rows 5</name>
+    <type>JoinRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <cache_size>500</cache_size>
+    <main/>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue/>
+        <function>=</function>
+        <rightvalue/>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1648</xloc>
+      <yloc>528</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Join rows 2</name>
+    <type>JoinRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <cache_size>500</cache_size>
+    <main/>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue/>
+        <function>=</function>
+        <rightvalue/>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>704</xloc>
+      <yloc>224</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>calculate metadata value and authority</name>
     <type>ScriptValueMod</type>
     <description/>
     <distribute>Y</distribute>
@@ -1531,12 +1795,12 @@ var metadata_authority = null;</jsScript_script>
     </remotesteps>
     <GUI>
       <xloc>1168</xloc>
-      <yloc>896</yloc>
+      <yloc>784</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Modified JavaScript value 2</name>
+    <name>Calculate pointer id and table</name>
     <type>ScriptValueMod</type>
     <description/>
     <distribute>Y</distribute>
@@ -1595,13 +1859,13 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>176</xloc>
+      <xloc>192</xloc>
       <yloc>832</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Modified JavaScript value 3</name>
+    <name>set null metadata authority</name>
     <type>ScriptValueMod</type>
     <description/>
     <distribute>Y</distribute>
@@ -1639,8 +1903,54 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>928</xloc>
-      <yloc>544</yloc>
+      <xloc>752</xloc>
+      <yloc>432</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Calculate will be referenced authority</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>//Script qua
+var metadata_authority = 'will be referenced::LEGACY-ID::' + pointer_crisid;
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>metadata_authority</name>
+        <rename>metadata_authority</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>640</xloc>
+      <yloc>832</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1719,35 +2029,27 @@ if(entityPrefix == 'ou'){
     <fields>
       <field>
         <name>schema</name>
-        <rename/>
       </field>
       <field>
         <name>element</name>
-        <rename/>
       </field>
       <field>
         <name>qualifier</name>
-        <rename/>
       </field>
       <field>
         <name>imp_record_id</name>
-        <rename/>
       </field>
       <field>
         <name>metadata_value</name>
-        <rename/>
       </field>
       <field>
         <name>metadata_order</name>
-        <rename/>
       </field>
       <field>
         <name>crisid</name>
-        <rename/>
       </field>
       <field>
         <name>metadata_authority</name>
-        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
@@ -1760,13 +2062,13 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>720</xloc>
-      <yloc>640</yloc>
+      <xloc>752</xloc>
+      <yloc>528</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Select values 2 2</name>
+    <name>select imp record id and crisid</name>
     <type>SelectValues</type>
     <description/>
     <distribute>Y</distribute>
@@ -1779,9 +2081,11 @@ if(entityPrefix == 'ou'){
     <fields>
       <field>
         <name>imp_record_id</name>
+        <rename/>
       </field>
       <field>
         <name>crisid</name>
+        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
@@ -1795,12 +2099,12 @@ if(entityPrefix == 'ou'){
     </remotesteps>
     <GUI>
       <xloc>912</xloc>
-      <yloc>784</yloc>
+      <yloc>672</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Select values 2 3</name>
+    <name>select metadata attributes</name>
     <type>SelectValues</type>
     <description/>
     <distribute>N</distribute>
@@ -1855,12 +2159,12 @@ if(entityPrefix == 'ou'){
     </remotesteps>
     <GUI>
       <xloc>1168</xloc>
-      <yloc>784</yloc>
+      <yloc>672</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Select values 2 3 2</name>
+    <name>Select values 3</name>
     <type>SelectValues</type>
     <description/>
     <distribute>N</distribute>
@@ -1914,13 +2218,13 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>624</xloc>
+      <xloc>640</xloc>
       <yloc>736</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Sort rows</name>
+    <name>Sort by imp record id</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -1957,15 +2261,15 @@ if(entityPrefix == 'ou'){
     </remotesteps>
     <GUI>
       <xloc>912</xloc>
-      <yloc>896</yloc>
+      <yloc>784</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Unique rows</name>
+    <name>Unique rows by imp_record id and crisid</name>
     <type>Unique</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
     <partitioning>
@@ -1996,7 +2300,7 @@ if(entityPrefix == 'ou'){
     </remotesteps>
     <GUI>
       <xloc>912</xloc>
-      <yloc>1008</yloc>
+      <yloc>896</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2037,13 +2341,13 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>768</xloc>
-      <yloc>544</yloc>
+      <xloc>608</xloc>
+      <yloc>432</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>add order 2</name>
+    <name>add order 3</name>
     <type>FieldsChangeSequence</type>
     <description/>
     <distribute>Y</distribute>
@@ -2079,7 +2383,7 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>512</xloc>
+      <xloc>640</xloc>
       <yloc>928</yloc>
       <draw>Y</draw>
     </GUI>
@@ -2124,8 +2428,98 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>608</xloc>
+      <xloc>784</xloc>
       <yloc>1120</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>calculate imp metadatavalue id </name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>imp_metadatavalue_id</name>
+        <rename>imp_metadatavalue_id</rename>
+        <type>Integer</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1648</xloc>
+      <yloc>784</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>calculate imp record id</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var imp_record_id = max_imp_record_id + row_number;
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>imp_record_id</name>
+        <rename>imp_record_id</rename>
+        <type>Integer</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1008</xloc>
+      <yloc>224</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2172,7 +2566,7 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>464</xloc>
+      <xloc>480</xloc>
       <yloc>736</yloc>
       <draw>Y</draw>
     </GUI>
@@ -2297,13 +2691,313 @@ if(entityPrefix == 'ou'){
 FROM "public".${ENTITY_TABLE}
 WHERE ${ENTITY_FILTER}
 </sql>
-    <limit>0</limit>
+    <limit/>
     <lookup/>
     <execute_each_row>N</execute_each_row>
     <variables_active>Y</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
     <cached_row_meta_active>N</cached_row_meta_active>
-    <row-meta/>
+    <row-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>id</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>entities</origin>
+        <comments>id</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>crisid</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>entities</origin>
+        <comments>crisid</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>sourceid</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>entities</origin>
+        <comments>sourceid</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Boolean</type>
+        <storagetype>normal</storagetype>
+        <name>status</name>
+        <length>-1</length>
+        <precision>-1</precision>
+        <origin>entities</origin>
+        <comments>status</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>uuid</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>entities</origin>
+        <comments>uuid</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>epersonid</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>entities</origin>
+        <comments>epersonid</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Timestamp</type>
+        <storagetype>normal</storagetype>
+        <name>namestimestamplastmodified</name>
+        <length>6</length>
+        <precision>-1</precision>
+        <origin>entities</origin>
+        <comments>namestimestamplastmodified</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Timestamp</type>
+        <storagetype>normal</storagetype>
+        <name>timestampcreated</name>
+        <length>6</length>
+        <precision>-1</precision>
+        <origin>entities</origin>
+        <comments>timestampcreated</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Timestamp</type>
+        <storagetype>normal</storagetype>
+        <name>timestamplastmodified</name>
+        <length>6</length>
+        <precision>-1</precision>
+        <origin>entities</origin>
+        <comments>timestamplastmodified</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>sourceref</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>entities</origin>
+        <comments>sourceref</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>oldsourceid</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>entities</origin>
+        <comments>oldsourceid</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>oldsourceref</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>entities</origin>
+        <comments>oldsourceref</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>row_number</name>
+        <length>15</length>
+        <precision>0</precision>
+        <origin>entities</origin>
+        <comments>row_number</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+    </row-meta>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -2957,13 +3651,13 @@ WHERE email = '${eperson_email}'
       </output>
     </remotesteps>
     <GUI>
-      <xloc>208</xloc>
-      <yloc>96</yloc>
+      <xloc>256</xloc>
+      <yloc>112</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>filter by entity type 3</name>
+    <name>filter by entity type 2</name>
     <type>FilterRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -2973,7 +3667,7 @@ WHERE email = '${eperson_email}'
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <send_true_to>Join rows 3</send_true_to>
+    <send_true_to>Join rows 6</send_true_to>
     <send_false_to/>
     <compare>
       <condition>
@@ -2997,7 +3691,7 @@ WHERE email = '${eperson_email}'
       </output>
     </remotesteps>
     <GUI>
-      <xloc>256</xloc>
+      <xloc>288</xloc>
       <yloc>544</yloc>
       <draw>Y</draw>
     </GUI>
@@ -3028,8 +3722,8 @@ WHERE email = '${eperson_email}'
       </output>
     </remotesteps>
     <GUI>
-      <xloc>384</xloc>
-      <yloc>16</yloc>
+      <xloc>400</xloc>
+      <yloc>112</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3050,7 +3744,7 @@ WHERE email = '${eperson_email}'
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
+    <use_batch>N</use_batch>
     <specify_fields>Y</specify_fields>
     <partitioning_enabled>N</partitioning_enabled>
     <partitioning_field/>
@@ -3088,7 +3782,7 @@ WHERE email = '${eperson_email}'
       </output>
     </remotesteps>
     <GUI>
-      <xloc>800</xloc>
+      <xloc>992</xloc>
       <yloc>1120</yloc>
       <draw>Y</draw>
     </GUI>
@@ -3110,7 +3804,7 @@ WHERE email = '${eperson_email}'
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
+    <use_batch>N</use_batch>
     <specify_fields>Y</specify_fields>
     <partitioning_enabled>N</partitioning_enabled>
     <partitioning_field/>
@@ -3164,8 +3858,8 @@ WHERE email = '${eperson_email}'
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1344</xloc>
-      <yloc>1040</yloc>
+      <xloc>1648</xloc>
+      <yloc>896</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3186,7 +3880,7 @@ WHERE email = '${eperson_email}'
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
+    <use_batch>N</use_batch>
     <specify_fields>Y</specify_fields>
     <partitioning_enabled>N</partitioning_enabled>
     <partitioning_field/>
@@ -3366,7 +4060,7 @@ WHERE email = '${eperson_email}'
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <send_true_to>Modified JavaScript value 2</send_true_to>
+    <send_true_to>Calculate pointer id and table</send_true_to>
     <send_false_to>is file</send_false_to>
     <compare>
       <condition>
@@ -3461,6 +4155,126 @@ FROM "public".imp_bitstream
     <GUI>
       <xloc>64</xloc>
       <yloc>1120</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>max imp_metadatavalue id</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>dspacefvg</connection>
+    <sql>SELECT max(imp_metadatavalue_id) as max_imp_metadatavalue_id
+FROM "public".imp_metadatavalue
+</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <cached_row_meta_active>N</cached_row_meta_active>
+    <row-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>max_imp_metadatavalue_id</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>max imp_metadatavalue id</origin>
+        <comments>max_imp_metadatavalue_id</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+    </row-meta>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1648</xloc>
+      <yloc>288</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>max imp_record id</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>dspacefvg</connection>
+    <sql>SELECT max(imp_id) as max_imp_record_id
+FROM "public".imp_record
+</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <cached_row_meta_active>N</cached_row_meta_active>
+    <row-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>max_imp_record_id</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>max imp_record id</origin>
+        <comments>max_imp_record_id</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+    </row-meta>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>576</xloc>
+      <yloc>48</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3641,14 +4455,14 @@ FROM "public".imp_bitstream
       </output>
     </remotesteps>
     <GUI>
-      <xloc>592</xloc>
-      <yloc>544</yloc>
+      <xloc>560</xloc>
+      <yloc>624</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>0 if null (2)</name>
-    <type>IfNull</type>
+    <name>Get ENTITY_TYPE from variables 3</name>
+    <type>GetVariable</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -3657,242 +4471,18 @@ FROM "public".imp_bitstream
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <replaceAllByValue/>
-    <replaceAllMask/>
-    <selectFields>Y</selectFields>
-    <selectValuesType>N</selectValuesType>
-    <setEmptyStringAll>N</setEmptyStringAll>
-    <valuetypes>
-      </valuetypes>
     <fields>
       <field>
-        <name>max_imp_metadatavalue_id</name>
-        <value>0</value>
-        <mask/>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1344</xloc>
-      <yloc>544</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>max imp_metadatavalue id</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>dspacefvg</connection>
-    <sql>SELECT max(imp_metadatavalue_id) as max_imp_metadatavalue_id
-FROM "public".imp_metadatavalue
-</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-    <cached_row_meta_active>N</cached_row_meta_active>
-    <row-meta>
-      <value-meta>
-        <type>Integer</type>
-        <storagetype>normal</storagetype>
-        <name>max_imp_metadatavalue_id</name>
-        <length>9</length>
-        <precision>0</precision>
-        <origin>max imp_metadatavalue id</origin>
-        <comments>max_imp_metadatavalue_id</comments>
-        <conversion_Mask>####0;-####0</conversion_Mask>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-    </row-meta>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1344</xloc>
-      <yloc>464</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Join rows 5</name>
-    <type>JoinRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <directory>%%java.io.tmpdir%%</directory>
-    <prefix>out</prefix>
-    <cache_size>500</cache_size>
-    <main/>
-    <compare>
-      <condition>
-        <negated>N</negated>
-        <leftvalue/>
-        <function>=</function>
-        <rightvalue/>
-      </condition>
-    </compare>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1344</xloc>
-      <yloc>640</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Add row number 2 2</name>
-    <type>Sequence</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <valuename>row_number</valuename>
-    <use_database>N</use_database>
-    <connection/>
-    <schema/>
-    <seqname>SEQ_</seqname>
-    <use_counter>Y</use_counter>
-    <counter_name/>
-    <start_at>1</start_at>
-    <increment_by>1</increment_by>
-    <max_value>999999999</max_value>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1344</xloc>
-      <yloc>736</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>calculate imp bitstream id 2</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>var imp_metadatavalue_id = max_imp_metadatavalue_id + row_number;
-</jsScript_script>
-      </jsScript>
-    </jsScripts>
-    <fields>
-      <field>
-        <name>imp_metadatavalue_id</name>
-        <rename>imp_metadatavalue_id</rename>
-        <type>Integer</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1344</xloc>
-      <yloc>848</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Modified JavaScript value 4</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>//Script qua
-var metadata_authority = 'will be referenced::LEGACY-ID::' + pointer_crisid;
-</jsScript_script>
-      </jsScript>
-    </jsScripts>
-    <fields>
-      <field>
-        <name>metadata_authority</name>
-        <rename>metadata_authority</rename>
+        <name>entity_type_var</name>
+        <variable>${ENTITY_TYPE}</variable>
         <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
         <length>-1</length>
         <precision>-1</precision>
-        <replace>N</replace>
+        <trim_type>none</trim_type>
       </field>
     </fields>
     <attributes/>
@@ -3904,14 +4494,14 @@ var metadata_authority = 'will be referenced::LEGACY-ID::' + pointer_crisid;
       </output>
     </remotesteps>
     <GUI>
-      <xloc>560</xloc>
-      <yloc>832</yloc>
+      <xloc>912</xloc>
+      <yloc>1008</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>0 if null</name>
-    <type>IfNull</type>
+    <name>is Person</name>
+    <type>FilterRows</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -3920,18 +4510,148 @@ var metadata_authority = 'will be referenced::LEGACY-ID::' + pointer_crisid;
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <replaceAllByValue/>
-    <replaceAllMask/>
-    <selectFields>Y</selectFields>
-    <selectValuesType>N</selectValuesType>
-    <setEmptyStringAll>N</setEmptyStringAll>
-    <valuetypes>
-      </valuetypes>
+    <send_true_to>Get eperson</send_true_to>
+    <send_false_to/>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue>entity_type_var</leftvalue>
+        <function>=</function>
+        <rightvalue/>
+        <value>
+          <name>constant</name>
+          <type>String</type>
+          <text>Person</text>
+          <length>-1</length>
+          <precision>-1</precision>
+          <isnull>N</isnull>
+          <mask/>
+        </value>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1168</xloc>
+      <yloc>1008</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Get eperson</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>dspacefvg</connection>
+    <rowlimit>1</rowlimit>
+    <sql>SELECT ep.uuid as metadata_authority, ep.email as metadata_value
+FROM old_cris_rpage rpage,
+eperson ep
+WHERE rpage.crisid = ? AND ep.eperson_id = rpage.epersonid;</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>Y</replace_vars>
+    <parameter>
+      <field>
+        <name>crisid</name>
+        <type>String</type>
+      </field>
+    </parameter>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1424</xloc>
+      <yloc>1008</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>add cris owner metadata field</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <fields>
       <field>
-        <name>max_imp_record_id</name>
-        <value>0</value>
-        <mask/>
+        <name>schema</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>cris</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>element</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>owner</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>metadata_order</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>0</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>qualifier</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>metadata_authority</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <length>-1</length>
+        <precision>-1</precision>
         <set_empty_string>N</set_empty_string>
       </field>
     </fields>
@@ -3944,14 +4664,14 @@ var metadata_authority = 'will be referenced::LEGACY-ID::' + pointer_crisid;
       </output>
     </remotesteps>
     <GUI>
-      <xloc>704</xloc>
-      <yloc>48</yloc>
+      <xloc>1424</xloc>
+      <yloc>784</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>max imp_record id</name>
-    <type>TableInput</type>
+    <name>owner not null</name>
+    <type>FilterRows</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -3960,75 +4680,13 @@ var metadata_authority = 'will be referenced::LEGACY-ID::' + pointer_crisid;
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>dspacefvg</connection>
-    <sql>SELECT max(imp_id) as max_imp_record_id
-FROM "public".imp_record
-</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-    <cached_row_meta_active>N</cached_row_meta_active>
-    <row-meta>
-      <value-meta>
-        <type>Integer</type>
-        <storagetype>normal</storagetype>
-        <name>max_imp_record_id</name>
-        <length>9</length>
-        <precision>0</precision>
-        <origin>max imp_record id</origin>
-        <comments>max_imp_record_id</comments>
-        <conversion_Mask>####0;-####0</conversion_Mask>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-    </row-meta>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>544</xloc>
-      <yloc>48</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Join rows 5 2</name>
-    <type>JoinRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <directory>%%java.io.tmpdir%%</directory>
-    <prefix>out</prefix>
-    <cache_size>500</cache_size>
-    <main/>
+    <send_true_to>add cris owner metadata field</send_true_to>
+    <send_false_to/>
     <compare>
       <condition>
         <negated>N</negated>
-        <leftvalue/>
-        <function>=</function>
+        <leftvalue>metadata_value</leftvalue>
+        <function>IS NOT NULL</function>
         <rightvalue/>
       </condition>
     </compare>
@@ -4041,76 +4699,48 @@ FROM "public".imp_record
       </output>
     </remotesteps>
     <GUI>
-      <xloc>704</xloc>
-      <yloc>224</yloc>
+      <xloc>1424</xloc>
+      <yloc>896</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Add row number 2 2 2</name>
-    <type>Sequence</type>
+    <name>select metadata attributes 2</name>
+    <type>SelectValues</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
     <partitioning>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <valuename>row_number</valuename>
-    <use_database>N</use_database>
-    <connection/>
-    <schema/>
-    <seqname>SEQ_</seqname>
-    <use_counter>Y</use_counter>
-    <counter_name/>
-    <start_at>1</start_at>
-    <increment_by>1</increment_by>
-    <max_value>999999999</max_value>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>832</xloc>
-      <yloc>224</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>calculate imp record id</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>var imp_record_id = max_imp_record_id + row_number;
-</jsScript_script>
-      </jsScript>
-    </jsScripts>
     <fields>
       <field>
-        <name>imp_record_id</name>
-        <rename>imp_record_id</rename>
-        <type>Integer</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
+        <name>schema</name>
       </field>
+      <field>
+        <name>element</name>
+      </field>
+      <field>
+        <name>qualifier</name>
+      </field>
+      <field>
+        <name>imp_record_id</name>
+      </field>
+      <field>
+        <name>metadata_value</name>
+      </field>
+      <field>
+        <name>metadata_order</name>
+      </field>
+      <field>
+        <name>crisid</name>
+      </field>
+      <field>
+        <name>metadata_authority</name>
+      </field>
+      <select_unspecified>N</select_unspecified>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -4121,8 +4751,35 @@ FROM "public".imp_record
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1008</xloc>
-      <yloc>224</yloc>
+      <xloc>1424</xloc>
+      <yloc>672</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Append cris owner</name>
+    <type>Append</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <head_name>Append legacy ids</head_name>
+    <tail_name>select metadata attributes 2</tail_name>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1424</xloc>
+      <yloc>528</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
