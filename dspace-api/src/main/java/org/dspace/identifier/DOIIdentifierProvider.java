@@ -229,7 +229,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @throws IdentifierException
      */
     @Override
-    public String register(Context context, DSpaceObject dso, Boolean skipFilter)
+    public String register(Context context, DSpaceObject dso, boolean skipFilter)
         throws IdentifierException {
         if (!(dso instanceof Item)) {
             // DOI are currently assigned only to Item
@@ -253,7 +253,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @throws IdentifierException
      */
     @Override
-    public void register(Context context, DSpaceObject dso, String identifier, Boolean skipFilter)
+    public void register(Context context, DSpaceObject dso, String identifier, boolean skipFilter)
         throws IdentifierException {
         if (!(dso instanceof Item)) {
             // DOI are currently assigned only to Item
@@ -322,7 +322,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @throws SQLException
      */
     @Override
-    public void reserve(Context context, DSpaceObject dso, String identifier, Boolean skipFilter)
+    public void reserve(Context context, DSpaceObject dso, String identifier, boolean skipFilter)
         throws IdentifierException, IllegalArgumentException {
         String doi = doiService.formatIdentifier(identifier);
         DOI doiRow = null;
@@ -371,7 +371,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @throws IllegalArgumentException
      * @throws SQLException
      */
-    public void reserveOnline(Context context, DSpaceObject dso, String identifier, Boolean skipFilter)
+    public void reserveOnline(Context context, DSpaceObject dso, String identifier, boolean skipFilter)
             throws IdentifierException, IllegalArgumentException, SQLException {
         String doi = doiService.formatIdentifier(identifier);
         // get TableRow and ensure DOI belongs to dso regarding our db
@@ -414,9 +414,9 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @throws IllegalArgumentException
      * @throws SQLException
      */
-    public void registerOnline(Context context, DSpaceObject dso, String identifier, Boolean skipFilter)
+    public void registerOnline(Context context, DSpaceObject dso, String identifier, boolean skipFilter)
             throws IdentifierException, IllegalArgumentException, SQLException {
-        log.debug("registerOnline: skipFilter is " + skipFilter.toString());
+        log.debug("registerOnline: skipFilter is " + skipFilter);
 
         String doi = doiService.formatIdentifier(identifier);
         // get TableRow and ensure DOI belongs to dso regarding our db
@@ -470,7 +470,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
         String doi = doiService.formatIdentifier(identifier);
 
-        Boolean skipFilter = false;
+        boolean skipFilter = false;
 
         if (doiService.findDOIByDSpaceObject(context, dso) != null) {
             // We can skip the filter here since we know the DOI already exists for the item
@@ -576,12 +576,12 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * Mint a new DOI in DSpace - this is usually the first step of registration
      * @param context    - DSpace context
      * @param dso        - DSpaceObject identified by the new identifier
-     * @param skipFilter - boolean indicating whether to skip any filtering of items before minting
+     * @param skipFilter - boolean indicating whether to skip any filtering of items before minting.
      * @return a String containing the new identifier
      * @throws IdentifierException
      */
     @Override
-    public String mint(Context context, DSpaceObject dso, Boolean skipFilter) throws IdentifierException {
+    public String mint(Context context, DSpaceObject dso, boolean skipFilter) throws IdentifierException {
 
         String doi = null;
         try {
@@ -910,7 +910,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @throws SQLException
      * @throws DOIIdentifierException
      */
-    protected DOI loadOrCreateDOI(Context context, DSpaceObject dso, String doiIdentifier, Boolean skipFilter)
+    protected DOI loadOrCreateDOI(Context context, DSpaceObject dso, String doiIdentifier, boolean skipFilter)
         throws SQLException, DOIIdentifierException, IdentifierNotApplicableException {
 
         DOI doi = null;
@@ -1105,8 +1105,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         if (this.filterService != null && contentServiceFactory
             .getDSpaceObjectService(dso).getTypeText(dso).equals("ITEM")) {
             try {
-                Boolean result = filterService.getResult(context, (Item) dso);
-                log.debug("Result of filter for " + dso.getHandle() + " is " + result.toString());
+                boolean result = filterService.getResult(context, (Item) dso);
+                log.debug("Result of filter for " + dso.getHandle() + " is " + result);
                 if (!result) {
                     throw new DOIIdentifierNotApplicableException("Item " + dso.getHandle() +
                         " was evaluated as 'false' by the item filter, not minting");
