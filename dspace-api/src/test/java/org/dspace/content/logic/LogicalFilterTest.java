@@ -220,7 +220,7 @@ public class LogicalFilterTest extends AbstractUnitTest {
     public void testAndOperator() {
         // Blank operator
         And and = new And();
-        // Try tests - the item can be null, as the statements are simply returning booleans themselves
+        // Try tests
         try {
             // Set to True, True (expect True)
             and.setStatements(trueStatements);
@@ -247,20 +247,20 @@ public class LogicalFilterTest extends AbstractUnitTest {
     public void testOrOperator() {
         // Blank operator
         Or or = new Or();
-        // Try tests - the item can be null, as the statements are simply returning booleans themselves
+        // Try tests
         try {
             // Set to True, True (expect True)
             or.setStatements(trueStatements);
             assertTrue("OR operator did not return true for a list of true statements",
-                or.getResult(context, null));
+                or.getResult(context, itemOne));
             // Set to True, False (expect True)
             or.setStatements(trueFalseStatements);
             assertTrue("OR operator did not return true for a list of statements with at least one false",
-                or.getResult(context, null));
+                or.getResult(context, itemOne));
             // Set to False, False (expect False)
             or.setStatements(falseStatements);
             assertFalse("OR operator did not return false for a list of false statements",
-                or.getResult(context, null));
+                or.getResult(context, itemOne));
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the OR operator" + e.getMessage());
@@ -274,20 +274,20 @@ public class LogicalFilterTest extends AbstractUnitTest {
     public void testNandOperator() {
         // Blank operator
         Nand nand = new Nand();
-        // Try tests - the item can be null, as the statements are simply returning booleans themselves
+        // Try tests
         try {
             // Set to True, True (expect False)
             nand.setStatements(trueStatements);
             assertFalse("NAND operator did not return false for a list of true statements",
-                nand.getResult(context, null));
+                nand.getResult(context, itemOne));
             // Set to True, False (expect True)
             nand.setStatements(trueFalseStatements);
             assertTrue("NAND operator did not return true for a list of statements with at least one false",
-                nand.getResult(context, null));
+                nand.getResult(context, itemOne));
             // Set to False, False (expect True)
             nand.setStatements(falseStatements);
             assertTrue("NAND operator did not return true for a list of false statements",
-                nand.getResult(context, null));
+                nand.getResult(context, itemOne));
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the NAND operator" + e.getMessage());
@@ -301,20 +301,20 @@ public class LogicalFilterTest extends AbstractUnitTest {
     public void testNorOperator() {
         // Blank operator
         Nor nor = new Nor();
-        // Try tests - the item can be null, as the statements are simply returning booleans themselves
+        // Try tests
         try {
             // Set to True, True (expect False)
             nor.setStatements(trueStatements);
             assertFalse("NOR operator did not return false for a list of true statements",
-                nor.getResult(context, null));
+                nor.getResult(context, itemOne));
             // Set to True, False (expect False)
             nor.setStatements(trueFalseStatements);
             assertFalse("NOR operator did not return false for a list of statements with a true and a false",
-                nor.getResult(context, null));
+                nor.getResult(context, itemOne));
             // Set to False, False (expect True)
             nor.setStatements(falseStatements);
             assertTrue("NOR operator did not return true for a list of false statements",
-                nor.getResult(context, null));
+                nor.getResult(context, itemOne));
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the NOR operator" + e.getMessage());
@@ -328,16 +328,16 @@ public class LogicalFilterTest extends AbstractUnitTest {
     public void testNotOperator() {
         // Blank operator
         Not not = new Not();
-        // Try tests - the item can be null, as the statements are simply returning booleans themselves
+        // Try tests
         try {
             // Set to True (expect False)
             not.setStatements(trueStatementOne);
             assertFalse("NOT operator did not return false for a true statement",
-                not.getResult(context, null));
+                not.getResult(context, itemOne));
             // Set to False (expect True)
             not.setStatements(falseStatementOne);
             assertTrue("NOT operator did not return true for a false statement",
-                not.getResult(context, null));
+                not.getResult(context, itemOne));
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the NOT operator" + e.getMessage());
