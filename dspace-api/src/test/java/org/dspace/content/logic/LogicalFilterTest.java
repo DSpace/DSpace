@@ -14,6 +14,7 @@ import static org.junit.Assert.fail;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.sql.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -419,6 +420,14 @@ public class LogicalFilterTest extends AbstractUnitTest {
         patterns.add("(?i)yes$");
         // Add the list of possible patterns
         parameters.put("patterns", patterns);
+
+        // Alternate parameters to test for a field where the item has no values
+        Map<String, Object> missingParameters = new HashMap<>();
+        // Match on the dc.subject field - none of our test items have this field set
+        missingParameters.put("field", "dc.subject");
+        // Add a pattern to the missing parameters
+        missingParameters.put("patterns", new ArrayList<>().add("TEST"));
+
         // Set up condition with these parameters and add it as the sole statement to the metadata filter
         try {
             condition.setParameters(parameters);
@@ -432,6 +441,12 @@ public class LogicalFilterTest extends AbstractUnitTest {
             // Test the filter on the third item - expected outcome is false
             assertFalse("itemThree unexpectedly matched the " +
                 "'dc.title starts with TEST or ends with yes' test", filter.getResult(context, itemThree));
+            // Set condition and filter to use the missing field instead
+            condition.setParameters(missingParameters);
+            filter.setStatement(condition);
+            // Test this updated filter against the first item - expected outcome is false
+            assertFalse("itemOne unexpectedly matched the 'dc.subject contains TEST' test" +
+                "(it has no dc.subject metadata value)", filter.getResult(context, itemOne));
         } catch (LogicalStatementException e) {
             log.error(e.getMessage());
             fail("LogicalStatementException thrown testing the MetadataValuesMatchCondition filter" + e.getMessage());
