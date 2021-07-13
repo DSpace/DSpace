@@ -310,15 +310,14 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
     }
 
-    /**
-     * Add relationships from a 'relationships' manifest file.
-     * 
-     * Each line in the file contains a relationship type id and an item identifier in the following format:
-     * 
-     * <relationship_type_id> <handle|uuid|import_item_folder>
-     * 
-     * The input_item_folder should refer the folder name of another item in this import batch.
-     */
+     /**
+      * Add relationships from a 'relationships' manifest file.
+      * 
+      * @param c Context
+      * @param sourceDir The parent import source directory
+      * @param itemMap Item imported in this batch, keyed by their import subfolder
+      * @throws Exception
+      */
     protected void addRelationships(Context c, String sourceDir, Map<String, Item> itemMap) throws Exception {
 
         System.out.println("Linking relationships");
@@ -332,13 +331,13 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             System.out.println("Adding relationships from directory "+ folderName);
 
             //look for a 'relationship' manifest
-            Map<Integer, String> relationships = processRelationshipFile(path, "relationships");
+            Map<Integer, List<String>> relationships = processRelationshipFile(path, "relationships");
             if (!relationships.isEmpty()) {
 
-                for (Map.Entry<Integer, String> relEntry : relationships.entrySet()) {
+                for (Map.Entry<Integer, List<String>> relEntry : relationships.entrySet()) {
                     
                     Integer relationshipTypeId = relEntry.getKey();
-                    String itemIdentifier = relEntry.getValue();
+                    List<String> identifierList = relEntry.getValue();
 
                     RelationshipType relationshipType = null;
                     try {
@@ -348,13 +347,17 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         throw e;
                     }
 
-                    Item rightItem = resolveRelatedItem(c, itemMap, itemIdentifier);
-                    if (null == rightItem) {
-                        throw new Exception("\tERROR: could not find item for "+ itemIdentifier);
-                    } 
+                    for (String itemIdentifier : identifierList) {
 
-                    Relationship relationship = relationshipService.create(c, leftItem, rightItem, relationshipType, -1, -1);
-                    System.out.println("\tAdded relationship (type: "+ relationshipTypeId +") to "+ rightItem.getHandle());
+                        Item rightItem = resolveRelatedItem(c, itemMap, itemIdentifier);
+                        if (null == rightItem) {
+                            throw new Exception("\tERROR: could not find item for "+ itemIdentifier);
+                        } 
+
+                        Relationship relationship = relationshipService.create(c, leftItem, rightItem, relationshipType, -1, -1);
+                        System.out.println("\tAdded relationship (type: "+ relationshipTypeId +") to "+ rightItem.getHandle());
+
+                    }
 
                 }
 
@@ -364,31 +367,24 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     }
 
-    protected Item resolveRelatedItem(Context c, Map<String, Item> itemMap, String itemIdentifier) throws Exception {
-
-        Item item = null;
-
-        if (itemMap.containsKey(itemIdentifier)) {
-            //identifier refers to a folder name in this import batch
-            item = itemMap.get(itemIdentifier);
-
-        } else if (itemIdentifier.indexOf('/') != -1) {
-            //resolve by handle
-            item = (Item) handleService.resolveToObject(c, itemIdentifier);
-
-        } else {
-            //try to resolve by UUID
-            item = itemService.findByIdOrLegacyId(c, itemIdentifier);
-        }
-
-        return item;
-
-    }
-
-    protected Map<Integer, String> processRelationshipFile(String path, String filename) throws Exception {
+    /**
+     * Read the relationship manifest file.
+     * 
+     * Each line in the file contains a relationship type id and an item identifier in the following format:
+     * 
+     * <relationship_type_id> <handle|uuid|import_item_folder>
+     * 
+     * The input_item_folder should refer the folder name of another item in this import batch.
+     * 
+     * @param path The main import folder path.
+     * @param filename The name of the manifest file to check ('relationships')
+     * @return Map of found relationships
+     * @throws Exception
+     */
+    protected Map<Integer, List<String>> processRelationshipFile(String path, String filename) throws Exception {
 
         File file = new File(path + File.separatorChar + filename);
-        Map<Integer, String> result = new HashMap<Integer, String>();
+        Map<Integer, List<String>> result = new HashMap<>();
 
         if (file.exists()) {
 
@@ -426,7 +422,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         throw new Exception("Bad mapfile line:\n" + line);
                     }
 
-                    result.put(relationshipTypeId, itemIdentifier);
+                    if (!result.containsKey(relationshipTypeId)) {
+                        result.put(relationshipTypeId, new ArrayList<>()); 
+                    } 
+                    
+                    result.get(relationshipTypeId).add(itemIdentifier);
 
                 }
 
@@ -447,6 +447,39 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
 
         return result;
+    }
+
+     /**
+      * Resolve an item identifier referred to in the relationships manifest file.
+      *
+      * The import item map will be checked first to see if the identifier refers to an item folder
+      * that was just imported. Next it will try to find the item by handle or UUID.
+      * 
+      * @param c Context
+      * @param itemMap Item imported in this batch, keyed by their import subfolder
+      * @param itemIdentifier The identifier string found in the import manifest (handle, uuid, or another import subfolder)
+      * @return Item if found, or null.
+      * @throws Exception
+      */
+      protected Item resolveRelatedItem(Context c, Map<String, Item> itemMap, String itemIdentifier) throws Exception {
+
+        Item item = null;
+
+        if (itemMap.containsKey(itemIdentifier)) {
+            //identifier refers to a folder name in this import batch
+            item = itemMap.get(itemIdentifier);
+
+        } else if (itemIdentifier.indexOf('/') != -1) {
+            //resolve by handle
+            item = (Item) handleService.resolveToObject(c, itemIdentifier);
+
+        } else {
+            //try to resolve by UUID
+            item = itemService.findByIdOrLegacyId(c, itemIdentifier);
+        }
+
+        return item;
+
     }
 
     @Override
