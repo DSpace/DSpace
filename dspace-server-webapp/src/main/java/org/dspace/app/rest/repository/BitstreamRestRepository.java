@@ -19,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
@@ -186,17 +185,9 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
 
             if (matchedBitstreams.isEmpty()) {
                 return null;
+            } else {
+                return converter.toRest(matchedBitstreams.get(0), utils.obtainProjection());
             }
-
-            // Returns the first matching bitstream the user has READ access to
-            for (Bitstream bitstream : matchedBitstreams) {
-                if (bitstreamMetadataReadPermissionEvaluatorPlugin
-                    .metadataReadPermissionOnBitstream(context, bitstream)) {
-                    return converter.toRest(bitstream, utils.obtainProjection());
-                }
-            }
-            throw new RESTAuthorizationException("Current user cannot access the bitstream.");
-
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
