@@ -44,7 +44,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
 import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.FileUtils;
@@ -68,6 +67,8 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataSchemaEnum;
+import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -77,6 +78,8 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -151,6 +154,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected WorkflowService workflowService;
     @Autowired(required = true)
     protected ConfigurationService configurationService;
+    @Autowired(required = true)
+    protected RelationshipService relationshipService;
+    @Autowired(required = true)
+    protected RelationshipTypeService relationshipTypeService;
 
     protected String tempWorkDir;
 
@@ -159,6 +166,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected boolean useWorkflow = false;
     protected boolean useWorkflowSendEmail = false;
     protected boolean isQuiet = false;
+    protected boolean processRelationships = false;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -211,9 +219,12 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         // create the mapfile
         File outFile = null;
         PrintWriter mapOut = null;
+
         try {
             Map<String, String> skipItems = new HashMap<>(); // set of items to skip if in 'resume'
             // mode
+
+            Map<String, Item> itemMap = new HashMap<>(); //remember which folder item was imported from
 
             System.out.println("Adding items from directory: " + sourceDir);
             log.debug("Adding items from directory: " + sourceDir);
@@ -274,10 +285,21 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     } else {
                         clist = mycollections;
                     }
+
                     Item item = addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
+
+                    if (processRelationships) {
+                        itemMap.put(dircontents[i], item);
+                    }
+
                     c.uncacheEntity(item);
                     System.out.println(i + " " + dircontents[i]);
                 }
+            }
+
+            if (processRelationships) {
+                //now that all items are imported, iterate again to link relationships
+                addRelationships(c, sourceDir, itemMap);
             }
 
         } finally {
@@ -286,6 +308,112 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 mapOut.close();
             }
         }
+    }
+
+    protected void addRelationships(Context c, String sourceDir, Map<String, Item> itemMap) throws Exception {
+
+        System.out.println("Linking relationships");
+        
+        for (Map.Entry<String, Item> itemEntry : itemMap.entrySet()) {
+
+            String folderName = itemEntry.getKey();
+            String path = sourceDir + File.separatorChar + folderName;
+            Item leftItem = itemEntry.getValue();
+
+            System.out.println("Adding relationships from directory "+ folderName);
+
+            //look for a 'relationship' manifest
+            Map<Integer, String> relationships = processRelationshipFile(path, "relationships");
+            if (!relationships.isEmpty()) {
+
+                for (Map.Entry<Integer, String> relEntry : relationships.entrySet()) {
+                    
+                    Integer relationshipId = relEntry.getKey();
+                    String mappedItemFolder = relEntry.getValue();
+                    Item rightItem = itemMap.get(mappedItemFolder);
+
+                    RelationshipType relationshipType = null;
+                    try {
+                        relationshipType = relationshipTypeService.find(c, relationshipId.intValue());
+                    } catch (Exception e) {
+                        System.out.println("\tERROR: relationship type "+ relationshipId +" not found.");
+                        throw e;
+                    }
+
+                    Relationship relationship = relationshipService.create(c, leftItem, rightItem, relationshipType, -1, -1);
+
+                    System.out.println("\tAdded relationship to " + rightItem.getHandle());
+
+                }
+
+            }
+
+        }
+
+    }
+
+    protected Map<Integer, String> processRelationshipFile(String path, String filename) throws Exception {
+
+        File file = new File(path + File.separatorChar + filename);
+        Map<Integer, String> result = new HashMap<Integer, String>();
+
+        if (file.exists()) {
+
+            System.out.println("\tProcessing relationships file: " + filename);
+
+            BufferedReader br = null;
+            try {
+                br = new BufferedReader(new FileReader(file));
+                String line = null;
+                while ((line = br.readLine()) != null) {
+                    line = line.trim();
+                    if ("".equals(line)) {
+                        continue;
+                    }
+
+                    int relationshipId;
+                    String folderName = null;
+
+                    //format: <relationship_id> <related_folder_name>
+                    StringTokenizer st = new StringTokenizer(line);
+
+                    if (st.hasMoreTokens()) {
+                        try {
+                            relationshipId = Integer.valueOf(st.nextToken());
+                        } catch (NumberFormatException e) {
+                            throw new Exception("Bad mapfile line:\n" + line);    
+                        }
+                    } else {
+                        throw new Exception("Bad mapfile line:\n" + line);
+                    }
+    
+                    if (st.hasMoreTokens()) {
+                        folderName = st.nextToken();
+                    } else {
+                        throw new Exception("Bad mapfile line:\n" + line);
+                    }
+
+                    result.put(relationshipId, folderName);
+
+                }
+
+            } catch (FileNotFoundException e) {
+                System.out.println("\tNo relationships file found.");
+            } finally {
+                if (br != null) {
+                    try {
+                        br.close();
+                    } catch (IOException e) {
+                        System.out.println("Non-critical problem releasing resources.");
+                    }
+                }
+            }
+        
+        } else {
+            System.out.println("\tNo relationships file found.");
+        }
+
+        return result;
     }
 
     @Override
@@ -1823,4 +1951,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     public void setQuiet(boolean isQuiet) {
         this.isQuiet = isQuiet;
     }
+
+    @Override
+    public void setProcessRelationships(boolean processRelationships) {
+        this.processRelationships = processRelationships;
+    }
+
 }
