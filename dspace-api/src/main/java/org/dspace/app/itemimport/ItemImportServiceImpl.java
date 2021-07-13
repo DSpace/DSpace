@@ -310,6 +310,15 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
     }
 
+    /**
+     * Add relationships from a 'relationships' manifest file.
+     * 
+     * Each line in the file contains a relationship type id and an item identifier in the following format:
+     * 
+     * <relationship_type_id> <handle|uuid|import_item_folder>
+     * 
+     * The input_item_folder should refer the folder name of another item in this import batch.
+     */
     protected void addRelationships(Context c, String sourceDir, Map<String, Item> itemMap) throws Exception {
 
         System.out.println("Linking relationships");
@@ -328,27 +337,51 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
                 for (Map.Entry<Integer, String> relEntry : relationships.entrySet()) {
                     
-                    Integer relationshipId = relEntry.getKey();
-                    String mappedItemFolder = relEntry.getValue();
-                    Item rightItem = itemMap.get(mappedItemFolder);
+                    Integer relationshipTypeId = relEntry.getKey();
+                    String itemIdentifier = relEntry.getValue();
 
                     RelationshipType relationshipType = null;
                     try {
-                        relationshipType = relationshipTypeService.find(c, relationshipId.intValue());
+                        relationshipType = relationshipTypeService.find(c, relationshipTypeId.intValue());
                     } catch (Exception e) {
-                        System.out.println("\tERROR: relationship type "+ relationshipId +" not found.");
+                        System.out.println("\tERROR: relationship type "+ relationshipTypeId +" not found.");
                         throw e;
                     }
 
-                    Relationship relationship = relationshipService.create(c, leftItem, rightItem, relationshipType, -1, -1);
+                    Item rightItem = resolveRelatedItem(c, itemMap, itemIdentifier);
+                    if (null == rightItem) {
+                        throw new Exception("\tERROR: could not find item for "+ itemIdentifier);
+                    } 
 
-                    System.out.println("\tAdded relationship to " + rightItem.getHandle());
+                    Relationship relationship = relationshipService.create(c, leftItem, rightItem, relationshipType, -1, -1);
+                    System.out.println("\tAdded relationship (type: "+ relationshipTypeId +") to "+ rightItem.getHandle());
 
                 }
 
             }
 
         }
+
+    }
+
+    protected Item resolveRelatedItem(Context c, Map<String, Item> itemMap, String itemIdentifier) throws Exception {
+
+        Item item = null;
+
+        if (itemMap.containsKey(itemIdentifier)) {
+            //identifier refers to a folder name in this import batch
+            item = itemMap.get(itemIdentifier);
+
+        } else if (itemIdentifier.indexOf('/') != -1) {
+            //resolve by handle
+            item = (Item) handleService.resolveToObject(c, itemIdentifier);
+
+        } else {
+            //try to resolve by UUID
+            item = itemService.findByIdOrLegacyId(c, itemIdentifier);
+        }
+
+        return item;
 
     }
 
@@ -371,15 +404,15 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         continue;
                     }
 
-                    int relationshipId;
-                    String folderName = null;
+                    int relationshipTypeId;
+                    String itemIdentifier = null;
 
                     //format: <relationship_id> <related_folder_name>
                     StringTokenizer st = new StringTokenizer(line);
 
                     if (st.hasMoreTokens()) {
                         try {
-                            relationshipId = Integer.valueOf(st.nextToken());
+                            relationshipTypeId = Integer.valueOf(st.nextToken());
                         } catch (NumberFormatException e) {
                             throw new Exception("Bad mapfile line:\n" + line);    
                         }
@@ -388,12 +421,12 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     }
     
                     if (st.hasMoreTokens()) {
-                        folderName = st.nextToken();
+                        itemIdentifier = st.nextToken();
                     } else {
                         throw new Exception("Bad mapfile line:\n" + line);
                     }
 
-                    result.put(relationshipId, folderName);
+                    result.put(relationshipTypeId, itemIdentifier);
 
                 }
 
