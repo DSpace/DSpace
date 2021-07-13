@@ -94,6 +94,7 @@ public class ItemImportCLITool {
             options.addOption("R", "resume", false,
                               "resume a failed import (add only)");
             options.addOption("q", "quiet", false, "don't display metadata");
+            options.addOption("l", "relationships", false, "process relationships manifest");
 
             options.addOption("h", "help", false, "help");
 
@@ -107,6 +108,7 @@ public class ItemImportCLITool {
             String[] collections = null; // db ID or handles
             boolean isTest = false;
             boolean isResume = false;
+            boolean processRelationships = false;
             boolean useWorkflow = false;
             boolean useWorkflowSendEmail = false;
             boolean isQuiet = false;
@@ -182,6 +184,10 @@ public class ItemImportCLITool {
 
             if (line.hasOption('c')) { // collections
                 collections = line.getOptionValues('c');
+            }
+
+            if (line.hasOption('l')) { //relationships
+                processRelationships = true;
             }
 
             if (line.hasOption('R')) {
@@ -303,6 +309,7 @@ public class ItemImportCLITool {
             myloader.setResume(isResume);
             myloader.setUseWorkflow(useWorkflow);
             myloader.setUseWorkflowSendEmail(useWorkflowSendEmail);
+            myloader.setProcessRelationships(processRelationships);
             myloader.setQuiet(isQuiet);
 
             // create a context
