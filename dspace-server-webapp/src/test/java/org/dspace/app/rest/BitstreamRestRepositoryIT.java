@@ -1805,7 +1805,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                     .param("handle", embargoItem1.getHandle())
                                     .param("filename", "Bitstream1")
         )
-                   .andExpect(status().isUnauthorized());
+                   .andExpect(status().isNoContent());
 
         String token = getAuthToken(eperson.getEmail(), password);
         String admintoken = getAuthToken(admin.getEmail(), password);
@@ -1814,7 +1814,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                     .param("handle", embargoItem1.getHandle())
                                     .param("filename", "Bitstream1")
         )
-                   .andExpect(status().isForbidden());
+                   .andExpect(status().isNoContent());
 
         getClient(admintoken).perform(get("/api/core/bitstreams/search/byItemHandle")
                                          .param("handle", embargoItem1.getHandle())
