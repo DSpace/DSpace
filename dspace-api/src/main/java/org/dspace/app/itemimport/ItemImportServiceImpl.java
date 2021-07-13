@@ -266,6 +266,14 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             for (int i = 0; i < dircontents.length; i++) {
                 if (skipItems.containsKey(dircontents[i])) {
                     System.out.println("Skipping import of " + dircontents[i]);
+
+                    if (processRelationships) {
+                        //we still need the item in the map for relationship linking
+                        String skippedHandle = skipItems.get(dircontents[i]);
+                        Item skippedItem = (Item) handleService.resolveToObject(c, skippedHandle);
+                        itemMap.put(dircontents[i], skippedItem);
+                    }
+
                 } else {
                     List<Collection> clist;
                     if (directoryFileCollections) {
