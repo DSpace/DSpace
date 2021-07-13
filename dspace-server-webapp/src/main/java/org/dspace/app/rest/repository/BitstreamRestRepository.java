@@ -174,40 +174,38 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
             }
             Item item = (Item) dSpaceObject;
 
-            List<Bitstream> matchedBitstreams = getMatchedBitstreams(item, sequence, filename);
+            Bitstream matchedBitstream = getFirstMatchedBitstream(item, sequence, filename);
 
-            if (matchedBitstreams.isEmpty()) {
+            if (matchedBitstream == null) {
                 return null;
             } else {
-                return converter.toRest(matchedBitstreams.get(0), utils.obtainProjection());
+                return converter.toRest(matchedBitstream, utils.obtainProjection());
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    private List<Bitstream> getMatchedBitstreams(Item item, Integer sequence, String filename) {
+    private Bitstream getFirstMatchedBitstream(Item item, Integer sequence, String filename) {
         List<Bundle> bundles = item.getBundles();
-
         List<Bitstream> bitstreams = new LinkedList<>();
         bundles.forEach(bundle -> bitstreams.addAll(bundle.getBitstreams()));
 
-        List<Bitstream> matchingBitstreams = new LinkedList<>();
         if (sequence != null) {
             for (Bitstream bitstream : bitstreams) {
                 if (bitstream.getSequenceID() == sequence) {
-                    matchingBitstreams.add(bitstream);
+                    return bitstream;
                 }
             }
         }
         if (StringUtils.isNotBlank(filename)) {
             for (Bitstream bitstream : bitstreams) {
-                if (StringUtils.equals(bitstream.getName(), filename) && !matchingBitstreams.contains(bitstream)) {
-                    matchingBitstreams.add(bitstream);
+                if (StringUtils.equals(bitstream.getName(), filename)) {
+                    return bitstream;
                 }
             }
         }
-        return matchingBitstreams;
+        return null;
     }
 
     public InputStream retrieve(UUID uuid) {
