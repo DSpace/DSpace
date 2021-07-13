@@ -81,8 +81,7 @@ public class DSpaceAPIRequestLoggingFilter extends AbstractRequestLoggingFilter 
                 referrer = "unknown";
             }
         }
-        logger.info("Request originated from " + referrer);
-        logger.info(message);
+        logger.info(message + " originated from " + referrer);
     }
 
     @Override
