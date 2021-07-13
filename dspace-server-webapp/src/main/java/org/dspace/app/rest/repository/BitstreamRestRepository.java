@@ -24,7 +24,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.security.BitstreamMetadataReadPermissionEvaluatorPlugin;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -71,13 +70,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     private CommunityService communityService;
 
     @Autowired
-    private BitstreamService bitstreamService;
-
-    @Autowired
     private HandleService handleService;
-
-    @Autowired
-    private BitstreamMetadataReadPermissionEvaluatorPlugin bitstreamMetadataReadPermissionEvaluatorPlugin;
 
     @Autowired
     public BitstreamRestRepository(BitstreamService dsoService) {
