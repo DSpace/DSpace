@@ -9,6 +9,7 @@ package org.dspace.app.rest.authorization.impl;
 
 import java.sql.SQLException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -58,11 +59,9 @@ public class ManageGroupFeature implements AuthorizationFeature {
             return true;
         }
 
-        // community/collection admins cannot manage special groups
-        if (
-            group.equals(groupService.findByName(context, Group.ANONYMOUS)) ||
-            group.equals(groupService.findByName(context, Group.ADMIN))
-        ) {
+        // Community/Collection admins cannot manage special groups (Anonymous or Admin)
+        // This check is required until https://github.com/DSpace/DSpace/issues/3323 is fixed.
+        if (StringUtils.equals(group.getName(), Group.ANONYMOUS) || StringUtils.equals(group.getName(), Group.ADMIN)) {
             return false;
         }
 
