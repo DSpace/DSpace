@@ -59,9 +59,10 @@ public class ManageGroupFeature implements AuthorizationFeature {
             return true;
         }
 
-        // Community/Collection admins cannot manage special groups (Anonymous or Admin)
+        // Community/Collection admins cannot manage groups that are not COMMUNITY/COLLECTION bound
         // This check is required until https://github.com/DSpace/DSpace/issues/3323 is fixed.
-        if (StringUtils.equals(group.getName(), Group.ANONYMOUS) || StringUtils.equals(group.getName(), Group.ADMIN)) {
+        if (!(StringUtils.startsWith(group.getName(), "COLLECTION_")
+              || StringUtils.startsWith(group.getName(), "COMMUNITY_"))) {
             return false;
         }
 
