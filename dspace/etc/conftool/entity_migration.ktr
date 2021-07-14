@@ -10,6 +10,31 @@
     <directory>/</directory>
     <parameters>
       <parameter>
+        <name>db_host_name</name>
+        <default_value/>
+        <description/>
+      </parameter>
+      <parameter>
+        <name>db_name</name>
+        <default_value/>
+        <description/>
+      </parameter>
+      <parameter>
+        <name>db_password</name>
+        <default_value/>
+        <description/>
+      </parameter>
+      <parameter>
+        <name>db_port_number</name>
+        <default_value/>
+        <description/>
+      </parameter>
+      <parameter>
+        <name>db_username</name>
+        <default_value/>
+        <description/>
+      </parameter>
+      <parameter>
         <name>eperson_email</name>
         <default_value>4science.it+noreply@gmail.com</default_value>
         <description/>
@@ -442,14 +467,14 @@
   <notepads>
   </notepads>
   <connection>
-    <name>dspacefvg</name>
-    <server>localhost</server>
+    <name>dspace</name>
+    <server>${DB_HOST_NAME}</server>
     <type>POSTGRESQL</type>
     <access>Native</access>
-    <database>dspace5-fvg</database>
-    <port>5432</port>
-    <username>dspacefvg</username>
-    <password>Encrypted 2be98afc86aa7b585b80da17edbcbfd9b</password>
+    <database>${DB_NAME}</database>
+    <port>${DB_PORT_NUMBER}</port>
+    <username>${DB_USERNAME}</username>
+    <password>${DB_PASSWORD}</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -472,7 +497,7 @@
       </attribute>
       <attribute>
         <code>PORT_NUMBER</code>
-        <attribute>5432</attribute>
+        <attribute>${DB_PORT_NUMBER}</attribute>
       </attribute>
       <attribute>
         <code>PRESERVE_RESERVED_WORD_CASE</code>
@@ -759,11 +784,11 @@
     </hop>
     <hop>
       <from>Add row number</from>
-      <to>calculate imp record id</to>
+      <to>calculate imp record id and status</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>calculate imp record id</from>
+      <from>calculate imp record id and status</from>
       <to>insert into imp_record</to>
       <enabled>Y</enabled>
     </hop>
@@ -995,7 +1020,7 @@
     </partitioning>
     <valuename>row_number</valuename>
     <use_database>N</use_database>
-    <connection>dspacefvg</connection>
+    <connection>dspace</connection>
     <schema/>
     <seqname>SEQ_</seqname>
     <use_counter>Y</use_counter>
@@ -1012,7 +1037,7 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>832</xloc>
+      <xloc>816</xloc>
       <yloc>224</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1065,7 +1090,7 @@
     </partitioning>
     <valuename>row_number</valuename>
     <use_database>N</use_database>
-    <connection>dspacefvg</connection>
+    <connection>dspace</connection>
     <schema/>
     <seqname>SEQ_</seqname>
     <use_counter>Y</use_counter>
@@ -1434,7 +1459,7 @@ var metadata_authority = 'will be referenced::LEGACY-ID::' + pointer_crisid;
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>dspacefvg</connection>
+    <connection>dspace</connection>
     <rowlimit>1</rowlimit>
     <sql>SELECT ep.uuid as metadata_authority, ep.email as metadata_value
 FROM old_cris_rpage rpage,
@@ -1473,7 +1498,7 @@ WHERE rpage.crisid = ? AND ep.eperson_id = rpage.epersonid;</sql>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>dspacefvg</connection>
+    <connection>dspace</connection>
     <rowlimit>1</rowlimit>
     <sql>SELECT subquery.crisid as pointer_crisid
 from (
@@ -1523,7 +1548,7 @@ WHERE subquery.table_name = ? AND subquery.id = ?;</sql>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>dspacefvg</connection>
+    <connection>dspace</connection>
     <rowlimit>1</rowlimit>
     <sql>SELECT values.textvalue as metadata_value
 FROM old_cris_project entity,
@@ -1838,21 +1863,6 @@ WHERE property_def.id = properties.typo_id
     <fields>
       <select_unspecified>N</select_unspecified>
       <remove>
-        <name>status</name>
-      </remove>
-      <remove>
-        <name>uuid</name>
-      </remove>
-      <remove>
-        <name>timestampcreated</name>
-      </remove>
-      <remove>
-        <name>timestamplastmodified</name>
-      </remove>
-      <remove>
-        <name>sourceref</name>
-      </remove>
-      <remove>
         <name>row_number</name>
       </remove>
       <remove>
@@ -1867,6 +1877,9 @@ WHERE property_def.id = properties.typo_id
       <remove>
         <name>operation</name>
       </remove>
+      <remove>
+        <name>sourceref</name>
+      </remove>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -1877,7 +1890,7 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1184</xloc>
+      <xloc>1232</xloc>
       <yloc>384</yloc>
       <draw>Y</draw>
     </GUI>
@@ -2431,7 +2444,7 @@ WHERE property_def.id = properties.typo_id
     </GUI>
   </step>
   <step>
-    <name>calculate imp record id</name>
+    <name>calculate imp record id and status</name>
     <type>ScriptValueMod</type>
     <description/>
     <distribute>Y</distribute>
@@ -2448,6 +2461,7 @@ WHERE property_def.id = properties.typo_id
         <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>var imp_record_id = max_imp_record_id + row_number;
+var status = 'z'
 </jsScript_script>
       </jsScript>
     </jsScripts>
@@ -2458,6 +2472,14 @@ WHERE property_def.id = properties.typo_id
         <type>Integer</type>
         <length>16</length>
         <precision>2</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>status</name>
+        <rename>status</rename>
+        <type>String</type>
+        <length>1</length>
+        <precision>-1</precision>
         <replace>N</replace>
       </field>
     </fields>
@@ -2691,8 +2713,8 @@ var metadata_authority = null;</jsScript_script>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>dspacefvg</connection>
-    <sql>SELECT *, row_number() OVER () as row_number
+    <connection>dspace</connection>
+    <sql>SELECT id, crisid, sourceref, row_number() OVER () as row_number
 FROM "public".${ENTITY_TABLE}
 WHERE ${ENTITY_FILTER}
 </sql>
@@ -2752,218 +2774,11 @@ WHERE ${ENTITY_FILTER}
       <value-meta>
         <type>String</type>
         <storagetype>normal</storagetype>
-        <name>sourceid</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>entities</origin>
-        <comments>sourceid</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Boolean</type>
-        <storagetype>normal</storagetype>
-        <name>status</name>
-        <length>-1</length>
-        <precision>-1</precision>
-        <origin>entities</origin>
-        <comments>status</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>uuid</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>entities</origin>
-        <comments>uuid</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Integer</type>
-        <storagetype>normal</storagetype>
-        <name>epersonid</name>
-        <length>9</length>
-        <precision>0</precision>
-        <origin>entities</origin>
-        <comments>epersonid</comments>
-        <conversion_Mask>####0;-####0</conversion_Mask>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Timestamp</type>
-        <storagetype>normal</storagetype>
-        <name>namestimestamplastmodified</name>
-        <length>6</length>
-        <precision>-1</precision>
-        <origin>entities</origin>
-        <comments>namestimestamplastmodified</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Timestamp</type>
-        <storagetype>normal</storagetype>
-        <name>timestampcreated</name>
-        <length>6</length>
-        <precision>-1</precision>
-        <origin>entities</origin>
-        <comments>timestampcreated</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Timestamp</type>
-        <storagetype>normal</storagetype>
-        <name>timestamplastmodified</name>
-        <length>6</length>
-        <precision>-1</precision>
-        <origin>entities</origin>
-        <comments>timestamplastmodified</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
         <name>sourceref</name>
         <length>255</length>
         <precision>-1</precision>
         <origin>entities</origin>
         <comments>sourceref</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>oldsourceid</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>entities</origin>
-        <comments>oldsourceid</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>oldsourceref</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>entities</origin>
-        <comments>oldsourceref</comments>
         <conversion_Mask/>
         <decimal_symbol>,</decimal_symbol>
         <grouping_symbol>.</grouping_symbol>
@@ -3028,7 +2843,7 @@ WHERE ${ENTITY_FILTER}
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>dspacefvg</connection>
+    <connection>dspace</connection>
     <sql>SELECT properties.parent_id, 
 property_def.shortname,
 values.dtype, 
@@ -3571,7 +3386,7 @@ WHERE property_def.id = properties.typo_id
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>dspacefvg</connection>
+    <connection>dspace</connection>
     <sql>SELECT uuid as eperson_id
 FROM "public".eperson
 WHERE email = '${eperson_email}'
@@ -3743,7 +3558,7 @@ WHERE email = '${eperson_email}'
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>dspacefvg</connection>
+    <connection>dspace</connection>
     <schema>public</schema>
     <table>imp_bitstream</table>
     <commit>1000</commit>
@@ -3803,7 +3618,7 @@ WHERE email = '${eperson_email}'
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>dspacefvg</connection>
+    <connection>dspace</connection>
     <schema>public</schema>
     <table>imp_metadatavalue</table>
     <commit>1000</commit>
@@ -3879,7 +3694,7 @@ WHERE email = '${eperson_email}'
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>dspacefvg</connection>
+    <connection>dspace</connection>
     <schema>public</schema>
     <table>imp_record</table>
     <commit>1000</commit>
@@ -3921,6 +3736,10 @@ WHERE email = '${eperson_email}'
         <column_name>imp_sourceref</column_name>
         <stream_name>sourceref</stream_name>
       </field>
+      <field>
+        <column_name>status</column_name>
+        <stream_name>status</stream_name>
+      </field>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -3931,7 +3750,7 @@ WHERE email = '${eperson_email}'
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1184</xloc>
+      <xloc>1232</xloc>
       <yloc>224</yloc>
       <draw>Y</draw>
     </GUI>
@@ -4154,7 +3973,7 @@ WHERE email = '${eperson_email}'
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>dspacefvg</connection>
+    <connection>dspace</connection>
     <sql>SELECT max(imp_bitstream_id) as max_imp_bitstream_id
 FROM "public".imp_bitstream
 </sql>
@@ -4214,7 +4033,7 @@ FROM "public".imp_bitstream
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>dspacefvg</connection>
+    <connection>dspace</connection>
     <sql>SELECT max(imp_metadatavalue_id) as max_imp_metadatavalue_id
 FROM "public".imp_metadatavalue
 </sql>
@@ -4274,7 +4093,7 @@ FROM "public".imp_metadatavalue
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>dspacefvg</connection>
+    <connection>dspace</connection>
     <sql>SELECT max(imp_id) as max_imp_record_id
 FROM "public".imp_record
 </sql>

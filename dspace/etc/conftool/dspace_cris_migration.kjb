@@ -12,6 +12,31 @@
   <modified_date>2021/07/05 17:15:08.900</modified_date>
   <parameters>
     <parameter>
+      <name>db_host_name</name>
+      <default_value>localhost</default_value>
+      <description/>
+    </parameter>
+    <parameter>
+      <name>db_name</name>
+      <default_value>dspace5-fvg</default_value>
+      <description/>
+    </parameter>
+    <parameter>
+      <name>db_password</name>
+      <default_value/>
+      <description/>
+    </parameter>
+    <parameter>
+      <name>db_port_number</name>
+      <default_value>5432</default_value>
+      <description/>
+    </parameter>
+    <parameter>
+      <name>db_username</name>
+      <default_value>dspacefvg</default_value>
+      <description/>
+    </parameter>
+    <parameter>
       <name>eperson_email</name>
       <default_value>4science.it+noreply@gmail.com</default_value>
       <description/>
@@ -354,7 +379,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>352</xloc>
+      <xloc>768</xloc>
       <yloc>48</yloc>
       <attributes_kjc/>
     </entry>
@@ -367,7 +392,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>32</xloc>
-      <yloc>208</yloc>
+      <yloc>304</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -408,7 +433,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>176</xloc>
+      <xloc>576</xloc>
       <yloc>48</yloc>
       <attributes_kjc/>
     </entry>
@@ -447,8 +472,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>720</xloc>
-      <yloc>48</yloc>
+      <xloc>1008</xloc>
+      <yloc>176</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -489,7 +514,7 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>528</xloc>
+      <xloc>1008</xloc>
       <yloc>48</yloc>
       <attributes_kjc/>
     </entry>
@@ -531,8 +556,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>896</xloc>
-      <yloc>48</yloc>
+      <xloc>1008</xloc>
+      <yloc>304</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -570,8 +595,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>896</xloc>
-      <yloc>208</yloc>
+      <xloc>768</xloc>
+      <yloc>304</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -612,8 +637,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>720</xloc>
-      <yloc>208</yloc>
+      <xloc>576</xloc>
+      <yloc>304</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -651,8 +676,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>528</xloc>
-      <yloc>208</yloc>
+      <xloc>368</xloc>
+      <yloc>304</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -688,8 +713,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>352</xloc>
-      <yloc>208</yloc>
+      <xloc>192</xloc>
+      <yloc>304</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -727,21 +752,54 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>176</xloc>
-      <yloc>208</yloc>
+      <xloc>368</xloc>
+      <yloc>48</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>set database variables</name>
+      <description/>
+      <type>SET_VARIABLES</type>
+      <attributes/>
+      <replacevars>Y</replacevars>
+      <filename/>
+      <file_variable_type>JVM</file_variable_type>
+      <fields>
+        <field>
+          <variable_name>DB_NAME</variable_name>
+          <variable_value>${db_name}</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>DB_PORT_NUMBER</variable_name>
+          <variable_value>${db_port_number}</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>DB_HOST_NAME</variable_name>
+          <variable_value>${db_host_name}</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>DB_USERNAME</variable_name>
+          <variable_value>${db_username}</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>DB_PASSWORD</variable_name>
+          <variable_value>${db_password}</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+      </fields>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>192</xloc>
+      <yloc>48</yloc>
       <attributes_kjc/>
     </entry>
   </entries>
   <hops>
-    <hop>
-      <from>Start</from>
-      <to>set funding variables</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>Y</unconditional>
-    </hop>
     <hop>
       <from>set funding variables</from>
       <to>funding migration</to>
@@ -815,7 +873,16 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>do job</from>
+      <from>Start</from>
+      <to>set database variables</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>set database variables</from>
       <to>publications migration</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
@@ -825,6 +892,15 @@
     </hop>
     <hop>
       <from>publications migration</from>
+      <to>set funding variables</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>do job</from>
       <to>Successo</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
