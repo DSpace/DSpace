@@ -54,6 +54,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.app.util.LocalSchemaFilenameFilter;
+import org.dspace.app.util.RelationshipUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -67,6 +68,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataSchemaEnum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
@@ -78,6 +80,7 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -158,6 +161,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected RelationshipService relationshipService;
     @Autowired(required = true)
     protected RelationshipTypeService relationshipTypeService;
+    @Autowired(required = true)
+    protected MetadataValueService metadataValueService;
 
     protected String tempWorkDir;
 
@@ -167,6 +172,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected boolean useWorkflowSendEmail = false;
     protected boolean isQuiet = false;
     protected boolean processRelationships = false;
+
+    //remember which folder item was imported from
+    Map<String, Item> itemFolderMap = null;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -224,7 +232,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             Map<String, String> skipItems = new HashMap<>(); // set of items to skip if in 'resume'
             // mode
 
-            Map<String, Item> itemMap = new HashMap<>(); //remember which folder item was imported from
+            itemFolderMap = new HashMap<>(); 
 
             System.out.println("Adding items from directory: " + sourceDir);
             log.debug("Adding items from directory: " + sourceDir);
@@ -271,7 +279,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         //we still need the item in the map for relationship linking
                         String skippedHandle = skipItems.get(dircontents[i]);
                         Item skippedItem = (Item) handleService.resolveToObject(c, skippedHandle);
-                        itemMap.put(dircontents[i], skippedItem);
+                        itemFolderMap.put(dircontents[i], skippedItem);
                     }
 
                 } else {
@@ -297,7 +305,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     Item item = addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
 
                     if (processRelationships) {
-                        itemMap.put(dircontents[i], item);
+                        itemFolderMap.put(dircontents[i], item);
                     }
 
                     c.uncacheEntity(item);
@@ -307,7 +315,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             if (processRelationships) {
                 //now that all items are imported, iterate again to link relationships
-                addRelationships(c, sourceDir, itemMap);
+                addRelationships(c, sourceDir);
             }
 
         } finally {
@@ -323,47 +331,75 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
       * 
       * @param c Context
       * @param sourceDir The parent import source directory
-      * @param itemMap Item imported in this batch, keyed by their import subfolder
       * @throws Exception
       */
-    protected void addRelationships(Context c, String sourceDir, Map<String, Item> itemMap) throws Exception {
+    protected void addRelationships(Context c, String sourceDir) throws Exception {
 
         System.out.println("Linking relationships");
         
-        for (Map.Entry<String, Item> itemEntry : itemMap.entrySet()) {
+        for (Map.Entry<String, Item> itemEntry : itemFolderMap.entrySet()) {
 
             String folderName = itemEntry.getKey();
             String path = sourceDir + File.separatorChar + folderName;
-            Item leftItem = itemEntry.getValue();
+            Item item = itemEntry.getValue();
 
             System.out.println("Adding relationships from directory "+ folderName);
 
             //look for a 'relationship' manifest
-            Map<Integer, List<String>> relationships = processRelationshipFile(path, "relationships");
+            Map<String, List<String>> relationships = processRelationshipFile(path, "relationships");
             if (!relationships.isEmpty()) {
 
-                for (Map.Entry<Integer, List<String>> relEntry : relationships.entrySet()) {
+                for (Map.Entry<String, List<String>> relEntry : relationships.entrySet()) {
                     
-                    Integer relationshipTypeId = relEntry.getKey();
+                    String relationshipType = relEntry.getKey();
                     List<String> identifierList = relEntry.getValue();
-
-                    RelationshipType relationshipType = null;
-                    try {
-                        relationshipType = relationshipTypeService.find(c, relationshipTypeId.intValue());
-                    } catch (Exception e) {
-                        System.out.println("\tERROR: relationship type "+ relationshipTypeId +" not found.");
-                        throw e;
-                    }
 
                     for (String itemIdentifier : identifierList) {
 
-                        Item rightItem = resolveRelatedItem(c, itemMap, itemIdentifier);
-                        if (null == rightItem) {
-                            throw new Exception("\tERROR: could not find item for "+ itemIdentifier);
+                        //find referenced item
+                        Item relationItem = resolveRelatedItem(c, itemIdentifier);
+                        if (null == relationItem) {
+                            throw new Exception("Could not find item for "+ itemIdentifier);
                         } 
 
-                        Relationship relationship = relationshipService.create(c, leftItem, rightItem, relationshipType, -1, -1);
-                        System.out.println("\tAdded relationship (type: "+ relationshipTypeId +") to "+ rightItem.getHandle());
+                        //get entity type of entity and item
+                        String itemEntityType = getEntityType(item);
+                        String relatedEntityType = getEntityType(relationItem);
+
+                        //find matching relationship type
+                        List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(c, relationshipType);
+                        RelationshipType foundRelationshipType = RelationshipUtils.matchRelationshipType(relTypes, relatedEntityType, itemEntityType, relationshipType);
+                        if (foundRelationshipType == null) {
+                            throw new Exception("No Relationship type found for:\n" +
+                                "Target type: " + relatedEntityType + "\n" +
+                                "Origin referer type: " + itemEntityType + "\n" +
+                                "with typeName: " + relationshipType
+                            );
+                        }
+
+                        boolean left = false;
+                        if (foundRelationshipType.getLeftwardType().equalsIgnoreCase(relationshipType)) {
+                            left = true;
+                        }
+
+                        // Placeholder items for relation placing
+                        Item leftItem = null;
+                        Item rightItem = null;
+                        if (left) {
+                            leftItem = item;
+                            rightItem = relationItem;
+                        } else {
+                            leftItem = relationItem;
+                            rightItem = item;
+                        }
+
+                        // Create the relationship
+                        int leftPlace = relationshipService.findNextLeftPlaceByLeftItem(c, leftItem);
+                        int rightPlace = relationshipService.findNextRightPlaceByRightItem(c, rightItem);
+                        Relationship persistedRelationship = relationshipService.create(c, leftItem, rightItem, foundRelationshipType, leftPlace, rightPlace);
+                        relationshipService.update(c, persistedRelationship);
+
+                        System.out.println("\tAdded relationship (type: "+ foundRelationshipType.getID() +") from "+ leftItem.getHandle() +" to "+ rightItem.getHandle());
 
                     }
 
@@ -376,11 +412,21 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     }
 
     /**
+     * Get the item's entity type from meta.
+     * 
+     * @param item
+     * @return
+     */
+    protected String getEntityType(Item item) throws Exception {
+        return itemService.getMetadata(item, "dspace", "entity", "type", Item.ANY).get(0).getValue();
+    }
+
+    /**
      * Read the relationship manifest file.
      * 
      * Each line in the file contains a relationship type id and an item identifier in the following format:
      * 
-     * <relationship_type_id> <handle|uuid|import_item_folder>
+     * relation.<relation_key> <handle|uuid|folderName:import_item_folder|schema.element[.qualifier]:value>
      * 
      * The input_item_folder should refer the folder name of another item in this import batch.
      * 
@@ -389,10 +435,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      * @return Map of found relationships
      * @throws Exception
      */
-    protected Map<Integer, List<String>> processRelationshipFile(String path, String filename) throws Exception {
+    protected Map<String, List<String>> processRelationshipFile(String path, String filename) throws Exception {
 
         File file = new File(path + File.separatorChar + filename);
-        Map<Integer, List<String>> result = new HashMap<>();
+        Map<String, List<String>> result = new HashMap<>();
 
         if (file.exists()) {
 
@@ -408,33 +454,31 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         continue;
                     }
 
-                    int relationshipTypeId;
+                    String relationshipType = null;
                     String itemIdentifier = null;
 
-                    //format: <relationship_id> <related_folder_name>
                     StringTokenizer st = new StringTokenizer(line);
 
                     if (st.hasMoreTokens()) {
-                        try {
-                            relationshipTypeId = Integer.valueOf(st.nextToken());
-                        } catch (NumberFormatException e) {
-                            throw new Exception("Bad mapfile line:\n" + line);    
+                        relationshipType= st.nextToken();
+                        if (relationshipType.split("\\.").length > 1) {
+                            relationshipType = relationshipType.split("\\.")[1];
                         }
                     } else {
                         throw new Exception("Bad mapfile line:\n" + line);
                     }
     
                     if (st.hasMoreTokens()) {
-                        itemIdentifier = st.nextToken();
+                        itemIdentifier = st.nextToken("").trim();
                     } else {
                         throw new Exception("Bad mapfile line:\n" + line);
                     }
 
-                    if (!result.containsKey(relationshipTypeId)) {
-                        result.put(relationshipTypeId, new ArrayList<>()); 
+                    if (!result.containsKey(relationshipType)) {
+                        result.put(relationshipType, new ArrayList<>()); 
                     } 
                     
-                    result.get(relationshipTypeId).add(itemIdentifier);
+                    result.get(relationshipType).add(itemIdentifier);
 
                 }
 
@@ -464,26 +508,81 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
       * that was just imported. Next it will try to find the item by handle or UUID.
       * 
       * @param c Context
-      * @param itemMap Item imported in this batch, keyed by their import subfolder
       * @param itemIdentifier The identifier string found in the import manifest (handle, uuid, or another import subfolder)
       * @return Item if found, or null.
       * @throws Exception
       */
-      protected Item resolveRelatedItem(Context c, Map<String, Item> itemMap, String itemIdentifier) throws Exception {
+      protected Item resolveRelatedItem(Context c, String itemIdentifier) throws Exception {
 
-        Item item = null;
+        if (itemIdentifier.contains(":")) {
 
-        if (itemMap.containsKey(itemIdentifier)) {
-            //identifier refers to a folder name in this import batch
-            item = itemMap.get(itemIdentifier);
+            if (itemIdentifier.startsWith("folderName:") || itemIdentifier.startsWith("rowName:")) {
+                //identifier refers to a folder name in this import
+                int i = itemIdentifier.indexOf(":");
+                String folderName = itemIdentifier.substring(i + 1);
+                if (itemFolderMap.containsKey(folderName)) {
+                    return itemFolderMap.get(folderName);
+                }
+            
+            } else {
+
+                //lookup by meta value
+                int i = itemIdentifier.indexOf(":");
+                String metaKey = itemIdentifier.substring(0, i);
+                String metaValue = itemIdentifier.substring(i + 1);
+                return findItemByMetaValue(c, metaKey, metaValue);
+
+            }
 
         } else if (itemIdentifier.indexOf('/') != -1) {
             //resolve by handle
-            item = (Item) handleService.resolveToObject(c, itemIdentifier);
+            return (Item) handleService.resolveToObject(c, itemIdentifier);
 
         } else {
             //try to resolve by UUID
-            item = itemService.findByIdOrLegacyId(c, itemIdentifier);
+            return itemService.findByIdOrLegacyId(c, itemIdentifier);
+        }
+
+        return null;
+
+    }
+
+    /**
+     * Lookup an item by a (unique) meta value.
+     * 
+     * @param metaKey
+     * @param metaValue
+     * @return Item
+     * @throws Exception if single item not found.
+     */
+    protected Item findItemByMetaValue(Context c, String metaKey, String metaValue) throws Exception {
+
+        Item item = null;
+
+        String mf[] = metaKey.split("\\.");
+        if (mf.length < 2) {
+            throw new Exception("Bad metadata field in reference: '" + metaKey + "' (expected syntax is schema.element[.qualifier])");
+        }
+        String schema = mf[0];
+        String element = mf[1];
+        String qualifier = mf.length == 2 ? null : mf[2];
+        try {
+            MetadataField mfo = metadataFieldService.findByElement(c, schema, element, qualifier);
+            Iterator<MetadataValue> mdv = metadataValueService.findByFieldAndValue(c, mfo, metaValue);
+            if (mdv.hasNext()) {
+                MetadataValue mdvVal = mdv.next();
+                UUID uuid = mdvVal.getDSpaceObject().getID();
+                if (mdv.hasNext()) {
+                    throw new Exception("Ambiguous reference; multiple matches in db: " + metaKey);
+                }
+                item = itemService.find(c, uuid);
+            }
+        } catch (SQLException e) {
+            throw new Exception("Error looking up item by metadata reference: " + metaKey, e);
+        }
+
+        if (item == null) {
+            throw new Exception("Item not found by metadata reference: " + metaKey);
         }
 
         return item;
