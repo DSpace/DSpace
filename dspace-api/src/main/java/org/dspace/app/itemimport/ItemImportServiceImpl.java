@@ -399,7 +399,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         Relationship persistedRelationship = relationshipService.create(c, leftItem, rightItem, foundRelationshipType, leftPlace, rightPlace);
                         relationshipService.update(c, persistedRelationship);
 
-                        System.out.println("\tAdded relationship (type: "+ foundRelationshipType.getID() +") from "+ leftItem.getHandle() +" to "+ rightItem.getHandle());
+                        System.out.println("\tAdded relationship (type: "+ relationshipType +") from "+ leftItem.getHandle() +" to "+ rightItem.getHandle());
 
                     }
 
@@ -505,7 +505,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
       * Resolve an item identifier referred to in the relationships manifest file.
       *
       * The import item map will be checked first to see if the identifier refers to an item folder
-      * that was just imported. Next it will try to find the item by handle or UUID.
+      * that was just imported. Next it will try to find the item by handle or UUID, or by a unique
+      * meta value.
       * 
       * @param c Context
       * @param itemIdentifier The identifier string found in the import manifest (handle, uuid, or another import subfolder)
