@@ -13,24 +13,66 @@ The original DSpace documentation:
 
 ### Installation
 
-Instructions for installing in UMD Libraries development environments (Mac OS X):
+### Installation
 
-*Important:* Until the upcoming DSpace 7 upgrade, we will be using Java 7 for both the maven build (local) and ant deployment (server). Set your JAVA_HOME and PATH environment variables to run maven build using Java 7.
+Instructions for building and running drum locally.
+#### Prerequisites
+
+The following images needs to be built once for the Dockerfile.dev to build successfully.
 
 ```
-# Build the base modules and overlay modules (Slower)
-# Full build is only required after a version change (checking out a different version
-# or a local project version change)
-cd /apps/git/drum
-mvn clean install
+docker build -t docker.lib.umd.edu/drum-dependencies-6_x:latest -f Dockerfile.dependencies .
+docker build -t docker.lib.umd.edu/drum-ant:latest -f Dockerfile.ant .
+docker build -t docker.lib.umd.edu/drum-tomcat:latest -f Dockerfile.tomcat .
+```
 
-# Build only the overlay modules (Faster)
-# Can be run only after a full build is done at least once after a version change.
-cd /apps/git/drum/dspace
-mvn install
+#### Build
+
+To build the dspace development image used by the docker-compose.yml
+
+```
+docker build -t docker.lib.umd.edu/drum:dev -f Dockerfile.dev .
+```
+
+#### Run
+
+Start the drum using docker-compose.
+
+```
+docker-compose up -d
+```
+
+Useful commands
+```
+# To stop all the containers
+docker-compose down
+
+# To stop just the dspace container
+docker-compose stop dspace
+
+# To attach to the dspace container
+docker exec -it $(docker ps -f name=dspace$ --format {{.ID}}) bash
+
 ```
 
 ### Building Images for K8s Deployment
+
+
+#### DSpace Image
+
+Dockerfile.dependencies is used to pre-cache maven downloads that will be used in subsequent DSpace docker builds.
+
+```
+docker build -t docker.lib.umd.edu/drum-dependencies-6_x:latest -f Dockerfile.dependencies .
+```
+
+This dockefile builds a drum tomcat image.
+
+```
+docker build -t docker.lib.umd.edu/drum:<VERSION> .
+```
+
+The version would follow the drum project version. For example, a release version could be `6.3/drum-4.2`, and we can suffix the version number with `-rcX` or use `latest` as the version for non-production images.
 
 #### Postgres Image
 
@@ -41,7 +83,19 @@ cd dspace/src/main/docker/dspace-postgres-pgcrypto
 docker build -t docker.lib.umd.edu/dspace-postgres:<VERSION> .
 ```
 
-The postgres image can be built when there is a relevant change.
+We could follow the same versioning scheme as the main drum image, but we don't necessariliy have create new image versions for postgres for every patch or hotfix version increments. The postgres image can be built when there is a relevant change.
+
+#### Solr Image
+
+To build postgres image with pgcrypto module.
+
+```
+cd dspace/solr
+docker build -t docker.lib.umd.edu/drum-solr:<VERSION> .
+```
+
+We could follow the same versioning scheme as the main drum image, but we don't necessariliy have create new image versions for solr for every patch or hotfix version increments. The solr image can be built when there is a relevant change.
+
 
 
 ### Deployment

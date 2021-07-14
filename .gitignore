@@ -41,6 +41,10 @@ META-INF/
 /local.cfg
 # Also ignore it under dspace/config
 /dspace/config/local.cfg
+# Ignore database dump directory to be used with docker-compose for initializing
+postgres-init/*
+!postgres-init/README.md
 
 ##Mac noise
 .DS_Store
+.java-version

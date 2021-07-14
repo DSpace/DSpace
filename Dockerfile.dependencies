@@ -1,0 +1,41 @@
+# This image will be published as dspace/dspace-dependencies
+# The purpose of this image is to make the build for dspace/dspace run faster 
+
+# Step 1 - Run Maven Build
+FROM maven:3.6-jdk-8 as build
+ARG TARGET_DIR=dspace-installer
+WORKDIR /app
+
+# Install Mirage2 dependencies
+RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
+    && apt-get install -y nodejs build-essential ruby-full=1:2.5.1 \
+    && npm install -g bower grunt grunt-cli
+
+# The Mirage2 build cannot run as root.  Setting the user to dspace.
+RUN useradd dspace \
+    && mkdir /home/dspace \
+    && mkdir -p /home/dspace/.m2/repository \
+    && chown -Rv dspace: /home/dspace
+USER dspace
+
+ENV PATH=$PATH:/home/dspace/.gem/ruby/2.5.0/bin
+ENV GEM_HOME=/home/dspace/.gem/ruby/2.5.0
+ENV GEM_PATH=/home/dspace/.gem/ruby/2.5.0
+
+RUN  gem install --user-install sass:3.3.14 compass:1.0.1
+
+# Add maven settings
+COPY dspace/src/main/docker/mvn-settings.xml /home/dspace/.m2/settings.xml
+
+# Copy the DSpace source code into the workdir (excluding .dockerignore contents)
+ADD --chown=dspace . /app/
+COPY --chown=dspace dspace/src/main/docker/local.cfg /app/local.cfg
+
+
+# Trigger the installation of all maven dependencies including the Mirage2 dependencies
+# Clean up the built artifacts in the same step to keep the docker image small
+RUN mvn package -Denv=local -P \!dspace-jspui,\!dspace-lni,\!dspace-rdf,\!dspace-solr,\!dspace-sword,\!dspace-swordv2 && mvn clean
+
+# Clear the contents of the /app directory so no artifacts are left when dspace:dspace is built
+USER root
+RUN rm -rf /app/*
