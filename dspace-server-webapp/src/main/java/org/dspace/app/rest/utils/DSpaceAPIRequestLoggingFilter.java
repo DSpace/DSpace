@@ -86,7 +86,13 @@ public class DSpaceAPIRequestLoggingFilter extends AbstractRequestLoggingFilter 
 
     @Override
     protected void afterRequest(HttpServletRequest request, String message) {
-        logger.info(message);
+        if (isAfterRequestLoggingEnabled()) {
+            logger.info(message);
+        }
         ThreadContext.clearAll();
+    }
+
+    private boolean isAfterRequestLoggingEnabled() {
+        return configurationService.getBooleanProperty("logging.server.include-after-request");
     }
 }
