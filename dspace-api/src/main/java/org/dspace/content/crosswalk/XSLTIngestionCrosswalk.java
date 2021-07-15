@@ -110,7 +110,9 @@ public class XSLTIngestionCrosswalk
             (sconf != null && sconf.length() > 0)) {
             int confidence = (sconf != null && sconf.length() > 0) ?
                 Choices.getConfidenceValue(sconf) : Choices.CF_UNSET;
-            itemService.addMetadata(context, item, metadataField, lang, field.getText(), authority, confidence);
+            if (!authority.startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+                itemService.addMetadata(context, item, metadataField, lang, field.getText(), authority, confidence);
+            }
         } else {
             itemService.addMetadata(context, item, metadataField, lang, field.getText());
         }
