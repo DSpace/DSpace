@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.content;
 
 import java.io.File;
@@ -108,12 +115,15 @@ public class PackagerFileService {
         return type;
     }
 
-    public List<FileNode> getFileNodes(Context context, String sourceFilePath, Map<String, Boolean> scope, Set<String> filesInTree) throws SQLException {
+    public List<FileNode> getFileNodes(Context context, String sourceFilePath,
+                                       Map<String, Boolean> scope, Set<String> filesInTree) throws SQLException {
         List<FileNode> fileNodes = new ArrayList<>();
-            filesInTree.add(sourceFilePath);
-            FileNode fileNode = new FileNode(getSourceFileHandle(sourceFilePath), sourceFilePath, getRels(context, sourceFilePath, scope, filesInTree), initUUID(sourceFilePath), initType(sourceFilePath));
-            getAction(context, fileNode);
-            fileNodes.add(fileNode);
+        filesInTree.add(sourceFilePath);
+        FileNode fileNode = new FileNode(getSourceFileHandle(sourceFilePath),
+                sourceFilePath, getRels(context, sourceFilePath, scope, filesInTree),
+                initUUID(sourceFilePath), initType(sourceFilePath));
+        getAction(context, fileNode);
+        fileNodes.add(fileNode);
         return fileNodes;
     }
 
@@ -126,8 +136,8 @@ public class PackagerFileService {
             //Assume zip
             boolean manifestOnly = false;
             if (params != null) {
-                 validate = params.getBooleanProperty("validate", false);
-                 manifestOnly = params.getBooleanProperty("manifestOnly", false);
+                validate = params.getBooleanProperty("validate", false);
+                manifestOnly = params.getBooleanProperty("manifestOnly", false);
             }
 
             // parsed out METS Manifest from the file.
@@ -191,7 +201,8 @@ public class PackagerFileService {
                     //The children of relElementChildrenElement are that items MPTR elements
                     Element relElementChildrenElement = (Element) relElementChildren;
                     handle = getMPTRData(relElementChildrenElement.getChildren(), "HANDLE");
-                    path = setRelPath(sourceFilePath, getMPTRData(relElementChildrenElement.getChildren(), "URL"));
+                    path = setRelPath(sourceFilePath,
+                            getMPTRData(relElementChildrenElement.getChildren(), "URL"));
                     uuid = getMPTRData(relElementChildrenElement.getChildren(), "URN").split(":")[2];
                     List<FileNode> relatedItems = rels.get(relName);
                     type = initType(sourceFilePath);
@@ -210,13 +221,15 @@ public class PackagerFileService {
                         if (scope.containsKey("*")) { // default to the recursive setting for *, if specified
                             recursive = scope.get("*");
                             if (!recursive) {
-                                childScope.remove("*"); // don't go deeper by default if non-recursive * is specified
+                                childScope.remove("*"); // don't go deeper by default if
+                                // non-recursive * is specified
                             }
                         }
                         if (scope.containsKey(relName)) { // if exact relName is specified, prefer its recursive setting
                             recursive = scope.get(relName);
                             if (!recursive) {
-                                childScope.remove(relName); // don't go deeper for this relName if given as non-recursive
+                                childScope.remove(relName); // don't go deeper for this relName
+                                // if given as non-recursive
                             }
                         }
                     }
@@ -246,7 +259,8 @@ public class PackagerFileService {
     public String getMPTRData(List<Element> mptrs, String loctype) {
         for (Element mptr : mptrs) {
             if (mptr.getAttribute("LOCTYPE").getValue().equals(loctype)) {
-                //For some god forsaken reason mptr.getAttribute("href") returns null so I guess I'll loop over all of them
+                //For some god forsaken reason mptr.getAttribute("href")
+                // returns null so I guess I'll loop over all of them
                 for (Object attribute : mptr.getAttributes()) {
                     Attribute attrAttribute = (Attribute) attribute;
                     if (attrAttribute.getName().equalsIgnoreCase("href")) {
@@ -267,8 +281,9 @@ public class PackagerFileService {
     //Get the top level rel strucMap
     public Element getRelsStrucMap(METSManifest metsManifest) {
         List<Element> children = metsManifest.getMets().getChildren();
-        for (int i=0; i < children.size(); i++) {
-            if (children.get(i).getAttribute("ID") != null && children.get(i).getAttribute("ID").getValue().equals("rels")) {
+        for (int i = 0; i < children.size(); i++) {
+            if (children.get(i).getAttribute("ID") != null && children.get(i)
+                    .getAttribute("ID").getValue().equals("rels")) {
                 return children.get(i);
             }
         }
@@ -281,16 +296,14 @@ public class PackagerFileService {
             if (fileNode.uuid != null && !fileNode.uuid.equals("")) {
                 dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(fileNode.type);
                 fileNodeObject = dSpaceObjectService.find(context, UUID.fromString(fileNode.uuid));
-            }
-            else if (fileNode.handle != null) {
+            } else if (fileNode.handle != null) {
                 handleService = HandleServiceFactory.getInstance().getHandleService();
                 fileNodeObject = handleService.resolveToObject(context, fileNode.handle);
             }
             if (fileNodeObject == null) {
                 if (restore && forceReplace) {
                     fileNode.action = PackagerIngestAction.REPLACE_NOT_IN_DSPACE;
-                }
-                else if (restore || restore && keepExist || restore && forceReplace) {
+                } else if (restore || restore && keepExist || restore && forceReplace) {
                     fileNode.action = PackagerIngestAction.RESTORE_NOT_IN_DSPACE;
                 }
             } else {
@@ -300,7 +313,7 @@ public class PackagerFileService {
                 if (restore && forceReplace) {
                     fileNode.action = PackagerIngestAction.REPLACE_IN_DSPACE;
                 }
-                if(restore && keepExist) {
+                if (restore && keepExist) {
                     fileNode.action =  PackagerIngestAction.SKIP_RESTORE_IN_DSPACE;
                 }
             }

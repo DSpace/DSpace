@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
-
 import javax.annotation.Nullable;
 
 import org.apache.commons.cli.CommandLine;
@@ -246,8 +245,8 @@ public class Packager {
                     System.out.println("\n\n" + line.getOptionValue('t') + " Dissemination (DIP) plugin options:\n");
                     System.out.println(dip.getParameterHelp());
                 } else {
-                    System.out
-                            .println("\nNo valid Dissemination plugin found for " + line.getOptionValue('t') + " type.");
+                    System.out.println("\nNo valid Dissemination plugin found for "
+                            + line.getOptionValue('t') + " type.");
                 }
 
             } else {
@@ -373,16 +372,15 @@ public class Packager {
 
             String choiceString = null;
             if (myPackager.userInteractionEnabled) {
-                if(dryRun){
+                if (dryRun) {
                     System.out.println("\n\n(DRYRUN MODE!)");
                 }
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
                 System.out.println("\n\nWARNING -- You are running the packager in REPLACE mode.");
-                System.out.println(
-                        "\nREPLACE mode may be potentially dangerous as it will automatically remove and replace contents" +
-                                " within DSpace.");
-                System.out.println(
-                        "We highly recommend backing up all your DSpace contents (files & database) before continuing.");
+                System.out.println("\nREPLACE mode may be potentially dangerous as it will automatically" +
+                        " remove and replace contents within DSpace.");
+                System.out.println("We highly recommend backing up all your DSpace " +
+                        "contents (files & database) before continuing.");
                 System.out.print("\nWould you like to continue? [y/n]: ");
                 choiceString = input.readLine();
             } else {
@@ -542,10 +540,11 @@ public class Packager {
                         //If we are doing a recursive ingest, call ingestAll()
                         if (pkgParams.recursiveModeEnabled()) {
                             System.out.println("\nAlso ingesting all referenced packages (recursive mode)..");
-                            System.out.println(
-                                    "This may take a while, please check your logs for ongoing status while we process each package.");
+                            System.out.println("This may take a while, please check " +
+                                    "your logs for ongoing status while we process each package.");
 
-                            //ingest first package & recursively ingest anything else that package references (child packages, etc)
+                            //ingest first package & recursively ingest
+                            // anything else that package references (child packages, etc)
                             List<String> hdlResults = sip.ingestAll(context, parent, pkgFile, pkgParams, null);
 
                             if (hdlResults != null) {
@@ -556,7 +555,8 @@ public class Packager {
                                 //Ask if user wants full list printed to command line, as this may be rather long.
                                 if (this.userInteractionEnabled) {
                                     BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-                                    System.out.print("\nWould you like to view a list of all objects that were created? [y/n]: ");
+                                    System.out.print("\nWould you like to view a list of all" +
+                                            " objects that were created? [y/n]: ");
                                     choiceString = input.readLine();
                                 } else {
                                     // user interaction disabled -- default answer to 'yes', as
@@ -575,13 +575,13 @@ public class Packager {
                                         if (dso != null) {
 
                                             if (pkgParams.restoreModeEnabled()) {
-                                                System.out.println("RESTORED DSpace " + Constants.typeText[dso.getType()] +
-                                                        " [ hdl=" + dso.getHandle() + ", dbID=" + dso
-                                                        .getID() + " ] ");
+                                                System.out.println("RESTORED DSpace " +
+                                                        Constants.typeText[dso.getType()] + " [ hdl=" + dso.getHandle()
+                                                        + ", dbID=" + dso.getID() + " ] ");
                                             } else {
-                                                System.out.println("CREATED new DSpace " + Constants.typeText[dso.getType()] +
-                                                        " [ hdl=" + dso.getHandle() + ", dbID=" + dso
-                                                        .getID() + " ] ");
+                                                System.out.println("CREATED new DSpace " +
+                                                        Constants.typeText[dso.getType()] + " [ hdl=" + dso.getHandle()
+                                                        + ", dbID=" + dso.getID() + " ] ");
                                             }
                                         }
                                     }
@@ -610,11 +610,11 @@ public class Packager {
                                 //if we are skipping over (i.e. keeping) existing objects
                                 if (pkgParams.keepExistingModeEnabled()) {
                                     System.out.println(
-                                            "\nSKIPPED processing package '" + pkgFile + "', as an Object already exists with this " +
-                                                    "handle.");
+                                            "\nSKIPPED processing package '" + pkgFile +
+                                                    "', as an Object already exists with this handle.");
                                 } else {
-                                    // Pass this exception on -- which essentially causes a full rollback of all changes (this
-                                    // is the default)
+                                    // Pass this exception on -- which essentially causes
+                                    // a full rollback of all changes (thisis the default)
                                     throw ie;
                                 }
                             }
@@ -631,7 +631,8 @@ public class Packager {
         if (!dryRun) {
             for (String path : pathToNewUUID.keySet()) {
                 if (getDSOTypeFromUUID(context, pathToNewUUID.get(path)) == Constants.ITEM) {
-                    PackagerFileService.FileNode fileNode = packagerFileService.getFileNodeTree(context, path, scope).get(0);
+                    PackagerFileService.FileNode fileNode = packagerFileService
+                            .getFileNodeTree(context, path, scope).get(0);
                     Map<String, Map<String, List<String>>> pathToRelMap = fileNode.getPathToRelMap();
                     Map<String, List<String>> relToUUID = new HashMap<>();
                     List<String> paths = new ArrayList<>();
@@ -719,11 +720,12 @@ public class Packager {
                 System.out.println("\nDisseminating DSpace " + Constants.typeText[dso.getType()] +
                         " [ hdl=" + dso.getHandle() + " ] to " + outputFile);
 
-                //If we are doing a recursive dissemination of this object & all its child objects, call disseminateAll()
+                //If we are doing a recursive dissemination of this object
+                // & all its child objects, call disseminateAll()
                 if (pkgParams.recursiveModeEnabled()) {
                     System.out.println("\nAlso disseminating all child objects (recursive mode)..");
-                    System.out.println(
-                            "This may take a while, please check your logs for ongoing status while we process each package.");
+                    System.out.println("This may take a while, please check your logs " +
+                            "for ongoing status while we process each package.");
 
                     //disseminate initial object & recursively disseminate all child objects as well
                     String pkgDirectory = pkgFile.getCanonicalFile().getParent();
@@ -734,7 +736,8 @@ public class Packager {
                         //Only items make it into alreadyDissedDSOs
                         //Diss all related items as well
                         Item childItem = (Item) childDSO;
-                        relatedUUIDSet.addAll(treeService.getItemsInTree(context, childItem, relationalScope, false));
+                        relatedUUIDSet.addAll(treeService
+                                .getItemsInTree(context, childItem, relationalScope, false));
                     }
                     //After we build related UUID set, process them
                     for (UUID uuid : relatedUUIDSet) {
@@ -749,7 +752,8 @@ public class Packager {
 
                     if (fileResults != null) {
                         //Report total files created
-                        System.out.println("\nCREATED a total of " + fileResults.size() + " dissemination package files.");
+                        System.out.println("\nCREATED a total of " + fileResults.size() +
+                                " dissemination package files.");
 
                         String choiceString = null;
                         //Ask if user wants full list printed to command line, as this may be rather long.
@@ -782,10 +786,12 @@ public class Packager {
                     //Diss all related items as well
                     if (dso.getType() == 2) {
                         Item parentItem = (Item) dso;
-                        Set<UUID> relatedUUIDSet = treeService.getItemsInTree(context, parentItem, relationalScope, false);
+                        Set<UUID> relatedUUIDSet = treeService
+                                .getItemsInTree(context, parentItem, relationalScope, false);
                         for (UUID uuid : relatedUUIDSet) {
                             if (!alreadyDissed.contains(uuid)) {
-                                disseminate(context, dip, dSpaceObjectService.find(context, uuid), pkgParams, orginalOutputPath, relationalScope, dryRun);
+                                disseminate(context, dip, dSpaceObjectService
+                                        .find(context, uuid), pkgParams, orginalOutputPath, relationalScope, dryRun);
                             }
                         }
                     }
@@ -797,9 +803,9 @@ public class Packager {
     //Short hand fileName utill
     public String evalFileName(String fileName, String extension, String dsoType, DSpaceObject dso) {
         if (extension.equalsIgnoreCase("zip")) {
-            fileName = dsoType+"@"+dso.getHandle().replace('/', '-')+"."+extension;
+            fileName = dsoType + "@" + dso.getHandle().replace('/', '-') + "." + extension;
         } else {
-            fileName = dsoType+"@"+dso.getHandle().replace('/', '-')+"/manifest."+extension;
+            fileName = dsoType + "@" + dso.getHandle().replace('/', '-') + "/manifest." + extension;
         }
         return fileName;
     }
@@ -832,7 +838,8 @@ public class Packager {
                 dryRunIngest(context,sourceFileInit, pkgParams.getProperty("scope"), packagerFileService);
             } else {
                 List<String> filePaths = new ArrayList<>();
-                List<PackagerFileService.FileNode> fileNodes = packagerFileService.getFileNodeTree(context, sourceFileInit, pkgParams.getProperty("scope"));
+                List<PackagerFileService.FileNode> fileNodes = packagerFileService
+                        .getFileNodeTree(context, sourceFileInit, pkgParams.getProperty("scope"));
                 //List will NEVER be empty
                 fileNodes.get(0).getTreePaths(filePaths);
                 for (String sourceFile : filePaths) {
@@ -846,7 +853,8 @@ public class Packager {
 
                     System.out.println("\nReplacing DSpace object(s) with package located at " + sourceFile);
                     if (objToReplace != null) {
-                        System.out.println("Will replace existing DSpace " + Constants.typeText[objToReplace.getType()] +
+                        System.out.println("Will replace existing DSpace " +
+                                Constants.typeText[objToReplace.getType()] +
                                 " [ hdl=" + objToReplace.getHandle() + " ]");
                     }
                     // NOTE: At this point, objToReplace may be null.  If it is null, it is up to the PackageIngester
@@ -855,8 +863,8 @@ public class Packager {
                     try {
                         //If we are doing a recursive replace, call replaceAll()
                         if (pkgParams.recursiveModeEnabled()) {
-                            //ingest first object using package & recursively replace anything else that package references
-                            // (child objects, etc)
+                            //ingest first object using package & recursively
+                            // replace anything else that package references(child objects, etc)
                             List<String> hdlResults = sip.replaceAll(context, objToReplace, pkgFile, pkgParams);
 
                             if (hdlResults != null) {
@@ -867,7 +875,8 @@ public class Packager {
                                 //Ask if user wants full list printed to command line, as this may be rather long.
                                 if (this.userInteractionEnabled) {
                                     BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-                                    System.out.print("\nWould you like to view a list of all objects that were replaced? [y/n]: ");
+                                    System.out.print("\nWould you like to view a list of all objects " +
+                                            "that were replaced? [y/n]: ");
                                     choiceString = input.readLine();
                                 } else {
                                     // user interaction disabled -- default answer to 'yes', as
@@ -908,7 +917,8 @@ public class Packager {
         }
         if (!dryRun) {
             for (String sourceFile : sourceFiles) {
-                PackagerFileService.FileNode fileNode = packagerFileService.getFileNodeTree(context, sourceFile, pkgParams.getProperty("scope")).get(0);
+                PackagerFileService.FileNode fileNode = packagerFileService
+                        .getFileNodeTree(context, sourceFile, pkgParams.getProperty("scope")).get(0);
                 Map<String, List<String>> parentRelationshipMap = new HashMap<>();
                 fileNode.getRelMap(parentRelationshipMap);
                 if (!parentRelationshipMap.isEmpty()) {
@@ -918,28 +928,35 @@ public class Packager {
         }
     }
 
-    public void addRelationships(Context context, Map<String, List<String>> relsMap, String initUUID) throws SQLException, AuthorizeException {
+    public void addRelationships(Context context, Map<String, List<String>> relsMap, String initUUID)
+            throws SQLException, AuthorizeException {
         //All IDs at this point should resolve as Items in the DB
         //We're adding relations ships TO `initUUID as Item` derived FROM the relsMap
         RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
-        RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
+        RelationshipTypeService relationshipTypeService = ContentServiceFactory
+                .getInstance().getRelationshipTypeService();
         ItemService itemService = ContentServiceFactory.getInstance().getItemService();
         Item parentItem = itemService.find(context, UUID.fromString(initUUID));
-        String parentEntityTypeLabel = itemService.getMetadataFirstValue(parentItem, "dspace", "entity", "type", null);
+        String parentEntityTypeLabel = itemService
+                .getMetadataFirstValue(parentItem, "dspace", "entity", "type", null);
         for (String key : relsMap.keySet()) {
             //This list will be in place order with respect to relationship side
             for (String childUUIDString : relsMap.get(key)) {
                 Item childItem = itemService.find(context, UUID.fromString(childUUIDString));
-                String childEntityTypeLabel = itemService.getMetadataFirstValue(childItem, "dspace", "entity", "type", null);
+                String childEntityTypeLabel = itemService.getMetadataFirstValue(
+                        childItem, "dspace", "entity", "type", null);
                 //Get all rel types of this label
-                List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(context, key);
+                List<RelationshipType> relTypes = relationshipTypeService.
+                        findByLeftwardOrRightwardTypeName(context, key);
                 //Get only possible Rel type of parent entity type, child entity type, and current label
-                RelationshipType relationshipType = matchRelationshipType(relTypes,childEntityTypeLabel, parentEntityTypeLabel, key);
+                RelationshipType relationshipType = matchRelationshipType(relTypes,
+                        childEntityTypeLabel, parentEntityTypeLabel, key);
                 if (relationshipType == null) {
                     continue;
                 }
                 //Get all relationships of parent item and derived relationship type
-                List<Relationship> relationships = relationshipService.findByItemAndRelationshipType(context, parentItem, relationshipType);
+                List<Relationship> relationships = relationshipService
+                        .findByItemAndRelationshipType(context, parentItem, relationshipType);
                 boolean alreadyExist = false;
                 //Determine if rel already exist
                 for (Relationship relationship : relationships) {
@@ -996,8 +1013,10 @@ public class Packager {
         }
     }
 
-    public void dryRunIngest(Context context, String sourceFileInit, String scope, PackagerFileService packagerFileService) throws SQLException {
-        List<PackagerFileService.FileNode> nodeTree = packagerFileService.getFileNodeTree(context, sourceFileInit, scope);
+    public void dryRunIngest(Context context, String sourceFileInit, String scope,
+                             PackagerFileService packagerFileService) throws SQLException {
+        List<PackagerFileService.FileNode> nodeTree = packagerFileService
+                .getFileNodeTree(context, sourceFileInit, scope);
         if (nodeTree.size() > 0) {
             nodeTree.get(0).print(System.out);
         }
@@ -1009,7 +1028,7 @@ public class Packager {
             File testFile = new File(sourceFile);
             if (testFile.exists() && testFile.isDirectory()) {
                 for (String file : testFile.list()) {
-                    sourceFileIngest.add(sourceFile+"/"+file);
+                    sourceFileIngest.add(sourceFile + "/" + file);
                 }
             } else {
                 sourceFileIngest.add(sourceFile);
@@ -1026,7 +1045,8 @@ public class Packager {
      * @return null or matched Relationship Type.
      */
     private RelationshipType matchRelationshipType(List<RelationshipType> relTypes,
-                                                   String childEntityType, String parentEntityType, String originTypeName) {
+                                                   String childEntityType, String parentEntityType,
+                                                   String originTypeName) {
         RelationshipType foundRelationshipType = null;
         if (originTypeName.split("\\.").length > 1) {
             originTypeName = originTypeName.split("\\.")[1];

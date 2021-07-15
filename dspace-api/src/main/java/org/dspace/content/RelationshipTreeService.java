@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.content;
 
 import java.io.PrintStream;
@@ -51,14 +58,16 @@ public class RelationshipTreeService {
         return scope;
     }
 
-    private void getNode(Context context, Item item, Map<String, Boolean> scope, Set<UUID> itemsInTree, int place, Node node) {
+    private void getNode(Context context, Item item, Map<String, Boolean> scope,
+                         Set<UUID> itemsInTree, int place, Node node) {
         try {
             if (item.getHandle() == null) {
                 //Not archived don't add
             } else {
                 itemsInTree.add(item.getID());
                 node = new Node(item.getID(), getFirstMetadataValue(item, "relationship", "type"),
-                        getFirstMetadataValue(item, "dc", "title"), place, getRels(context, item, scope, itemsInTree));
+                        getFirstMetadataValue(item, "dc", "title"),
+                        place, getRels(context, item, scope, itemsInTree));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

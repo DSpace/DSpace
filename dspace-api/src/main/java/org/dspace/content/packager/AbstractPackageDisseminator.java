@@ -149,7 +149,8 @@ public abstract class AbstractPackageDisseminator
                             //disseminate all collections (recursively!)
                             String childFileName = pkgDirectory + PackageUtils
                                 .getPackageName(collections.get(i), fileExtension);
-                            disseminateAll(context, collections.get(i), params, new File(childFileName), alreadyDisseminated);
+                            disseminateAll(context, collections.get(i), params,
+                                    new File(childFileName), alreadyDisseminated);
                         }
 
                         break;

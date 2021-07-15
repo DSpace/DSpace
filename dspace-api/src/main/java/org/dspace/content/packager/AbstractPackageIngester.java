@@ -198,7 +198,7 @@ public abstract class AbstractPackageIngester
                             String childHandle = getIngestedMap().get(childPkg);
                             if (childHandle != null) {
                                 Item childItem = (Item) handleService.resolveToObject(context, childHandle);
-                                if (childItem!= null && !pathToNewUUID.containsKey(childPkg.getAbsolutePath())) {
+                                if (childItem != null && !pathToNewUUID.containsKey(childPkg.getAbsolutePath())) {
                                     pathToNewUUID.put(childPkg.getAbsolutePath(), childItem.getID().toString());
                                 }
                                 // Ensure Item is mapped to Collection that referenced it
