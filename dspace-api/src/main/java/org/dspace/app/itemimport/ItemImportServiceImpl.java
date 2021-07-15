@@ -44,6 +44,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+
 import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.FileUtils;
@@ -232,7 +233,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             Map<String, String> skipItems = new HashMap<>(); // set of items to skip if in 'resume'
             // mode
 
-            itemFolderMap = new HashMap<>(); 
+            itemFolderMap = new HashMap<>();
 
             System.out.println("Adding items from directory: " + sourceDir);
             log.debug("Adding items from directory: " + sourceDir);
@@ -336,21 +337,21 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected void addRelationships(Context c, String sourceDir) throws Exception {
 
         System.out.println("Linking relationships");
-        
+
         for (Map.Entry<String, Item> itemEntry : itemFolderMap.entrySet()) {
 
             String folderName = itemEntry.getKey();
             String path = sourceDir + File.separatorChar + folderName;
             Item item = itemEntry.getValue();
 
-            System.out.println("Adding relationships from directory "+ folderName);
+            System.out.println("Adding relationships from directory " + folderName);
 
             //look for a 'relationship' manifest
             Map<String, List<String>> relationships = processRelationshipFile(path, "relationships");
             if (!relationships.isEmpty()) {
 
                 for (Map.Entry<String, List<String>> relEntry : relationships.entrySet()) {
-                    
+
                     String relationshipType = relEntry.getKey();
                     List<String> identifierList = relEntry.getValue();
 
@@ -359,16 +360,19 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         //find referenced item
                         Item relationItem = resolveRelatedItem(c, itemIdentifier);
                         if (null == relationItem) {
-                            throw new Exception("Could not find item for "+ itemIdentifier);
-                        } 
+                            throw new Exception("Could not find item for " + itemIdentifier);
+                        }
 
                         //get entity type of entity and item
                         String itemEntityType = getEntityType(item);
                         String relatedEntityType = getEntityType(relationItem);
 
                         //find matching relationship type
-                        List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(c, relationshipType);
-                        RelationshipType foundRelationshipType = RelationshipUtils.matchRelationshipType(relTypes, relatedEntityType, itemEntityType, relationshipType);
+                        List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(
+                            c, relationshipType);
+                        RelationshipType foundRelationshipType = RelationshipUtils.matchRelationshipType(
+                            relTypes, relatedEntityType, itemEntityType, relationshipType);
+
                         if (foundRelationshipType == null) {
                             throw new Exception("No Relationship type found for:\n" +
                                 "Target type: " + relatedEntityType + "\n" +
@@ -396,10 +400,12 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         // Create the relationship
                         int leftPlace = relationshipService.findNextLeftPlaceByLeftItem(c, leftItem);
                         int rightPlace = relationshipService.findNextRightPlaceByRightItem(c, rightItem);
-                        Relationship persistedRelationship = relationshipService.create(c, leftItem, rightItem, foundRelationshipType, leftPlace, rightPlace);
+                        Relationship persistedRelationship = relationshipService.create(
+                            c, leftItem, rightItem, foundRelationshipType, leftPlace, rightPlace);
                         relationshipService.update(c, persistedRelationship);
 
-                        System.out.println("\tAdded relationship (type: "+ relationshipType +") from "+ leftItem.getHandle() +" to "+ rightItem.getHandle());
+                        System.out.println("\tAdded relationship (type: " + relationshipType + ") from " +
+                            leftItem.getHandle() + " to " + rightItem.getHandle());
 
                     }
 
@@ -460,14 +466,14 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     StringTokenizer st = new StringTokenizer(line);
 
                     if (st.hasMoreTokens()) {
-                        relationshipType= st.nextToken();
+                        relationshipType = st.nextToken();
                         if (relationshipType.split("\\.").length > 1) {
                             relationshipType = relationshipType.split("\\.")[1];
                         }
                     } else {
                         throw new Exception("Bad mapfile line:\n" + line);
                     }
-    
+
                     if (st.hasMoreTokens()) {
                         itemIdentifier = st.nextToken("").trim();
                     } else {
@@ -475,9 +481,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     }
 
                     if (!result.containsKey(relationshipType)) {
-                        result.put(relationshipType, new ArrayList<>()); 
-                    } 
-                    
+                        result.put(relationshipType, new ArrayList<>());
+                    }
+
                     result.get(relationshipType).add(itemIdentifier);
 
                 }
@@ -493,7 +499,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     }
                 }
             }
-        
+
         } else {
             System.out.println("\tNo relationships file found.");
         }
@@ -509,11 +515,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
       * meta value.
       * 
       * @param c Context
-      * @param itemIdentifier The identifier string found in the import manifest (handle, uuid, or another import subfolder)
+      * @param itemIdentifier The identifier string found in the import manifest (handle, uuid, or import subfolder)
       * @return Item if found, or null.
       * @throws Exception
       */
-      protected Item resolveRelatedItem(Context c, String itemIdentifier) throws Exception {
+    protected Item resolveRelatedItem(Context c, String itemIdentifier) throws Exception {
 
         if (itemIdentifier.contains(":")) {
 
@@ -524,7 +530,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 if (itemFolderMap.containsKey(folderName)) {
                     return itemFolderMap.get(folderName);
                 }
-            
+
             } else {
 
                 //lookup by meta value
@@ -562,7 +568,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         String mf[] = metaKey.split("\\.");
         if (mf.length < 2) {
-            throw new Exception("Bad metadata field in reference: '" + metaKey + "' (expected syntax is schema.element[.qualifier])");
+            throw new Exception("Bad metadata field in reference: '" + metaKey +
+                "' (expected syntax is schema.element[.qualifier])");
         }
         String schema = mf[0];
         String element = mf[1];
