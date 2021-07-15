@@ -459,11 +459,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         crosswalkObjectDmd(context, dso, manifest, callback, manifest
             .getItemDmds(), params);
 
-        // For Items, also sanity-check the metadata for minimum requirements.
-        if (type == Constants.ITEM) {
-            PackageUtils.checkItemMetadata((Item) dso);
-        }
-
         // -- Step 5 --
         // Add all content files as bitstreams on new DSpace Object
         if (type == Constants.ITEM) {
@@ -662,11 +657,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         // Run our Descriptive metadata (dublin core, etc) crosswalks!
         crosswalkObjectDmd(context, dso, manifest, callback, manifest
             .getItemDmds(), params);
-
-        // For Items, also sanity-check the metadata for minimum requirements.
-        if (dso.getType() == Constants.ITEM) {
-            PackageUtils.checkItemMetadata((Item) dso);
-        }
 
         // -- Step 6 --
         // Finish things up!
