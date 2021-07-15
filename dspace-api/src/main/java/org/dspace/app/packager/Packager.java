@@ -13,7 +13,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -22,11 +30,23 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.PackagerFileService;
+import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipTreeService;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.packager.PackageDisseminator;
 import org.dspace.content.packager.PackageException;
 import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
+import org.dspace.content.packager.PackageUtils;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -34,6 +54,8 @@ import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.kernel.ServiceManager;
+import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowException;
 
 /**
@@ -125,6 +147,7 @@ public class Packager {
     protected String packageType = null;
     protected boolean submit = true;
     protected boolean userInteractionEnabled = true;
+    protected Set<UUID> alreadyDissed = new TreeSet<>();
 
     // die from illegal command line
     protected static void usageError(String msg) {
@@ -134,54 +157,60 @@ public class Packager {
     }
 
     public static void main(String[] argv) throws Exception {
+        List<String> sourceFileIngest = new ArrayList<>();
         Options options = new Options();
         options.addOption("p", "parent", true,
-                          "Handle(s) of parent Community or Collection into which to ingest object (repeatable)");
+                "Handle(s) of parent Community or Collection into which to ingest object (repeatable)");
         options.addOption("e", "eperson", true,
-                          "email address of eperson doing importing");
+                "email address of eperson doing importing");
         options
-            .addOption(
-                "w",
-                "install",
-                false,
-                "disable workflow; install immediately without going through collection's workflow");
+                .addOption(
+                        "w",
+                        "install",
+                        false,
+                        "disable workflow; install immediately without going through collection's workflow");
         options.addOption("r", "restore", false,
-                          "ingest in \"restore\" mode.  Restores a missing object based on the contents in a package.");
+                "ingest in \"restore\" mode.  Restores a missing object based on the contents in a package.");
         options.addOption("k", "keep-existing", false,
-                          "if an object is found to already exist during a restore (-r), then keep the existing " +
-                              "object and continue processing.  Can only be used with '-r'.  This avoids " +
-                              "object-exists errors which are thrown by -r by default.");
+                "if an object is found to already exist during a restore (-r), then keep the existing " +
+                        "object and continue processing.  Can only be used with '-r'.  This avoids " +
+                        "object-exists errors which are thrown by -r by default.");
         options.addOption("f", "force-replace", false,
-                          "if an object is found to already exist during a restore (-r), then remove it and replace " +
-                              "it with the contents of the package.  Can only be used with '-r'.  This REPLACES the " +
-                              "object(s) in the repository with the contents from the package(s).");
+                "if an object is found to already exist during a restore (-r), then remove it and replace " +
+                        "it with the contents of the package.  Can only be used with '-r'.  This REPLACES the " +
+                        "object(s) in the repository with the contents from the package(s).");
         options.addOption("t", "type", true, "package type or MIMEtype");
         options
-            .addOption("o", "option", true,
-                       "Packager option to pass to plugin, \"name=value\" (repeatable)");
+                .addOption("o", "option", true,
+                        "Packager option to pass to plugin, \"name=value\" (repeatable)");
         options.addOption("d", "disseminate", false,
-                          "Disseminate package (output); default is to submit.");
+                "Disseminate package (output); default is to submit.");
         options.addOption("s", "submit", false,
-                          "Submission package (Input); this is the default. ");
+                "Submission package (Input); this is the default. ");
         options.addOption("i", "identifier", true, "Handle of object to disseminate.");
         options.addOption("a", "all", false,
-                          "also recursively ingest/disseminate any child packages, e.g. all Items within a Collection" +
-                              " (not all packagers may support this option!)");
+                "also recursively ingest/disseminate any child packages, e.g. all Items within a Collection" +
+                        " (not all packagers may support this option!)");
         options.addOption("h", "help", false,
-                          "help (you may also specify '-h -t [type]' for additional help with a specific type of " +
-                              "packager)");
+                "help (you may also specify '-h -t [type]' for additional help with a specific type of " +
+                        "packager)");
+        options.addOption("z", "relationalScope", true,
+                "The scope of relations to disseminate with parent item.");
         options.addOption("u", "no-user-interaction", false,
-                          "Skips over all user interaction (i.e. [y/n] question prompts) within this script. This " +
-                              "flag can be used if you want to save (pipe) a report of all changes to a file, and " +
-                              "therefore need to bypass all user interaction.");
+                "Skips over all user interaction (i.e. [y/n] question prompts) within this script. This " +
+                        "flag can be used if you want to save (pipe) a report of all changes to a file, and " +
+                        "therefore need to bypass all user interaction.");
+        options.addOption("y", "dryRun", false,
+                "Dry run to output the result of an ingest without actually ingesting.");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine line = parser.parse(options, argv);
 
-        String sourceFile = null;
         String eperson = null;
         String[] parents = null;
         String identifier = null;
+        String relationalScope = null;
+        boolean dryRun = false;
         PackageParameters pkgParams = new PackageParameters();
         PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
 
@@ -191,7 +220,7 @@ public class Packager {
         if (line.hasOption('h')) {
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("Packager  [options]  package-file|-\n",
-                             options);
+                    options);
             //If user specified a type, also print out the SIP and DIP options
             // that are specific to that type of packager
             if (line.hasOption('t')) {
@@ -201,7 +230,7 @@ public class Packager {
                 System.out.println("(These options may be specified using --option as described above)");
 
                 PackageIngester sip = (PackageIngester) pluginService
-                    .getNamedPlugin(PackageIngester.class, line.getOptionValue('t'));
+                        .getNamedPlugin(PackageIngester.class, line.getOptionValue('t'));
 
                 if (sip != null) {
                     System.out.println("\n\n" + line.getOptionValue('t') + " Submission (SIP) plugin options:\n");
@@ -211,26 +240,26 @@ public class Packager {
                 }
 
                 PackageDisseminator dip = (PackageDisseminator) pluginService
-                    .getNamedPlugin(PackageDisseminator.class, line.getOptionValue('t'));
+                        .getNamedPlugin(PackageDisseminator.class, line.getOptionValue('t'));
 
                 if (dip != null) {
                     System.out.println("\n\n" + line.getOptionValue('t') + " Dissemination (DIP) plugin options:\n");
                     System.out.println(dip.getParameterHelp());
                 } else {
                     System.out
-                        .println("\nNo valid Dissemination plugin found for " + line.getOptionValue('t') + " type.");
+                            .println("\nNo valid Dissemination plugin found for " + line.getOptionValue('t') + " type.");
                 }
 
             } else {
                 //otherwise, display list of valid packager types
                 System.out.println("\nAvailable Submission Package (SIP) types:");
                 String pn[] = pluginService
-                    .getAllPluginNames(PackageIngester.class);
+                        .getAllPluginNames(PackageIngester.class);
                 for (int i = 0; i < pn.length; ++i) {
                     System.out.println("  " + pn[i]);
                 }
                 System.out
-                    .println("\nAvailable Dissemination Package (DIP) types:");
+                        .println("\nAvailable Dissemination Package (DIP) types:");
                 pn = pluginService.getAllPluginNames(PackageDisseminator.class);
                 for (int i = 0; i < pn.length; ++i) {
                     System.out.println("  " + pn[i]);
@@ -269,15 +298,20 @@ public class Packager {
         if (line.hasOption('i')) {
             identifier = line.getOptionValue('i');
         }
+        if (line.hasOption("relationalScope")) {
+            relationalScope = line.getOptionValue("relationalScope");
+        }
+        relationalScope = (relationalScope == null) ? "*" : relationalScope;
+        pkgParams.setProperty("scope", relationalScope);
+        if (line.hasOption("dryRun")) {
+            dryRun = true;
+        }
         if (line.hasOption('a')) {
             //enable 'recursiveMode' param to packager implementations, in case it helps with packaging or ingestion
             // process
             pkgParams.setRecursiveModeEnabled(true);
         }
-        String files[] = line.getArgs();
-        if (files.length > 0) {
-            sourceFile = files[0];
-        }
+        String[] sourceFiles = line.getArgs();
         if (line.hasOption('d')) {
             myPackager.submit = false;
         }
@@ -291,15 +325,15 @@ public class Packager {
                     pkgParams.addProperty(pair[0].trim(), "");
                 } else {
                     System.err
-                        .println("Warning: Illegal package option format: \""
-                                     + popt[i] + "\"");
+                            .println("Warning: Illegal package option format: \""
+                                    + popt[i] + "\"");
                 }
             }
         }
 
         // Sanity checks on arg list: required args
         // REQUIRED: sourceFile, ePerson (-e), packageType (-t)
-        if (sourceFile == null || eperson == null || myPackager.packageType == null) {
+        if (sourceFiles == null || eperson == null || eperson == null || myPackager.packageType == null) {
             System.err.println("Error - missing a REQUIRED argument or option.\n");
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("PackageManager  [options]  package-file|-\n", options);
@@ -320,7 +354,7 @@ public class Packager {
         if (pkgParams.replaceModeEnabled()) {
             context.setMode(Context.Mode.BATCH_EDIT);
             PackageIngester sip = (PackageIngester) pluginService
-                .getNamedPlugin(PackageIngester.class, myPackager.packageType);
+                    .getNamedPlugin(PackageIngester.class, myPackager.packageType);
             if (sip == null) {
                 usageError("Error, Unknown package type: " + myPackager.packageType);
             }
@@ -330,22 +364,25 @@ public class Packager {
             //if a specific identifier was specified, make sure it is valid
             if (identifier != null && identifier.length() > 0) {
                 objToReplace = HandleServiceFactory.getInstance().getHandleService()
-                                                   .resolveToObject(context, identifier);
+                        .resolveToObject(context, identifier);
                 if (objToReplace == null) {
                     throw new IllegalArgumentException("Bad identifier/handle -- "
-                                                           + "Cannot resolve handle \"" + identifier + "\"");
+                            + "Cannot resolve handle \"" + identifier + "\"");
                 }
             }
 
             String choiceString = null;
             if (myPackager.userInteractionEnabled) {
+                if(dryRun){
+                    System.out.println("\n\n(DRYRUN MODE!)");
+                }
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
                 System.out.println("\n\nWARNING -- You are running the packager in REPLACE mode.");
                 System.out.println(
-                    "\nREPLACE mode may be potentially dangerous as it will automatically remove and replace contents" +
-                        " within DSpace.");
+                        "\nREPLACE mode may be potentially dangerous as it will automatically remove and replace contents" +
+                                " within DSpace.");
                 System.out.println(
-                    "We highly recommend backing up all your DSpace contents (files & database) before continuing.");
+                        "We highly recommend backing up all your DSpace contents (files & database) before continuing.");
                 System.out.print("\nWould you like to continue? [y/n]: ");
                 choiceString = input.readLine();
             } else {
@@ -358,7 +395,8 @@ public class Packager {
 
                 try {
                     //replace the object from the source file
-                    myPackager.replace(context, sip, pkgParams, sourceFile, objToReplace);
+                    dirAndFilePathBuilder(sourceFileIngest, sourceFiles);
+                    myPackager.replace(context, sip, pkgParams, sourceFileIngest, objToReplace, dryRun);
 
                     //commit all changes & exit successfully
                     context.complete();
@@ -377,7 +415,7 @@ public class Packager {
             context.setMode(Context.Mode.BATCH_EDIT);
 
             PackageIngester sip = (PackageIngester) pluginService
-                .getNamedPlugin(PackageIngester.class, myPackager.packageType);
+                    .getNamedPlugin(PackageIngester.class, myPackager.packageType);
             if (sip == null) {
                 usageError("Error, Unknown package type: " + myPackager.packageType);
             }
@@ -391,21 +429,22 @@ public class Packager {
                 for (int i = 0; i < parents.length; i++) {
                     // sanity check: did handle resolve?
                     parentObjs[i] = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context,
-                                                                                                          parents[i]);
+                            parents[i]);
                     if (parentObjs[i] == null) {
                         throw new IllegalArgumentException(
-                            "Bad parent list -- "
-                                + "Cannot resolve parent handle \""
-                                + parents[i] + "\"");
+                                "Bad parent list -- "
+                                        + "Cannot resolve parent handle \""
+                                        + parents[i] + "\"");
                     }
                     System.out.println((i == 0 ? "Owner: " : "Parent: ")
-                                           + parentObjs[i].getHandle());
+                            + parentObjs[i].getHandle());
                 }
             }
 
             try {
                 //ingest the object from the source file
-                myPackager.ingest(context, sip, pkgParams, sourceFile, parentObjs);
+                dirAndFilePathBuilder(sourceFileIngest, sourceFiles);
+                myPackager.ingest(context, sip, pkgParams, sourceFileIngest, parentObjs, dryRun, relationalScope);
 
                 //commit all changes & exit successfully
                 context.complete();
@@ -423,20 +462,22 @@ public class Packager {
 
             //retrieve specified package disseminator
             PackageDisseminator dip = (PackageDisseminator) pluginService
-                .getNamedPlugin(PackageDisseminator.class, myPackager.packageType);
+                    .getNamedPlugin(PackageDisseminator.class, myPackager.packageType);
             if (dip == null) {
                 usageError("Error, Unknown package type: " + myPackager.packageType);
             }
 
             DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
-                                                   .resolveToObject(context, identifier);
+                    .resolveToObject(context, identifier);
             if (dso == null) {
                 throw new IllegalArgumentException("Bad identifier/handle -- "
-                                                       + "Cannot resolve handle \"" + identifier + "\"");
+                        + "Cannot resolve handle \"" + identifier + "\"");
             }
 
             //disseminate the requested object
-            myPackager.disseminate(context, dip, dso, pkgParams, sourceFile);
+            for (String sourceFile : sourceFiles) {
+                myPackager.disseminate(context, dip, dso, pkgParams, sourceFile, relationalScope, dryRun);
+            }
         }
         System.exit(0);
     }
@@ -451,7 +492,7 @@ public class Packager {
      * @param context    DSpace Context
      * @param sip        PackageIngester which will actually ingest the package
      * @param pkgParams  Parameters to pass to individual packager instances
-     * @param sourceFile location of the source package to ingest
+     * @param sourceFiles locations of the source package(s) to ingest
      * @param parentObjs Parent DSpace object(s) to attach new object to
      * @throws IOException           if IO error
      * @throws SQLException          if database error
@@ -460,109 +501,163 @@ public class Packager {
      * @throws CrosswalkException    if crosswalk error
      * @throws PackageException      if packaging error
      */
-    protected void ingest(Context context, PackageIngester sip, PackageParameters pkgParams, String sourceFile,
-                          DSpaceObject parentObjs[])
-        throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException,
-        PackageException {
+    protected void ingest(Context context, PackageIngester sip, PackageParameters pkgParams, List<String> sourceFiles,
+                          DSpaceObject parentObjs[], boolean dryRun, @Nullable String scope)
+            throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException,
+            PackageException {
+        Map<String, String> pathToNewUUID = new HashMap<>();
         // make sure we have an input file
-        File pkgFile = new File(sourceFile);
+        PackagerFileService packagerFileService = new PackagerFileService(pkgParams);
+        for (String sourceFileInit : sourceFiles) {
+            //new list to contain newly minted UUIDs
+            DSpaceObject dso = null;
+            PackagerFileService.FileNode fileNode = null;
+            if (dryRun) {
+                dryRunIngest(context,sourceFileInit, scope, packagerFileService);
+            } else {
+                List<String> filePaths = new ArrayList<>();
+                fileNode = packagerFileService.getFileNodeTree(context, sourceFileInit, scope).get(0);
+                //List will NEVER be empty
+                fileNode.getTreePaths(filePaths);
+                for (String sourceFile : filePaths) {
+                    //populate rels map
+                    File pkgFile = new File(sourceFile);
 
-        if (!pkgFile.exists()) {
-            System.out.println("\nERROR: Package located at " + sourceFile + " does not exist!");
-            System.exit(1);
-        }
-
-        System.out.println("\nIngesting package located at " + sourceFile);
-
-        //find first parent (if specified) -- this will be the "owner" of the object
-        DSpaceObject parent = null;
-        if (parentObjs != null && parentObjs.length > 0) {
-            parent = parentObjs[0];
-        }
-        //NOTE: at this point, Parent may be null -- in which case it is up to the PackageIngester
-        // to either determine the Parent (from package contents) or throw an error.
-
-        try {
-            //If we are doing a recursive ingest, call ingestAll()
-            if (pkgParams.recursiveModeEnabled()) {
-                System.out.println("\nAlso ingesting all referenced packages (recursive mode)..");
-                System.out.println(
-                    "This may take a while, please check your logs for ongoing status while we process each package.");
-
-                //ingest first package & recursively ingest anything else that package references (child packages, etc)
-                List<String> hdlResults = sip.ingestAll(context, parent, pkgFile, pkgParams, null);
-
-                if (hdlResults != null) {
-                    //Report total objects created
-                    System.out.println("\nCREATED a total of " + hdlResults.size() + " DSpace Objects.");
-
-                    String choiceString = null;
-                    //Ask if user wants full list printed to command line, as this may be rather long.
-                    if (this.userInteractionEnabled) {
-                        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-                        System.out.print("\nWould you like to view a list of all objects that were created? [y/n]: ");
-                        choiceString = input.readLine();
-                    } else {
-                        // user interaction disabled -- default answer to 'yes', as
-                        // we want to provide user with as detailed a report as possible.
-                        choiceString = "y";
+                    if (!pkgFile.exists()) {
+                        System.out.println("\nERROR: Package located at " + sourceFile + " does not exist!");
+                        System.exit(1);
                     }
 
-                    // Provide detailed report if user answered 'yes'
-                    if (choiceString.equalsIgnoreCase("y")) {
-                        System.out.println("\n\n");
-                        for (String result : hdlResults) {
-                            DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
-                                                                   .resolveToObject(context, result);
+                    System.out.println("\nIngesting package located at " + sourceFile);
 
-                            if (dso != null) {
+                    //find first parent (if specified) -- this will be the "owner" of the object
+                    DSpaceObject parent = null;
+                    if (parentObjs != null && parentObjs.length > 0) {
+                        parent = parentObjs[0];
+                    }
+                    //NOTE: at this point, Parent may be null -- in which case it is up to the PackageIngester
+                    // to either determine the Parent (from package contents) or throw an error.
 
-                                if (pkgParams.restoreModeEnabled()) {
-                                    System.out.println("RESTORED DSpace " + Constants.typeText[dso.getType()] +
-                                                           " [ hdl=" + dso.getHandle() + ", dbID=" + dso
-                                        .getID() + " ] ");
+                    try {
+                        //If we are doing a recursive ingest, call ingestAll()
+                        if (pkgParams.recursiveModeEnabled()) {
+                            System.out.println("\nAlso ingesting all referenced packages (recursive mode)..");
+                            System.out.println(
+                                    "This may take a while, please check your logs for ongoing status while we process each package.");
+
+                            //ingest first package & recursively ingest anything else that package references (child packages, etc)
+                            List<String> hdlResults = sip.ingestAll(context, parent, pkgFile, pkgParams, null);
+
+                            if (hdlResults != null) {
+                                //Report total objects created
+                                System.out.println("\nCREATED a total of " + hdlResults.size() + " DSpace Objects.");
+
+                                String choiceString = null;
+                                //Ask if user wants full list printed to command line, as this may be rather long.
+                                if (this.userInteractionEnabled) {
+                                    BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+                                    System.out.print("\nWould you like to view a list of all objects that were created? [y/n]: ");
+                                    choiceString = input.readLine();
                                 } else {
-                                    System.out.println("CREATED new DSpace " + Constants.typeText[dso.getType()] +
-                                                           " [ hdl=" + dso.getHandle() + ", dbID=" + dso
-                                        .getID() + " ] ");
+                                    // user interaction disabled -- default answer to 'yes', as
+                                    // we want to provide user with as detailed a report as possible.
+                                    choiceString = "y";
+                                }
+
+                                // Provide detailed report if user answered 'yes'
+                                if (choiceString.equalsIgnoreCase("y")) {
+                                    System.out.println("\n\n");
+                                    for (String result : hdlResults) {
+                                        dso = HandleServiceFactory.getInstance().getHandleService()
+                                                .resolveToObject(context, result);
+                                        pathToNewUUID.put(sourceFile, dso.getID().toString());
+
+                                        if (dso != null) {
+
+                                            if (pkgParams.restoreModeEnabled()) {
+                                                System.out.println("RESTORED DSpace " + Constants.typeText[dso.getType()] +
+                                                        " [ hdl=" + dso.getHandle() + ", dbID=" + dso
+                                                        .getID() + " ] ");
+                                            } else {
+                                                System.out.println("CREATED new DSpace " + Constants.typeText[dso.getType()] +
+                                                        " [ hdl=" + dso.getHandle() + ", dbID=" + dso
+                                                        .getID() + " ] ");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        } else {
+                            //otherwise, just one package to ingest
+                            try {
+                                dso = sip.ingest(context, parent, pkgFile, pkgParams, null);
+                                pathToNewUUID.put(sourceFile, dso.getID().toString());
+
+                                if (dso != null) {
+                                    if (pkgParams.restoreModeEnabled()) {
+                                        System.out.println("RESTORED DSpace " + Constants.typeText[dso.getType()] +
+                                                " [ hdl=" + dso.getHandle() + ", dbID=" + dso.getID() + " ] ");
+                                    } else {
+                                        System.out.println("CREATED new DSpace " + Constants.typeText[dso.getType()] +
+                                                " [ hdl=" + dso.getHandle() + ", dbID=" + dso.getID() + " ] ");
+                                    }
+                                }
+                            } catch (IllegalStateException ie) {
+                                // NOTE: if we encounter an IllegalStateException, this means the
+                                // handle is already in use and this object already exists.
+
+                                //if we are skipping over (i.e. keeping) existing objects
+                                if (pkgParams.keepExistingModeEnabled()) {
+                                    System.out.println(
+                                            "\nSKIPPED processing package '" + pkgFile + "', as an Object already exists with this " +
+                                                    "handle.");
+                                } else {
+                                    // Pass this exception on -- which essentially causes a full rollback of all changes (this
+                                    // is the default)
+                                    throw ie;
                                 }
                             }
                         }
-                    }
-                }
-
-            } else {
-                //otherwise, just one package to ingest
-                try {
-                    DSpaceObject dso = sip.ingest(context, parent, pkgFile, pkgParams, null);
-
-                    if (dso != null) {
-                        if (pkgParams.restoreModeEnabled()) {
-                            System.out.println("RESTORED DSpace " + Constants.typeText[dso.getType()] +
-                                                   " [ hdl=" + dso.getHandle() + ", dbID=" + dso.getID() + " ] ");
-                        } else {
-                            System.out.println("CREATED new DSpace " + Constants.typeText[dso.getType()] +
-                                                   " [ hdl=" + dso.getHandle() + ", dbID=" + dso.getID() + " ] ");
-                        }
-                    }
-                } catch (IllegalStateException ie) {
-                    // NOTE: if we encounter an IllegalStateException, this means the
-                    // handle is already in use and this object already exists.
-
-                    //if we are skipping over (i.e. keeping) existing objects
-                    if (pkgParams.keepExistingModeEnabled()) {
-                        System.out.println(
-                            "\nSKIPPED processing package '" + pkgFile + "', as an Object already exists with this " +
-                                "handle.");
-                    } else {
-                        // Pass this exception on -- which essentially causes a full rollback of all changes (this
-                        // is the default)
-                        throw ie;
+                    } catch (WorkflowException e) {
+                        throw new PackageException(e);
                     }
                 }
             }
-        } catch (WorkflowException e) {
-            throw new PackageException(e);
+        }
+        if (pkgParams.recursiveModeEnabled()) {
+            pathToNewUUID = sip.getPathToNewUUID();
+        }
+        if (!dryRun) {
+            for (String path : pathToNewUUID.keySet()) {
+                if (getDSOTypeFromUUID(context, pathToNewUUID.get(path)) == Constants.ITEM) {
+                    PackagerFileService.FileNode fileNode = packagerFileService.getFileNodeTree(context, path, scope).get(0);
+                    Map<String, Map<String, List<String>>> pathToRelMap = fileNode.getPathToRelMap();
+                    Map<String, List<String>> relToUUID = new HashMap<>();
+                    List<String> paths = new ArrayList<>();
+                    if (pathToRelMap.size() > 0) {
+                        for (String relation : pathToRelMap.get(path).keySet()) {
+                            paths = pathToRelMap.get(path).get(relation);
+                            List<String> uuids = new ArrayList<>();
+                            for (String relPath : paths) {
+                                //Check for varrying paths but file NAMES should line up
+                                if (pathToNewUUID.get(relPath) == null) {
+                                    for (String pathCheck : pathToNewUUID.keySet()) {
+                                        if (pathCheck.contains(relPath)) {
+                                            uuids.add(pathToNewUUID.get(pathCheck));
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    uuids.add(pathToNewUUID.get(relPath));
+                                }
+                            }
+                            relToUUID.put(relation, uuids);
+                            addRelationships(context, relToUUID, pathToNewUUID.get(path));
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -573,7 +668,7 @@ public class Packager {
      *
      * @param context    DSpace context
      * @param dip        PackageDisseminator which will actually create the package
-     * @param dso        DSpace Object to disseminate as a package
+     * @param dsoParent        DSpace Object to disseminate as a package
      * @param pkgParams  Parameters to pass to individual packager instances
      * @param outputFile File where final package should be saved
      * @throws IOException           if IO error
@@ -584,59 +679,130 @@ public class Packager {
      * @throws PackageException      if packaging error
      */
     protected void disseminate(Context context, PackageDisseminator dip,
-                               DSpaceObject dso, PackageParameters pkgParams,
-                               String outputFile)
-        throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException,
-        PackageException {
-        // initialize output file
-        File pkgFile = new File(outputFile);
+                               DSpaceObject dsoParent, PackageParameters pkgParams,
+                               String outputFile, @Nullable String relationalScope, boolean dryRun )
+            throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException,
+            PackageException {
+        ServiceManager serviceManager = new DSpace().getServiceManager();
+        RelationshipTreeService treeService = serviceManager.getServiceByName(
+                RelationshipTreeService.class.getName(), RelationshipTreeService.class);
+        DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dsoParent);
+        ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+        //List of UUIDs to disseminate
+        ArrayList<DSpaceObject> dsoToProcess = new ArrayList<>();
+        dsoToProcess.add(dsoParent);
 
-        System.out.println("\nDisseminating DSpace " + Constants.typeText[dso.getType()] +
-                               " [ hdl=" + dso.getHandle() + " ] to " + outputFile);
-
-        //If we are doing a recursive dissemination of this object & all its child objects, call disseminateAll()
-        if (pkgParams.recursiveModeEnabled()) {
-            System.out.println("\nAlso disseminating all child objects (recursive mode)..");
-            System.out.println(
-                "This may take a while, please check your logs for ongoing status while we process each package.");
-
-            //disseminate initial object & recursively disseminate all child objects as well
-            List<File> fileResults = dip.disseminateAll(context, dso, pkgParams, pkgFile);
-
-            if (fileResults != null) {
-                //Report total files created
-                System.out.println("\nCREATED a total of " + fileResults.size() + " dissemination package files.");
-
-                String choiceString = null;
-                //Ask if user wants full list printed to command line, as this may be rather long.
-                if (this.userInteractionEnabled) {
-                    BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-                    System.out.print("\nWould you like to view a list of all files that were created? [y/n]: ");
-                    choiceString = input.readLine();
-                } else {
-                    // user interaction disabled -- default answer to 'yes', as
-                    // we want to provide user with as detailed a report as possible.
-                    choiceString = "y";
-                }
-
-                // Provide detailed report if user answered 'yes'
-                if (choiceString.equalsIgnoreCase("y")) {
-                    System.out.println("\n\n");
-                    for (File result : fileResults) {
-                        System.out.println("CREATED package file: " + result.getCanonicalPath());
-                    }
+        List<DSpaceObject> alreadyDissedDSOs = new ArrayList<>();
+        String orginalOutputPath = outputFile;
+        if (dryRun) {
+            Set<UUID> relatedUUIDSet = new TreeSet<>();
+            System.out.println("DRYRUN Listing UUIDs of DSpace Objects to be disseminated");
+            for (DSpaceObject dso : dsoToProcess) {
+                relatedUUIDSet.add(dso.getID());
+                if (dso.getType() == 2) {
+                    Item item = (Item) dso;
+                    relatedUUIDSet = treeService.getItemsInTree(context, item, relationalScope, false);
+                    dryRunDisseminate(relatedUUIDSet);
                 }
             }
+            System.out.println("Total DSpace Objects: " + relatedUUIDSet.size());
         } else {
-            //otherwise, just disseminate a single object to a single package file
-            dip.disseminate(context, dso, pkgParams, pkgFile);
+            for (DSpaceObject dso : dsoToProcess) {
+                // initialize output file
+                outputFile = orginalOutputPath;
+                String dsoType = Constants.typeText[dso.getType()];
+                String extension = getMIMEType(pkgParams).split("/")[1];
+                String fileName = "";
+                fileName = evalFileName(fileName, extension, dsoType, dso);
+                outputFile = outputFile.replaceAll(".([^.]*)$", "_" + fileName);
+                File pkgFile = new File(outputFile);
+                System.out.println("\nDisseminating DSpace " + Constants.typeText[dso.getType()] +
+                        " [ hdl=" + dso.getHandle() + " ] to " + outputFile);
 
-            if (pkgFile != null && pkgFile.exists()) {
-                System.out.println("\nCREATED package file: " + pkgFile.getCanonicalPath());
+                //If we are doing a recursive dissemination of this object & all its child objects, call disseminateAll()
+                if (pkgParams.recursiveModeEnabled()) {
+                    System.out.println("\nAlso disseminating all child objects (recursive mode)..");
+                    System.out.println(
+                            "This may take a while, please check your logs for ongoing status while we process each package.");
+
+                    //disseminate initial object & recursively disseminate all child objects as well
+                    String pkgDirectory = pkgFile.getCanonicalFile().getParent();
+                    List<File> fileResults = dip.disseminateAll(context, dso, pkgParams, pkgFile, alreadyDissedDSOs);
+                    //Build set of UUIDs to process
+                    Set<UUID> relatedUUIDSet = new TreeSet<>();
+                    for (DSpaceObject childDSO : alreadyDissedDSOs) {
+                        //Only items make it into alreadyDissedDSOs
+                        //Diss all related items as well
+                        Item childItem = (Item) childDSO;
+                        relatedUUIDSet.addAll(treeService.getItemsInTree(context, childItem, relationalScope, false));
+                    }
+                    //After we build related UUID set, process them
+                    for (UUID uuid : relatedUUIDSet) {
+                        if (!alreadyDissed.contains(uuid)) {
+                            Item childOfChildItem = itemService.find(context, uuid);
+                            fileName = pkgDirectory + "/" + PackageUtils.getPackageName(childOfChildItem, extension);
+                            pkgFile = new File(fileName);
+                            dip.disseminate(context, childOfChildItem, pkgParams, pkgFile);
+                            fileResults.add(pkgFile);
+                        }
+                    }
+
+                    if (fileResults != null) {
+                        //Report total files created
+                        System.out.println("\nCREATED a total of " + fileResults.size() + " dissemination package files.");
+
+                        String choiceString = null;
+                        //Ask if user wants full list printed to command line, as this may be rather long.
+                        if (this.userInteractionEnabled) {
+                            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+                            System.out.print("\nWould you like to view a list of all files that were created? [y/n]: ");
+                            choiceString = input.readLine();
+                        } else {
+                            // user interaction disabled -- default answer to 'yes', as
+                            // we want to provide user with as detailed a report as possible.
+                            choiceString = "y";
+                        }
+
+                        // Provide detailed report if user answered 'yes'
+                        if (choiceString.equalsIgnoreCase("y")) {
+                            System.out.println("\n\n");
+                            for (File result : fileResults) {
+                                System.out.println("CREATED package file: " + result.getCanonicalPath());
+                            }
+                        }
+                    }
+                } else {
+                    //otherwise, just disseminate a single object to a single package file
+                    dip.disseminate(context, dso, pkgParams, pkgFile);
+                    alreadyDissed.add(dso.getID());
+
+                    if (pkgFile != null && pkgFile.exists()) {
+                        System.out.println("\nCREATED package file: " + pkgFile.getCanonicalPath());
+                    }
+                    //Diss all related items as well
+                    if (dso.getType() == 2) {
+                        Item parentItem = (Item) dso;
+                        Set<UUID> relatedUUIDSet = treeService.getItemsInTree(context, parentItem, relationalScope, false);
+                        for (UUID uuid : relatedUUIDSet) {
+                            if (!alreadyDissed.contains(uuid)) {
+                                disseminate(context, dip, dSpaceObjectService.find(context, uuid), pkgParams, orginalOutputPath, relationalScope, dryRun);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
+    //Short hand fileName utill
+    public String evalFileName(String fileName, String extension, String dsoType, DSpaceObject dso) {
+        if (extension.equalsIgnoreCase("zip")) {
+            fileName = dsoType+"@"+dso.getHandle().replace('/', '-')+"."+extension;
+        } else {
+            fileName = dsoType+"@"+dso.getHandle().replace('/', '-')+"/manifest."+extension;
+        }
+        return fileName;
+    }
 
     /**
      * Replace an one or more existing DSpace objects with the contents of
@@ -646,7 +812,7 @@ public class Packager {
      * @param context      DSpace Context
      * @param sip          PackageIngester which will actually replace the object with the package
      * @param pkgParams    Parameters to pass to individual packager instances
-     * @param sourceFile   location of the source package to ingest as the replacement
+     * @param sourceFiles   location of the source package to ingest as the replacement
      * @param objToReplace DSpace object to replace (may be null if it will be specified in the package itself)
      * @throws IOException           if IO error
      * @throws SQLException          if database error
@@ -655,77 +821,241 @@ public class Packager {
      * @throws CrosswalkException    if crosswalk error
      * @throws PackageException      if packaging error
      */
-    protected void replace(Context context, PackageIngester sip, PackageParameters pkgParams, String sourceFile,
-                           DSpaceObject objToReplace)
-        throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException,
-        PackageException {
+    protected void replace(Context context, PackageIngester sip, PackageParameters pkgParams,  List<String> sourceFiles,
+                           DSpaceObject objToReplace, boolean dryRun)
+            throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException,
+            PackageException {
 
-        // make sure we have an input file
-        File pkgFile = new File(sourceFile);
+        PackagerFileService packagerFileService = new PackagerFileService(pkgParams);
+        for (String sourceFileInit : sourceFiles) {
+            if (dryRun) {
+                dryRunIngest(context,sourceFileInit, pkgParams.getProperty("scope"), packagerFileService);
+            } else {
+                List<String> filePaths = new ArrayList<>();
+                List<PackagerFileService.FileNode> fileNodes = packagerFileService.getFileNodeTree(context, sourceFileInit, pkgParams.getProperty("scope"));
+                //List will NEVER be empty
+                fileNodes.get(0).getTreePaths(filePaths);
+                for (String sourceFile : filePaths) {
+                    //populate rels map
+                    File pkgFile = new File(sourceFile);
 
-        if (!pkgFile.exists()) {
-            System.out.println("\nPackage located at " + sourceFile + " does not exist!");
-            System.exit(1);
-        }
-
-        System.out.println("\nReplacing DSpace object(s) with package located at " + sourceFile);
-        if (objToReplace != null) {
-            System.out.println("Will replace existing DSpace " + Constants.typeText[objToReplace.getType()] +
-                                   " [ hdl=" + objToReplace.getHandle() + " ]");
-        }
-        // NOTE: At this point, objToReplace may be null.  If it is null, it is up to the PackageIngester
-        // to determine which Object needs to be replaced (based on the handle specified in the pkg, etc.)
-
-        try {
-            //If we are doing a recursive replace, call replaceAll()
-            if (pkgParams.recursiveModeEnabled()) {
-                //ingest first object using package & recursively replace anything else that package references
-                // (child objects, etc)
-                List<String> hdlResults = sip.replaceAll(context, objToReplace, pkgFile, pkgParams);
-
-                if (hdlResults != null) {
-                    //Report total objects replaced
-                    System.out.println("\nREPLACED a total of " + hdlResults.size() + " DSpace Objects.");
-
-                    String choiceString = null;
-                    //Ask if user wants full list printed to command line, as this may be rather long.
-                    if (this.userInteractionEnabled) {
-                        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-                        System.out.print("\nWould you like to view a list of all objects that were replaced? [y/n]: ");
-                        choiceString = input.readLine();
-                    } else {
-                        // user interaction disabled -- default answer to 'yes', as
-                        // we want to provide user with as detailed a report as possible.
-                        choiceString = "y";
+                    if (!pkgFile.exists()) {
+                        System.out.println("\nPackage located at " + sourceFile + " does not exist!");
+                        System.exit(1);
                     }
 
-                    // Provide detailed report if user answered 'yes'
-                    if (choiceString.equalsIgnoreCase("y")) {
-                        System.out.println("\n\n");
-                        for (String result : hdlResults) {
-                            DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
-                                                                   .resolveToObject(context, result);
+                    System.out.println("\nReplacing DSpace object(s) with package located at " + sourceFile);
+                    if (objToReplace != null) {
+                        System.out.println("Will replace existing DSpace " + Constants.typeText[objToReplace.getType()] +
+                                " [ hdl=" + objToReplace.getHandle() + " ]");
+                    }
+                    // NOTE: At this point, objToReplace may be null.  If it is null, it is up to the PackageIngester
+                    // to determine which Object needs to be replaced (based on the handle specified in the pkg, etc.)
+
+                    try {
+                        //If we are doing a recursive replace, call replaceAll()
+                        if (pkgParams.recursiveModeEnabled()) {
+                            //ingest first object using package & recursively replace anything else that package references
+                            // (child objects, etc)
+                            List<String> hdlResults = sip.replaceAll(context, objToReplace, pkgFile, pkgParams);
+
+                            if (hdlResults != null) {
+                                //Report total objects replaced
+                                System.out.println("\nREPLACED a total of " + hdlResults.size() + " DSpace Objects.");
+
+                                String choiceString = null;
+                                //Ask if user wants full list printed to command line, as this may be rather long.
+                                if (this.userInteractionEnabled) {
+                                    BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+                                    System.out.print("\nWould you like to view a list of all objects that were replaced? [y/n]: ");
+                                    choiceString = input.readLine();
+                                } else {
+                                    // user interaction disabled -- default answer to 'yes', as
+                                    // we want to provide user with as detailed a report as possible.
+                                    choiceString = "y";
+                                }
+
+                                // Provide detailed report if user answered 'yes'
+                                if (choiceString.equalsIgnoreCase("y")) {
+                                    System.out.println("\n\n");
+                                    for (String result : hdlResults) {
+                                        DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
+                                                .resolveToObject(context, result);
+
+                                        if (dso != null) {
+                                            System.out.println("REPLACED DSpace " + Constants.typeText[dso.getType()] +
+                                                    " [ hdl=" + dso.getHandle() + " ] ");
+                                        }
+                                    }
+                                }
+
+
+                            }
+                        } else {
+                            //otherwise, just one object to replace
+                            DSpaceObject dso = sip.replace(context, objToReplace, pkgFile, pkgParams);
 
                             if (dso != null) {
                                 System.out.println("REPLACED DSpace " + Constants.typeText[dso.getType()] +
-                                                       " [ hdl=" + dso.getHandle() + " ] ");
+                                        " [ hdl=" + dso.getHandle() + " ] ");
                             }
                         }
+                    } catch (WorkflowException e) {
+                        throw new PackageException(e);
                     }
-
-
-                }
-            } else {
-                //otherwise, just one object to replace
-                DSpaceObject dso = sip.replace(context, objToReplace, pkgFile, pkgParams);
-
-                if (dso != null) {
-                    System.out.println("REPLACED DSpace " + Constants.typeText[dso.getType()] +
-                                           " [ hdl=" + dso.getHandle() + " ] ");
                 }
             }
-        } catch (WorkflowException e) {
-            throw new PackageException(e);
         }
+        if (!dryRun) {
+            for (String sourceFile : sourceFiles) {
+                PackagerFileService.FileNode fileNode = packagerFileService.getFileNodeTree(context, sourceFile, pkgParams.getProperty("scope")).get(0);
+                Map<String, List<String>> parentRelationshipMap = new HashMap<>();
+                fileNode.getRelMap(parentRelationshipMap);
+                if (!parentRelationshipMap.isEmpty()) {
+                    addRelationships(context, parentRelationshipMap, fileNode.uuid);
+                }
+            }
+        }
+    }
+
+    public void addRelationships(Context context, Map<String, List<String>> relsMap, String initUUID) throws SQLException, AuthorizeException {
+        //All IDs at this point should resolve as Items in the DB
+        //We're adding relations ships TO `initUUID as Item` derived FROM the relsMap
+        RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+        RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
+        ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+        Item parentItem = itemService.find(context, UUID.fromString(initUUID));
+        String parentEntityTypeLabel = itemService.getMetadataFirstValue(parentItem, "dspace", "entity", "type", null);
+        for (String key : relsMap.keySet()) {
+            //This list will be in place order with respect to relationship side
+            for (String childUUIDString : relsMap.get(key)) {
+                Item childItem = itemService.find(context, UUID.fromString(childUUIDString));
+                String childEntityTypeLabel = itemService.getMetadataFirstValue(childItem, "dspace", "entity", "type", null);
+                //Get all rel types of this label
+                List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(context, key);
+                //Get only possible Rel type of parent entity type, child entity type, and current label
+                RelationshipType relationshipType = matchRelationshipType(relTypes,childEntityTypeLabel, parentEntityTypeLabel, key);
+                if (relationshipType == null) {
+                    continue;
+                }
+                //Get all relationships of parent item and derived relationship type
+                List<Relationship> relationships = relationshipService.findByItemAndRelationshipType(context, parentItem, relationshipType);
+                boolean alreadyExist = false;
+                //Determine if rel already exist
+                for (Relationship relationship : relationships) {
+                    if (relationship.getRightItem() == childItem || relationship.getLeftItem() == childItem) {
+                        alreadyExist = true;
+                        break;
+                    }
+                }
+                if (!alreadyExist) {
+                    boolean isParentLeft = false;
+                    Relationship persistedRelationship = null;
+                    //Determine left or right rel side for parent
+                    if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(parentEntityTypeLabel)) {
+                        isParentLeft = true;
+                    }
+                    if (isParentLeft) {
+                        int leftPlace = relationshipService.findNextLeftPlaceByLeftItem(context, parentItem);
+                        int rightPlace = relationshipService.findNextRightPlaceByRightItem(context, childItem);
+                        persistedRelationship = relationshipService.create(context, parentItem, childItem,
+                                relationshipType, leftPlace, rightPlace);
+                    } else {
+                        int leftPlace = relationshipService.findNextLeftPlaceByLeftItem(context, childItem);
+                        int rightPlace = relationshipService.findNextRightPlaceByRightItem(context, parentItem);
+                        persistedRelationship = relationshipService.create(context, childItem, parentItem,
+                                relationshipType, leftPlace, rightPlace);
+                    }
+                    relationshipService.update(context, persistedRelationship);
+                }
+            }
+        }
+    }
+
+    public int getDSOTypeFromUUID(Context context, String uuid) throws SQLException {
+        CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+        ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+        if (itemService.find(context, UUID.fromString(uuid)) != null) {
+            return Constants.ITEM;
+        } else if (collectionService.find(context, UUID.fromString(uuid)) != null) {
+            return Constants.COLLECTION;
+        } else {
+            return Constants.COMMUNITY;
+        }
+    }
+
+    public String getMIMEType(PackageParameters params) {
+        return (params != null &&
+                (params.getBooleanProperty("manifestOnly", false))) ?
+                "text/xml" : "application/zip";
+    }
+
+    public void dryRunDisseminate(Set<UUID> relatedUUIDSet) throws SQLException {
+        for (UUID uuid : relatedUUIDSet) {
+            System.out.println(uuid.toString());
+        }
+    }
+
+    public void dryRunIngest(Context context, String sourceFileInit, String scope, PackagerFileService packagerFileService) throws SQLException {
+        List<PackagerFileService.FileNode> nodeTree = packagerFileService.getFileNodeTree(context, sourceFileInit, scope);
+        if (nodeTree.size() > 0) {
+            nodeTree.get(0).print(System.out);
+        }
+    }
+
+    public static void dirAndFilePathBuilder(List<String> sourceFileIngest, String[] sourceFiles) {
+        //ingest the object from the source file
+        for (String sourceFile : sourceFiles) {
+            File testFile = new File(sourceFile);
+            if (testFile.exists() && testFile.isDirectory()) {
+                for (String file : testFile.list()) {
+                    sourceFileIngest.add(sourceFile+"/"+file);
+                }
+            } else {
+                sourceFileIngest.add(sourceFile);
+            }
+        }
+    }
+
+    /**
+     * Matches two Entity types to a Relationship Type from a set of Relationship Types.
+     *
+     * @param relTypes set of Relationship Types.
+     * @param childEntityType entity type of target.
+     * @param parentEntityType entity type of origin referer.
+     * @return null or matched Relationship Type.
+     */
+    private RelationshipType matchRelationshipType(List<RelationshipType> relTypes,
+                                                   String childEntityType, String parentEntityType, String originTypeName) {
+        RelationshipType foundRelationshipType = null;
+        if (originTypeName.split("\\.").length > 1) {
+            originTypeName = originTypeName.split("\\.")[1];
+        }
+        for (RelationshipType relationshipType : relTypes) {
+            // Is origin type leftward or rightward
+            boolean isLeft = false;
+            if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(parentEntityType)) {
+                isLeft = true;
+            }
+            if (isLeft) {
+                // Validate typeName reference
+                if (!relationshipType.getLeftwardType().equalsIgnoreCase(originTypeName)) {
+                    continue;
+                }
+                if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(parentEntityType) &&
+                        relationshipType.getRightType().getLabel().equalsIgnoreCase(childEntityType)) {
+                    foundRelationshipType = relationshipType;
+                }
+            } else {
+                if (!relationshipType.getRightwardType().equalsIgnoreCase(originTypeName)) {
+                    continue;
+                }
+                if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(childEntityType) &&
+                        relationshipType.getRightType().getLabel().equalsIgnoreCase(parentEntityType)) {
+                    foundRelationshipType = relationshipType;
+                }
+            }
+        }
+        return foundRelationshipType;
     }
 }

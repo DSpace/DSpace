@@ -55,7 +55,7 @@ import org.dspace.workflow.WorkflowException;
  * @see org.dspace.core.service.PluginService
  */
 public abstract class AbstractPackageIngester
-    implements PackageIngester {
+        implements PackageIngester {
     /**
      * log4j category
      */
@@ -70,6 +70,9 @@ public abstract class AbstractPackageIngester
      * Key = DSpace Object just ingested, Value = List of all packages relating to a DSpaceObject
      **/
     private Map<DSpaceObject, List<String>> packageReferences = new HashMap<DSpaceObject, List<String>>();
+    private Map<DSpaceObject, Map<String, List<String>>> relPackageReferences = new HashMap<>();
+
+    private Map<String, String> pathToNewUUID = new HashMap<>();
 
     /**
      * Map of all successfully ingested/replaced DSpace objects for current
@@ -122,9 +125,9 @@ public abstract class AbstractPackageIngester
     @Override
     public List<String> ingestAll(Context context, DSpaceObject parent, File pkgFile,
                                   PackageParameters params, String license)
-        throws PackageException, UnsupportedOperationException,
-        CrosswalkException, AuthorizeException,
-        SQLException, IOException, WorkflowException {
+            throws PackageException, UnsupportedOperationException,
+            CrosswalkException, AuthorizeException,
+            SQLException, IOException, WorkflowException {
         //If unset, make sure the Parameters specifies this is a recursive ingest
         if (!params.recursiveModeEnabled()) {
             params.setRecursiveModeEnabled(true);
@@ -148,7 +151,7 @@ public abstract class AbstractPackageIngester
                 //if we are skipping over (i.e. keeping) existing objects
                 if (params.keepExistingModeEnabled()) {
                     log.warn(LogManager.getHeader(context, "skip_package_ingest",
-                                                  "Object already exists, package-skipped=" + pkgFile.getName()));
+                            "Object already exists, package-skipped=" + pkgFile.getName()));
                 } else {
                     // Pass this exception on -- which essentially causes a full rollback of all changes (this is
                     // the default)
@@ -157,7 +160,7 @@ public abstract class AbstractPackageIngester
             }
         } else {
             log.info(LogManager.getHeader(context, "skip_package_ingest",
-                                          "Object was already ingested, package-skipped=" + pkgFile.getName()));
+                    "Object was already ingested, package-skipped=" + pkgFile.getName()));
         }
 
         // As long as an object was successfully created from this package
@@ -195,6 +198,9 @@ public abstract class AbstractPackageIngester
                             String childHandle = getIngestedMap().get(childPkg);
                             if (childHandle != null) {
                                 Item childItem = (Item) handleService.resolveToObject(context, childHandle);
+                                if (childItem!= null && !pathToNewUUID.containsKey(childPkg.getAbsolutePath())) {
+                                    pathToNewUUID.put(childPkg.getAbsolutePath(), childItem.getID().toString());
+                                }
                                 // Ensure Item is mapped to Collection that referenced it
                                 Collection collection = (Collection) dso;
                                 if (childItem != null && !itemService.isIn(childItem, collection)) {
@@ -253,9 +259,9 @@ public abstract class AbstractPackageIngester
     @Override
     public List<String> replaceAll(Context context, DSpaceObject dso,
                                    File pkgFile, PackageParameters params)
-        throws PackageException, UnsupportedOperationException,
-        CrosswalkException, AuthorizeException,
-        SQLException, IOException, WorkflowException {
+            throws PackageException, UnsupportedOperationException,
+            CrosswalkException, AuthorizeException,
+            SQLException, IOException, WorkflowException {
         //If unset, make sure the Parameters specifies this is a recursive replace
         if (!params.recursiveModeEnabled()) {
             params.setRecursiveModeEnabled(true);
@@ -275,7 +281,7 @@ public abstract class AbstractPackageIngester
             replacedDso = replace(context, dso, pkgFile, params);
         } else {
             log.info(LogManager.getHeader(context, "skip_package_replace",
-                                          "Object was already replaced, package-skipped=" + pkgFile.getName()));
+                    "Object was already replaced, package-skipped=" + pkgFile.getName()));
         }
 
         // As long as an object was successfully replaced from this package
@@ -359,6 +365,31 @@ public abstract class AbstractPackageIngester
         packageReferences.put(dso, packageRefValues);
     }
 
+    public void addRelPackageReference(DSpaceObject dso, String relType, String packageRef) {
+        Map<String, List<String>> packageTypeMap = null;
+
+        // Check if we already have an entry for packages reference by this object
+        if (relPackageReferences.containsKey(dso)) {
+            packageTypeMap = relPackageReferences.get(dso);
+        } else {
+            //Create a new empty list of references
+            packageTypeMap = new HashMap<>();
+        }
+
+        List<String> packageRefValues = null;
+        if (packageTypeMap.containsKey(relType)) {
+            packageRefValues = packageTypeMap.get(relType);
+        } else {
+            packageRefValues = new ArrayList<>();
+        }
+
+        //add this package reference to existing list and save
+        packageRefValues.add(packageRef);
+        packageTypeMap.put(relType, packageRefValues);
+        relPackageReferences.put(dso, packageTypeMap);
+    }
+
+
     /**
      * Return a list of known SIP references from a newly created DSpaceObject.
      * <P>
@@ -424,5 +455,9 @@ public abstract class AbstractPackageIngester
         } else {
             return new ArrayList(coll);
         }
+    }
+
+    public Map<String, String> getPathToNewUUID() {
+        return pathToNewUUID;
     }
 }

@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Logger;
@@ -306,7 +307,7 @@ public class PDFPackager
      */
     @Override
     public List<File> disseminateAll(Context context, DSpaceObject dso,
-                                     PackageParameters params, File pkgFile)
+                                     PackageParameters params, File pkgFile, List<DSpaceObject> alreadyDisseminated)
         throws PackageException, CrosswalkException,
         AuthorizeException, SQLException, IOException {
         throw new UnsupportedOperationException(
@@ -446,6 +447,11 @@ public class PDFPackager
     @Override
     public String getParameterHelp() {
         return "No additional options available.";
+    }
+
+    @Override
+    public Map<String, String> getPathToNewUUID() {
+        throw new UnsupportedOperationException();
     }
 
 }

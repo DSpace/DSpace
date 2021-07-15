@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -212,4 +213,6 @@ public interface PackageIngester {
      * with this packager
      */
     String getParameterHelp();
+
+    Map<String, String> getPathToNewUUID();
 }

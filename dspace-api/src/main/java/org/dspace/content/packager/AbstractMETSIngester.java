@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -279,6 +280,13 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                     // recursive ingest call, based on these child pkg references
                     for (int i = 0; i < childFilePaths.length; i++) {
                         addPackageReference(dso, childFilePaths[i]);
+                    }
+
+                    Map<String, List<String>> relFilePathsMap = manifest.getRelMetsFilePaths(params);
+                    for (String relType : relFilePathsMap.keySet()) {
+                        for (String relFilePath : relFilePathsMap.get(relType)) {
+                            addRelPackageReference(dso, relType, relFilePath);
+                        }
                     }
                 }
             } //end if dso not null
@@ -729,6 +737,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
 
             // retrieve path/name of file in manifest
             String path = METSManifest.getFileName(mfile);
+
             // extract the file input stream from package (or retrieve
             // externally, if it is an externally referenced file)
             InputStream fileStream = getFileInputStream(pkgFile, params, path);
