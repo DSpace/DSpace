@@ -579,7 +579,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         Node schemaAttr = metadata.item(0).getAttributes().getNamedItem(
             "schema");
         if (schemaAttr == null) {
-            schema = MetadataSchemaEnum.DC.getName();
+            schema = null;
         } else {
             schema = schemaAttr.getNodeValue();
         }
@@ -602,11 +602,19 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected void addDCValue(Context c, Item i, String schema, Node n)
         throws TransformerException, SQLException, AuthorizeException {
         String value = getStringValue(n); //n.getNodeValue();
+        String inlineSchema = schema;
         // compensate for empty value getting read as "null", which won't display
         if (value == null) {
             value = "";
         } else {
             value = value.trim();
+        }
+        // check the schema attribute within the given node
+        if (inlineSchema==null || "".equals(inlineSchema)) {
+            inlineSchema = getAttributeValue(n, "schema");
+            if (inlineSchema==null || "".equals(inlineSchema)) {
+                inlineSchema = MetadataSchemaEnum.DC.getName();
+            }
         }
         // //getElementData(n, "element");
         String element = getAttributeValue(n, "element");
@@ -619,7 +627,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
 
         if (!isQuiet) {
-            System.out.println("\tSchema: " + schema + " Element: " + element + " Qualifier: " + qualifier
+            System.out.println("\tSchema: " + inlineSchema + " Element: " + element + " Qualifier: " + qualifier
                                    + " Value: " + value);
         }
 
@@ -628,13 +636,13 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
         // only add metadata if it is no test and there is an actual value
         if (!isTest && !value.equals("")) {
-            itemService.addMetadata(c, i, schema, element, qualifier, language, value);
+            itemService.addMetadata(c, i, inlineSchema, element, qualifier, language, value);
         } else {
             // If we're just test the import, let's check that the actual metadata field exists.
-            MetadataSchema foundSchema = metadataSchemaService.find(c, schema);
+            MetadataSchema foundSchema = metadataSchemaService.find(c, inlineSchema);
 
             if (foundSchema == null) {
-                System.out.println("ERROR: schema '" + schema + "' was not found in the registry.");
+                System.out.println("ERROR: schema '" + inlineSchema + "' was not found in the registry.");
                 return;
             }
 
@@ -642,7 +650,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             if (foundField == null) {
                 System.out.println(
-                    "ERROR: Metadata field: '" + schema + "." + element + "." + qualifier + "' was not found in the " +
+                    "ERROR: Metadata field: '" + inlineSchema + "." + element + "." + qualifier + "' was not found in the " +
                         "registry.");
                 return;
             }
