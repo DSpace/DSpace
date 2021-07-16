@@ -5,12 +5,18 @@
 ## See org.dspace.core.Email for information on the format of this file.
 ##
 #set($subject = "${config.get('dspace.name')} Account Registration")
+#set($phone = ${config.get('mail.message.helpdesk.telephone')})
 To complete registration for a DSpace account, please click the link
 below:
 
   ${params[0]}
 
 If you need assistance with your account, please email
-${config.get("mail.admin")} or call us at xxx-555-xxxx.
+
+  ${config.get("mail.helpdesk")}
+#if( $phone )
+
+or call us at ${phone}.
+#end
 
 The DSpace Team
