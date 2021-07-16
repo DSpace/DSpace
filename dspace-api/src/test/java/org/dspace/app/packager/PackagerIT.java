@@ -147,6 +147,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
             throw new Exception(e);
         } finally {
             tempFile.delete();
+            resultFile.delete();
         }
     }
 
