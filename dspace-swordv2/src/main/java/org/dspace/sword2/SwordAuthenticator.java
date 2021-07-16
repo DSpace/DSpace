@@ -702,7 +702,7 @@ public class SwordAuthenticator {
                 }
 
                 // get the "ORIGINAL" bundle(s)
-                List<Bundle> bundles = item.getBundles(Constants.CONTENT_BUNDLE_NAME);
+                List<Bundle> bundles = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
 
                 // look up the READ policy on the community.  This will include determining if the user is an
                 // administrator
@@ -871,7 +871,7 @@ public class SwordAuthenticator {
             boolean write = authorizeService
                 .authorizeActionBoolean(allowContext, item, Constants.WRITE);
 
-            List<Bundle> bundles = item.getBundles(Constants.CONTENT_BUNDLE_NAME);
+            List<Bundle> bundles = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
             boolean add = false;
             if (bundles.isEmpty()) {
                 add = authorizeService.authorizeActionBoolean(
