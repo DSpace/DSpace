@@ -38,6 +38,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -52,6 +53,8 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -76,6 +79,7 @@ import org.xml.sax.SAXException;
  *   </community>
  * </import_structure>
  * }</pre>
+ *
  * <p>
  * It can be arbitrarily deep, and supports all the metadata elements
  * that make up the community and collection metadata.  See the system
@@ -104,12 +108,16 @@ public class StructBuilder {
      */
     private static final Map<String, MetadataFieldName> communityMap = new HashMap<>();
 
-    protected static CommunityService communityService
+    protected static final CommunityService communityService
             = ContentServiceFactory.getInstance().getCommunityService();
-    protected static CollectionService collectionService
+    protected static final CollectionService collectionService
             = ContentServiceFactory.getInstance().getCollectionService();
-    protected static EPersonService ePersonService
+    protected static final EPersonService ePersonService
             = EPersonServiceFactory.getInstance().getEPersonService();
+    protected static final HandleService handleService
+            = HandleServiceFactory.getInstance().getHandleService();
+
+    private static boolean keepHandles;
 
     /**
      * Default constructor
@@ -145,6 +153,7 @@ public class StructBuilder {
         options.addOption("h", "help", false, "Print this help message.");
         options.addOption("?", "help");
         options.addOption("x", "export", false, "Export the current structure as XML.");
+        options.addOption("k", "keep-handles", false, "Apply Handles from input document.");
 
         options.addOption(Option.builder("e").longOpt("eperson")
                 .desc("User who is manipulating the repository's structure.")
@@ -220,6 +229,7 @@ public class StructBuilder {
                 inputStream = new FileInputStream(input);
             }
 
+            keepHandles = options.hasOption("k");
             importStructure(context, inputStream, outputStream);
             // save changes from import
             context.complete();
@@ -239,8 +249,10 @@ public class StructBuilder {
      * @throws TransformerException
      * @throws SQLException
      */
-    static void importStructure(Context context, InputStream input, OutputStream output)
-            throws IOException, ParserConfigurationException, SQLException, TransformerException {
+    static void importStructure(Context context, InputStream input,
+            OutputStream output)
+            throws IOException, ParserConfigurationException, SQLException,
+            TransformerException {
 
         // load the XML
         Document document = null;
@@ -266,7 +278,19 @@ public class StructBuilder {
         // Check for 'identifier' attributes -- possibly output by this class.
         NodeList identifierNodes = XPathAPI.selectNodeList(document, "//*[@identifier]");
         if (identifierNodes.getLength() > 0) {
-            System.err.println("The input document has 'identifier' attributes, which will be ignored.");
+            if (!keepHandles) {
+                System.err.println("The input document has 'identifier' attributes, which will be ignored.");
+            } else {
+                for (int i = 0; i < identifierNodes.getLength() ; i++) {
+                    String identifier = identifierNodes.item(i).getAttributes().item(0).getTextContent();
+                    if (handleService.resolveToURL(context, identifier) != null) {
+                        System.err.printf("The input document contains handle %s,"
+                                + " which is in use already. Aborting...%n",
+                                identifier);
+                        System.exit(1);
+                    }
+                }
+            }
         }
 
         // load the mappings into the member variable hashmaps
@@ -617,14 +641,17 @@ public class StructBuilder {
         Element[] elements = new Element[communities.getLength()];
 
         for (int i = 0; i < communities.getLength(); i++) {
-            Community community;
-            Element element = new Element("community");
+            Node tn = communities.item(i);
+            Node identifier = tn.getAttributes().getNamedItem("identifier");
 
             // create the community or sub community
-            if (parent != null) {
+            Community community;
+            if (null == identifier
+                    || StringUtils.isBlank(identifier.getNodeValue())
+                    || !keepHandles) {
                 community = communityService.create(parent, context);
             } else {
-                community = communityService.create(null, context);
+                community = communityService.create(parent, context, identifier.getNodeValue());
             }
 
             // default the short description to be an empty string
@@ -632,7 +659,6 @@ public class StructBuilder {
                     MD_SHORT_DESCRIPTION, null, " ");
 
             // now update the metadata
-            Node tn = communities.item(i);
             for (Map.Entry<String, MetadataFieldName> entry : communityMap.entrySet()) {
                 NodeList nl = XPathAPI.selectNodeList(tn, entry.getKey());
                 if (nl.getLength() == 1) {
@@ -658,6 +684,7 @@ public class StructBuilder {
             // but it's here to keep it separate from the create process in
             // case
             // we want to move it or make it switchable later
+            Element element = new Element("community");
             element.setAttribute("identifier", community.getHandle());
 
             Element nameElement = new Element("name");
@@ -735,15 +762,24 @@ public class StructBuilder {
         Element[] elements = new Element[collections.getLength()];
 
         for (int i = 0; i < collections.getLength(); i++) {
-            Element element = new Element("collection");
-            Collection collection = collectionService.create(context, parent);
+            Node tn = collections.item(i);
+            Node identifier = tn.getAttributes().getNamedItem("identifier");
+
+            // Create the Collection.
+            Collection collection;
+            if (null == identifier
+                    || StringUtils.isBlank(identifier.getNodeValue())
+                    || !keepHandles) {
+                collection = collectionService.create(context, parent);
+            } else {
+                collection = collectionService.create(context, parent, identifier.getNodeValue());
+            }
 
             // default the short description to the empty string
             collectionService.setMetadataSingleValue(context, collection,
                     MD_SHORT_DESCRIPTION, Item.ANY, " ");
 
             // import the rest of the metadata
-            Node tn = collections.item(i);
             for (Map.Entry<String, MetadataFieldName> entry : collectionMap.entrySet()) {
                 NodeList nl = XPathAPI.selectNodeList(tn, entry.getKey());
                 if (nl.getLength() == 1) {
@@ -754,6 +790,7 @@ public class StructBuilder {
 
             collectionService.update(context, collection);
 
+            Element element = new Element("collection");
             element.setAttribute("identifier", collection.getHandle());
 
             Element nameElement = new Element("name");
