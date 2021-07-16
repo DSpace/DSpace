@@ -45,7 +45,7 @@ public class PackagerIT extends AbstractEntityIntegrationTest {
         Community child1 = null;
         Collection col1 = null;
         Item article = null;
-        createTemplate(child1, col1, article);
+        article = createTemplate(child1, col1, article);
 
         File tempFile = File.createTempFile("packagerExportTest", ".zip");
         try {
@@ -67,7 +67,8 @@ public class PackagerIT extends AbstractEntityIntegrationTest {
         Community child1 = null;
         Collection col1 = null;
         Item article = null;
-        createTemplate(child1, col1, article);
+        article = createTemplate(child1, col1, article);
+
 
         File tempFile = File.createTempFile("packagerExportTest", ".zip");
         try {
@@ -85,7 +86,7 @@ public class PackagerIT extends AbstractEntityIntegrationTest {
         }
     }
 
-    private void createTemplate(Community child1, Collection col1, Item article) {
+    private Item createTemplate(Community child1, Collection col1, Item article) {
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
@@ -100,6 +101,7 @@ public class PackagerIT extends AbstractEntityIntegrationTest {
                 .withIssueDate("2017-10-17")
                 .withEntityType("Publication")
                 .build();
+        return article;
     }
 
     private String getID(File tempFile) throws IOException, MetadataValidationException {
