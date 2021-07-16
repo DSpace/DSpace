@@ -519,8 +519,15 @@
         
         <!-- PostgreSQL ships different JDBC drivers based on the version of Java
              you are running. See https://jdbc.postgresql.org/download.html
-             These next two profiles handle pulling in the correct PostgreSQL JDBC driver. -->
-        <!-- Default PostgreSQL driver is only for Java 8 -->
+
+             The Apache Commons DBCP2 Component ships version 2.4.0 with Java 7 and
+             higher versions for Java 8.
+             See https://commons.apache.org/proper/commons-dbcp/index.html
+
+             These next two profiles handle pulling in the correct packages based
+             on the Java version. -->
+
+        <!-- Java 8 -->
         <profile>
             <id>postgresql-jdbc-default</id>
             <activation>
@@ -533,10 +540,21 @@
                         <artifactId>postgresql</artifactId>
                         <version>${postgresql.driver.version}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-dbcp2</artifactId>
+                        <version>2.8.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-pool2</artifactId>
+                        <version>2.10.0</version>
+                    </dependency>
                 </dependencies>
             </dependencyManagement>
         </profile>
-        <!-- If running Java 7, use JRE7 PostgreSQL driver -->
+
+        <!-- Java 7 -->
         <profile>
             <id>postgresql-jdbc-jre7</id>
             <activation>
@@ -548,6 +566,16 @@
                         <groupId>org.postgresql</groupId>
                         <artifactId>postgresql</artifactId>
                         <version>${postgresql.driver.version}.jre7</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-dbcp2</artifactId>
+                        <version>2.4.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-pool2</artifactId>
+                        <version>2.6.2</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -1101,11 +1129,6 @@
                 <version>1.10</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-dbcp2</artifactId>
-                <version>2.1.1</version>
-            </dependency>
-            <dependency>
                 <groupId>commons-discovery</groupId>
                 <artifactId>commons-discovery</artifactId>
                 <version>0.5</version>
@@ -1130,11 +1153,6 @@
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
                 <version>1.2</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-pool2</artifactId>
-                <version>2.4.2</version>
             </dependency>
             <dependency>
                 <groupId>commons-validator</groupId>
