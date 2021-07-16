@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
+import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
@@ -25,27 +25,21 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.MetadataValidationException;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.packager.METSManifest;
 import org.dspace.content.service.ItemService;
 import org.jdom.Element;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 
 // See CsvImportIT for other examples involving rels
-public class PackagerIT extends AbstractEntityIntegrationTest {
+public class PackagerIT extends AbstractIntegrationTestWithDatabase {
 
-    @Autowired
-    private ItemService itemService;
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     @Test
-    @Order(1)
     public void packagerExportUUIDTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Community child1 = null;
-        Collection col1 = null;
-        Item article = null;
-        article = createTemplate(child1, col1, article);
+        Item article = createTemplate();
 
         File tempFile = File.createTempFile("packagerExportTest", ".zip");
         try {
@@ -61,13 +55,9 @@ public class PackagerIT extends AbstractEntityIntegrationTest {
     }
 
     @Test
-    @Order(2)
     public void packagerImportUUIDTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Community child1 = null;
-        Collection col1 = null;
-        Item article = null;
-        article = createTemplate(child1, col1, article);
+        Item article = createTemplate();
 
 
         File tempFile = File.createTempFile("packagerExportTest", ".zip");
@@ -76,7 +66,6 @@ public class PackagerIT extends AbstractEntityIntegrationTest {
             String idStr = getID(tempFile);
             itemService.delete(context, article);
             performImportScript(tempFile);
-            System.out.println(idStr);
             Item item = itemService.find(context, UUID.fromString(idStr));
             assertNotNull(item);
         } catch (Exception e) {
@@ -86,27 +75,25 @@ public class PackagerIT extends AbstractEntityIntegrationTest {
         }
     }
 
-    private Item createTemplate(Community child1, Collection col1, Item article) {
+    private Item createTemplate() {
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         // Create a new Publication (which is an Article)
-        article = ItemBuilder.createItem(context, col1)
+        return ItemBuilder.createItem(context, col1)
                 .withTitle("Article")
                 .withIssueDate("2017-10-17")
                 .withEntityType("Publication")
                 .build();
-        return article;
     }
 
     private String getID(File tempFile) throws IOException, MetadataValidationException {
         METSManifest manifest = null;
-        System.out.println(tempFile.getAbsolutePath());
         ZipFile zip = new ZipFile(tempFile);
         ZipEntry manifestEntry = zip.getEntry(METSManifest.MANIFEST_FILE);
         if (manifestEntry != null) {
@@ -124,10 +111,12 @@ public class PackagerIT extends AbstractEntityIntegrationTest {
 
 
     private void performExportScript(String handle, File outputFile) throws Exception {
-        runDSpaceScript("packager", "-d", "-e", "admin@email.com", "-i", handle, "-t", "AIP", outputFile.getPath());
+        runDSpaceScript("packager", "-d", "-e", "admin@email.com", "-i", handle, "-t",
+                "AIP", outputFile.getPath());
     }
 
     private void performImportScript(File outputFile) throws Exception {
-        runDSpaceScript("packager", "-r", "-f", "-u", "-e", "admin@email.com", "-t", "AIP", outputFile.getPath());
+        runDSpaceScript("packager", "-r", "-f", "-u", "-e", "admin@email.com", "-t",
+                "AIP", outputFile.getPath());
     }
 }
