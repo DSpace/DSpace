@@ -442,16 +442,66 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Get rows from result</from>
-      <to>Convert to crisid start with prefix filter</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>Convert to crisid start with prefix filter</from>
       <to>Set entity type and filter variables</to>
       <enabled>Y</enabled>
     </hop>
+    <hop>
+      <from>Get rows from result</from>
+      <to>Write to log</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Write to log</from>
+      <to>Convert to crisid start with prefix filter</to>
+      <enabled>Y</enabled>
+    </hop>
   </order>
+  <step>
+    <name>Convert to crisid start with prefix filter</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var filter = "crisid LIKE '" + entity_prefix + "%'";
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>filter</name>
+        <rename>filter</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>224</xloc>
+      <yloc>288</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
   <step>
     <name>Get rows from result</name>
     <type>RowsFromResult</type>
@@ -526,8 +576,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>624</xloc>
-      <yloc>160</yloc>
+      <xloc>544</xloc>
+      <yloc>288</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -581,14 +631,14 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>832</xloc>
-      <yloc>160</yloc>
+      <xloc>768</xloc>
+      <yloc>288</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Convert to crisid start with prefix filter</name>
-    <type>ScriptValueMod</type>
+    <name>Write to log</name>
+    <type>WriteToLog</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -597,24 +647,17 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>var filter = "crisid LIKE '" + entity_prefix + "%'";
-</jsScript_script>
-      </jsScript>
-    </jsScripts>
+    <loglevel>log_level_basic</loglevel>
+    <displayHeader>Y</displayHeader>
+    <limitRows>N</limitRows>
+    <limitRowsNumber>0</limitRowsNumber>
+    <logmessage>DO migration</logmessage>
     <fields>
       <field>
-        <name>filter</name>
-        <rename>filter</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
+        <name>entity_type</name>
+      </field>
+      <field>
+        <name>entity_prefix</name>
       </field>
     </fields>
     <attributes/>
@@ -626,7 +669,7 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>336</xloc>
+      <xloc>224</xloc>
       <yloc>160</yloc>
       <draw>Y</draw>
     </GUI>
