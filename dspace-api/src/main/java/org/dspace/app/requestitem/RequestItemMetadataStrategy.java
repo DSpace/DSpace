@@ -8,6 +8,8 @@
 package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -16,12 +18,13 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Try to look to an item metadata for the corresponding author name and email.
- * Failover to the RequestItemSubmitterStrategy
+ * Failover to the RequestItemSubmitterStrategy.
  *
  * @author Andrea Bollini
  */
@@ -37,52 +40,64 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
     }
 
     @Override
-    public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
+    public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
         throws SQLException {
-        RequestItemAuthor author = null;
+        List<RequestItemAuthor> authors;
         if (emailMetadata != null) {
             List<MetadataValue> vals = itemService.getMetadataByMetadataString(item, emailMetadata);
             if (vals.size() > 0) {
-                String email = vals.iterator().next().getValue();
-                String fullname = null;
-                if (fullNameMetadata != null) {
-                    List<MetadataValue> nameVals = itemService.getMetadataByMetadataString(item, fullNameMetadata);
-                    if (nameVals.size() > 0) {
-                        fullname = nameVals.iterator().next().getValue();
+                authors = new ArrayList<>(vals.size());
+                for (MetadataValue datum : vals) {
+                    String email = datum.getValue();
+                    String fullname = null;
+                    if (fullNameMetadata != null) {
+                        List<MetadataValue> nameVals = itemService.getMetadataByMetadataString(item, fullNameMetadata);
+                        if (!nameVals.isEmpty()) {
+                            fullname = nameVals.get(0).getValue();
+                        }
                     }
+
+                    if (StringUtils.isBlank(fullname)) {
+                        fullname = I18nUtil.getMessage(
+                                "org.dspace.app.requestitem.RequestItemMetadataStrategy.unnamed",
+                                context);
+                    }
+                    RequestItemAuthor author = new RequestItemAuthor(
+                            fullname, email);
+                    authors.add(author);
                 }
-                if (StringUtils.isBlank(fullname)) {
-                    fullname = I18nUtil
-                            .getMessage(
-                                    "org.dspace.app.requestitem.RequestItemMetadataStrategy.unnamed",
-                                    context);
-                }
-                author = new RequestItemAuthor(fullname, email);
-                return author;
+                return authors;
+            } else {
+                return Collections.EMPTY_LIST;
             }
         } else {
             // Uses the basic strategy to look for the original submitter
-            author = super.getRequestItemAuthor(context, item);
-            // Is the author or his email  null, so get the help desk or admin name and email
-            if (null == author || null == author.getEmail()) {
+            authors = super.getRequestItemAuthor(context, item);
+
+            // Remove from the list authors that do not have email addresses.
+            for (RequestItemAuthor author : authors) {
+                if (null == author.getEmail()) {
+                    authors.remove(author);
+                }
+            }
+
+            if (authors.isEmpty()) { // No author email addresses!  Fall back
                 String email = null;
                 String name = null;
+                ConfigurationService configurationService
+                        = DSpaceServicesFactory.getInstance().getConfigurationService();
                 //First get help desk name and email
-                email = DSpaceServicesFactory.getInstance()
-                        .getConfigurationService().getProperty("mail.helpdesk");
-                name = DSpaceServicesFactory.getInstance()
-                                            .getConfigurationService().getProperty("mail.helpdesk.name");
+                email = configurationService.getProperty("mail.helpdesk");
+                name = configurationService.getProperty("mail.helpdesk.name");
                 // If help desk mail is null get the mail and name of admin
                 if (email == null) {
-                    email = DSpaceServicesFactory.getInstance()
-                            .getConfigurationService().getProperty("mail.admin");
-                    name = DSpaceServicesFactory.getInstance()
-                            .getConfigurationService().getProperty("mail.admin.name");
+                    email = configurationService.getProperty("mail.admin");
+                    name = configurationService.getProperty("mail.admin.name");
                 }
-                author = new RequestItemAuthor(name, email);
+                authors.add(new RequestItemAuthor(name, email));
             }
+            return authors;
         }
-        return author;
     }
 
     public void setEmailMetadata(String emailMetadata) {

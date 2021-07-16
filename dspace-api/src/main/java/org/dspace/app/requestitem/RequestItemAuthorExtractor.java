@@ -8,6 +8,7 @@
 package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -19,9 +20,8 @@ import org.dspace.core.Context;
  * @author Andrea Bollini
  */
 public interface RequestItemAuthorExtractor {
-
     /**
-     * Retrieve the auhtor to contact for a request copy of the give item.
+     * Retrieve the author to contact for a request copy of the give item.
      *
      * @param context DSpace context object
      * @param item item to request
@@ -29,5 +29,6 @@ public interface RequestItemAuthorExtractor {
      *         or null if no valid email address was found.
      * @throws SQLException if database error
      */
-    public RequestItemAuthor getRequestItemAuthor(Context context, Item item) throws SQLException;
+    public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
+        throws SQLException;
 }

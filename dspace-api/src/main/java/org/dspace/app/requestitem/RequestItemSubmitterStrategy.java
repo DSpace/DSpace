@@ -8,6 +8,8 @@
 package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -31,14 +33,15 @@ public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor 
      * @throws SQLException if database error
      */
     @Override
-    public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
+    public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
         throws SQLException {
         EPerson submitter = item.getSubmitter();
-        RequestItemAuthor author = null;
+        List<RequestItemAuthor> authors = new ArrayList<>(1);
         if (null != submitter) {
-            author = new RequestItemAuthor(
-                    submitter.getFullName(), submitter.getEmail());
+            RequestItemAuthor author = new RequestItemAuthor(
+                submitter.getFullName(), submitter.getEmail());
+            authors.add(author);
         }
-        return author;
+        return authors;
     }
 }
