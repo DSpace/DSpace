@@ -60,11 +60,16 @@ public class InstallItemServiceImpl implements InstallItemService {
         Item item = is.getItem();
         Collection collection = is.getCollection();
         try {
-            if (suppliedHandle == null) {
-                identifierService.register(c, item);
-            } else {
+            // first register the handle if it was supplied
+            if (suppliedHandle != null) {
                 identifierService.register(c, item, suppliedHandle);
             }
+            // We need to register persistent identifiers for all configured identifier providers.
+            // Therefore we need to run the registration process a second time. If a handle was registered before,
+            // the HandleIdentifierProvider is expect to return the previously registered handle, and must not create
+            // another handle. In this second run other identifiers like DOIs will be minted if the repository is
+            // configured to register DOIs.
+            identifierService.register(c, item);
         } catch (IdentifierException e) {
             throw new RuntimeException("Can't create an Identifier!", e);
         }
