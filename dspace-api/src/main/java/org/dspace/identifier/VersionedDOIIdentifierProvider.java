@@ -222,7 +222,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
 
     // Should never return null!
     protected String makeIdentifierBasedOnHistory(Context context, DSpaceObject dso, VersionHistory history)
-        throws AuthorizeException, SQLException, DOIIdentifierException {
+        throws AuthorizeException, SQLException, DOIIdentifierException, IdentifierNotApplicableException {
         // Mint foreach new version an identifier like: 12345/100.versionNumber
         // use the bare handle (g.e. 12345/100) for the first version.
 

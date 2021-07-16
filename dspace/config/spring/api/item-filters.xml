@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+>
+    <!--   default-autowire-candidates="*Service,*DAO,javax.sql.DataSource"> -->
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+
+    <!-- DEFINE CONDITIONS
+        Define condition beans below for use as sub-statements in operator and filter beans
+    -->
+
+    <!--
+        The MetadataValueMatchCondition takes a regular expression, not an exact value.
+        For an exact value match (rather than 'contains'), make sure to anchor the string
+        like "^Exact Match$".
+        Special characters used in Java regular expressions will need escaping.
+        The below condition returns true if dc.title contains "demo" (case insensitive)
+    -->
+    <bean id="title-contains-demo_condition"
+          class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="dc.title" />
+                <entry key="pattern" value="(?i)demo" />
+            </map>
+        </property>
+    </bean>
+
+
+    <bean id="item-is-public_condition"
+          class="org.dspace.content.logic.condition.ReadableByGroupCondition">
+        <property name="parameters">
+            <map>
+                <entry key="group" value="Anonymous" />
+                <entry key="action" value="READ" />
+            </map>
+        </property>
+    </bean>
+
+    <!-- dc.title starts with Pattern -->
+    <bean id="title-starts-with-pattern_condition"
+          class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="dc.title" />
+                <entry key="pattern" value="^Pattern" />
+            </map>
+        </property>
+    </bean>
+
+    <!-- dc.type is exactly Journal Article -->
+    <bean id="type-equals-journal-article_condition"
+          class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="dc.type" />
+                <entry key="pattern" value="^Journal Article$" />
+            </map>
+        </property>
+    </bean>
+
+    <!-- dc.type is exactly Dataset -->
+    <bean id="type-equals-dataset_condition"
+          class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="dc.type" />
+                <entry key="pattern" value="^Dataset$" />
+            </map>
+        </property>
+    </bean>
+
+    <!--
+         A filter that checks if any value of dc.identifier.uri contains "10.12345/".
+    -->
+    <bean id="dc-identifier-uri-contains-doi_condition"
+          class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="dc.identifier.uri" />
+                <entry key="pattern" value="10.12345/" />
+            </map>
+        </property>
+    </bean>
+
+    <!-- dc.type ends with any of the listed values, as per XOAI "driverDocumentTypeCondition" -->
+    <bean id="driver-document-type_condition"
+          class="org.dspace.content.logic.condition.MetadataValuesMatchCondition">
+        <property name="parameters">
+            <map>
+                <entry key="field" value="dc.type" />
+                <entry key="patterns">
+                    <list>
+                        <value>article$</value>
+                        <value>bachelorThesis$</value>
+                        <value>masterThesis$</value>
+                        <value>doctoralThesis$</value>
+                        <value>book$</value>
+                        <value>bookPart$</value>
+                        <value>review$</value>
+                        <value>conferenceObject$</value>
+                        <value>lecture$</value>
+                        <value>workingPaper$</value>
+                        <value>preprint$</value>
+                        <value>report$</value>
+                        <value>annotation$</value>
+                        <value>contributionToPeriodical$</value>
+                        <value>patent$</value>
+                        <value>dataset$</value>
+                        <value>other$</value>
+                    </list>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <!-- is in collection 123456789/20 (note, list parameter map means multiple collections can be passed) -->
+    <bean id="in-outfit-collection_condition"
+          class="org.dspace.content.logic.condition.InCollectionCondition">
+        <property name="parameters">
+            <map>
+                <entry key="collections">
+                    <list>
+                        <value>123456789/20</value>
+                    </list>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <!-- has exactly one bitstream in ORIGINAL bundle -->
+    <bean id="has-one-bitstream_condition"
+          class="org.dspace.content.logic.condition.BitstreamCountCondition">
+        <property name="parameters">
+            <map>
+                <entry key="bundle" value="ORIGINAL"/>
+                <entry key="min" value="1"/>
+                <entry key="max" value="1"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- has at least one bitstream in ORIGINAL bundle -->
+    <bean id="has-at-least-one-bitstream_condition"
+          class="org.dspace.content.logic.condition.BitstreamCountCondition">
+        <property name="parameters">
+            <map>
+                <entry key="bundle" value="ORIGINAL"/>
+                <entry key="min" value="1"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- DEFINE OPERATORS
+        Operators can be defined too, if a particular AND or OR statement needs to be re-used a lot, though
+        it may be easier in most cases to turn that into a filter and reference the filter in other sub-statements
+    -->
+    <bean class="org.dspace.content.logic.operator.Or" id="a-common-or_statement">
+        <property name="statements">
+            <list>
+                <ref bean="type-equals-journal-article_condition"/>
+                <ref bean="type-equals-dataset_condition"/>
+            </list>
+        </property>
+    </bean>
+
+
+    <!-- DEFINE FILTERS -->
+    <!-- Note that this filter is almost the same as the above "or" bean but the advantage is we
+         can reference the type_filter directly for item logic *and* as a sub-statement of other filters
+         whereas the operator class can only be a sub-statement
+    -->
+
+    <!-- Example DOI Filter. An item has to pass the filter (filter returns true) to get a DOI.
+         If the filter returns false on an item, minting of a new DOI for that item is prevented. -->
+    <bean id="doi-filter" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <bean class="org.dspace.content.logic.operator.And">
+                <property name="statements">
+                    <list>
+                        <!-- Don't create new DOIs for items that already have one  -->
+                        <bean class="org.dspace.content.logic.operator.Not">
+                            <property name="statements">
+                                <ref bean="dc-identifier-uri-contains-doi_condition"/>
+                            </property>
+                        </bean>
+                        <!-- Create DOIs for items only that do have at least one bitstream. -->
+                        <ref bean="has-at-least-one-bitstream_condition"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="type_filter" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <!-- the below is the same as referencing the above, eg:
+                 <ref bean="a-common-r_statement"/> -->
+            <bean class="org.dspace.content.logic.operator.Or">
+                <property name="statements">
+                    <list>
+                        <ref bean="type-equals-journal-article_condition"/>
+                        <ref bean="type-equals-dataset_condition"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- A very simple demonstration filter, using the metadata match condition -->
+    <bean id="simple-demo_filter" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <ref bean="title-contains-demo_condition"/>
+        </property>
+    </bean>
+
+    <!-- A very simple filter for items with at least one bitstream -->
+    <bean id="has-bitstream_filter" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <ref bean="has-at-least-one-bitstream_condition"/>
+        </property>
+    </bean>
+
+    <!--
+    a more complex example:
+    title contains 'demo' AND (title starts with 'Pattern' OR item is in one of the listed collections)
+    -->
+    <bean id="demo_filter" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <bean class="org.dspace.content.logic.operator.And">
+                <!-- title contains 'demo' AND (the result of the OR substatement is true) -->
+                <property name="statements">
+                    <list>
+                        <ref bean="title-contains-demo_condition"/>
+                        <bean class="org.dspace.content.logic.operator.Or">
+                            <!-- title starts with Lily OR the item in one of the listed collections -->
+                            <property name="statements">
+                                <list>
+                                    <ref bean="title-starts-with-pattern_condition"/>
+                                    <bean class="org.dspace.content.logic.condition.InCollectionCondition">
+                                        <property name="parameters">
+                                            <map>
+                                                <entry key="collections">
+                                                    <list>
+                                                        <value>123456789/3</value>
+                                                        <value>123456789/4</value>
+                                                    </list>
+                                                </entry>
+                                            </map>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- An example of an OpenAIRE compliance filter based on the same rules in xoai.xml
+         some sub-statements are defined within this bean, and some are referenced from earlier definitions
+    -->
+    <bean id="openaire_filter" class="org.dspace.content.logic.DefaultFilter">
+        <property name="statement">
+            <bean class="org.dspace.content.logic.operator.And">
+                <property name="statements">
+                    <list>
+                        <!-- Has a non-empty title -->
+                        <bean id="has-title_condition"
+                              class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+                            <property name="parameters">
+                                <map>
+                                    <entry key="field" value="dc.title" />
+                                    <entry key="pattern" value=".*" />
+                                </map>
+                            </property>
+                        </bean>
+                        <!-- AND has a non-empty author -->
+                        <bean id="has-author_condition"
+                              class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+                            <property name="parameters">
+                                <map>
+                                    <entry key="field" value="dc.contributor.author" />
+                                    <entry key="pattern" value=".*" />
+                                </map>
+                            </property>
+                        </bean>
+                        <!-- AND has a valid DRIVER document type (defined earlier) -->
+                        <ref bean="driver-document-type_condition" />
+                        <!-- AND (the item is publicly accessible OR withdrawn) -->
+                        <bean class="org.dspace.content.logic.operator.Or">
+                            <property name="statements">
+                                <list>
+                                    <!-- item is public, defined earlier -->
+                                    <ref bean="item-is-public_condition" />
+                                    <!-- OR item is withdrawn, for tombstoning -->
+                                    <bean class="org.dspace.content.logic.condition.IsWithdrawnCondition">
+                                        <property name="parameters"><map></map></property>
+                                    </bean>
+                                </list>
+                            </property>
+                        </bean>
+                        <!-- AND the dc.relation is a valid OpenAIRE identifier
+                             (starts with "info:eu-repo/grantAgreement/") -->
+                        <bean id="has-openaire-relation_condition"
+                              class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+                            <property name="parameters">
+                                <map>
+                                    <entry key="field" value="dc.relation" />
+                                    <entry key="pattern" value="^info:eu-repo/grantAgreement/" />
+                                </map>
+                            </property>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+
+</beans>
