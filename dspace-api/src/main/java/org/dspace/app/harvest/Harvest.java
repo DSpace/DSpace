@@ -60,7 +60,6 @@ public class Harvest {
         options.addOption("p", "purge", false, "delete all items in the collection");
         options.addOption("r", "run", false, "run the standard harvest procedure");
         options.addOption("g", "ping", false, "test the OAI server and set");
-        options.addOption("o", "once", false, "run the harvest procedure with specified parameters");
         options.addOption("s", "setup", false, "Set the collection up for harvesting");
         options.addOption("S", "start", false, "start the harvest loop");
         options.addOption("R", "reset", false, "reset harvest status on all collections");
@@ -98,9 +97,6 @@ public class Harvest {
             myhelp.printHelp("Harvest\n", options);
             System.out.println("\nPING OAI server: Harvest -g -a oai_source -i oai_set_id");
             System.out.println(
-                "RUNONCE harvest with arbitrary options: Harvest -o -e eperson -c collection -t harvest_type -a " +
-                    "oai_source -i oai_set_id -m metadata_format");
-            System.out.println(
                 "SETUP a collection for harvesting: Harvest -s -c collection -t harvest_type -a oai_source -i " +
                     "oai_set_id -m metadata_format");
             System.out.println("RUN harvest once: Harvest -r -e eperson -c collection");
@@ -124,9 +120,6 @@ public class Harvest {
         }
         if (line.hasOption('g')) {
             command = "ping";
-        }
-        if (line.hasOption('o')) {
-            command = "runOnce";
         }
         if (line.hasOption('S')) {
             command = "start";
@@ -246,6 +239,10 @@ public class Harvest {
             }
 
             pingResponder(oaiSource, oaiSetID, metadataKey);
+        } else {
+            System.out.println("Error - your command '" + command + "' was not recoginzed properly");
+            System.out.println(" (run with -h flag for details)");
+            System.exit(1);
         }
     }
 
