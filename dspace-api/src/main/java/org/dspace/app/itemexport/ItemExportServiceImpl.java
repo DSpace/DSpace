@@ -63,17 +63,21 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Item exporter to create simple AIPs for DSpace content. Currently exports
  * individual items, or entire collections. For instructions on use, see
  * printUsage() method.
- * <P>
+ * <p>
  * ItemExport creates the simple AIP package that the importer also uses. It
  * consists of:
- * <P>
- * /exportdir/42/ (one directory per item) / dublin_core.xml - qualified dublin
- * core in RDF schema / contents - text file, listing one file per line / file1
- * - files contained in the item / file2 / ...
- * <P>
+ * <pre>{@code
+ * /exportdir/42/ (one directory per item)
+ *              / dublin_core.xml - qualified dublin core in RDF schema
+ *              / contents - text file, listing one file per line
+ *              / file1 - files contained in the item
+ *              / file2
+ *              / ...
+ * }</pre>
+ * <p>
  * issues -doesn't handle special characters in metadata (needs to turn {@code &'s} into
  * {@code &amp;}, etc.)
- * <P>
+ * <p>
  * Modified by David Little, UCSD Libraries 12/21/04 to allow the registration
  * of files (bitstreams) into DSpace.
  *
@@ -100,7 +104,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     /**
      * log4j logger
      */
-    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemExportServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     protected ItemExportServiceImpl() {
 
@@ -167,6 +171,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 // make it this far, now start exporting
                 writeMetadata(c, myItem, itemDir, migrate);
                 writeBitstreams(c, myItem, itemDir, excludeBitstreams);
+                writeCollections(myItem, itemDir);
                 if (!migrate) {
                     writeHandle(c, myItem, itemDir);
                 }
@@ -191,7 +196,7 @@ public class ItemExportServiceImpl implements ItemExportService {
      */
     protected void writeMetadata(Context c, Item i, File destDir, boolean migrate)
         throws Exception {
-        Set<String> schemas = new HashSet<String>();
+        Set<String> schemas = new HashSet<>();
         List<MetadataValue> dcValues = itemService.getMetadata(i, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (MetadataValue metadataValue : dcValues) {
             schemas.add(metadataValue.getMetadataField().getMetadataSchema().getName());
@@ -343,6 +348,33 @@ public class ItemExportServiceImpl implements ItemExportService {
     }
 
     /**
+     * Create the 'collections' file.  List handles of all Collections which
+     * contain this Item.  The "owning" Collection is listed first.
+     *
+     * @param item list collections holding this Item.
+     * @param destDir write the file here.
+     * @throws IOException if the file cannot be created or written.
+     */
+    protected void writeCollections(Item item, File destDir)
+            throws IOException {
+        File outFile = new File(destDir, "collections");
+        if (outFile.createNewFile()) {
+            try (PrintWriter out = new PrintWriter(new FileWriter(outFile))) {
+                String ownerHandle = item.getOwningCollection().getHandle();
+                out.println(ownerHandle);
+                for (Collection collection : item.getCollections()) {
+                    String collectionHandle = collection.getHandle();
+                    if (!collectionHandle.equals(ownerHandle)) {
+                        out.println(collectionHandle);
+                    }
+                }
+            }
+        } else {
+            throw new IOException("Cannot create 'collections' in " + destDir);
+        }
+    }
+
+    /**
      * Create both the bitstreams and the contents file. Any bitstreams that
      * were originally registered will be marked in the contents file as such.
      * However, the export directory will contain actual copies of the content
@@ -474,7 +506,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     public void createDownloadableExport(DSpaceObject dso,
                                          Context context, boolean migrate) throws Exception {
         EPerson eperson = context.getCurrentUser();
-        ArrayList<DSpaceObject> list = new ArrayList<DSpaceObject>(1);
+        ArrayList<DSpaceObject> list = new ArrayList<>(1);
         list.add(dso);
         processDownloadableExport(list, context, eperson == null ? null
             : eperson.getEmail(), migrate);
@@ -491,7 +523,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     @Override
     public void createDownloadableExport(DSpaceObject dso,
                                          Context context, String additionalEmail, boolean migrate) throws Exception {
-        ArrayList<DSpaceObject> list = new ArrayList<DSpaceObject>(1);
+        ArrayList<DSpaceObject> list = new ArrayList<>(1);
         list.add(dso);
         processDownloadableExport(list, context, additionalEmail, migrate);
     }
@@ -652,7 +684,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                         while (iter.hasNext()) {
                             String keyName = iter.next();
                             List<UUID> uuids = itemsMap.get(keyName);
-                            List<Item> items = new ArrayList<Item>();
+                            List<Item> items = new ArrayList<>();
                             for (UUID uuid : uuids) {
                                 items.add(itemService.find(context, uuid));
                             }
