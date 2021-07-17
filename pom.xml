@@ -1554,11 +1554,11 @@
         </repository>
     </distributionManagement>
 
-    <!-- Enable access to artifacts in Sonatype's snapshot repo for Snapshots ONLY -->
     <repositories>
+        <!-- Enable access to artifacts in Sonatype's snapshot repo for Snapshots ONLY -->
         <repository>
           <id>maven-snapshots</id>
-          <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
           <layout>default</layout>
             <releases>
               <enabled>false</enabled>
@@ -1566,6 +1566,11 @@
           <snapshots>
             <enabled>true</enabled>
           </snapshots>
+        </repository>
+        <!-- Add mirror for restlet - maven-default-http-blocker fix -->
+        <repository>
+            <id>restlet-mirror</id>
+            <url>https://maven.restlet.talend.com</url>
         </repository>
     </repositories>
 
