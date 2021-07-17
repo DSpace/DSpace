@@ -1629,10 +1629,10 @@
             <url>https://oss.sonatype.org/content/repositories/releases/</url>
         </repository>
         <!--Nor sonatype nor maven central appear to still contain org.restlet.jee:org.restlet.ext.servlet:jar:2.1.1 any more. No problem if it is in your local repo. Build fail if it isn't-->
+        <!-- Add mirror for restlet - maven-default-http-blocker fix -->
         <repository>
-            <id>restlet</id>
-            <name>restlet</name>
-            <url>http://maven.restlet.org</url>
+            <id>restlet-mirror</id>
+            <url>https://maven.restlet.talend.com</url>
         </repository>
     </repositories>
 
