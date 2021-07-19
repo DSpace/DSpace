@@ -176,6 +176,27 @@ function AuthorLookup(url, authorityInput, collectionID) {
                         var oldAuthority = $('input[name=' + authorityInput + '_authority]');
                         oldAuthority.val(vcard.data('authorityID'));
                         $('textarea[name='+ authorityInput+']').val(vcard.data('name'));
+
+                        /*
+
+                        Manually setting confidence hidden value and class of graphic
+                        confidence indicator as onchange event handler won't do the trick.
+
+                         */
+
+                        var elem = document.getElementById('aspect_administrative_item_EditItemMetadataForm_field_' + authorityInput + '_authority')
+                        var conf = 'aspect_administrative_item_EditItemMetadataForm_field_' + authorityInput + '_confidence';
+                        var ind = conf + '_indicator';
+
+                        DSpaceAuthorityOnChange(elem, conf, ind);
+
+                        var ind_elem = $('#' + ind)[0];
+                        var ind_classes = ind_elem.className;
+                        ind_elem.title = 'This authority value has been confirmed as accurate by an interactive user';
+                        var new_classes = ind_classes.replace(new RegExp(" glyphicon-.* "), '');
+
+                        ind_elem.className = new_classes + " glyphicon-thumbs-up";
+
                     } else {
                         // submission
                         var lastName = $('input[name=' + authorityInput + '_last]');
