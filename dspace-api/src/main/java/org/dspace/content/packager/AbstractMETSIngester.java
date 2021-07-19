@@ -16,6 +16,8 @@ import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -279,6 +281,13 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                     for (int i = 0; i < childFilePaths.length; i++) {
                         addPackageReference(dso, childFilePaths[i]);
                     }
+
+                    Map<String, List<String>> relFilePathsMap = manifest.getRelMetsFilePaths(params);
+                    for (String relType : relFilePathsMap.keySet()) {
+                        for (String relFilePath : relFilePathsMap.get(relType)) {
+                            addRelPackageReference(dso, relType, relFilePath);
+                        }
+                    }
                 }
             } //end if dso not null
 
@@ -409,6 +418,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // get handle from manifest
             handle = getObjectHandle(manifest);
         }
+        UUID uuid = getObjectID(manifest);
 
         // -- Step 2 --
         // Create our DSpace Object based on info parsed from manifest, and
@@ -416,7 +426,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         DSpaceObject dso;
         try {
             dso = PackageUtils.createDSpaceObject(context, parent,
-                                                  type, handle, params);
+                                                  type, handle, uuid, params);
         } catch (SQLException sqle) {
             throw new PackageValidationException("Exception while ingesting "
                                                      + pkgFile.getPath(), sqle);
@@ -448,11 +458,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         // Run our Descriptive metadata (dublin core, etc) crosswalks!
         crosswalkObjectDmd(context, dso, manifest, callback, manifest
             .getItemDmds(), params);
-
-        // For Items, also sanity-check the metadata for minimum requirements.
-        if (type == Constants.ITEM) {
-            PackageUtils.checkItemMetadata((Item) dso);
-        }
 
         // -- Step 5 --
         // Add all content files as bitstreams on new DSpace Object
@@ -652,11 +657,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         // Run our Descriptive metadata (dublin core, etc) crosswalks!
         crosswalkObjectDmd(context, dso, manifest, callback, manifest
             .getItemDmds(), params);
-
-        // For Items, also sanity-check the metadata for minimum requirements.
-        if (dso.getType() == Constants.ITEM) {
-            PackageUtils.checkItemMetadata((Item) dso);
-        }
 
         // -- Step 6 --
         // Finish things up!
@@ -1505,5 +1505,23 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
      * @return name
      */
     public abstract String getConfigurationName();
+
+    public UUID getObjectID(METSManifest manifest)
+            throws PackageValidationException {
+        Element mets = manifest.getMets();
+        String idStr = mets.getAttributeValue("ID");
+        if (idStr == null || idStr.length() == 0) {
+            throw new PackageValidationException("Manifest is missing the required mets@ID attribute.");
+        }
+        if (idStr.contains("DB-ID-")) {
+            idStr = idStr.substring(idStr.lastIndexOf("DB-ID-") + 6, idStr.length());
+        }
+        try {
+            return UUID.fromString(idStr);
+        } catch (IllegalArgumentException ignored) {
+            //do nothing
+        }
+        return null;
+    }
 
 }

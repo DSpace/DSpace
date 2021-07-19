@@ -129,12 +129,23 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public Collection create(Context context, Community community, String handle)
-        throws SQLException, AuthorizeException {
+            throws SQLException, AuthorizeException {
+        return create(context, community, handle, null);
+    }
+
+    @Override
+    public Collection create(Context context, Community community,
+                             String handle, UUID uuid) throws SQLException, AuthorizeException {
         if (community == null) {
             throw new IllegalArgumentException("Community cannot be null when creating a new collection.");
         }
 
-        Collection newCollection = collectionDAO.create(context, new Collection());
+        Collection newCollection;
+        if (uuid != null) {
+            newCollection = collectionDAO.create(context, new Collection(uuid));
+        }  else {
+            newCollection = collectionDAO.create(context, new Collection());
+        }
         //Add our newly created collection to our community, authorization checks occur in THIS method
         communityService.addCollection(context, community, newCollection);
 
@@ -169,7 +180,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         log.info(LogManager.getHeader(context, "create_collection",
                                       "collection_id=" + newCollection.getID())
-                     + ",handle=" + newCollection.getHandle());
+                    + ",handle=" + newCollection.getHandle());
 
         return newCollection;
     }
@@ -944,7 +955,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
      * Finds all Indexed Collections where the current user has submit rights. If the user is an Admin,
      * this is all Indexed Collections. Otherwise, it includes those collections where
      * an indexed "submit" policy lists either the eperson or one of the eperson's groups
-     * 
+     *
      * @param context                    DSpace context
      * @param discoverQuery
      * @param community                  parent community, could be null
