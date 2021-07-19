@@ -31,7 +31,6 @@ import org.dspace.content.service.ItemService;
 import org.jdom.Element;
 import org.junit.Test;
 
-// See CsvImportIT for other examples involving rels
 public class PackagerIT extends AbstractIntegrationTestWithDatabase {
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
