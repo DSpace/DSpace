@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -156,13 +157,17 @@ public class Orcidv2 implements SolrAuthorityInterface {
         if (rows > 100) {
             throw new IllegalArgumentException("The maximum number of results to retrieve cannot exceed 100.");
         }
-
-        String searchPath = "search?q=" + URLEncoder.encode(text) + "&start=" + start + "&rows=" + rows;
-        log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
-        InputStream bioDocument = restConnector.get(searchPath, accessToken);
-        XMLtoBio converter = new XMLtoBio();
-        List<Person> bios = converter.convert(bioDocument);
-        return bios;
+        try {
+            String searchPath = "search?q=" + URLEncoder.encode(text, "UTF-8") + "&start=" + start + "&rows=" + rows;
+            log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
+            InputStream bioDocument = restConnector.get(searchPath, accessToken);
+            XMLtoBio converter = new XMLtoBio();
+            List<Person> bios = converter.convert(bioDocument);
+            return bios;
+        } catch (UnsupportedEncodingException e) {
+			log.error(e.getMessage());
+		}
+		return null;
     }
 
     /**
