@@ -694,38 +694,39 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         // viewers are incapable of handling this request. You can
         // uncomment the following lines to turn this feature back on.
 
-//        response.setHeader("Accept-Ranges", "bytes");
-//        String ranges = request.getHeader("Range");
-//        if (ranges != null)
-//        {
-//            try
-//            {
-//                ranges = ranges.substring(ranges.indexOf('=') + 1);
-//                byteRange = new ByteRange(ranges);
-//            }
-//            catch (NumberFormatException e)
-//            {
-//                byteRange = null;
-//                if (response instanceof HttpResponse)
-//                {
-//                    // Respond with status 416 (Request range not
-//                    // satisfiable)
-//                    response.setStatus(416);
-//                }
-//            }
-//        }
+        response.setHeader("Accept-Ranges", "bytes");
+        String ranges = request.getHeader("Range");
+        if (ranges != null)
+        {
+            try
+            {
+                ranges = ranges.substring(ranges.indexOf('=') + 1);
+                byteRange = new ByteRange(ranges);
+            }
+            catch (NumberFormatException e)
+            {
+                byteRange = null;
+                if (response instanceof HttpResponse)
+                {
+                    //Respond with status 416 (Request range not
+                    //satisfiable)
+                    response.setStatus(416);
+                }
+            }
+        }
 
         try
         {
             if (byteRange != null)
             {
+                ByteRange actualByteRange = byteRange;
                 String entityLength;
                 String entityRange;
                 if (this.bitstreamSize != -1)
                 {
                     entityLength = "" + this.bitstreamSize;
-                    entityRange = byteRange.intersection(
-                            new ByteRange(0, this.bitstreamSize)).toString();
+                    actualByteRange = byteRange.intersection(new ByteRange(0, this.bitstreamSize - 1));
+                    entityRange = actualByteRange.toString();
                 }
                 else
                 {
@@ -733,7 +734,11 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                     entityRange = byteRange.toString();
                 }
 
-                response.setHeader("Content-Range", entityRange + "/" + entityLength);
+                response.setHeader("Content-Range", "bytes " + entityRange + "/" + entityLength);
+                if(byteRange.length() != -1) {
+                    response.setHeader("Content-Length", String.valueOf(actualByteRange.length()));
+                }
+
                 if (response instanceof HttpResponse)
                 {
                     // Response with status 206 (Partial content)
