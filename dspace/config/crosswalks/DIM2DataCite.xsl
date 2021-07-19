@@ -11,7 +11,7 @@
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:dspace="http://www.dspace.org/xmlns/dspace/dim"
-                xmlns="http://datacite.org/schema/kernel-3"
+                xmlns="http://datacite.org/schema/kernel-4"
                 version="2.0">
     
     <!-- CONFIGURATION -->
@@ -46,9 +46,9 @@
             properties are in the metadata of the item to export.
             The classe named above respects this.
         -->
-        <resource xmlns="http://datacite.org/schema/kernel-3"
+        <resource xmlns="http://datacite.org/schema/kernel-4"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+                  xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
 
             <!--
                 MANDATORY PROPERTIES
@@ -214,6 +214,21 @@
             -->
             <xsl:apply-templates select="(//dspace:field[@mdschema='dc' and @element='language' and (@qualifier='iso' or @qualifier='rfc3066')])[1]" />
 
+            <!-- Add resource type. -->
+            <xsl:element name="resourceType">
+                <xsl:attribute name="resourceTypeGeneral">
+                    <xsl:call-template name="getResourceType">
+                        <xsl:with-param name="type" select="//dspace:field[@mdschema='dc' and @element='type' and not(@qualifier)]/text()"/>
+                    </xsl:call-template>
+                </xsl:attribute>
+                <xsl:choose>
+                    <xsl:when test="//dspace:field[@mdschema='dc' and @element='type' and not(@qualifier)]">
+                        <xsl:value-of select="//dspace:field[@mdschema='dc' and @element='type' and not(@qualifier)]"/>
+                    </xsl:when>
+                    <xsl:otherwise>(:unav) unavailable</xsl:otherwise>
+                </xsl:choose>
+            </xsl:element>
+
             <!--
                 DataCite (10)
                 Template call for ResourceType
@@ -277,9 +292,18 @@
                     <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='description' and (@qualifier='abstract' or @qualifier='tableofcontents' or not(@qualifier))]" />
                 </xsl:element>
             </xsl:if>
-            
+
+            <!-- DataCite (13)
+                 Add funding references.
+            -->
+            <xsl:if test="//dspace:field[@mdschema='dc' and @element='description' and @qualifier='sponsorship']">
+                <fundingReferences>
+                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='description' and @qualifier='sponsorship']"/>
+                </fundingReferences>
+            </xsl:if>
+
             <!--
-                DataCite (18)
+                DataCite (19)
                 GeoLocation
                 DSpace currently doesn't store geolocations.
             -->
@@ -468,38 +492,36 @@
         DataCite (10), DataCite (10.1)
         Adds resourceType and resourceTypeGeneral information
     -->
-    <xsl:template match="//dspace:field[@mdschema='dc' and @element='type'][1]">
-        <xsl:element name="resourceType">
-            <xsl:attribute name="resourceTypeGeneral">
-                <xsl:choose>
-                    <xsl:when test="string(text())='Animation'">Audiovisual</xsl:when>
-                    <xsl:when test="string(text())='Article'">Text</xsl:when>
-                    <xsl:when test="string(text())='Book'">Text</xsl:when>
-                    <xsl:when test="string(text())='Book chapter'">Text</xsl:when>
-                    <xsl:when test="string(text())='Dataset'">Dataset</xsl:when>
-                    <xsl:when test="string(text())='Learning Object'">InteractiveResource</xsl:when>
-                    <xsl:when test="string(text())='Image'">Image</xsl:when>
-                    <xsl:when test="string(text())='Image, 3-D'">Image</xsl:when>
-                    <xsl:when test="string(text())='Map'">Model</xsl:when>
-                    <xsl:when test="string(text())='Musical Score'">Other</xsl:when>
-                    <xsl:when test="string(text())='Plan or blueprint'">Model</xsl:when>
-                    <xsl:when test="string(text())='Preprint'">Text</xsl:when>
-                    <xsl:when test="string(text())='Presentation'">Text</xsl:when>
-                    <xsl:when test="string(text())='Recording, acoustical'">Sound</xsl:when>
-                    <xsl:when test="string(text())='Recording, musical'">Sound</xsl:when>
-                    <xsl:when test="string(text())='Recording, oral'">Sound</xsl:when>
-                    <xsl:when test="string(text())='Software'">Software</xsl:when>
-                    <xsl:when test="string(text())='Technical Report'">Text</xsl:when>
-                    <xsl:when test="string(text())='Thesis'">Text</xsl:when>
-                    <xsl:when test="string(text())='Video'">Audiovisual</xsl:when>
-                    <xsl:when test="string(text())='Working Paper'">Text</xsl:when>
-                    <xsl:when test="string(text())='Other'">Other</xsl:when>
-                    <xsl:otherwise>Other</xsl:otherwise>
-                </xsl:choose>
-            </xsl:attribute>
-            <xsl:value-of select="." />
-        </xsl:element>
+    <xsl:template name="getResourceType">
+        <xsl:param name="type"/>
+        <!-- Transforming the language flags according to ISO 639-2/B & ISO 639-3 -->
+        <xsl:choose>
+            <xsl:when test="$type='Animation'">Audiovisual</xsl:when>
+            <xsl:when test="$type='Article'">Text</xsl:when>
+            <xsl:when test="$type='Book'">Text</xsl:when>
+            <xsl:when test="$type='Book chapter'">Text</xsl:when>
+            <xsl:when test="$type='Dataset'">Dataset</xsl:when>
+            <xsl:when test="$type='Learning Object'">InteractiveResource</xsl:when>
+            <xsl:when test="$type='Image'">Image</xsl:when>
+            <xsl:when test="$type='Image, 3-D'">Image</xsl:when>
+            <xsl:when test="$type='Map'">Model</xsl:when>
+            <xsl:when test="$type='Musical Score'">Other</xsl:when>
+            <xsl:when test="$type='Plan or blueprint'">Model</xsl:when>
+            <xsl:when test="$type='Preprint'">Text</xsl:when>
+            <xsl:when test="$type='Presentation'">Text</xsl:when>
+            <xsl:when test="$type='Recording, acoustical'">Sound</xsl:when>
+            <xsl:when test="$type='Recording, musical'">Sound</xsl:when>
+            <xsl:when test="$type='Recording, oral'">Sound</xsl:when>
+            <xsl:when test="$type='Software'">Software</xsl:when>
+            <xsl:when test="$type='Technical Report'">Text</xsl:when>
+            <xsl:when test="$type='Thesis'">Text</xsl:when>
+            <xsl:when test="$type='Video'">Audiovisual</xsl:when>
+            <xsl:when test="$type='Working Paper'">Text</xsl:when>
+            <xsl:when test="$type='Other'">Other</xsl:when>
+            <xsl:otherwise>Other</xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
+
 
     <!--
         DataCite (11), DataCite (11.1)
@@ -591,6 +613,14 @@
                 </xsl:choose>
             </xsl:attribute>
             <xsl:value-of select="." />
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="//dspace:field[@mdschema='dc' and @element='description' and @qualifier='sponsorship']">
+        <xsl:element name="fundingReference">
+            <xsl:element name="funderName">
+                <xsl:value-of select="."/>
+            </xsl:element>
         </xsl:element>
     </xsl:template>
 
