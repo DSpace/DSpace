@@ -23,6 +23,9 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
+import org.dspace.authority.AuthorityValue;
+import org.dspace.authority.factory.AuthorityServiceFactory;
+import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.core.Context;
@@ -79,6 +82,13 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     private static final Message T_filter_authority = message("xmlui.Discovery.SimpleSearch.filter.authority");
     private static final Message T_filter_notauthority = message("xmlui.Discovery.SimpleSearch.filter.notauthority");
     private static final Message T_did_you_mean = message("xmlui.Discovery.SimpleSearch.did_you_mean");
+
+    protected final AuthorityValueService authorityValueService;
+
+    public SimpleSearch() {
+        this.authorityValueService = AuthorityServiceFactory.getInstance().getAuthorityValueService();
+
+    }
 
 
     /**
@@ -255,8 +265,13 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         typeSelect.addOption(StringUtils.equals(relationalOperator, "notauthority"), "notauthority", T_filter_notauthority);
          
 
-
-
+        if (StringUtils.equals(relationalOperator, "authority") && StringUtils.isNotBlank(value) ) {
+            //print the display value
+            AuthorityValue authorityValue = authorityValueService.findByUID(context, value);
+            if (authorityValue != null) {
+                row.addCell("", Cell.ROLE_DATA, "discovery-filter-display-value-cell hidden").addText("filter_display_value_" + index, "discovery-filter-display-value").setValue(authorityValue.getValue());
+            }
+        }
         //Add a box so we can search for our value
         row.addCell("", Cell.ROLE_DATA, "discovery-filter-input-cell").addText("filter_" + index, "discovery-filter-input").setValue(value == null ? "" : value);
 
