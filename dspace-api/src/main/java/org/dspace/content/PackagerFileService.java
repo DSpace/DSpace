@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -144,8 +145,9 @@ public class PackagerFileService {
             if (manifestOnly) {
                 // parse the bare METS manifest and sanity-check it.
                 //dspaceSIP value comes from METSIngest
-                manifest = METSManifest.create(new FileInputStream(pkgFile),
-                        validate, "dspaceSIP");
+                try (InputStream is = new FileInputStream(pkgFile)) {
+                    manifest = METSManifest.create(is, validate, "dspaceSIP");
+                }
             } else {
                 try (ZipFile zip = new ZipFile(pkgFile)) {
                     // Retrieve the manifest file entry (named mets.xml)

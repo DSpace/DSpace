@@ -159,46 +159,46 @@ public class Packager {
         List<String> sourceFileIngest = new ArrayList<>();
         Options options = new Options();
         options.addOption("p", "parent", true,
-                "Handle(s) of parent Community or Collection into which to ingest object (repeatable)");
+                          "Handle(s) of parent Community or Collection into which to ingest object (repeatable)");
         options.addOption("e", "eperson", true,
-                "email address of eperson doing importing");
+                          "email address of eperson doing importing");
         options
-                .addOption(
-                        "w",
-                        "install",
-                        false,
-                        "disable workflow; install immediately without going through collection's workflow");
+            .addOption(
+                    "w",
+                    "install",
+                    false,
+                    "disable workflow; install immediately without going through collection's workflow");
         options.addOption("r", "restore", false,
-                "ingest in \"restore\" mode.  Restores a missing object based on the contents in a package.");
+                          "ingest in \"restore\" mode.  Restores a missing object based on the contents in a package.");
         options.addOption("k", "keep-existing", false,
-                "if an object is found to already exist during a restore (-r), then keep the existing " +
-                        "object and continue processing.  Can only be used with '-r'.  This avoids " +
-                        "object-exists errors which are thrown by -r by default.");
+                          "if an object is found to already exist during a restore (-r), then keep the existing " +
+                              "object and continue processing.  Can only be used with '-r'.  This avoids " +
+                              "object-exists errors which are thrown by -r by default.");
         options.addOption("f", "force-replace", false,
-                "if an object is found to already exist during a restore (-r), then remove it and replace " +
-                        "it with the contents of the package.  Can only be used with '-r'.  This REPLACES the " +
-                        "object(s) in the repository with the contents from the package(s).");
+                          "if an object is found to already exist during a restore (-r), then remove it and replace " +
+                              "it with the contents of the package.  Can only be used with '-r'.  This REPLACES the " +
+                              "object(s) in the repository with the contents from the package(s).");
         options.addOption("t", "type", true, "package type or MIMEtype");
         options
-                .addOption("o", "option", true,
-                        "Packager option to pass to plugin, \"name=value\" (repeatable)");
+            .addOption("o", "option", true,
+                       "Packager option to pass to plugin, \"name=value\" (repeatable)");
         options.addOption("d", "disseminate", false,
-                "Disseminate package (output); default is to submit.");
+                          "Disseminate package (output); default is to submit.");
         options.addOption("s", "submit", false,
-                "Submission package (Input); this is the default. ");
+                          "Submission package (Input); this is the default. ");
         options.addOption("i", "identifier", true, "Handle of object to disseminate.");
         options.addOption("a", "all", false,
-                "also recursively ingest/disseminate any child packages, e.g. all Items within a Collection" +
-                        " (not all packagers may support this option!)");
+                          "also recursively ingest/disseminate any child packages, e.g. all Items within a Collection" +
+                              " (not all packagers may support this option!)");
         options.addOption("h", "help", false,
-                "help (you may also specify '-h -t [type]' for additional help with a specific type of " +
-                        "packager)");
+                          "help (you may also specify '-h -t [type]' for additional help with a specific type of " +
+                              "packager)");
         options.addOption("z", "relationalScope", true,
                 "The scope of relations to disseminate with parent item.");
         options.addOption("u", "no-user-interaction", false,
-                "Skips over all user interaction (i.e. [y/n] question prompts) within this script. This " +
-                        "flag can be used if you want to save (pipe) a report of all changes to a file, and " +
-                        "therefore need to bypass all user interaction.");
+                          "Skips over all user interaction (i.e. [y/n] question prompts) within this script. This " +
+                              "flag can be used if you want to save (pipe) a report of all changes to a file, and " +
+                              "therefore need to bypass all user interaction.");
         options.addOption("y", "dryRun", false,
                 "Dry run to output the result of an ingest without actually ingesting.");
 
@@ -218,8 +218,7 @@ public class Packager {
 
         if (line.hasOption('h')) {
             HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("Packager  [options]  package-file|-\n",
-                    options);
+            myhelp.printHelp("Packager  [options]  package-file|-\n", options);
             //If user specified a type, also print out the SIP and DIP options
             // that are specific to that type of packager
             if (line.hasOption('t')) {
@@ -229,7 +228,7 @@ public class Packager {
                 System.out.println("(These options may be specified using --option as described above)");
 
                 PackageIngester sip = (PackageIngester) pluginService
-                        .getNamedPlugin(PackageIngester.class, line.getOptionValue('t'));
+                    .getNamedPlugin(PackageIngester.class, line.getOptionValue('t'));
 
                 if (sip != null) {
                     System.out.println("\n\n" + line.getOptionValue('t') + " Submission (SIP) plugin options:\n");
@@ -239,7 +238,7 @@ public class Packager {
                 }
 
                 PackageDisseminator dip = (PackageDisseminator) pluginService
-                        .getNamedPlugin(PackageDisseminator.class, line.getOptionValue('t'));
+                    .getNamedPlugin(PackageDisseminator.class, line.getOptionValue('t'));
 
                 if (dip != null) {
                     System.out.println("\n\n" + line.getOptionValue('t') + " Dissemination (DIP) plugin options:\n");
@@ -332,7 +331,7 @@ public class Packager {
 
         // Sanity checks on arg list: required args
         // REQUIRED: sourceFile, ePerson (-e), packageType (-t)
-        if (sourceFiles == null || eperson == null || eperson == null || myPackager.packageType == null) {
+        if (sourceFiles == null || eperson == null || myPackager.packageType == null) {
             System.err.println("Error - missing a REQUIRED argument or option.\n");
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("PackageManager  [options]  package-file|-\n", options);
@@ -363,10 +362,10 @@ public class Packager {
             //if a specific identifier was specified, make sure it is valid
             if (identifier != null && identifier.length() > 0) {
                 objToReplace = HandleServiceFactory.getInstance().getHandleService()
-                        .resolveToObject(context, identifier);
+                                                   .resolveToObject(context, identifier);
                 if (objToReplace == null) {
                     throw new IllegalArgumentException("Bad identifier/handle -- "
-                            + "Cannot resolve handle \"" + identifier + "\"");
+                                                           + "Cannot resolve handle \"" + identifier + "\"");
                 }
             }
 
@@ -413,7 +412,7 @@ public class Packager {
             context.setMode(Context.Mode.BATCH_EDIT);
 
             PackageIngester sip = (PackageIngester) pluginService
-                    .getNamedPlugin(PackageIngester.class, myPackager.packageType);
+                        .getNamedPlugin(PackageIngester.class, myPackager.packageType);
             if (sip == null) {
                 usageError("Error, Unknown package type: " + myPackager.packageType);
             }
@@ -427,15 +426,15 @@ public class Packager {
                 for (int i = 0; i < parents.length; i++) {
                     // sanity check: did handle resolve?
                     parentObjs[i] = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context,
-                            parents[i]);
+                                                                                                          parents[i]);
                     if (parentObjs[i] == null) {
                         throw new IllegalArgumentException(
-                                "Bad parent list -- "
-                                        + "Cannot resolve parent handle \""
-                                        + parents[i] + "\"");
+                            "Bad parent list -- "
+                                    + "Cannot resolve parent handle \""
+                                    + parents[i] + "\"");
                     }
                     System.out.println((i == 0 ? "Owner: " : "Parent: ")
-                            + parentObjs[i].getHandle());
+                                           + parentObjs[i].getHandle());
                 }
             }
 
@@ -460,16 +459,16 @@ public class Packager {
 
             //retrieve specified package disseminator
             PackageDisseminator dip = (PackageDisseminator) pluginService
-                    .getNamedPlugin(PackageDisseminator.class, myPackager.packageType);
+                        .getNamedPlugin(PackageDisseminator.class, myPackager.packageType);
             if (dip == null) {
                 usageError("Error, Unknown package type: " + myPackager.packageType);
             }
 
             DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
-                    .resolveToObject(context, identifier);
+                                                   .resolveToObject(context, identifier);
             if (dso == null) {
                 throw new IllegalArgumentException("Bad identifier/handle -- "
-                        + "Cannot resolve handle \"" + identifier + "\"");
+                                                       + "Cannot resolve handle \"" + identifier + "\"");
             }
 
             //disseminate the requested object
@@ -570,9 +569,8 @@ public class Packager {
                                     for (String result : hdlResults) {
                                         dso = HandleServiceFactory.getInstance().getHandleService()
                                                 .resolveToObject(context, result);
-                                        pathToNewUUID.put(sourceFile, dso.getID().toString());
-
                                         if (dso != null) {
+                                            pathToNewUUID.put(sourceFile, dso.getID().toString());
 
                                             if (pkgParams.restoreModeEnabled()) {
                                                 System.out.println("RESTORED DSpace " +
@@ -592,9 +590,9 @@ public class Packager {
                             //otherwise, just one package to ingest
                             try {
                                 dso = sip.ingest(context, parent, pkgFile, pkgParams, null);
-                                pathToNewUUID.put(sourceFile, dso.getID().toString());
-
                                 if (dso != null) {
+                                    pathToNewUUID.put(sourceFile, dso.getID().toString());
+
                                     if (pkgParams.restoreModeEnabled()) {
                                         System.out.println("RESTORED DSpace " + Constants.typeText[dso.getType()] +
                                                 " [ hdl=" + dso.getHandle() + ", dbID=" + dso.getID() + " ] ");
@@ -746,7 +744,9 @@ public class Packager {
                             fileName = pkgDirectory + "/" + PackageUtils.getPackageName(childOfChildItem, extension);
                             pkgFile = new File(fileName);
                             dip.disseminate(context, childOfChildItem, pkgParams, pkgFile);
-                            fileResults.add(pkgFile);
+                            if (fileResults != null) {
+                                fileResults.add(pkgFile);
+                            }
                         }
                     }
 

@@ -55,7 +55,7 @@ import org.dspace.workflow.WorkflowException;
  * @see org.dspace.core.service.PluginService
  */
 public abstract class AbstractPackageIngester
-        implements PackageIngester {
+    implements PackageIngester {
     /**
      * log4j category
      */
@@ -125,9 +125,9 @@ public abstract class AbstractPackageIngester
     @Override
     public List<String> ingestAll(Context context, DSpaceObject parent, File pkgFile,
                                   PackageParameters params, String license)
-            throws PackageException, UnsupportedOperationException,
-            CrosswalkException, AuthorizeException,
-            SQLException, IOException, WorkflowException {
+        throws PackageException, UnsupportedOperationException,
+        CrosswalkException, AuthorizeException,
+        SQLException, IOException, WorkflowException {
         //If unset, make sure the Parameters specifies this is a recursive ingest
         if (!params.recursiveModeEnabled()) {
             params.setRecursiveModeEnabled(true);
@@ -151,7 +151,7 @@ public abstract class AbstractPackageIngester
                 //if we are skipping over (i.e. keeping) existing objects
                 if (params.keepExistingModeEnabled()) {
                     log.warn(LogManager.getHeader(context, "skip_package_ingest",
-                            "Object already exists, package-skipped=" + pkgFile.getName()));
+                                                  "Object already exists, package-skipped=" + pkgFile.getName()));
                 } else {
                     // Pass this exception on -- which essentially causes a full rollback of all changes (this is
                     // the default)
@@ -160,7 +160,7 @@ public abstract class AbstractPackageIngester
             }
         } else {
             log.info(LogManager.getHeader(context, "skip_package_ingest",
-                    "Object was already ingested, package-skipped=" + pkgFile.getName()));
+                                          "Object was already ingested, package-skipped=" + pkgFile.getName()));
         }
 
         // As long as an object was successfully created from this package
@@ -259,9 +259,9 @@ public abstract class AbstractPackageIngester
     @Override
     public List<String> replaceAll(Context context, DSpaceObject dso,
                                    File pkgFile, PackageParameters params)
-            throws PackageException, UnsupportedOperationException,
-            CrosswalkException, AuthorizeException,
-            SQLException, IOException, WorkflowException {
+        throws PackageException, UnsupportedOperationException,
+        CrosswalkException, AuthorizeException,
+        SQLException, IOException, WorkflowException {
         //If unset, make sure the Parameters specifies this is a recursive replace
         if (!params.recursiveModeEnabled()) {
             params.setRecursiveModeEnabled(true);
@@ -281,7 +281,7 @@ public abstract class AbstractPackageIngester
             replacedDso = replace(context, dso, pkgFile, params);
         } else {
             log.info(LogManager.getHeader(context, "skip_package_replace",
-                    "Object was already replaced, package-skipped=" + pkgFile.getName()));
+                                          "Object was already replaced, package-skipped=" + pkgFile.getName()));
         }
 
         // As long as an object was successfully replaced from this package

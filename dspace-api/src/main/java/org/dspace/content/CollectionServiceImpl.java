@@ -157,10 +157,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         authorizeService.createResourcePolicy(context, newCollection, anonymousGroup, null, Constants.READ, null);
         // now create the default policies for submitted items
         authorizeService
-                .createResourcePolicy(context, newCollection, anonymousGroup, null, Constants.DEFAULT_ITEM_READ, null);
+            .createResourcePolicy(context, newCollection, anonymousGroup, null, Constants.DEFAULT_ITEM_READ, null);
         authorizeService
-                .createResourcePolicy(context, newCollection, anonymousGroup, null,
-                        Constants.DEFAULT_BITSTREAM_READ, null);
+            .createResourcePolicy(context, newCollection, anonymousGroup, null, Constants.DEFAULT_BITSTREAM_READ, null);
 
         collectionDAO.save(context, newCollection);
 
@@ -176,12 +175,12 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
         context.addEvent(new Event(Event.CREATE, Constants.COLLECTION,
-                newCollection.getID(), newCollection.getHandle(),
-                getIdentifiers(context, newCollection)));
+                                   newCollection.getID(), newCollection.getHandle(),
+                                   getIdentifiers(context, newCollection)));
 
         log.info(LogManager.getHeader(context, "create_collection",
-                "collection_id=" + newCollection.getID())
-                + ",handle=" + newCollection.getHandle());
+                                      "collection_id=" + newCollection.getID())
+                    + ",handle=" + newCollection.getHandle());
 
         return newCollection;
     }
