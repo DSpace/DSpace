@@ -777,9 +777,6 @@ public abstract class AbstractMETSDisseminator
         Mets mets = new Mets();
 
         String identifier = "DB-ID-" + dso.getID();
-        if (dso.getHandle() != null) {
-            identifier = dso.getHandle().replace('/', '-');
-        }
 
         // this ID should be globally unique (format: DSpace_[objType]_[handle with slash replaced with a dash])
         mets.setID("DSpace_" + Constants.typeText[dso.getType()] + "_" + identifier);

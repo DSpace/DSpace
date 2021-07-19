@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -94,6 +95,10 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     protected Community() {
 
+    }
+
+    protected Community(UUID uuid) {
+        this.predefinedUUID = uuid;
     }
 
     void addSubCommunity(Community subCommunity) {
