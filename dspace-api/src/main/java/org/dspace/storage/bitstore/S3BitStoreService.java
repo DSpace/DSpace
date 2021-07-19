@@ -77,6 +77,18 @@ public class S3BitStoreService implements BitStoreService
         AWSCredentials awsCredentials = new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey());
         s3Service = new AmazonS3Client(awsCredentials);
 
+        // region
+        if(StringUtils.isNotBlank(awsRegionName)) {
+            try {
+                Regions regions = Regions.fromName(awsRegionName);
+                Region region = Region.getRegion(regions);
+                s3Service.setRegion(region);
+                log.info("S3 Region set to: " + region.getName());
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid aws_region: " + awsRegionName);
+            }
+        }
+
         // bucket name
         if(StringUtils.isEmpty(bucketName)) {
             bucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname");
@@ -95,17 +107,6 @@ public class S3BitStoreService implements BitStoreService
             throw new IOException(e);
         }
 
-        // region
-        if(StringUtils.isNotBlank(awsRegionName)) {
-            try {
-                Regions regions = Regions.fromName(awsRegionName);
-                Region region = Region.getRegion(regions);
-                s3Service.setRegion(region);
-                log.info("S3 Region set to: " + region.getName());
-            } catch (IllegalArgumentException e) {
-                log.warn("Invalid aws_region: " + awsRegionName);
-            }
-        }
 
         log.info("AWS S3 Assetstore ready to go! bucket:"+bucketName);
     }
