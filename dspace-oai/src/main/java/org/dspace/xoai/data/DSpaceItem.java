@@ -42,11 +42,19 @@ public abstract class DSpaceItem implements Item
     
     private static List<String> values (List<Element> input) {
     	List<String> elems = new ArrayList<String>();
-    	for (Element e : input)
-    		if (e.getElement() != null && !e.getElement().isEmpty() && e.getElement().get(0).getField() != null)
-    			for (Field f : e.getElement().get(0).getField())
-    				if (f.getName() != null && f.getName().equals("value"))
-    					elems.add(f.getValue());
+    	for (Element e : input) {
+    		if (e.getElement() != null && !e.getElement().isEmpty()) {
+    			for (Element eLang : e.getElement()) {
+    				if (eLang.getField() != null) {
+    					for (Field f : eLang.getField()) {
+    						if (f.getName() != null && f.getName().equals("value")) {
+    							elems.add(f.getValue());
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
     	return elems;
     }
     
