@@ -78,7 +78,7 @@ public class UploadStep extends AbstractProcessingStep
     public static final int STATUS_NO_FILES_ERROR = 5;
 
     // format of uploaded file is unknown
-    public static final int STATUS_UNKNOWN_FORMAT = 10;
+    public static final int STATUS_UNKNOWN_FORMAT = 11;
 
     // virus checker unavailable ?
     public static final int STATUS_VIRUS_CHECKER_UNAVAILABLE = 14;
