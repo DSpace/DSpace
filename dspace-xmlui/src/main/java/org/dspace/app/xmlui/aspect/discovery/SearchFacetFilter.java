@@ -652,6 +652,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         queryParams.putAll(params.getCommonBrowseParams());
         Request request = ObjectModelHelper.getRequest(objectModel);
         queryParams.put("order",request.getParameter("order"));
+        queryParams.put("starts_with",request.getParameter("starts_with"));
         String facetField = request.getParameter(SearchFilterParam.FACET_FIELD);
         Division controls = div.addInteractiveDivision("browse-controls", "search-filter?field="+facetField,
                 Division.METHOD_POST, "browse controls");
