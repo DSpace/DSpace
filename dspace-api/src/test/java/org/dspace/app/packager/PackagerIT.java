@@ -34,20 +34,21 @@ import org.junit.Test;
 public class PackagerIT extends AbstractIntegrationTestWithDatabase {
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected Community child1;
+    protected Collection col1;
+    protected Item article;
+    File tempFile;
 
     @Test
     public void packagerExportUUIDTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item article = createTemplate();
-
-        File tempFile = File.createTempFile("packagerExportTest", ".zip");
+        createTemplate();
+        createFiles();
         try {
             performExportScript(article.getHandle(), tempFile);
             assertTrue(tempFile.length() > 0);
-            String idStr = getID(tempFile);
+            String idStr = getID();
             assertEquals(idStr, article.getID().toString());
-        } catch (Exception e) {
-            throw new Exception(e);
         } finally {
             tempFile.delete();
         }
@@ -56,42 +57,43 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void packagerImportUUIDTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item article = createTemplate();
-
-
-        File tempFile = File.createTempFile("packagerExportTest", ".zip");
+        createTemplate();
+        createFiles();
         try {
             performExportScript(article.getHandle(), tempFile);
-            String idStr = getID(tempFile);
+            String idStr = getID();
             itemService.delete(context, article);
             performImportScript(tempFile);
             Item item = itemService.find(context, UUID.fromString(idStr));
             assertNotNull(item);
-        } catch (Exception e) {
-            throw new Exception(e);
         } finally {
             tempFile.delete();
         }
     }
 
-    private Item createTemplate() {
+    protected void createTemplate() {
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+        child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         // Create a new Publication (which is an Article)
-        return ItemBuilder.createItem(context, col1)
+        article = ItemBuilder.createItem(context, col1)
                 .withTitle("Article")
                 .withIssueDate("2017-10-17")
                 .withEntityType("Publication")
                 .build();
     }
 
-    private String getID(File tempFile) throws IOException, MetadataValidationException {
+    protected void createFiles() throws IOException {
+        tempFile = File.createTempFile("packagerExportTest", ".zip");
+    }
+
+    private String getID() throws IOException, MetadataValidationException {
+        //this method gets the UUID from the mets file thats stored in the attribute element
         METSManifest manifest = null;
         ZipFile zip = new ZipFile(tempFile);
         ZipEntry manifestEntry = zip.getEntry(METSManifest.MANIFEST_FILE);
