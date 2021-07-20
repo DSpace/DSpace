@@ -1472,7 +1472,9 @@ prevent the generation of resource policy entry values with null dspace_object a
                 "bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not " +
                 "exist!");
         }
+
         final Supplier<Integer> placeSupplier =  () -> place;
+
         return addMetadata(context, dso, metadataField, lang, Arrays.asList(value),
                 Arrays.asList(authority), Arrays.asList(confidence), placeSupplier)
                 .stream().findFirst().orElse(null);

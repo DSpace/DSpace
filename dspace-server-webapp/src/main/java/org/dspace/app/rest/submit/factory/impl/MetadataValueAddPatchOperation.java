@@ -23,7 +23,7 @@ import org.dspace.core.Utils;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public abstract class MetadataValueAddPatchOperation<DSO extends DSpaceObject>
-        extends AddPatchOperation<MetadataValueRest> {
+    extends AddPatchOperation<MetadataValueRest> {
 
     @Override
     protected Class<MetadataValueRest[]> getArrayClassForEvaluation() {
@@ -36,19 +36,19 @@ public abstract class MetadataValueAddPatchOperation<DSO extends DSpaceObject>
     }
 
     protected void replaceValue(Context context, DSO source, String target, List<MetadataValueRest> list)
-            throws SQLException {
+        throws SQLException {
         String[] metadata = Utils.tokenize(target);
 
         getDSpaceObjectService().clearMetadata(context, source, metadata[0], metadata[1], metadata[2], Item.ANY);
         for (MetadataValueRest ll : list) {
             getDSpaceObjectService()
-                    .addMetadata(context, source, metadata[0], metadata[1], metadata[2], ll.getLanguage(),
-                            ll.getValue(), ll.getAuthority(), ll.getConfidence());
+                .addMetadata(context, source, metadata[0], metadata[1], metadata[2], ll.getLanguage(),
+                             ll.getValue(), ll.getAuthority(), ll.getConfidence());
         }
     }
 
     protected void addValue(Context context, DSO source, String target, MetadataValueRest object, int index)
-            throws SQLException {
+        throws SQLException {
         String[] metadata = Utils.tokenize(target);
         if (index == -1) {
             if (object.getSecurityLevel() != null) {

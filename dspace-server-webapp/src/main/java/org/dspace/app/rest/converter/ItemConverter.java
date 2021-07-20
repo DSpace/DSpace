@@ -98,7 +98,7 @@ public class ItemConverter
         item.setLastModified(obj.getLastModified());
 
         List<MetadataValue> entityTypes =
-                itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
+            itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
         if (CollectionUtils.isNotEmpty(entityTypes) && StringUtils.isNotBlank(entityTypes.get(0).getValue())) {
             item.setEntityType(entityTypes.get(0).getValue());
         }
@@ -134,6 +134,7 @@ public class ItemConverter
             if (submissionDefinitionInputs.isPresent()) {
                 return fromSubmissionDefinition(context, boxes, obj, submissionDefinitionInputs.get(), fullList);
             }
+
             for (MetadataValue metadataValue : fullList) {
                 MetadataField metadataField = metadataValue.getMetadataField();
                 if (checkMetadataFieldVisibility(context, boxes, obj, metadataField)) {
@@ -147,13 +148,14 @@ public class ItemConverter
                     }
                 }
             }
-        } catch (SQLException e) {
+        } catch (SQLException e ) {
             log.error("Error filtering item metadata based on permissions", e);
         }
         return new MetadataValueList(returnList);
     }
 
-    public boolean checkMetadataFieldVisibility(Context context, Item item, MetadataField metadataField) throws SQLException {
+    public boolean checkMetadataFieldVisibility(Context context, Item item,
+            MetadataField metadataField) throws SQLException {
         String entityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
         List<CrisLayoutBox> boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 1000, 0);
         return checkMetadataFieldVisibility(context, boxes, item, metadataField);
@@ -161,7 +163,7 @@ public class ItemConverter
 
     private Optional<List<DCInputSet>> submissionDefinitionInputs() {
         return Optional.ofNullable(requestService.getCurrentRequest())
-                .map(rq -> (String) rq.getAttribute("submission-name"))
+                .map(rq -> (String )rq.getAttribute("submission-name"))
                 .map(this::dcInputsSet);
     }
 
@@ -178,7 +180,7 @@ public class ItemConverter
     }
 
     private MetadataValueList fromSubmissionDefinition(Context context, List<CrisLayoutBox> boxes, Item item,
-                                                       final List<DCInputSet> dcInputSets, final List<MetadataValue> fullList) {
+            final List<DCInputSet> dcInputSets, final List<MetadataValue> fullList) {
 
         Predicate<MetadataValue> inDcInputs = mv -> dcInputSets.stream()
                 .anyMatch((dc) -> {
@@ -191,33 +193,33 @@ public class ItemConverter
                 });
 
         List<MetadataValue> metadataFields = fullList.stream()
-                .filter(inDcInputs)
-                .collect(Collectors.toList());
+                                                     .filter(inDcInputs)
+                                                     .collect(Collectors.toList());
 
         return new MetadataValueList(metadataFields);
     }
 
     private boolean checkMetadataFieldVisibility(Context context, List<CrisLayoutBox> boxes, Item item,
-                                                 MetadataField metadataField) throws SQLException {
+            MetadataField metadataField) throws SQLException {
         if (boxes.size() == 0) {
             if (context != null && authorizeService.isAdmin(context)) {
-                    return true;
+                return true;
             } else {
                 if (!metadataExposureService
                         .isHidden(context, metadataField.getMetadataSchema().getName(),
-                                metadataField.getElement(),
-                                metadataField.getQualifier())) {
-                        return true;
+                                  metadataField.getElement(),
+                                  metadataField.getQualifier())) {
+                    return true;
                 }
             }
         } else {
-              return   checkMetadataFieldVisibilityByBoxes(context, boxes, item, metadataField);
+            return checkMetadataFieldVisibilityByBoxes(context, boxes, item, metadataField);
         }
         return false;
     }
 
     private boolean checkMetadataFieldVisibilityByBoxes(Context context, List<CrisLayoutBox> boxes, Item item,
-                                                        MetadataField metadataField) throws SQLException {
+            MetadataField metadataField) throws SQLException {
         List<MetadataField> allPublicMetadata = getPublicMetadata(boxes);
         List<CrisLayoutBox> boxesWithMetadataFieldExcludedPublic = getBoxesWithMetadataFieldExcludedPublic(
                 metadataField, boxes);
@@ -235,8 +237,8 @@ public class ItemConverter
         if (boxesWithMetadataFieldExcludedPublic.size() == 0) {
             if (!metadataExposureService
                     .isHidden(context, metadataField.getMetadataSchema().getName(),
-                            metadataField.getElement(),
-                            metadataField.getQualifier())) {
+                              metadataField.getElement(),
+                              metadataField.getQualifier())) {
                 return true;
             }
         }
@@ -245,7 +247,7 @@ public class ItemConverter
     }
 
     private List<CrisLayoutBox> getBoxesWithMetadataFieldExcludedPublic(MetadataField metadataField,
-                                                                        List<CrisLayoutBox> boxes) {
+            List<CrisLayoutBox> boxes) {
         List<CrisLayoutBox> boxesWithMetadataField = new LinkedList<CrisLayoutBox>();
         for (CrisLayoutBox box : boxes) {
             List<CrisLayoutField> crisLayoutFields = box.getLayoutFields();
@@ -262,7 +264,7 @@ public class ItemConverter
     }
 
     private void checkField(MetadataField metadataField, List<CrisLayoutBox> boxesWithMetadataField, CrisLayoutBox box,
-                            MetadataField field) {
+            MetadataField field) {
         if (field.equals(metadataField) && box.getSecurity() != LayoutSecurity.PUBLIC.getValue()) {
             boxesWithMetadataField.add(box);
         }

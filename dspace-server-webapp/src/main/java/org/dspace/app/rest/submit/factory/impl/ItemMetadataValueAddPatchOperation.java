@@ -127,6 +127,7 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
                 }
             }
         }
+
     }
 
     protected void replaceValue(Context context, Item source, String target, List<MetadataValueRest> list)
