@@ -331,9 +331,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         return newMetadata;
     }
 
-    public List<MetadataValue> addSecuredMetadataAtPlace(Context context, T dso, MetadataField metadataField, String lang,
-                                           List<String> values, List<String> authorities, List<Integer> confidences, Supplier<Integer> placeSupplier, Integer securityValue)
-            throws SQLException {
+    public List<MetadataValue> addSecuredMetadataAtPlace(Context context, T dso, MetadataField metadataField,
+        String lang, List<String> values, List<String> authorities, List<Integer> confidences,
+        Supplier<Integer> placeSupplier, Integer securityValue) throws SQLException {
         boolean storeAuthoritySetForMetadata = Optional.ofNullable(requestService.getCurrentRequest())
                 .map(r -> (Boolean) r.getAttribute("store_authority_" + metadataField.toString('.')))
                 .orElse(false);
@@ -353,7 +353,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             newMetadata.add(metadataValue);
 
             metadataValue.setPlace(placeSupplier.get());
-            metadataValue.setSecurity_level(securityValue);
+            metadataValue.setSecurityLevel(securityValue);
             metadataValue.setLanguage(lang == null ? null : lang.trim());
 
             // Logic to set Authority and Confidence:
@@ -405,16 +405,16 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         return newMetadata;
     }
     @Override
-    public List<MetadataValue> addSecuredMetadata(Context context, T dso, String schema, String element, String qualifier,
-                                                  String lang, String value, String authority, int confidence, Integer securityLevel)
-            throws SQLException {
+    public List<MetadataValue> addSecuredMetadata(Context context, T dso, String schema, String element,
+        String qualifier, String lang, String value, String authority, int confidence, Integer securityLevel)
+        throws SQLException {
+
         // We will not verify that they are valid entries in the registry
         // until update() is called.
         MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
         if (metadataField == null) {
-            throw new SQLException(
-                    "bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not " +
-                            "exist!");
+            throw new SQLException("bad_dublin_core schema=" + schema + "." + element + "." + qualifier
+                + ". Metadata field does not exist!");
         }
         //Set place to list length of all metadatavalues for the given schema.element.qualifier combination.
         // Subtract one to adhere to the 0 as first element rule
@@ -448,7 +448,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             metadataValue.setPlace(placeSupplier.get());
 
             metadataValue.setLanguage(lang == null ? null : lang.trim());
-            metadataValue.setSecurity_level(securityLevel);
+            metadataValue.setSecurityLevel(securityLevel);
             // Logic to set Authority and Confidence:
             //  - normalize an empty string for authority to NULL.
             //  - if authority key is present, use given confidence or NOVALUE if not given
@@ -499,8 +499,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     }
 
     @Override
-    public void addAndShiftRightSecuredMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                                                String value, String authority, int confidence, int index, Integer securitylevel) throws SQLException {
+    public void addAndShiftRightSecuredMetadata(Context context, T dso, String schema, String element, String qualifier,
+        String lang, String value, String authority, int confidence, int index, Integer securitylevel)
+        throws SQLException {
         List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
 
         int idx = 0;
@@ -1030,11 +1031,13 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     }
 
     @Override
-    public void replaceSecuredMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                                       String value, String authority, int confidence, int index, Integer securityLevel) throws SQLException {
+    public void replaceSecuredMetadata(Context context, T dso, String schema, String element, String qualifier,
+        String lang, String value, String authority, int confidence, int index, Integer securityLevel)
+        throws SQLException {
         List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
         removeMetadataValues(context, dso, Arrays.asList(list.get(index)));
-        addAndShiftRightSecuredMetadata(context, dso, schema, element, qualifier, lang, value, authority, confidence, index, securityLevel);
+        addAndShiftRightSecuredMetadata(context, dso, schema, element, qualifier, lang, value, authority, confidence,
+            index, securityLevel);
     }
 
     @Override

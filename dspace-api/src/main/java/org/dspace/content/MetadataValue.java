@@ -284,11 +284,11 @@ public class MetadataValue implements ReloadableEntity<Integer> {
         return getMetadataField().getQualifier();
     }
 
-    public Integer getSecurity_level() {
+    public Integer getSecurityLevel() {
         return securityLevel;
     }
 
-    public void setSecurity_level(Integer security_level) {
-        this.securityLevel = security_level;
+    public void setSecurityLevel(Integer securityLevel) {
+        this.securityLevel = securityLevel;
     }
 }

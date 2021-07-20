@@ -182,8 +182,9 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
                 if (ll.getSecurityLevel() != null) {
                     getDSpaceObjectService()
                             .addMetadataInPlaceSecured(context, source, metadata[0], metadata[1], metadata[2],
-                                    ll.getLanguage(), ll.getValue(), ll.getAuthority(), ll.getConfidence(), idx, ll.getSecurityLevel());
-                }else {
+                                    ll.getLanguage(), ll.getValue(), ll.getAuthority(), ll.getConfidence(),
+                                    idx, ll.getSecurityLevel());
+                } else {
                     getDSpaceObjectService()
                             .addMetadata(context, source, metadata[0], metadata[1], metadata[2],
                                     ll.getLanguage(), ll.getValue(), ll.getAuthority(), ll.getConfidence(), idx);

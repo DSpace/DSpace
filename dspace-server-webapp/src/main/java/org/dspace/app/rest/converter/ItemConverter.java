@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import javax.annotation.Resource;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -47,8 +49,6 @@ import org.dspace.layout.service.CrisLayoutBoxService;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 /**
  * This is the converter from/to the Item in the DSpace API data model and the
@@ -138,12 +138,13 @@ public class ItemConverter
             for (MetadataValue metadataValue : fullList) {
                 MetadataField metadataField = metadataValue.getMetadataField();
                 if (checkMetadataFieldVisibility(context, boxes, obj, metadataField)) {
-                    if (metadataValue.getSecurity_level() != null) {
-                        MetadataSecurityEvaluation  metadataSecurityEvaluation = mapBetweenSecurityLevelAndClassSecurityLevel(metadataValue.getSecurity_level());
+                    if (metadataValue.getSecurityLevel() != null) {
+                        MetadataSecurityEvaluation metadataSecurityEvaluation =
+                            mapBetweenSecurityLevelAndClassSecurityLevel( metadataValue.getSecurityLevel());
                         if (metadataSecurityEvaluation.allowMetadataFieldReturn(context, obj ,metadataField)) {
                             returnList.add(metadataValue);
                         }
-                    }else {
+                    } else {
                         returnList.add(metadataValue);
                     }
                 }

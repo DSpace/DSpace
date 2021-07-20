@@ -12,6 +12,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import com.lyncode.xoai.dataprovider.xml.xoai.Element;
+import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -25,8 +27,6 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.xoai.util.ItemUtils;
 
-import com.lyncode.xoai.dataprovider.xml.xoai.Element;
-import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 
 /**
  * XOAIExtensionItemCompilePlugin to calculate access right to the item
@@ -43,7 +43,7 @@ import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
  *
  */
 public class FulltextAccessElementItemCompilePlugin implements XOAIExtensionItemCompilePlugin {
-    
+
     @Override
     public Metadata additionalMetadata(Context context, Metadata metadata, Item item) {
         ResourcePolicyService rpServ = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
@@ -57,10 +57,11 @@ public class FulltextAccessElementItemCompilePlugin implements XOAIExtensionItem
             anonGroup = gServ.findByName(context, Group.ANONYMOUS);
             List<Bundle> bnds = item.getBundles(Constants.CONTENT_BUNDLE_NAME);
             Date now = new Date();
-            
+
             main: for (Bundle bnd : bnds) {
                 for (Bitstream b : bnd.getBitstreams()) {
-                    for (ResourcePolicy rp : rpServ.findByResouceUuidAndActionId(context, b.getID(), Constants.READ, 0, Integer.MAX_VALUE)) {
+                    for (ResourcePolicy rp : rpServ.findByResouceUuidAndActionId(context, b.getID(), Constants.READ, 0,
+                        Integer.MAX_VALUE)) {
                         if (rp.getGroup() != null && rp.getGroup().getID().equals(anonGroup.getID())) {
                             // we found an embargo or an openaccess bitstream
                             // exclude temporary access from computation
@@ -76,9 +77,8 @@ public class FulltextAccessElementItemCompilePlugin implements XOAIExtensionItem
                                     coarURI = "http://purl.org/coar/access_right/c_f1cf";
                                     euTermURI = "info:eu-repo/semantics/embargoedAccess";
                                     accessName = "embargoed access";
-                                    embargoEndDate = embargoEndDate == null?
-                                            rp.getEndDate():
-                                            (embargoEndDate.after(rp.getEndDate())?rp.getEndDate():embargoEndDate);
+                                    embargoEndDate = embargoEndDate == null ? rp.getEndDate()
+                                        : (embargoEndDate.after(rp.getEndDate()) ? rp.getEndDate() : embargoEndDate);
                                 }
                             }
                         } else if (embargoEndDate == null) {

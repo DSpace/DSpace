@@ -390,8 +390,9 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
     public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
                            String lang, String value, String authority, int confidence, int place) throws SQLException;
 
-    default public MetadataValue addMetadataInPlaceSecured(Context context, T dso, String schema, String element, String qualifier,
-                                                           String lang, String value, String authority, int confidence, int place, Integer securityValue) throws SQLException {
+    default public MetadataValue addMetadataInPlaceSecured(Context context, T dso, String schema, String element,
+        String qualifier, String lang, String value, String authority, int confidence, int place, Integer securityValue)
+        throws SQLException {
         return null;
     }
 
@@ -539,7 +540,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
                          String value, String authority, int confidence, int index) throws SQLException;
 
     void replaceSecuredMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                                String value, String authority, int confidence, int index, Integer securityLevel) throws SQLException;
+        String value, String authority, int confidence, int index, Integer securityLevel) throws SQLException;
 
     void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to)
         throws SQLException;
@@ -557,13 +558,15 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      */
     public void setMetadataModified(T dso);
 
-    default public List<MetadataValue> addSecuredMetadata(Context context, T dso, String schema, String element, String qualifier,
-                                                          String lang, String value, String authority, int confidence, Integer securityLevel) throws SQLException {
+    default public List<MetadataValue> addSecuredMetadata(Context context, T dso, String schema, String element,
+        String qualifier, String lang, String value, String authority, int confidence, Integer securityLevel)
+        throws SQLException {
         return null;
     }
 
-    default void addAndShiftRightSecuredMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                                                 String value, String authority, int confidence, int index, Integer securitylevel) throws SQLException {
+    default void addAndShiftRightSecuredMetadata(Context context, T dso, String schema, String element,
+        String qualifier, String lang, String value, String authority, int confidence, int index, Integer securitylevel)
+        throws SQLException {
 
     }
 }

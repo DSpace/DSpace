@@ -26,7 +26,7 @@ public class MetadataValueConverter implements DSpaceConverter<MetadataValue, Me
         metadataValueRest.setAuthority(metadataValue.getAuthority());
         metadataValueRest.setConfidence(metadataValue.getConfidence());
         metadataValueRest.setPlace(metadataValue.getPlace());
-        metadataValueRest.setSecurityLevel(metadataValue.getSecurity_level());
+        metadataValueRest.setSecurityLevel(metadataValue.getSecurityLevel());
         return metadataValueRest;
     }
 
