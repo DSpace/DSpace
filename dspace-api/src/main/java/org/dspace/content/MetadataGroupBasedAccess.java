@@ -1,10 +1,18 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.content;
+
+import java.sql.SQLException;
 
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.service.MetadataSecurityEvaluation;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.sql.SQLException;
 
 /**
  *
@@ -29,7 +37,8 @@ public class MetadataGroupBasedAccess implements MetadataSecurityEvaluation {
      */
 
     @Override
-    public boolean allowMetadataFieldReturn(Context context, Item item, MetadataField metadataField) throws SQLException {
+    public boolean allowMetadataFieldReturn(Context context, Item item, MetadataField metadataField)
+        throws SQLException {
         // returns true only if the user is part of the group
         return context != null && authorizeService.isPartOfTheGroup(context, getEgroup());
     }

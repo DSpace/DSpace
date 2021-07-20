@@ -46,7 +46,7 @@ public abstract class MetadataValueReplacePatchOperation<DSO extends DSpaceObjec
             getDSpaceObjectService().replaceSecuredMetadata(context, source, metadata[0], metadata[1], metadata[2],
                     object.getLanguage(), object.getValue(), object.getAuthority(),
                     object.getConfidence(), index, object.getSecurityLevel());
-        }else {
+        } else {
             getDSpaceObjectService().replaceMetadata(context, source, metadata[0], metadata[1], metadata[2],
                     object.getLanguage(), object.getValue(), object.getAuthority(),
                     object.getConfidence(), index);

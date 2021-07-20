@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.content;
@@ -67,7 +67,7 @@ public class MetadataValueServiceImpl implements MetadataValueService {
 
     @Override
     public List<MetadataValue> findByField(Context context, MetadataField metadataField)
-            throws IOException, SQLException {
+        throws IOException, SQLException {
         return metadataValueDAO.findByField(context, metadataField);
     }
 
@@ -81,17 +81,17 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     public void update(Context context, MetadataValue metadataValue) throws SQLException {
         metadataValueDAO.save(context, metadataValue);
         log.info(LogManager.getHeader(context, "update_metadatavalue",
-                "metadata_value_id=" + metadataValue.getID()));
+                                      "metadata_value_id=" + metadataValue.getID()));
 
     }
 
     @Override
     public void update(Context context, MetadataValue metadataValue, boolean updateLastModified)
-            throws SQLException, AuthorizeException {
+        throws SQLException, AuthorizeException {
         if (updateLastModified) {
             authorizeService.authorizeAction(context, metadataValue.getDSpaceObject(), Constants.WRITE);
             DSpaceObjectService<DSpaceObject> dSpaceObjectService = contentServiceFactory
-                    .getDSpaceObjectService(metadataValue.getDSpaceObject());
+                .getDSpaceObjectService(metadataValue.getDSpaceObject());
             // get the right class for our dspaceobject not the DSpaceObject lazy proxy
             DSpaceObject dso = dSpaceObjectService.find(context, metadataValue.getDSpaceObject().getID());
             dSpaceObjectService.updateLastModified(context, dso);
@@ -103,7 +103,7 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     @Override
     public void delete(Context context, MetadataValue metadataValue) throws SQLException {
         log.info(LogManager.getHeader(context, "delete_metadata_value",
-                " metadata_value_id=" + metadataValue.getID()));
+                                      " metadata_value_id=" + metadataValue.getID()));
         metadataValueDAO.delete(context, metadataValue);
     }
 
@@ -119,15 +119,13 @@ public class MetadataValueServiceImpl implements MetadataValueService {
 
     @Override
     public MetadataValue getMinimum(Context context, int metadataFieldId)
-            throws SQLException {
+        throws SQLException {
         return metadataValueDAO.getMinimum(context,
-                metadataFieldId);
+                                           metadataFieldId);
     }
 
     @Override
     public int countTotal(Context context) throws SQLException {
         return metadataValueDAO.countRows(context);
     }
-
-
 }

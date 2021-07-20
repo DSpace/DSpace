@@ -146,7 +146,8 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
                     metadataField.getElement(), metadataField.getQualifier(), Item.ANY);
             dsoService.addAndShiftRightMetadata(context, dso, metadataField.getMetadataSchema().getName(),
                     metadataField.getElement(), metadataField.getQualifier(), metadataValue.getLanguage(),
-                    metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence(), metadataValue.getSecurityLevel());
+                    metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence(),
+                    metadataValue.getSecurityLevel());
         } catch (SQLException e) {
             throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataOperation.replace trying to " +
                     "remove and replace metadata from dso.", e);
@@ -180,7 +181,7 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
                 existingMdv.setLanguage(metadataValue.getLanguage());
                 existingMdv.setValue(metadataValue.getValue());
                 dsoService.setMetadataModified(dso);
-                existingMdv.setSecurity_level(metadataValue.getSecurityLevel());
+                existingMdv.setSecurityLevel(metadataValue.getSecurityLevel());
             } else {
                 throw new UnprocessableEntityException("There is no metadata of this type at that index");
             }

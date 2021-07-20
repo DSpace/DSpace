@@ -40,8 +40,7 @@
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
     </bean>
 
-    <bean name="org.dspace.core.DBConnection" class="org.dspace.core.HibernateDBConnection" lazy-init="true"
-          scope="prototype"/>
+    <bean name="org.dspace.core.DBConnection" class="org.dspace.core.HibernateDBConnection" lazy-init="true" scope="prototype"/>
 
     <!-- Register all our Flyway callback classes (which run before/after database migrations) -->
     <bean class="org.dspace.storage.rdbms.RegistryUpdater"/>
@@ -62,22 +61,22 @@
         <constructor-arg>
             <map>
                 <entry key="submitter">
-                    <bean class="org.dspace.content.template.generator.SubmitterValueGenerator"/>
+                    <bean class="org.dspace.content.template.generator.SubmitterValueGenerator" />
                 </entry>
                 <entry key="date">
-                    <bean class="org.dspace.content.template.generator.DateValueGenerator"/>
+                    <bean class="org.dspace.content.template.generator.DateValueGenerator" />
                 </entry>
                 <entry key="identifier">
-                    <bean class="org.dspace.content.template.generator.IdentifierValueGenerator"/>
+                    <bean class="org.dspace.content.template.generator.IdentifierValueGenerator" />
                 </entry>
                 <entry key="group">
-                    <bean class="org.dspace.content.template.generator.GroupValueGenerator"/>
+                    <bean class="org.dspace.content.template.generator.GroupValueGenerator" />
                 </entry>
                 <entry key="eperson">
-                    <bean class="org.dspace.content.template.generator.EPersonValueGenerator"/>
+                    <bean class="org.dspace.content.template.generator.EPersonValueGenerator" />
                 </entry>
                 <entry key="currentuser">
-                    <bean class="org.dspace.content.template.generator.CurrentUserValueGenerator"/>
+                    <bean class="org.dspace.content.template.generator.CurrentUserValueGenerator" />
                 </entry>
             </map>
         </constructor-arg>

@@ -1,4 +1,14 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.content;
+
+import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.service.AuthorizeService;
@@ -6,21 +16,19 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSecurityEvaluation;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.function.Predicate;
 
 /**
  *
  * @author Alba Aliu
  */
 public class MetadataAdministratorAndOwnerAccess implements MetadataSecurityEvaluation {
+
     @Autowired
     private AuthorizeService authorizeService;
-    @Autowired
-    private   DSpaceObjectServiceImpl<Item> dSpaceObjectServiceImpl;
+
     @Autowired
     private ItemService itemService;
+
     /**
      *
      * @return true/false if the user can/'t see the metadata
@@ -29,12 +37,15 @@ public class MetadataAdministratorAndOwnerAccess implements MetadataSecurityEval
      * @param metadataField The metadata field related with a metadata value
      */
     @Override
-    public boolean allowMetadataFieldReturn(Context context, Item item, MetadataField metadataField) throws SQLException {
+    public boolean allowMetadataFieldReturn(Context context, Item item, MetadataField metadataField)
+        throws SQLException {
+
         if (context != null && authorizeService.isAdmin(context)) {
             List<MetadataValue> owners = itemService.getMetadataByMetadataString(item, "cris.owner");
-            Predicate<MetadataValue> checkOwner = v -> StringUtils.equals(v.getAuthority(), context.getCurrentUser().id+"");
-            return owners.stream().anyMatch(checkOwner);
+            return owners.stream()
+                .anyMatch(v -> StringUtils.equals(v.getAuthority(), context.getCurrentUser().id + ""));
         }
+
         return false;
     }
 }

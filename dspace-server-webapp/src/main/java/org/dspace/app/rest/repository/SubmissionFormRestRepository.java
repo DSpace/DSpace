@@ -101,5 +101,4 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
             inputReaders.put(locale, new DCInputsReader(I18nUtil.getInputFormsFileName(locale)));
         }
     }
-
 }

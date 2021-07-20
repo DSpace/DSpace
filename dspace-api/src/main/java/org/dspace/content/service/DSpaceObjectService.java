@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.content.service;
@@ -57,7 +57,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * Generic find for when the precise type of an Entity is not known
      *
      * @param context - the context
-     * @param uuid    - uuid within table of typed dspace objects
+     * @param uuid      - uuid within table of typed dspace objects
      * @return the dspace object found, or null if it does not exist.
      * @throws SQLException only upon failure accessing the database.
      */
@@ -138,19 +138,19 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * Passing in <code>DSpaceObject.ANY</code>
      * retrieves all metadata fields with any value for the qualifier or
      * language, including <code>null</code>
-     * <p>
+     * <P>
      * Examples:
-     * <p>
+     * <P>
      * Return values of the unqualified "title" field, in any language.
      * Qualified title fields (e.g. "title.uniform") are NOT returned:
-     * <p>
+     * <P>
      * <code>dspaceobject.getMetadataByMetadataString("dc", "title", null, DSpaceObject.ANY );</code>
-     * <p>
+     * <P>
      * Return all US English values of the "title" element, with any qualifier
      * (including unqualified):
-     * <p>
+     * <P>
      * <code>dspaceobject.getMetadataByMetadataString("dc, "title", DSpaceObject.ANY, "en_US" );</code>
-     * <p>
+     * <P>
      * The ordering of values of a particular element/qualifier/language
      * combination is significant. When retrieving with wildcards, values of a
      * particular element/qualifier/language combinations will be adjacent, but
@@ -200,29 +200,27 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Get the value(s) of a metadata field.
-     *
      * @param dSpaceObject the object whose metadata are sought.
-     * @param mdString     the name of the field:  {@code schema.element.qualifier}.
-     * @param authority    name of the authority which controls these values, or null.
+     * @param mdString the name of the field:  {@code schema.element.qualifier}.
+     * @param authority name of the authority which controls these values, or null.
      * @return all matching metadata values, or null if none.
      */
     public List<MetadataValue> getMetadata(T dSpaceObject, String mdString, String authority);
 
     /**
      * Get the value(s) of a metadata field.
-     *
      * @param dSpaceObject the object whose metadata are sought.
-     * @param schema       name of the schema which defines the field.
-     * @param element      the field's element name.
-     * @param qualifier    the field's qualifier name, or null.
-     * @param lang         the language of the requested field value(s),
-     *                     null if explicitly no language,
-     *                     or {@link org.dspace.content.Item.ANY} to match all languages.
-     * @param authority    name of the authority which controls these values, or null.
+     * @param schema name of the schema which defines the field.
+     * @param element the field's element name.
+     * @param qualifier the field's qualifier name, or null.
+     * @param lang the language of the requested field value(s),
+     *              null if explicitly no language,
+     *              or {@link org.dspace.content.Item.ANY} to match all languages.
+     * @param authority name of the authority which controls these values, or null.
      * @return value(s) of the indicated field for the given DSO, or null.
      */
     public List<MetadataValue> getMetadata(T dSpaceObject, String schema,
-                                           String element, String qualifier, String lang, String authority);
+            String element, String qualifier, String lang, String authority);
 
     /**
      * Add metadata fields. These are appended to existing values.
@@ -248,7 +246,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @throws SQLException if database error
      */
     public List<MetadataValue> addMetadata(Context context, T dso, String schema, String element, String qualifier,
-                                           String lang, List<String> values) throws SQLException;
+                            String lang, List<String> values) throws SQLException;
 
     /**
      * Add metadata fields. These are appended to existing values.
@@ -272,8 +270,8 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @throws SQLException if database error
      */
     public List<MetadataValue> addMetadata(Context context, T dso, String schema, String element, String qualifier,
-                                           String lang, List<String> values, List<String> authorities, List<Integer> confidences)
-            throws SQLException;
+                            String lang, List<String> values, List<String> authorities, List<Integer> confidences)
+        throws SQLException;
 
     /**
      * Add metadata fields. These are appended to existing values.
@@ -293,7 +291,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @throws SQLException if database error
      */
     public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
-                                           List<String> values, List<String> authorities, List<Integer> confidences) throws SQLException;
+                       List<String> values, List<String> authorities, List<Integer> confidences) throws SQLException;
 
     /**
      * Shortcut for {@link #addMetadata(Context, DSpaceObject, MetadataField, String, List, List, List)} when a single
@@ -312,7 +310,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @throws SQLException
      */
     public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language,
-                                     String value, String authority, int confidence) throws SQLException;
+           String value, String authority, int confidence) throws SQLException;
 
     /**
      * Add a metadatafield. These are appended to existing values.
@@ -324,12 +322,12 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @param language      the ISO639 language code, optionally followed by an underscore
      *                      and the ISO3166 country code. <code>null</code> means the
      *                      value has no language (for example, a date).
-     * @param value         the value to add.
+     * @param value        the value to add.
      * @return the MetadataValue added ot the object
      * @throws SQLException if database error
      */
     public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language, String value)
-            throws SQLException;
+        throws SQLException;
 
     /**
      * Add a metadatafields. These are appended to existing values.
@@ -346,7 +344,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @throws SQLException if database error
      */
     public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String language,
-                                           List<String> values) throws SQLException;
+                       List<String> values) throws SQLException;
 
     /**
      * Add a single metadata field. This is appended to existing
@@ -367,7 +365,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @throws SQLException if database error
      */
     public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
-                                     String lang, String value) throws SQLException;
+                             String lang, String value) throws SQLException;
 
     /**
      * Add a single metadata value at the given place position.
@@ -390,10 +388,11 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @throws SQLException if database error
      */
     public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
-                                     String lang, String value, String authority, int confidence, int place) throws SQLException;
+                           String lang, String value, String authority, int confidence, int place) throws SQLException;
 
-    default public MetadataValue addMetadataInPlaceSecured(Context context, T dso, String schema, String element, String qualifier,
-                                                           String lang, String value, String authority, int confidence, int place, Integer securityValue) throws SQLException {
+    default public MetadataValue addMetadataInPlaceSecured(Context context, T dso, String schema, String element,
+        String qualifier, String lang, String value, String authority, int confidence, int place, Integer securityValue)
+        throws SQLException {
         return null;
     }
 
@@ -418,8 +417,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @throws SQLException if database error
      */
     public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
-                                     String lang, String value, String authority, int confidence) throws SQLException;
-
+                           String lang, String value, String authority, int confidence) throws SQLException;
 
     /**
      * Clear metadata values. As with <code>getDC</code> above,
@@ -445,27 +443,25 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @throws SQLException if database error
      */
     public void clearMetadata(Context context, T dso, String schema, String element, String qualifier, String lang)
-            throws SQLException;
+        throws SQLException;
 
     public void removeMetadataValues(Context context, T dso, List<MetadataValue> values) throws SQLException;
 
     /**
      * Get the first value of a metadata field.
-     *
-     * @param dso       the object whose metadata are sought.
-     * @param schema    name of the schema which defines the field.
-     * @param element   element name of the field.
+     * @param dso the object whose metadata are sought.
+     * @param schema name of the schema which defines the field.
+     * @param element element name of the field.
      * @param qualifier qualifier name of the field, or null.
-     * @param language  select only values in this language.
+     * @param language select only values in this language.
      * @return first value of the field, or null if none.
      */
     public String getMetadataFirstValue(T dso, String schema, String element, String qualifier, String language);
 
     /**
      * Get the first value of a metadata field.
-     *
-     * @param dso      the object whose metadata are sought.
-     * @param field    {schema, element, qualifier} for the desired field.
+     * @param dso the object whose metadata are sought.
+     * @param field {schema, element, qualifier} for the desired field.
      * @param language select only values in this language.
      * @return first value of the field, or null if none.
      */
@@ -496,19 +492,19 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
     /**
      * Set first metadata field value
      *
-     * @param context  DSpace context
-     * @param dso      DSpaceObject
-     * @param field    {schema, element, qualifier} for the desired field.
-     * @param language the ISO639 language code, optionally followed by an underscore
-     *                 and the ISO3166 country code. <code>null</code> means only
-     *                 values with no language are removed, and <code>Item.ANY</code>
-     *                 means values with any country code or no country code are
-     *                 removed.
-     * @param value    metadata value
+     * @param context   DSpace context
+     * @param dso       DSpaceObject
+     * @param field     {schema, element, qualifier} for the desired field.
+     * @param language  the ISO639 language code, optionally followed by an underscore
+     *                  and the ISO3166 country code. <code>null</code> means only
+     *                  values with no language are removed, and <code>Item.ANY</code>
+     *                  means values with any country code or no country code are
+     *                  removed.
+     * @param value     metadata value
      * @throws SQLException if database error
      */
     public void setMetadataSingleValue(Context context, T dso,
-                                       MetadataFieldName field, String language, String value)
+            MetadataFieldName field, String language, String value)
             throws SQLException;
 
     public void updateLastModified(Context context, T dso) throws SQLException, AuthorizeException;
@@ -544,10 +540,10 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
                          String value, String authority, int confidence, int index) throws SQLException;
 
     void replaceSecuredMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                                String value, String authority, int confidence, int index, Integer securityLevel) throws SQLException;
+        String value, String authority, int confidence, int index, Integer securityLevel) throws SQLException;
 
     void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to)
-            throws SQLException;
+        throws SQLException;
 
     /**
      * Returns the Constants which this service supports
@@ -558,18 +554,19 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Trigger the modifiedMetadata variable in DSpaceObject
-     *
-     * @param dso DSpaceObject whose metadata has been modified
+     * @param dso   DSpaceObject whose metadata has been modified
      */
     public void setMetadataModified(T dso);
 
-    default public List<MetadataValue> addSecuredMetadata(Context context, T dso, String schema, String element, String qualifier,
-                                                          String lang, String value, String authority, int confidence, Integer securityLevel) throws SQLException {
+    default public List<MetadataValue> addSecuredMetadata(Context context, T dso, String schema, String element,
+        String qualifier, String lang, String value, String authority, int confidence, Integer securityLevel)
+        throws SQLException {
         return null;
     }
 
-    default void addAndShiftRightSecuredMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                                                 String value, String authority, int confidence, int index, Integer securitylevel) throws SQLException {
+    default void addAndShiftRightSecuredMetadata(Context context, T dso, String schema, String element,
+        String qualifier, String lang, String value, String authority, int confidence, int index, Integer securitylevel)
+        throws SQLException {
 
     }
 }

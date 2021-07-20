@@ -2087,6 +2087,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                      )));
 
     }
+
     @Test
     public void configurationContainLayoutSecurityWithNestedFieldAdministratorTest() throws Exception {
         context.turnOffAuthorisationSystem();
