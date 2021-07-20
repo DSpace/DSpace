@@ -20,9 +20,9 @@
         <entry key="1" value-ref="level1Security"/>
         <entry key="2" value-ref="level2Security"/>
     </util:map>
-    <bean id ="level0Security" name="level0Security" class="org.dspace.content.MetadataSecurityEvaluationLevel0"/>
-    <bean id ="level1Security" name="level1Security" class="org.dspace.content.MetadataSecurityEvaluationLevel1">
+    <bean id ="level0Security" name="level0Security" class="org.dspace.content.MetadataPublicAccess"/>
+    <bean id ="level1Security" name="level1Security" class="org.dspace.content.MetadataGroupBasedAccess">
         <property name="egroup" value="Trusted"/>
     </bean>
-    <bean  id ="level2Security" name="level2Security" class="org.dspace.content.MetadataSecurityEvaluationLevel2"/>
+    <bean  id ="level2Security" name="level2Security" class="org.dspace.content.MetadataAdministratorAndOwnerAccess"/>
 </beans>
