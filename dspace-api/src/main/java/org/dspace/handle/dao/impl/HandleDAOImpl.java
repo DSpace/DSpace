@@ -84,6 +84,23 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
     }
 
     @Override
+    public List<Handle> findByVersion(Context context, String prefix) throws SQLException {
+        Query query = createQuery(context,
+            "select h " +
+            "from Handle h, DSpaceObject dso, Version v " +
+            "where h.dso = dso.id " +
+            "and v.item = dso.id " +
+            "and h.handle like :handle " +
+            "order by v.versionDate desc "
+            );
+
+        query.setParameter("handle", prefix + "%");
+
+        query.setCacheable(true);
+        return list(query);
+    }
+
+    @Override
     public long countHandlesByPrefix(Context context, String prefix) throws SQLException {
         Criteria criteria = createCriteria(context, Handle.class);
         criteria.add(Restrictions.like("handle", prefix + "%"));

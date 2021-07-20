@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.SiteService;
+import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.dao.HandleDAO;
@@ -45,6 +46,9 @@ public class HandleServiceImpl implements HandleService
     /** Prefix registered to no one */
     static final String EXAMPLE_PREFIX = "123456789";
 
+    /** Initial version suffix  */
+    private static String INITIAL_VERSION_SUFFIX = "";
+
     @Autowired(required = true)
     protected HandleDAO handleDAO;
 
@@ -57,13 +61,14 @@ public class HandleServiceImpl implements HandleService
     /** Public Constructor */
     protected HandleServiceImpl()
     {
+
     }
 
     @Override
     public String resolveToURL(Context context, String handle)
             throws SQLException
     {
-        Handle dbhandle = findHandleInternal(context, handle);
+        Handle dbhandle = findHandleInternal(context, handle, true);
 
         if (dbhandle == null)
         {
@@ -111,7 +116,7 @@ public class HandleServiceImpl implements HandleService
         {
             handle = handle.substring(1);
         }
-        Handle dbhandle = findHandleInternal(context, handle);
+        Handle dbhandle = findHandleInternal(context, handle, true);
 
         return (null == dbhandle) ? null : handle;
     }
@@ -142,7 +147,7 @@ public class HandleServiceImpl implements HandleService
             throws SQLException
     {
         Handle handle = handleDAO.create(context, new Handle());
-        String handleId = createId(context);
+        String handleId = createId(context, dso);
 
         handle.setHandle(handleId);
         handle.setDSpaceObject(dso);
@@ -171,7 +176,7 @@ public class HandleServiceImpl implements HandleService
                                String suppliedHandle, boolean force) throws SQLException, IllegalStateException
     {
         //Check if the supplied handle is already in use -- cannot use the same handle twice
-        Handle handle = findHandleInternal(context, suppliedHandle);
+        Handle handle = findHandleInternal(context, suppliedHandle, false);
         if(handle!=null && handle.getDSpaceObject() != null)
         {
             //Check if this handle is already linked up to this specified DSpace Object
@@ -258,7 +263,14 @@ public class HandleServiceImpl implements HandleService
     public DSpaceObject resolveToObject(Context context, String handle)
             throws IllegalStateException, SQLException
     {
-        Handle dbhandle = findHandleInternal(context, handle);
+        return resolveToObject(context, handle, true);
+    }
+
+    @Override
+    public DSpaceObject resolveToObject(Context context, String handle, boolean fallbackResolvingToMostRecentVersion)
+            throws IllegalStateException, SQLException
+    {
+        Handle dbhandle = findHandleInternal(context, handle, fallbackResolvingToMostRecentVersion);
         // check if handle was allocated previously, but is currently not
         // associated with a DSpaceObject
         // (this may occur when 'unbindHandle()' is called for an obj that was removed)
@@ -336,7 +348,7 @@ public class HandleServiceImpl implements HandleService
 
     @Override
     public void modifyHandleDSpaceObject(Context context, String handle, DSpaceObject newOwner) throws SQLException {
-        Handle dbHandle = findHandleInternal(context, handle);
+        Handle dbHandle = findHandleInternal(context, handle, false);
         if(dbHandle != null)
         {
             // Check if we have to remove the handle from the current handle list
@@ -383,11 +395,14 @@ public class HandleServiceImpl implements HandleService
      *            DSpace context
      * @param handle
      *            The handle to resolve
+     * @param fallbackResolvingToMostRecentVersion
+     *            When set to true, resolving a non-versioned handle prefix/suffix will fall back to the most recent version, if the specified handle does not exist in its verbatim form.
+     *            Supply true value only in handle resolving context. Supply false value e.g. for exsistence checks upon handle creation.
      * @return The database row corresponding to the handle
      * @exception SQLException
      *                If a database error occurs
      */
-    protected Handle findHandleInternal(Context context, String handle)
+    protected Handle findHandleInternal(Context context, String handle, boolean fallbackResolvingToMostRecentVersion)
             throws SQLException
     {
         if (handle == null)
@@ -395,7 +410,30 @@ public class HandleServiceImpl implements HandleService
             throw new IllegalArgumentException("Handle is null");
         }
 
-        return handleDAO.findByHandle(context, handle);
+        INITIAL_VERSION_SUFFIX = configurationService.getProperty("dspace.initialVersionSuffix", "");
+
+        // search the handle string as is
+        Handle tempHandle = handleDAO.findByHandle(context, handle);
+
+        // if there is no handle found AND we currently do not creating a new version ... 
+        if (tempHandle == null && fallbackResolvingToMostRecentVersion) {
+            List<Handle> tempHandleList;
+            // ... then try to find the most recent DSO within the versions
+            tempHandleList = handleDAO.findByVersion(context, handle);
+
+            // if there is no DSO with this handle within the versions ...
+            if ( (tempHandleList == null) || (tempHandleList.isEmpty()) ) {
+                // ... then give it a last try appending a version string of ".1"
+                return handleDAO.findByHandle(context, handle + INITIAL_VERSION_SUFFIX);
+            }
+            else {
+                // findByVersion returns the DSO list in descending order by version date field
+                return tempHandleList.get(0);
+            }
+        }
+        else {
+           return tempHandle;
+        }
     }
 
     /**
@@ -406,15 +444,23 @@ public class HandleServiceImpl implements HandleService
      * @exception SQLException
      *                If a database error occurs
      */
-    protected String createId(Context context) throws SQLException
+    protected String createId(Context context, DSpaceObject dso) throws SQLException
     {
+        INITIAL_VERSION_SUFFIX = configurationService.getProperty("dspace.initialVersionSuffix", "");
+
         // Get configured prefix
         String handlePrefix = getPrefix();
 
         // Get next available suffix (as a Long, since DSpace uses an incrementing sequence)
         Long handleSuffix = handleDAO.getNextHandleSuffix(context);
 
-        return handlePrefix + (handlePrefix.endsWith("/") ? "" : "/") + handleSuffix.toString();
+        String strHandle = handlePrefix + (handlePrefix.endsWith("/") ? "" : "/") + handleSuffix.toString();
+
+        if (dso instanceof Item) {
+            strHandle += INITIAL_VERSION_SUFFIX;
+        }
+
+        return strHandle;
     }
 
     @Override

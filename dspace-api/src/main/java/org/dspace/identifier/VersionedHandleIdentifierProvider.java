@@ -413,8 +413,9 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
             identifier = identifier.concat(String.valueOf(DOT)).concat(String.valueOf(versionNumber));
         }
 
+        // in case of creating new version we do not need try to find handles without version numbers
         // Ensure this handle does not exist already.
-        if (handleService.resolveToObject(context, identifier) == null)
+        if (handleService.resolveToObject(context, identifier, false) == null)
         {
              handleService.createHandle(context, dso, identifier);
         }
@@ -422,6 +423,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         {
             throw new IllegalStateException("A versioned handle is used for another version already!");
         }
+
         return identifier;
     }
     
