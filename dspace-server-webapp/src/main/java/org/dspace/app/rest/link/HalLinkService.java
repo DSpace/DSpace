@@ -114,9 +114,9 @@ public class HalLinkService {
         HALResource<? extends RestAddressableModel> resource = (HALResource<RestAddressableModel>) halResource;
         // Remove original links and replace them with the links with the optional added projection query params
         Links originalLinks = resource.getLinks();
-        resource.removeLinks();
         Projection projection = resource.getContent().getProjection();
         List<LinkRest> linkRests = utils.getLinkRests(resource.getContent().getClass());
+        resource.removeLinks();
         for (Link link : originalLinks) {
             try {
                 LinkRestRepository linkRepository = null;
