@@ -7,7 +7,6 @@
  */
 package org.dspace.browse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -409,7 +408,7 @@ public class BrowseEngine
             // get the table name that we are going to be getting our data from
             // this is the distinct table constrained to either community or collection
             dao.setTable(browseIndex.getDistinctTableName());
-            dao.setStartsWith("0".equals(scope.getStartsWith()) && !scope.getOrder().equals("ASC") ? "9" : StringUtils.lowerCase(scope.getStartsWith()));
+            dao.setStartsWith("0".equals(scope.getStartsWith()) && !scope.getOrder().equals("ASC") ? "9" : normalizeJumpToValue(scope.getStartsWith()));
             // remind the DAO that this is a distinct value browse, so it knows what sort
             // of query to build
             dao.setDistinct(true);
