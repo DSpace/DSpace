@@ -7,6 +7,8 @@
  */
 package org.dspace.builder;
 
+import static org.dspace.content.authority.Choices.CF_UNSET;
+
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -70,7 +72,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
                                                                                    final String qualifier,
                                                                                    final String value,
                                                                                    final Integer securityLevel) {
-        return addSecuredMetadataValue(dso, schema, element, qualifier, null, value, null, Choices.CF_UNSET, securityLevel);
+        return addSecuredMetadataValue(dso, schema, element, qualifier, null, value, null, CF_UNSET, securityLevel);
     }
 
     protected <B extends AbstractDSpaceObjectBuilder<T>> B addMetadataValue(final T dso, final String schema,
@@ -105,7 +107,8 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
                                                                                    final int confidence,
                                                                                    final Integer securityLevel) {
         try {
-            getService().addSecuredMetadata(context, dso, schema, element, qualifier, language, value, authority, confidence, securityLevel);
+            getService().addSecuredMetadata(context, dso, schema, element, qualifier, language, value, authority,
+                confidence, securityLevel);
         } catch (Exception e) {
             return handleException(e);
         }
