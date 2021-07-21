@@ -47,6 +47,8 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -63,6 +65,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
     @Autowired
     private BitstreamFormatService bitstreamFormatService;
 
+    @Autowired
+    private GroupService groupService;
     @Test
     public void findAllTest() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
@@ -1692,5 +1696,574 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/thumbnail"))
                    .andExpect(status().isNoContent());
     }
+
+    @Test
+    public void findByHandleAndFileNameForPublicItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                                                createBitstream(context, publicItem1, is)
+                                        .withName("Bitstream1")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+
+        bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                                                 createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream2")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", publicItem1.getHandle())
+                                    .param("filename", "Bitstream1")
+        )
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$",
+                                       BitstreamMatcher.matchProperties(bitstream1)
+                   ));
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", publicItem1.getHandle())
+                                    .param("filename", "Bitstream2")
+        )
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$",
+                                       BitstreamMatcher.matchProperties(bitstream2)
+                   ));
+    }
+
+    @Test
+    public void findByHandleAndFileNameForEmbargoItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item embargoItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withEmbargoPeriod("6 months")
+                                      .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                                                createBitstream(context, embargoItem1, is)
+                                        .withName("Bitstream1")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+
+        Group group = groupService.findByName(context, Group.ANONYMOUS);
+
+        bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                                                 createBitstream(context, embargoItem1, is)
+                                         .withName("Bitstream2")
+                                         .withMimeType("text/plain")
+                                         .withReaderGroup(group)
+                                         .build();
+        }
+
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", embargoItem1.getHandle())
+                                    .param("filename", "Bitstream1")
+        )
+                   .andExpect(status().isNoContent());
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        String admintoken = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", embargoItem1.getHandle())
+                                    .param("filename", "Bitstream1")
+        )
+                   .andExpect(status().isNoContent());
+
+        getClient(admintoken).perform(get("/api/core/bitstreams/search/byItemHandle")
+                                         .param("handle", embargoItem1.getHandle())
+                                         .param("filename", "Bitstream1")
+        )
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(contentType))
+                             .andExpect(jsonPath("$",
+                                                 BitstreamMatcher.matchProperties(bitstream1)
+                             ));
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", embargoItem1.getHandle())
+                                    .param("filename", "Bitstream2")
+        )
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$",
+                                       BitstreamMatcher.matchProperties(bitstream2)
+                   ));
+    }
+    @Test
+    public void findByHandleAndFileNameForPrivateItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item privateItem1 = ItemBuilder.createItem(context, col1)
+                                       .withTitle("Test")
+                                       .withIssueDate("2010-10-17")
+                                       .withAuthor("Smith, Donald")
+                                       .makeUnDiscoverable()
+                                       .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                                                createBitstream(context, privateItem1, is)
+                                        .withName("Bitstream1")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+
+        bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                                                 createBitstream(context, privateItem1, is)
+                                         .withName("Bitstream2")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", privateItem1.getHandle())
+                                    .param("filename", "Bitstream1")
+        )
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$",
+                           BitstreamMatcher.matchProperties(bitstream1)
+                   ));
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", privateItem1.getHandle())
+                                    .param("filename", "Bitstream2")
+        )
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$",
+                           BitstreamMatcher.matchProperties(bitstream2)
+                   ));
+    }
+
+    @Test
+    public void findByHandleAndFileNameForPublicItemWithSameFileName() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                                                 createBitstream(context, publicItem1, is)
+                                         .withName("BitstreamName")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                                                 createBitstream(context, publicItem1, is)
+                                         .withName("BitstreamName")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", publicItem1.getHandle())
+                                    .param("sequence", String.valueOf(bitstream1.getSequenceID()))
+        )
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$",
+                                       BitstreamMatcher.matchProperties(bitstream1)
+                   ));
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", publicItem1.getHandle())
+                                    .param("sequence", String.valueOf(bitstream2.getSequenceID()))
+
+        )
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$",
+                                       BitstreamMatcher.matchProperties(bitstream2)
+                   ));
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", publicItem1.getHandle())
+                                    .param("filename", "BitstreamName")
+        )
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$",
+                                       BitstreamMatcher.matchProperties(bitstream1)
+                   ));
+    }
+
+    @Test
+    public void findByHandleAndFileNameForPublicItemInLicenseBundle() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .build();
+
+        Bundle license = BundleBuilder.createBundle(context, publicItem1)
+                                      .withName("LICENSE")
+                                      .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                                                 createBitstream(context, license, is)
+                                         .withName("BitstreamName")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", publicItem1.getHandle())
+                                    .param("sequence", String.valueOf(bitstream1.getSequenceID()))
+        )
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$",
+                                       BitstreamMatcher.matchProperties(bitstream1)
+                   ));
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", publicItem1.getHandle())
+                                    .param("filename", "BitstreamName")
+        )
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$",
+                                       BitstreamMatcher.matchProperties(bitstream1)
+                   ));
+    }
+
+    @Test
+    public void findByHandleAndFileNameForPublicItemWithCorrectSequenceButWrongName() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .build();
+
+        Bundle license = BundleBuilder.createBundle(context, publicItem1)
+                                      .withName("LICENSE")
+                                      .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                                                 createBitstream(context, license, is)
+                                         .withName("BitstreamName")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", publicItem1.getHandle())
+                                    .param("sequence", String.valueOf(bitstream1.getSequenceID()))
+                                    .param("filename", "WrongBitstreamName")
+
+        )
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$",
+                                       BitstreamMatcher.matchProperties(bitstream1)
+                   ));
+    }
+
+    @Test
+    public void findByHandleAndFileNameForPublicItemWithFaultyHandle() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .build();
+
+        Bundle license = BundleBuilder.createBundle(context, publicItem1)
+                                      .withName("LICENSE")
+                                      .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                                                 createBitstream(context, license, is)
+                                         .withName("BitstreamName")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("sequence", String.valueOf(bitstream1.getSequenceID()))
+                                    .param("filename", "WrongBitstreamName")
+
+        )
+                   .andExpect(status().isBadRequest());
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", "123456789/999999999999")
+                                    .param("sequence", String.valueOf(bitstream1.getSequenceID()))
+                                    .param("filename", "WrongBitstreamName")
+
+        )
+                   .andExpect(status().isUnprocessableEntity());
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", parentCommunity.getHandle())
+                                    .param("sequence", String.valueOf(bitstream1.getSequenceID()))
+                                    .param("filename", "WrongBitstreamName")
+
+        )
+                   .andExpect(status().isUnprocessableEntity());
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", col1.getHandle())
+                                    .param("sequence", String.valueOf(bitstream1.getSequenceID()))
+                                    .param("filename", "WrongBitstreamName")
+
+        )
+                   .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    @Test
+    public void findByHandleAndFileNameForPublicItemNoFileNameOrSequence() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .build();
+
+        Bundle license = BundleBuilder.createBundle(context, publicItem1)
+                                      .withName("LICENSE")
+                                      .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                                                 createBitstream(context, license, is)
+                                         .withName("BitstreamName")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", publicItem1.getHandle())
+        )
+                   .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void findByHandleAndFileNameForPublicItemNoContent() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .build();
+
+        Bundle license = BundleBuilder.createBundle(context, publicItem1)
+                                      .withName("LICENSE")
+                                      .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                                                 createBitstream(context, license, is)
+                                         .withName("BitstreamName")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", publicItem1.getHandle())
+                                    .param("filename", "WrongBitstreamName")
+
+        )
+                   .andExpect(status().isNoContent());
+
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                    .param("handle", publicItem1.getHandle())
+                                    .param("sequence", "999999")
+
+        )
+                   .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void findByHandleAndFileNameForPublicItemWithEmbargoOnFile() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .build();
+
+        String bitstreamContent = "Embargoed bitstream";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Test Embargoed Bitstream")
+                .withDescription("This bitstream is embargoed")
+                .withMimeType("text/plain")
+                .withEmbargoPeriod("3 months")
+                .build();
+        }
+
+        // Embargo on bitstream, but item is public, so has read_metadata access on bitstream
+        getClient().perform(get("/api/core/bitstreams/search/byItemHandle")
+                                              .param("handle", publicItem1.getHandle())
+                                              .param("sequence", String.valueOf(bitstream1.getSequenceID()))
+
+        )
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(contentType))
+                             .andExpect(jsonPath("$",
+                                                 BitstreamMatcher.matchProperties(bitstream1)
+                             ));
+    }
+
+
 
 }
