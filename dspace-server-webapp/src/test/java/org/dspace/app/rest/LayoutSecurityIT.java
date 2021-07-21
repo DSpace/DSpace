@@ -2297,11 +2297,12 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
     @Test
     public void configurationContainMetadataSecuritySecondLevel() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group group = groupService.create(context);
-        groupService.setName(group, "Trusted");
-        eperson.getGroups().add(group);
-        ePersonService.update(context, eperson);
-        context.getCurrentUser().getGroups().add(group);
+
+        GroupBuilder.createGroup(context)
+            .withName("Trusted")
+            .addMember(eperson)
+            .addMember(context.getCurrentUser())
+            .build();
 
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
         parentCommunity = CommunityBuilder.createCommunity(context)
