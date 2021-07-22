@@ -665,6 +665,7 @@ public class ItemImportOA {
             schema = impSchema;
         }
         language = n.getTextLang();
+        Integer securityLevel = n.getSecurityLevel();
 
         System.out.println(
                 "\tSchema: " + schema + " Element: " + element + " Qualifier: " + qualifier + " Value: " + value);
@@ -702,9 +703,19 @@ public class ItemImportOA {
         if (authority != null && authority.equalsIgnoreCase("[GUESS]")) {
             // remove placeholder
             authority = null;
-            itemService.addMetadata(c, i, schema, element, qualifier, language, value);
+            if (securityLevel == null) {
+                itemService.addMetadata(c, i, schema, element, qualifier, language, value);
+            } else {
+                itemService.addSecuredMetadata(c, i, schema, element, qualifier, language, value, null, -1,
+                    securityLevel);
+            }
         } else {
-            itemService.addMetadata(c, i, schema, element, qualifier, language, value, authority, confidence);
+            if (securityLevel == null) {
+                itemService.addMetadata(c, i, schema, element, qualifier, language, value, authority, confidence);
+            } else {
+                itemService.addSecuredMetadata(c, i, schema, element, qualifier, language, value, authority,
+                    confidence, securityLevel);
+            }
         }
     }
 

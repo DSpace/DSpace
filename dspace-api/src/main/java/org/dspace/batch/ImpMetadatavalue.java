@@ -64,6 +64,9 @@ public class ImpMetadatavalue {
     @Column(name = "text_lang", length = 32)
     private String textLang;
 
+    @Column(name = "security_level")
+    private Integer securityLevel;
+
     public Integer getMetadatavalueId() {
         return impMetadatavalueId;
     }
@@ -146,5 +149,13 @@ public class ImpMetadatavalue {
 
     public void setTextLang(String textLang) {
         this.textLang = textLang;
+    }
+
+    public Integer getSecurityLevel() {
+        return securityLevel;
+    }
+
+    public void setSecurityLevel(Integer securityLevel) {
+        this.securityLevel = securityLevel;
     }
 }
