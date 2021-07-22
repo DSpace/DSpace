@@ -28,6 +28,7 @@ public class SubmissionSectionRest extends BaseObjectRest<String> {
 
     private String header;
     private boolean mandatory;
+    private boolean opened;
     private String sectionType;
     private ScopeEnum scope;
     private SubmissionVisibilityRest visibility;
@@ -44,9 +45,17 @@ public class SubmissionSectionRest extends BaseObjectRest<String> {
         return mandatory;
     }
 
+	public boolean isOpened() {
+		return opened;
+	}
+
     public void setMandatory(boolean mandatory) {
         this.mandatory = mandatory;
     }
+    
+	public void setOpened(boolean opened) {
+		this.opened = opened;
+	}
 
     public String getType() {
         return NAME;
