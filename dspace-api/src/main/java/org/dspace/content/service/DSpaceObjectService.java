@@ -12,6 +12,7 @@ import static org.dspace.content.MetadataSchemaEnum.DC;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -390,6 +391,11 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
     public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
                            String lang, String value, String authority, int confidence, int place) throws SQLException;
 
+    default public MetadataValue addMetadataInPlaceSecured(Context context, T dso, String schema, String element,
+        String qualifier, String lang, String value, String authority, int confidence, int place, Integer securityValue)
+        throws SQLException {
+        return null;
+    }
 
     /**
      * Add a single metadata field. This is appended to existing
@@ -534,6 +540,9 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
     void replaceMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
                          String value, String authority, int confidence, int index) throws SQLException;
 
+    void replaceSecuredMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
+        String value, String authority, int confidence, int index, Integer securityLevel) throws SQLException;
+
     void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to)
         throws SQLException;
 
@@ -549,4 +558,16 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @param dso   DSpaceObject whose metadata has been modified
      */
     public void setMetadataModified(T dso);
+
+    default public List<MetadataValue> addSecuredMetadata(Context context, T dso, String schema, String element,
+        String qualifier, String lang, String value, String authority, int confidence, Integer securityLevel)
+        throws SQLException {
+        return Collections.emptyList();
+    }
+
+    default void addAndShiftRightSecuredMetadata(Context context, T dso, String schema, String element,
+        String qualifier, String lang, String value, String authority, int confidence, int index, Integer securitylevel)
+        throws SQLException {
+
+    }
 }

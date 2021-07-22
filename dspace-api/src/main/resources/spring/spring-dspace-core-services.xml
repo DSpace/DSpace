@@ -10,8 +10,11 @@
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
 
 
     <!-- Identifier Service Application Interface.  Will be autowired with
@@ -78,5 +81,14 @@
             </map>
         </constructor-arg>
     </bean>
-
+    <util:map id="securityLevelsMap">
+        <entry key="0" value-ref="level0Security"/>
+        <entry key="1" value-ref="level1Security"/>
+        <entry key="2" value-ref="level2Security"/>
+    </util:map>
+    <bean id ="level0Security" name="level0Security" class="org.dspace.content.MetadataPublicAccess"/>
+    <bean id ="level1Security" name="level1Security" class="org.dspace.content.MetadataGroupBasedAccess">
+        <property name="egroup" value="Trusted"/>
+    </bean>
+    <bean  id ="level2Security" name="level2Security" class="org.dspace.content.MetadataAdministratorAndOwnerAccess"/>
 </beans>

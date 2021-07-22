@@ -86,9 +86,10 @@ public class DSpaceObjectMetadataAddOperation<R extends DSpaceObject> extends Pa
             indexInt = -1;
         }
         try {
-            dsoService.addAndShiftRightMetadata(context, dso, metadataField.getMetadataSchema().getName(),
+            dsoService.addAndShiftRightSecuredMetadata(context, dso, metadataField.getMetadataSchema().getName(),
                     metadataField.getElement(), metadataField.getQualifier(), metadataValue.getLanguage(),
-                    metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence(), indexInt);
+                    metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence(), indexInt,
+                    metadataValue.getSecurityLevel());
         } catch (SQLException e) {
             throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataAddOperation.add trying to add " +
                     "metadata to dso.", e);
