@@ -1480,7 +1480,23 @@ prevent the generation of resource policy entry values with null dspace_object a
                 .stream().findFirst().orElse(null);
     }
 
+    @Override
+    public MetadataValue addMetadataInPlaceSecured(Context context, Item dso, String schema, String element,
+        String qualifier, String lang, String value, String authority, int confidence, int place, Integer securityValue)
+        throws SQLException {
 
+        // We will not verify that they are valid entries in the registry
+        // until update() is called.
+        MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
+        if (metadataField == null) {
+            throw new SQLException("bad_dublin_core schema=" + schema + "." + element + "." + qualifier +
+                ". Metadata field does not exist!");
+        }
+        final Supplier<Integer> placeSupplier =  () -> place;
+        return addSecuredMetadataAtPlace(context, dso, metadataField, lang, Arrays.asList(value),
+                Arrays.asList(authority), Arrays.asList(confidence), placeSupplier, securityValue)
+                .stream().findFirst().orElse(null);
+    }
     private void removeOrcidSynchronizationStuff(Context context, Item item) throws SQLException, AuthorizeException {
 
         try {

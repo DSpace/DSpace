@@ -78,8 +78,9 @@ public class XOAICerifItemCompilePlugin implements XOAIExtensionItemCompilePlugi
                 Element none = ItemUtils.create("none");
                 fieldname.getElement().add(none);
                 String xml_presentation = out.toString();
-                String toWrite = String.format("<![CDATA[%s]]>", xml_presentation);
-                none.getField().add(ItemUtils.createValue("value", toWrite ));
+                // replace \n to avoid invalid element in the xml
+                String toWrite = xml_presentation.replace("\n", "");
+                none.getField().add(ItemUtils.createValue("value", xml_presentation));
                 none.getField().add(ItemUtils.createValue("authority", ""));
                 none.getField().add(ItemUtils.createValue("confidence", "-1"));
                 return metadata;

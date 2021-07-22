@@ -473,11 +473,13 @@ public class XOAI {
         metadata.write(xmlContext);
         xmlContext.getWriter().flush();
         xmlContext.getWriter().close();
-        doc.addField("item.compile", out.toString().replace("&lt;","<").replace("&gt;",">").replace("\n",""));
+        doc.addField("item.compile", out.toString());
+
         if (verbose) {
             println(String.format("Item %s with handle %s indexed",
                     item.getID().toString(), handle));
         }
+
         return doc;
     }
 

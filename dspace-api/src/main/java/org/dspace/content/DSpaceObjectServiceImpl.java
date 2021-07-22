@@ -331,6 +331,202 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         return newMetadata;
     }
 
+    public List<MetadataValue> addSecuredMetadataAtPlace(Context context, T dso, MetadataField metadataField,
+        String lang, List<String> values, List<String> authorities, List<Integer> confidences,
+        Supplier<Integer> placeSupplier, Integer securityValue) throws SQLException {
+        boolean storeAuthoritySetForMetadata = Optional.ofNullable(requestService.getCurrentRequest())
+                .map(r -> (Boolean) r.getAttribute("store_authority_" + metadataField.toString('.')))
+                .orElse(false);
+        boolean authorityControlled = storeAuthoritySetForMetadata
+                || metadataAuthorityService.isAuthorityControlled(metadataField);
+        boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
+        List<MetadataValue> newMetadata = new ArrayList<>(values.size());
+        // We will not verify that they are valid entries in the registry
+        // until update() is called.
+        for (int i = 0; i < values.size(); i++) {
+            if (authorities != null && authorities.size() >= i) {
+                if (StringUtils.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+                    continue;
+                }
+            }
+            MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
+            newMetadata.add(metadataValue);
+
+            metadataValue.setPlace(placeSupplier.get());
+            metadataValue.setSecurityLevel(securityValue);
+            metadataValue.setLanguage(lang == null ? null : lang.trim());
+
+            // Logic to set Authority and Confidence:
+            //  - normalize an empty string for authority to NULL.
+            //  - if authority key is present, use given confidence or NOVALUE if not given
+            //  - otherwise, preserve confidence if meaningful value was given since it may document a failed
+            // authority lookup
+            //  - CF_UNSET signifies no authority nor meaningful confidence.
+            //  - it's possible to have empty authority & CF_ACCEPTED if e.g. user deletes authority key
+            if (authorityControlled) {
+                if (authorities != null && authorities.get(i) != null && authorities.get(i).length() > 0) {
+                    metadataValue.setAuthority(authorities.get(i));
+                    metadataValue.setConfidence(confidences == null ? Choices.CF_NOVALUE : confidences.get(i));
+                } else {
+                    metadataValue.setAuthority(null);
+                    metadataValue.setConfidence(confidences == null ? Choices.CF_UNSET : confidences.get(i));
+                }
+                // authority sanity check: if authority is required, was it supplied?
+                // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so
+                // use a runtime exception
+                if (authorityRequired && (metadataValue.getAuthority() == null || metadataValue.getAuthority()
+                        .length() == 0)) {
+                    throw new IllegalArgumentException("The metadata field \"" + metadataField
+                            .toString() + "\" requires an authority key but none was provided. Value=\"" + values
+                            .get(i) + "\"");
+                }
+            }
+            if (values.get(i) != null) {
+                // remove control unicode char
+                String temp = values.get(i).trim();
+                char[] dcvalue = temp.toCharArray();
+                for (int charPos = 0; charPos < dcvalue.length; charPos++) {
+                    if (Character.isISOControl(dcvalue[charPos]) &&
+                            !String.valueOf(dcvalue[charPos]).equals("\u0009") &&
+                            !String.valueOf(dcvalue[charPos]).equals("\n") &&
+                            !String.valueOf(dcvalue[charPos]).equals("\r")) {
+                        dcvalue[charPos] = ' ';
+                    }
+                }
+                metadataValue.setValue(String.valueOf(dcvalue));
+            } else {
+                metadataValue.setValue(null);
+            }
+            //An update here isn't needed, this is persited upon the merge of the owning object
+//            metadataValueService.update(context, metadataValue);
+            dso.addDetails(metadataField.toString());
+        }
+        setMetadataModified(dso);
+        return newMetadata;
+    }
+    @Override
+    public List<MetadataValue> addSecuredMetadata(Context context, T dso, String schema, String element,
+        String qualifier, String lang, String value, String authority, int confidence, Integer securityLevel)
+        throws SQLException {
+
+        // We will not verify that they are valid entries in the registry
+        // until update() is called.
+        MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
+        if (metadataField == null) {
+            throw new SQLException("bad_dublin_core schema=" + schema + "." + element + "." + qualifier
+                + ". Metadata field does not exist!");
+        }
+        //Set place to list length of all metadatavalues for the given schema.element.qualifier combination.
+        // Subtract one to adhere to the 0 as first element rule
+        final Supplier<Integer> placeSupplier = () ->
+                this.getMetadata(dso, metadataField.getMetadataSchema().getName(), metadataField.getElement(),
+                        metadataField.getQualifier(), Item.ANY).size() - 1;
+
+
+        boolean storeAuthoritySetForMetadata = Optional.ofNullable(requestService.getCurrentRequest())
+                .map(r -> (Boolean) r.getAttribute("store_authority_" + metadataField.toString('.')))
+                .orElse(false);
+        boolean authorityControlled = storeAuthoritySetForMetadata
+                || metadataAuthorityService.isAuthorityControlled(metadataField);
+        boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
+        List<String> values = Arrays.asList(value);
+        List<String> authorities = Arrays.asList(authority);
+        List<Integer> confidences = Arrays.asList(confidence);
+        List<MetadataValue> newMetadata = new ArrayList<>(values.size());
+        // We will not verify that they are valid entries in the registry
+        // until update() is called.
+        for (int i = 0; i < values.size(); i++) {
+
+            if (authorities != null && authorities.size() >= i) {
+                if (StringUtils.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+                    continue;
+                }
+            }
+            MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
+            newMetadata.add(metadataValue);
+
+            metadataValue.setPlace(placeSupplier.get());
+
+            metadataValue.setLanguage(lang == null ? null : lang.trim());
+            metadataValue.setSecurityLevel(securityLevel);
+            // Logic to set Authority and Confidence:
+            //  - normalize an empty string for authority to NULL.
+            //  - if authority key is present, use given confidence or NOVALUE if not given
+            //  - otherwise, preserve confidence if meaningful value was given since it may document a failed
+            // authority lookup
+            //  - CF_UNSET signifies no authority nor meaningful confidence.
+            //  - it's possible to have empty authority & CF_ACCEPTED if e.g. user deletes authority key
+            if (authorityControlled) {
+                if (authorities != null && authorities.get(i) != null && authorities.get(i).length() > 0) {
+                    metadataValue.setAuthority(authorities.get(i));
+                    metadataValue.setConfidence(confidences == null ? Choices.CF_NOVALUE : confidences.get(i));
+                } else {
+                    metadataValue.setAuthority(null);
+                    metadataValue.setConfidence(confidences == null ? Choices.CF_UNSET : confidences.get(i));
+                }
+                // authority sanity check: if authority is required, was it supplied?
+                // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so
+                // use a runtime exception
+                if (authorityRequired && (metadataValue.getAuthority() == null || metadataValue.getAuthority()
+                        .length() == 0)) {
+                    throw new IllegalArgumentException("The metadata field \"" + metadataField
+                            .toString() + "\" requires an authority key but none was provided. Value=\"" + values
+                            .get(i) + "\"");
+                }
+            }
+            if (values.get(i) != null) {
+                // remove control unicode char
+                String temp = values.get(i).trim();
+                char[] dcvalue = temp.toCharArray();
+                for (int charPos = 0; charPos < dcvalue.length; charPos++) {
+                    if (Character.isISOControl(dcvalue[charPos]) &&
+                            !String.valueOf(dcvalue[charPos]).equals("\u0009") &&
+                            !String.valueOf(dcvalue[charPos]).equals("\n") &&
+                            !String.valueOf(dcvalue[charPos]).equals("\r")) {
+                        dcvalue[charPos] = ' ';
+                    }
+                }
+                metadataValue.setValue(String.valueOf(dcvalue));
+            } else {
+                metadataValue.setValue(null);
+            }
+            //An update here isn't needed, this is persited upon the merge of the owning object
+//            metadataValueService.update(context, metadataValue);
+            dso.addDetails(metadataField.toString());
+        }
+        setMetadataModified(dso);
+        return newMetadata;
+    }
+
+    @Override
+    public void addAndShiftRightSecuredMetadata(Context context, T dso, String schema, String element, String qualifier,
+        String lang, String value, String authority, int confidence, int index, Integer securitylevel)
+        throws SQLException {
+        List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
+
+        int idx = 0;
+        int place = 0;
+        boolean last = true;
+        for (MetadataValue rr : list) {
+            if (idx == index) {
+                MetadataValue newMetadata = addMetadata(context, dso, schema, element, qualifier,
+                        lang, value, authority, confidence);
+
+                moveSingleMetadataValue(context, dso, place, newMetadata);
+                place++;
+                last = false;
+            }
+            moveSingleMetadataValue(context, dso, place, rr);
+            place++;
+            idx++;
+        }
+        if (last) {
+            addSecuredMetadata(context, dso, schema, element, qualifier,
+                    lang, value, authority, confidence, securitylevel);
+
+        }
+    }
+
     @Override
     public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language,
                             String value, String authority, int confidence) throws SQLException {
@@ -832,6 +1028,16 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
         removeMetadataValues(context, dso, Arrays.asList(list.get(index)));
         addAndShiftRightMetadata(context, dso, schema, element, qualifier, lang, value, authority, confidence, index);
+    }
+
+    @Override
+    public void replaceSecuredMetadata(Context context, T dso, String schema, String element, String qualifier,
+        String lang, String value, String authority, int confidence, int index, Integer securityLevel)
+        throws SQLException {
+        List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
+        removeMetadataValues(context, dso, Arrays.asList(list.get(index)));
+        addAndShiftRightSecuredMetadata(context, dso, schema, element, qualifier, lang, value, authority, confidence,
+            index, securityLevel);
     }
 
     @Override

@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -31,6 +32,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.BitstreamBuilder;
@@ -47,6 +49,7 @@ import org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMappe
 import org.dspace.core.CrisConstants;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.utils.DSpace;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -1899,6 +1902,28 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         assertThat(resultLines[5].trim(), is("\"deep-element\": \"research software\""));
         assertThat(resultLines[6].trim(), is("}"));
 
+    }
+
+    @Test
+    public void placeholderFieldMustBeReplacedWithEmptyStringTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item patent = ItemBuilder.createItem(context, collection)
+                                 .withTitle(PLACEHOLDER_PARENT_METADATA_VALUE)
+                                 .withEntityType("Patent").build();
+
+        context.restoreAuthSystemState();
+
+        ReferCrosswalk referCrossWalk = (ReferCrosswalk) crosswalkMapper.getByType("patent-json");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, patent, out);
+
+        String json = out.toString();
+        JSONObject obj = new JSONObject(json);
+        assertTrue(obj.has("title"));
+        assertTrue(StringUtils.equals(obj.getString("title"), StringUtils.EMPTY));
     }
 
     private void compareEachLine(String result, String expectedResult) {

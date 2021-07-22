@@ -955,4 +955,13 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             return query + " AND ";
         }
     }
+    @Override
+    public boolean isPartOfTheGroup(Context c, String egroup) throws SQLException {
+        EPerson e = c.getCurrentUser();
+        if (e == null) {
+            return false; // anonymous users can't be part of group
+        } else {
+            return groupService.isMember(c, egroup);
+        }
+    }
 }

@@ -63,6 +63,7 @@ import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 
@@ -297,7 +298,9 @@ public class ReferCrosswalk implements ItemExportCrosswalk {
 
             List<String> metadataValues = getMetadataValuesForLine(context, templateLine, item);
             for (String metadataValue : metadataValues) {
-                if (isNotBlank(metadataValue)) {
+                if (PLACEHOLDER_PARENT_METADATA_VALUE.equals(metadataValue)) {
+                    appendLine(lines, templateLine, StringUtils.EMPTY);
+                } else if (isNotBlank(metadataValue)) {
                     appendLine(lines, templateLine, metadataValue);
                 }
             }
@@ -426,7 +429,8 @@ public class ReferCrosswalk implements ItemExportCrosswalk {
         return itemService.getMetadataByMetadataString(item, metadataField.replaceAll("-", ".")).stream()
             .map(MetadataValue::getAuthority)
             .filter(Objects::nonNull)
-            .map(authority -> findById(context, authority))
+            .filter(authority -> UUIDUtils.fromString(authority) != null)
+            .map(authority -> findById(context, UUIDUtils.fromString(authority)))
             .filter(Objects::nonNull)
             .iterator();
     }
@@ -477,9 +481,9 @@ public class ReferCrosswalk implements ItemExportCrosswalk {
         }
     }
 
-    private Item findById(Context context, String id) {
+    private Item findById(Context context, UUID id) {
         try {
-            return itemService.findByIdOrLegacyId(context, id);
+            return itemService.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
