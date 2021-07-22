@@ -11,12 +11,12 @@
     <parameters>
       <parameter>
         <name>db_host_name</name>
-        <default_value/>
+        <default_value>localhost</default_value>
         <description/>
       </parameter>
       <parameter>
         <name>db_name</name>
-        <default_value/>
+        <default_value>dspace5-fvg</default_value>
         <description/>
       </parameter>
       <parameter>
@@ -26,12 +26,12 @@
       </parameter>
       <parameter>
         <name>db_port_number</name>
-        <default_value/>
+        <default_value>5432</default_value>
         <description/>
       </parameter>
       <parameter>
         <name>db_username</name>
-        <default_value/>
+        <default_value>dspacefvg</default_value>
         <description/>
       </parameter>
       <parameter>
@@ -553,11 +553,6 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Join rows 6</from>
-      <to>is date or text</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>is date or text</from>
       <to>is pointer</to>
       <enabled>Y</enabled>
@@ -797,6 +792,26 @@
       <to>wait insert into imp_record</to>
       <enabled>Y</enabled>
     </hop>
+    <hop>
+      <from>metadata visibility configuration</from>
+      <to>Rename to metadata_visibility</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Join rows 6</from>
+      <to>Join rows 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Join rows 2</from>
+      <to>is date or text</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Rename to metadata_visibility</from>
+      <to>Join rows 2</to>
+      <enabled>Y</enabled>
+    </hop>
   </order>
   <step>
     <name>Add imp_bitstream_id</name>
@@ -828,8 +843,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>512</xloc>
-      <yloc>1024</yloc>
+      <xloc>496</xloc>
+      <yloc>1280</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -864,7 +879,7 @@
     </remotesteps>
     <GUI>
       <xloc>1104</xloc>
-      <yloc>784</yloc>
+      <yloc>1040</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -977,7 +992,7 @@
     </remotesteps>
     <GUI>
       <xloc>1104</xloc>
-      <yloc>688</yloc>
+      <yloc>944</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1004,7 +1019,7 @@
     </remotesteps>
     <GUI>
       <xloc>960</xloc>
-      <yloc>688</yloc>
+      <yloc>944</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1057,8 +1072,8 @@ var file_path = getVariable('file_root','') + '/' + file_main_dir + '/' + filefo
       </output>
     </remotesteps>
     <GUI>
-      <xloc>208</xloc>
-      <yloc>1024</yloc>
+      <xloc>192</xloc>
+      <yloc>1280</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1122,8 +1137,8 @@ if(entityPrefix == 'ou'){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>192</xloc>
-      <yloc>832</yloc>
+      <xloc>176</xloc>
+      <yloc>1088</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1168,8 +1183,8 @@ var metadata_authority = 'will be referenced::LEGACY-ID::' + pointer_crisid;
       </output>
     </remotesteps>
     <GUI>
-      <xloc>752</xloc>
-      <yloc>928</yloc>
+      <xloc>768</xloc>
+      <yloc>1184</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1246,7 +1261,7 @@ var metadata_authority = 'will be referenced::LEGACY-ID::' + pointer_crisid;
       </output>
     </remotesteps>
     <GUI>
-      <xloc>256</xloc>
+      <xloc>272</xloc>
       <yloc>16</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1285,8 +1300,8 @@ var metadata_authority = 'will be referenced::LEGACY-ID::' + pointer_crisid;
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1584</xloc>
-      <yloc>192</yloc>
+      <xloc>1552</xloc>
+      <yloc>288</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1324,8 +1339,8 @@ WHERE rpage.crisid = ? AND ep.eperson_id = rpage.epersonid;</sql>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1328</xloc>
-      <yloc>336</yloc>
+      <xloc>1552</xloc>
+      <yloc>560</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1374,8 +1389,8 @@ WHERE subquery.table_name = ? AND subquery.id = ?;</sql>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>368</xloc>
-      <yloc>832</yloc>
+      <xloc>352</xloc>
+      <yloc>1088</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1464,8 +1479,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>368</xloc>
-      <yloc>928</yloc>
+      <xloc>352</xloc>
+      <yloc>1184</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1542,8 +1557,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>368</xloc>
-      <yloc>1024</yloc>
+      <xloc>352</xloc>
+      <yloc>1280</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1581,6 +1596,43 @@ WHERE property_def.id = properties.typo_id
     <GUI>
       <xloc>656</xloc>
       <yloc>96</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Join rows 2</name>
+    <type>JoinRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <cache_size>50000000</cache_size>
+    <main>project metadata</main>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue>legacy_value</leftvalue>
+        <function>=</function>
+        <rightvalue>visibility</rightvalue>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>480</xloc>
+      <yloc>816</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1659,6 +1711,42 @@ WHERE property_def.id = properties.typo_id
     </GUI>
   </step>
   <step>
+    <name>Rename to metadata_visibility</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>new_value</name>
+        <rename>metadata_visibility</rename>
+      </field>
+      <field>
+        <name>legacy_value</name>
+        <rename/>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>112</xloc>
+      <yloc>816</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
     <name>Select values</name>
     <type>SelectValues</type>
     <description/>
@@ -1696,7 +1784,7 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>960</xloc>
+      <xloc>720</xloc>
       <yloc>304</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1715,27 +1803,39 @@ WHERE property_def.id = properties.typo_id
     <fields>
       <field>
         <name>schema</name>
+        <rename/>
       </field>
       <field>
         <name>element</name>
+        <rename/>
       </field>
       <field>
         <name>qualifier</name>
+        <rename/>
       </field>
       <field>
         <name>imp_record_id</name>
+        <rename/>
       </field>
       <field>
         <name>metadata_value</name>
+        <rename/>
       </field>
       <field>
         <name>metadata_order</name>
+        <rename/>
       </field>
       <field>
         <name>crisid</name>
+        <rename/>
       </field>
       <field>
         <name>metadata_authority</name>
+        <rename/>
+      </field>
+      <field>
+        <name>metadata_visibility</name>
+        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
@@ -1748,8 +1848,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>752</xloc>
-      <yloc>528</yloc>
+      <xloc>768</xloc>
+      <yloc>784</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1767,27 +1867,39 @@ WHERE property_def.id = properties.typo_id
     <fields>
       <field>
         <name>schema</name>
+        <rename/>
       </field>
       <field>
         <name>element</name>
+        <rename/>
       </field>
       <field>
         <name>qualifier</name>
+        <rename/>
       </field>
       <field>
         <name>imp_record_id</name>
+        <rename/>
       </field>
       <field>
         <name>metadata_value</name>
+        <rename/>
       </field>
       <field>
         <name>metadata_order</name>
+        <rename/>
       </field>
       <field>
         <name>crisid</name>
+        <rename/>
       </field>
       <field>
         <name>metadata_authority</name>
+        <rename/>
+      </field>
+      <field>
+        <name>metadata_visibility</name>
+        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
@@ -1800,8 +1912,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>752</xloc>
-      <yloc>816</yloc>
+      <xloc>768</xloc>
+      <yloc>1072</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1877,6 +1989,18 @@ WHERE property_def.id = properties.typo_id
         <precision>-1</precision>
         <set_empty_string>N</set_empty_string>
       </field>
+      <field>
+        <name>metadata_visibility</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -1888,7 +2012,7 @@ WHERE property_def.id = properties.typo_id
     </remotesteps>
     <GUI>
       <xloc>1248</xloc>
-      <yloc>448</yloc>
+      <yloc>704</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1962,8 +2086,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1136</xloc>
-      <yloc>336</yloc>
+      <xloc>960</xloc>
+      <yloc>496</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2004,8 +2128,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>608</xloc>
-      <yloc>384</yloc>
+      <xloc>624</xloc>
+      <yloc>640</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2046,8 +2170,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>528</xloc>
-      <yloc>928</yloc>
+      <xloc>512</xloc>
+      <yloc>1184</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2073,8 +2197,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>752</xloc>
-      <yloc>688</yloc>
+      <xloc>768</xloc>
+      <yloc>944</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2119,7 +2243,7 @@ WHERE property_def.id = properties.typo_id
     </remotesteps>
     <GUI>
       <xloc>720</xloc>
-      <yloc>1024</yloc>
+      <yloc>1280</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2166,8 +2290,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>608</xloc>
-      <yloc>736</yloc>
+      <xloc>624</xloc>
+      <yloc>992</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2189,7 +2313,8 @@ WHERE property_def.id = properties.typo_id
         <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>var metadata_value = crisid;
-var metadata_authority = null;</jsScript_script>
+var metadata_authority = null;
+var metadata_visibility = null;</jsScript_script>
       </jsScript>
     </jsScripts>
     <fields>
@@ -2209,6 +2334,14 @@ var metadata_authority = null;</jsScript_script>
         <precision>-1</precision>
         <replace>N</replace>
       </field>
+      <field>
+        <name>metadata_visibility</name>
+        <rename>metadata_visibility</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -2220,7 +2353,7 @@ var metadata_authority = null;</jsScript_script>
     </remotesteps>
     <GUI>
       <xloc>960</xloc>
-      <yloc>464</yloc>
+      <yloc>720</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -2323,7 +2456,7 @@ var metadata_authority = null;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>64</xloc>
+      <xloc>80</xloc>
       <yloc>16</yloc>
       <draw>Y</draw>
     </GUI>
@@ -2453,7 +2586,7 @@ WHERE ${ENTITY_FILTER}
       </output>
     </remotesteps>
     <GUI>
-      <xloc>64</xloc>
+      <xloc>80</xloc>
       <yloc>96</yloc>
       <draw>Y</draw>
     </GUI>
@@ -2471,6 +2604,7 @@ WHERE ${ENTITY_FILTER}
     </partitioning>
     <connection>dspace</connection>
     <sql>SELECT properties.parent_id, 
+properties.visibility,
 property_def.shortname,
 values.dtype, 
 values.sortvalue, 
@@ -2996,7 +3130,7 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>64</xloc>
+      <xloc>80</xloc>
       <yloc>304</yloc>
       <draw>Y</draw>
     </GUI>
@@ -3168,7 +3302,7 @@ WHERE property_def.id = properties.typo_id
     </remotesteps>
     <GUI>
       <xloc>1216</xloc>
-      <yloc>1024</yloc>
+      <yloc>1280</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3233,6 +3367,10 @@ WHERE property_def.id = properties.typo_id
         <column_name>imp_authority</column_name>
         <stream_name>metadata_authority</stream_name>
       </field>
+      <field>
+        <column_name>security_level</column_name>
+        <stream_name>metadata_visibility</stream_name>
+      </field>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -3244,7 +3382,7 @@ WHERE property_def.id = properties.typo_id
     </remotesteps>
     <GUI>
       <xloc>1552</xloc>
-      <yloc>784</yloc>
+      <yloc>1040</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3359,8 +3497,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1584</xloc>
-      <yloc>336</yloc>
+      <xloc>1552</xloc>
+      <yloc>400</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3424,8 +3562,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>304</xloc>
-      <yloc>736</yloc>
+      <xloc>480</xloc>
+      <yloc>992</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3473,8 +3611,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>64</xloc>
-      <yloc>1024</yloc>
+      <xloc>48</xloc>
+      <yloc>1280</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3522,8 +3660,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>64</xloc>
-      <yloc>736</yloc>
+      <xloc>48</xloc>
+      <yloc>992</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3657,8 +3795,107 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>64</xloc>
+      <xloc>80</xloc>
       <yloc>416</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>metadata visibility configuration</name>
+    <type>ExcelInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <header>Y</header>
+    <noempty>Y</noempty>
+    <stoponempty>N</stoponempty>
+    <filefield/>
+    <sheetfield/>
+    <sheetrownumfield/>
+    <rownumfield/>
+    <sheetfield/>
+    <filefield/>
+    <limit>0</limit>
+    <encoding/>
+    <add_to_result_filenames>Y</add_to_result_filenames>
+    <accept_filenames>N</accept_filenames>
+    <accept_field/>
+    <accept_stepname/>
+    <file>
+      <name>/home/luca/git/dspace-cris/dspace/etc/conftool/migration_configuration.xls</name>
+      <filemask/>
+      <exclude_filemask/>
+      <file_required>N</file_required>
+      <include_subfolders>N</include_subfolders>
+    </file>
+    <fields>
+      <field>
+        <name>legacy_value</name>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+      </field>
+      <field>
+        <name>new_value</name>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+      </field>
+    </fields>
+    <sheets>
+      <sheet>
+        <name>metadata_visibility</name>
+        <startrow>0</startrow>
+        <startcol>0</startcol>
+      </sheet>
+    </sheets>
+    <strict_types>N</strict_types>
+    <error_ignored>N</error_ignored>
+    <error_line_skipped>N</error_line_skipped>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+    <spreadsheet_type>JXL</spreadsheet_type>
+    <password>Encrypted </password>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>112</xloc>
+      <yloc>688</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3692,8 +3929,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1584</xloc>
-      <yloc>448</yloc>
+      <xloc>1552</xloc>
+      <yloc>704</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3726,8 +3963,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1216</xloc>
-      <yloc>192</yloc>
+      <xloc>1152</xloc>
+      <yloc>288</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3745,27 +3982,39 @@ WHERE property_def.id = properties.typo_id
     <fields>
       <field>
         <name>schema</name>
+        <rename/>
       </field>
       <field>
         <name>element</name>
+        <rename/>
       </field>
       <field>
         <name>qualifier</name>
+        <rename/>
       </field>
       <field>
         <name>imp_record_id</name>
+        <rename/>
       </field>
       <field>
         <name>metadata_value</name>
+        <rename/>
       </field>
       <field>
         <name>metadata_order</name>
+        <rename/>
       </field>
       <field>
         <name>crisid</name>
+        <rename/>
       </field>
       <field>
         <name>metadata_authority</name>
+        <rename/>
+      </field>
+      <field>
+        <name>metadata_visibility</name>
+        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
@@ -3779,7 +4028,7 @@ WHERE property_def.id = properties.typo_id
     </remotesteps>
     <GUI>
       <xloc>1248</xloc>
-      <yloc>560</yloc>
+      <yloc>816</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3797,27 +4046,39 @@ WHERE property_def.id = properties.typo_id
     <fields>
       <field>
         <name>schema</name>
+        <rename/>
       </field>
       <field>
         <name>element</name>
+        <rename/>
       </field>
       <field>
         <name>qualifier</name>
+        <rename/>
       </field>
       <field>
         <name>imp_record_id</name>
+        <rename/>
       </field>
       <field>
         <name>metadata_value</name>
+        <rename/>
       </field>
       <field>
         <name>metadata_order</name>
+        <rename/>
       </field>
       <field>
         <name>crisid</name>
+        <rename/>
       </field>
       <field>
         <name>metadata_authority</name>
+        <rename/>
+      </field>
+      <field>
+        <name>metadata_visibility</name>
+        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
@@ -3831,7 +4092,7 @@ WHERE property_def.id = properties.typo_id
     </remotesteps>
     <GUI>
       <xloc>960</xloc>
-      <yloc>560</yloc>
+      <yloc>816</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3874,8 +4135,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>752</xloc>
-      <yloc>384</yloc>
+      <xloc>768</xloc>
+      <yloc>640</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3921,8 +4182,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>608</xloc>
-      <yloc>528</yloc>
+      <xloc>624</xloc>
+      <yloc>784</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3953,7 +4214,7 @@ WHERE property_def.id = properties.typo_id
     </remotesteps>
     <GUI>
       <xloc>1312</xloc>
-      <yloc>784</yloc>
+      <yloc>1040</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -3984,7 +4245,7 @@ WHERE property_def.id = properties.typo_id
     </remotesteps>
     <GUI>
       <xloc>976</xloc>
-      <yloc>1024</yloc>
+      <yloc>1280</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
