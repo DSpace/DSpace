@@ -11,7 +11,7 @@ pipeline {
 		SLACK_CHANNEL = '#sandbox_playground'
     }
 
-    options { buildDiscarder(logRotator(numToKeepStr: '5')) }
+    options { buildDiscarder(logRotator(numToKeepStr: '2')) }
 
     stages {
 

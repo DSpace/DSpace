@@ -7,6 +7,9 @@
  */
 package org.dspace.discovery;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.Transformer;
@@ -1614,7 +1617,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 return new DiscoverResult();
             }
             SolrQuery solrQuery = resolveToSolrQuery(context, discoveryQuery, includeUnDiscoverable);
-
+            log.debug("SolrQuery " + solrQuery.getQuery());
+            log.debug("FacetSortString " + solrQuery.getFacetSortString());
+            log.debug("SortField " + solrQuery.getSortField());
+            if (solrQuery.getFacetQuery() != null) {
+                for (int i = 0; i < solrQuery.getFacetQuery().length; i++) {
+                    log.debug("facetQueries: " + solrQuery.getFacetQuery()[i]);
+                }
+            }
 
             QueryResponse queryResponse = getSolr().query(solrQuery, SolrRequest.METHOD.POST);
             return retrieveResult(context, discoveryQuery, queryResponse);
@@ -1642,6 +1652,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         for(String fieldName : discoveryQuery.getSearchFields())
         {
             solrQuery.addField(fieldName);
+            log.debug("solr field : " + fieldName);
         }
         // Also ensure a few key obj identifier fields are returned with every query
         solrQuery.addField(HANDLE_FIELD);
@@ -1675,6 +1686,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         {
             String filterQuery = discoveryQuery.getFieldPresentQueries().get(i);
             solrQuery.addFilterQuery(filterQuery + ":[* TO *]");
+            log.debug("Filter query  " + filterQuery);
         }
 
         if(discoveryQuery.getStart() != -1)
@@ -1700,6 +1712,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         {
             List<String> values = discoveryQuery.getProperties().get(property);
             solrQuery.add(property, values.toArray(new String[values.size()]));
+            log.debug("solr props: "+ property);
         }
 
         List<DiscoverFacetField> facetFields = discoveryQuery.getFacetFields();
@@ -1710,6 +1723,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             {
                 String field = transformFacetField(facetFieldConfig, facetFieldConfig.getField(), false);
                 solrQuery.addFacetField(field);
+                log.debug("solr discoveryfield "+field);
 
                 // Setting the facet limit in this fashion ensures that each facet can have its own max
                 solrQuery.add("f." + field + "." + FacetParams.FACET_LIMIT, String.valueOf(facetFieldConfig.getLimit()));
@@ -1729,7 +1743,17 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
                 if(facetFieldConfig.getPrefix() != null)
                 {
-                    solrQuery.setFacetPrefix(field, facetFieldConfig.getPrefix());
+                    log.debug("facetFieldConfigPrefix : " + facetFieldConfig.getPrefix());
+                    if (facetFieldConfig.getPrefix().equalsIgnoreCase("å")) {
+                        try {
+                            solrQuery.setFacetPrefix(field, String.valueOf('å'));
+                            log.debug("facetFieldConfigPrefix URLEncoded: " + URLEncoder.encode(String.valueOf('å'), StandardCharsets.UTF_8.name()));
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        solrQuery.setFacetPrefix(field, facetFieldConfig.getPrefix());
+                    }
                 }
             }
 
@@ -1737,6 +1761,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             for (String facetQuery : facetQueries)
             {
                 solrQuery.addFacetQuery(facetQuery);
+                log.debug("facetQuery : " + facetQuery);
             }
 
             if(discoveryQuery.getFacetMinCount() != -1)

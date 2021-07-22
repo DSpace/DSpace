@@ -765,6 +765,10 @@ public class BrowseEngine
         String focusField = dao.getJumpToField();
         String focusValue = dao.getJumpToValue();
         String orderField = dao.getOrderField();
+        log.debug("JumpToField:  "+ focusField);
+        log.debug("focusValue:  "+ focusValue);
+        log.debug("orderField:  "+ orderField);
+        log.debug("startsWith:  "+ dao.getStartsWith());
         int limit = dao.getLimit();
         int offset = dao.getOffset();
 

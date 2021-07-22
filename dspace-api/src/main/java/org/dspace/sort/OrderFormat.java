@@ -7,6 +7,10 @@
  */
 package org.dspace.sort;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import org.apache.log4j.Logger;
 import org.dspace.core.factory.CoreServiceFactory;
 
 /**
@@ -36,6 +40,7 @@ import org.dspace.core.factory.CoreServiceFactory;
  */
 public class OrderFormat
 {
+    private static final Logger log = Logger.getLogger(OrderFormat.class);
 	public static final String AUTHOR = "author";
 	public static final String TITLE  = "title";
 	public static final String TEXT   = "text";
@@ -77,7 +82,15 @@ public class OrderFormat
             // No delegates found, so apply defaults
             if (type.equalsIgnoreCase(OrderFormat.AUTHOR) && authorDelegate != null)
             {
-              return authorDelegate.makeSortString(value, language);
+                log.debug("orderTextFilterSort Author before: " + value);
+                final String s = authorDelegate.makeSortString(value, language);
+                log.debug("orderTextFilterSort Author after: " + s);
+                try {
+                    log.debug("orderTextFilterSort Author after: " + URLEncoder.encode(s, StandardCharsets.UTF_8.name()));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                return s;
             }
 
             if (type.equalsIgnoreCase(OrderFormat.TITLE) && titleDelegate != null)

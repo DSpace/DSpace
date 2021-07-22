@@ -152,6 +152,7 @@ public class SolrBrowseDAO implements BrowseDAO
             if (distinct)
             {
                 DiscoverFacetField dff;
+                log.debug("startsWith: "+ startsWith);
                 if (StringUtils.isNotBlank(startsWith)) {
                     dff = new DiscoverFacetField(facetField,
                         DiscoveryConfigurationParameters.TYPE_TEXT, -1,
@@ -198,6 +199,7 @@ public class SolrBrowseDAO implements BrowseDAO
             }
             try
             {
+                log.debug("Solr query: " + query.getQuery());
 				sResponse = searcher.search(context, query, itemsWithdrawn
 						|| !itemsDiscoverable);
             }
@@ -255,11 +257,14 @@ public class SolrBrowseDAO implements BrowseDAO
     public int doCountQuery() throws BrowseException
     {
         DiscoverResult resp = getSolrResponse();
+        log.debug("raw count: " + resp.getTotalSearchResults());
         int count = 0;
         if (distinct)
         {
+            log.debug("faceField: " + facetField);
             List<FacetResult> facetResults = resp.getFacetResult(facetField);
             count = facetResults.size();
+            log.debug("Facet count: " + count);
         }
         else
         {
