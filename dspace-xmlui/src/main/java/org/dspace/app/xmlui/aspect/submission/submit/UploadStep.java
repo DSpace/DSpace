@@ -337,13 +337,13 @@ public class UploadStep extends AbstractSubmissionStep
                     cell.addContent(" ");
                     switch (support)
                     {
-                        case 1:
-                            cell.addContent(T_supported);
-                            break;
-                        case 2:
+                        case BitstreamFormat.KNOWN:
                             cell.addContent(T_known);
                             break;
-                        case 3:
+                        case BitstreamFormat.SUPPORTED:
+                            cell.addContent(T_supported);
+                            break;
+                        case BitstreamFormat.UNKNOWN:
                             cell.addContent(T_unsupported);
                             break;
                     }
