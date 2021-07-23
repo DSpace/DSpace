@@ -18,12 +18,12 @@
     </parameter>
     <parameter>
       <name>db_name</name>
-      <default_value>dspace5-fvg</default_value>
+      <default_value>dspace-cris-demo</default_value>
       <description/>
     </parameter>
     <parameter>
       <name>db_password</name>
-      <default_value/>
+      <default_value>dspace</default_value>
       <description/>
     </parameter>
     <parameter>
@@ -33,12 +33,12 @@
     </parameter>
     <parameter>
       <name>db_username</name>
-      <default_value>dspacefvg</default_value>
+      <default_value>dspacecrisdemo</default_value>
       <description/>
     </parameter>
     <parameter>
       <name>eperson_email</name>
-      <default_value>4science.it+noreply@gmail.com</default_value>
+      <default_value>support@4science.it</default_value>
       <description/>
     </parameter>
     <parameter>
