@@ -4,13 +4,39 @@
   <description/>
   <extended_description/>
   <job_version/>
+  <job_status>0</job_status>
   <directory>/</directory>
   <created_user>-</created_user>
   <created_date>2021/07/23 16:27:19.590</created_date>
   <modified_user>-</modified_user>
   <modified_date>2021/07/23 16:27:19.590</modified_date>
   <parameters>
-    </parameters>
+    <parameter>
+      <name>db_host_name</name>
+      <default_value>localhost</default_value>
+      <description/>
+    </parameter>
+    <parameter>
+      <name>db_name</name>
+      <default_value>dspace-cris-demo</default_value>
+      <description/>
+    </parameter>
+    <parameter>
+      <name>db_password</name>
+      <default_value>dspace</default_value>
+      <description/>
+    </parameter>
+    <parameter>
+      <name>db_port_number</name>
+      <default_value>5432</default_value>
+      <description/>
+    </parameter>
+    <parameter>
+      <name>db_username</name>
+      <default_value>dspacecrisdemo</default_value>
+      <description/>
+    </parameter>
+  </parameters>
   <slaveservers>
     </slaveservers>
   <job-log-table>
@@ -315,7 +341,7 @@
       <attributes/>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>${Internal.Entry.Current.Directory}/relations_migration.ktr</filename>
+      <filename>${Internal.Entry.Current.Directory}/relations_migrations.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
