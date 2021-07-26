@@ -574,9 +574,7 @@ public class SubmissionConfigReader {
         String opened = getAttribute(nStep, "opened");
         if (StringUtils.isNotBlank(opened)) {
             stepInfo.put("opened", opened);
-        } else {
-        	stepInfo.put("opened", "true");
-        }
+		}
 
         // look for REQUIRED 'step' information
         String missing = null;

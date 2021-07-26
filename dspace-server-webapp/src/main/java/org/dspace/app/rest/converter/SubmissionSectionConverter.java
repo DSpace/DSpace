@@ -36,6 +36,7 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
         SubmissionSectionRest sp = new SubmissionSectionRest();
         sp.setProjection(projection);
         sp.setMandatory(step.isMandatory());
+        sp.setOpened(step.isOpened());
         sp.setHeader(step.getHeading());
         sp.setSectionType(step.getType());
         sp.setId(step.getId());
