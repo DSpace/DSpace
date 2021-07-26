@@ -57,13 +57,10 @@ public class ConfigurationRestRepository extends DSpaceRestRepository<PropertyRe
         if (!exposedProperties.contains(property) || !configurationService.hasProperty(property)) {
             throw new ResourceNotFoundException("No such configuration property: " + property);
         }
-
         String[] propertyValues = configurationService.getArrayProperty(property);
-
         PropertyRest propertyRest = new PropertyRest();
         propertyRest.setName(property);
         propertyRest.setValues(Arrays.asList(propertyValues));
-
         return propertyRest;
     }
 
