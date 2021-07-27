@@ -105,9 +105,11 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
                         }
                     }
 
-                    if (dSpaceObject instanceof Bitstream && context.getCurrentUser() == null) {
-                        return bitstreamService.isRelatedToAProcessStartedByDefaultUser(context,
-                            (Bitstream) dSpaceObject);
+                    if (dSpaceObject instanceof Bitstream
+                        && context.getCurrentUser() == null
+                        && bitstreamService.isRelatedToAProcessStartedByDefaultUser(context,
+                            (Bitstream) dSpaceObject)) {
+                        return true;
                     }
 
                     return authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,
