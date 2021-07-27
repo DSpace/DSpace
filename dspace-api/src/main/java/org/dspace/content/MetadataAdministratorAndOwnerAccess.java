@@ -9,6 +9,8 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
+
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.service.AuthorizeService;
@@ -40,10 +42,13 @@ public class MetadataAdministratorAndOwnerAccess implements MetadataSecurityEval
     public boolean allowMetadataFieldReturn(Context context, Item item, MetadataField metadataField)
         throws SQLException {
 
-        if (context != null && authorizeService.isAdmin(context)) {
+        if (Objects.nonNull(context)) {
+            if (authorizeService.isAdmin(context)) {
+                return true;
+            }
             List<MetadataValue> owners = itemService.getMetadataByMetadataString(item, "cris.owner");
             return owners.stream()
-                .anyMatch(v -> StringUtils.equals(v.getAuthority(), context.getCurrentUser().id + ""));
+                         .anyMatch(v -> StringUtils.equals(v.getAuthority(), context.getCurrentUser().id + ""));
         }
 
         return false;
