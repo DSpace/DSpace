@@ -68,6 +68,8 @@ public class GoogleMetadata
 
     protected final String DATE = "citation_date";
 
+    protected final String PUBLICATION_DATE = "citation_publication_date";
+
     protected final String VOLUME = "citation_volume";
 
     protected final String ISSUE = "citation_issue";
@@ -667,6 +669,9 @@ public class GoogleMetadata
         // DATE
         addSingleField(DATE);
 
+        // PUBLICATION_DATE
+        addSingleField(PUBLICATION_DATE);
+
         // ISSN
         addSingleField(ISSN);
 
@@ -831,7 +836,15 @@ public class GoogleMetadata
      */
     public List<String> getDate()
     {
-        return metadataMappings.get(DATE);
+        if (metadataMappings.containsKey(DATE)) {
+            return metadataMappings.get(DATE);
+        }
+        else if (metadataMappings.containsKey(PUBLICATION_DATE)) {
+            return metadataMappings.get(PUBLICATION_DATE);
+        }
+        else {
+            return null;
+        }
     }
 
     /**
