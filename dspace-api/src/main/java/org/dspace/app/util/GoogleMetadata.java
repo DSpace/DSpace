@@ -66,6 +66,7 @@ public class GoogleMetadata
 
     protected final String AUTHORS = "citation_author";
 
+    // superseded by citation_publication_date, but will be used as its fallback. See DS-4518
     protected final String DATE = "citation_date";
 
     protected final String PUBLICATION_DATE = "citation_publication_date";
@@ -97,6 +98,8 @@ public class GoogleMetadata
     protected final String KEYWORDS = "citation_keywords";
 
     protected final String CONFERENCE = "citation_conference";
+
+    protected final String CONFERENCE_TITLE = "citation_conference_title";
 
     protected final String DISSERTATION_ID = "identifiers.dissertation";
 
@@ -182,6 +185,15 @@ public class GoogleMetadata
             }
         }
 
+        if (!googleScholarSettings.containsKey("citation_publication_date"))
+        {
+            log.warn("Google Metadata configuration not found for key "
+                     + GOOGLE_PREFIX + "citation_publication_date. "
+                     + "DSpace will fall back to use settings for key (if present) "
+                     + GOOGLE_PREFIX + "citation_date. "
+                     + "Consider upgrading your DSpace configuration.");
+        }
+
         if (log.isDebugEnabled())
         {
             logConfiguration();
@@ -235,7 +247,15 @@ public class GoogleMetadata
 
         if (null == config || config.equals(""))
         {
-            return false;
+            // if PUBLICATION_DATE is not configured, we will fall back to DATE instead
+            if (PUBLICATION_DATE.equals(fieldName)) {
+                config = googleScholarSettings.get(DATE);
+            }
+
+            if (null == config || config.equals(""))
+            {
+                return false;
+            }
         }
 
         if (log.isDebugEnabled())
@@ -666,9 +686,6 @@ public class GoogleMetadata
         // AUTHORS (multi)
         addMultipleValues(AUTHORS);
 
-        // DATE
-        addSingleField(DATE);
-
         // PUBLICATION_DATE
         addSingleField(PUBLICATION_DATE);
 
@@ -716,6 +733,9 @@ public class GoogleMetadata
 
         // CONFERENCE
         addSingleField(CONFERENCE);
+
+        // CONFERENCE_TITLE
+        addSingleField(CONFERENCE_TITLE);
 
         // Dissertations
         if (itemIsDissertation())
@@ -832,19 +852,11 @@ public class GoogleMetadata
     }
 
     /**
-     * @return the citation_date
+     * @return the citation_publication_date
      */
     public List<String> getDate()
     {
-        if (metadataMappings.containsKey(DATE)) {
-            return metadataMappings.get(DATE);
-        }
-        else if (metadataMappings.containsKey(PUBLICATION_DATE)) {
-            return metadataMappings.get(PUBLICATION_DATE);
-        }
-        else {
-            return null;
-        }
+        return metadataMappings.get(PUBLICATION_DATE);
     }
 
     /**
@@ -957,6 +969,14 @@ public class GoogleMetadata
     public List<String> getConference()
     {
         return metadataMappings.get(CONFERENCE);
+    }
+
+    /**
+     * @return the citation_conference_title
+     */
+    public List<String> getConferenceTitle()
+    {
+        return metadataMappings.get(CONFERENCE_TITLE);
     }
 
     /**
