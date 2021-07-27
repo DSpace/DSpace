@@ -42,7 +42,7 @@ public class MetadataAdministratorAndOwnerAccess implements MetadataSecurityEval
     public boolean allowMetadataFieldReturn(Context context, Item item, MetadataField metadataField)
         throws SQLException {
 
-        if (Objects.nonNull(context)) {
+        if (Objects.nonNull(context) && Objects.nonNull(context.getCurrentUser())) {
             if (authorizeService.isAdmin(context)) {
                 return true;
             }
