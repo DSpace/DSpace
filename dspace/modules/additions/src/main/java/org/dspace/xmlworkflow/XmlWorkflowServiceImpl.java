@@ -160,6 +160,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             XmlWorkflowItem wfi = xmlWorkflowItemService.create(context, myitem, collection);
             wfi.setMultipleFiles(wsi.hasMultipleFiles());
             wfi.setMultipleTitles(wsi.hasMultipleTitles());
+            wfi.setDataset(wsi.isDataset()); // Customization for LIBDRUM-628
             wfi.setPublishedBefore(wsi.isPublishedBefore());
             xmlWorkflowItemService.update(context, wfi);
             removeUserItemPolicies(context, myitem, myitem.getSubmitter());
@@ -866,6 +867,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         WorkspaceItem workspaceItem = workspaceItemService.create(c, wfi);
         workspaceItem.setMultipleFiles(wfi.hasMultipleFiles());
         workspaceItem.setMultipleTitles(wfi.hasMultipleTitles());
+        workspaceItem.setDataset(wfi.isDataset()); // Customization for LIBDRUM-628
         workspaceItem.setPublishedBefore(wfi.isPublishedBefore());
         workspaceItemService.update(c, workspaceItem);
 

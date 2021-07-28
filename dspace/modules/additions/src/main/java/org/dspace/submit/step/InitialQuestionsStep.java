@@ -9,6 +9,7 @@ package org.dspace.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,6 +24,10 @@ import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.AbstractProcessingStep;
 
 /**
@@ -71,6 +76,12 @@ public class InitialQuestionsStep extends AbstractProcessingStep
 
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
+    // Customization for LIBDRUM-628
+    private final static HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
+    private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    // End customization for LIBDRUM-628
+
     /**
      * Do any processing of the information input by the user, and/or perform
      * step processing (if no user interaction required)
@@ -103,6 +114,10 @@ public class InitialQuestionsStep extends AbstractProcessingStep
         // Get the values from the initial questions form
         boolean multipleTitles = Util.getBoolParameter(request,
                 "multiple_titles");
+        // Customization for LIBDRUM-628
+        boolean isDataset = Util.getBoolParameter(request,
+                "is_dataset");
+        // End customization for LIBDRUM-628
         boolean publishedBefore = Util.getBoolParameter(request,
                 "published_before");
         boolean multipleFiles = Util.getBoolParameter(request,
@@ -144,7 +159,7 @@ public class InitialQuestionsStep extends AbstractProcessingStep
         else if (request.getParameter("prune") != null)
         {
             processVerifyPrune(context, request, response, subInfo,
-                    multipleTitles, publishedBefore, multipleFiles);
+                    multipleTitles, isDataset, publishedBefore, multipleFiles); // Customization for LIBDRUM-628
         }
         else
         // otherwise, check if pruning is necessary
@@ -161,6 +176,12 @@ public class InitialQuestionsStep extends AbstractProcessingStep
                             .getMetadata(item, MetadataSchema.DC_SCHEMA, "title", "alternative", Item.ANY);
 
                     willRemoveTitles = altTitles.size() > 0;
+                }
+
+                 // Customization for LIBDRUM-628
+                if (isDataset)
+                {
+                    // TODO628: Is this necessary?
                 }
 
                 if (!publishedBefore)
@@ -208,8 +229,22 @@ public class InitialQuestionsStep extends AbstractProcessingStep
             }
         }
 
+        // Customization for LIBDRUM-628
+        if(isDataset) {
+            // Add mapped collections
+            String dataCommunityHandle = configurationService.getProperty("data.community.handle");
+            Community dataCommunity = (Community) handleService.resolveToObject(context, dataCommunityHandle);
+            
+            subInfo.getSubmissionItem().addMappedCollections(dataCommunity.getCollections());
+        } else {
+            // remove mapped collections?
+            subInfo.getSubmissionItem().removeMappedCollections();
+        }
+        // End customization for LIBDRUM-628
+
         // If step is complete, save the changes
         subInfo.getSubmissionItem().setMultipleTitles(multipleTitles);
+        subInfo.getSubmissionItem().setDataset(isDataset); // Customization for LIBDRUM-628
         subInfo.getSubmissionItem().setPublishedBefore(publishedBefore);
 
         // "Multiple files" irrelevant in workflow mode
@@ -289,7 +324,7 @@ public class InitialQuestionsStep extends AbstractProcessingStep
      */
     protected void processVerifyPrune(Context context,
             HttpServletRequest request, HttpServletResponse response,
-            SubmissionInfo subInfo, boolean multipleTitles,
+            SubmissionInfo subInfo, boolean multipleTitles, boolean isDataset, // Customization for LIBDRUM-628
             boolean publishedBefore, boolean multipleFiles)
             throws ServletException, IOException, SQLException,
             AuthorizeException
@@ -302,6 +337,30 @@ public class InitialQuestionsStep extends AbstractProcessingStep
             itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "title", "alternative", Item.ANY);
         }
 
+        // Customization for LIBDRUM-628
+        if (isDataset) {
+            itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "relation", "ispartofseries", Item.ANY);
+            itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", Item.ANY, Item.ANY);
+            itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "", Item.ANY);
+            List<MetadataValue> typeValues = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "type", "", Item.ANY);
+            if (typeValues.size() > 0) {
+                List<String> filteredTypeValues = new ArrayList<String>();
+                for(MetadataValue value : typeValues) {
+                    if(value.getValue().equals("Dataset") || value.getValue().equals("Software")) {
+                        filteredTypeValues.add(value.getValue());
+                    }
+                }
+                if(filteredTypeValues.size() > 0) {
+                    itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "type", "", Item.ANY, filteredTypeValues);
+                } else {
+                    itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "type", "", Item.ANY);
+                }
+            }
+        } else {
+            itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "description", Item.ANY);
+        }
+        // End customization for LIBDRUM-628
+        
         if (!publishedBefore && subInfo.getSubmissionItem().isPublishedBefore())
         {
             // Begin UMD Customization

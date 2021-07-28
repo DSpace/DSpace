@@ -142,6 +142,7 @@ public class DescribeStep extends AbstractProcessingStep
             inputs = inputsReader.getInputs(c.getHandle()).getPageRows(
                     currentPage - 1,
                     subInfo.getSubmissionItem().hasMultipleTitles(),
+                    subInfo.getSubmissionItem().isDataset(), // Customization for LIBDRUM-628
                     subInfo.getSubmissionItem().isPublishedBefore());
         }
         catch (DCInputsReaderException e)

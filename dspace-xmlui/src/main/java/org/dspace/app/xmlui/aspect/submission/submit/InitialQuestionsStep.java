@@ -142,6 +142,17 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
 	        }
         }
         
+        // Customization for LIBDRUM-628
+        CheckBox isDataset = form.addItem().addCheckBox("is_dataset");
+        isDataset.setLabel(T_multiple_titles);
+        isDataset.setHelp(T_multiple_titles_help);
+        isDataset.addOption("true");
+        if (submission.hasMultipleTitles())
+        {
+        	isDataset.setOptionSelected("true");
+        }
+        // End customization for LIBDRUM-628
+        
         CheckBox publishedBefore = form.addItem().addCheckBox("published_before");
         publishedBefore.setLabel(T_published_before);
         publishedBefore.setHelp(T_published_before_help);

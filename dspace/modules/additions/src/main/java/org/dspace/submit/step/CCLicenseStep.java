@@ -263,5 +263,20 @@ public class CCLicenseStep extends AbstractProcessingStep
     {
 		return 1;
     }
-   
+
+    // Customization for LIBDRUM-628
+    /**
+     * Returns true if there are no uploaded bitstreams.
+     * 
+     * @param @submissionInfo
+     *              SubmissionInfo object
+     */
+    @Override
+    public boolean canSkip(SubmissionInfo submissionInfo) throws SQLException {
+        if(submissionInfo.getSubmissionItem().isDataset()) {
+            return false;
+        }
+        return true;
+    }
+    // End customization for LIBDRUM-628
 }

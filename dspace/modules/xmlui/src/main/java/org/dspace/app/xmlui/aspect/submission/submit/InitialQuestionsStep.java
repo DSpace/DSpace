@@ -65,6 +65,14 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
         message("xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_help");
     protected static final Message T_multiple_titles_note= 
         message("xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_note");
+    // Customization for LIBDRUM-628
+    protected static final Message T_is_dataset= 
+        message("xmlui.Submission.submit.InitialQuestionsStep.is_dataset");
+    protected static final Message T_is_dataset_help= 
+        message("xmlui.Submission.submit.InitialQuestionsStep.is_dataset_help");
+    protected static final Message T_is_dataset_note= 
+        message("xmlui.Submission.submit.InitialQuestionsStep.is_dataset_note");
+    // End customization for LIBDRUM-628
     protected static final Message T_published_before= 
         message("xmlui.Submission.submit.InitialQuestionsStep.published_before");
     protected static final Message T_published_before_help= 
@@ -141,6 +149,17 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
 	        	note.addContent("\"");
 	        }
         }
+        
+        // Customization for LIBDRUM-628
+        CheckBox isDataset = form.addItem().addCheckBox("is_dataset");
+        isDataset.setLabel(T_is_dataset);
+        isDataset.setHelp(T_is_dataset_help);
+        isDataset.addOption("true");
+        if (submission.isDataset())
+        {
+        	isDataset.setOptionSelected("true");
+        }
+        // End customization for LIBDRUM-628
         
         CheckBox publishedBefore = form.addItem().addCheckBox("published_before");
         publishedBefore.setLabel(T_published_before);
@@ -276,6 +295,14 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
         {
             multipleTitles = ReviewStep.T_yes;
         }
+
+        // Customization for LIBDRUM-628
+        Message isDataset = ReviewStep.T_no;
+        if (submission.isDataset())
+        {
+            isDataset = ReviewStep.T_yes;
+        }
+        // End customization for LIBDRUM-628
     
         Message publishedBefore = ReviewStep.T_no;
         if (submission.isPublishedBefore())
@@ -285,6 +312,8 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
         
         initSection.addLabel(T_multiple_titles);
         initSection.addItem(multipleTitles);
+        initSection.addLabel(T_is_dataset); // Customization for LIBDRUM-628
+        initSection.addItem(isDataset); // Customization for LIBDRUM-628
         initSection.addLabel(T_published_before);
         initSection.addItem(publishedBefore);
         

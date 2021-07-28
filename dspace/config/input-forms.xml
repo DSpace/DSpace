@@ -153,6 +153,19 @@
           <required></required>
         </field>
 
+        <!-- Customization for LIBDRUM-628 -->
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>type</dc-element>
+          <dc-qualifier></dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Type</label>
+          <input-type value-pairs-name="data_types">dropdown</input-type>
+          <hint>Select the type of content of the item.</hint>
+          <required></required>
+        </field>
+        <!-- End customization for LIBDRUM-628 -->
+
         <field>
           <dc-schema>dc</dc-schema>
           <dc-element>language</dc-element>
@@ -211,6 +224,19 @@
           <hint>Enter any other description or comments in this box. </hint>
           <required></required>
         </field>
+
+        <!-- Customization for LIBDRUM-628 -->
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>date</dc-element>
+          <dc-qualifier>description</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Methodology Description</label>
+          <input-type>textarea</input-type>
+          <hint>TBD. </hint>
+          <required></required>
+        </field>
+        <!-- End customization for LIBDRUM-628 -->
       </page>
     </form>
 
@@ -655,6 +681,19 @@
         <stored-value>Working Paper</stored-value>
       </pair>
     </value-pairs>
+
+    <!-- Customization for LIBDRUM-628 -->
+    <value-pairs value-pairs-name="data_types" dc-term="type">
+      <pair>
+        <displayed-value>Dataset</displayed-value>
+        <stored-value>Dataset</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Software</displayed-value>
+        <stored-value>Software</stored-value>
+      </pair>
+    </value-pairs>
+    <!-- End customization for LIBDRUM-628 -->
 
     <value-pairs value-pairs-name="library_award_types" dc-term="type">
       <pair>

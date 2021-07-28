@@ -710,7 +710,7 @@
     <message key="xmlui.Submission.submit.progressbar.upload">Upload</message>
 	<message key="xmlui.Submission.submit.progressbar.verify">Review</message>
 	<message key="xmlui.Submission.submit.progressbar.creative-commons">Creative Commons</message>
-	<message key="xmlui.Submission.submit.progressbar.CClicense">CC License</message>
+	<message key="xmlui.Submission.submit.progressbar.CClicense">Data License</message>
     <message key="xmlui.Submission.submit.progressbar.license">License</message>
 	<message key="xmlui.Submission.submit.progressbar.complete">Complete</message>
 
@@ -741,6 +741,9 @@
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles">Multiple titles</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_help">The item has more than one title, <em>e.g. a translated title</em></message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_note">If the checkbox above is unchecked then the following title(s) will be removed from the item: </message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.is_dataset">Dataset</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.is_dataset_help">TBD</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.is_dataset_note">TBD</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before">Published</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_help">The item has been published or publicly distributed before</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_note">If the checkbox above is unchecked then the following will be removed from the item:</message>
@@ -898,6 +901,7 @@
 	<message key="xmlui.Submission.submit.ReviewStep.head2">Describe Page {0}</message>
 	<message key="xmlui.Submission.submit.ReviewStep.head3">Uploaded Files</message>
 	<message key="xmlui.Submission.submit.ReviewStep.multiple_titles">Multiple titles</message>
+	<message key="xmlui.Submission.submit.ReviewStep.is_dataset">Dataset</message>
 	<message key="xmlui.Submission.submit.ReviewStep.published_before">Published before</message>
 	<message key="xmlui.Submission.submit.ReviewStep.no_metadata">-</message>
 	<message key="xmlui.Submission.submit.ReviewStep.unknown">unknown</message>
