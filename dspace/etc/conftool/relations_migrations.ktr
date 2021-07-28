@@ -1656,10 +1656,9 @@ where item_id = ?</sql>
     </partitioning>
     <connection>dspace</connection>
     <rowlimit>0</rowlimit>
-    <sql>select item.uuid as target_item_uuid
-from Item item, metadatavalue metadata_value, metadatafieldregistry metadata_field, metadataschemaregistry metadata_schema
-where metadata_value.dspace_object_id = item.uuid
-AND metadata_value.metadata_field_id = metadata_field.metadata_field_id
+    <sql>select metadata_value.dspace_object_id
+from metadatavalue metadata_value, metadatafieldregistry metadata_field, metadataschemaregistry metadata_schema
+where metadata_value.metadata_field_id = metadata_field.metadata_field_id
 AND metadata_field.element = 'legacyId'
 AND metadata_field.qualifier is null
 AND metadata_field.metadata_schema_id = metadata_schema.metadata_schema_id
