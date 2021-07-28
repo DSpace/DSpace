@@ -39,7 +39,7 @@
         <log4j.version>2.13.3</log4j.version>
         <pdfbox-version>2.0.24</pdfbox-version>
         <poi-version>3.17</poi-version>
-        <slf4j.version>1.7.25</slf4j.version>
+        <slf4j.version>1.7.31</slf4j.version>
 
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
         <!-- Spring Data REST HAL Browser (used by Server webapp) -->
@@ -112,7 +112,7 @@
                             </goals>
                             <configuration>
                                 <rules>
-                                    <DependencyConvergence />
+                                    <DependencyConvergence/>
                                 </rules>
                             </configuration>
                         </execution>
