@@ -651,7 +651,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             String language = getMetadataLanguage(field);
             MetadataField metadataField = metadataFieldService.findByString(context, getMetadataField(field), '.');
             for (MetadataValueVO metadataValue : metadata.get(field)) {
-                metadataValue = bulkImportTransformerService.conver(context, field, metadataValue);
+                metadataValue = bulkImportTransformerService.converter(context, field, metadataValue);
                 String authority = metadataValue.getAuthority();
                 int confidence = metadataValue.getConfidence();
                 String value = metadataValue.getValue();

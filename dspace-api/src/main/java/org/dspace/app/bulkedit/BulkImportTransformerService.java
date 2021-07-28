@@ -24,7 +24,7 @@ public class BulkImportTransformerService {
         this.field2ValueTransformer = field2ValueTransformer;
     }
 
-    public MetadataValueVO conver(Context context, String field, MetadataValueVO metadataValue) {
+    public MetadataValueVO converter(Context context, String field, MetadataValueVO metadataValue) {
         if (field2ValueTransformer.containsKey(field)) {
             BulkImportValueTransformer transformer = field2ValueTransformer.get(field);
             return transformer.transform(context, metadataValue);
