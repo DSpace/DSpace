@@ -95,7 +95,7 @@ public class DescribeStep extends AbstractProcessingStep {
                         dto.setLanguage(md.getLanguage());
                         dto.setPlace(md.getPlace());
                         dto.setValue(md.getValue());
-
+                        dto.setSecurityLevel(md.getSecurityLevel());
                         String[] metadataToCheck = Utils.tokenize(md.getMetadataField().toString());
                         if (data.getMetadata().containsKey(
                             Utils.standardize(metadataToCheck[0], metadataToCheck[1], metadataToCheck[2], "."))) {
