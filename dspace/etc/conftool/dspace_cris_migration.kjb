@@ -429,6 +429,21 @@
           <variable_value>1 = 1</variable_value>
           <variable_type>JVM</variable_type>
         </field>
+        <field>
+          <variable_name>NESTED_TABLE</variable_name>
+          <variable_value>old_cris_pj_no</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>NESTED_PROP</variable_name>
+          <variable_value>old_cris_pj_no_prop</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>NESTED_PROP_DEF</variable_name>
+          <variable_value>old_cris_pj_no_pdef</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
       </fields>
       <parallel>N</parallel>
       <draw>Y</draw>
@@ -510,6 +525,21 @@
           <variable_value>1 = 1</variable_value>
           <variable_type>JVM</variable_type>
         </field>
+        <field>
+          <variable_name>NESTED_TABLE</variable_name>
+          <variable_value>old_cris_ou_no</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>NESTED_PROP</variable_name>
+          <variable_value>old_cris_ou_prop</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>NESTED_PROP_DEF</variable_name>
+          <variable_value>old_cris_ou_pdef</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
       </fields>
       <parallel>N</parallel>
       <draw>Y</draw>
@@ -550,6 +580,21 @@
         <field>
           <variable_name>ENTITY_FILTER</variable_name>
           <variable_value>1 = 1</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>NESTED_TABLE</variable_name>
+          <variable_value>old_cris_rp_no</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>NESTED_PROP</variable_name>
+          <variable_value>old_cris_rp_no_prop</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>NESTED_PDEF</variable_name>
+          <variable_value>old_cris_rp_no_pdef</variable_value>
           <variable_type>JVM</variable_type>
         </field>
       </fields>
@@ -631,6 +676,21 @@
         <field>
           <variable_name>ENTITY_FILTER</variable_name>
           <variable_value/>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>NESTED_TABLE</variable_name>
+          <variable_value>old_cris_do_no</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>NESTED_PROP</variable_name>
+          <variable_value>old_cris_do_no_prop</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>NESTED_PROP_DEF</variable_name>
+          <variable_value>old_cris_do_no_pdef</variable_value>
           <variable_type>JVM</variable_type>
         </field>
       </fields>
