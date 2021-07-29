@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>search publication by handle</name>
+    <name>orcid history migration</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -431,20 +431,20 @@
     <created_date>2021/07/28 11:39:40.659</created_date>
     <modified_user>-</modified_user>
     <modified_date>2021/07/28 11:39:40.659</modified_date>
-    <key_for_session_key/>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
   <connection>
     <name>dspace</name>
-    <server>localhost</server>
+    <server>${db_host_name}</server>
     <type>POSTGRESQL</type>
     <access>Native</access>
-    <database>dspace-cris-demo</database>
-    <port>5432</port>
-    <username>dspacecrisdemo</username>
-    <password>Encrypted 2be98afc86aa7f2e4cb79aa63ce93acdf</password>
+    <database>${db_name}</database>
+    <port>${db_port_number}</port>
+    <username>${db_username}</username>
+    <password>${db_password}</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -467,7 +467,7 @@
       </attribute>
       <attribute>
         <code>PORT_NUMBER</code>
-        <attribute>5432</attribute>
+        <attribute>${db_port_number}</attribute>
       </attribute>
       <attribute>
         <code>PRESERVE_RESERVED_WORD_CASE</code>
@@ -579,8 +579,8 @@
     </hop>
   </order>
   <step>
-    <name>cris orcid history records</name>
-    <type>TableInput</type>
+    <name>Add sequence</name>
+    <type>Sequence</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -589,225 +589,16 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
+    <valuename>orcid_history_id</valuename>
+    <use_database>Y</use_database>
     <connection>dspace</connection>
-    <sql>SELECT * 
-FROM old_cris_orcid_history
-where putcode is not null;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-    <cached_row_meta_active>N</cached_row_meta_active>
-    <row-meta>
-      <value-meta>
-        <type>Integer</type>
-        <storagetype>normal</storagetype>
-        <name>id</name>
-        <length>9</length>
-        <precision>0</precision>
-        <origin>Table input</origin>
-        <comments>id</comments>
-        <conversion_Mask>####0;-####0</conversion_Mask>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>owner</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>Table input</origin>
-        <comments>owner</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Integer</type>
-        <storagetype>normal</storagetype>
-        <name>typeid</name>
-        <length>9</length>
-        <precision>0</precision>
-        <origin>Table input</origin>
-        <comments>typeid</comments>
-        <conversion_Mask>####0;-####0</conversion_Mask>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>responsemessage</name>
-        <length>2147483647</length>
-        <precision>-1</precision>
-        <origin>Table input</origin>
-        <comments>responsemessage</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Timestamp</type>
-        <storagetype>normal</storagetype>
-        <name>lastattempt</name>
-        <length>6</length>
-        <precision>-1</precision>
-        <origin>Table input</origin>
-        <comments>lastattempt</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Timestamp</type>
-        <storagetype>normal</storagetype>
-        <name>lastsuccess</name>
-        <length>6</length>
-        <precision>-1</precision>
-        <origin>Table input</origin>
-        <comments>lastsuccess</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>entityuuid</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>Table input</origin>
-        <comments>entityuuid</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>putcode</name>
-        <length>20</length>
-        <precision>-1</precision>
-        <origin>Table input</origin>
-        <comments>putcode</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>String</type>
-        <storagetype>normal</storagetype>
-        <name>orcid</name>
-        <length>255</length>
-        <precision>-1</precision>
-        <origin>Table input</origin>
-        <comments>orcid</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>it_IT</date_format_locale>
-        <date_format_timezone>Europe/Rome</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-    </row-meta>
+    <schema/>
+    <seqname>orcid_history_id_seq</seqname>
+    <use_counter>N</use_counter>
+    <counter_name/>
+    <start_at>1</start_at>
+    <increment_by>1</increment_by>
+    <max_value>999999999</max_value>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -817,8 +608,229 @@ where putcode is not null;</sql>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>112</xloc>
-      <yloc>48</yloc>
+      <xloc>1008</xloc>
+      <yloc>752</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Append streams</name>
+    <type>Append</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <head_name>Select values</head_name>
+    <tail_name>Select values 2</tail_name>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>336</xloc>
+      <yloc>752</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Append streams 2</name>
+    <type>Append</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <head_name>Append streams</head_name>
+    <tail_name>Select values 3</tail_name>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>672</xloc>
+      <yloc>752</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Select values</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>responsemessage</name>
+      </field>
+      <field>
+        <name>lastsuccess</name>
+      </field>
+      <field>
+        <name>putcode</name>
+      </field>
+      <field>
+        <name>owner_uuid</name>
+      </field>
+      <field>
+        <name>operation</name>
+      </field>
+      <field>
+        <name>entity_uuid</name>
+      </field>
+      <field>
+        <name>record_type</name>
+      </field>
+      <field>
+        <name>status</name>
+      </field>
+      <field>
+        <name>metadata</name>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>176</xloc>
+      <yloc>544</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Select values 2</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>responsemessage</name>
+      </field>
+      <field>
+        <name>lastsuccess</name>
+      </field>
+      <field>
+        <name>putcode</name>
+      </field>
+      <field>
+        <name>owner_uuid</name>
+      </field>
+      <field>
+        <name>operation</name>
+      </field>
+      <field>
+        <name>entity_uuid</name>
+      </field>
+      <field>
+        <name>record_type</name>
+      </field>
+      <field>
+        <name>status</name>
+      </field>
+      <field>
+        <name>metadata</name>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>528</xloc>
+      <yloc>544</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Select values 3</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>responsemessage</name>
+      </field>
+      <field>
+        <name>lastsuccess</name>
+      </field>
+      <field>
+        <name>putcode</name>
+      </field>
+      <field>
+        <name>owner_uuid</name>
+      </field>
+      <field>
+        <name>operation</name>
+      </field>
+      <field>
+        <name>owner_uuid</name>
+        <rename>entity_uuid</rename>
+      </field>
+      <field>
+        <name>record_type</name>
+      </field>
+      <field>
+        <name>status</name>
+      </field>
+      <field>
+        <name>entityuuid</name>
+        <rename>metadata</rename>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>864</xloc>
+      <yloc>544</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -865,88 +877,6 @@ where putcode is not null;</sql>
     <GUI>
       <xloc>528</xloc>
       <yloc>176</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>search publication by handle</name>
-    <type>DBJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>dspace</connection>
-    <rowlimit>0</rowlimit>
-    <sql>SELECT h.resource_id as entity_uuid
-FROM handle h
-WHERE h.resource_type_id = 2
-AND h.handle = ?</sql>
-    <outer_join>N</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
-      <field>
-        <name>entityuuid</name>
-        <type>Binary</type>
-      </field>
-    </parameter>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>176</xloc>
-      <yloc>320</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>search owner</name>
-    <type>DBJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>dspace</connection>
-    <rowlimit>0</rowlimit>
-    <sql>select metadata_value.dspace_object_id as owner_uuid
-from metadatavalue metadata_value, metadatafieldregistry metadata_field, metadataschemaregistry metadata_schema
-where metadata_value.metadata_field_id = metadata_field.metadata_field_id
-AND metadata_field.element = 'legacyId'
-AND metadata_field.qualifier is null
-AND metadata_field.metadata_schema_id = metadata_schema.metadata_schema_id
-AND metadata_schema.short_id = 'cris'
-AND metadata_value.text_value = ?;</sql>
-    <outer_join>N</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
-      <field>
-        <name>owner</name>
-        <type>String</type>
-      </field>
-    </parameter>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>320</xloc>
-      <yloc>48</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -998,50 +928,6 @@ AND metadata_value.text_value = ?;</sql>
     <GUI>
       <xloc>528</xloc>
       <yloc>48</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>search project by uuid</name>
-    <type>DBJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>dspace</connection>
-    <rowlimit>0</rowlimit>
-    <sql>SELECT metadata_value.dspace_object_id as entity_uuid
-FROM old_cris_project project, metadatavalue metadata_value, metadatafieldregistry metadata_field, metadataschemaregistry metadata_schema
-WHERE project.uuid = ?
-AND metadata_value.metadata_field_id = metadata_field.metadata_field_id
-AND metadata_field.element = 'legacyId'
-AND metadata_field.qualifier is null
-AND metadata_field.metadata_schema_id = metadata_schema.metadata_schema_id
-AND metadata_schema.short_id = 'cris'
-AND metadata_value.text_value = project.crisid;</sql>
-    <outer_join>N</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
-      <field>
-        <name>entityuuid</name>
-        <type>Binary</type>
-      </field>
-    </parameter>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>528</xloc>
-      <yloc>320</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1148,161 +1034,6 @@ AND metadata_value.text_value = project.crisid;</sql>
     </GUI>
   </step>
   <step>
-    <name>Select values</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <name>responsemessage</name>
-        <rename/>
-      </field>
-      <field>
-        <name>lastsuccess</name>
-        <rename/>
-      </field>
-      <field>
-        <name>putcode</name>
-        <rename/>
-      </field>
-      <field>
-        <name>owner_uuid</name>
-        <rename/>
-      </field>
-      <field>
-        <name>operation</name>
-        <rename/>
-      </field>
-      <field>
-        <name>entity_uuid</name>
-        <rename/>
-      </field>
-      <field>
-        <name>record_type</name>
-        <rename/>
-      </field>
-      <field>
-        <name>status</name>
-        <rename/>
-      </field>
-      <field>
-        <name>metadata</name>
-        <rename/>
-      </field>
-      <select_unspecified>N</select_unspecified>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>176</xloc>
-      <yloc>544</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Select values 2</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <name>responsemessage</name>
-        <rename/>
-      </field>
-      <field>
-        <name>lastsuccess</name>
-        <rename/>
-      </field>
-      <field>
-        <name>putcode</name>
-        <rename/>
-      </field>
-      <field>
-        <name>owner_uuid</name>
-        <rename/>
-      </field>
-      <field>
-        <name>operation</name>
-        <rename/>
-      </field>
-      <field>
-        <name>entity_uuid</name>
-        <rename/>
-      </field>
-      <field>
-        <name>record_type</name>
-        <rename/>
-      </field>
-      <field>
-        <name>status</name>
-        <rename/>
-      </field>
-      <field>
-        <name>metadata</name>
-        <rename/>
-      </field>
-      <select_unspecified>N</select_unspecified>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>528</xloc>
-      <yloc>544</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Append streams</name>
-    <type>Append</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <head_name>Select values</head_name>
-    <tail_name>Select values 2</tail_name>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>528</xloc>
-      <yloc>704</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
     <name>calculate record type</name>
     <type>ScriptValueMod</type>
     <description/>
@@ -1372,8 +1103,8 @@ switch(entityPrefix){
     </GUI>
   </step>
   <step>
-    <name>Select values 3</name>
-    <type>SelectValues</type>
+    <name>cris orcid history records</name>
+    <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1382,45 +1113,225 @@ switch(entityPrefix){
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <fields>
-      <field>
+    <connection>dspace</connection>
+    <sql>SELECT * 
+FROM old_cris_orcid_history
+where putcode is not null;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <cached_row_meta_active>N</cached_row_meta_active>
+    <row-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>id</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>cris orcid history records</origin>
+        <comments>id</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>owner</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>cris orcid history records</origin>
+        <comments>owner</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>typeid</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>cris orcid history records</origin>
+        <comments>typeid</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
         <name>responsemessage</name>
-        <rename/>
-      </field>
-      <field>
+        <length>2147483647</length>
+        <precision>-1</precision>
+        <origin>cris orcid history records</origin>
+        <comments>responsemessage</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Timestamp</type>
+        <storagetype>normal</storagetype>
+        <name>lastattempt</name>
+        <length>6</length>
+        <precision>-1</precision>
+        <origin>cris orcid history records</origin>
+        <comments>lastattempt</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Timestamp</type>
+        <storagetype>normal</storagetype>
         <name>lastsuccess</name>
-        <rename/>
-      </field>
-      <field>
-        <name>putcode</name>
-        <rename/>
-      </field>
-      <field>
-        <name>owner_uuid</name>
-        <rename/>
-      </field>
-      <field>
-        <name>operation</name>
-        <rename/>
-      </field>
-      <field>
-        <name>owner_uuid</name>
-        <rename>entity_uuid</rename>
-      </field>
-      <field>
-        <name>record_type</name>
-        <rename/>
-      </field>
-      <field>
-        <name>status</name>
-        <rename/>
-      </field>
-      <field>
+        <length>6</length>
+        <precision>-1</precision>
+        <origin>cris orcid history records</origin>
+        <comments>lastsuccess</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
         <name>entityuuid</name>
-        <rename>metadata</rename>
-      </field>
-      <select_unspecified>N</select_unspecified>
-    </fields>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>cris orcid history records</origin>
+        <comments>entityuuid</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>putcode</name>
+        <length>20</length>
+        <precision>-1</precision>
+        <origin>cris orcid history records</origin>
+        <comments>putcode</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>orcid</name>
+        <length>255</length>
+        <precision>-1</precision>
+        <origin>cris orcid history records</origin>
+        <comments>orcid</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>it_IT</date_format_locale>
+        <date_format_timezone>Europe/Rome</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+    </row-meta>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -1430,35 +1341,8 @@ switch(entityPrefix){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>864</xloc>
-      <yloc>544</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Append streams 2</name>
-    <type>Append</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <head_name>Append streams</head_name>
-    <tail_name>Select values 3</tail_name>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>864</xloc>
-      <yloc>704</yloc>
+      <xloc>112</xloc>
+      <yloc>48</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1541,14 +1425,14 @@ switch(entityPrefix){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1296</xloc>
-      <yloc>704</yloc>
+      <xloc>1248</xloc>
+      <yloc>752</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Add sequence</name>
-    <type>Sequence</type>
+    <name>search owner</name>
+    <type>DBJoin</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1557,16 +1441,24 @@ switch(entityPrefix){
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <valuename>orcid_history_id</valuename>
-    <use_database>Y</use_database>
     <connection>dspace</connection>
-    <schema/>
-    <seqname>orcid_history_id_seq</seqname>
-    <use_counter>N</use_counter>
-    <counter_name/>
-    <start_at>1</start_at>
-    <increment_by>1</increment_by>
-    <max_value>999999999</max_value>
+    <rowlimit>0</rowlimit>
+    <sql>select metadata_value.dspace_object_id as owner_uuid
+from metadatavalue metadata_value, metadatafieldregistry metadata_field, metadataschemaregistry metadata_schema
+where metadata_value.metadata_field_id = metadata_field.metadata_field_id
+AND metadata_field.element = 'legacyId'
+AND metadata_field.qualifier is null
+AND metadata_field.metadata_schema_id = metadata_schema.metadata_schema_id
+AND metadata_schema.short_id = 'cris'
+AND metadata_value.text_value = ?;</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>owner</name>
+        <type>String</type>
+      </field>
+    </parameter>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -1576,8 +1468,91 @@ switch(entityPrefix){
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1072</xloc>
-      <yloc>704</yloc>
+      <xloc>320</xloc>
+      <yloc>48</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>search project by uuid</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>dspace</connection>
+    <rowlimit>0</rowlimit>
+    <sql>SELECT metadata_value.dspace_object_id as entity_uuid
+FROM old_cris_project project, metadatavalue metadata_value, metadatafieldregistry metadata_field, metadataschemaregistry metadata_schema
+WHERE project.uuid = ?
+AND metadata_value.metadata_field_id = metadata_field.metadata_field_id
+AND metadata_field.element = 'legacyId'
+AND metadata_field.qualifier is null
+AND metadata_field.metadata_schema_id = metadata_schema.metadata_schema_id
+AND metadata_schema.short_id = 'cris'
+AND metadata_value.text_value = project.crisid;</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>entityuuid</name>
+        <type>Binary</type>
+      </field>
+    </parameter>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>528</xloc>
+      <yloc>320</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>search publication by handle</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>dspace</connection>
+    <rowlimit>0</rowlimit>
+    <sql>SELECT h.resource_id as entity_uuid
+FROM handle h
+WHERE h.resource_type_id = 2
+AND h.handle = ?</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>entityuuid</name>
+        <type>Binary</type>
+      </field>
+    </parameter>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>176</xloc>
+      <yloc>320</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
