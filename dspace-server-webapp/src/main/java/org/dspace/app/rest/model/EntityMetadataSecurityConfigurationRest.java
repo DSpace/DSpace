@@ -2,14 +2,16 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.model;
 
-import org.dspace.app.rest.RestResourceController;
 import java.util.HashMap;
 import java.util.List;
+
+import org.dspace.app.rest.RestResourceController;
+
 
 /**
  * Model class to offer security configuration levels foreach entity type
@@ -29,7 +31,7 @@ public class EntityMetadataSecurityConfigurationRest extends BaseObjectRest<Stri
      */
     private HashMap<String, List<Integer>> metadataCustomSecurity;
 
-     public String getCategory() {
+    public String getCategory() {
         return CATEGORY;
     }
 
@@ -60,7 +62,8 @@ public class EntityMetadataSecurityConfigurationRest extends BaseObjectRest<Stri
     public EntityMetadataSecurityConfigurationRest() {
     }
 
-    public EntityMetadataSecurityConfigurationRest(List<Integer> metadataSecurityDefault, HashMap<String, List<Integer>> metadataCustomSecurity) {
+    public EntityMetadataSecurityConfigurationRest(List<Integer> metadataSecurityDefault,
+                                                   HashMap<String, List<Integer>> metadataCustomSecurity) {
         this.metadataSecurityDefault = metadataSecurityDefault;
         this.metadataCustomSecurity = metadataCustomSecurity;
     }

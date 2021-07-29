@@ -18,7 +18,8 @@ public class EntityMetadataSecurityConfiguration {
      */
     private HashMap<String, List<Integer>> metadataCustomSecurity;
 
-    public EntityMetadataSecurityConfiguration(List<Integer> metadataSecurityDefault, HashMap<String, List<Integer>> metadataCustomSecurity) {
+    public EntityMetadataSecurityConfiguration(List<Integer> metadataSecurityDefault,
+                                               HashMap<String, List<Integer>> metadataCustomSecurity) {
         this.metadataSecurityDefault = metadataSecurityDefault;
         this.metadataCustomSecurity = metadataCustomSecurity;
     }

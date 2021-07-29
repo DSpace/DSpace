@@ -15,7 +15,8 @@ import org.dspace.app.rest.utils.Utils;
  * The Resource representation of a EntityMetadataSecurityConfiguration object
  */
 @RelNameDSpaceResource(EntityMetadataSecurityConfigurationRest.NAME)
-public class EntityMetadataSecurityConfigurationResource extends DSpaceResource<EntityMetadataSecurityConfigurationRest> {
+public class EntityMetadataSecurityConfigurationResource
+        extends DSpaceResource<EntityMetadataSecurityConfigurationRest> {
     public EntityMetadataSecurityConfigurationResource(EntityMetadataSecurityConfigurationRest data, Utils utils) {
         super(data, utils);
     }

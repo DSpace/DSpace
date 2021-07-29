@@ -7,6 +7,14 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,14 +29,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+
+
 
 /**
  * This is the repository that is responsible to manage
@@ -69,27 +71,28 @@ public class EnitityMetadataSecurityConfigurationRestRepository extends
     private ConverterService converter;
 
     @Override
-    public EntityMetadataSecurityConfigurationRest findOne(
-            final Context context, final String entityType) {
-        EntityMetadataSecurityConfiguration entityMetadataSecurityConfiguration = new EntityMetadataSecurityConfiguration();
+    public EntityMetadataSecurityConfigurationRest findOne(final Context context, final String entityType) {
+        EntityMetadataSecurityConfiguration entityMetadataSecurityConfiguration
+                = new EntityMetadataSecurityConfiguration();
         List<Integer> securityLevelValuesFallBack = new ArrayList<>();
         String entitySecurityConfiguration;
         // find the security levels configuration for the entity type
         if (configurationService.hasProperty(
-                prefixPropertyBasicFallbackSecurityConfiguration + "." + entityType + "."
-                        + suffixPropertyNameMetadataSecurityConfiguration)) {
+                prefixPropertyBasicFallbackSecurityConfiguration + "."
+                        + entityType + "." + suffixPropertyNameMetadataSecurityConfiguration)) {
             entitySecurityConfiguration = configurationService.getProperty(
-                    prefixPropertyBasicFallbackSecurityConfiguration + "." + entityType + "."
-                            + suffixPropertyNameMetadataSecurityConfiguration);
+                    prefixPropertyBasicFallbackSecurityConfiguration + "."
+                    + entityType + "." + suffixPropertyNameMetadataSecurityConfiguration);
         } else {
             // if not found look at the fallback configuration level
-            if (configurationService.hasProperty(prefixPropertyBasicFallbackSecurityConfiguration + "."
-                            + suffixPropertyNameMetadataSecurityConfiguration
+            if (configurationService.hasProperty(prefixPropertyBasicFallbackSecurityConfiguration
+                    + "." + suffixPropertyNameMetadataSecurityConfiguration
             )) {
                 // set as default security configuration level the fallback
                 // level found
                 entitySecurityConfiguration = configurationService.getProperty(
-                        prefixPropertyBasicFallbackSecurityConfiguration + "." + suffixPropertyNameMetadataSecurityConfiguration);
+                        prefixPropertyBasicFallbackSecurityConfiguration
+                        + "." + suffixPropertyNameMetadataSecurityConfiguration);
             } else {
                 // if neither metadata.visibility found, set as null
                 entitySecurityConfiguration = null;
@@ -98,7 +101,8 @@ public class EnitityMetadataSecurityConfigurationRestRepository extends
         }
         try {
             if (entitySecurityConfiguration != null) {
-                String listOfSecuritiesAsString = entitySecurityConfiguration.substring(1, entitySecurityConfiguration.length() - 1);
+                String listOfSecuritiesAsString = entitySecurityConfiguration.
+                        substring(1, entitySecurityConfiguration.length() - 1);
                 securityLevelValuesFallBack = Arrays.stream(listOfSecuritiesAsString.split(" "))
                         .map(Integer::parseInt)
                         .collect(Collectors.toList());
@@ -108,17 +112,21 @@ public class EnitityMetadataSecurityConfigurationRestRepository extends
         }
         entityMetadataSecurityConfiguration.setMetadataSecurityDefault(securityLevelValuesFallBack);
         HashMap<String, List<Integer>> metadataCustomSecurity = new HashMap<>();
-        Iterator<Map.Entry<Object, Object>> securityValuesIterator = configurationService.getPropertiesWithPrefix(prefixPropertyBasicFallbackSecurityConfiguration + "." + entityType).entrySet().iterator();
+        Iterator<Map.Entry<Object, Object>> securityValuesIterator = configurationService.getPropertiesWithPrefix(
+                prefixPropertyBasicFallbackSecurityConfiguration
+                        + "." + entityType).entrySet().iterator();
         while (securityValuesIterator.hasNext()) {
             Map.Entry<Object, Object> next = securityValuesIterator.next();
             List<Integer> securityValueList = new ArrayList<>();
             String value = next.getValue().toString();
-            String key = next.getKey().toString();
+            String draftKey =  next.getKey().toString();
             // include only values different from the default configurations
-            if (key.equals(suffixPropertyNameMetadataSecurityConfiguration) || Objects.equals(entitySecurityConfiguration, value)) {
+            if (draftKey.equals(suffixPropertyNameMetadataSecurityConfiguration)
+                    || Objects.equals(entitySecurityConfiguration, value)) {
                 continue;
             }
             try {
+                String key = draftKey.substring(0, draftKey.indexOf(".settings"));
                 securityValueList = Arrays.stream(value.substring(1, value.length() - 1).split(" "))
                         .map(Integer::parseInt)
                         .collect(Collectors.toList());
