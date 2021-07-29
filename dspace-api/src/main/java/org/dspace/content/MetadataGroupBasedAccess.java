@@ -8,10 +8,7 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
-import java.util.List;
 
-
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.service.MetadataSecurityEvaluation;
 import org.dspace.core.Context;
