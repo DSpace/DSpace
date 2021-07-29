@@ -45,17 +45,17 @@ public class SubmissionSectionRest extends BaseObjectRest<String> {
         return mandatory;
     }
 
-	public boolean isOpened() {
-		return opened;
-	}
+    public boolean isOpened() {
+        return opened;
+    }
 
     public void setMandatory(boolean mandatory) {
         this.mandatory = mandatory;
     }
-    
-	public void setOpened(boolean opened) {
-		this.opened = opened;
-	}
+
+    public void setOpened(boolean opened) {
+        this.opened = opened;
+    }
 
     public String getType() {
         return NAME;

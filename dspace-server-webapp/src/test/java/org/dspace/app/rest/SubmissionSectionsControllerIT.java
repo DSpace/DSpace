@@ -76,12 +76,12 @@ public class SubmissionSectionsControllerIT extends AbstractControllerIntegratio
             .andExpect(jsonPath("$", matches("traditionalpageone", true, "submission-form")));
 
         getClient(token).perform(get("/api/config/submissionsections/traditionalpageone-cris"))
-        	.andExpect(status().isOk())
-        	.andExpect(jsonPath("$", matches("traditionalpageone-cris", true, "submission-form", true)));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matches("traditionalpageone-cris", true, "submission-form", true)));
 
         getClient(token).perform(get("/api/config/submissionsections/traditionalpagethree-cris-open"))
-        	.andExpect(status().isOk())
-        	.andExpect(jsonPath("$", matches("traditionalpagethree-cris-open", true, "submission-form", true)));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matches("traditionalpagethree-cris-open", true, "submission-form", true)));
 
         getClient(token).perform(get("/api/config/submissionsections/traditionalpagethree-cris-collapsed"))
             .andExpect(status().isOk())
