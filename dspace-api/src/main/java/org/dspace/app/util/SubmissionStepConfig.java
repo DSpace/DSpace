@@ -48,7 +48,7 @@ public class SubmissionStepConfig implements Serializable {
     private String id = null;
 
     private boolean mandatory = true;
-    
+
     private boolean opened = true;
 
     /**
@@ -109,7 +109,7 @@ public class SubmissionStepConfig implements Serializable {
         }
         String s2 = stepMap.get("opened");
         if (s2 != null) {
-        	opened = BooleanUtils.toBoolean(s2);
+            opened = BooleanUtils.toBoolean(s2);
         }
         heading = stepMap.get("heading");
         processingClassName = stepMap.get("processing-class");
@@ -213,7 +213,7 @@ public class SubmissionStepConfig implements Serializable {
     public boolean isMandatory() {
         return mandatory;
     }
-    
+
     public boolean isOpened() {
         return opened;
     }
