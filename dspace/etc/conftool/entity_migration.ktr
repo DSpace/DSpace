@@ -2117,9 +2117,6 @@ WHERE property_def.id = properties.typo_id
       <remove>
         <name>nested_object_id</name>
       </remove>
-      <remove>
-        <name>nested_metadata</name>
-      </remove>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -3696,7 +3693,7 @@ WHERE property_def.id = properties.typo_id
     <name>entities nested metadata</name>
     <type>TableInput</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
     <partitioning>
@@ -4280,8 +4277,8 @@ WHERE property_def.id = properties.typo_id
       </output>
     </remotesteps>
     <GUI>
-      <xloc>112</xloc>
-      <yloc>832</yloc>
+      <xloc>80</xloc>
+      <yloc>880</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
