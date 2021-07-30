@@ -341,7 +341,6 @@ public class InitialQuestionsStep extends AbstractProcessingStep
         if (isDataset) {
             itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "relation", "ispartofseries", Item.ANY);
             itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", Item.ANY, Item.ANY);
-            itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "", Item.ANY);
             List<MetadataValue> typeValues = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "type", "", Item.ANY);
             if (typeValues.size() > 0) {
                 List<String> filteredTypeValues = new ArrayList<String>();
@@ -356,8 +355,6 @@ public class InitialQuestionsStep extends AbstractProcessingStep
                     itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "type", "", Item.ANY);
                 }
             }
-        } else {
-            itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "description", Item.ANY);
         }
         // End customization for LIBDRUM-628
         

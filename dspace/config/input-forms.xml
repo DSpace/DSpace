@@ -228,8 +228,8 @@
         <!-- Customization for LIBDRUM-628 -->
         <field>
           <dc-schema>dc</dc-schema>
-          <dc-element>date</dc-element>
-          <dc-qualifier>description</dc-qualifier>
+          <dc-element>description</dc-element>
+          <dc-qualifier></dc-qualifier>
           <repeatable>false</repeatable>
           <label>Methodology Description</label>
           <input-type>textarea</input-type>

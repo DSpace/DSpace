@@ -198,7 +198,11 @@ public class DCInputSet
     	{
     		return false;
       }
-			if ( rowName.equals("description.null") && isDataset )
+			if ( rowName.equals("description.null") && dcf.getLabel().equals("Description") && isDataset )
+    	{
+    		return false;
+      }
+			if ( rowName.equals("description.null") && ! dcf.getLabel().equals("Description") && ! isDataset )
     	{
     		return false;
       }
@@ -207,10 +211,6 @@ public class DCInputSet
     		return false;
       }
 			if ( rowName.equals("type.null") && dcf.getPairsType().equals("data_types") && ! isDataset )
-    	{
-    		return false;
-      }
-			if ( rowName.equals("date.description") && ! isDataset )
     	{
     		return false;
       }
