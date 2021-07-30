@@ -62,6 +62,7 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -76,6 +77,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.workflow.WorkflowItem;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -171,8 +173,17 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        // Create one Collection with an enabled "reviewer" Workflow step. This lets us create a WorkflowItem below.
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup("reviewer", admin)
+                                           .build();
+        // Create a second Collection with a template Item. This is used to ensure that Template Items are
+        // NOT counted/listed in this endpoint.
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2")
+                                           .withTemplateItem()
+                                           .build();
 
         //2. Three public items that are readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -197,6 +208,24 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("ExtraEntry")
                                       .build();
 
+        // Create a Workspace Item (which in turn creates an Item with "in_archive=false")
+        // This is only created to prove that WorkspaceItems are NOT counted/listed in this endpoint
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+                .withTitle("In Progress Item")
+                .withIssueDate("2018-02-05")
+                .withAuthor("Doe, Jane").withAuthor("Smith, Jennifer")
+                .build();
+        Item itemInWorkspace = workspaceItem.getItem();
+
+        // Also create a Workflow Item (in the workflow-enabled Collection), to ensure WorkflowItems are
+        // NOT counted/listed in this endpoint
+        WorkflowItem workflowItem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                .withTitle("Item in Workflow")
+                .withIssueDate("2019-06-03")
+                .withAuthor("Smith, Jennifer").withAuthor("Doe, John")
+                .build();
+        Item itemInWorkflow = workflowItem.getItem();
+
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -212,7 +241,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$._embedded.items", Matchers.not(
                            Matchers.contains(
                                ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
-                                       "Public item 3", "2016-02-13")
+                                       "Public item 3", "2016-02-13"),
+                               ItemMatcher.matchItemWithTitleAndDateIssued(itemInWorkspace,
+                                       "In Progress Item", "2018-02-05"),
+                               ItemMatcher.matchItemWithTitleAndDateIssued(itemInWorkflow,
+                                       "Item in Workflow", "2019-06-03"),
+                               ItemMatcher.matchItemProperties(col2.getTemplateItem())
                            )
                    )))
                    .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
@@ -245,7 +279,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                            ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
                                    "Public item 1", "2017-10-17"),
                            ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
-                                   "Public item 2", "2016-02-13")
+                                   "Public item 2", "2016-02-13"),
+                           ItemMatcher.matchItemWithTitleAndDateIssued(itemInWorkspace,
+                                   "In Progress Item", "2018-02-05"),
+                           ItemMatcher.matchItemWithTitleAndDateIssued(itemInWorkflow,
+                                   "Item in Workflow", "2019-06-03"),
+                           ItemMatcher.matchItemProperties(col2.getTemplateItem())
                        )
                    )))
                    .andExpect(jsonPath("$._links.first.href", Matchers.allOf(

@@ -10,11 +10,17 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.patch.Patch;
@@ -24,11 +30,14 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
+import org.dspace.handle.service.HandleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,6 +68,9 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
 
     @Autowired
     private CommunityService communityService;
+
+    @Autowired
+    private HandleService handleService;
 
     @Autowired
     public BitstreamRestRepository(BitstreamService dsoService) {
@@ -135,6 +147,67 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         }
     }
 
+    /**
+     * Find the bitstream for the provided handle and sequence or filename.
+     * When a bitstream can be found with the sequence ID it will be returned if the user has "METADATA_READ" access.
+     *
+     * @param handle    The handle of the item
+     * @param sequence  The sequence ID of the bitstream
+     * @param filename  The filename of the bitstream
+     *
+     * @return a Page of BitstreamRest instance matching the user query
+     */
+    @SearchRestMethod(name = "byItemHandle")
+    public BitstreamRest findByItemHandle(@Parameter(value = "handle", required = true) String handle,
+                                          @Parameter(value = "sequence") Integer sequence,
+                                          @Parameter(value = "filename") String filename) {
+        if (StringUtils.isBlank(filename) && sequence == null) {
+            throw new IllegalArgumentException("The request should include a sequence or a filename");
+        }
+
+        try {
+            Context context = obtainContext();
+            DSpaceObject dSpaceObject = handleService.resolveToObject(context, handle);
+
+            if (!(dSpaceObject instanceof Item)) {
+                throw new UnprocessableEntityException("The provided handle does not correspond to an existing item");
+            }
+            Item item = (Item) dSpaceObject;
+
+            Bitstream matchedBitstream = getFirstMatchedBitstream(item, sequence, filename);
+
+            if (matchedBitstream == null) {
+                return null;
+            } else {
+                return converter.toRest(matchedBitstream, utils.obtainProjection());
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private Bitstream getFirstMatchedBitstream(Item item, Integer sequence, String filename) {
+        List<Bundle> bundles = item.getBundles();
+        List<Bitstream> bitstreams = new LinkedList<>();
+        bundles.forEach(bundle -> bitstreams.addAll(bundle.getBitstreams()));
+
+        if (sequence != null) {
+            for (Bitstream bitstream : bitstreams) {
+                if (bitstream.getSequenceID() == sequence) {
+                    return bitstream;
+                }
+            }
+        }
+        if (StringUtils.isNotBlank(filename)) {
+            for (Bitstream bitstream : bitstreams) {
+                if (StringUtils.equals(bitstream.getName(), filename)) {
+                    return bitstream;
+                }
+            }
+        }
+        return null;
+    }
+
     public InputStream retrieve(UUID uuid) {
         Context context = obtainContext();
         Bitstream bit = null;
@@ -157,7 +230,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     }
 
     /**
-     * Method that will move the bitsream corresponding to the uuid to the target bundle
+     * Method that will move the bitstream corresponding to the uuid to the target bundle
      *
      * @param context      The context
      * @param bitstream    The bitstream to be moved

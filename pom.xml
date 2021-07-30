@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>7.0-beta6-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -35,7 +35,7 @@
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
-        <jetty.version>9.4.38.v20210224</jetty.version>
+        <jetty.version>9.4.41.v20210516</jetty.version>
         <log4j.version>2.13.3</log4j.version>
         <pdfbox-version>2.0.24</pdfbox-version>
         <poi-version>3.17</poi-version>
@@ -662,6 +662,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>license-maven-plugin</artifactId>
+                        <version>2.0.0</version>
                         <!-- This plugin only needs to be run on the Parent POM
                              as it aggregates results from all child POMs. -->
                         <inherited>false</inherited>
@@ -826,14 +827,14 @@
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.0-beta6-SNAPSHOT</version>
+                       <version>7.1-SNAPSHOT</version>
                        <type>jar</type>
                        <classifier>classes</classifier>
                    </dependency>
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.0-beta6-SNAPSHOT</version>
+                       <version>7.1-SNAPSHOT</version>
                        <type>war</type>
                    </dependency>
                </dependencies>
@@ -980,71 +981,71 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>7.0-beta6-SNAPSHOT</version>
+                <version>7.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>7.0-beta6-SNAPSHOT</version>
+                <version>7.1-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>7.0-beta6-SNAPSHOT</version>
+                <version>7.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>7.0-beta6-SNAPSHOT</version>
+                <version>7.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>7.0-beta6-SNAPSHOT</version>
+                <version>7.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>7.0-beta6-SNAPSHOT</version>
+                <version>7.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>7.0-beta6-SNAPSHOT</version>
+                <version>7.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>7.0-beta6-SNAPSHOT</version>
+                <version>7.1-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>7.0-beta6-SNAPSHOT</version>
+                <version>7.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.0-beta6-SNAPSHOT</version>
+                <version>7.1-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.0-beta6-SNAPSHOT</version>
+                <version>7.1-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api-lang</artifactId>
-                <version>[6.0.0,7.0.0)</version>
+                <version>[7.0.0,8.0.0)</version>
             </dependency>
 
             <!-- DSpace third Party Dependencies -->
