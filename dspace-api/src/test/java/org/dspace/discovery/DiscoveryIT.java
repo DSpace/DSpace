@@ -461,10 +461,10 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void disabilitySolrToRemoveStaleObjectsTest() throws Exception {
+    public void disabledSolrToRemoveStaleObjectsTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        // disability solr to remove documents related to items not on database anymore (Stale)
+        // disable removal of solr documents related to items not on database anymore (Stale)
         configurationService.setProperty("discovery.removestale.attempts", -1);
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -549,6 +549,98 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         // check Item type with start=0 and limit=default,
         // we expect: indexableObjects=3, totalFound=should be 3 but we have 6 ->(3 stale objects here)
         assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, -1);
+    }
+
+    @Test
+    public void disabledRerunOfSolrQueryDueToStaleObjectsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // disable re-run of the solr query when stale documents are found
+        configurationService.setProperty("discovery.removestale.attempts", 0);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child2)
+                                           .withName("Collection 3").build();
+
+        ItemBuilder.createItem(context, col1)
+                   .withTitle("Public item 1")
+                   .withIssueDate("2010-10-17")
+                   .withAuthor("Smith, Donald")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        ItemBuilder.createItem(context, col2)
+                   .withTitle("Public item 2")
+                   .withIssueDate("2011-08-13")
+                   .withAuthor("Smith, Maria")
+                   .withSubject("TestingForMore")
+                   .build();
+
+        ItemBuilder.createItem(context, col2)
+                   .withTitle("Public item 3")
+                   .withIssueDate("2012-02-19")
+                   .withAuthor("Doe, Jane")
+                   .withSubject("AnotherTest")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        ItemBuilder.createItem(context, col3)
+                   .withTitle("Public item 4")
+                   .withIssueDate("2013-05-16")
+                   .withAuthor("Vova, Jane")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        ItemBuilder.createItem(context, col3)
+                   .withTitle("Public item 5")
+                    .withIssueDate("2015-04-13")
+                    .withAuthor("Marco, Bruni")
+                    .withSubject("ExtraEntry")
+                    .build();
+
+        ItemBuilder.createItem(context, col3)
+                   .withTitle("Public item 6")
+                   .withIssueDate("2016-01-21")
+                   .withAuthor("Andriy, Beket")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        context.setDispatcher("noindex");
+
+        // check Collection type with start=0 and limit=default, we expect: indexableObjects=3, totalFound=3
+        assertSearchQuery(IndexableCollection.TYPE, 3, 3, 0, -1);
+        // check Item type with page=0 and limit=default, we expect: indexableObjects=6, totalFound=6
+        assertSearchQuery(IndexableItem.TYPE, 6, 6, 0, -1);
+        // delete col3 and all items that it contained
+        collectionService.delete(context, col3);
+        context.restoreAuthSystemState();
+
+        // check Collection type with start=0 and limit=default,
+        // we expect: indexableObjects=2, totalFound=should be 2 but we have 3 ->(1 stale object here)
+        assertSearchQuery(IndexableCollection.TYPE, 2, 3, 0, -1);
+        // as the previous query hit the stale object running a new query should lead to a clean situation
+        assertSearchQuery(IndexableCollection.TYPE, 2, 2, 0, -1);
+
+        // similar test over the items
+        // check Item type with start=0 and limit=default,
+        // we expect: indexableObjects=3, totalFound=6 (3 stale objects here)
+        assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, -1);
+        // as the previous query hit the stale objects running a new query should lead to a clean situation
+        assertSearchQuery(IndexableItem.TYPE, 3, 3, 0, -1);
     }
 
     private void assertSearchQuery(String resourceType, int size) throws SearchServiceException {

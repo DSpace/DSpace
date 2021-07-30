@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -121,7 +122,18 @@ public class ItemConverter
 
         List<MetadataValue> returnList = new LinkedList<>();
         String entityType = itemService.getMetadataFirstValue(obj, "dspace", "entity", "type", Item.ANY);
+
         try {
+
+            if (obj.isWithdrawn() && (Objects.isNull(context) ||
+                Objects.isNull(context.getCurrentUser()) || !authorizeService.isAdmin(context))) {
+                return new MetadataValueList(new ArrayList<MetadataValue>());
+            }
+
+            if (context != null && authorizeService.isAdmin(context)) {
+                return new MetadataValueList(fullList);
+            }
+
             List<CrisLayoutBox> boxes;
             if (context != null) {
                 boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 1000, 0);

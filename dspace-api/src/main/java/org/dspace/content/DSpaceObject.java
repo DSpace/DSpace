@@ -53,10 +53,10 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     private List<MetadataValue> metadata = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "dso")
-    // Order by is here to ensure that the oldest handle is retrieved first,
-    // multiple handles are assigned to the latest version of an item the original handle will have the lowest
-    // identifier
-    // This handle is the preferred handle.
+    // OrderBy is here to ensure that the oldest handle is retrieved first.
+    // Multiple handles are assigned to the latest version of an item.
+    // The original handle will have the lowest identifier.  This handle is the
+    // preferred handle.
     @OrderBy("id ASC")
     private List<Handle> handles = new ArrayList<>();
 
@@ -122,6 +122,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
      *
      * @return internal ID of object
      */
+    @Override
     public UUID getID() {
         return id;
     }
@@ -142,6 +143,10 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
         this.handles = handle;
     }
 
+    /**
+     * Append to this object's list of Handles.
+     * @param handle the new Handle to be added.
+     */
     public void addHandle(Handle handle) {
         this.handles.add(handle);
     }

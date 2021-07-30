@@ -9,7 +9,6 @@
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
         <version>cris-2021.01.01-SNAPSHOT</version>
-        <relativePath>..</relativePath>
     </parent>
 
     <properties>

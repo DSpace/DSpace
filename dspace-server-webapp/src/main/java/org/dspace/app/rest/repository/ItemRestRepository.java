@@ -100,7 +100,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
+    @PreAuthorize("hasPermission(#id, 'ITEM', 'STATUS') || hasPermission(#id, 'ITEM', 'READ')")
     public ItemRest findOne(Context context, UUID id) {
         Item item = null;
         try {
@@ -121,7 +121,8 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<ItemRest> findAll(Context context, Pageable pageable) {
         try {
-            long total = itemService.countTotal(context);
+            // This endpoint only returns archived items
+            long total = itemService.countArchivedItems(context);
             Iterator<Item> it = itemService.findAll(context, pageable.getPageSize(),
                 Math.toIntExact(pageable.getOffset()));
             List<Item> items = new ArrayList<>();
