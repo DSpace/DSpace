@@ -105,6 +105,7 @@
 
     <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
         <div class="item-summary-view-metadata">
+            <xsl:call-template name="schema-org-json-ld"/>
             <xsl:call-template name="itemSummaryView-DIM-title"/>
             <div class="row">
                 <div class="col-sm-4">
@@ -543,6 +544,7 @@
     </xsl:template>
 
     <xsl:template match="dim:dim" mode="itemDetailView-DIM">
+        <xsl:call-template name="schema-org-json-ld"/>
         <xsl:call-template name="itemSummaryView-DIM-title"/>
         <div class="ds-table-responsive">
             <table class="ds-includeSet-table detailtable table table-striped table-hover">
