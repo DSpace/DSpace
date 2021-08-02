@@ -37,6 +37,16 @@ public final class SubmissionSectionMatcher {
             hasNoJsonPath("$.visibility"));
     }
 
+    public static Matcher<? super Object> matches(String id, boolean mandatory, String sectionType, boolean opened) {
+        return allOf(
+            hasJsonPath("$.id", is(id)),
+            hasJsonPath("$.mandatory", is(mandatory)),
+            hasJsonPath("$.opened", is(opened)),
+            hasJsonPath("$.sectionType", is(sectionType)),
+            hasJsonPath("$.type", is("submissionsection")),
+            hasNoJsonPath("$.visibility"));
+    }
+
     public static Matcher<? super Object> matches(String id, boolean mandatory, String sectionType,
         Map<String, String> visibilities) {
         return allOf(
