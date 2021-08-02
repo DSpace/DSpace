@@ -67,7 +67,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     protected static final String BSN_LICENSE_URL = "license_url";
 
     /**
-     * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it
+     * @deprecated the bitstream with the license in the textual format it
      * is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
      */
     @Deprecated

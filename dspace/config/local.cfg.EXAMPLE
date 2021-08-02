@@ -152,9 +152,8 @@ db.schema = public
 # handle.canonical.prefix = http://hdl.handle.net/
 # handle.canonical.prefix = https://hdl.handle.net/
 #
-# Note that this will not alter dc.identifer.uri metadata for existing
-# items (only for subsequent submissions), but it will alter the URL
-# in JSPUI's 'identifier' message on item record pages for existing items.
+# Note that this will not alter dc.identifier.uri metadata for existing
+# items (only for subsequent submissions).
 
 # CNRI Handle prefix
 # (Defaults to a dummy/fake prefix of 123456789)
