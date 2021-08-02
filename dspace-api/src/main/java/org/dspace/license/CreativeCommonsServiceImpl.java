@@ -219,7 +219,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
             return getLicenseURI(item);
         }
 
-        // JSPUI backward compatibility see https://jira.duraspace.org/browse/DS-2604
+        // backward compatibility see https://jira.duraspace.org/browse/DS-2604
         return getStringFromBitstream(context, item, BSN_LICENSE_URL);
     }
 
