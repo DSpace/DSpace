@@ -138,4 +138,11 @@ public interface DOIService {
     public List<DOI> getSimilarDOIsNotInState(Context context, String doiPattern, List<Integer> statuses,
                                               boolean dsoIsNotNull)
         throws SQLException;
+
+    /**
+     * Get the URL stem of the DOI resolver, e.g. "https://doi.org/".
+     *
+     * @return URL to the DOI resolver.
+     */
+    public String getResolver();
 }
