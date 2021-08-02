@@ -1,0 +1,14 @@
+--
+-- The contents of this file are subject to the license and copyright
+-- detailed in the LICENSE and NOTICE files at the root of the source
+-- tree and available online at
+--
+-- http://www.dspace.org/license/
+--
+
+-----------------------------------------------------------------------------------
+-- ADD field security_level into imp_metadatavalue table.
+-----------------------------------------------------------------------------------
+
+
+ALTER TABLE imp_metadatavalue ADD COLUMN security_level INTEGER

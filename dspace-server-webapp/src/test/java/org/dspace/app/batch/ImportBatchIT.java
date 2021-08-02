@@ -9,6 +9,9 @@ package org.dspace.app.batch;
 
 import static org.dspace.batch.service.ImpRecordService.DELETE_OPERATION;
 import static org.dspace.batch.service.ImpRecordService.SEND_BACK_TO_WORKSPACE_STATUS;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -1027,6 +1030,48 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
         }
     }
 
+    @Test
+    public void testInsertionWithMetadataValueSecurityLevelSet() throws IOException, SQLException {
+        // create imp_record records
+        int impRecordKey = 1;
+        ImpRecord impRecord = createImpRecord(context, impRecordKey, ImpRecordService.SEND_BACK_TO_WORKSPACE_STATUS,
+            ImpRecordService.INSERT_OR_UPDATE_OPERATION, admin, collection);
+
+        // create imp_metadatavalue records
+        createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(), "title",
+            null, null, "Sample Item", 1);
+        createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(), "type",
+            null, null, "Item type", 2);
+
+        // Create a new item
+        String argv[] = new String[] { "-E", admin.getEmail() };
+
+        ItemImportMainOA.main(argv);
+
+        int nItem = workspaceItemService.countByEPerson(context, admin);
+        assertEquals("One workspace item found for " + admin.getID(), 1, nItem);
+
+        List<WorkspaceItem> wis = workspaceItemService.findByEPerson(context, admin);
+        assertEquals("One workspace item found for " + admin.getID(), 1, wis.size());
+
+        WorkspaceItem wi = wis.get(0);
+        Item item = wi.getItem();
+
+        List<MetadataValue> metadata = item.getMetadata();
+        assertEquals("Only two metadata found", 3, metadata.size());
+
+        String defLanguage = configurationService.getProperty("default.language");
+        metadata = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, defLanguage);
+        assertThat(metadata, hasSize(1));
+        assertThat(metadata.get(0).getValue(), is("Sample Item"));
+        assertThat(metadata.get(0).getSecurityLevel(), is(Integer.valueOf(1)));
+
+        metadata = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "type", null, defLanguage);
+        assertThat(metadata, hasSize(1));
+        assertThat(metadata.get(0).getValue(), is("Item type"));
+        assertThat(metadata.get(0).getSecurityLevel(), is(Integer.valueOf(2)));
+    }
+
     /***
      * Create an ImpRecord.
      * 
@@ -1067,12 +1112,31 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
      */
     private ImpMetadatavalue createImpMetadatavalue(Context context, ImpRecord impRecord,
             String schema, String element, String qualifier, String language, String value) throws SQLException {
+        return createImpMetadatavalue(context, impRecord, schema, element, qualifier, language, value, null);
+    }
+
+    /***
+     * Create a Metadata of ImpRecord
+     *
+     * @param  context      The context
+     * @param  impRecordKey The ImpRecord key
+     * @param  schema       The schema
+     * @param  qualifier    The qualifier
+     * @param  language     The language
+     * @param  value        The metadata value
+     * @return
+     * @throws SQLException
+     */
+    private ImpMetadatavalue createImpMetadatavalue(Context context, ImpRecord impRecord,
+        String schema, String element, String qualifier, String language, String value, Integer securityLevel)
+        throws SQLException {
         ImpMetadatavalue impMetadatavalue = new ImpMetadatavalue();
         impMetadatavalue.setMetadatavalueId(impMedataSeq++);
         impMetadatavalue.setImpRecord(impRecord);
         List<ImpMetadatavalue> metadata = impMetadatavalueService.searchByImpRecordId(context, impRecord);
         impMetadatavalueService.setMetadata(impMetadatavalue, schema, element, qualifier, language, value);
         impMetadatavalue.setMetadataOrder(metadata.size() + 1);
+        impMetadatavalue.setSecurityLevel(securityLevel);
 
         return impMetadatavalueService.create(context, impMetadatavalue);
     }

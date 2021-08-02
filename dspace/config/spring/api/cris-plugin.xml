@@ -109,6 +109,7 @@
 				<entry key="RID" value-ref="itemSearcherByRID"/>
 				<entry key="ISNI" value-ref="itemSearcherByISNI"/>
 				<entry key="DOI" value-ref="itemSearcherByDOI"/>
+				<entry key="LEGACY-ID" value-ref="itemSearcherByLegacyId"/>
 			</map>
 		</constructor-arg>
 		<constructor-arg index="1">
@@ -134,6 +135,11 @@
 	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByISNI">
 		<constructor-arg value="person.identifier.isni"></constructor-arg>
 		<constructor-arg value="ISNI"></constructor-arg>
+	</bean>
+	
+	<bean class="org.dspace.authority.service.impl.ItemSearcherByMetadata" name="itemSearcherByLegacyId">
+		<constructor-arg value="cris.legacyId"></constructor-arg>
+		<constructor-arg value="LEGACY-ID"></constructor-arg>
 	</bean>
 	
 	<bean class="org.dspace.authority.service.impl.ItemSearchServiceImpl" name="org.dspace.authority.service.ItemSearchService"/>
