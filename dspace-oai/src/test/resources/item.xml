@@ -70,7 +70,7 @@
                     <field name="originalName">10.1.1.13.814.pdf</field>
                     <field name="format">application/pdf</field>
                     <field name="size">449025</field>
-                    <field name="url">http://localhost:8080/xmlui/bitstream/123456789/3/1/10.1.1.13.814.pdf</field>
+                    <field name="url">http://localhost:8080/bitstream/123456789/3/1/10.1.1.13.814.pdf</field>
                     <field name="checksum">de2290628b85b17abdf829d121793c77</field>
                     <field name="checksumAlgorithm">MD5</field>
                     <field name="sid">1</field>
@@ -85,7 +85,7 @@
                     <field name="originalName">license.txt</field>
                     <field name="format">text/plain; charset=utf-8</field>
                     <field name="size">1748</field>
-                    <field name="url">http://localhost:8080/xmlui/bitstream/123456789/3/2/license.txt</field>
+                    <field name="url">http://localhost:8080/bitstream/123456789/3/2/license.txt</field>
                     <field name="checksum">8a4605be74aa9ea9d79846c1fba20a33</field>
                     <field name="checksumAlgorithm">MD5</field>
                     <field name="sid">2</field>
