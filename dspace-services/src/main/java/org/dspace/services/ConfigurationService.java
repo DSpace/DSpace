@@ -268,4 +268,11 @@ public interface ConfigurationService {
      */
     public void reloadConfig();
 
+
+    /**
+     * Find the configurations that starts with prefix
+     *
+     * @param prefix the prefix string of configurations to be found
+     */
+    public Properties getPropertiesWithPrefix(String prefix);
 }
