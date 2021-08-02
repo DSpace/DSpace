@@ -130,10 +130,6 @@ public class ItemConverter
                 return new MetadataValueList(new ArrayList<MetadataValue>());
             }
 
-            if (context != null && authorizeService.isAdmin(context)) {
-                return new MetadataValueList(fullList);
-            }
-
             List<CrisLayoutBox> boxes;
             if (context != null) {
                 boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 1000, 0);
