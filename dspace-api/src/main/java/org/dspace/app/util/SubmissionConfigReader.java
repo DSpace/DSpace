@@ -571,6 +571,11 @@ public class SubmissionConfigReader {
             stepInfo.put("mandatory", mandatory);
         }
 
+        String opened = getAttribute(nStep, "opened");
+        if (StringUtils.isNotBlank(opened)) {
+            stepInfo.put("opened", opened);
+        }
+
         // look for REQUIRED 'step' information
         String missing = null;
         if (stepInfo.get("processing-class") == null) {

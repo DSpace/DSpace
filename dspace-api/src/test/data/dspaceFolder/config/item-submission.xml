@@ -71,6 +71,16 @@
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
+        <step-definition id="traditionalpagethree-cris-open" mandatory="true" opened="true">
+            <heading>submit.progressbar.describe.stepthree</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="traditionalpagethree-cris-collapsed" mandatory="true" opened="false">
+            <heading>submit.progressbar.describe.stepthree</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
         <step-definition id="upload">
             <heading>submit.progressbar.upload</heading>
             <processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
@@ -214,7 +224,7 @@
             <step id="extraction" />
 
             <!--Step will be to Describe the item. -->
-            <step id="traditionalpageone"/>
+            <step id="traditionalpageone"/>"
             <step id="traditionalpagetwo"/>
 
             <!--Step will be to Upload the item -->
@@ -240,6 +250,8 @@
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone-cris"/>
             <step id="traditionalpagetwo"/>
+            <step id="traditionalpagethree-cris-open"/>
+            <step id="traditionalpagethree-cris-collapsed"/>
 
             <!--Step will be to Upload the item -->
             <step id="upload"/>
