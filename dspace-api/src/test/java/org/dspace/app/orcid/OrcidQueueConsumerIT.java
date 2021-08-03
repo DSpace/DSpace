@@ -861,6 +861,82 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
     }
 
+    @Test
+    public void testWithManyInsertionAndDeletionOfSameMetadataValue() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withOrcidSynchronizationProfilePreference(BIOGRAPHICAL)
+            .withSubject("Science")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, hasSize(1));
+        assertThat(queueRecords.get(0), matches(profile, "KEYWORDS", null,
+            "dc.subject::Science", "Science", INSERT));
+
+        OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
+            .withRecordType(KEYWORDS.name())
+            .withDescription("Science")
+            .withMetadata("dc.subject::Science")
+            .withOperation(OrcidOperation.INSERT)
+            .withPutCode("12345")
+            .withStatus(201)
+            .build();
+
+        removeMetadata(profile, "dc", "subject", null);
+
+        context.commit();
+
+        queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, hasSize(1));
+        assertThat(queueRecords.get(0), matches(profile, "KEYWORDS", "12345",
+            "dc.subject::Science", "Science", DELETE));
+
+        OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
+            .withRecordType(KEYWORDS.name())
+            .withDescription("Science")
+            .withMetadata("dc.subject::Science")
+            .withOperation(OrcidOperation.DELETE)
+            .withStatus(204)
+            .build();
+
+        addMetadata(profile, "dc", "subject", null, "Science", null);
+
+        context.commit();
+
+        queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, hasSize(1));
+        assertThat(queueRecords.get(0), matches(profile, "KEYWORDS", null,
+            "dc.subject::Science", "Science", INSERT));
+
+        OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
+            .withRecordType(KEYWORDS.name())
+            .withDescription("Science")
+            .withMetadata("dc.subject::Science")
+            .withOperation(OrcidOperation.INSERT)
+            .withPutCode("12346")
+            .withStatus(201)
+            .build();
+
+        removeMetadata(profile, "dc", "subject", null);
+
+        context.commit();
+
+        queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, hasSize(1));
+        assertThat(queueRecords.get(0), matches(profile, "KEYWORDS", "12346",
+            "dc.subject::Science", "Science", DELETE));
+
+    }
+
     private void addMetadata(Item item, String schema, String element, String qualifier, String value,
         String authority) throws Exception {
         context.turnOffAuthorisationSystem();
