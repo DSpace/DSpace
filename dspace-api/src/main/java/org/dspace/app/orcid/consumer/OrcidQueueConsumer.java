@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -168,24 +168,20 @@ public class OrcidQueueConsumer implements Consumer {
 
             String sectionType = factory.getProfileSectionType().name();
 
-            deleteRecordsByEntityAndType(context, item, sectionType);
+            orcidQueueService.deleteByEntityAndRecordType(context, item, sectionType);
 
             if (isSynchronizationDisabled(context, item, factory)) {
                 continue;
             }
 
             List<String> signatures = factory.getMetadataSignatures(context, item);
-            List<OrcidHistory> historyRecords = findOrcidHistoryRecords(context, item, sectionType);
+            List<OrcidHistory> historyRecords = findSuccessfullyOrcidHistoryRecords(context, item, sectionType);
 
             createInsertionRecordForNewSignatures(context, item, historyRecords, factory, signatures);
             createDeletionRecordForNoMorePresentSignatures(context, item, historyRecords, factory, signatures);
 
         }
 
-    }
-
-    private void deleteRecordsByEntityAndType(Context context, Item item, String sectionType) throws SQLException {
-        orcidQueueService.deleteByEntityAndRecordType(context, item, sectionType);
     }
 
     private boolean isSynchronizationDisabled(Context context, Item item, OrcidProfileSectionFactory factory) {
@@ -215,17 +211,12 @@ public class OrcidQueueConsumer implements Consumer {
 
         String sectionType = factory.getProfileSectionType().name();
 
-        List<String> deletedSignatures = historyRecords.stream()
-            .filter(historyRecord -> historyRecord.getOperation() == OrcidOperation.DELETE)
-            .map(OrcidHistory::getMetadata)
-            .collect(Collectors.toList());
-
         for (OrcidHistory historyRecord : historyRecords) {
             String storedSignature = historyRecord.getMetadata();
             String putCode = historyRecord.getPutCode();
             String description = historyRecord.getDescription();
 
-            if (signatures.contains(storedSignature) || deletedSignatures.contains(storedSignature)) {
+            if (signatures.contains(storedSignature) || isAlreadyDeleted(historyRecords, historyRecord)) {
                 continue;
             }
 
@@ -240,7 +231,7 @@ public class OrcidQueueConsumer implements Consumer {
 
     }
 
-    private List<OrcidHistory> findOrcidHistoryRecords(Context context, Item item,
+    private List<OrcidHistory> findSuccessfullyOrcidHistoryRecords(Context context, Item item,
         String sectionType) throws SQLException {
         return orcidHistoryService.findSuccessfullyRecordsByEntityAndType(context, item, sectionType);
     }
@@ -249,6 +240,22 @@ public class OrcidQueueConsumer implements Consumer {
         return getLastOperation(records, signature)
             .map(operation -> operation == OrcidOperation.DELETE)
             .orElse(Boolean.TRUE);
+    }
+
+    private boolean isAlreadyDeleted(List<OrcidHistory> records, OrcidHistory historyRecord) {
+
+        if (historyRecord.getOperation() == OrcidOperation.DELETE) {
+            return true;
+        }
+
+        return findDeletedHistoryRecordsBySignature(records, historyRecord.getMetadata())
+            .anyMatch(record -> record.getTimestamp().after(historyRecord.getTimestamp()));
+    }
+
+    private Stream<OrcidHistory> findDeletedHistoryRecordsBySignature(List<OrcidHistory> records, String signature) {
+        return records.stream()
+            .filter(record -> signature.equals(record.getMetadata()))
+            .filter(record -> record.getOperation() == OrcidOperation.DELETE);
     }
 
     private Optional<OrcidOperation> getLastOperation(List<OrcidHistory> records, String signature) {
