@@ -31,6 +31,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -375,8 +376,8 @@ public class OrcidClientImpl implements OrcidClient {
 
     private HttpEntity convertToEntity(Object object) {
         try {
-            return new StringEntity(marshall(object));
-        } catch (UnsupportedEncodingException | JAXBException ex) {
+            return new StringEntity(marshall(object), StandardCharsets.UTF_8);
+        } catch (JAXBException ex) {
             throw new IllegalArgumentException("The given object cannot be sent to ORCID", ex);
         }
     }
