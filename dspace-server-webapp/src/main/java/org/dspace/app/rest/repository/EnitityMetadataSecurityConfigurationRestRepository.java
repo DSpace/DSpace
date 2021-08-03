@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 
@@ -71,6 +72,7 @@ public class EnitityMetadataSecurityConfigurationRestRepository extends
     private ConverterService converter;
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public EntityMetadataSecurityConfigurationRest findOne(final Context context, final String entityType) {
         EntityMetadataSecurityConfiguration entityMetadataSecurityConfiguration
                 = new EntityMetadataSecurityConfiguration();
