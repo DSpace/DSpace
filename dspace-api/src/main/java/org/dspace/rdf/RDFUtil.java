@@ -48,7 +48,7 @@ public class RDFUtil {
     public static final String STORAGE_GRAPHSTORE_PASSWORD_KEY = "rdf.storage.graphstore.password";
     /**
      * Property key to load the URL of the dspace-rdf module. This is necessary
-     * to create links from the jspui or xmlui to RDF representation of
+     * to create links from the UI to RDF representation of
      * DSpaceObjects.
      */
     public static final String CONTEXT_PATH_KEY = "rdf.contextPath";
@@ -289,7 +289,7 @@ public class RDFUtil {
     public static void isPublic(Context context, DSpaceObject dso)
         throws SQLException, ItemNotArchivedException, ItemWithdrawnException,
         ItemNotDiscoverableException, AuthorizeException {
-        // as there is no way to set site permissions in XMLUI or JSPUI, we
+        // as there is no way to set site permissions in UI, we
         // ignore the permissions of the repository root (DSpaceObject of type
         // Site).
         if (dso instanceof Site) {
