@@ -40,6 +40,8 @@ public class DOIServiceImpl implements DOIService {
             = Pattern.compile("http(s)?://([a-z0-9-.]+)?doi.org(?<path>/.*)",
                     Pattern.CASE_INSENSITIVE);
     private static final String DOI_URL_PATTERN_PATH_GROUP = "path";
+    
+    private static final String RESOLVER_DEFAULT = "https://doi.org";
 
     protected DOIServiceImpl() {
 
@@ -171,7 +173,8 @@ public class DOIServiceImpl implements DOIService {
 
     @Override
     public String getResolver() {
-        String resolver = configurationService.getProperty("identifier.doi.resolver", "https://doi.org");
+        String resolver = configurationService.getProperty("identifier.doi.resolver", 
+                RESOLVER_DEFAULT);
         if (resolver.endsWith("/")) {
             resolver = resolver.substring(0, resolver.length() - 1);
         }
