@@ -88,8 +88,8 @@ public interface DOIService {
      *
      * @param identifier A DOI that should be returned in external form.
      * @return A String containing a URL to the official DOI resolver.
-     * @throws IllegalArgumentException                  If identifier is null or an empty String.
-     * @throws org.dspace.identifier.IdentifierException If identifier could not be recognized as valid DOI.
+     * @throws IllegalArgumentException If identifier is null or an empty String.
+     * @throws IdentifierException      If identifier could not be recognized as valid DOI.
      */
     public String DOIToExternalForm(String identifier)
         throws IdentifierException;
