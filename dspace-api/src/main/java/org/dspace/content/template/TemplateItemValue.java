@@ -7,6 +7,8 @@
  */
 package org.dspace.content.template;
 
+import java.util.List;
+
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.vo.MetadataValueVO;
@@ -34,7 +36,7 @@ public interface TemplateItemValue {
      * @param metadataValue
      * @return
      */
-    MetadataValueVO value(final Context context, final Item targetItem,
+    List<MetadataValueVO> values(final Context context, final Item targetItem,
                         final Item templateItem, final MetadataValue metadataValue);
 
     /**

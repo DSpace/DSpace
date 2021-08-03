@@ -8,6 +8,8 @@
 package org.dspace.content.template.generator;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Collection;
@@ -44,7 +46,7 @@ public class GroupValueGenerator implements TemplateValueGenerator {
 
 
     @Override
-    public MetadataValueVO generator(Context context, Item targetItem, Item templateItem, String extraParams) {
+    public List<MetadataValueVO> generator(Context context, Item targetItem, Item templateItem, String extraParams) {
 
         String[] params = StringUtils.split(extraParams, "\\.");
         String prefix = params[0];
@@ -86,6 +88,7 @@ public class GroupValueGenerator implements TemplateValueGenerator {
             log.error(e.getMessage(), e);
         }
 
-        return group != null ? new MetadataValueVO(value, group.getID().toString()) : new MetadataValueVO("");
+        return Arrays.asList(group != null ?
+                new MetadataValueVO(value, group.getID().toString()) : new MetadataValueVO(""));
     }
 }

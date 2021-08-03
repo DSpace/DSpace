@@ -7,6 +7,7 @@
  */
 package org.dspace.content.template;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -31,7 +32,7 @@ public class TemplateItemValueService {
         this.templateItemValues = templateItemValues;
     }
 
-    public MetadataValueVO value(final Context context, final Item targetItem,
+    public List<MetadataValueVO> value(final Context context, final Item targetItem,
                                final Item templateItem,
                                final MetadataValue metadataValue) {
         if (CollectionUtils.isEmpty(templateItemValues)) {
@@ -40,8 +41,8 @@ public class TemplateItemValueService {
         }
         return templateItemValues.stream().filter(tiv -> tiv.appliesTo(metadataValue.getValue()))
                                  .findFirst()
-                                 .map(tiv -> tiv.value(context, targetItem, templateItem, metadataValue))
-                                 .orElseGet(() -> new MetadataValueVO(metadataValue));
+                                 .map(tiv -> tiv.values(context, targetItem, templateItem, metadataValue))
+                                 .orElseGet(() -> Arrays.asList(new MetadataValueVO(metadataValue)));
     }
 
 
