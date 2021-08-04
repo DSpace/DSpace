@@ -24,7 +24,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -95,7 +95,7 @@ public class RegistryLoader {
 
             System.exit(1);
         } catch (Exception e) {
-            log.fatal(LogManager.getHeader(context, "error_loading_registries",
+            log.fatal(LogHelper.getHeader(context, "error_loading_registries",
                                            ""), e);
 
             System.err.println("Error: \n - " + e.getMessage());
@@ -135,7 +135,7 @@ public class RegistryLoader {
             loadFormat(context, n);
         }
 
-        log.info(LogManager.getHeader(context, "load_bitstream_formats",
+        log.info(LogHelper.getHeader(context, "load_bitstream_formats",
                                       "number_loaded=" + typeNodes.getLength()));
     }
 
