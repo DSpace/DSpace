@@ -206,7 +206,9 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                 }
             }
         } catch (IOException | SQLException | AuthorizeException e) {
-            log.error(LogHelper.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID(), e);
         }
     }
@@ -258,7 +260,9 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         try {
             handleService.createHandle(context, dso, identifier);
         } catch (IllegalStateException | SQLException e) {
-            log.error(LogHelper.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
         }
     }
@@ -291,7 +295,9 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
             }
             return handleId;
         } catch (SQLException | AuthorizeException e) {
-            log.error(LogHelper.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
         }
     }
@@ -350,7 +356,9 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                 }
             }
         } catch (RuntimeException | SQLException e) {
-            log.error(LogHelper.getHeader(context, "Error while attempting to register doi", "Item id: " + dso.getID()), e);
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to register doi",
+                    "Item id: " + dso.getID()), e);
             throw new IdentifierException("Error while moving doi identifier", e);
         }
 
