@@ -76,7 +76,9 @@ public class HandleIdentifierProvider extends IdentifierProvider {
 
             return id;
         } catch (IOException | SQLException | AuthorizeException e) {
-            log.error(LogHelper.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID(), e);
         }
     }
@@ -90,7 +92,9 @@ public class HandleIdentifierProvider extends IdentifierProvider {
                 populateHandleMetadata(context, item, identifier);
             }
         } catch (IOException | IllegalStateException | SQLException | AuthorizeException e) {
-            log.error(LogHelper.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID(), e);
         }
     }
@@ -101,7 +105,9 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         try {
             handleService.createHandle(context, dso, identifier);
         } catch (IllegalStateException | SQLException e) {
-            log.error(LogHelper.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
         }
     }
@@ -123,7 +129,9 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         try {
             return handleService.createHandle(context, dso);
         } catch (SQLException e) {
-            log.error(LogHelper.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
         }
     }

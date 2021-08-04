@@ -240,7 +240,9 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         try {
             handleService.createHandle(context, dso, identifier);
         } catch (IllegalStateException | SQLException e) {
-            log.error(LogHelper.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
         }
     }
@@ -273,7 +275,9 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
             }
             return handleId;
         } catch (SQLException | AuthorizeException e) {
-            log.error(LogHelper.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
         }
     }
