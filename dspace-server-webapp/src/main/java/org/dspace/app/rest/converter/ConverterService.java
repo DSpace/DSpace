@@ -80,9 +80,6 @@ public class ConverterService {
     private List<Projection> projections;
 
     @Autowired
-    private DSpacePermissionEvaluator dSpacePermissionEvaluator;
-
-    @Autowired
     private WebSecurityExpressionEvaluator webSecurityExpressionEvaluator;
 
     @Autowired
