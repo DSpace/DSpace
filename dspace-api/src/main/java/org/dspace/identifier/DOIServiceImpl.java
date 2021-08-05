@@ -108,7 +108,7 @@ public class DOIServiceImpl implements DOIService {
         }
 
         Matcher matcher = DOI_URL_PATTERN.matcher(identifier);
-        if (DOI_URL_PATTERN.matcher(identifier).matches()) { // various old URL forms
+        if (matcher.matches()) { // various old URL forms
             return resolver + matcher.group(DOI_URL_PATTERN_PATH_GROUP);
         }
 
