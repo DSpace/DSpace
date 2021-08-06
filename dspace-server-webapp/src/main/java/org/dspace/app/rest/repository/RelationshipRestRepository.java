@@ -48,7 +48,8 @@ import org.springframework.stereotype.Component;
  * This is the repository that is responsible to manage Relationship Rest objects
  */
 @Component(RelationshipRest.CATEGORY + "." + RelationshipRest.NAME)
-public class RelationshipRestRepository extends DSpaceRestRepository<RelationshipRest, Integer> {
+public class RelationshipRestRepository extends DSpaceRestRepository<RelationshipRest, Integer>
+        implements ReloadableEntityObjectRepository<Relationship, Integer> {
 
     private static final Logger log = LogManager.getLogger();
 
@@ -366,5 +367,15 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         }
 
         return converter.toRestPage(relationships, pageable, total, utils.obtainProjection());
+    }
+
+    @Override
+    public Relationship findDomainObjectByPk(Context context, Integer id) throws SQLException {
+        return relationshipService.find(context, id);
+    }
+
+    @Override
+    public Class<Integer> getPKClass() {
+        return Integer.class;
     }
 }

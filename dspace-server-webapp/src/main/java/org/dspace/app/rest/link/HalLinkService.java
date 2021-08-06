@@ -126,6 +126,7 @@ public class HalLinkService {
                     Optional<LinkRest> matchingLinkRest =
                         linkRests.stream().filter(linkRest -> linkRest.name().equals(link.getRel().value())).findAny();
                     if (matchingLinkRest.isPresent()) {
+                        // This is a linked method, e.g. /api/core/items/<:uuid>/bundles
                         LinkRest linkRest = matchingLinkRest.get();
                         LinkRestRepository linkRepository = utils
                                 .getLinkResourceRepository(resource.getContent().getCategory(),
@@ -143,6 +144,7 @@ public class HalLinkService {
                             restAddressableModelClass = (Class<RestAddressableModel>) type.getActualTypeArguments()[0];
                         }
                     } else {
+                        // This is a direct uri, e.g. /api/core/items/<:uuid>
                         // If the object of the link is not connected to the resource with a @LinkRest annotation
                         // then determine the repository and thus corresponding domainClass by parsing the uri of link
                         DSpaceRestRepository repository = utils.getRepositoryFromUri(link.getHref());
