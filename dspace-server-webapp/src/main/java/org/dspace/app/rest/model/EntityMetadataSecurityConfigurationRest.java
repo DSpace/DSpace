@@ -9,6 +9,7 @@ package org.dspace.app.rest.model;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.dspace.app.rest.RestResourceController;
 
@@ -19,6 +20,9 @@ import org.dspace.app.rest.RestResourceController;
  * @author Alba Aliu (alba.aliu@atis.al)
  */
 public class EntityMetadataSecurityConfigurationRest extends BaseObjectRest<String> {
+
+    private static final long serialVersionUID = 1L;
+
     public static final String NAME = "securitysetting";
     public static final String NAME_PLURAL = "securitysettings";
     public static final String CATEGORY = RestAddressableModel.CORE;
@@ -29,13 +33,13 @@ public class EntityMetadataSecurityConfigurationRest extends BaseObjectRest<Stri
     /**
      * List of configuration levels for each metadata of entity type
      */
-    private HashMap<String, List<Integer>> metadataCustomSecurity;
+    private Map<String, List<Integer>> metadataCustomSecurity;
 
     public String getCategory() {
         return CATEGORY;
     }
 
-    public Class getController() {
+    public Class<?> getController() {
         return RestResourceController.class;
     }
 
@@ -51,11 +55,11 @@ public class EntityMetadataSecurityConfigurationRest extends BaseObjectRest<Stri
         this.metadataSecurityDefault = metadataSecurityDefault;
     }
 
-    public HashMap<String, List<Integer>> getMetadataCustomSecurity() {
+    public Map<String, List<Integer>> getMetadataCustomSecurity() {
         return metadataCustomSecurity;
     }
 
-    public void setMetadataCustomSecurity(HashMap<String, List<Integer>> metadataCustomSecurity) {
+    public void setMetadataCustomSecurity(Map<String, List<Integer>> metadataCustomSecurity) {
         this.metadataCustomSecurity = metadataCustomSecurity;
     }
 

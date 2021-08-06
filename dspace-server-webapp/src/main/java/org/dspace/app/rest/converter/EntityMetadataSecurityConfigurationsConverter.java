@@ -30,6 +30,7 @@ public class EntityMetadataSecurityConfigurationsConverter
             final Projection projection) {
         EntityMetadataSecurityConfigurationRest entityMetadataSecurityConfigurationRest =
                 new EntityMetadataSecurityConfigurationRest();
+        entityMetadataSecurityConfigurationRest.setId(modelObject.getEntityType());
         entityMetadataSecurityConfigurationRest.setProjection(projection);
         entityMetadataSecurityConfigurationRest.setMetadataSecurityDefault(modelObject.getMetadataSecurityDefault());
         entityMetadataSecurityConfigurationRest.setMetadataCustomSecurity(modelObject.getMetadataCustomSecurity());

@@ -7,8 +7,10 @@
  */
 package org.dspace.metadataSecurity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Configuration class to offer security configuration levels foreach entity type
@@ -16,22 +18,26 @@ import java.util.List;
  * @author Alba Aliu (alba.aliu@atis.al)
  */
 public class EntityMetadataSecurityConfiguration {
+
+    /**
+     * The entity type
+     */
+    private String entityType;
+
     /**
      * Default configuration level for entity type
      */
     private List<Integer> metadataSecurityDefault;
+
     /**
      * List of configuration levels for each metadata of entity type
      */
-    private HashMap<String, List<Integer>> metadataCustomSecurity;
+    private Map<String, List<Integer>> metadataCustomSecurity;
 
-    public EntityMetadataSecurityConfiguration(List<Integer> metadataSecurityDefault,
-                                               HashMap<String, List<Integer>> metadataCustomSecurity) {
-        this.metadataSecurityDefault = metadataSecurityDefault;
-        this.metadataCustomSecurity = metadataCustomSecurity;
-    }
-
-    public EntityMetadataSecurityConfiguration() {
+    public EntityMetadataSecurityConfiguration(String entityType) {
+        this.entityType = entityType;
+        this.metadataSecurityDefault = new ArrayList<>();
+        this.metadataCustomSecurity = new HashMap<>();
     }
 
     public List<Integer> getMetadataSecurityDefault() {
@@ -42,11 +48,19 @@ public class EntityMetadataSecurityConfiguration {
         this.metadataSecurityDefault = metadataSecurityDefault;
     }
 
-    public HashMap<String, List<Integer>> getMetadataCustomSecurity() {
+    public Map<String, List<Integer>> getMetadataCustomSecurity() {
         return metadataCustomSecurity;
     }
 
-    public void setMetadataCustomSecurity(HashMap<String, List<Integer>> metadataCustomSecurity) {
+    public void setMetadataCustomSecurity(Map<String, List<Integer>> metadataCustomSecurity) {
         this.metadataCustomSecurity = metadataCustomSecurity;
+    }
+
+    public String getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
     }
 }

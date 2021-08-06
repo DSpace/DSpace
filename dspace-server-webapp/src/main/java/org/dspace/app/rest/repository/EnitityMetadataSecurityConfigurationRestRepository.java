@@ -75,7 +75,7 @@ public class EnitityMetadataSecurityConfigurationRestRepository extends
     @PreAuthorize("isAuthenticated()")
     public EntityMetadataSecurityConfigurationRest findOne(final Context context, final String entityType) {
         EntityMetadataSecurityConfiguration entityMetadataSecurityConfiguration
-                = new EntityMetadataSecurityConfiguration();
+            = new EntityMetadataSecurityConfiguration(entityType);
         List<Integer> securityLevelValuesFallBack = new ArrayList<>();
         String entitySecurityConfiguration;
         // find the security levels configuration for the entity type
