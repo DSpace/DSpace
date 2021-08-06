@@ -720,6 +720,8 @@
                                         <licenseMerge>MIT License|The MIT License|MIT LICENSE|MIT|MIT license|MIT License (MIT)</licenseMerge>
                                         <!-- BouncyCastle uses an MIT-style license: https://www.bouncycastle.org/licence.html -->
                                         <licenseMerge>MIT License|Bouncy Castle Licence</licenseMerge>
+                                        <!-- netCDF tools uses an MIT-style license -->
+                                        <licenseMerge>MIT License|(MIT-style) netCDF C library license</licenseMerge>
                                         <licenseMerge>Mozilla Public License|Mozilla Public License version 1.1|Mozilla Public License 1.1 (MPL 1.1)|MPL 1.1|Mozilla Public License Version 2.0</licenseMerge>
                                         <!-- H2 Database claims this license, but for our purposes it's MPL: http://www.h2database.com -->
                                         <licenseMerge>Mozilla Public License|MPL 2.0, and EPL 1.0</licenseMerge>
