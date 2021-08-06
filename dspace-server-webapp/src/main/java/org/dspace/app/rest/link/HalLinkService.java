@@ -119,19 +119,19 @@ public class HalLinkService {
         resource.removeLinks();
         for (Link link : originalLinks) {
             try {
-                LinkRestRepository linkRepository = null;
-                Method method = null;
                 Class<RestAddressableModel> restAddressableModelClass = null;
+                // We need to get the restAddressableModelClass corresponding to the link to identify what type of
+                // object this is linking to
                 try {
                     Optional<LinkRest> matchingLinkRest =
                         linkRests.stream().filter(linkRest -> linkRest.name().equals(link.getRel().value())).findAny();
                     if (matchingLinkRest.isPresent()) {
                         LinkRest linkRest = matchingLinkRest.get();
-                        linkRepository = utils
-                            .getLinkResourceRepository(resource.getContent().getCategory(),
-                                resource.getContent().getType(), linkRest.name());
+                        LinkRestRepository linkRepository = utils
+                                .getLinkResourceRepository(resource.getContent().getCategory(),
+                                        resource.getContent().getType(), linkRest.name());
                         // Retrieve the corresponding method and REST model class
-                        method = utils.requireMethod(linkRepository.getClass(), linkRest.method());
+                        Method method = utils.requireMethod(linkRepository.getClass(), linkRest.method());
                         restAddressableModelClass = (Class<RestAddressableModel>) method.getReturnType();
                         // If the found restAddressableModelClass was a Page, determine the REST model class of paged
                         // objects
@@ -152,8 +152,12 @@ public class HalLinkService {
                     log.debug("Couldn't find the LinkRestRepository or DSpaceRestRepository corresponding to this " +
                               "link ({}) \n {}", link, e.getMessage());
                 }
+                // The restAddressableModelClass represents the type of object in the link.
+                // Identify whether there are any relevant projection parameters requested for this type of object
                 Map<String, List<String>> projectionParameters =
                     projection.getProjectionParametersForHalLink(restAddressableModelClass);
+                // If there were relevant projection parameters requested for this type of object, they will be added
+                // Otherwise, it's still the same link
                 resource.add(this.buildNewHrefWithProjectionQueryParams(link, projectionParameters));
             } catch (Exception e) {
                 log.error("Something went wrong trying to add projection query params to this link ({}) \n {}",

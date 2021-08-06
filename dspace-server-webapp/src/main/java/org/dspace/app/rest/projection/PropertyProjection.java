@@ -20,8 +20,10 @@ import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Abstract superclass of {@link CheckSideEntityInRelationshipTypeProjection} and {@link CheckRelatedItemProjection}
- * which optionally support {@link RestAddressableModel} Classe
+ * Abstract class for projections which add properties to the JSON response.
+ * This is used to help define the projection parameters to add to the HAL links
+ * It will only add the projection parameters to HAL links which are impacted by the given projection
+ * It will also only add the projection parameters if the projection was actually requested.
  *
  * @author Maria Verdonck (Atmire) on 09/07/2021
  */

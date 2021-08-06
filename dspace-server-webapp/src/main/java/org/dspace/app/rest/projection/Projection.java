@@ -152,6 +152,8 @@ public interface Projection {
 
     /**
      * Get the query parameters map to be added to the HAL link for this projection
+     * These query parameters are assumed to be relevant based on the user's query. They are also assumed to be
+     * relevant for the given restAddressableModelClass.
      *
      * @param restAddressableModelClass The class of the object of the link we're optionally adding projection query
      *                                  parameters to

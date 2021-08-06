@@ -942,8 +942,8 @@ public class Utils {
     /**
      * Get the {@link DSpaceRestRepository} associated with the given URI (with uriParts already determined)
      *
+     * @param uriParts The uri already split into parts
      * @param uri The uri of a {@link BaseObjectRest}
-     * @param uri The uri already split into parts
      * @return The {@link DSpaceRestRepository} corresponding to the provided uri
      * @throws IllegalArgumentException if the uri is not for a repository of type ReloadableEntityObjectRepository
      * or if the there was no repository found for this uri
