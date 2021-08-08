@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Named
 public class RequestItemConverter
         implements DSpaceConverter<RequestItem, RequestItemRest> {
-    @Autowired(required=true)
+    @Autowired(required = true)
     protected BitstreamConverter bitstreamConverter;
 
     @Autowired(required = true)

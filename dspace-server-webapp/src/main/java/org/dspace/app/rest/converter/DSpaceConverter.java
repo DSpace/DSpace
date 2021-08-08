@@ -21,7 +21,7 @@ public interface DSpaceConverter<M, R> {
      * Convert a DSpace model object into its equivalent REST resource, applying
      * a given projection.
      *
-     * @param modelObject a DSpace API model object. 
+     * @param modelObject a DSpace API model object.
      * @param projection
      * @return a resource representing the model object.
      */

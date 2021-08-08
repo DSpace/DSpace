@@ -11,7 +11,6 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

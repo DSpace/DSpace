@@ -8,7 +8,6 @@
 package org.dspace.builder;
 
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
