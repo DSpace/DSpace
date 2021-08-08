@@ -14,8 +14,8 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
 import org.dspace.app.requestitem.RequestItem;
-import org.dspace.app.rest.repository.RequestItemRepositoryIT;
 import org.dspace.app.rest.model.RequestItemRest;
+import org.dspace.app.rest.repository.RequestItemRepositoryIT;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 

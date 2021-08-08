@@ -10,7 +10,6 @@ package org.dspace.app.rest.model;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.dspace.app.rest.RestResourceController;
 
 /**

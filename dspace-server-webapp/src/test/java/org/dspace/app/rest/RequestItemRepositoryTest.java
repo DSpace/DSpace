@@ -1,13 +1,9 @@
-/*
- * Copyright 2019 Indiana University.  All rights reserved.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Mark H. Wood, IUPUI University Library, Jun 5, 2019
- */
-
-/*
- * Copyright 2019 Indiana University.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * http://www.dspace.org/license/
  */
 
 package org.dspace.app.rest;
@@ -22,14 +18,12 @@ import org.junit.Test;
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
-public class RequestItemRepositoryTest
-{
+public class RequestItemRepositoryTest {
     /**
      * Test of getDomainClass method, of class RequestItemRepository.
      */
     @Test
-    public void testGetDomainClass()
-    {
+    public void testGetDomainClass() {
         System.out.println("getDomainClass");
         RequestItemRepository instance = new RequestItemRepository();
         Class instanceClass = instance.getDomainClass();
@@ -41,8 +35,7 @@ public class RequestItemRepositoryTest
      */
     /*
     @Test
-    public void testWrapResource()
-    {
+    public void testWrapResource() {
     System.out.println("wrapResource");
     RequestItemRest model = null;
     String[] rels = null;
@@ -54,5 +47,4 @@ public class RequestItemRepositoryTest
     fail("The test case is a prototype.");
     }
      */
-
 }
