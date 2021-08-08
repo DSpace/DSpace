@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.repository;
+package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
@@ -30,6 +30,7 @@ import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.converter.RequestItemConverter;
 import org.dspace.app.rest.matcher.RequestCopyMatcher;
 import org.dspace.app.rest.model.RequestItemRest;
+import org.dspace.app.rest.repository.RequestItemRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.BitstreamBuilder;
@@ -156,11 +157,11 @@ public class RequestItemRepositoryIT
                         hasJsonPath("$.id", not(isEmptyOrNullString())),
                         hasJsonPath("$.type", is(RequestItemRest.NAME)),
                         hasJsonPath("$.token", not(isEmptyOrNullString())),
-                        hasJsonPath("$.request_email", is(RequestItemBuilder.REQ_EMAIL)),
-                        hasJsonPath("$.request_message", is(RequestItemBuilder.REQ_MESSAGE)),
-                        hasJsonPath("$.request_name", is(RequestItemBuilder.REQ_NAME)),
+                        hasJsonPath("$.requestEmail", is(RequestItemBuilder.REQ_EMAIL)),
+                        hasJsonPath("$.requestMessage", is(RequestItemBuilder.REQ_MESSAGE)),
+                        hasJsonPath("$.requestName", is(RequestItemBuilder.REQ_NAME)),
                         hasJsonPath("$.allfiles", is(false)),
-                        hasJsonPath("$.request_date", not(isEmptyOrNullString())), // TODO should be an ISO datetime
+                        hasJsonPath("$.requestDate", not(isEmptyOrNullString())), // TODO should be an ISO datetime
                         hasJsonPath("$._links.self.href", not(isEmptyOrNullString()))
                 )))
                 .andReturn();

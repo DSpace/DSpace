@@ -14,8 +14,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.converter.RequestItemConverter;
@@ -42,8 +40,6 @@ import org.springframework.stereotype.Component;
 @Component(RequestItemRest.CATEGORY + '.' + RequestItemRest.NAME)
 public class RequestItemRepository
         extends DSpaceRestRepository<RequestItemRest, String> {
-    private static final Logger LOG = LogManager.getLogger();
-
     @Autowired(required = true)
     protected RequestItemService requestItemService;
 
@@ -57,6 +53,7 @@ public class RequestItemRepository
     protected RequestItemConverter requestItemConverter;
 
     @Override
+    //@PreAuthorize(expr)
     public RequestItemRest findOne(Context context, String id) {
         RequestItem requestItem = requestItemService.findByToken(context, id);
         if (null == requestItem) {
