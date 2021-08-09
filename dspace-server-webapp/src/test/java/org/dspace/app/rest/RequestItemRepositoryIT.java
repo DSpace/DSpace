@@ -9,8 +9,8 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -98,9 +98,9 @@ public class RequestItemRepositoryIT
                 .build();
 
         // Test:  can we find it?
-        final String uri = URI_ROOT + '/'
-                + request.getToken();
-        getClient().perform(get(uri))
+        String authToken = getAuthToken(admin.getEmail(), password);
+        final String uri = URI_ROOT + '/' + request.getToken();
+        getClient(authToken).perform(get(uri))
                    .andExpect(status().isOk()) // Can we find it?
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
@@ -154,15 +154,15 @@ public class RequestItemRepositoryIT
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", Matchers.allOf(
-                        hasJsonPath("$.id", not(isEmptyOrNullString())),
+                        hasJsonPath("$.id", not(is(emptyOrNullString()))),
                         hasJsonPath("$.type", is(RequestItemRest.NAME)),
-                        hasJsonPath("$.token", not(isEmptyOrNullString())),
+                        hasJsonPath("$.token", not(is(emptyOrNullString()))),
                         hasJsonPath("$.requestEmail", is(RequestItemBuilder.REQ_EMAIL)),
                         hasJsonPath("$.requestMessage", is(RequestItemBuilder.REQ_MESSAGE)),
                         hasJsonPath("$.requestName", is(RequestItemBuilder.REQ_NAME)),
                         hasJsonPath("$.allfiles", is(false)),
-                        hasJsonPath("$.requestDate", not(isEmptyOrNullString())), // TODO should be an ISO datetime
-                        hasJsonPath("$._links.self.href", not(isEmptyOrNullString()))
+                        hasJsonPath("$.requestDate", not(is(emptyOrNullString()))), // TODO should be an ISO datetime
+                        hasJsonPath("$._links.self.href", not(is(emptyOrNullString())))
                 )))
                 .andReturn();
 
