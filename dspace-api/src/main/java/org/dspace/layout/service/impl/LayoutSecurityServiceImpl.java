@@ -73,6 +73,9 @@ public class LayoutSecurityServiceImpl implements LayoutSecurityService {
                 return customDataGrantAccess(context, user, metadataSecurityFields, item);
             case ADMINISTRATOR:
                 return authorizeService.isAdmin(context);
+            case CUSTOM_DATA_AND_ADMINISTRATOR:
+                return authorizeService.isAdmin(context)
+                    || customDataGrantAccess(context, user, metadataSecurityFields, item);
             case OWNER_AND_ADMINISTRATOR:
                 return authorizeService.isAdmin(context) || crisSecurityService.isOwner(user, item);
             default:

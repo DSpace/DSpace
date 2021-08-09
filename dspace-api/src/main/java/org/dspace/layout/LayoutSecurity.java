@@ -18,7 +18,8 @@ public enum LayoutSecurity {
     ADMINISTRATOR(1),
     OWNER_ONLY(2),
     OWNER_AND_ADMINISTRATOR(3),
-    CUSTOM_DATA(4);
+    CUSTOM_DATA(4),
+    CUSTOM_DATA_AND_ADMINISTRATOR(5);
 
     private int value;
     private LayoutSecurity(int value) {
@@ -35,26 +36,11 @@ public enum LayoutSecurity {
      * @return {@link LayoutSecurity}
      */
     public static LayoutSecurity valueOf(int val) {
-        LayoutSecurity value = null;
-        switch (val) {
-            case 0:
-                value = LayoutSecurity.PUBLIC;
-                break;
-            case 1:
-                value = LayoutSecurity.ADMINISTRATOR;
-                break;
-            case 2:
-                value = LayoutSecurity.OWNER_ONLY;
-                break;
-            case 3:
-                value = LayoutSecurity.OWNER_AND_ADMINISTRATOR;
-                break;
-            case 4:
-                value = LayoutSecurity.CUSTOM_DATA;
-                break;
-            default:
-                value = null;
+        for (LayoutSecurity security : LayoutSecurity.values()) {
+            if (security.value == val) {
+                return security;
+            }
         }
-        return value;
+        return null;
     }
 }

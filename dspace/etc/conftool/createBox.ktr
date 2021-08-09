@@ -1195,6 +1195,9 @@ else if (VISIBILITY == "OWNER &amp; ADMINISTRATOR"){
 }
 else if (VISIBILITY == "CUSTOM DATA"){
   security = 4;
+}
+else if (VISIBILITY == "CUSTOM DATA &amp; ADMINISTRATOR"){
+  security = 5;
 }</jsScript_script>
       </jsScript>
     </jsScripts>
