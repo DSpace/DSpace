@@ -23,7 +23,7 @@ import org.hamcrest.Description;
 public class DateMatcher
         extends BaseMatcher<String> {
     private static final SimpleDateFormat dateFormat
-            = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+            = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
     private final Date matchDate;
 
@@ -57,7 +57,8 @@ public class DateMatcher
         try {
             testDateDecoded = dateFormat.parse((String)testDate);
         } catch (ParseException ex) {
-            throw new IllegalArgumentException("Argument is not an ISO 8601 zoned date", ex);
+            throw new IllegalArgumentException("Argument '" + testDate
+                    + "' is not an ISO 8601 zoned date", ex);
         }
 
         // Compare with the Date that must match
