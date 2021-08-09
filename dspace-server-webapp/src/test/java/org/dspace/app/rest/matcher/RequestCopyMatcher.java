@@ -14,8 +14,8 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
 import org.dspace.app.requestitem.RequestItem;
-import org.dspace.app.rest.model.RequestItemRest;
 import org.dspace.app.rest.RequestItemRepositoryIT;
+import org.dspace.app.rest.model.RequestItemRest;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
@@ -32,12 +32,12 @@ public class RequestCopyMatcher {
                 //hasJsonPath("$._links.bitstream", Matchers.not(Matchers.empty())),
                 //hasJsonPath("$._links.item", Matchers.not(Matchers.empty())),
                 hasJsonPath("$.allfiles", is(request.isAllfiles())),
-                hasJsonPath("$.request_email", is(request.getReqEmail())),
-                hasJsonPath("$.request_name", is(request.getReqName())),
-                hasJsonPath("$.request_message", is(request.getReqMessage())),
-                hasJsonPath("$.request_date", dateMatcher(request.getRequest_date())),
-                hasJsonPath("$.accept_request", is(request.isAccept_request())),
-                hasJsonPath("$.decision_date", dateMatcher(request.getDecision_date())),
+                hasJsonPath("$.requestEmail", is(request.getReqEmail())),
+                hasJsonPath("$.requestName", is(request.getReqName())),
+                hasJsonPath("$.requestMessage", is(request.getReqMessage())),
+                hasJsonPath("$.requestDate", dateMatcher(request.getRequest_date())),
+                hasJsonPath("$.acceptRequest", is(request.isAccept_request())),
+                hasJsonPath("$.decisionDate", dateMatcher(request.getDecision_date())),
                 hasJsonPath("$.expires", dateMatcher(request.getExpires())),
                 hasJsonPath("$.type", is(RequestItemRest.NAME)),
                 hasJsonPath("$._links.self.href",
