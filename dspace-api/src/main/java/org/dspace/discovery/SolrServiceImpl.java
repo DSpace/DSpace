@@ -1572,7 +1572,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         try {
             SolrInputDocument solrInDoc = new SolrInputDocument();
-            solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, "Item-" + itemId);
+            String itemType = IndexableItem.TYPE;
+            solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, itemType + "-" + itemId);
+            solrInDoc.addField(SearchUtils.RESOURCE_TYPE_FIELD, itemType);
+            solrInDoc.addField(SearchUtils.RESOURCE_ID_FIELD, itemId);
             final String field = "relation." + relationLabel;
             solrInDoc.addField(field,
                                Collections.<String, Object>singletonMap("set", relatedItems));
