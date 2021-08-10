@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.eperson.service;
@@ -12,9 +12,11 @@ import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
+import org.dspace.eperson.SubscriptionParameter;
 
 /**
  * Service interface class for the Subscription object.
@@ -41,14 +43,14 @@ public interface SubscribeService {
      * new item appears in the collection.
      *
      * @param context    DSpace context
-     * @param eperson    EPerson to subscribe
-     * @param collection Collection to subscribe to
      * @throws SQLException       An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      */
-    public void subscribe(Context context, EPerson eperson,
-                          Collection collection) throws SQLException, AuthorizeException;
+    public Subscription subscribe(Context context, EPerson eperson,
+                                  DSpaceObject dSpaceObject,
+                                  List<SubscriptionParameter> subscriptionParameterList,
+                                  String type ) throws SQLException, AuthorizeException;
 
     /**
      * Unsubscribe an e-person to a collection. Passing in <code>null</code>
@@ -83,7 +85,7 @@ public interface SubscribeService {
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public List<Collection> getAvailableSubscriptions(Context context)
-        throws SQLException;
+            throws SQLException;
 
     /**
      * Find out which collections an e-person can subscribe to
@@ -94,19 +96,19 @@ public interface SubscribeService {
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public List<Collection> getAvailableSubscriptions(Context context, EPerson eperson)
-        throws SQLException;
+            throws SQLException;
 
     /**
      * Is that e-person subscribed to that collection?
      *
      * @param context    DSpace context
      * @param eperson    find out if this e-person is subscribed
-     * @param collection find out if subscribed to this collection
+     * @param dSpaceObject find out if subscribed to this dSpaceObject
      * @return <code>true</code> if they are subscribed
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public boolean isSubscribed(Context context, EPerson eperson,
-                                Collection collection) throws SQLException;
+                                DSpaceObject dSpaceObject) throws SQLException;
 
     /**
      * Delete subscription by collection.
@@ -125,4 +127,32 @@ public interface SubscribeService {
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public void deleteByEPerson(Context context, EPerson ePerson) throws SQLException;
+
+    /**
+     * Finds a subscription by id
+     *
+     * @param context DSpace context
+     * @param id the id of subscription to be searched
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    public Subscription findById(Context context, int id) throws SQLException;
+
+    /**
+     * Updates a subscription by id
+     *
+     * @param context DSpace context
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    public Subscription updateSubscription(Context context, Integer id,  EPerson eperson,
+                                           DSpaceObject dSpaceObject,
+                                           List<SubscriptionParameter> subscriptionParameterList,
+                                           String type)  throws SQLException, AuthorizeException;
+
+    /**
+     * Deletes a subscription
+     *
+     * @param context DSpace context
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    public void deleteSubscription(Context context, Integer id) throws SQLException, AuthorizeException;
 }
