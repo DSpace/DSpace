@@ -27,15 +27,14 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "subscription_parameter")
-@DiscriminatorColumn(name = "name")
 public class SubscriptionParameter {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "subscription_parameter_seq")
     @SequenceGenerator(name = "subscription_parameter_seq", sequenceName = "subscription_parameter_seq", allocationSize = 1)
-    @Column(name = "subscription_parameter_id", unique = true, nullable = false, insertable = true)
+    @Column(name = "subscription_parameter_id", unique = true, nullable = false)
     private Integer id;
     @ManyToOne
-    @JoinColumn(name = "subscription_id")
+    @JoinColumn(name = "subscription_id", nullable = false)
     private Subscription subscription;
     @Column
     private String name;
@@ -67,4 +66,22 @@ public class SubscriptionParameter {
         this.value = value;
     }
 
+    public SubscriptionParameter(Integer id, Subscription subscription, String name, String value) {
+        this.id = id;
+        this.subscription = subscription;
+        this.name = name;
+        this.value = value;
+    }
+
+    public SubscriptionParameter() {
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }
+

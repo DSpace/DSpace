@@ -60,7 +60,7 @@ public class SubscribeServiceImpl implements SubscribeService {
         if (authorizeService.isAdmin(context)
                 || ((context.getCurrentUser() != null) && (context
                 .getCurrentUser().getID().equals(eperson.getID())))) {
-            if (!isSubscribed(context, eperson, dSpaceObject)) {
+            if (true) {
                 Subscription new_subscription = subscriptionDAO.create(context, new Subscription());
                 new_subscription.setSubscriptionParameterList(subscriptionParameterList);
                 new_subscription.setePerson(eperson);
@@ -171,12 +171,17 @@ public class SubscribeServiceImpl implements SubscribeService {
         if (subscription != null) {
             // must be admin or the subscriber of the subscription
             if (authorizeService.isAdmin(context, context.getCurrentUser()) || subscription.getePerson().equals(context.getCurrentUser())) {
-                subscriptionDAO.delete(context, subscription);
+                try {
+                    subscriptionDAO.delete(context, subscription);
+                } catch (SQLException sqlException) {
+                    throw new SQLException(sqlException);
+                }
+
             } else {
                 throw new AuthorizeException("Only admin or e-person themselves can delete the subscription");
             }
         } else {
-            throw new IllegalArgumentException("Subscription with id" + id + "is not found");
+            throw new IllegalArgumentException("Subscription with id " + id + " is not found");
         }
 
     }

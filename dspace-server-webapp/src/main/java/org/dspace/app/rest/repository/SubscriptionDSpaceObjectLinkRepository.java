@@ -33,7 +33,6 @@ import java.sql.SQLException;
  * Link repository for "mappedCollections" subresource of an individual item.
  */
 @Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.NAME + "." + SubscriptionRest.DSPACE_OBJECT)
-@Transactional
 public class SubscriptionDSpaceObjectLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

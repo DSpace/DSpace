@@ -62,7 +62,6 @@ public class Subscription implements ReloadableEntity<Integer> {
      * {@link org.dspace.eperson.service.SubscribeService#subscribe(Context, EPerson, DSpaceObject, List, String)}
      */
     protected Subscription() {
-
     }
 
     public Integer getID() {
@@ -103,5 +102,9 @@ public class Subscription implements ReloadableEntity<Integer> {
 
     public void setSubscriptionParameterList(List<SubscriptionParameter> subscriptionList) {
         this.subscriptionParameterList = subscriptionList;
+    }
+    public void addParameters(SubscriptionParameter subscriptionParameter){
+        subscriptionParameterList.add(subscriptionParameter);
+        subscriptionParameter.setSubscription(this);
     }
 }

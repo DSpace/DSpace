@@ -34,7 +34,7 @@ public class SubscriptionRest extends BaseObjectRest<Integer>{
 
     private Integer id;
     private String type;
-    private List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+    private List<SubscriptionParameterRest> subscriptionParameterList = new ArrayList<>();
 
     @Override
     public String getCategory() {
@@ -55,11 +55,11 @@ public class SubscriptionRest extends BaseObjectRest<Integer>{
         this.type = type;
     }
 
-    public List<SubscriptionParameter> getSubscriptionParameterList() {
+    public List<SubscriptionParameterRest> getSubscriptionParameterList() {
         return subscriptionParameterList;
     }
 
-    public void setSubscriptionParameterList(List<SubscriptionParameter> subscriptionParameterList) {
+    public void setSubscriptionParameterList(List<SubscriptionParameterRest> subscriptionParameterList) {
         this.subscriptionParameterList = subscriptionParameterList;
     }
     public String getSubscriptionType() {
