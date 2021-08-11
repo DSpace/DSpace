@@ -150,17 +150,6 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
 	        }
         }
         
-        // Customization for LIBDRUM-628
-        CheckBox isDataset = form.addItem().addCheckBox("is_dataset");
-        isDataset.setLabel(T_is_dataset);
-        isDataset.setHelp(T_is_dataset_help);
-        isDataset.addOption("true");
-        if (submission.isDataset())
-        {
-        	isDataset.setOptionSelected("true");
-        }
-        // End customization for LIBDRUM-628
-        
         CheckBox publishedBefore = form.addItem().addCheckBox("published_before");
         publishedBefore.setLabel(T_published_before);
         publishedBefore.setHelp(T_published_before_help);
@@ -251,6 +240,17 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
 	        	note.addContent(T_close);
 	        }
         }
+        
+        // Customization for LIBDRUM-628
+        CheckBox isDataset = form.addItem().addCheckBox("is_dataset");
+        isDataset.setLabel(T_is_dataset);
+        isDataset.setHelp(T_is_dataset_help);
+        isDataset.addOption("true");
+        if (submission.isDataset())
+        {
+        	isDataset.setOptionSelected("true");
+        }
+        // End customization for LIBDRUM-628
         
         //add standard control/paging buttons
         addControlButtons(form);

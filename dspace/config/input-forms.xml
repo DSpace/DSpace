@@ -233,7 +233,7 @@
           <repeatable>false</repeatable>
           <label>Methodology Description</label>
           <input-type>textarea</input-type>
-          <hint>TBD. </hint>
+          <hint>Description of methods used for data collection/generation, processing, analysis, standards, quality-assurance procedures, etc. </hint>
           <required></required>
         </field>
         <!-- End customization for LIBDRUM-628 -->
