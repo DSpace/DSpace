@@ -893,7 +893,19 @@
 
     <!-- Generate the license information from the file section -->
     <xsl:template match="mets:fileGrp[@USE='CC-LICENSE']" mode="simple">
-        <li><a href="{mets:file/mets:FLocat[@xlink:title='license_text']/@xlink:href}"><i18n:text>xmlui.dri2xhtml.structural.link_cc</i18n:text></a></li>
+        <!-- UMD Customization for LIBDRUM-628 -->
+        <xsl:variable name="license_text_url" select="mets:file/mets:FLocat[@xlink:title='license_text']/@xlink:href" />
+        <li>
+            <xsl:choose>
+                <xsl:when test="$license_text_url != ''">
+                     <a href="{$license_text_url}"><i18n:text>xmlui.dri2xhtml.structural.link_cc</i18n:text></a>
+                </xsl:when>
+                <xsl:otherwise>
+                    <i18n:text>xmlui.dri2xhtml.structural.link_cc</i18n:text>
+                </xsl:otherwise>
+            </xsl:choose>
+        </li>
+        <!-- End UMD Customization for LIBDRUM-628 -->
     </xsl:template>
 
     <!-- Generate the license information from the file section -->
@@ -984,13 +996,16 @@
 
     <!-- Template to display rights metadata -->
     <xsl:template name="itemSummaryView-DIM-rights">
-        <xsl:if test="dim:field[@element='rights' and descendant::text()]">
-            <div class="simple-item-view-rights item-page-field-wrapper table">
-                <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-rights</i18n:text></h5>
-                <xsl:for-each select="dim:field[@element='rights']">
-                    <span>
-                        <xsl:copy-of select="node()"/>
-                    </span>
+        <xsl:if test="dim:field[(@element='rights' or @element='accessRights') and descendant::text()]">
+            <div class="simple-item-view-rights word-break item-page-field-wrapper table">
+                <h5>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-rights</i18n:text>
+                </h5>
+                <xsl:for-each select="dim:field[@element='rights' or @element='accessRights']">
+                    <xsl:copy-of select="./node()"/>
+                    <xsl:if test="count(following-sibling::dim:field[@element='rights' or @element='accessRights']) != 0">
+                        <br/>
+                    </xsl:if>
                 </xsl:for-each>
             </div>
         </xsl:if>
