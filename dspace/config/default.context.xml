@@ -1,7 +1,9 @@
 <?xml version="1.0" ?>
-<Context debug="0" reloadable="true" crossContext="true">
+<Context>
 	<WatchedResource>WEB-INF/web.xml</WatchedResource>
-	<Parameter name="dspace.dir" override="false"
-		value="${dspace.dir}"
-		description="Path to the DSpace home directory." />
+	<WatchedResource>WEB-INF/tomcat-web.xml</WatchedResource>
+	<WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+	<Parameter name="dspace.dir" value="/home/alba-atis/IdeaProjects/dspace-crisChanges" override="
+false"/>
+	<Parameter name="dspace-config" value="/home/alba-atis/IdeaProjects/dspace-crisChanges/config/dspace.cfg" override="false"/>
 </Context>

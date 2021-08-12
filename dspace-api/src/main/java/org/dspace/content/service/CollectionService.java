@@ -439,7 +439,24 @@ public interface CollectionService
      */
     List<Collection> findCollectionsAdministered(String query, Context context, int offset, int limit)
         throws SQLException, SearchServiceException;
-
+    /**
+     * Returns the collections that are administered by the current user.
+     *
+     * @param  query                  limit the returned collection to those with
+     *                                metadata values matching the query terms. The
+     *                                terms are used to make also a prefix query on
+     *                                SOLR so it can be used to implement an
+     *                                autosuggest feature over the collection name
+     * @param  entityType             entityType of the collection
+     * @param  context                DSpace Context
+     * @param  offset                 the position of the first result to return
+     * @param  limit                  paging limit
+     * @return                        discovery search result objects
+     * @throws SQLException           if something goes wrong
+     * @throws SearchServiceException if search error
+     */
+    List<Collection> findCollectionsAdministeredByEntityType(String query,String entityType, Context context, int offset, int limit)
+            throws SQLException, SearchServiceException;
     /**
      * Counts the collections that are administered by the current user.
      *
