@@ -15,20 +15,20 @@ CREATE SEQUENCE subscription_parameter_seq;
 CREATE TABLE  subscription_parameter
 (
   subscription_parameter_id  INTEGER NOT NULL,
-  parameter_name    CHARACTER VARYING(255),
-  parameter_value  CHARACTER VARYING(255),
+  name    CHARACTER VARYING(255),
+  value  CHARACTER VARYING(255),
   subscription_id     INTEGER  NOT NULL,
   CONSTRAINT subscription_parameter_pkey PRIMARY KEY (subscription_parameter_id),
   CONSTRAINT subscription_parameter_subscription_fkey  FOREIGN KEY  (subscription_id) REFERENCES subscription (subscription_id)
 );
 -- --
 --ALTER TABLE subscription DROP CONSTRAINT subscription_collection_id_fkey;
----- --
---ALTER TABLE subscription ALTER COLUMN collection_id RENAME TO dspace_object_id;
+-- --
+ALTER TABLE subscription ALTER COLUMN collection_id RENAME TO dspace_object_id;
 -- --
 ALTER TABLE subscription ADD COLUMN type CHARACTER VARYING(255);
 ---- --
---ALTER TABLE subscription ADD CONSTRAINT subscription_dspaceobject_fkey FOREIGN KEY (dspace_object_id) REFERENCES dspaceobject(uuid);
+ALTER TABLE subscription ADD CONSTRAINT subscription_dspaceobject_fkey FOREIGN KEY (dspace_object_id) REFERENCES dspaceobject(uuid);
 
 
 

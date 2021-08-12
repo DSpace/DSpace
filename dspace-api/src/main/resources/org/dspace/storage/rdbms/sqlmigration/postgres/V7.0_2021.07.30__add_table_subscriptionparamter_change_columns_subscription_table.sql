@@ -21,15 +21,15 @@ CREATE TABLE  subscription_parameter
   CONSTRAINT subscription_parameter_pkey PRIMARY KEY (subscription_parameter_id),
   CONSTRAINT subscription_parameter_subscription_fkey  FOREIGN KEY  (subscription_id) REFERENCES subscription (subscription_id)
 );
--- --
+ --
 --ALTER TABLE subscription DROP CONSTRAINT subscription_collection_id_fkey;
----- --
---ALTER TABLE subscription RENAME COLUMN collection_id TO dspace_object_id;
----- --
+-- --
+ALTER TABLE subscription RENAME COLUMN collection_id TO dspace_object_id;
+-- --
 ALTER TABLE subscription ADD COLUMN type CHARACTER VARYING(255);
 ---- --
---ALTER TABLE subscription ADD CONSTRAINT subscription_dspaceobject_fkey FOREIGN KEY (dspace_object_id) REFERENCES dspaceobject (uuid);
+ALTER TABLE subscription ADD CONSTRAINT subscription_dspaceobject_fkey FOREIGN KEY (dspace_object_id) REFERENCES dspaceobject (uuid);
 --
---
---
+
+
 

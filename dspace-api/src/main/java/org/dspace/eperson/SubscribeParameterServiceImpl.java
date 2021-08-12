@@ -59,7 +59,7 @@ public class SubscribeParameterServiceImpl implements SubscriptionParameterServi
         return subscriptionParameter;
     }
     @Override
-    public SubscriptionParameter edit(Context context,Integer id,  String name, String value, Subscription subscription) throws SQLException, AuthorizeException {
+    public SubscriptionParameter edit(Context context,Integer id,String value,  String name, Subscription subscription) throws SQLException, AuthorizeException {
         SubscriptionParameter subscriptionParameter = subscriptionParameterDAO.findByID(context, SubscriptionParameter.class, id);
         subscriptionParameter.setId(id);
         subscriptionParameter.setName(name);
@@ -67,8 +67,6 @@ public class SubscribeParameterServiceImpl implements SubscriptionParameterServi
         subscriptionParameter.setValue(value);
         subscriptionParameterDAO.save(context, subscriptionParameter);
         return subscriptionParameter;
-
-
     }
 
     @Override
@@ -80,6 +78,7 @@ public class SubscribeParameterServiceImpl implements SubscriptionParameterServi
     public void deleteSubscriptionParameter(Context context, Integer id) throws SQLException, AuthorizeException {
         SubscriptionParameter subscriptionParameter = subscriptionParameterDAO.findByID(context, SubscriptionParameter.class, id);
         if (subscriptionParameter != null) {
+            subscriptionParameter.setSubscription(null);
             subscriptionParameterDAO.delete(context, subscriptionParameter);
         } else {
             throw new SQLException("Subscription parameter with id" + id + "do not exists");

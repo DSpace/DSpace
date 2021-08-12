@@ -25,12 +25,12 @@ CREATE TABLE  subscription_parameter
 -- --
 
 --ALTER TABLE subscription DROP CONSTRAINT subscription_collection_id_fkey
------- --
---ALTER TABLE subscription ALTER COLUMN collection_id RENAME TO dspace_object_id;
+---- --
+ALTER TABLE subscription ALTER COLUMN collection_id RENAME TO dspace_object_id;
 ---- --
 ALTER TABLE subscription ADD COL
 ---- --
---ALTER TABLE subscription ADD CONSTRAINT subscription_dspaceobject_fkey FOREIGN KEY (dspace_object_id) REFERENCES dspaceobject (uuid);
+ALTER TABLE subscription ADD CONSTRAINT subscription_dspaceobject_fkey FOREIGN KEY (dspace_object_id) REFERENCES dspaceobject (uuid);
 --
 
 

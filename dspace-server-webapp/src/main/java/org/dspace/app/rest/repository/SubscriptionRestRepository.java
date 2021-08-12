@@ -227,11 +227,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
                 throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
             }
             resourcePatch.patch(context, subscription, patch.getOperations());
-            subscribeService.updateSubscription(context, id, subscription.getePerson(),
-                    subscription.getdSpaceObject(), subscription.getSubscriptionParameterList(), subscription.getType());
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (AuthorizeException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
