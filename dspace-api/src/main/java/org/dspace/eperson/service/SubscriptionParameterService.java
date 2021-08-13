@@ -8,10 +8,7 @@
 package org.dspace.eperson.service;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
 
@@ -19,17 +16,16 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Service interface class for the Subscription object.
- * The implementation of this class is responsible for all business logic calls for the Subscription object and is
+ * Service interface class for the SubscriptionParameter object.
+ * The implementation of this class is responsible for all business logic calls for the SubscriptionParameter object and is
  * autowired by spring
  * Class defining methods for sending new item e-mail alerts to users
  *
- * @author kevinvandevelde at atmire.com
+ * @author Alba Aliu @atis.al
  */
 public interface SubscriptionParameterService {
     /**
-     * Subscribe an e-person to a collection. An e-mail will be sent every day a
-     * new item appears in the collection.
+     * Finds all of subscriptions parameter
      *
      * @param context DSpace context
      * @return list of Subscription objects
@@ -38,10 +34,12 @@ public interface SubscriptionParameterService {
     public List<SubscriptionParameter> findAll(Context context) throws SQLException;
 
     /**
-     * Subscribe an e-person to a collection. An e-mail will be sent every day a
-     * new item appears in the collection.
+     * Adds a new subscription parameter related with a subscription
      *
      * @param context    DSpace context
+     * @param value      String value
+     * @param name       String name
+     * @param subscription    Subscription subscription
      * @throws SQLException       An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
@@ -51,10 +49,13 @@ public interface SubscriptionParameterService {
                                   Subscription subscription) throws SQLException, AuthorizeException;
 
     /**
-     * Subscribe an e-person to a collection. An e-mail will be sent every day a
-     * new item appears in the collection.
+     * Updates a  subscription parameter with id
      *
      * @param context    DSpace context
+     * @param id    Integer id
+     * @param value      String value
+     * @param name       String name
+     * @param subscription    Subscription subscription
      * @throws SQLException       An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
@@ -64,17 +65,17 @@ public interface SubscriptionParameterService {
                                      Subscription subscription) throws SQLException, AuthorizeException;
 
     /**
-     * Finds a subscription by id
+     * Finds a subscriptionParameter by id
      *
      * @param context DSpace context
-     * @param id the id of subscription to be searched
+     * @param id the id of subscriptionParameter to be searched
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public SubscriptionParameter findById(Context context, int id) throws SQLException;
 
 
     /**
-     * Deletes a subscription
+     * Deletes a subscriptionParameter with id
      *
      * @param context DSpace context
      * @throws SQLException An exception that provides information on a database access error or other errors.

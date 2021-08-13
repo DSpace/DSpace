@@ -7,24 +7,24 @@
  */
 package org.dspace.app.rest.repository;
 
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
+import java.sql.SQLException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.core.Context;
 import org.dspace.eperson.Subscription;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.SubscribeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-import java.sql.SQLException;
+
 
 /**
- * Link repository for "mappedCollections" subresource of an individual item.
+ * Link repository for "eperson" of subscription
  */
 @Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.NAME + "." + SubscriptionRest.EPERSON)
 public class SubscriptionEPersonLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {

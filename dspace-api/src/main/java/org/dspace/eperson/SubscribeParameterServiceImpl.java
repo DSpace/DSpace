@@ -9,16 +9,8 @@ package org.dspace.eperson;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.service.CollectionService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.eperson.dao.SubscriptionDAO;
 import org.dspace.eperson.dao.SubscriptionParameterDAO;
-import org.dspace.eperson.service.SubscribeService;
 import org.dspace.eperson.service.SubscriptionParameterService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,10 +18,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Class defining methods for sending new item e-mail alerts to users
+ * Class implemennting method for service layer of SubscriptionParameter entity
  *
- * @author Robert Tansley
- * @version $Revision$
+ * @author Alba Aliu at atis.al
  */
 public class SubscribeParameterServiceImpl implements SubscriptionParameterService {
     /**

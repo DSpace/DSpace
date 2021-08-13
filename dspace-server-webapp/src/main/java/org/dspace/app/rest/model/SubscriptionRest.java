@@ -9,8 +9,6 @@
 package org.dspace.app.rest.model;
 
 import org.dspace.app.rest.RestResourceController;
-import org.dspace.eperson.Subscription;
-import org.dspace.eperson.SubscriptionParameter;
 
 import java.util.ArrayList;
 import java.util.List;

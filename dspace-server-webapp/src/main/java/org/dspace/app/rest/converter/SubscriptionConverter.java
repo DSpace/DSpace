@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This is the converter from Entity CrisLayoutTab to the REST data model
+ * This is the converter from Entity Subscription to the REST data model
  * 
- * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
+ * @author Alba Aliu at atis.al
  *
  */
 @Component

@@ -9,20 +9,13 @@ package org.dspace.app.rest.repository.patch.operation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.jsonldjava.utils.Obj;
-import javassist.NotFoundException;
-import org.apache.xpath.operations.Bool;
-import org.dspace.app.profile.ResearcherProfile;
-import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.SubscriptionParameterRest;
 import org.dspace.app.rest.model.patch.JsonValueEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
 import org.dspace.eperson.service.SubscriptionParameterService;
@@ -30,8 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+
 
 /**
  * Implementation for SubscriptionParameterReplaceOperation patches.
@@ -97,12 +89,5 @@ public class SubscriptionParameterReplaceOperation extends PatchOperation<Subscr
             return subscriptionParameter.getId().equals(id);
         }).findFirst().orElseThrow();
 
-    }
-
-    public SubscriptionParameter generateObjectFromValue(Subscription subscription, String name) {
-        return subscription
-                .getSubscriptionParameterList().stream().filter(subscriptionParameter1 -> {
-                    return subscriptionParameter1.getName().equals(name);
-                }).findFirst().orElseThrow();
     }
 }

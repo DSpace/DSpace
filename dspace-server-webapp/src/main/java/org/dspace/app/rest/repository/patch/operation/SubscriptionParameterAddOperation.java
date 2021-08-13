@@ -7,31 +7,21 @@
  */
 package org.dspace.app.rest.repository.patch.operation;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
-import org.dspace.app.profile.ResearcherProfile;
-import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.SubscriptionParameterRest;
 import org.dspace.app.rest.model.patch.JsonValueEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
 import org.dspace.eperson.service.SubscribeService;
-import org.dspace.eperson.service.SubscriptionParameterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Implementation for SubscriptionParameterAddOperation patches.

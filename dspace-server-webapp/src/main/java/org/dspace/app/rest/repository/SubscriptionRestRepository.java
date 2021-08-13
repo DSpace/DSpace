@@ -23,7 +23,6 @@ import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
@@ -31,7 +30,6 @@ import org.dspace.eperson.SubscriptionParameter;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.eperson.service.SubscriptionParameterService;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,12 +63,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     protected ConverterService converter;
     @Autowired
     protected EPersonService personService;
-    @Autowired(required = true)
-    protected ContentServiceFactory contentServiceFactory;
     @Autowired
     private DSpaceObjectUtils dspaceObjectUtil;
-    @Autowired
-    private SessionFactory sessionFactory;
     @Autowired
     private ResourcePatch<Subscription> resourcePatch;
 
@@ -105,8 +99,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         try {
             Context context = obtainContext();
             EPerson ePerson = personService.findByIdOrLegacyId(context, id);
-            if (context.getCurrentUser().equals(ePerson) || true) {
-                List<Subscription> subscriptionList = subscribeService.getSubscriptions(context, ePerson);
+            if (context.getCurrentUser().equals(ePerson) || authorizeService.isAdmin(context, ePerson)) {
+                List<Subscription> subscriptionList = subscribeService.getSubscriptionsByEPerson(context, ePerson);
                 return converter.toRestPage(subscriptionList, pageable, utils.obtainProjection());
             } else {
                 throw new AuthorizeException("Only admin or e-person themselves can search for it's subscription");
@@ -154,10 +148,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
                         dSpaceObject,
                         subscriptionParameters,
                         subscriptionRest.getType());
-                for (SubscriptionParameter subscriptionParameter : subscription.getSubscriptionParameterList()) {
-                    subscriptionParameter.setSubscription(subscription);
-                }
             }
+            context.commit();
             return converter.toRest(subscription, utils.obtainProjection());
         } catch (SQLException sqlException) {
             throw new SQLException(sqlException.getMessage(), sqlException);
@@ -218,8 +210,9 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch) throws UnprocessableEntityException, DSpaceBadRequestException {
+    @PreAuthorize("isAuthenticated()")
+    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch)
+            throws UnprocessableEntityException, DSpaceBadRequestException {
         Subscription subscription = null;
         try {
             subscription = subscribeService.findById(context, id);

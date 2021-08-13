@@ -12,7 +12,7 @@ import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
 /**
- * The Resource representation of a Script object
+ * The Resource representation of a Subscription object
  */
 @RelNameDSpaceResource(SubscriptionRest.NAME)
 public class SubscriptionResource extends DSpaceResource<SubscriptionRest> {

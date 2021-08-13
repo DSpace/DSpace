@@ -22,9 +22,11 @@ CREATE TABLE  subscription_parameter
   CONSTRAINT subscription_parameter_subscription_fkey  FOREIGN KEY  (subscription_id) REFERENCES subscription (subscription_id)
 );
  --
---ALTER TABLE subscription DROP CONSTRAINT subscription_collection_id_fkey;
+ALTER TABLE subscription DROP CONSTRAINT subscription_collection_id_fkey;
 -- --
-ALTER TABLE subscription RENAME COLUMN collection_id TO dspace_object_id;
+ALTER TABLE subscription DROP COLUMN collection_id;
+--
+ALTER TABLE subscription ADD COLUMN dspace_object_id UUID;
 -- --
 ALTER TABLE subscription ADD COLUMN type CHARACTER VARYING(255);
 ---- --
