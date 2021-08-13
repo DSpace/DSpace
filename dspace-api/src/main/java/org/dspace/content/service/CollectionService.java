@@ -455,7 +455,8 @@ public interface CollectionService
      * @throws SQLException           if something goes wrong
      * @throws SearchServiceException if search error
      */
-    List<Collection> findCollectionsAdministeredByEntityType(String query,String entityType, Context context, int offset, int limit)
+    List<Collection> findCollectionsAdministeredByEntityType(String query,String entityType,
+                                                             Context context, int offset, int limit)
             throws SQLException, SearchServiceException;
     /**
      * Counts the collections that are administered by the current user.
@@ -483,4 +484,15 @@ public interface CollectionService
      * @throws SQLException if an SQL error occurs
      */
     public Collection findByItem(Context context, Item item) throws SQLException;
+    /**
+     * Returns thenu number of collections administered by user of an entity type
+     *
+     * @param  context      the DSpace context
+     * @param  query        the query to be filtered
+     * @return entityType   the entity type of collection
+     * @throws SQLException if an SQL error occurs
+     * @throws SearchServiceException if an Solr error occurs
+     */
+    public int countCollectionsAdministeredByEntityType(String query, String entityType,
+                                                        Context context) throws SQLException, SearchServiceException;
 }

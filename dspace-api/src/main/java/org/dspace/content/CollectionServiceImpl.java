@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.content;
@@ -203,7 +203,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                                                                      "title", null);
         if (nameField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
+                    "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
         return collectionDAO.findAll(context, nameField, limit, offset);
@@ -1101,7 +1101,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             throws SQLException, SearchServiceException {
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
-//        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
         discoverQuery.setStart(offset);
         discoverQuery.setMaxResults(limit);
 
@@ -1145,16 +1145,19 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                                                                        DiscoverQuery discoverQuery,
                                                                        String query, String entityType)
             throws SQLException, SearchServiceException {
-
+        String filterQuery = "";
         if (!authorizeService.isAdmin(context)) {
-            String filterQuery = groupService.allMemberGroupsSet(context, context.getCurrentUser()).stream()
+            filterQuery = groupService.allMemberGroupsSet(context, context.getCurrentUser()).stream()
                     .map(group -> "g" + group.getID())
                     .collect(Collectors.joining(" OR ", "admin:(", ")"));
             discoverQuery.addFilterQueries(filterQuery);
         }
         if (StringUtils.isNoneBlank(entityType)) {
-            String filterQueryEntity = "entityType :[" + entityType + " TO *]";
-            discoverQuery.addFilterQueries(filterQueryEntity);
+            if (filterQuery.length() > 0) {
+                filterQuery += " AND ";
+            }
+            filterQuery += "search.entitytype: " + entityType;
+            discoverQuery.addFilterQueries(filterQuery);
         }
         if (StringUtils.isNotBlank(query)) {
             StringBuilder buildQuery = new StringBuilder();
@@ -1163,5 +1166,14 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             discoverQuery.setQuery(buildQuery.toString());
         }
         return searchService.search(context, discoverQuery);
+    }
+    @Override
+    public int countCollectionsAdministeredByEntityType(String query, String entityType, Context context)
+            throws SQLException, SearchServiceException {
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setMaxResults(0);
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        return (int) retrieveCollectionsAdministeredByEntityType(context,
+                discoverQuery, query, entityType).getTotalSearchResults();
     }
 }

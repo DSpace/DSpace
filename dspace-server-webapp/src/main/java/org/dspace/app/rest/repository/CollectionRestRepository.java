@@ -245,7 +245,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                     query,entityTypeLabel, context,
                     Math.toIntExact(pageable.getOffset()),
                     Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            int tot = cs.countCollectionsWithSubmit(query, context, null, entityTypeLabel);
+            int tot = cs.countCollectionsAdministeredByEntityType(query, entityTypeLabel, context);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
