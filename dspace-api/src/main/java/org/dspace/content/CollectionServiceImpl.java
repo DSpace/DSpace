@@ -588,7 +588,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public void removeTemplateItem(Context context, Collection collection)
-        throws SQLException, AuthorizeException, IOException {
+            throws SQLException, AuthorizeException, IOException {
         // Check authorisation
         AuthorizeUtil.authorizeManageTemplateItem(context, collection);
 
@@ -925,7 +925,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community,
-        String entityType, int offset, int limit) throws SQLException, SearchServiceException {
+                                                      String entityType, int offset,
+                                                      int limit) throws SQLException, SearchServiceException {
 
         List<Collection> collections = new ArrayList<>();
         DiscoverQuery discoverQuery = new DiscoverQuery();
@@ -1095,7 +1096,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public List<Collection> findCollectionsAdministeredByEntityType(String query, String entityType, Context context, int offset, int limit)
+    public List<Collection> findCollectionsAdministeredByEntityType(String query, String entityType,
+                                                                    Context context, int offset, int limit)
             throws SQLException, SearchServiceException {
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
@@ -1103,7 +1105,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         discoverQuery.setStart(offset);
         discoverQuery.setMaxResults(limit);
 
-        return retrieveCollectionsAdministeredByEntityType(context, discoverQuery, query, entityType).getIndexableObjects().stream()
+        return retrieveCollectionsAdministeredByEntityType(context, discoverQuery,
+                query, entityType).getIndexableObjects().stream()
                 .map(indexableObject -> ((IndexableCollection) indexableObject).getIndexedObject())
                 .collect(Collectors.toList());
     }
@@ -1138,7 +1141,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         return searchService.search(context, discoverQuery);
     }
 
-    private DiscoverResult retrieveCollectionsAdministeredByEntityType(Context context, DiscoverQuery discoverQuery, String query, String entityType)
+    private DiscoverResult retrieveCollectionsAdministeredByEntityType(Context context,
+                                                                       DiscoverQuery discoverQuery,
+                                                                       String query, String entityType)
             throws SQLException, SearchServiceException {
 
         if (!authorizeService.isAdmin(context)) {
