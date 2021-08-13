@@ -27,12 +27,11 @@ import org.dspace.eperson.Subscription;
  */
 public interface SubscriptionDAO extends GenericDAO<Subscription> {
 
-    public void deleteByCollection(Context context, Collection collection) throws SQLException;
+    public void deleteByDspaceObject(Context context, DSpaceObject dSpaceObject) throws SQLException;
 
     public List<Subscription> findByEPerson(Context context, EPerson eperson) throws SQLException;
 
-    public Subscription findByCollectionAndEPerson(Context context, EPerson eperson, DSpaceObject dSpaceObject)
-            throws SQLException;
+    public List<Subscription> findByEPersonAndDso(Context context, EPerson eperson, DSpaceObject dSpaceObject) throws SQLException;
 
     public void deleteByEPerson(Context context, EPerson eperson) throws SQLException;
 

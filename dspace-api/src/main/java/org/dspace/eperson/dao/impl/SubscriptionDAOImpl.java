@@ -46,27 +46,26 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
         return list(context, criteriaQuery, false, Subscription.class, -1, -1);
 
     }
-
     @Override
-    public Subscription findByCollectionAndEPerson(Context context, EPerson eperson, DSpaceObject dSpaceObject)
-            throws SQLException {
+    public List<Subscription> findByEPersonAndDso(Context context, EPerson eperson, DSpaceObject dSpaceObject) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         javax.persistence.criteria.CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
         Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
         criteriaQuery.select(subscriptionRoot);
+        criteriaQuery.where(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.ePerson), eperson));
+
         criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.ePerson), eperson),
-                                criteriaBuilder.equal(subscriptionRoot.get(Subscription_.dSpaceObject), dSpaceObject)
-                        )
-                );
-        return singleResult(context, criteriaQuery);
+                criteriaBuilder.equal(subscriptionRoot.get(Subscription_.dSpaceObject), dSpaceObject)
+        ));
+        return list(context, criteriaQuery, false, Subscription.class, -1, -1);
     }
 
 
     @Override
-    public void deleteByCollection(Context context, Collection collection) throws SQLException {
-        String hqlQuery = "delete from Subscription where collection=:collection";
+    public void deleteByDspaceObject(Context context, DSpaceObject dSpaceObject) throws SQLException {
+        String hqlQuery = "delete from Subscription where dSpaceObject=:dSpaceObject";
         Query query = createQuery(context, hqlQuery);
-        query.setParameter("collection", collection);
+        query.setParameter("dSpaceObject", dSpaceObject);
         query.executeUpdate();
     }
 

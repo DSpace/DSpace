@@ -78,6 +78,16 @@ public interface SubscribeService {
     public List<Subscription> getSubscriptionsByEPerson(Context context, EPerson eperson) throws SQLException;
 
     /**
+     * Find out which collections an e-person is subscribed to and related with dso
+     *
+     * @param context DSpace context
+     * @param eperson EPerson
+     * @param dSpaceObject DSpaceObject
+     * @return array of collections e-person is subscribed to and related with dso
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    public List<Subscription> getSubscriptionsByEPersonAndDso(Context context, EPerson eperson, DSpaceObject dSpaceObject) throws SQLException;
+    /**
      * Find out which collections the currently logged in e-person can subscribe to
      *
      * @param context DSpace context
@@ -114,10 +124,10 @@ public interface SubscribeService {
      * Delete subscription by collection.
      *
      * @param context    DSpace context
-     * @param collection find out if subscribed to this collection
+     * @param dSpaceObject find out if subscribed to this dSpaceObject
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public void deleteByCollection(Context context, Collection collection) throws SQLException;
+    public void deleteByDspaceObject(Context context, DSpaceObject dSpaceObject) throws SQLException;
 
     /**
      * Delete subscription by eperson (subscriber).
