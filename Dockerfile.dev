@@ -24,7 +24,7 @@ ADD --chown=dspace . /app/
 COPY dspace/src/main/docker/local.cfg /app/local.cfg
 
 # Build DSpace.  Copy the dspace-install directory to /install.  Clean up the build to keep the docker image small
-RUN mvn package -Denv=local -P \!dspace-jspui,\!dspace-lni,\!dspace-rdf,\!dspace-solr,\!dspace-sword,\!dspace-swordv2 && \
+RUN mvn package -Denv=local -Dgrunt.environment=dev -P \!dspace-jspui,\!dspace-lni,\!dspace-rdf,\!dspace-solr,\!dspace-sword,\!dspace-swordv2 -Dmirage2.deps.included=true && \
 # RUN mvn package -Dmirage2.on=true  -Dmirage2.deps.included=true && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
