@@ -105,7 +105,7 @@ public class SubscribeServiceImpl implements SubscribeService {
     @Override
     public List<Subscription> getSubscriptionsByEPersonAndDso(Context context, EPerson eperson, DSpaceObject dSpaceObject)
             throws SQLException {
-        return subscriptionDAO.findByEPerson(context, eperson);
+        return subscriptionDAO.findByEPersonAndDso(context, eperson, dSpaceObject);
     }
 
     @Override

@@ -18,6 +18,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.SubscriptionParameterRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -36,6 +37,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -51,7 +53,7 @@ import java.util.UUID;
  */
 
 @Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.NAME)
-public class SubscriptionRestRepository extends DSpaceRestRepository<SubscriptionRest, Integer> {
+public class SubscriptionRestRepository extends DSpaceRestRepository<SubscriptionRest, Integer> implements LinkRestRepository {
     private static final Logger log = LogManager.getLogger();
     @Autowired
     AuthorizeService authorizeService;
@@ -93,9 +95,10 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         }
     }
 
-    @PreAuthorize("isAuthenticated()")
+
     @SearchRestMethod(name = "findByEPerson")
-    public Page<SubscriptionRest> findAllByEPerson(String id, Pageable pageable) throws Exception {
+    @PreAuthorize("isAuthenticated()")
+    public Page<SubscriptionRest> findAllSubscriptionsByEPerson(String id, Pageable pageable) throws Exception {
         try {
             Context context = obtainContext();
             EPerson ePerson = personService.findByIdOrLegacyId(context, id);
@@ -112,6 +115,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             throw new AuthorizeException(authorizeException.getMessage());
         }
     }
+
     @PreAuthorize("isAuthenticated()")
     @SearchRestMethod(name = "findByEPersonAndDso")
     public Page<SubscriptionRest> findByEPersonAndDso(Pageable pageable) throws Exception {
@@ -127,7 +131,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
                 throw new UnprocessableEntityException("error parsing the body");
             }
             if (context.getCurrentUser().equals(ePerson) || authorizeService.isAdmin(context, context.getCurrentUser())) {
-                List<Subscription> subscriptionList = subscribeService.getSubscriptionsByEPerson(context, ePerson);
+                List<Subscription> subscriptionList = subscribeService.getSubscriptionsByEPersonAndDso(context, ePerson, dSpaceObject);
                 return converter.toRestPage(subscriptionList, pageable, utils.obtainProjection());
             } else {
                 throw new AuthorizeException("Only admin or e-person themselves can search for it's subscription");
@@ -139,6 +143,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             throw new AuthorizeException(authorizeException.getMessage());
         }
     }
+
     @Override
     @PreAuthorize("isAuthenticated()")
     protected SubscriptionRest createAndReturn(Context context) throws SQLException, AuthorizeException {
@@ -173,7 +178,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
                 subscription = subscribeService.subscribe(context, ePerson,
                         dSpaceObject,
                         subscriptionParameters,
-                        subscriptionRest.getType());
+                        subscriptionRest.getSubscriptionType());
             }
             context.commit();
             return converter.toRest(subscription, utils.obtainProjection());
@@ -222,11 +227,11 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
                 SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
                 subscriptionParameter.setSubscription(subscription);
                 subscriptionParameter.setValue(subscriptionParameterRest.getValue());
-                subscriptionParameter.setName(subscriptionParameterRest.getValue());
+                subscriptionParameter.setName(subscriptionParameterRest.getName());
                 subscriptionParameterList.add(subscriptionParameter);
             }
             subscription = subscribeService.updateSubscription(context, id, ePerson,
-                    dSpaceObject, subscriptionParameterList, subscriptionRest.getType());
+                    dSpaceObject, subscriptionParameterList, subscriptionRest.getSubscriptionType());
             return converter.toRest(subscription, utils.obtainProjection());
         } else {
             throw new IllegalArgumentException("The id in the Json and the id in the url do not match: "
@@ -238,26 +243,33 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     @Override
     @PreAuthorize("isAuthenticated()")
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch)
-            throws UnprocessableEntityException, DSpaceBadRequestException {
+            throws UnprocessableEntityException, DSpaceBadRequestException, AuthorizeException {
         Subscription subscription = null;
         try {
             subscription = subscribeService.findById(context, id);
             if (subscription == null) {
                 throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
             }
+            if (!authorizeService.isAdmin(context) || subscription.getePerson().equals(context.getCurrentUser())) {
+                throw new AuthorizeException("Only admin or e-person themselves can edit the subscription");
+            }
             resourcePatch.patch(context, subscription, patch.getOperations());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
+        } catch (AuthorizeException authorizeException) {
+            throw new AuthorizeException(authorizeException.getMessage());
         }
     }
 
     @Override
     @PreAuthorize("isAuthenticated()")
-    public void delete(Context context, Integer id) {
+    public void delete(Context context, Integer id) throws AuthorizeException {
         try {
             subscribeService.deleteSubscription(context, id);
-        } catch (SQLException | AuthorizeException sqlException) {
+        } catch (SQLException sqlException) {
             throw new RuntimeException(sqlException.getMessage(), sqlException);
+        } catch (AuthorizeException authorizeException) {
+            throw new AuthorizeException(authorizeException.getMessage());
         }
     }
 

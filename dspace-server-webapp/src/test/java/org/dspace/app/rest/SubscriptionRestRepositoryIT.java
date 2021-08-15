@@ -32,6 +32,7 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -43,6 +44,7 @@ import java.util.Map;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -54,6 +56,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Integration test to test the /api/config/subscriptions endpoint
  * (Class has to start or end with IT to be picked up by the failsafe plugin)
+ *
  */
 public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -207,12 +210,11 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     public void findAllSubscriptionsByEPerson() throws Exception {
-        //When we call the root endpoint as anonymous user
-//        getClient().perform(get("/api/core/subscriptions"))
-//                //The status has to be 403 Not Authorized
-//                .andExpect(status().isUnauthorized());
-        String token = getAuthToken(eperson.getEmail(), password);
         context.turnOffAuthorisationSystem();
+        EPerson user = EPersonBuilder.createEPerson(context)
+                .withEmail("user@test.it")
+                .withPassword(password)
+                .build();
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
@@ -232,10 +234,11 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Parameter1");
         subscriptionParameter.setValue("ValueParameter1");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "TestType");
+        Subscription subscription = subscribeService.subscribe(context, user, publicItem1, subscriptionParameterList, "TestType");
         context.restoreAuthSystemState();
         //When we call the root endpoint
-        getClient(token).perform(get("/api/core/subscriptions/search/findByEPerson?id=" + eperson.getID()))
+        String token = getAuthToken(user.getEmail(), password);
+        getClient(token).perform(get("/api/core/subscriptions/search/findByEPerson?id=" + user.getID()))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page.size", is(20)))
@@ -251,16 +254,60 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].value", is("ValueParameter1")))
                 .andExpect(jsonPath("$._links.self.href", Matchers.is(REST_SERVER_URL + "core/subscriptions")));
 
-
-        EPerson epersonIT = EPersonBuilder.createEPerson(context)
-                .withEmail("epersonIT@example.com")
+    }
+    @Test
+    public void findAllSubscriptionsByEPersonAndDSO() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson user = EPersonBuilder.createEPerson(context)
+                .withEmail("user@test.it")
                 .withPassword(password)
-                .withLanguage("al")
                 .build();
-        String epersonITtoken = getAuthToken(epersonIT.getEmail(), password);
-        getClient(epersonITtoken).perform(get("/api/core/subscriptions/" + subscription.getID()))
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter1");
+        subscriptionParameter.setValue("ValueParameter1");
+        subscriptionParameterList.add(subscriptionParameter);
+
+
+        List<SubscriptionParameter> subscriptionParameterList1 = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter1 = new SubscriptionParameter();
+        subscriptionParameter1.setName("Parameter1");
+        subscriptionParameter1.setValue("ValueParameter1");
+        subscriptionParameterList1.add(subscriptionParameter1);
+        Subscription subscription = subscribeService.subscribe(context, user, col1, subscriptionParameterList, "TestType");
+        Subscription subscription1 = subscribeService.subscribe(context, user, col1, subscriptionParameterList1, "Test");
+        context.restoreAuthSystemState();
+        //When we call the root endpoint
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/subscriptions/search/findByEPersonAndDso?dspace_object_id=" + col1.getID()+"&eperson_id="+user.getID()))
                 //The status has to be 200 OK
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(2)))
+                .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$._embedded.subscriptions[1].subscriptionType", is("TestType")))
+                .andExpect(jsonPath("$._embedded.subscriptions[1]._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._embedded.subscriptions[1]._links.dSpaceObject.href", Matchers.endsWith("dSpaceObject")))
+                .andExpect(jsonPath("$._embedded.subscriptions[1]._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._embedded.subscriptions[1]._links.ePerson.href", Matchers.endsWith("ePerson")))
+                .andExpect(jsonPath("$._embedded.subscriptions[1].subscriptionParameterList[0].name", is("Parameter1")))
+                .andExpect(jsonPath("$._embedded.subscriptions[1].subscriptionParameterList[0].value", is("ValueParameter1")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionType", is("Test")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.dSpaceObject.href", Matchers.endsWith("dSpaceObject")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.ePerson.href", Matchers.endsWith("ePerson")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].name", is("Parameter1")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].value", is("ValueParameter1")));
+
     }
 
     @Test
@@ -292,8 +339,8 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         params.add("dspace_object_id", publicItem1.getID().toString());
         params.add("eperson_id", eperson.getID().toString());
         ObjectMapper objectMapper = new ObjectMapper();
-        getClient().perform(post("/api/core/subscriptions?dspace_object_id="+publicItem1.getID()+"&eperson_id="+eperson.getID())
-                .content(objectMapper.writeValueAsString(subscriptionRest))
+        getClient().perform(post("/api/core/subscriptions?dspace_object_id=" + publicItem1.getID() + "&eperson_id=" + eperson.getID())
+                        .content(objectMapper.writeValueAsString(subscriptionRest))
                         .contentType(contentType))
                 //The status has to be 401 Not Authorized
                 .andExpect(status().isUnauthorized());
@@ -328,22 +375,28 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 //        subscriptionRest.setSubscriptionParameterList(subscriptionParameterRestList);
         ObjectMapper objectMapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post("/api/core/subscriptions?dspace_object_id="+publicItem1.getID()+"&eperson_id="+admin.getID())
-                        .content(objectMapper.writeValueAsString(subscriptionRest))
-                .contentType(contentType))
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", "test");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "daily");
+        list.add(sub_list);
+        map.put("subscriptionParameterList", list);
+        getClient(token).perform(post("/api/core/subscriptions?dspace_object_id=" + publicItem1.getID() + "&eperson_id=" + admin.getID())
+                        .content(objectMapper.writeValueAsString(map))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
                 //The status has to be 200 OK
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
                 //By default we expect at least 1 submission forms so this to be reflected in the page object
-                .andExpect(jsonPath("$.subscriptionType", is("testType")))
-                .andExpect(jsonPath("$.id", Matchers.endsWith(REST_SERVER_URL + "core/dSpaceObject")))
-                .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("nameTest")))
-                .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("valueTest")))
-                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$.subscriptionType", is("test")))
+                .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("frequency")))
+                .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("daily")))
                 .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("dSpaceObject")))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")))
                 .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("ePerson")));
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")));
     }
 
     @Test
@@ -363,15 +416,28 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .withAuthor("John, Doe")
                 .withSubject("Test")
                 .build();
+
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-        subscriptionParameter.setName("Parameter1");
-        subscriptionParameter.setValue("ValueParameter1");
+        subscriptionParameter.setName("Parameter");
+        subscriptionParameter.setValue("ValueParameter");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "TestType");
+        Subscription subscription = subscribeService.subscribe(context, admin, publicItem1, subscriptionParameterList, "TestType");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        Map<String, Object> newSubscription = new HashMap<>();
+        newSubscription.put("type", "test");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "daily");
+        list.add(sub_list);
+        newSubscription.put("subscriptionParameterList", list);
         context.restoreAuthSystemState();
         //When we call the root endpoint as anonymous user
-        getClient().perform(put("/api/core/subscriptions"))
+        getClient().perform(put("/api/core/subscriptions/"+subscription.getID()+"?dspace_object_id=" + publicItem1.getID() + "&eperson_id=" + admin.getID())
+                .content(objectMapper.writeValueAsString(newSubscription))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
                 //The status has to be 403 Not Authorized
                 .andExpect(status().isUnauthorized());
     }
@@ -406,16 +472,26 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameterList.add(subscriptionParameter);
         Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "TestType");
         context.restoreAuthSystemState();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        Map<String, Object> newSubscription = new HashMap<>();
+        newSubscription.put("type", "test");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "daily");
+        list.add(sub_list);
+        newSubscription.put("subscriptionParameterList", list);
         //When we call the root endpoint as anonymous user
-        getClient(epersonITtoken).perform(put("/api/core/subscriptions"))
+        getClient().perform(put("/api/core/subscriptions/"+subscription.getID()+"?dspace_object_id=" + publicItem1.getID() + "&eperson_id=" + admin.getID())
+                .content(objectMapper.writeValueAsString(newSubscription))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
                 //The status has to be 403 Not Authorized
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void editSubscriptionAsAdministratorOrSubscriber() throws Exception {
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        String tokenSubscriber = getAuthToken(eperson.getEmail(), password);
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
@@ -436,27 +512,35 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Frequency");
         subscriptionParameter.setValue("Daily");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
+        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "TestType");
         context.restoreAuthSystemState();
-        getClient(tokenSubscriber).perform(put("/api/core/subscriptions"))
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> newSubscription = new HashMap<>();
+        newSubscription.put("type", "test");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "daily");
+        list.add(sub_list);
+        newSubscription.put("subscriptionParameterList", list);
+        String tokenSubscriber = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenSubscriber).perform(put("/api/core/subscriptions/"+subscription.getID()+"?dspace_object_id=" + publicItem1.getID() + "&eperson_id=" + eperson.getID())
                 //The status has to be 403 Not Authorized
-                .andExpect(status().isOk());
-        //When we call the root endpoint as anonymous user
-        getClient(tokenAdmin).perform(put("/api/core/subscriptions"))
-                //The status has to be 403 Not Authorized
+                        .content(objectMapper.writeValueAsString(newSubscription))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
                 //By default we expect at least 1 submission forms so this to be reflected in the page object
-                .andExpect(jsonPath("$.type", is("Test")))
-                .andExpect(jsonPath("$.id", Matchers.endsWith(REST_SERVER_URL + "/api/core/dSpaceObject")))
-                .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Frequency")))
-                .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("Daily")))
-                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith(REST_SERVER_URL + "/api/core/dSpaceObject")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith(REST_SERVER_URL + "/api/core/ePerson")));
+                .andExpect(jsonPath("$.subscriptionType", is("test")))
+                .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("frequency")))
+                .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("daily")))
+                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")));
+        //When we call the root endpoint as anonymous user
     }
 
     @Test
@@ -489,9 +573,9 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameterList.add(subscriptionParameter);
         Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
         context.restoreAuthSystemState();
-        getClient(epersonITtoken).perform(put("/api/core/subscriptions"))
+        getClient(epersonITtoken).perform(delete("/api/core/subscriptions/"+subscription.getID()))
                 //The status has to be 403 Not Authorized
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -517,15 +601,14 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setValue("Daily");
         subscriptionParameterList.add(subscriptionParameter);
         Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
-        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(put("/api/core/subscriptions"))
-                //The status has to be 403 Not Authorized
-                .andExpect(status().isOk());
+        context.restoreAuthSystemState();
+        getClient(token).perform(delete("/api/core/subscriptions/"+subscription.getID())).andExpect(status().isNoContent());
     }
 
     @Test
     public void patchReplaceSubscriptionParameterAsAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
@@ -554,27 +637,28 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         ReplaceOperation replaceOperation = new ReplaceOperation("/subscriptionsParameter/" + subscription.getSubscriptionParameterList().get(0).getId(), value);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
+        context.restoreAuthSystemState();
         getClient(token).perform(patch("/api/core/subscriptions/" + subscription.getID())
+                        .contentType(contentType)
                         .content(patchBody)
                 )
-                //The status has to be 403 Not Authorized
                 .andExpect(status().isOk())
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
                 //By default we expect at least 1 submission forms so this to be reflected in the page object
-                .andExpect(jsonPath("$.type", is("Test")))
-                .andExpect(jsonPath("$.id", Matchers.endsWith(REST_SERVER_URL + "/api/core/dSpaceObject")))
+                .andExpect(jsonPath("$.subscriptionType", is("Test")))
                 .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("frequency")))
                 .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("monthly")))
-                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith(REST_SERVER_URL + "/api/core/dSpaceObject")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith(REST_SERVER_URL + "/api/core/ePerson")));
+                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")));
     }
 
     @Test
     public void patchSubscriptionParameterNotAsAdminNotAsSubscriber() throws Exception {
+        context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
@@ -608,15 +692,18 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .withLanguage("al")
                 .build();
         String epersonITtoken = getAuthToken(epersonIT.getEmail(), password);
+        context.restoreAuthSystemState();
         getClient(epersonITtoken).perform(patch("/api/core/subscriptions/" + subscription.getID())
+                        .contentType(contentType)
                         .content(patchBody)
                 )
                 //The status has to be 200 OK
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     public void patchAddSubscriptionParameter() throws Exception {
+        context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
@@ -645,7 +732,9 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         AddOperation addOperation = new AddOperation("/subscriptionsParameter/" + subscription.getSubscriptionParameterList().get(0).getId(), value);
         ops.add(addOperation);
         String patchBody = getPatchContent(ops);
+        context.restoreAuthSystemState();
         getClient(token).perform(patch("/api/core/subscriptions/" + subscription.getID())
+                        .contentType(contentType)
                         .content(patchBody)
                 )
                 //The status has to be 403 Not Authorized
@@ -653,17 +742,16 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
                 //By default we expect at least 1 submission forms so this to be reflected in the page object
-                .andExpect(jsonPath("$.type", is("Test")))
-                .andExpect(jsonPath("$.id", Matchers.endsWith(REST_SERVER_URL + "/api/core/dSpaceObject")))
+                .andExpect(jsonPath("$.subscriptionType", is("Test")))
                 .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("TestName")))
                 .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("TestValue")))
                 .andExpect(jsonPath("$.subscriptionParameterList[1].name", is("frequency")))
                 .andExpect(jsonPath("$.subscriptionParameterList[1].value", is("monthly")))
-                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith(REST_SERVER_URL + "/api/core/dSpaceObject")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith(REST_SERVER_URL + "/api/core/ePerson")));
+                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")));
     }
 
     @Test
@@ -699,6 +787,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         String patchBody = getPatchContent(ops);
         context.restoreAuthSystemState();
         getClient(token).perform(patch("/api/core/subscriptions/" + subscription.getID())
+                        .contentType(contentType)
                         .content(patchBody)
                 )
                 //The status has to be 403 Not Authorized
@@ -706,9 +795,8 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
                 //By default we expect at least 1 submission forms so this to be reflected in the page object
-                .andExpect(jsonPath("$.type", is("Test")))
-                .andExpect(jsonPath("$.id", Matchers.endsWith(REST_SERVER_URL + "/api/core/dSpaceObject")))
-                .andExpect(jsonPath("$.subscriptionParameterList", Matchers.arrayWithSize(0)))
-                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")));
+                .andExpect(jsonPath("$.subscriptionType", is("Test")))
+                .andExpect(jsonPath("$.subscriptionParameterList", Matchers.hasSize(0)))
+                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")));
     }
 }
