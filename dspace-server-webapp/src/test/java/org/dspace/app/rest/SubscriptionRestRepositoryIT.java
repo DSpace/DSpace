@@ -19,11 +19,10 @@ import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.SubscribeBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.SiteService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
@@ -56,7 +55,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Integration test to test the /api/config/subscriptions endpoint
  * (Class has to start or end with IT to be picked up by the failsafe plugin)
- *
  */
 public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -67,13 +65,6 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        // We turn off the authorization system in order to create the structure as
-        // defined below
-//        context.turnOffAuthorisationSystem();
-//        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
-//        colPeople = CollectionBuilder.createCollection(context, parentCommunity).withName("People")
-//                .withEntityType("Person").build();
-//        context.restoreAuthSystemState();
     }
 
     @Test
@@ -104,7 +95,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Frequency");
         subscriptionParameter.setValue("Daily");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, admin, publicItem1, subscriptionParameterList, "TypeTest");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TypeTest", publicItem1, admin, subscriptionParameterList).build();
         subscriptionParameter.setSubscription(subscription);
         //When we call the root endpoint
         context.restoreAuthSystemState();
@@ -156,7 +147,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Parameter");
         subscriptionParameter.setValue("ValueParameter");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, admin, publicItem1, subscriptionParameterList, "TestType");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem1, admin, subscriptionParameterList).build();
         context.restoreAuthSystemState();
         //When we call the root endpoint
         getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID()))
@@ -200,7 +191,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Parameter");
         subscriptionParameter.setValue("ValueParameter");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, admin, publicItem1, subscriptionParameterList, "TestType");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem1, admin, subscriptionParameterList).build();
         context.restoreAuthSystemState();
         //When we call the root endpoint
         getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID()))
@@ -234,7 +225,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Parameter1");
         subscriptionParameter.setValue("ValueParameter1");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, user, publicItem1, subscriptionParameterList, "TestType");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem1, user, subscriptionParameterList).build();
         context.restoreAuthSystemState();
         //When we call the root endpoint
         String token = getAuthToken(user.getEmail(), password);
@@ -255,6 +246,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$._links.self.href", Matchers.is(REST_SERVER_URL + "core/subscriptions")));
 
     }
+
     @Test
     public void findAllSubscriptionsByEPersonAndDSO() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -281,12 +273,12 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter1.setName("Parameter1");
         subscriptionParameter1.setValue("ValueParameter1");
         subscriptionParameterList1.add(subscriptionParameter1);
-        Subscription subscription = subscribeService.subscribe(context, user, col1, subscriptionParameterList, "TestType");
-        Subscription subscription1 = subscribeService.subscribe(context, user, col1, subscriptionParameterList1, "Test");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", col1, user, subscriptionParameterList).build();
+        Subscription subscription1 = SubscribeBuilder.subscribeBuilder(context, "Test", col1, user, subscriptionParameterList1).build();
         context.restoreAuthSystemState();
         //When we call the root endpoint
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/core/subscriptions/search/findByEPersonAndDso?dspace_object_id=" + col1.getID()+"&eperson_id="+user.getID()))
+        getClient(token).perform(get("/api/core/subscriptions/search/findByEPersonAndDso?dspace_object_id=" + col1.getID() + "&eperson_id=" + user.getID()))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page.size", is(20)))
@@ -422,7 +414,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Parameter");
         subscriptionParameter.setValue("ValueParameter");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, admin, publicItem1, subscriptionParameterList, "TestType");
+        Subscription subscription =  SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem1, admin, subscriptionParameterList).build();
         ObjectMapper objectMapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
         Map<String, Object> newSubscription = new HashMap<>();
@@ -435,8 +427,8 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         newSubscription.put("subscriptionParameterList", list);
         context.restoreAuthSystemState();
         //When we call the root endpoint as anonymous user
-        getClient().perform(put("/api/core/subscriptions/"+subscription.getID()+"?dspace_object_id=" + publicItem1.getID() + "&eperson_id=" + admin.getID())
-                .content(objectMapper.writeValueAsString(newSubscription))
+        getClient().perform(put("/api/core/subscriptions/" + subscription.getID() + "?dspace_object_id=" + publicItem1.getID() + "&eperson_id=" + admin.getID())
+                        .content(objectMapper.writeValueAsString(newSubscription))
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 //The status has to be 403 Not Authorized
                 .andExpect(status().isUnauthorized());
@@ -470,7 +462,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Parameter1");
         subscriptionParameter.setValue("ValueParameter1");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "TestType");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem1, eperson, subscriptionParameterList).build();
         context.restoreAuthSystemState();
         ObjectMapper objectMapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
@@ -483,9 +475,9 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         list.add(sub_list);
         newSubscription.put("subscriptionParameterList", list);
         //When we call the root endpoint as anonymous user
-        getClient().perform(put("/api/core/subscriptions/"+subscription.getID()+"?dspace_object_id=" + publicItem1.getID() + "&eperson_id=" + admin.getID())
-                .content(objectMapper.writeValueAsString(newSubscription))
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
+        getClient().perform(put("/api/core/subscriptions/" + subscription.getID() + "?dspace_object_id=" + publicItem1.getID() + "&eperson_id=" + admin.getID())
+                        .content(objectMapper.writeValueAsString(newSubscription))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
                 //The status has to be 403 Not Authorized
                 .andExpect(status().isUnauthorized());
     }
@@ -512,7 +504,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Frequency");
         subscriptionParameter.setValue("Daily");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "TestType");
+        Subscription subscription =  SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem1, eperson, subscriptionParameterList).build();
         context.restoreAuthSystemState();
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> newSubscription = new HashMap<>();
@@ -524,8 +516,8 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         list.add(sub_list);
         newSubscription.put("subscriptionParameterList", list);
         String tokenSubscriber = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenSubscriber).perform(put("/api/core/subscriptions/"+subscription.getID()+"?dspace_object_id=" + publicItem1.getID() + "&eperson_id=" + eperson.getID())
-                //The status has to be 403 Not Authorized
+        getClient(tokenSubscriber).perform(put("/api/core/subscriptions/" + subscription.getID() + "?dspace_object_id=" + publicItem1.getID() + "&eperson_id=" + eperson.getID())
+                        //The status has to be 403 Not Authorized
                         .content(objectMapper.writeValueAsString(newSubscription))
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -571,9 +563,9 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Frequency");
         subscriptionParameter.setValue("Daily");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
+        Subscription subscription =  SubscribeBuilder.subscribeBuilder(context, "Test", publicItem1, eperson, subscriptionParameterList).build();
         context.restoreAuthSystemState();
-        getClient(epersonITtoken).perform(delete("/api/core/subscriptions/"+subscription.getID()))
+        getClient(epersonITtoken).perform(delete("/api/core/subscriptions/" + subscription.getID()))
                 //The status has to be 403 Not Authorized
                 .andExpect(status().isForbidden());
     }
@@ -600,10 +592,10 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Frequency");
         subscriptionParameter.setValue("Daily");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
+        Subscription subscription =  SubscribeBuilder.subscribeBuilder(context, "Test", publicItem1, eperson, subscriptionParameterList).build();
         String token = getAuthToken(admin.getEmail(), password);
         context.restoreAuthSystemState();
-        getClient(token).perform(delete("/api/core/subscriptions/"+subscription.getID())).andExpect(status().isNoContent());
+        getClient(token).perform(delete("/api/core/subscriptions/" + subscription.getID())).andExpect(status().isNoContent());
     }
 
     @Test
@@ -628,7 +620,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("TestName");
         subscriptionParameter.setValue("TestValue");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
+        Subscription subscription =SubscribeBuilder.subscribeBuilder(context, "Test", publicItem1, eperson, subscriptionParameterList).build();
         String token = getAuthToken(admin.getEmail(), password);
         List<Operation> ops = new ArrayList<Operation>();
         Map<String, String> value = new HashMap<>();
@@ -678,7 +670,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("TestName");
         subscriptionParameter.setValue("TestValue");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "Test", publicItem1, eperson, subscriptionParameterList).build();
         List<Operation> ops = new ArrayList<Operation>();
         Map<String, String> value = new HashMap<>();
         value.put("name", "frequency");
@@ -723,7 +715,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("TestName");
         subscriptionParameter.setValue("TestValue");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
+        Subscription subscription =SubscribeBuilder.subscribeBuilder(context, "Test", publicItem1, eperson, subscriptionParameterList).build();
         String token = getAuthToken(admin.getEmail(), password);
         List<Operation> ops = new ArrayList<Operation>();
         Map<String, String> value = new HashMap<>();
@@ -776,7 +768,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("TestName");
         subscriptionParameter.setValue("TestValue");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "Test", publicItem1, eperson, subscriptionParameterList).build();
         String token = getAuthToken(admin.getEmail(), password);
         List<Operation> ops = new ArrayList<Operation>();
         Map<String, String> value = new HashMap<>();
