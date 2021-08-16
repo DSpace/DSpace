@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -150,8 +151,9 @@ public class StatisticsDatasetDisplay {
             value = LocationUtils.getContinentName(value, context
                     .getCurrentLocale());
         } else if ("countryCode".equals(queryName)) {
-            value = LocationUtils.getCountryName(value, context
-                    .getCurrentLocale());
+            // FIXME: to use localized country name, as a marker, current component requires a Maps API-key. See DSC-187 and DSC-197
+            value = LocationUtils.getCountryName(value, Locale.getDefault());
+
         } else {
             //TODO: CHANGE & THROW AWAY THIS ENTIRE METHOD
             //Check if int
