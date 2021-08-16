@@ -151,8 +151,7 @@ public class StatisticsDatasetDisplay {
             value = LocationUtils.getContinentName(value, context
                     .getCurrentLocale());
         } else if ("countryCode".equals(queryName)) {
-            // FIXME: to use localized country name, as a marker, current component requires a Maps API-key. See DSC-187 and DSC-197
-            value = LocationUtils.getCountryName(value, Locale.getDefault());
+            // no operations needed in case of countryCode
 
         } else {
             //TODO: CHANGE & THROW AWAY THIS ENTIRE METHOD
