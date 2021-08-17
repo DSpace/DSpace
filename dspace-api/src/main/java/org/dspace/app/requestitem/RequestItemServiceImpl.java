@@ -54,7 +54,7 @@ public class RequestItemServiceImpl implements RequestItemService {
         requestItemDAO.save(context, requestItem);
 
         log.debug("Created RequestItem with ID {} and token {}",
-                    ()->requestItem.getID(), ()->requestItem.getToken());
+                requestItem::getID, requestItem::getToken);
         return requestItem.getToken();
     }
 
