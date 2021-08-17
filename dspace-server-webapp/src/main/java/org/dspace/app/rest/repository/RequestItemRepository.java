@@ -30,6 +30,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,7 +54,7 @@ public class RequestItemRepository
     protected RequestItemConverter requestItemConverter;
 
     @Override
-    //@PreAuthorize(expr)
+    @PreAuthorize("permitAll()")
     public RequestItemRest findOne(Context context, String id) {
         RequestItem requestItem = requestItemService.findByToken(context, id);
         if (null == requestItem) {
@@ -70,6 +71,7 @@ public class RequestItemRepository
     }
 
     @Override
+    @PreAuthorize("permitAll()")
     public RequestItemRest createAndReturn(Context ctx) {
         // Fill a RequestItemRest from the client's HTTP request.
         HttpServletRequest req = getRequestService()
