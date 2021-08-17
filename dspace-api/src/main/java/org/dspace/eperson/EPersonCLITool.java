@@ -29,6 +29,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.util.ConsoleService;
+import org.dspace.util.ConsoleServiceImpl;
 
 public class EPersonCLITool {
 
@@ -64,10 +66,13 @@ public class EPersonCLITool {
     private static final EPersonService ePersonService
             = EPersonServiceFactory.getInstance().getEPersonService();
 
+    private static ConsoleService consoleService
+            = new ConsoleServiceImpl();
+
     /**
      * Default constructor
      */
-    private EPersonCLITool() { }
+    EPersonCLITool() { }
 
     /**
      * Tool for manipulating user accounts.
@@ -372,14 +377,11 @@ public class EPersonCLITool {
                 modified = true;
             }
             if (command.hasOption(OPT_NEW_PASSWORD.getOpt())) {
-                // TODO prompt, collect password, verify
-                char[] password = System.console()
-                        .readPassword("Enter new password for user %s", userName);
-                char[] password2 = System.console()
-                        .readPassword("Enter new password again to verify");
-                if (Arrays.equals(password, password2)) {
-                    PasswordHash newHashedPassword = new PasswordHash(String.valueOf(password));
-                    Arrays.fill(password, '\0'); // Obliterate cleartext passwords
+                char[] password1 = consoleService.readPassword("Enter new password for user %s", userName);
+                char[] password2 = consoleService.readPassword("Enter new password again to verify");
+                if (Arrays.equals(password1, password2)) {
+                    PasswordHash newHashedPassword = new PasswordHash(String.valueOf(password1));
+                    Arrays.fill(password1, '\0'); // Obliterate cleartext passwords
                     Arrays.fill(password2, '\0');
                     eperson.setPassword(newHashedPassword.getHashString());
                     eperson.setSalt(newHashedPassword.getSaltString());
@@ -455,5 +457,14 @@ public class EPersonCLITool {
         }
 
         return 0;
+    }
+
+    /**
+     * Replace the ConsoleService for testing.
+     *
+     * @param service new ConsoleService to be used henceforth.
+     */
+    void setConsoleService(ConsoleService service) {
+        consoleService = service;
     }
 }
