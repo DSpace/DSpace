@@ -73,11 +73,12 @@ public class RequestItemRepositoryIT
     }
 
     /**
-     * Test of findOne method, of class RequestItemRepository.
+     * Test of findOne method, with an authenticated user.
+     *
      * @throws java.lang.Exception passed through.
      */
     @Test
-    public void testFindOne()
+    public void testFindOneAuthenticated()
             throws Exception {
         System.out.println("findOne");
 
@@ -112,14 +113,53 @@ public class RequestItemRepositoryIT
     }
 
     /**
-     * Test of createAndReturn method, of class RequestItemRepository.
+     * Test of findOne method, with an UNauthenticated user.
+     *
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testFindOneNotAuthenticated()
+            throws Exception {
+        System.out.println("findOne");
+
+        context.turnOffAuthorisationSystem();
+
+        // Create necessary supporting objects.
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                .build();
+        Item item = ItemBuilder.createItem(context, collection)
+                .build();
+        InputStream is = new ByteArrayInputStream(new byte[0]);
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, is)
+                .build();
+
+        // Create a request.
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        // Test:  can we find it?
+        final String uri = URI_ROOT + '/' + request.getToken();
+        getClient().perform(get(uri))
+                   .andExpect(status().isOk()) // Can we find it?
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.is(
+                       RequestCopyMatcher.matchRequestCopy(request))));
+
+        // Clean up.
+        bitstream.setDeleted(true);
+        context.restoreAuthSystemState();
+    }
+
+    /**
+     * Test of createAndReturn method, with an authenticated user.
      *
      * @throws java.sql.SQLException passed through.
      * @throws org.dspace.authorize.AuthorizeException passed through.
      * @throws java.io.IOException passed through.
      */
     @Test
-    public void testCreateAndReturn()
+    public void testCreateAndReturnAuthenticated()
             throws SQLException, AuthorizeException, IOException, Exception {
         System.out.println("createAndReturn");
 
@@ -148,6 +188,71 @@ public class RequestItemRepositoryIT
         ObjectMapper mapper = new ObjectMapper();
         String authToken = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(authToken)
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", Matchers.allOf(
+                        hasJsonPath("$.id", not(is(emptyOrNullString()))),
+                        hasJsonPath("$.type", is(RequestItemRest.NAME)),
+                        hasJsonPath("$.token", not(is(emptyOrNullString()))),
+                        hasJsonPath("$.requestEmail", is(RequestItemBuilder.REQ_EMAIL)),
+                        hasJsonPath("$.requestMessage", is(RequestItemBuilder.REQ_MESSAGE)),
+                        hasJsonPath("$.requestName", is(RequestItemBuilder.REQ_NAME)),
+                        hasJsonPath("$.allfiles", is(false)),
+                        hasJsonPath("$.requestDate", not(is(emptyOrNullString()))), // TODO should be an ISO datetime
+                        hasJsonPath("$._links.self.href", not(is(emptyOrNullString())))
+                )))
+                .andReturn();
+
+        // Clean up the created request.
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String requestToken = String.valueOf(map.get("token"));
+        RequestItem ri = requestItemService.findByToken(context, requestToken);
+        requestItemService.delete(context, ri);
+
+        context.restoreAuthSystemState();
+    }
+
+    /**
+     * Test of createAndReturn method, with an UNauthenticated user.
+     * This should succeed:  anyone can file a request.
+     *
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     */
+    @Test
+    public void testCreateAndReturnNotAuthenticated()
+            throws SQLException, AuthorizeException, IOException, Exception {
+        System.out.println("createAndReturn");
+
+        context.turnOffAuthorisationSystem();
+
+        // Create some necessary objects.
+        Collection col = CollectionBuilder.createCollection(context,
+                parentCommunity).build();
+        Item item = ItemBuilder.createItem(context, col).build();
+        InputStream is = new ByteArrayInputStream(new byte[0]);
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, is)
+                .withName("/dev/null")
+                .withMimeType("text/plain")
+                .build();
+
+        // Fake up a request in REST form.
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        rir.setRequestEmail(RequestItemBuilder.REQ_EMAIL);
+        rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
+        rir.setRequestName(RequestItemBuilder.REQ_NAME);
+        rir.setAllfiles(false);
+
+        // Create it and see if it was created correctly.
+        ObjectMapper mapper = new ObjectMapper();
+        MvcResult mvcResult = getClient()
                 .perform(post(URI_ROOT)
                         .content(mapper.writeValueAsBytes(rir))
                         .contentType(contentType))
