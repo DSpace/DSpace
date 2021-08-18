@@ -39,9 +39,11 @@ public interface VersionDAO extends GenericDAO<Version> {
      * @return all versions of an version history that have items assigned.
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<Version> findVersionsWithItems(Context context, VersionHistory versionHistory)
+    public List<Version> findVersionsWithItems(Context context, VersionHistory versionHistory, int offset, int limit)
         throws SQLException;
 
     public int getNextVersionNumber(Context c, VersionHistory vh) throws SQLException;
+
+    public int countVersionsByHistory(Context context, VersionHistory versionHistory) throws SQLException;
 
 }

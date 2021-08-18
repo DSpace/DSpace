@@ -40,7 +40,16 @@ public interface VersioningService {
      */
     List<Version> getVersionsByHistory(Context c, VersionHistory vh) throws SQLException;
 
-    void removeVersion(Context c, Version version) throws SQLException;
+    List<Version> getVersionsByHistory(Context c, VersionHistory vh, int offset, int limit) throws SQLException;
+
+    /**
+     * Delete a Version
+     *
+     * @param context        context
+     * @param Version        version
+     * @throws SQLException  if database error
+     */
+    public void delete(Context c, Version version) throws SQLException;
 
     void removeVersion(Context c, Item item) throws SQLException;
 
@@ -56,4 +65,16 @@ public interface VersioningService {
 
     Version createNewVersion(Context context, VersionHistory history, Item item, String summary, Date date,
                              int versionNumber);
+
+    /**
+     * Update the Version
+     *
+     * @param context        context
+     * @param Version        version
+     * @throws SQLException  if database error
+     */
+    public void update(Context context, Version version) throws SQLException;
+
+    public int countVersionsByHistory(Context context, VersionHistory versionHistory) throws SQLException;
+
 }

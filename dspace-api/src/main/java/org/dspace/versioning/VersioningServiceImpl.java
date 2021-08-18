@@ -96,7 +96,7 @@ public class VersioningServiceImpl implements VersioningService {
     }
 
     @Override
-    public void removeVersion(Context c, Version version) throws SQLException {
+    public void delete(Context c, Version version) throws SQLException {
         try {
             // we will first delete the version and then the item
             // after deletion of the version we cannot find the item anymore
@@ -158,7 +158,7 @@ public class VersioningServiceImpl implements VersioningService {
     public void removeVersion(Context c, Item item) throws SQLException {
         Version version = versionDAO.findByItem(c, item);
         if (version != null) {
-            removeVersion(c, version);
+            delete(c, version);
         }
     }
 
@@ -196,8 +196,11 @@ public class VersioningServiceImpl implements VersioningService {
                                     int versionNumber) {
         try {
             Version version = versionDAO.create(context, new Version());
-
-            version.setVersionNumber(getNextVersionNumer(context, history));
+            if (versionNumber > 0) {
+                version.setVersionNumber(versionNumber);
+            } else {
+                version.setVersionNumber(getNextVersionNumer(context, history));
+            }
             version.setVersionDate(date);
             version.setePerson(item.getSubmitter());
             version.setItem(item);
@@ -213,10 +216,14 @@ public class VersioningServiceImpl implements VersioningService {
 
     @Override
     public List<Version> getVersionsByHistory(Context c, VersionHistory vh) throws SQLException {
-        List<Version> versions = versionDAO.findVersionsWithItems(c, vh);
+        List<Version> versions = versionDAO.findVersionsWithItems(c, vh, -1, -1);
         return versions;
     }
 
+    @Override
+    public List<Version> getVersionsByHistory(Context c, VersionHistory vh, int offset, int limit) throws SQLException {
+        return versionDAO.findVersionsWithItems(c, vh, offset, limit);
+    }
 
 // **** PROTECTED METHODS!!
 
@@ -236,4 +243,17 @@ public class VersioningServiceImpl implements VersioningService {
 
         return next;
     }
+
+    @Override
+    public void update(Context context, Version version) throws SQLException {
+        if (version != null) {
+            versionDAO.save(context, version);
+        }
+    }
+
+    @Override
+    public int countVersionsByHistory(Context context, VersionHistory versionHistory) throws SQLException {
+        return versionDAO.countVersionsByHistory(context, versionHistory);
+    }
+
 }
