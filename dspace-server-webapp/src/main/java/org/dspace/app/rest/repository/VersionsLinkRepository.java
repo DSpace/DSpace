@@ -62,8 +62,9 @@ public class VersionsLinkRepository extends AbstractDSpaceRestRepository
             throw new ResourceNotFoundException("The versionHistory with ID: " + versionHistoryId +
                                                     " couldn't be found");
         }
-        List<Version> versions = versioningService.getVersionsByHistory(context, versionHistory);
         Pageable pageable = optionalPageable != null ? optionalPageable : PageRequest.of(0, 20);
+        List<Version> versions = versioningService.getVersionsByHistory(context, versionHistory,
+                                 Math.toIntExact(pageable.getOffset()), Math.toIntExact(pageable.getPageSize()));
         return converter.toRestPage(versions, pageable, projection);
     }
 }

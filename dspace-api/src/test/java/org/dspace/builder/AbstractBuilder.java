@@ -44,6 +44,7 @@ import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
@@ -89,6 +90,7 @@ public abstract class AbstractBuilder<T, S> {
     static RelationshipTypeService relationshipTypeService;
     static EntityTypeService entityTypeService;
     static ProcessService processService;
+    static VersioningService versioningService;
 
     protected Context context;
 
@@ -136,6 +138,8 @@ public abstract class AbstractBuilder<T, S> {
         relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
         entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
         processService = ScriptServiceFactory.getInstance().getProcessService();
+        versioningService = DSpaceServicesFactory.getInstance().getServiceManager()
+                                 .getServiceByName(VersioningService.class.getName(), VersioningService.class);
 
         // Temporarily disabled
         claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
@@ -172,6 +176,7 @@ public abstract class AbstractBuilder<T, S> {
         relationshipTypeService = null;
         entityTypeService = null;
         processService = null;
+        versioningService = null;
 
     }
 

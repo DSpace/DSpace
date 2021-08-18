@@ -44,6 +44,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         @LinkRest(
                 name = ItemRest.THUMBNAIL,
                 method = "getThumbnail"
+        ),
+        @LinkRest(
+                name = ItemRest.VERSION_HISTORY,
+                method = "getVersionHistory"
         )
 })
 public class ItemRest extends DSpaceObjectRest {
@@ -58,6 +62,7 @@ public class ItemRest extends DSpaceObjectRest {
     public static final String VERSION = "version";
     public static final String TEMPLATE_ITEM_OF = "templateItemOf";
     public static final String THUMBNAIL = "thumbnail";
+    public static final String VERSION_HISTORY = "versionhistory";
 
     private boolean inArchive = false;
     private boolean discoverable = false;
