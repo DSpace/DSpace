@@ -170,6 +170,29 @@
                 </configuration>
             </plugin>
 
+            <!-- Used to create/generate 'org.dspace.workflow' classes from our workflow-curation.xsd via JAXB -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>2.5.0</version>
+                <executions>
+                    <execution>
+                        <id>workflow-curation</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/resources/org/dspace/workflow</source>
+                            </sources>
+                            <packageName>org.dspace.workflow</packageName>
+                            <addGeneratedAnnotation>true</addGeneratedAnnotation>
+                            <noPackageLevelAnnotations>true</noPackageLevelAnnotations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 

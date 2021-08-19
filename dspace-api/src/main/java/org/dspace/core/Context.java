@@ -565,6 +565,10 @@ public class Context implements AutoCloseable {
         }
     }
 
+    /**
+     * Close this Context, discarding any uncommitted changes and releasing its
+     * database connection.
+     */
     @Override
     public void close() {
         if (isValid()) {

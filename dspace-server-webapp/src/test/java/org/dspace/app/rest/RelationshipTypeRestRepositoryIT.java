@@ -25,10 +25,12 @@ import java.util.List;
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.matcher.RelationshipTypeMatcher;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
+import org.dspace.content.EntityType;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.h2.util.StringUtils;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -254,5 +256,99 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
 
     }
 
+    @Test
+    public void findByEntityType_Search_Test() throws Exception {
+        EntityType publicationEntityType = entityTypeService.findByEntityType(context, "Publication");
+        EntityType personEntityType = entityTypeService.findByEntityType(context, "Person");
+        EntityType projectEntityType = entityTypeService.findByEntityType(context, "Project");
+        RelationshipType isAuthorOfPublicationRelType = relationshipTypeService
+            .findbyTypesAndTypeName(context, publicationEntityType, personEntityType, "isAuthorOfPublication",
+                "isPublicationOfAuthor");
+        RelationshipType isProjectOfPublicationRelType = relationshipTypeService
+            .findbyTypesAndTypeName(context, publicationEntityType, projectEntityType, "isProjectOfPublication",
+                "isPublicationOfProject");
+        RelationshipType isProjectOfPersonRelType = relationshipTypeService
+            .findbyTypesAndTypeName(context, personEntityType, projectEntityType, "isProjectOfPerson",
+                "isPersonOfProject");
+
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType")
+            .param("type", "Publication"))
+                   // We expect a 200 OK status
+                   .andExpect(status().isOk())
+                   // There needs to be a self link to this endpoint
+                   .andExpect(jsonPath("$._links.self.href",
+                       containsString("api/core/relationshiptypes/search/byEntityType?type=Publication")))
+                   // We expect to find at least isAuthorOfPublication and isProjectOfPublication
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", Matchers.hasItems(
+                       RelationshipTypeMatcher.matchRelationshipTypeEntryWithoutEmbedded(isAuthorOfPublicationRelType),
+                       RelationshipTypeMatcher.matchRelationshipTypeEntryWithoutEmbedded(isProjectOfPublicationRelType)
+                                                                                )))
+                   // We expect NOT to find isProjectOfPerson (neither sides of relationship expects Publication entity)
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", Matchers.not(Matchers.contains(
+                       RelationshipTypeMatcher.matchRelationshipTypeEntryWithoutEmbedded(isProjectOfPersonRelType)
+                                                                                                      ))))
+                   .andExpect(status().isOk());
+
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType")
+            .param("type", "Person"))
+                   // We expect a 200 OK status
+                   .andExpect(status().isOk())
+                   // There needs to be a self link to this endpoint
+                   .andExpect(jsonPath("$._links.self.href",
+                       containsString("api/core/relationshiptypes/search/byEntityType?type=Person")))
+                   // We expect to find at least isAuthorOfPublication and isProjectOfPerson
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", Matchers.hasItems(
+                       RelationshipTypeMatcher.matchRelationshipTypeEntryWithoutEmbedded(isAuthorOfPublicationRelType),
+                       RelationshipTypeMatcher.matchRelationshipTypeEntryWithoutEmbedded(isProjectOfPersonRelType)
+                                                                                         )))
+                   // We expect NOT to find isProjectOfPublication (neither sides of relationship expects Person entity)
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", Matchers.not(Matchers.hasItems(
+                       RelationshipTypeMatcher.matchRelationshipTypeEntryWithoutEmbedded(isProjectOfPublicationRelType)
+                                                                                                      ))))
+                   .andExpect(status().isOk());
+
+        // Pagination test
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType")
+            .param("type", "Person")
+            .param("size", "1"))
+                   // We expect a 200 OK status
+                   .andExpect(status().isOk())
+                   // There needs to be a self link to this endpoint
+                   .andExpect(jsonPath("$._links.self.href",
+                       containsString("api/core/relationshiptypes/search/byEntityType?type=Person")))
+                   // We expect to find at isAuthorOfPublication (on first page, first 2 elements)
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", Matchers.hasItems(
+                       RelationshipTypeMatcher.matchRelationshipTypeEntryWithoutEmbedded(isProjectOfPersonRelType)
+                                                                                         )))
+                   // We expect NOT to find isProjectOfPublication (neither sides of relationship expects Person entity)
+                   // We expect NOT to find isProjectOfPerson (is second element, so on second page)
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", Matchers.not(Matchers.hasItems(
+                       RelationshipTypeMatcher.matchRelationshipTypeEntryWithoutEmbedded(isProjectOfPublicationRelType),
+                       RelationshipTypeMatcher.matchRelationshipTypeEntryWithoutEmbedded(isAuthorOfPublicationRelType)
+                                                                                                      ))))
+                   .andExpect(status().isOk());
+
+        // Pagination test
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType")
+            .param("type", "Person")
+            .param("size", "1")
+            .param("page", "1"))
+                   // We expect a 200 OK status
+                   .andExpect(status().isOk())
+                   // There needs to be a self link to this endpoint
+                   .andExpect(jsonPath("$._links.self.href",
+                       containsString("api/core/relationshiptypes/search/byEntityType?type=Person")))
+                   // We expect to find at isProjectOfPerson (second element, so on second page)
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", Matchers.hasItems(
+                       RelationshipTypeMatcher.matchRelationshipTypeEntryWithoutEmbedded(isAuthorOfPublicationRelType)
+                                                                                         )))
+                   // We expect NOT to find isProjectOfPublication (neither sides of relationship expects Person entity)
+                   // We expect NOT to find isAuthorOfPublication (is first element, so on first page)
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", Matchers.not(Matchers.hasItems(
+                       RelationshipTypeMatcher.matchRelationshipTypeEntryWithoutEmbedded(isProjectOfPersonRelType),
+                       RelationshipTypeMatcher.matchRelationshipTypeEntryWithoutEmbedded(isProjectOfPersonRelType)
+                                                                                                      ))))
+                   .andExpect(status().isOk());
+    }
 
 }

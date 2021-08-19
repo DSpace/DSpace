@@ -89,4 +89,25 @@ public class RelationshipTypeMatcher {
             ))
         );
     }
+
+    public static Matcher<? super Object> matchRelationshipTypeEntryWithoutEmbedded(RelationshipType relationshipType) {
+        return allOf(
+            hasJsonPath("$.id", is(relationshipType.getID())),
+            hasJsonPath("$.leftwardType", is(relationshipType.getLeftwardType())),
+            hasJsonPath("$.rightwardType", is(relationshipType.getRightwardType())),
+            hasJsonPath("$.copyToLeft", is(relationshipType.isCopyToLeft())),
+            hasJsonPath("$.copyToRight", is(relationshipType.isCopyToRight())),
+            hasJsonPath("$.leftMinCardinality", is(relationshipType.getLeftMinCardinality())),
+            hasJsonPath("$.leftMaxCardinality", is(relationshipType.getLeftMaxCardinality())),
+            hasJsonPath("$.rightMinCardinality", is(relationshipType.getRightMinCardinality())),
+            hasJsonPath("$.rightMaxCardinality", is(relationshipType.getRightMaxCardinality())),
+            hasJsonPath("$.type", is("relationshiptype")),
+            hasJsonPath("$._links.self.href",
+                containsString("/api/core/relationshiptypes/" + relationshipType.getID())),
+            hasJsonPath("$._links.leftType.href",
+                containsString("/api/core/entitytypes/" + relationshipType.getLeftType().getID())),
+            hasJsonPath("$._links.rightType.href",
+                containsString("/api/core/entitytypes/" + relationshipType.getRightType().getID()))
+                    );
+    }
 }
