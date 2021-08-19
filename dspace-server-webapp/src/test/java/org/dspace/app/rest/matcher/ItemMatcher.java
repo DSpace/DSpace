@@ -56,7 +56,8 @@ public class ItemMatcher {
                 "version",
                 "relationships[]",
                 "templateItemOf",
-                "thumbnail"
+                "thumbnail",
+                "versionhistory"
         );
     }
 

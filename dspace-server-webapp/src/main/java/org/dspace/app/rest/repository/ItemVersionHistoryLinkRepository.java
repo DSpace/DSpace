@@ -51,11 +51,8 @@ public class ItemVersionHistoryLinkRepository extends AbstractDSpaceRestReposito
             if (item == null) {
                 throw new ResourceNotFoundException("No such item: " + itemId);
             }
-            VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
-            if (Objects.isNull(versionHistory)) {
-                throw new ResourceNotFoundException("No such VersionHistory for item: " + itemId);
-            }
-            return converter.toRest(versionHistory, projection);
+            VersionHistory vh = versionHistoryService.findByItem(context, item);
+            return Objects.nonNull(vh) ? converter.toRest(vh, projection) : null;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
