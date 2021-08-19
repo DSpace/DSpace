@@ -4159,7 +4159,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/core/items/" + item.getID() + "/versionhistory"))
-                             .andExpect(status().isNotFound());
+                             .andExpect(status().isNoContent());
     }
 
     @Test
