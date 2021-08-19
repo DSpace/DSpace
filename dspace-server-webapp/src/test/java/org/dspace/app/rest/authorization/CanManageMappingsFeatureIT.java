@@ -244,8 +244,7 @@ public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTes
                  .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(admin2ItemA))));
 
         getClient(tokenAUser).perform(get("/api/authz/authorizations/" + userA2ItemA.getID()))
-                 .andExpect(status().isOk())
-                 .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(userA2ItemA))));
+                             .andExpect(status().isNotFound());
 
         getClient(tokenEPerson).perform(get("/api/authz/authorizations/" + eperson2ItemA.getID()))
                                .andExpect(status().isNotFound());
@@ -277,4 +276,160 @@ public class CanManageMappingsFeatureIT extends AbstractControllerIntegrationTes
                              .andExpect(status().isNotFound());
 
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void canManageMappingsCommunityAdminAndCollectionsAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson userComAdmin = EPersonBuilder.createEPerson(context)
+                                      .withEmail("userComAdminEmail@test.com")
+                                      .withPassword(password).build();
+
+        EPerson user1 = EPersonBuilder.createEPerson(context)
+                                      .withEmail("user1Email@test.com")
+                                      .withPassword(password).build();
+
+        EPerson user2 = EPersonBuilder.createEPerson(context)
+                                      .withEmail("user2Email@test.com")
+                                      .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Community subCommunity1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                                  .withName("SubCommunity 1")
+                                                  .withAdminGroup(userComAdmin)
+                                                  .build();
+
+        Community subCommunity2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                                  .withName("SubCommunity 2")
+                                                  .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, subCommunity1)
+                                           .withName("Collection 1")
+                                           .withAdminGroup(user1).build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, subCommunity1)
+                                           .withName("Collection 2")
+                                           .withAdminGroup(user1, user2).build();
+
+        Collection col3 = CollectionBuilder.createCollection(context, subCommunity2)
+                                           .withName("Collection 3").build();
+
+        Item item1 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Test Item 1")
+                                .build();
+
+        Item item2 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Test Item 2")
+                                .build();
+
+        Item item3 = ItemBuilder.createItem(context, col3)
+                                .withTitle("Test Item 3")
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        ItemRest itemRest1 = itemConverter.convert(item1, DefaultProjection.DEFAULT);
+        ItemRest itemRest2 = itemConverter.convert(item2, DefaultProjection.DEFAULT);
+        ItemRest itemRest3 = itemConverter.convert(item3, DefaultProjection.DEFAULT);
+        CollectionRest colRest1 = collectionConverter.convert(col1, DefaultProjection.DEFAULT);
+        CollectionRest colRest2 = collectionConverter.convert(col2, DefaultProjection.DEFAULT);
+        CollectionRest colRest3 = collectionConverter.convert(col3, DefaultProjection.DEFAULT);
+
+        String tokenUserComAdmin = getAuthToken(userComAdmin.getEmail(), password);
+        String tokenUser1 = getAuthToken(user1.getEmail(), password);
+        String tokenUser2 = getAuthToken(user2.getEmail(), password);
+
+        // define authorizations
+        Authorization userComAdminItem1 = new Authorization(userComAdmin, canManageMappingsFeature, itemRest1);
+        Authorization userComAdminItem2 = new Authorization(userComAdmin, canManageMappingsFeature, itemRest2);
+        Authorization userComAdminItem3 = new Authorization(userComAdmin, canManageMappingsFeature, itemRest3);
+        Authorization userComAdminCol1 = new Authorization(userComAdmin, canManageMappingsFeature, colRest1);
+        Authorization userComAdminCol2 = new Authorization(userComAdmin, canManageMappingsFeature, colRest2);
+        Authorization userComAdminCol3 = new Authorization(userComAdmin, canManageMappingsFeature, colRest3);
+
+        Authorization user1Item1 = new Authorization(user1, canManageMappingsFeature, itemRest1);
+        Authorization user1Item2 = new Authorization(user1, canManageMappingsFeature, itemRest2);
+        Authorization user1Item3 = new Authorization(user1, canManageMappingsFeature, itemRest3);
+        Authorization user1Col1 = new Authorization(user1, canManageMappingsFeature, colRest1);
+        Authorization user1Col2 = new Authorization(user1, canManageMappingsFeature, colRest2);
+        Authorization user1Col3 = new Authorization(user1, canManageMappingsFeature, colRest3);
+
+        Authorization user2Item1 = new Authorization(user2, canManageMappingsFeature, itemRest1);
+        Authorization user2Item2 = new Authorization(user2, canManageMappingsFeature, itemRest2);
+        Authorization user2Item3 = new Authorization(user2, canManageMappingsFeature, itemRest3);
+        Authorization user2Col1 = new Authorization(user2, canManageMappingsFeature, colRest1);
+        Authorization user2Col2 = new Authorization(user2, canManageMappingsFeature, colRest2);
+        Authorization user2Col3 = new Authorization(user2, canManageMappingsFeature, colRest3);
+
+        //Community admin
+        getClient(tokenUserComAdmin).perform(get("/api/authz/authorizations/" + userComAdminItem1.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(userComAdminItem1))));
+
+        getClient(tokenUserComAdmin).perform(get("/api/authz/authorizations/" + userComAdminItem2.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(userComAdminItem2))));
+
+        getClient(tokenUserComAdmin).perform(get("/api/authz/authorizations/" + userComAdminCol1.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(userComAdminCol1))));
+
+        getClient(tokenUserComAdmin).perform(get("/api/authz/authorizations/" + userComAdminCol2.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(userComAdminCol2))));
+
+        getClient(tokenUserComAdmin).perform(get("/api/authz/authorizations/" + userComAdminItem3.getID()))
+                                    .andExpect(status().isNotFound());
+
+        getClient(tokenUserComAdmin).perform(get("/api/authz/authorizations/" + userComAdminCol3.getID()))
+                                    .andExpect(status().isNotFound());
+
+        // user 1
+        getClient(tokenUser1).perform(get("/api/authz/authorizations/" + user1Item1.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(user1Item1))));
+
+        getClient(tokenUser1).perform(get("/api/authz/authorizations/" + user1Item2.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(user1Item2))));
+
+        getClient(tokenUser1).perform(get("/api/authz/authorizations/" + user1Col1.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(user1Col1))));
+
+        getClient(tokenUser1).perform(get("/api/authz/authorizations/" + user1Col2.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(user1Col2))));
+
+        getClient(tokenUser1).perform(get("/api/authz/authorizations/" + user1Item3.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenUser1).perform(get("/api/authz/authorizations/" + user1Col3.getID()))
+                             .andExpect(status().isNotFound());
+
+        // user 2
+        getClient(tokenUser2).perform(get("/api/authz/authorizations/" + user2Col2.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(user2Col2))));
+
+        getClient(tokenUser2).perform(get("/api/authz/authorizations/" + user2Item1.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenUser2).perform(get("/api/authz/authorizations/" + user2Item2.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenUser2).perform(get("/api/authz/authorizations/" + user2Col1.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenUser2).perform(get("/api/authz/authorizations/" + user2Item3.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenUser2).perform(get("/api/authz/authorizations/" + user2Col3.getID()))
+                             .andExpect(status().isNotFound());
+    }
+
 }

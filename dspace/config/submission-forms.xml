@@ -1212,7 +1212,7 @@
                     <label>Funding Agency</label>
                     <hint>Add a Funding Agency</hint>
                     <linked-metadata-field>
-                        <dc-schema>oaire</dc-schema>
+                        <dc-schema>project</dc-schema>
                         <dc-element>funder</dc-element>
                         <dc-qualifier>name</dc-qualifier>
                         <input-type>onebox</input-type>
