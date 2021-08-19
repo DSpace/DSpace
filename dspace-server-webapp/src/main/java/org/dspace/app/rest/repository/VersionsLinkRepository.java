@@ -57,6 +57,7 @@ public class VersionsLinkRepository extends AbstractDSpaceRestRepository
                                                Projection projection) throws SQLException {
 
         Context context = obtainContext();
+        int total = 0;
         VersionHistory versionHistory = versionHistoryService.find(context, versionHistoryId);
         if (versionHistory == null) {
             throw new ResourceNotFoundException("The versionHistory with ID: " + versionHistoryId +
@@ -64,7 +65,9 @@ public class VersionsLinkRepository extends AbstractDSpaceRestRepository
         }
         Pageable pageable = optionalPageable != null ? optionalPageable : PageRequest.of(0, 20);
         List<Version> versions = versioningService.getVersionsByHistory(context, versionHistory,
-                                 Math.toIntExact(pageable.getOffset()), Math.toIntExact(pageable.getPageSize()));
-        return converter.toRestPage(versions, pageable, projection);
+                                                   Math.toIntExact(pageable.getOffset()),
+                                                   Math.toIntExact(pageable.getPageSize()));
+        total = versioningService.countVersionsByHistory(context, versionHistory);
+        return converter.toRestPage(versions, pageable, total, projection);
     }
 }
