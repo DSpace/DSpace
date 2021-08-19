@@ -16,7 +16,19 @@ import org.dspace.app.rest.RestResourceController;
     @LinkRest(
         name = VersionHistoryRest.VERSIONS,
         method = "getVersions"
-    )
+        ),
+        @LinkRest(
+                name = VersionHistoryRest.OLDEST_VERSION,
+                method = "getOldestVersion"
+        ),
+        @LinkRest(
+                name = VersionHistoryRest.CURRENT_VERSION,
+                method = "getCurrentVersion"
+        ),
+        @LinkRest(
+                name = VersionHistoryRest.LAST_VERSION,
+                method = "getLastVersion"
+        )
 })
 public class VersionHistoryRest extends BaseObjectRest<Integer> {
 
@@ -25,6 +37,9 @@ public class VersionHistoryRest extends BaseObjectRest<Integer> {
     public static final String NAME = "versionhistory";
     public static final String CATEGORY = RestAddressableModel.VERSIONING;
     public static final String VERSIONS = "versions";
+    public static final String OLDEST_VERSION = "oldestversion";
+    public static final String CURRENT_VERSION = "currentversion";
+    public static final String LAST_VERSION = "lastversion";
 
     @Override
     public String getCategory() {

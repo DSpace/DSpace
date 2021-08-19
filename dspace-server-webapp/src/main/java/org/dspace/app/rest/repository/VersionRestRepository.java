@@ -29,11 +29,13 @@ import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +45,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * This is the Repository that takes care of the operations on the {@link VersionRest} objects
+ * 
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component(VersionRest.CATEGORY + "." + VersionRest.NAME)
 public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Integer> {
@@ -63,6 +67,13 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
 
     @Autowired
     private VersionHistoryService versionHistoryService;
+
+    @Autowired
+    private WorkspaceItemService workspaceItemService;
+
+    @SuppressWarnings("rawtypes")
+    @Autowired(required = true)
+    protected WorkflowItemService workflowItemService;
 
     @Override
     @PreAuthorize("hasPermission(#id, 'VERSION', 'READ')")
@@ -105,6 +116,10 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
         Item item = uriListHandlerService.handle(context, req, stringList, Item.class);
         if (Objects.isNull(item)) {
             throw new UnprocessableEntityException("The given URI list could not be properly parsed to one result");
+        }
+        if (Objects.nonNull(workspaceItemService.findByItem(context, item)) ||
+            Objects.nonNull(workflowItemService.findByItem(context, item))) {
+            throw new UnprocessableEntityException("");
         }
         Version version = null;
         if (StringUtils.isNotBlank(summary)) {
