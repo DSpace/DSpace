@@ -6,17 +6,9 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.eperson.dao;
-
-import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
 
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Database Access Object interface class for the SubscriptionParamter object.

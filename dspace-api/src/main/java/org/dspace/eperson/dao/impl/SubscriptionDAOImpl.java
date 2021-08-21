@@ -15,7 +15,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -47,14 +46,17 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
 
     }
     @Override
-    public List<Subscription> findByEPersonAndDso(Context context, EPerson eperson, DSpaceObject dSpaceObject) throws SQLException {
+    public List<Subscription> findByEPersonAndDso(Context context, EPerson eperson,
+                                                  DSpaceObject dSpaceObject) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        javax.persistence.criteria.CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
+        javax.persistence.criteria.CriteriaQuery criteriaQuery =
+                getCriteriaQuery(criteriaBuilder, Subscription.class);
         Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
         criteriaQuery.select(subscriptionRoot);
         criteriaQuery.where(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.ePerson), eperson));
 
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.ePerson), eperson),
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(
+                subscriptionRoot.get(Subscription_.ePerson), eperson),
                 criteriaBuilder.equal(subscriptionRoot.get(Subscription_.dSpaceObject), dSpaceObject)
         ));
         return list(context, criteriaQuery, false, Subscription.class, -1, -1);
@@ -78,11 +80,11 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
     }
 
     @Override
-    public void deleteByCollectionAndEPerson(Context context, Collection collection, EPerson eperson)
+    public void deleteByDSOAndEPerson(Context context, DSpaceObject dSpaceObject, EPerson eperson)
             throws SQLException {
-        String hqlQuery = "delete from Subscription where collection=:collection AND ePerson=:ePerson";
+        String hqlQuery = "delete from Subscription where dSpaceObject=:dSpaceObject AND ePerson=:ePerson";
         Query query = createQuery(context, hqlQuery);
-        query.setParameter("collection", collection);
+        query.setParameter("dSpaceObject", dSpaceObject);
         query.setParameter("ePerson", eperson);
         query.executeUpdate();
     }

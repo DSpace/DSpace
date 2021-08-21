@@ -7,9 +7,10 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.sql.SQLException;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
-import java.sql.SQLException;
+
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.projection.Projection;
@@ -20,8 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
-
-
 
 /**
  * Link repository for "eperson" of subscription

@@ -2,10 +2,13 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.eperson;
+
+import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -14,8 +17,6 @@ import org.dspace.eperson.dao.SubscriptionParameterDAO;
 import org.dspace.eperson.service.SubscriptionParameterService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Class implemennting method for service layer of SubscriptionParameter entity
@@ -42,16 +43,20 @@ public class SubscribeParameterServiceImpl implements SubscriptionParameterServi
     }
 
     @Override
-    public SubscriptionParameter add(Context context, String name, String value, Subscription subscription) throws SQLException, AuthorizeException {
-        SubscriptionParameter subscriptionParameter =  subscriptionParameterDAO.create(context, new SubscriptionParameter());
+    public SubscriptionParameter add(Context context, String name, String value,
+                         Subscription subscription) throws SQLException, AuthorizeException {
+        SubscriptionParameter subscriptionParameter =
+                subscriptionParameterDAO.create(context, new SubscriptionParameter());
         subscriptionParameter.setName(name);
         subscriptionParameter.setSubscription(subscription);
         subscriptionParameter.setValue(value);
         return subscriptionParameter;
     }
     @Override
-    public SubscriptionParameter edit(Context context,Integer id,String value,  String name, Subscription subscription) throws SQLException, AuthorizeException {
-        SubscriptionParameter subscriptionParameter = subscriptionParameterDAO.findByID(context, SubscriptionParameter.class, id);
+    public SubscriptionParameter edit(Context context,Integer id,String value,
+                                      String name, Subscription subscription) throws SQLException, AuthorizeException {
+        SubscriptionParameter subscriptionParameter =
+                subscriptionParameterDAO.findByID(context, SubscriptionParameter.class, id);
         subscriptionParameter.setId(id);
         subscriptionParameter.setName(name);
         subscriptionParameter.setSubscription(subscription);
@@ -67,7 +72,8 @@ public class SubscribeParameterServiceImpl implements SubscriptionParameterServi
 
     @Override
     public void deleteSubscriptionParameter(Context context, Integer id) throws SQLException, AuthorizeException {
-        SubscriptionParameter subscriptionParameter = subscriptionParameterDAO.findByID(context, SubscriptionParameter.class, id);
+        SubscriptionParameter subscriptionParameter =
+                subscriptionParameterDAO.findByID(context, SubscriptionParameter.class, id);
         if (subscriptionParameter != null) {
             subscriptionParameter.setSubscription(null);
             subscriptionParameterDAO.delete(context, subscriptionParameter);
