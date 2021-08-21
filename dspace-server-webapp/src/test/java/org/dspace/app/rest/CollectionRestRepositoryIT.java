@@ -1109,6 +1109,124 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                        ))));
     }
 
+
+    @Test
+    public void findAdministeredByEntityType() throws Exception {
+        String entityType = "Journal";
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        // create two collections of Journal type and administered by eperson
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withEntityType(entityType)
+                .withName("Collection 1")
+                .withAdminGroup(eperson)
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withEntityType(entityType)
+                .withName("Collection 2")
+                .withAdminGroup(eperson)
+                .build();
+
+        context.setCurrentUser(eperson);
+        authorizeService.addPolicy(context, parentCommunity, Constants.ADD, eperson);
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/search/findAdministeredByEntityType")
+                        .param("entityType", entityType))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(2)))
+                .andExpect(jsonPath("$._embedded.collections", containsInAnyOrder(
+                        CollectionMatcher.matchCollection(col1),
+                        CollectionMatcher.matchCollection(col2))));
+
+    }
+
+    @Test
+    public void findAdministeredByNotExistingEntityType() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/search/findAdministeredByEntityType")
+                        .param("entityType", "test"))
+                .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void findEmptyAdministeredByEntityType() throws Exception {
+        String entityType = "Journal";
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        // create two collections of Journal type and administered by eperson
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withEntityType(entityType)
+                .withName("Collection 1")
+                .withAdminGroup(eperson)
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withEntityType(entityType)
+                .withName("Collection 2")
+                .withAdminGroup(eperson)
+                .build();
+
+        context.setCurrentUser(eperson);
+        authorizeService.addPolicy(context, parentCommunity, Constants.ADD, eperson);
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/search/findAdministeredByEntityType")
+                        .param("entityType", "Publication"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(0)));
+
+    }
+
+    @Test
+    public void findAdministeredByEntityTypeOfUser() throws Exception {
+        String entityType = "Publication";
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        // create a collections of Publication type and administered by admin
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                .withEntityType(entityType)
+                .withName("Collection 1")
+                .withAdminGroup(admin)
+                .build();
+
+        context.setCurrentUser(admin);
+        authorizeService.addPolicy(context, parentCommunity, Constants.ADD, admin);
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/search/findAdministeredByEntityType")
+                        .param("entityType", "Publication"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(0)));
+
+    }
     @Test
     public void updateTest() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
