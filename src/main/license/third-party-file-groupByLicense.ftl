@@ -61,7 +61,7 @@ PLEASE NOTE: Some dependencies may be listed under multiple licenses if they
 are dual-licensed. This is especially true of anything listed as 
 "GNU General Public Library" below, as DSpace actually does NOT allow for any 
 dependencies that are solely released under GPL terms. For more info see:
-https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
+https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
 ---------------------------------------------------
     <#list licenseMap as e>
         <#assign license = e.getKey()/>
