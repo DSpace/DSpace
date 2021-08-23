@@ -55,12 +55,14 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
                 getCriteriaQuery(criteriaBuilder, Subscription.class);
         Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
         criteriaQuery.select(subscriptionRoot);
-        criteriaQuery.where(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.ePerson), eperson));
-
         criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(
                         subscriptionRoot.get(Subscription_.ePerson), eperson),
                 criteriaBuilder.equal(subscriptionRoot.get(Subscription_.dSpaceObject), dSpaceObject)
         ));
+        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.ePerson)));
+        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.id)));
+        criteriaQuery.orderBy(orderList);
         return list(context, criteriaQuery, false, Subscription.class, limit, offset);
     }
 
@@ -116,6 +118,7 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
         criteriaQuery.select(subscriptionRoot);
         List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.ePerson)));
+        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.id)));
         criteriaQuery.orderBy(orderList);
         return list(context, criteriaQuery, false, Subscription.class, -1, -1);
     }

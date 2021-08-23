@@ -117,6 +117,55 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
+    public void findAllWithResourceType() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //When we call the root endpoint as anonymous user
+        getClient().perform(get("/api/core/subscriptions"))
+                //The status has to be 401 Not Authorized
+                .andExpect(status().isUnauthorized());
+        String token = getAuthToken(admin.getEmail(), password);
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Frequency");
+        subscriptionParameter.setValue("Daily");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TypeTest", publicItem, admin, subscriptionParameterList).build();
+        subscriptionParameter.setSubscription(subscription);
+        //When we call the root endpoint
+        context.restoreAuthSystemState();
+        getClient(token).perform(get("/api/core/subscriptions?resourceType=Item"))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                //By default we expect at least 1 submission forms so this to be reflected in the page object
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionType", is("TypeTest")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.dSpaceObject.href", Matchers.endsWith("dSpaceObject")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.ePerson.href", Matchers.endsWith("ePerson")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].name", is("Frequency")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].value", is("Daily")))
+                .andExpect(jsonPath("$._links.self.href", Matchers.is(REST_SERVER_URL + "core/subscriptions?resourceType=Item")));
+        // search for subscriptions related with collections
+        getClient(token).perform(get("/api/core/subscriptions?resourceType=Collection"))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                //By default we expect at least 1 submission forms so this to be reflected in the page object
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(0)))
+                .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(0)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$._links.self.href", Matchers.is(REST_SERVER_URL + "core/subscriptions?resourceType=Collection")));
+    }
+
+    @Test
     public void findByIdAsAdministrator() throws Exception {
         context.turnOffAuthorisationSystem();
         //When we call the root endpoint as anonymous user
@@ -228,14 +277,14 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(2)))
                 .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(1)))
                 .andExpect(jsonPath("$.page.number", is(0)))
-                .andExpect(jsonPath("$._embedded.subscriptions[1].subscriptionType", is("TestType")))
+                .andExpect(jsonPath("$._embedded.subscriptions[1].subscriptionType", is("Test")))
                 .andExpect(jsonPath("$._embedded.subscriptions[1]._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
                 .andExpect(jsonPath("$._embedded.subscriptions[1]._links.dSpaceObject.href", Matchers.endsWith("dSpaceObject")))
                 .andExpect(jsonPath("$._embedded.subscriptions[1]._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
                 .andExpect(jsonPath("$._embedded.subscriptions[1]._links.ePerson.href", Matchers.endsWith("ePerson")))
                 .andExpect(jsonPath("$._embedded.subscriptions[1].subscriptionParameterList[0].name", is("Parameter1")))
                 .andExpect(jsonPath("$._embedded.subscriptions[1].subscriptionParameterList[0].value", is("ValueParameter1")))
-                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionType", is("Test")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionType", is("TestType")))
                 .andExpect(jsonPath("$._embedded.subscriptions[0]._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
                 .andExpect(jsonPath("$._embedded.subscriptions[0]._links.dSpaceObject.href", Matchers.endsWith("dSpaceObject")))
                 .andExpect(jsonPath("$._embedded.subscriptions[0]._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
