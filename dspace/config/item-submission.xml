@@ -33,18 +33,18 @@
              If you are using that demo dataset, you can simply uncomment the below configuration to enable Entity
              submission into all of the above Collections.
         -->
-        <name-map collection-handle="123456789/3" submission-name="Publication"/>
-        <name-map collection-handle="123456789/4" submission-name="Publication"/>
-        <name-map collection-handle="123456789/281" submission-name="Publication"/>
-        <name-map collection-handle="123456789/5" submission-name="Publication"/>
-        <name-map collection-handle="123456789/8" submission-name="OrgUnit"/>
-        <name-map collection-handle="123456789/6" submission-name="Person"/>
-        <name-map collection-handle="123456789/279" submission-name="Person"/>
-        <name-map collection-handle="123456789/7" submission-name="Project"/>
-        <name-map collection-handle="123456789/280" submission-name="Project"/>
-        <name-map collection-handle="123456789/28" submission-name="Journal"/>
-        <name-map collection-handle="123456789/29" submission-name="JournalVolume"/>
-        <name-map collection-handle="123456789/30" submission-name="JournalIssue"/>
+        <name-map collection-handle="10673/3" submission-name="Publication"/>
+        <name-map collection-handle="10673/4" submission-name="Publication"/>
+        <name-map collection-handle="10673/281" submission-name="Publication"/>
+        <name-map collection-handle="10673/5" submission-name="Publication"/>
+        <name-map collection-handle="10673/8" submission-name="OrgUnit"/>
+        <name-map collection-handle="10673/6" submission-name="Person"/>
+        <name-map collection-handle="10673/279" submission-name="Person"/>
+        <name-map collection-handle="10673/7" submission-name="Project"/>
+        <name-map collection-handle="10673/280" submission-name="Project"/>
+        <name-map collection-handle="10673/28" submission-name="Journal"/>
+        <name-map collection-handle="10673/29" submission-name="JournalVolume"/>
+        <name-map collection-handle="10673/30" submission-name="JournalIssue"/>
     </submission-map>
 
 
