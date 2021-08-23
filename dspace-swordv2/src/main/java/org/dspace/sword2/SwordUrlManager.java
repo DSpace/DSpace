@@ -107,7 +107,7 @@ public class SwordUrlManager {
                     "Unable to construct service document urls, due to missing/invalid " +
                         "config in sword2.url and/or dspace.server.url");
             }
-            sUrl = validSWORDUrl("/swordv2");
+            sUrl = buildSWORDUrl("swordv2");
         }
         return sUrl;
     }
@@ -305,7 +305,7 @@ public class SwordUrlManager {
                     "Unable to construct service document urls, due to missing/invalid " +
                         "config in swordv2-server.cfg servicedocument.url and/or dspace.server.url");
             }
-            sdUrl = validSWORDUrl("/servicedocument");
+            sdUrl = buildSWORDUrl("servicedocument");
         }
         return sdUrl;
     }
@@ -336,7 +336,7 @@ public class SwordUrlManager {
                     "Unable to construct deposit urls, due to missing/invalid config in " +
                         "swordv2-server.cfg deposit.url and/or dspace.server.url");
             }
-            depositUrl = validSWORDUrl("/collection");
+            depositUrl = buildSWORDUrl("collection");
         }
         return depositUrl;
     }
@@ -488,16 +488,12 @@ public class SwordUrlManager {
     }
 
     /**
-     * Ensure configured paths when combined are vail URLs
+     * Return configured server path for SWORD url
      *
      * @param path the target SWORD endpoint
-     * @return a valid sword URL
+     * @return a sword URL
      */
-    private String validSWORDUrl(String path) {
-        String[] splitDspaceUrl = dspaceUrl.split("//");
-        String url = splitDspaceUrl[1] + "/" + swordPath + "/" + path;
-        url = url.replace("///", "/");
-        url = url.replace("//", "/");
-        return splitDspaceUrl[0] + "//" + url;
+    private String buildSWORDUrl(String path) {
+        return dspaceUrl + "/" + swordPath + "/" + path;
     }
 }
