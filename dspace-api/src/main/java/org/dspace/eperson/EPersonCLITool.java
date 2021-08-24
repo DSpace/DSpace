@@ -122,7 +122,6 @@ public class EPersonCLITool {
             new HelpFormatter().printHelp("user [options]", globalOptions);
             context.abort();
             status = 1;
-            throw new IllegalArgumentException();
         }
 
         if (context.isValid()) {
