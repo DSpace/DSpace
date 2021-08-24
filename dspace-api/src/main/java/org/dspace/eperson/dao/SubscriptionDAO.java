@@ -10,7 +10,7 @@ package org.dspace.eperson.dao;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.eperson.EPerson;
@@ -26,17 +26,22 @@ import org.dspace.eperson.Subscription;
  */
 public interface SubscriptionDAO extends GenericDAO<Subscription> {
 
-    public void deleteByCollection(Context context, Collection collection) throws SQLException;
+    public void deleteByDspaceObject(Context context, DSpaceObject dSpaceObject) throws SQLException;
 
-    public List<Subscription> findByEPerson(Context context, EPerson eperson) throws SQLException;
+    public List<Subscription> findByEPerson(Context context,
+                                            EPerson eperson, Integer limit, Integer offset) throws SQLException;
 
-    public Subscription findByCollectionAndEPerson(Context context, EPerson eperson, Collection collection)
-        throws SQLException;
+    public List<Subscription> findByEPersonAndDso(Context context,
+                                                  EPerson eperson, DSpaceObject dSpaceObject,
+                                                  Integer limit, Integer offset) throws SQLException;
 
     public void deleteByEPerson(Context context, EPerson eperson) throws SQLException;
 
-    public void deleteByCollectionAndEPerson(Context context, Collection collection, EPerson eperson)
-        throws SQLException;
+    public void deleteByDSOAndEPerson(Context context, DSpaceObject dSpaceObject, EPerson eperson)
+            throws SQLException;
 
-    public List<Subscription> findAllOrderedByEPerson(Context context) throws SQLException;
+    public List<Subscription> findAllOrderedByIDAndResourceType(Context context, String resourceType,
+                                                      Integer limit, Integer offset) throws SQLException;
+
+    public List<Subscription> findAllOrderedById(Context context, Integer limit, Integer offset) throws SQLException;
 }

@@ -46,6 +46,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
+import org.dspace.eperson.service.SubscribeService;
 import org.dspace.externalservices.scopus.factory.CrisMetricsServiceFactory;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
@@ -118,6 +119,7 @@ public abstract class AbstractBuilder<T, S> {
     static HarvestedCollectionService harvestedCollectionService;
     static NBEventService nbEventService;
     static SolrSuggestionStorageService solrSuggestionService;
+    static SubscribeService subscribeService;
 
     protected Context context;
 
@@ -183,6 +185,7 @@ public abstract class AbstractBuilder<T, S> {
         crisLayoutMetric2BoxService = CrisLayoutServiceFactory.getInstance().getMetric2BoxService();
         nbEventService = new DSpace().getSingletonService(NBEventService.class);
         solrSuggestionService = new DSpace().getSingletonService(SolrSuggestionStorageService.class);
+        subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
     }
 
 
@@ -223,6 +226,7 @@ public abstract class AbstractBuilder<T, S> {
         crisLayoutMetric2BoxService = null;
         nbEventService = null;
         harvestedCollectionService = null;
+        subscribeService = null;
     }
 
     public static void cleanupObjects() throws Exception {

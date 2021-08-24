@@ -93,13 +93,20 @@ public class SubscribeCLITool {
         IOException {
         // Grab the subscriptions
 
-        List<Subscription> subscriptions = subscribeService.findAll(context);
-
+        List<Subscription> subscriptions = new ArrayList<>();
+        try {
+            subscriptions = subscribeService.findAll(context, null, -1, -1);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
         EPerson currentEPerson = null;
         List<Collection> collections = null; // List of Collections
 
         // Go through the list collating subscriptions for each e-person
         for (Subscription subscription : subscriptions) {
+            if (!(subscription.getdSpaceObject() != null && subscription.getdSpaceObject() instanceof Collection)) {
+                continue;
+            }
             // Does this row relate to the same e-person as the last?
             if ((currentEPerson == null)
                 || (!subscription.getePerson().getID().equals(currentEPerson
@@ -120,7 +127,7 @@ public class SubscribeCLITool {
                 collections = new ArrayList<>();
             }
 
-            collections.add(subscription.getCollection());
+            collections.add((Collection) subscription.getdSpaceObject());
         }
 
         // Process the last person

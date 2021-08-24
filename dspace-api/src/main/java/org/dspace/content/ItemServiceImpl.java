@@ -57,6 +57,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
@@ -134,6 +135,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired(required = true)
     private OrcidSynchronizationService orcidSynchronizationService;
+
+    @Autowired(required = true)
+    protected SubscribeService subscribeService;
 
     protected ItemServiceImpl() {
         super();
@@ -700,7 +704,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         log.info(LogManager.getHeader(context, "delete_item", "item_id="
             + item.getID()));
-
+        //remove subscription related with it
+        subscribeService.deleteByDspaceObject(context, item);
         // Remove relationships
         for (Relationship relationship : relationshipService.findByItem(context, item)) {
             relationshipService.forceDelete(context, relationship, false, false);
