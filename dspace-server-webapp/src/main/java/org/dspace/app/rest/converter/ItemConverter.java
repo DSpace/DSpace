@@ -32,10 +32,8 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSecurityEvaluation;
-import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
@@ -75,9 +73,6 @@ public class ItemConverter
     private AuthorizeService authorizeService;
 
     @Autowired
-    private ChoiceAuthorityService cas;
-
-    @Autowired
     GroupService groupService;
 
     @Autowired
@@ -85,8 +80,6 @@ public class ItemConverter
 
     @Autowired
     private RequestService requestService;
-    @Autowired
-    private MetadataValueService metadataValueService;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
 
