@@ -377,9 +377,13 @@ public class EPersonCLITool {
                 modified = true;
             }
             if (command.hasOption(OPT_NEW_PASSWORD.getOpt())) {
-                char[] password1 = consoleService.readPassword("Enter new password for user %s", userName);
-                char[] password2 = consoleService.readPassword("Enter new password again to verify");
-                if (Arrays.equals(password1, password2)) {
+                char[] password1 = consoleService.readPassword(
+                        "Enter new password for user '%s':  ", userName);
+                char[] password2 = consoleService.readPassword(
+                        "Enter new password again to verify:  ");
+                if (password1.length <= 0 || password2.length <= 0) {
+                    System.err.println("The new password may not be empty.");
+                } else if (Arrays.equals(password1, password2)) {
                     PasswordHash newHashedPassword = new PasswordHash(String.valueOf(password1));
                     Arrays.fill(password1, '\0'); // Obliterate cleartext passwords
                     Arrays.fill(password2, '\0');

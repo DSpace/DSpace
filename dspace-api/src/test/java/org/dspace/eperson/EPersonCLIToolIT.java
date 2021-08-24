@@ -7,13 +7,16 @@
  */
 package org.dspace.eperson;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.util.FakeConsoleServiceImpl;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
+import org.junit.contrib.java.lang.system.SystemErrRule;
 
 /**
  *
@@ -26,6 +29,10 @@ public class EPersonCLIToolIT
     // Handle System.exit() from unit under test.
     @Rule
     public final ExpectedSystemExit exit = ExpectedSystemExit.none();
+
+    // Capture System.err() output.
+    @Rule
+    public final SystemErrRule sysErr = new SystemErrRule().enableLog();
 
     /**
      * Test --modify --newPassword
@@ -40,7 +47,7 @@ public class EPersonCLIToolIT
 
         // Create a source of "console" input.
         FakeConsoleServiceImpl consoleService = new FakeConsoleServiceImpl();
-        consoleService.setPassword("secret".toCharArray());
+        consoleService.setPassword(NEW_PASSWORD.toCharArray());
 
         // Make certain that we know the eperson's email and old password hash.
         String email = eperson.getEmail();
@@ -54,11 +61,50 @@ public class EPersonCLIToolIT
         String[] argv = {
             "--modify",
             "--email", email,
-            "--newPassword", NEW_PASSWORD
+            "--newPassword"
         };
         instance.main(argv);
 
         String newPasswordHash = eperson.getPassword();
         assertNotEquals("Password hash did not change", oldPasswordHash, newPasswordHash);
+    }
+
+    /**
+     * Test --modify --newPassword with an empty password
+     * @throws Exception passed through.
+     */
+    @Test
+    @SuppressWarnings("static-access")
+    public void testSetEmptyPassword()
+            throws Exception {
+        exit.expectSystemExitWithStatus(0);
+        System.out.println("main");
+
+        // Create a source of "console" input.
+        FakeConsoleServiceImpl consoleService = new FakeConsoleServiceImpl();
+        consoleService.setPassword(new char[0]);
+
+        // Make certain that we know the eperson's email and old password hash.
+        String email = eperson.getEmail();
+        String oldPasswordHash = eperson.getPassword();
+
+        // Instantiate the unit under test.
+        EPersonCLITool instance = new EPersonCLITool();
+        instance.setConsoleService(consoleService);
+
+        // Test!
+        String[] argv = {
+            "--modify",
+            "--email", email,
+            "--newPassword"
+        };
+        instance.main(argv);
+
+        String newPasswordHash = eperson.getPassword();
+        assertEquals("Password hash changed", oldPasswordHash, newPasswordHash);
+
+        String response = sysErr.getLog();
+        assertTrue("Standard error did not mention 'empty'",
+                response.contains("empty"));
     }
 }
