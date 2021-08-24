@@ -78,7 +78,7 @@ function AuthorLookup(url, authorityInput, collectionID) {
                 initialInput = $('textarea[name=' + authorityInput + ']').val();
             } else {   // submission
                 var lastName = $('input[name=' + authorityInput + '_last]');
-                if (lastName.size()) { // author input type
+                if (lastName.length > 0) { // author input type
                     initialInput = (lastName.val() + " " + $('input[name=' + authorityInput + '_first]').val()).trim();
                 } else { // other input types
                     initialInput = $('input[name=' + authorityInput + ']').val();
@@ -163,7 +163,7 @@ function AuthorLookup(url, authorityInput, collectionID) {
                     } else {
                         // submission
                         var lastName = $('input[name=' + authorityInput + '_last]');
-                        if (lastName.size()) { // author input type
+                        if (lastName.length > 0) { // author input type
                             lastName.val(vcard.find('.vcard-last-name span').text());
                         $('input[name=' + authorityInput + '_first]').val(vcard.find('.vcard-first-name span').text());
                         }

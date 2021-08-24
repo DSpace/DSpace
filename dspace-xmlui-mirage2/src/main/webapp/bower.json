@@ -4,8 +4,8 @@
     "dependencies": {
         "bootstrap-sass-official": "3.3.0",
         "modernizr": "2.8.3",
-        "jquery": "~1.10.2",
-        "jquery-ui": "1.10.3",
+        "jquery": "~3.4.1",
+        "jquery-ui": "1.12.1",
         "jqueryuibootstrap": "4f3772cd37b898f456c0126c4b44178ce8d4aad7",
         "handlebars": "4.0.0",
         "respond": "1.4.2",
