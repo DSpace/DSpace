@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
+ * This class extends the {@link ExternalSourceEntryItemUriListHandler} abstract class and implements it specifically
+ * for the List<Item> objects.
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */

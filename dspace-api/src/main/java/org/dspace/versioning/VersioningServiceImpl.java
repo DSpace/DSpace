@@ -10,6 +10,7 @@ package org.dspace.versioning;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
@@ -196,7 +197,7 @@ public class VersioningServiceImpl implements VersioningService {
                                     int versionNumber) {
         try {
             Version version = versionDAO.create(context, new Version());
-            if (versionNumber > 0) {
+            if (versionNumber > 0 && !isVersionExist(context, item, versionNumber)) {
                 version.setVersionNumber(versionNumber);
             } else {
                 version.setVersionNumber(getNextVersionNumer(context, history));
@@ -212,6 +213,16 @@ public class VersioningServiceImpl implements VersioningService {
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    private boolean isVersionExist(Context context, Item item, int versionNumber) throws SQLException {
+        VersionHistory history = versionHistoryService.findByItem(context, item);
+        if (Objects.isNull(history)) {
+            return false;
+        }
+        return history.getVersions().stream().filter(v -> v.getVersionNumber() == versionNumber)
+                                    .findFirst()
+                                    .isPresent();
     }
 
     @Override
