@@ -63,6 +63,9 @@ public class EPersonCLITool {
     private static final Option OPT_NEW_PASSWORD
             = new Option("w", "newPassword", false, "prompt for new password");
 
+    static final String ERR_PASSWORD_EMPTY = "The new password may not be empty.";
+    static final String ERR_PASSWORD_NOMATCH = "Passwords do not match.  Password not set";
+
     private static final EPersonService ePersonService
             = EPersonServiceFactory.getInstance().getEPersonService();
 
@@ -382,7 +385,7 @@ public class EPersonCLITool {
                 char[] password2 = consoleService.readPassword(
                         "Enter new password again to verify:  ");
                 if (password1.length <= 0 || password2.length <= 0) {
-                    System.err.println("The new password may not be empty.");
+                    System.err.println(ERR_PASSWORD_EMPTY);
                 } else if (Arrays.equals(password1, password2)) {
                     PasswordHash newHashedPassword = new PasswordHash(String.valueOf(password1));
                     Arrays.fill(password1, '\0'); // Obliterate cleartext passwords
@@ -392,7 +395,7 @@ public class EPersonCLITool {
                     eperson.setDigestAlgorithm(newHashedPassword.getAlgorithm());
                     modified = true;
                 } else {
-                    System.err.println("Passwords do not match.  Password not set");
+                    System.err.println(ERR_PASSWORD_NOMATCH);
                 }
             }
             if (command.hasOption(OPT_GIVENNAME.getOpt())) {
@@ -442,6 +445,7 @@ public class EPersonCLITool {
     /**
      * Command to list known EPersons.
      */
+    @SuppressWarnings("unused")
     private static int cmdList(Context context, String[] argv) {
         // XXX ideas:
         // specific user/netid
