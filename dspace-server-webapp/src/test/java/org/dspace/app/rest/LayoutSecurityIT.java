@@ -2185,7 +2185,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$.metadata['crisrp.education.end']").doesNotExist())
                    .andExpect(jsonPath("$.metadata['dc.description.abstract']").doesNotExist());
     }
-    //testing the view
+
     @Test
     public void configurationContainMetadataSecurityThirdLevel() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -2219,26 +2219,26 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
 
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-          // An admin can see the dc.description.abstract metadata
+        // An admin can see the dc.description.abstract metadata
         getClient(tokenAdmin).perform(get("/api/core/items/" + itemA.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Publication")))
                 .andExpect(jsonPath("$.metadata['dc.description.abstract'].[0].value", is ("Metadata Secured")))
                 .andExpect(jsonPath("$.metadata['dc.description.abstract'].[0].securityLevel", is (2)));
 
-//        // An user who is not admin can not see the dc.description.abstract metadata
+        // An user who is not admin can not see the dc.description.abstract metadata
         getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Publication")))
                 .andExpect(jsonPath("$.metadata['dc.description.abstract']").doesNotExist());
-//
         // An anonymous user can not see the dc.description.abstract metadata
         getClient().perform(get("/api/core/items/" + itemA.getID()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Publication")));
+                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Publication")))
+                .andExpect(jsonPath("$.metadata['dc.description.abstract']").doesNotExist());
 
-}
-    //testing the view
+    }
+
     @Test
     public void configurationContainMetadataSecurityFirstLevel() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -2271,21 +2271,21 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        // An admin can see the dc.description.abstract metadata
+        // An admin can see the dc.description.provenance metadata
         getClient(tokenAdmin).perform(get("/api/core/items/" + itemA.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")))
                 .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].value", is ("Metadata Secured")))
                 .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].securityLevel", is (0)));
 
-//        // An user who is not admin can not see the dc.description.abstract metadata
+        // An user who is not admin can not see the dc.description.provenance metadata
         getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")))
                 .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].value", is ("Metadata Secured")))
                 .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].securityLevel", is (0)));
-//
-        // An anonymous user can not see the dc.description.abstract metadata
+
+        // An anonymous user can not see the dc.description.provenance metadata
         getClient().perform(get("/api/core/items/" + itemA.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")))
@@ -2293,7 +2293,7 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].securityLevel", is (0)));
 
     }
-    //testing the view
+
     @Test
     public void configurationContainMetadataSecuritySecondLevel() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -2301,7 +2301,6 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
         GroupBuilder.createGroup(context)
             .withName("Trusted")
             .addMember(eperson)
-            .addMember(context.getCurrentUser())
             .build();
 
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
@@ -2331,22 +2330,30 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                 .withBox(box1)
                 .build();
 
-//        context.restoreAuthSystemState();
+        context.restoreAuthSystemState();
+
         String tokenEperson = getAuthToken(ePersonService.find(context, eperson.getID()).getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        // An admin can see the dc.description.abstract metadata
-        getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID()))
+        // An admin can see the dc.description.provenance metadata
+        getClient(tokenAdmin).perform(get("/api/core/items/" + itemA.getID()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")));
+                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")))
+                .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].value", is ("Metadata Secured")))
+                .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].securityLevel", is (1)));
 
+        // An user that belongs to 'Trusted' group can see the dc.description.provenance metadata
         getClient(tokenEperson).perform(get("/api/core/items/" + itemA.getID()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")));
-//
-        // An anonymous user can not see the dc.description.abstract metadata
+                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")))
+                .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].value", is ("Metadata Secured")))
+                .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].securityLevel", is (1)));
+
+        // An anonymous user can not see the dc.description.provenance metadata
         getClient().perform(get("/api/core/items/" + itemA.getID()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")));
+                .andExpect(jsonPath("$.metadata['dspace.entity.type'].[0].value", is ("Person")))
+                .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].value").doesNotExist())
+                .andExpect(jsonPath("$.metadata['dc.description.provenance'].[1].securityLevel").doesNotExist());
 
     }
 
