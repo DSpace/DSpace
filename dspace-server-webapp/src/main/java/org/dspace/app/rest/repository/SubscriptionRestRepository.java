@@ -83,6 +83,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository
             return converter.toRest(subscription, utils.obtainProjection());
         } catch (SQLException sqlException) {
             throw new RuntimeException(sqlException.getMessage(), sqlException);
+        } catch (AuthorizeException authorizeException) {
+            throw new RuntimeException(authorizeException.getMessage());
         }
     }
 
@@ -96,7 +98,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository
                     pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(subscriptionList, pageable, utils.obtainProjection());
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -231,6 +233,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository
             }
         } catch (SQLException e) {
             throw new ResourceNotFoundException(notFoundException);
+        } catch (AuthorizeException e) {
+            throw new AuthorizeException(e.getMessage());
         }
         if (id.equals(subscription.getID())) {
             List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
@@ -244,6 +248,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository
             }
             subscription = subscribeService.updateSubscription(context, id, ePerson,
                     dSpaceObject, subscriptionParameterList, subscriptionRest.getSubscriptionType());
+            context.commit();
             return converter.toRest(subscription, utils.obtainProjection());
         } else {
             throw new IllegalArgumentException("The id in the Json and the id in the url do not match: "
@@ -271,6 +276,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository
             throw new RuntimeException(e.getMessage(), e);
         } catch (AuthorizeException authorizeException) {
             throw new AuthorizeException(authorizeException.getMessage());
+        } catch (RuntimeException runtimeException) {
+            throw new RuntimeException(runtimeException.getMessage());
         }
     }
 

@@ -79,13 +79,10 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
     }
 
+    // FIND ALL
     @Test
     public void findAll() throws Exception {
         context.turnOffAuthorisationSystem();
-        //When we call the root endpoint as anonymous user
-        getClient().perform(get("/api/core/subscriptions"))
-                //The status has to be 401 Not Authorized
-                .andExpect(status().isUnauthorized());
         String token = getAuthToken(admin.getEmail(), password);
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
@@ -114,6 +111,25 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].name", is("Frequency")))
                 .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].value", is("Daily")))
                 .andExpect(jsonPath("$._links.self.href", Matchers.is(REST_SERVER_URL + "core/subscriptions")));
+    }
+
+    @Test
+    public void findAllAnonymous() throws Exception {
+        //When we call the root endpoint as anonymous user
+        getClient().perform(get("/api/core/subscriptions"))
+                //The status has to be 401 Not Authorized
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findAllAsUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String token = getAuthToken(eperson.getEmail(), password);
+        context.restoreAuthSystemState();
+        //When we call the root endpoint as simple user
+        getClient(token).perform(get("/api/core/subscriptions"))
+                //The status has to be 403 Forbidden
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -165,13 +181,10 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$._links.self.href", Matchers.is(REST_SERVER_URL + "core/subscriptions?resourceType=Collection")));
     }
 
+    // FIND BY ID
     @Test
     public void findByIdAsAdministrator() throws Exception {
         context.turnOffAuthorisationSystem();
-        //When we call the root endpoint as anonymous user
-        getClient().perform(get("/api/core/subscriptions"))
-                //The status has to be 403 Not Authorized
-                .andExpect(status().isUnauthorized());
         String token = getAuthToken(admin.getEmail(), password);
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
@@ -215,6 +228,24 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    public void findByIdNotAsSubscriberNotAsAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String token = getAuthToken(eperson.getEmail(), password);
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter");
+        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, admin, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+        //When we call the root endpoint
+        getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID()))
+                //The status has to be 500
+                .andExpect(status().isInternalServerError());
+    }
+
+    // FIND ALL BY EPERSON/DSO
     @Test
     public void findAllSubscriptionsByEPerson() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -294,6 +325,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
     }
 
+    // ADD
     @Test
     public void addSubscriptionNotLoggedIn() throws Exception {
         SubscriptionParameterRest subscriptionParameterRest = new SubscriptionParameterRest();
@@ -351,6 +383,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")));
     }
 
+    // PUT
     @Test
     public void editSubscriptionAnonymous() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -395,7 +428,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, eperson, subscriptionParameterList).build();
         context.restoreAuthSystemState();
         ObjectMapper objectMapper = new ObjectMapper();
-        String token = getAuthToken(admin.getEmail(), password);
+        String token = getAuthToken(epersonIT.getEmail(), password);
         Map<String, Object> newSubscription = new HashMap<>();
         newSubscription.put("type", "test");
         List<Map<String, Object>> list = new ArrayList<>();
@@ -405,11 +438,11 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         list.add(sub_list);
         newSubscription.put("subscriptionParameterList", list);
         //When we call the root endpoint as anonymous user
-        getClient().perform(put("/api/core/subscriptions/" + subscription.getID() + "?dspace_object_id=" + publicItem.getID() + "&eperson_id=" + admin.getID())
+        getClient(token).perform(put("/api/core/subscriptions/" + subscription.getID() + "?dspace_object_id=" + publicItem.getID() + "&eperson_id=" + admin.getID())
                         .content(objectMapper.writeValueAsString(newSubscription))
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
-                //The status has to be 403 Not Authorized
-                .andExpect(status().isUnauthorized());
+                //The status has to be 500 Error
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
@@ -450,6 +483,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")));
     }
 
+    // DELETE
     @Test
     public void deleteSubscriptionNotAsSubscriberNotAsAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -485,6 +519,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         getClient(token).perform(delete("/api/core/subscriptions/" + subscription.getID())).andExpect(status().isNoContent());
     }
 
+    // PATCH
     @Test
     public void patchReplaceSubscriptionParameterAsAdmin() throws Exception {
         context.turnOffAuthorisationSystem();

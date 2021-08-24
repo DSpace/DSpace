@@ -157,7 +157,7 @@ public interface SubscribeService {
      * @param id the id of subscription to be searched
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public Subscription findById(Context context, int id) throws SQLException;
+    public Subscription findById(Context context, int id) throws SQLException, AuthorizeException;
 
     /**
      * Updates a subscription by id

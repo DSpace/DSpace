@@ -49,10 +49,10 @@ public class SubscribeServiceImpl implements SubscribeService {
     public List<Subscription> findAll(Context context, String resourceType,
                                       Integer limit, Integer offset) throws Exception {
         if (resourceType == null) {
-            return subscriptionDAO.findAllOrderedByEPerson(context);
+            return subscriptionDAO.findAllOrderedById(context, limit, offset);
         } else {
             if (resourceType.equals("Item") || resourceType.equals("Collection") || resourceType.equals("Community")) {
-                return subscriptionDAO.findAllOrderedByEPersonAndResourceType(context, resourceType, limit, offset);
+                return subscriptionDAO.findAllOrderedByIDAndResourceType(context, resourceType, limit, offset);
             } else {
                 log.error("Resource type must be Item, Collection or Community");
                 throw new Exception("Resource type must be Item, Collection or Community");
@@ -69,13 +69,13 @@ public class SubscribeServiceImpl implements SubscribeService {
         if (authorizeService.isAdmin(context)
                 || ((context.getCurrentUser() != null) && (context
                 .getCurrentUser().getID().equals(eperson.getID())))) {
-            Subscription new_subscription = subscriptionDAO.create(context, new Subscription());
+            Subscription newSubscription = subscriptionDAO.create(context, new Subscription());
             subscriptionParameterList.forEach(subscriptionParameter ->
-                    new_subscription.addParameter(subscriptionParameter));
-            new_subscription.setePerson(eperson);
-            new_subscription.setdSpaceObject(dSpaceObject);
-            new_subscription.setType(type);
-            return new_subscription;
+                    newSubscription.addParameter(subscriptionParameter));
+            newSubscription.setePerson(eperson);
+            newSubscription.setdSpaceObject(dSpaceObject);
+            newSubscription.setType(type);
+            return newSubscription;
         } else {
             throw new AuthorizeException(
                     "Only admin or e-person themselves can subscribe");
@@ -153,8 +153,13 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public Subscription findById(Context context, int id) throws SQLException {
-        return subscriptionDAO.findByID(context, Subscription.class, id);
+    public Subscription findById(Context context, int id) throws SQLException, AuthorizeException {
+        Subscription subscription = subscriptionDAO.findByID(context, Subscription.class, id);
+        if (context.getCurrentUser().equals(subscription.getePerson()) ||
+                authorizeService.isAdmin(context, context.getCurrentUser())) {
+            return  subscription;
+        }
+        throw new AuthorizeException("Only admin or e-person themselves can edit the subscription");
     }
 
     @Override
