@@ -29,6 +29,10 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -337,44 +341,72 @@ public class LogAnalyser {
         Date myEndDate = null;
         boolean myLookUp = false;
 
-        // read in our command line options
-        for (int i = 0; i < argv.length; i++) {
-            if (argv[i].equals("-log")) {
-                myLogDir = argv[i + 1];
-            }
+        // Define command line options.
+        Options options = new Options();
+        Option option;
 
-            if (argv[i].equals("-file")) {
-                myFileTemplate = argv[i + 1];
-            }
+        option = Option.builder().longOpt("log").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-cfg")) {
-                myConfigFile = argv[i + 1];
-            }
+        option = Option.builder().longOpt("file").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-out")) {
-                myOutFile = argv[i + 1];
-            }
+        option = Option.builder().longOpt("cfg").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-help")) {
-                LogAnalyser.usage();
-                System.exit(0);
-            }
+        option = Option.builder().longOpt("out").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-start")) {
-                myStartDate = parseDate(argv[i + 1]);
-            }
+        option = Option.builder().longOpt("help").build();
+        options.addOption(option);
 
-            if (argv[i].equals("-end")) {
-                myEndDate = parseDate(argv[i + 1]);
-            }
+        option = Option.builder().longOpt("start").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-lookup")) {
-                myLookUp = true;
-            }
+        option = Option.builder().longOpt("end").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder().longOpt("lookup").build();
+
+        // Parse the command.
+        DefaultParser cmdParser = new DefaultParser();
+        CommandLine cmd = cmdParser.parse(options, argv);
+
+        // Analyze the command.
+        if (cmd.hasOption("help")) {
+            LogAnalyser.usage();
+            System.exit(0);
         }
 
+        if (cmd.hasOption("log")) {
+            myLogDir = cmd.getOptionValue("log");
+        }
+
+        if (cmd.hasOption("file")) {
+            myFileTemplate = cmd.getOptionValue("file");
+        }
+
+        if (cmd.hasOption("cfg")) {
+            myConfigFile = cmd.getOptionValue("cfg");
+        }
+
+        if (cmd.hasOption("out")) {
+            myOutFile = cmd.getOptionValue("out");
+        }
+
+        if (cmd.hasOption("start")) {
+            myStartDate = parseDate(cmd.getOptionValue("start"));
+        }
+
+        if (cmd.hasOption("end")) {
+            myEndDate = parseDate(cmd.getOptionValue("end"));
+        }
+
+        myLookUp = cmd.hasOption("lookup");
+
         // now call the method which actually processes the logs
-        processLogs(context, myLogDir, myFileTemplate, myConfigFile, myOutFile, myStartDate, myEndDate, myLookUp);
+        processLogs(context, myLogDir, myFileTemplate, myConfigFile, myOutFile,
+                myStartDate, myEndDate, myLookUp);
     }
 
     /**
