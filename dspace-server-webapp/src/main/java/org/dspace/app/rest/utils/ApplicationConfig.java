@@ -49,10 +49,11 @@ public class ApplicationConfig {
     /**
      * Return the array of allowed origins (client URLs) for the CORS "Access-Control-Allow-Origin" header
      * Used by Application class
+     * @param corsOrigins list of allowed origins for the dspace api or iiif endpoints
      * @return Array of URLs
      */
     public String[] getCorsAllowedOrigins(String[] corsOrigins) {
-        // Use "rest.cors.allowed-origins" if configured. Otherwise, default to the "dspace.ui.url" setting.
+        // Use origins from configuration. Otherwise, default to the "dspace.ui.url" setting.
         if (corsOrigins != null) {
             // Ensure no allowed origins end in a trailing slash
             // Browsers send 'Origin' header without a trailing slash & Spring Security considers
@@ -79,7 +80,7 @@ public class ApplicationConfig {
     }
 
     /**
-     * Returns the rest.iiif.cors.allowed-origins defined in DSpace configuration.
+     * Returns the rest.iiif.cors.allowed-origins (for IIIF access) defined in DSpace configuration.
      * @return allowed origins
      */
     public String[] getIiifAllowedOriginsConfig() {
