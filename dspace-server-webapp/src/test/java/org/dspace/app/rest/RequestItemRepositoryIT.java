@@ -8,13 +8,17 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 import static org.junit.Assert.assertEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Map;
+import javax.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.requestitem.RequestItem;
@@ -290,5 +295,74 @@ public class RequestItemRepositoryIT
         RequestItemRepository instance = new RequestItemRepository();
         Class instanceClass = instance.getDomainClass();
         assertEquals("Wrong domain class", RequestItemRest.class, instanceClass);
+    }
+
+    /**
+     * Verify that Spring Security's CSRF protection is working as we expect.
+     * We must test this using a simple non-GET request, as CSRF Tokens are not
+     * validated in a GET request.
+     *
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testRefreshTokenWithInvalidCSRF()
+            throws Exception {
+        // Login via password to retrieve a valid token
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Remove "Bearer " from that token, so that we are left with the token itself
+        token = token.replace("Bearer ", "");
+
+        // Save token to an Authorization cookie
+        Cookie[] cookies = new Cookie[1];
+        cookies[0] = new Cookie(AUTHORIZATION_COOKIE, token);
+
+        getClient().perform(post(URI_ROOT)
+                .with(csrf().useInvalidToken().asHeader())
+                .secure(true)
+                .cookie(cookies))
+                // Should return a 403 Forbidden, for an invalid CSRF token
+                .andExpect(status().isForbidden())
+                // Verify it includes our custom error reason (from DSpaceApiExceptionControllerAdvice)
+                .andExpect(status().reason(containsString("Invalid CSRF token")))
+                // And, a new/updated token should be returned (as both server-side cookie and header)
+                // This is handled by DSpaceAccessDeniedHandler
+                .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
+                .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
+
+        //Logout
+        getClient(token).perform(post("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
+    }
+
+    /**
+     * Verify that Spring Security's CORS settings are working as we expect.
+     *
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testCannotReuseTokenFromUntrustedOrigin()
+            throws Exception {
+        // First, get a valid login token
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Verify token works
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        // Test token cannot be used from an *untrusted* Origin
+        // (NOTE: this Origin is NOT listed in our 'rest.cors.allowed-origins' configuration)
+        getClient(token).perform(get(URI_ROOT)
+                .header("Origin", "https://example.org"))
+                // should result in a 403 error as Spring Security
+                //returns that for untrusted origins
+                .andExpect(status().isForbidden());
+
+        //Logout
+        getClient(token).perform(post("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
     }
 }
