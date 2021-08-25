@@ -21,7 +21,7 @@ import org.dspace.app.rest.RestResourceController;
 @LinksRest(links = {
     @LinkRest(name = "bitstream", method = "getUuid"),
     @LinkRest(name = "item", method = "getUuid")
-})
+    })
 public class RequestItemRest
         extends BaseObjectRest<Integer> {
     public static final String NAME = "copyrequest";

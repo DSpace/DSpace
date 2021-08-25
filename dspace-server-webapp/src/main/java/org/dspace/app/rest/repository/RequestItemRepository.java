@@ -8,6 +8,8 @@
 
 package org.dspace.app.rest.repository;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -17,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.converter.RequestItemConverter;
+import org.dspace.app.rest.exception.IncompleteItemRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RequestItemRest;
@@ -88,13 +91,36 @@ public class RequestItemRepository
         // Create the item request model object from the REST object.
         String token;
         try {
-            Bitstream bitstream = bitstreamService.find(ctx,
-                    UUID.fromString(rir.getBitstreamId()));
-            Item item = itemService.find(ctx,
-                    UUID.fromString(rir.getItemId()));
+            String bitstreamId = rir.getBitstreamId();
+            if (isBlank(bitstreamId)) {
+                throw new IncompleteItemRequestException("A bitstream ID is required");
+            }
+            Bitstream bitstream = bitstreamService.find(ctx, UUID.fromString(bitstreamId));
+            if (null == bitstream) {
+                throw new IncompleteItemRequestException("That bitstream does not exist");
+            }
+
+            String itemId = rir.getItemId();
+            if (isBlank(itemId)) {
+                throw new IncompleteItemRequestException("An item ID is required");
+            }
+            Item item = itemService.find(ctx, UUID.fromString(itemId));
+            if (null == item) {
+                throw new IncompleteItemRequestException("That item does not exist");
+            }
+
+            boolean allFiles = rir.isAllfiles();
+
+            String email = rir.getRequestEmail();
+            if (isBlank(email)) {
+                throw new IncompleteItemRequestException("A submitter's email address is required");
+            }
+
+            String username = rir.getRequestName();
+            String message = rir.getRequestMessage();
+
             token = requestItemService.createRequest(ctx, bitstream, item,
-                    rir.isAllfiles(), rir.getRequestEmail(), rir.getRequestName(),
-                    rir.getRequestMessage());
+                    allFiles, email, username, message);
         } catch (SQLException ex) {
             throw new RuntimeException("Item request not created.", ex);
         }
