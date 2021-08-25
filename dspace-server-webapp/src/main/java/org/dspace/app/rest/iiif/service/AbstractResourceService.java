@@ -31,6 +31,7 @@ public abstract class AbstractResourceService {
     protected String IMAGE_SERVICE;
     protected String SEARCH_URL;
     protected String CLIENT_URL;
+    protected String IIIF_LOGO_IMAGE;
     protected String BITSTREAM_PATH_PREFIX;
     /**
      * Possible values: "paged" or "individuals". The property
@@ -74,6 +75,7 @@ public abstract class AbstractResourceService {
         BITSTREAM_PATH_PREFIX = configurationService.getProperty("iiif.bitstream.url");
         DOCUMENT_VIEWING_HINT = configurationService.getProperty("iiif.document.viewing.hint");
         CLIENT_URL = configurationService.getProperty("dspace.ui.url");
+        IIIF_LOGO_IMAGE = configurationService.getProperty("iiif.logo.image");
     }
 
     /**
