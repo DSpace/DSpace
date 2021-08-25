@@ -10,11 +10,13 @@ package org.dspace.ctask.general;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.XMLConstants;
@@ -33,6 +35,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -60,18 +63,18 @@ import org.xml.sax.SAXException;
  * Intended use: cataloging tool in workflow and general curation.
  * The task uses a URL 'template' to compose the service call, e.g.
  *
- * {@code http://www.sherpa.ac.uk/romeo/api29.php?issn=\{dc.identifier.issn\}}
+ * <p>{@code http://www.sherpa.ac.uk/romeo/api29.php?issn=\{dc.identifier.issn\}}
  *
- * Task will substitute the value of the passed item's metadata field
+ * <p>Task will substitute the value of the passed item's metadata field
  * in the {parameter} position. If multiple values are present in the
  * item field, the first value is used.
  *
- * The task uses another property (the datamap) to determine what data
+ * <p>The task uses another property (the datamap) to determine what data
  * to extract from the service response and how to use it, e.g.
  *
- * {@code //publisher/name=>dc.publisher,//romeocolour}
+ * <p>{@code //publisher/name=>dc.publisher,//romeocolour}
  *
- * Task will evaluate the left-hand side (or entire token) of each
+ * <p>Task will evaluate the left-hand side (or entire token) of each
  * comma-separated token in the property as an XPath 1.0 expression into
  * the response document, and if there is a mapping symbol (e.g. {@code '=>'}) and
  * value, it will assign the response document value(s) to the named
@@ -79,48 +82,52 @@ import org.xml.sax.SAXException;
  * multiple values, they will all be assigned to the item field. The
  * mapping symbol governs the nature of metadata field assignment:
  *
- * {@code '->'} mapping will add to any existing values in the item field
- * {@code '=>'} mapping will replace any existing values in the item field
- * {@code '~>'} mapping will add *only* if item field has no existing values
+ * <ul>
+ * <li>{@code '->'} mapping will add to any existing values in the item field</li>
+ * <li>{@code '=>'} mapping will replace any existing values in the item field</li>
+ * <li>{@code '~>'} mapping will add *only* if item field has no existing values</li>
+ * </ul>
  *
- * Unmapped data (without a mapping symbol) will simply be added to the task
+ * <p>Unmapped data (without a mapping symbol) will simply be added to the task
  * result string, prepended by the XPath expression (a little prettified).
  * Each label/value pair in the result string is separated by a space,
  * unless the optional 'separator' property is defined.
  *
- * A very rudimentary facility for transformation of data is supported, e.g.
+ * <p>A very rudimentary facility for transformation of data is supported, e.g.
  *
- * {@code http://www.crossref.org/openurl/?id=\{doi:dc.relation.isversionof\}&format=unixref}
+ * <p>{@code http://www.crossref.org/openurl/?id=\{doi:dc.relation.isversionof\}&format=unixref}
  *
- * The 'doi:' prefix will cause the task to look for a 'transform' with that
+ * <p>The 'doi:' prefix will cause the task to look for a 'transform' with that
  * name, which is applied to the metadata value before parameter substitution
  * occurs. Transforms are defined in a task property such as the following:
  *
- * {@code transform.doi = match 10. trunc 60}
+ * <p>{@code transform.doi = match 10. trunc 60}
  *
- * This means exclude the value string up to the occurrence of '10.', then
+ * <p>This means exclude the value string up to the occurrence of '10.', then
  * truncate after 60 characters. The only transform functions currently defined:
  *
- * {@code 'cut' <number>} = remove number leading characters
- * {@code 'trunc' <number>} = remove trailing characters after number length
- * {@code 'match' <pattern>} = start match at pattern
- * {@code 'text' <characters>} = append literal characters (enclose in ' ' when whitespace needed)
+ * <ul>
+ * <li>{@code 'cut' <number>} = remove number leading characters</li>
+ * <li>{@code 'trunc' <number>} = remove trailing characters after number length</li>
+ * <li>{@code 'match' <pattern>} = start match at pattern</li>
+ * <li>{@code 'text' <characters>} = append literal characters (enclose in ' ' when whitespace needed)</li>
+ * </ul>
  *
- * If the transform results in an invalid state (e.g. cutting more characters
+ * <p>If the transform results in an invalid state (e.g. cutting more characters
  * than are in the value), the condition will be logged and the
  * un-transformed value used.
  *
- * Transforms may also be used in datamaps, e.g.
+ * <p>Transforms may also be used in datamaps, e.g.
  *
- * {@code //publisher/name=>shorten:dc.publisher,//romeocolour}
+ * <p>{@code //publisher/name=>shorten:dc.publisher,//romeocolour}
  *
- * which would apply the 'shorten' transform to the service response value(s)
+ * <p>which would apply the 'shorten' transform to the service response value(s)
  * prior to metadata field assignment.
  *
- * An optional property 'headers' may be defined to stipulate any HTTP headers
+ * <p>An optional property 'headers' may be defined to stipulate any HTTP headers
  * required in the service call. The property syntax is double-pipe separated headers:
  *
- * {@code Accept: text/xml||Cache-Control: no-cache}
+ * <p>{@code Accept: text/xml||Cache-Control: no-cache}
  *
  * @author richardrodgers
  */
@@ -128,9 +135,9 @@ import org.xml.sax.SAXException;
 @Suspendable
 public class MetadataWebService extends AbstractCurationTask implements NamespaceContext {
     /**
-     * log4j category
+     * logging category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataWebService.class);
+    private static final Logger log = LogManager.getLogger();
     // transform token parsing pattern
     protected Pattern ttPattern = Pattern.compile("\'([^\']*)\'|(\\S+)");
     // URL of web service with template parameters
@@ -360,42 +367,45 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
         if (transDef == null) {
             return value;
         }
-        String[] tokens = tokenize(transDef);
+        Queue<String> tokens = tokenize(transDef);
         String retValue = value;
-        for (int i = 0; i < tokens.length; i += 2) {
-            if ("cut".equals(tokens[i]) || "trunc".equals(tokens[i])) {
-                int index = Integer.parseInt(tokens[i + 1]);
+        while (!tokens.isEmpty()) {
+            String function = tokens.poll();
+            if ("cut".equals(function) || "trunc".equals(function)) {
+                String argument = tokens.poll();
+                int index = Integer.parseInt(argument);
                 if (retValue.length() > index) {
-                    if ("cut".equals(tokens[i])) {
+                    if ("cut".equals(function)) {
                         retValue = retValue.substring(index);
                     } else {
                         retValue = retValue.substring(0, index);
                     }
-                } else if ("cut".equals(tokens[i])) {
-                    log.error("requested cut: " + index + " exceeds value length");
+                } else if ("cut".equals(function)) {
+                    log.error("requested cut: {} exceeds value length", index);
                     return value;
                 }
-            } else if ("match".equals(tokens[i])) {
-                int index2 = retValue.indexOf(tokens[i + 1]);
+            } else if ("match".equals(function)) {
+                String argument = tokens.poll();
+                int index2 = retValue.indexOf(argument);
                 if (index2 > 0) {
                     retValue = retValue.substring(index2);
                 } else {
-                    log.error("requested match: " + tokens[i + 1] + " failed");
+                    log.error("requested match: {} failed", argument);
                     return value;
                 }
-            } else if ("text".equals(tokens[i])) {
-                retValue = retValue + tokens[i + 1];
+            } else if ("text".equals(function)) {
+                retValue = retValue + tokens.poll();
             } else {
-                log.error(" unknown transform operation: " + tokens[i]);
+                log.error(" unknown transform operation: " + function);
                 return value;
             }
         }
         return retValue;
     }
 
-    protected String[] tokenize(String text) {
-        List<String> list = new ArrayList<>();
+    protected Queue<String> tokenize(String text) {
         Matcher m = ttPattern.matcher(text);
+        Queue<String> list = new ArrayDeque<>(m.groupCount());
         while (m.find()) {
             if (m.group(1) != null) {
                 list.add(m.group(1));
@@ -403,7 +413,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
                 list.add(m.group(2));
             }
         }
-        return list.toArray(new String[0]);
+        return list;
     }
 
     protected int getMapIndex(String mapping) {
