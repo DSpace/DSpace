@@ -17,7 +17,9 @@ import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.rest.iiif.model.generator.CanvasItemsGenerator;
 import org.dspace.app.rest.iiif.model.generator.ContentSearchGenerator;
 import org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator;
+import org.dspace.app.rest.iiif.model.generator.ImageContentGenerator;
 import org.dspace.app.rest.iiif.model.generator.ManifestGenerator;
+import org.dspace.app.rest.iiif.model.generator.ProfileGenerator;
 import org.dspace.app.rest.iiif.model.generator.RangeGenerator;
 import org.dspace.app.rest.iiif.model.info.Info;
 import org.dspace.app.rest.iiif.model.info.Range;
@@ -101,6 +103,7 @@ public class ManifestService extends AbstractResourceService {
         Info info = utils.validateInfoForManifest(utils.getInfo(context, item, IIIF_BUNDLE), bitstreams);
         manifestGenerator.setIdentifier(getManifestId(item.getID()));
         manifestGenerator.setLabel(item.getName());
+        setLogoContainer();
         addRelated(item);
         addSearchService(item);
         addMetadata(item.getMetadata());
@@ -334,6 +337,16 @@ public class ManifestService extends AbstractResourceService {
             if (utils.checkImageMimeType(mimeType)) {
                 manifestGenerator.addThumbnail(getThumbnailAnnotation(bitstreams.get(0).getID(), mimeType));
             }
+        }
+    }
+
+    /**
+     * If the logo is defined in DSpace configuration, add to manifest
+     */
+    private void setLogoContainer() {
+        if (IIIF_LOGO_IMAGE != null) {
+            imageContent.setIdentifier(IIIF_LOGO_IMAGE);
+            manifestGenerator.addLogo(imageContent);
         }
     }
 }

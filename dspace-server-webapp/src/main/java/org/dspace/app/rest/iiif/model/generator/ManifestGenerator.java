@@ -40,6 +40,7 @@ public class ManifestGenerator implements IIIFResource {
 
     private String identifier;
     private String label;
+    private Resource<ImageContent> logo;
     private OtherContent seeAlso;
     // Becomes the "items" element in IIIF version 3.0
     private CanvasItemsGenerator sequence;
@@ -78,6 +79,10 @@ public class ManifestGenerator implements IIIFResource {
      */
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public void addLogo(ImageContentGenerator logo) {
+        this.logo = logo.getResource();
     }
 
     /**
@@ -178,6 +183,11 @@ public class ManifestGenerator implements IIIFResource {
             manifest = new Manifest(identifier, label);
         } else {
             manifest = new Manifest(identifier);
+        }
+        if (logo != null) {
+            List<ImageContent> logos = new ArrayList<>();
+            logos.add((ImageContent) logo);
+            manifest.setLogos(logos);
         }
         if (sequence != null) {
             manifest.addSequence((Sequence) sequence.getResource());

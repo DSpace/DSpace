@@ -66,7 +66,9 @@ public class ImageContentGenerator implements IIIFResource  {
         }
         // Supporting a single service for each image resource.
         List<Service> services = new ArrayList<>();
-        services.add(imageService.getService());
+        if (imageService != null) {
+            services.add(imageService.getService());
+        }
         imageContent.setServices(services);
 
         return imageContent;
