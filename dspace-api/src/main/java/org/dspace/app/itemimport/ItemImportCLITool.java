@@ -94,7 +94,7 @@ public class ItemImportCLITool {
             options.addOption("R", "resume", false,
                               "resume a failed import (add only)");
             options.addOption("q", "quiet", false, "don't display metadata");
-            options.addOption("l", "relationships", false, "process relationships manifest");
+            options.addOption("l", "relationships", false, "process relationships manifest (add only)");
 
             options.addOption("h", "help", false, "help");
 

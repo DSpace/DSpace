@@ -17,11 +17,19 @@ public class RelationshipUtils {
     }
 
     /**
-    * Matches two Entity types to a Relationship Type from a set of Relationship Types.
+     * Matches two Entity types to a Relationship Type from a set of Relationship Types.
      *
-    * @param relTypes set of Relationship Types.
-     * @param targetType entity type of target.
-     * @param originType entity type of origin referer.
+     * Given a list of Relationship Types, this method will find a Relationship Type that 
+     * is configured between the originType and the targetType, with the matching originTypeName.
+     * It will match a relationship between these two entities in either direction (eg leftward
+     * or rightward).
+     * 
+     * Example: originType = Author, targetType = Publication, originTypeName = isAuthorOfPublication. 
+     * 
+     * @param relTypes set of Relationship Types in which to find a match.
+     * @param targetType entity type of target (eg. Publication).
+     * @param originType entity type of origin referer (eg. Author).
+     * @param originTypeName the name of the relationship (eg. isAuthorOfPublication)
      * @return null or matched Relationship Type.
      */
     public static RelationshipType matchRelationshipType(List<RelationshipType> relTypes, String targetType,
