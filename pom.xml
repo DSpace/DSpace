@@ -248,9 +248,9 @@
                             <id>verify-style</id>
                             <!-- Bind to verify so it runs after package & unit tests, but before install -->
                             <phase>verify</phase>
-                            <!-- <goals>
+                            <goals>
                                 <goal>check</goal>
-                            </goals> -->
+                            </goals>
                         </execution>
                     </executions>
                     <configuration>
