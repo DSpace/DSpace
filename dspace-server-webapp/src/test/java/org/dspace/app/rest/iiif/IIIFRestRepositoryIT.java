@@ -72,7 +72,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
         // Status 500
-        getClient().perform(get("/api/iiif/" + publicItem1.getID() + "/manifest"))
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().is(500));
 
     }
@@ -105,14 +105,14 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         // Default canvas size and label.
-        getClient().perform(get("/api/iiif/" + publicItem1.getID() + "/manifest"))
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.service.profile", is("http://iiif.io/api/search/0/search")))
                 .andExpect(jsonPath("$.thumbnail.@id", Matchers.containsString("/iiif/2/"
                         + bitstream1.getID())))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
-                        Matchers.containsString("/api/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Page 1")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(1200)))
                 .andExpect(jsonPath("$.related.@id",
@@ -153,11 +153,11 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
         // Expect canvas label, width and height to match bitstream description.
-        getClient().perform(get("/api/iiif/" + publicItem1.getID() + "/manifest"))
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
-                        Matchers.containsString("/api/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Global 1")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(2000)))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].height", is(3000)))
@@ -198,11 +198,11 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
         // Expect canvas label, width and height to match bitstream description.
-        getClient().perform(get("/api/iiif/" + publicItem1.getID() + "/manifest"))
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
-                        Matchers.containsString("/api/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Custom Label")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(3163)))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].height", is(4220)))
@@ -258,12 +258,12 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
         // unless that has been changed in dspace configuration. This test assumes that DSpace
         // has been configured to return the "individuals" hint for documents to better support
         // search results in Mirador. That is the current dspace.cfg default setting.
-        getClient().perform(get("/api/iiif/" + publicItem1.getID() + "/manifest"))
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.license", is("https://license.org")))
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
-                        Matchers.containsString("/api/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Page 1")))
                 .andExpect(jsonPath("$.viewingHint", is("individuals")))
                 .andExpect(jsonPath("$.service").doesNotExist());
@@ -319,17 +319,17 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
         // expect structures elements with label and canvas id.
-        getClient().perform(get("/api/iiif/" + publicItem1.getID() + "/manifest"))
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
-                        Matchers.containsString("/api/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Global 1")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(2000)))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].height", is(3000)))
                 .andExpect(jsonPath("$.structures[1].label", is("Section 2")))
                 .andExpect(jsonPath("$.structures[1].canvases[0]",
-                        Matchers.containsString("/api/iiif/" + publicItem1.getID() + "/canvas/c2")))
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c2")))
                 .andExpect(jsonPath("$.service").exists());
     }
 
@@ -360,12 +360,12 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/iiif/" + publicItem1.getID() + "/manifest"))
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.license", is("https://license.org")))
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
-                        Matchers.containsString("/api/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Page 1")))
                 .andExpect(jsonPath("$.service").doesNotExist());
 
@@ -406,13 +406,13 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         // Expect seeAlso annotation list.
-        getClient().perform(get("/api/iiif/" + publicItem1.getID() + "/manifest"))
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.license", is("https://license.org")))
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.seeAlso.@type", is("sc:AnnotationList")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
-                        Matchers.containsString("/api/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Page 1")))
                 .andExpect(jsonPath("$.service").doesNotExist());
 
@@ -451,12 +451,12 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         // Image in the ORIGINAL bundle added as canvas; PDF ignored...
-        getClient().perform(get("/api/iiif/" + publicItem1.getID() + "/manifest"))
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.sequences[0].canvases", Matchers.hasSize(1)))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
-                        Matchers.containsString("/api/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Page 1")))
                 .andExpect(jsonPath("$.service").doesNotExist());
     }
@@ -488,7 +488,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         // Single canvas.
-        getClient().perform(get("/api/iiif/" + publicItem1.getID() + "/canvas/c0"))
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/canvas/c0"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.@type", is("sc:Canvas")))
                 .andExpect(jsonPath("$.images[0].@type", is("oa:Annotation")));
@@ -519,7 +519,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
         // Status 500.  The item contains only one bitstream. The item manifest likewise contains one canvas.
-        getClient().perform(get("/api/iiif/" + publicItem1.getID() + "/canvas/c2"))
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/canvas/c2"))
                 .andExpect(status().is(500));
     }
 
@@ -558,7 +558,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         // Expect seeAlso AnnotationList if the dspace item includes an OtherContent bundle.
-        getClient().perform(get("/api/iiif/" + publicItem1.getID() + "/manifest/seeAlso"))
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest/seeAlso"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.@type", is("sc:AnnotationList")))
                 .andExpect(jsonPath("$.resources[0].@type", is("oa:Annotation")))
