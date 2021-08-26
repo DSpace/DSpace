@@ -532,10 +532,10 @@ public final class DSpaceConfigurationService implements ConfigurationService {
             // NOTE: This MUST be added *after* the first call to getConfiguration(), as getReloadingController() is
             // not initialized until the configuration is first parsed/read.
             this.configurationBuilder.addEventListener(ConfigurationBuilderEvent.CONFIGURATION_REQUEST,
-                    // Lamba which checks reloadable configurations for any updates.
-                    // Auto-reloadable configs are ONLY those flagged config-reload="true" in the configuration definition
-                    (Event e) -> this.configurationBuilder.getReloadingController()
-                            .checkForReloading(null));
+                // Lamba which checks reloadable configurations for any updates.
+                // Auto-reloadable configs are ONLY those flagged config-reload="true" in the configuration definition
+                (Event e) -> this.configurationBuilder.getReloadingController()
+                        .checkForReloading(null));
         } catch (ConfigurationException ce) {
             log.error("Unable to load configurations based on definition at " + this.configDefinition);
             System.err.println("Unable to load configurations based on definition at " + this.configDefinition);
