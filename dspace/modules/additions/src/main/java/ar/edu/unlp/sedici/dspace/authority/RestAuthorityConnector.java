@@ -13,7 +13,7 @@ import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.json.JSONArray;
 
 public class RestAuthorityConnector {
@@ -21,8 +21,8 @@ public class RestAuthorityConnector {
 	protected static Logger log = Logger.getLogger(RestAuthorityProvider.class);
 
 	private static String getRestEndpoint() {
-		ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-		String endpoint = configurationService.getProperty("rest-authorities.endpoint.url", null);
+		ConfigurationService configurationService = new DSpace().getConfigurationService();
+		String endpoint = configurationService.getProperty("rest-authorities.rest-authorities.endpoint.url");
 		if (endpoint != null) {
 			if (endpoint.endsWith("/")) {
 				endpoint = endpoint.substring(0, endpoint.length() - 1);

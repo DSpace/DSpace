@@ -29,7 +29,10 @@ public class InstitutionsRestAuthorityProvider extends RestAuthorityProvider {
    protected final String getFatherAuthField(String field) {
        String metadataField = field.replace("_", ".");
        // Gets the value from conf file if set, else uses default value
-       String fatherAuthField = configurationService.getProperty(CHOICES_FATHER_AUTH_PREFIX + metadataField, this.FATHER_AUTH_FIELD);
+       String fatherAuthField = configurationService.getProperty(CHOICES_FATHER_AUTH_PREFIX + metadataField);
+       if (fatherAuthField == null) {
+           fatherAuthField = this.FATHER_AUTH_FIELD;
+       }
        return fatherAuthField;
    };
 
@@ -41,7 +44,10 @@ public class InstitutionsRestAuthorityProvider extends RestAuthorityProvider {
    protected final String getFatherAuthValueField(String field) {
        String metadataField = field.replace("_", ".");
        // Gets the value from conf file if set, else uses default value
-       String fatherAuthValueField = configurationService.getProperty(CHOICES_FATHER_AUTH_VALUE_PREFIX + metadataField, this.FATHER_AUTH_VALUE_FIELD);
+       String fatherAuthValueField = configurationService.getProperty(CHOICES_FATHER_AUTH_VALUE_PREFIX + metadataField);
+       if ( fatherAuthValueField == null) {
+           fatherAuthValueField = this.FATHER_AUTH_VALUE_FIELD;
+       }
        return fatherAuthValueField;
    };
 

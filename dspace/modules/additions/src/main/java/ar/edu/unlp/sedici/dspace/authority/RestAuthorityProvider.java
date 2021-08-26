@@ -5,12 +5,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.dspace.content.Collection;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.json.JSONArray;
 
 public abstract class RestAuthorityProvider implements ChoiceAuthority {
@@ -42,7 +41,7 @@ public abstract class RestAuthorityProvider implements ChoiceAuthority {
 		// Default value for text filter field
 		this.FILTER_FIELD = "title";
 		this.AUTH_KEY_PREFIX_FILTER = "";
-		this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+		this.configurationService = new DSpace().getConfigurationService();
 	}
 
 	/**
@@ -53,7 +52,10 @@ public abstract class RestAuthorityProvider implements ChoiceAuthority {
 	private String getPath(String field) {
 		String metadataField = field.replace("_", ".");
 		// Gets the value from conf file if setted, else uses default value
-		String path = configurationService.getProperty(CHOICES_ENDPOINT_PATH_PREFIX + metadataField, "");
+		String path = configurationService.getProperty(CHOICES_ENDPOINT_PATH_PREFIX + metadataField);
+		if (path == null) {
+		    path = "";
+		}
 		return path;
 	};
 
@@ -65,8 +67,10 @@ public abstract class RestAuthorityProvider implements ChoiceAuthority {
 	protected final String getFilterField(String field) {
 		String metadataField = field.replace("_", ".");
 		// Gets the value from conf file if setted, else uses default value
-		String filterField = configurationService.getProperty(CHOICES_FILTER_FIELD_PREFIX + metadataField,
-				this.FILTER_FIELD);
+		String filterField = configurationService.getProperty(CHOICES_FILTER_FIELD_PREFIX + metadataField);
+		if (filterField == null) {
+		    filterField = this.FILTER_FIELD;
+		}
 		return filterField;
 	}
 
@@ -79,7 +83,10 @@ public abstract class RestAuthorityProvider implements ChoiceAuthority {
 	protected final String getIdField(String field) {
 		String metadataField = field.replace("_", ".");
 		// Gets the value from conf file if set, else uses default value
-		String idField = configurationService.getProperty(CHOICES_ID_FIELD_PREFIX + metadataField, this.ID_FIELD);
+		String idField = configurationService.getProperty(CHOICES_ID_FIELD_PREFIX + metadataField);
+		if (idField == null) {
+		    idField = this.ID_FIELD;
+		}
 		return idField;
 	};
 
@@ -92,7 +99,10 @@ public abstract class RestAuthorityProvider implements ChoiceAuthority {
    protected final String getAuthKeyPrefixFilter(String field) {
        String metadataField = field.replace("_", ".");
        // Gets the value from conf file if set, else uses default value
-       String authKeyPrefix = configurationService.getProperty(CHOICES_AUTH_KEY_PREFIX + metadataField, this.AUTH_KEY_PREFIX_FILTER);
+       String authKeyPrefix = configurationService.getProperty(CHOICES_AUTH_KEY_PREFIX + metadataField);
+       if (authKeyPrefix == null) {
+           authKeyPrefix = this.AUTH_KEY_PREFIX_FILTER;
+       }
        return authKeyPrefix;
    };
 
@@ -140,14 +150,14 @@ public abstract class RestAuthorityProvider implements ChoiceAuthority {
 	}
 
     @Override
-	public final Choices getMatches(String field, String text, Collection collection, int start, int limit,
+	public final Choices getMatches(String field, String text, int collection, int start, int limit,
 			String locale) {
 		Choice[] choices = this.doChoicesTextQuery(field, text);
 		return new Choices(choices, start, limit, Choices.CF_ACCEPTED, false);
 	}
 
 	@Override
-	public final Choices getBestMatch(String field, String text, Collection collection, String locale) {
+	public final Choices getBestMatch(String field, String text, int collection, String locale) {
 		return this.getMatches(field, text, collection, 0, 1, locale);
 	}
 
