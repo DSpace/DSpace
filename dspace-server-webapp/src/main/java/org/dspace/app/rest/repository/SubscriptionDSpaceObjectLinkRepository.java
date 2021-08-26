@@ -15,6 +15,7 @@ import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.service.SubscribeService;
@@ -45,10 +46,13 @@ public class SubscriptionDSpaceObjectLinkRepository extends AbstractDSpaceRestRe
             if (subscription == null) {
                 throw new ResourceNotFoundException("No such subscription: " + subscriptionId);
             }
-            HibernateProxy hibernateProxy = (HibernateProxy) subscription.getdSpaceObject();
-            LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
-
-            return converter.toRest(initializer.getImplementation(), projection);
+            if (subscription.getdSpaceObject() instanceof Item) {
+                return converter.toRest(subscription.getdSpaceObject(), projection);
+            } else {
+                HibernateProxy hibernateProxy = (HibernateProxy) subscription.getdSpaceObject();
+                LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
+                return converter.toRest(initializer.getImplementation(), projection);
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } catch (AuthorizeException e) {

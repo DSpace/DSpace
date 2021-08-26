@@ -35,6 +35,7 @@ public class SubscriptionConverter implements DSpaceConverter<Subscription, Subs
     @Override
     public SubscriptionRest convert(Subscription subscription, Projection projection) {
         SubscriptionRest rest = new SubscriptionRest();
+        rest.setProjection(projection);
         rest.setId(subscription.getID());
         List<SubscriptionParameterRest> subscriptionParameterRestList = new ArrayList<>();
         for (SubscriptionParameter subscriptionParameter : subscription.getSubscriptionParameterList()) {

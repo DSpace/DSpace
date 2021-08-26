@@ -245,6 +245,98 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isInternalServerError());
     }
 
+    @Test
+    public void findByIdAsAdministratorEmbedDSO() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String token = getAuthToken(admin.getEmail(), password);
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter");
+        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, admin, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+        //When we call the root endpoint
+        getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID()+"?embed=dSpaceObject"))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                //By default we expect at least 1 submission forms so this to be reflected in the page object
+                .andExpect(jsonPath("$.subscriptionType", is("TestType")))
+                .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Parameter")))
+                .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("ValueParameter")))
+                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions/" + subscription.getID())))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")))
+                .andExpect(jsonPath("$._embedded.dSpaceObject.id", is(publicItem.getID().toString())))
+                .andExpect(jsonPath("$._embedded.dSpaceObject.name",is(publicItem.getName())));
+    }
+    @Test
+    public void findByIdAsAdministratorEmbedEPerson() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String token = getAuthToken(admin.getEmail(), password);
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter");
+        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, admin, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+        //When we call the root endpoint
+        getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID()+"?embed=ePerson"))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                //By default we expect at least 1 submission forms so this to be reflected in the page object
+                .andExpect(jsonPath("$.subscriptionType", is("TestType")))
+                .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Parameter")))
+                .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("ValueParameter")))
+                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions/" + subscription.getID())))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")))
+                .andExpect(jsonPath("$._embedded.ePerson.id", is(admin.getID().toString())))
+                .andExpect(jsonPath("$._embedded.ePerson.name",is(admin.getName())));
+    }
+    @Test
+    public void findByIdAsAdministratorProjectionFull() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String token = getAuthToken(admin.getEmail(), password);
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter");
+        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, admin, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+        //When we call the root endpoint
+        getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID()+"?projection=full"))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                //By default we expect at least 1 submission forms so this to be reflected in the page object
+                .andExpect(jsonPath("$.subscriptionType", is("TestType")))
+                .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Parameter")))
+                .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("ValueParameter")))
+                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions/" + subscription.getID())))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")))
+                .andExpect(jsonPath("$._embedded.ePerson.id", is(admin.getID().toString())))
+                .andExpect(jsonPath("$._embedded.ePerson.name",is(admin.getName())))
+                .andExpect(jsonPath("$._embedded.ePerson.type",is("eperson")))
+                .andExpect(jsonPath("$._embedded.dSpaceObject.id", is(publicItem.getID().toString())))
+                .andExpect(jsonPath("$._embedded.dSpaceObject.name",is(publicItem.getName())))
+                .andExpect(jsonPath("$._embedded.dSpaceObject.type",is("item")));
+
+    }
     // FIND ALL BY EPERSON/DSO
     @Test
     public void findAllSubscriptionsByEPerson() throws Exception {
@@ -324,7 +416,6 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].value", is("ValueParameter1")));
 
     }
-
     // ADD
     @Test
     public void addSubscriptionNotLoggedIn() throws Exception {
