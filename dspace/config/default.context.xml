@@ -2,6 +2,6 @@
 <Context debug="0" reloadable="true" crossContext="true">
 	<WatchedResource>WEB-INF/web.xml</WatchedResource>
 	<Parameter name="dspace.dir" override="false"
-		value="${dspace.dir}"
-		description="Path to the DSpace home directory." />
+			   value="${dspace.dir}"
+			   description="Path to the DSpace home directory." />
 </Context>

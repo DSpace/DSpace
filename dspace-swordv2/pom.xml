@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>cris-2021.01.01-SNAPSHOT</version>
+        <version>cris-2021.01.02-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 

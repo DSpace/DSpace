@@ -142,6 +142,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private DCInputsReader reader;
 
+    private BulkImportTransformerService bulkImportTransformerService;
 
     private String collectionId;
 
@@ -167,6 +168,8 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         this.itemSearchService = new DSpace().getSingletonService(ItemSearchService.class);
         this.validationService = ValidationServiceFactory.getInstance().getValidationService();
         this.workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
+        this.bulkImportTransformerService = new DSpace().getServiceManager().getServiceByName(
+               BulkImportTransformerService.class.getName(), BulkImportTransformerService.class);
 
         try {
             this.reader = new DCInputsReader();
@@ -648,6 +651,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
             String language = getMetadataLanguage(field);
             MetadataField metadataField = metadataFieldService.findByString(context, getMetadataField(field), '.');
             for (MetadataValueVO metadataValue : metadata.get(field)) {
+                metadataValue = bulkImportTransformerService.converter(context, field, metadataValue);
                 String authority = metadataValue.getAuthority();
                 int confidence = metadataValue.getConfidence();
                 String value = metadataValue.getValue();
