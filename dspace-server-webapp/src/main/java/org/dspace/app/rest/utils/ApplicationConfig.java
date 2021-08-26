@@ -34,13 +34,18 @@ public class ApplicationConfig {
 
     // Allowed IIIF CORS origins ("Access-Control-Allow-Origin" header)
     // Can be overridden in DSpace configuration
-    @Value("${rest.iiif.cors.allowed-origins}")
-    private String[] corsIiifAllowedOrigins;
+    @Value("${iiif.cors.allowed-origins}")
+    private String[] iiifCorsAllowedOrigins;
 
     // Whether to allow credentials (cookies) in CORS requests ("Access-Control-Allow-Credentials" header)
     // Defaults to true. Can be overridden in DSpace configuration
     @Value("${rest.cors.allow-credentials:true}")
     private boolean corsAllowCredentials;
+
+    // Whether to allow credentials (cookies) in CORS requests ("Access-Control-Allow-Credentials" header)
+    // Defaults to true. Can be overridden in DSpace configuration
+    @Value("${iiif.cors.allow-credentials:true}")
+    private boolean iiifCAllowCredentials;
 
     // Configured User Interface URL (default: http://localhost:4000)
     @Value("${dspace.ui.url:http://localhost:4000}")
@@ -84,7 +89,7 @@ public class ApplicationConfig {
      * @return allowed origins
      */
     public String[] getIiifAllowedOriginsConfig() {
-        return this.corsIiifAllowedOrigins;
+        return this.iiifCorsAllowedOrigins;
     }
 
     /**
@@ -93,6 +98,15 @@ public class ApplicationConfig {
      * @return true or false
      */
     public boolean getCorsAllowCredentials() {
+        return corsAllowCredentials;
+    }
+
+    /**
+     * Return whether to allow credentials (cookies) on IIIF requests. This is used to set the
+     * CORS "Access-Control-Allow-Credentials" header in Application class. Defaults to false.
+     * @return true or false
+     */
+    public boolean getIiifAllowCredentials() {
         return corsAllowCredentials;
     }
 }
