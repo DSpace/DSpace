@@ -265,10 +265,11 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Parameter");
         subscriptionParameter.setValue("ValueParameter");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, admin, subscriptionParameterList).build();
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, admin,
+            subscriptionParameterList).build();
         context.restoreAuthSystemState();
         //When we call the root endpoint
-        getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID()+"?embed=dSpaceObject"))
+        getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID() + "?embed=dSpaceObject"))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
@@ -277,10 +278,13 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$.subscriptionType", is("TestType")))
                 .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Parameter")))
                 .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("ValueParameter")))
-                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions/" + subscription.getID())))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(
+                    REST_SERVER_URL + "core/subscriptions/" + subscription.getID())))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(
+                    REST_SERVER_URL + "core/subscriptions")))
                 .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(
+                    REST_SERVER_URL + "core/subscriptions")))
                 .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")))
                 .andExpect(jsonPath("$._embedded.dSpaceObject.id", is(publicItem.getID().toString())))
                 .andExpect(jsonPath("$._embedded.dSpaceObject.name",is(publicItem.getName())));
@@ -294,10 +298,11 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Parameter");
         subscriptionParameter.setValue("ValueParameter");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, admin, subscriptionParameterList).build();
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem,
+            admin, subscriptionParameterList).build();
         context.restoreAuthSystemState();
         //When we call the root endpoint
-        getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID()+"?embed=ePerson"))
+        getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID() + "?embed=ePerson"))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
@@ -306,10 +311,13 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$.subscriptionType", is("TestType")))
                 .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Parameter")))
                 .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("ValueParameter")))
-                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions/" + subscription.getID())))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(
+                    REST_SERVER_URL + "core/subscriptions/" + subscription.getID())))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(
+                    REST_SERVER_URL + "core/subscriptions")))
                 .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(
+                    REST_SERVER_URL + "core/subscriptions")))
                 .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")))
                 .andExpect(jsonPath("$._embedded.ePerson.id", is(admin.getID().toString())))
                 .andExpect(jsonPath("$._embedded.ePerson.name",is(admin.getName())));
@@ -323,10 +331,11 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Parameter");
         subscriptionParameter.setValue("ValueParameter");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, admin, subscriptionParameterList).build();
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType",
+            publicItem, admin, subscriptionParameterList).build();
         context.restoreAuthSystemState();
         //When we call the root endpoint
-        getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID()+"?projection=full"))
+        getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID() + "?projection=full"))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
@@ -335,10 +344,13 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$.subscriptionType", is("TestType")))
                 .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Parameter")))
                 .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("ValueParameter")))
-                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions/" + subscription.getID())))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(
+                    REST_SERVER_URL + "core/subscriptions/" + subscription.getID())))
+                .andExpect(jsonPath("$._links.dSpaceObject.href",
+                    Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
                 .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.ePerson.href",
+                    Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
                 .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")))
                 .andExpect(jsonPath("$._embedded.ePerson.id", is(admin.getID().toString())))
                 .andExpect(jsonPath("$._embedded.ePerson.name",is(admin.getName())))
