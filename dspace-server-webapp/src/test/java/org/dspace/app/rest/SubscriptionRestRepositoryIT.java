@@ -448,6 +448,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                         is("ValueParameter1")));
 
     }
+
     // ADD
     @Test
     public void addSubscriptionNotLoggedIn() throws Exception {
