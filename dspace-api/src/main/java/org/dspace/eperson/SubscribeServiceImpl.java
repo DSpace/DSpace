@@ -237,4 +237,8 @@ public class SubscribeServiceImpl implements SubscribeService {
         }
 
     }
+    @Override
+    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context, String type, String frequencyValue) throws SQLException {
+        return subscriptionDAO.findAllSubscriptionsByTypeAndFrequency(context, type, frequencyValue);
+    }
 }

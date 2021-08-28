@@ -13,6 +13,7 @@ import java.util.List;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
 import org.dspace.content.DSpaceObject;
@@ -20,6 +21,8 @@ import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
+import org.dspace.eperson.SubscriptionParameter;
+import org.dspace.eperson.SubscriptionParameter_;
 import org.dspace.eperson.Subscription_;
 import org.dspace.eperson.dao.SubscriptionDAO;
 
@@ -124,5 +127,20 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
         orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.id)));
         criteriaQuery.orderBy(orderList);
         return list(context, criteriaQuery, false, Subscription.class, limit, offset);
+    }
+    @Override
+    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context, String type, String frequencyValue) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
+        Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
+        criteriaQuery.select(subscriptionRoot);
+        criteriaQuery.where(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.TYPE), type));
+        Join<Subscription, SubscriptionParameter> childJoin = subscriptionRoot.join("subscriptionParameterList" );
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(childJoin.get(SubscriptionParameter_.name), "frequence")));
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(childJoin.get(SubscriptionParameter_.value), frequencyValue)));
+        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.ePerson)));
+        criteriaQuery.orderBy(orderList);
+        return list(context, criteriaQuery, false, Subscription.class, -1, -1);
     }
 }

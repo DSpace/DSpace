@@ -152,4 +152,19 @@ public class DiscoveryConfigurationService {
             }
         }
     }
+
+    /**
+     * Retrieves a list of all DiscoveryConfiguration objects where key starts with prefixConfigurationName
+     * @param prefixConfigurationName string as prefix key
+     */
+    public List<DiscoveryConfiguration> getDiscoveryConfigurationWithPrefixName(final String prefixConfigurationName) {
+        List<DiscoveryConfiguration> discoveryConfigurationList = new ArrayList<>();
+        if (StringUtils.isNotBlank(prefixConfigurationName)) {
+            for (String key : map.keySet()) {
+                DiscoveryConfiguration config = map.get(key);
+                discoveryConfigurationList.add(config);
+            }
+        }
+        return discoveryConfigurationList;
+    }
 }

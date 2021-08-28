@@ -110,7 +110,6 @@
     <bean class="org.dspace.harvest.OAIHarvesterValidatorImpl"/>
     <bean class="org.dspace.harvest.OAIHarvesterEmailSenderImpl"/>
     <bean class="org.dspace.harvest.OAIHarvesterXlsReportGeneratorImpl"/>
-    
 
     <bean class="org.dspace.identifier.DOIServiceImpl"/>
 
@@ -162,7 +161,7 @@
     
     <bean class="org.dspace.content.security.CrisSecurityServiceImpl" />
 
-    <bean class="org.dspace.app.metrics.service.CrisMetricsServiceImpl" />
-
+    <bean class="org.dspace.app.metrics.service.CrisMetricsServiceImpl"/>
+    <bean class="org.dspace.app.util.DiscoverQueryBuilder"/>
 </beans>
 
