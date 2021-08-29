@@ -16,7 +16,6 @@ import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
@@ -39,6 +38,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 /**
@@ -89,11 +89,11 @@ public class SubscriptionEmailNotificationService {
                     }
                     iterator++;
                 }
-                List listmerged = ListUtils.union(collectionUpdates, collectionUpdates);
+                List listmerged = ListUtils.union(communitiesUpdates, collectionUpdates);
                 List listmergedFinal = ListUtils.union(listmerged, itemUpdates);
                 for (EPerson ePerson : ePersonList) {
                     // generate mail for type content
-                    generators.get("content").notifyForSubscriptions(context, ePerson, listmergedFinal);
+                    generators.get(type).notifyForSubscriptions(context, ePerson, listmergedFinal);
                 }
             } else {
                 int iterator = 0;
@@ -114,7 +114,7 @@ public class SubscriptionEmailNotificationService {
                     iterator++;
                 }
                 for (EPerson ePerson : ePersonList) {
-                    generators.get("statistics").notifyForSubscriptions(context, ePerson, crisMetricsList);
+                    generators.get(type).notifyForSubscriptions(context, ePerson, crisMetricsList);
                 }
             }
         } catch (Exception e) {
@@ -135,7 +135,7 @@ public class SubscriptionEmailNotificationService {
         return null;
     }
 
-//    public SubscriptionEmailNotificationService(LinkedHashMap<String, ContentGenerator> generators) {
+    //    public SubscriptionEmailNotificationService(LinkedHashMap<String, ContentGenerator> generators) {
 //        System.out.println(generators);
 //    }
 }

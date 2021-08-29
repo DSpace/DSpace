@@ -10,6 +10,14 @@ package org.dspace.subscriptions;
 
 
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
@@ -18,6 +26,9 @@ import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.subscriptions.service.SubscriptionGenerator;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,7 +45,7 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
     private final Logger log = org.apache.logging.log4j.LogManager.getLogger(ContentGenerator.class);
 
     @Override
-    public void notifyForSubscriptions(Context c, EPerson ePerson, List<IndexableObject> dSpaceObjectListForContentType) {
+    public void notifyForSubscriptions(Context c, EPerson ePerson, List<IndexableObject> indexableObjects) {
         try {
             // send the notification to the user
             if (ePerson != null) {
@@ -43,7 +54,8 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
                 Locale supportedLocale = I18nUtil.getEPersonLocale(ePerson);
                 Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_reject"));
                 email.addRecipient(ePerson.getEmail());
-                email.setContent("", "");
+                email.addAttachment(generateExcel(indexableObjects), "Attachment");
+                email.setContent("Subscriptions", "");
                 email.send();
             } else {
                 // DO nothing
@@ -63,7 +75,52 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
 
         return submitter;
     }
-//    public ContentGenerator(LinkedHashMap<String, DSpaceObjectUpdates> updates) {
-//        System.out.println(updates);
-//    }
+
+    private File generateExcel(List<IndexableObject> indexableObjects) {
+        Workbook workbook = new HSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Subscription Test");
+        int rowCount = 0;
+        // datas are ordered communities -> collections -> items
+        boolean comm = false;
+        boolean coll = false;
+        boolean items = false;
+        for (IndexableObject indexableObject : indexableObjects) {
+            // for each object add a row
+            if (indexableObject.getType().equals(Community.class.getSimpleName()) || !comm) {
+                Row sheetRow = sheet.createRow(rowCount++);
+                Cell cell = sheetRow.createCell(1);
+                cell.setCellValue("List of changed communities");
+                comm = true;
+                rowCount++;
+            }
+            if (indexableObject.getType().equals(Collection.class.getSimpleName()) || !coll) {
+                Row sheetRow = sheet.createRow(rowCount++);
+                Cell cell = sheetRow.createCell(1);
+                cell.setCellValue("List of changed collections");
+                coll = true;
+                rowCount++;
+            }
+            if (indexableObject.getType().equals(Item.class.getSimpleName()) || !items) {
+                Row sheetRow = sheet.createRow(rowCount++);
+                Cell cell = sheetRow.createCell(1);
+                cell.setCellValue("List of changed items");
+                items = true;
+                rowCount++;
+            }
+            Row sheetRow = sheet.createRow(rowCount);
+            Cell cell = sheetRow.createCell(1);
+            cell.setCellValue("Name");
+            rowCount++;
+        }
+        try {
+            File file = File.createTempFile("Report", "xlsx");
+            FileOutputStream fileOut = new FileOutputStream(file);
+            workbook.write(fileOut);
+            return file;
+        } catch (IOException ioException) {
+            log.error(ioException.getMessage());
+        }
+        return null;
+    }
+
 }

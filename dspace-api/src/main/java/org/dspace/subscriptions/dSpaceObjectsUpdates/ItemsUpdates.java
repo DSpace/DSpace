@@ -63,7 +63,8 @@ public class ItemsUpdates implements DSpaceObjectUpdates {
     public List<IndexableObject> findUpdates(Context context, DSpaceObject dSpaceObject, String frequency) {
         List<IndexableObject> list = new ArrayList<>();
         // entity type found
-        String inverseRelationName = "RELATION" + dSpaceObject.getName();
+//        String inverseRelationName = "RELATION" + dSpaceObject.getName();
+        String inverseRelationName = "RELATION" + "Item";
         List<DiscoveryConfiguration> discoveryConfigurationList = searchConfigurationService.getDiscoveryConfigurationWithPrefixName(inverseRelationName);
         DiscoverQuery discoverQuery = null;
         DiscoverResult searchResult = null;
@@ -71,6 +72,7 @@ public class ItemsUpdates implements DSpaceObjectUpdates {
         try {
             for (DiscoveryConfiguration discoveryConfiguration : discoveryConfigurationList) {
                 discoverQuery = discoverQueryBuilder.buildQuery(context, indexableObject, discoveryConfiguration, null, null, "ITEM");
+                discoverQuery.addFilterQueries("lastModified_dt:" + this.findLastFrequency(frequency));
                 searchResult = searchService.search(context, discoverQuery);
                 list.addAll(searchResult.getIndexableObjects());
             }

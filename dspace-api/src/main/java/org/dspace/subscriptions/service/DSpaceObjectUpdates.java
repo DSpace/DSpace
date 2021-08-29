@@ -12,11 +12,11 @@ import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchServiceException;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Calendar;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 
 /**
@@ -35,19 +35,29 @@ public interface DSpaceObjectUpdates {
      */
     public List<IndexableObject> findUpdates(Context context, DSpaceObject dSpaceObject, String frequency) throws SearchServiceException;
 
-    default LocalDate findLastFrequency(String frequency) {
-        LocalDate now = LocalDate.now(); // now
-        Calendar cal = Calendar.getInstance();
+    default String findLastFrequency(String frequency) {
+        GregorianCalendar localCalendar = new GregorianCalendar(2021, 3, 5);
+        localCalendar.setTime(new Date());
+        TimeZone utcZone = TimeZone.getTimeZone("UTC");
+        // Full ISO 8601 is e.g. "2009-07-16T13:59:21Z"
+        SimpleDateFormat fullIsoStart = new SimpleDateFormat("yyyy-MM-dd'T'00:00:00'Z'");
+        SimpleDateFormat fullIsoEnd = new SimpleDateFormat("yyyy-MM-dd'T'23:59:59'Z'");
+        localCalendar.setTimeZone(utcZone);
+        // Now set the UTC equivalent.
         switch (frequency) {
             case "daily":
-                return now.minusDays(1);
+                localCalendar.add(GregorianCalendar.DAY_OF_YEAR, -1);
+                break;
             case "monthly":
-                return now.minusMonths(1);
+                localCalendar.add(GregorianCalendar.MONTH, -1);
+                break;
             case "weekly":
-                return now.minusWeeks(1);
+                localCalendar.add(GregorianCalendar.WEEK_OF_MONTH, -1);
+                break;
             default:
                 return null;
         }
+        return "[" + fullIsoStart.format(localCalendar.getTime()) + " TO " + fullIsoEnd.format(localCalendar.getTime()) + "]";
     }
 
 }

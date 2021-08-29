@@ -47,10 +47,12 @@ public class SubscriptionEmailNotificationConfiguration<T
     public Options getOptions() {
         if (options == null) {
             Options options = new Options();
-            options.addOption("t", "Type", false,
+            options.addOption("t", "Type", true,
                     "Subscription type");
-            options.addOption("f", "Frequence", false,
-                    "Subscription frequence");
+            options.getOption("t").setRequired(true);
+            options.addOption("f", "Frequency", true,
+                    "Subscription frequency");
+            options.getOption("f").setRequired(true);
             super.options = options;
         }
         return options;
