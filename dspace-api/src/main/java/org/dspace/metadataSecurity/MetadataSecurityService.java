@@ -5,8 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.converter;
-
+package org.dspace.metadataSecurity;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,15 +18,11 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.MetadataValueList;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -35,9 +30,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSecurityEvaluation;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.GroupService;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutFieldMetadata;
@@ -47,33 +40,28 @@ import org.dspace.layout.service.CrisLayoutBoxAccessService;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
- * This is the converter from/to the Item in the DSpace API data model and the
- * REST data model
- *
- * @author Andrea Bollini (andrea.bollini at 4science.it)
- */
-@Component
-public class ItemConverter
-        extends DSpaceObjectConverter<Item, ItemRest>
-        implements IndexableObjectConverter<Item, ItemRest> {
+* @author Mykhaylo Boychuk (4science.it)
+*/
+public class MetadataSecurityService {
 
-    @Autowired
-    private ItemService itemService;
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataSecurityService.class);
 
     @Resource(name = "securityLevelsMap")
     private final Map<String, MetadataSecurityEvaluation> securityLevelsMap = new HashMap<>();
 
     @Autowired
-    private CrisLayoutBoxService crisLayoutBoxService;
+    private ItemService itemService;
 
     @Autowired
     private AuthorizeService authorizeService;
 
     @Autowired
-    GroupService groupService;
+    private CrisLayoutBoxService crisLayoutBoxService;
+
+    @Autowired
+    private MetadataExposureService metadataExposureService;
 
     @Autowired
     private CrisLayoutBoxAccessService crisLayoutBoxAccessService;
@@ -81,48 +69,16 @@ public class ItemConverter
     @Autowired
     private RequestService requestService;
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
-
-    @Override
-    public ItemRest convert(Item obj, Projection projection) {
-        ItemRest item = super.convert(obj, projection);
-        item.setInArchive(obj.isArchived());
-        item.setDiscoverable(obj.isDiscoverable());
-        item.setWithdrawn(obj.isWithdrawn());
-        item.setLastModified(obj.getLastModified());
-
-        List<MetadataValue> entityTypes =
-            itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
-        if (CollectionUtils.isNotEmpty(entityTypes) && StringUtils.isNotBlank(entityTypes.get(0).getValue())) {
-            item.setEntityType(entityTypes.get(0).getValue());
-        }
-
-        return item;
-    }
-
-    /**
-     * Retrieves the metadata list filtered according to the hidden metadata configuration
-     * When the context is null, it will return the metadatalist as for an anonymous user
-     * Overrides the parent method to include virtual metadata
-     * @param context The context
-     * @param obj     The object of which the filtered metadata will be retrieved
-     * @return A list of object metadata (including virtual metadata) filtered based on the the hidden metadata
-     * configuration
-     */
-    @Override
-    public MetadataValueList getPermissionFilteredMetadata(Context context, Item obj) {
-        List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
+    // TODO this method id duplicate of @ItemConverter#getPermissionFilteredMetadata(Context context, Item obj)
+    public List<MetadataValue> getPermissionFilteredMetadata(Context context, Item obj, List<MetadataValue> fullList) {
 
         List<MetadataValue> returnList = new LinkedList<>();
         String entityType = itemService.getMetadataFirstValue(obj, "dspace", "entity", "type", Item.ANY);
-
         try {
-
             if (obj.isWithdrawn() && (Objects.isNull(context) ||
                 Objects.isNull(context.getCurrentUser()) || !authorizeService.isAdmin(context))) {
-                return new MetadataValueList(new ArrayList<MetadataValue>());
+                return new ArrayList<MetadataValue>();
             }
-
             List<CrisLayoutBox> boxes;
             if (context != null) {
                 boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 1000, 0);
@@ -153,52 +109,15 @@ public class ItemConverter
         } catch (SQLException e ) {
             log.error("Error filtering item metadata based on permissions", e);
         }
-        return new MetadataValueList(returnList);
+        return returnList;
     }
 
+    // TODO this method id duplicate of @ItemConverter#checkMetadataFieldVisibility(context, item, metadataField)
     public boolean checkMetadataFieldVisibility(Context context, Item item,
             MetadataField metadataField) throws SQLException {
         String entityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
         List<CrisLayoutBox> boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 1000, 0);
         return checkMetadataFieldVisibility(context, boxes, item, metadataField);
-    }
-
-    private Optional<List<DCInputSet>> submissionDefinitionInputs() {
-        return Optional.ofNullable(requestService.getCurrentRequest())
-                .map(rq -> (String )rq.getAttribute("submission-name"))
-                .map(this::dcInputsSet);
-    }
-
-    // private method to catch checked exception that might occur during a lambda call
-    private List<DCInputSet> dcInputsSet(final String sd) {
-        final DCInputsReader dcInputsReader;
-        try {
-            dcInputsReader = new DCInputsReader();
-            return dcInputsReader.getInputsBySubmissionName(sd);
-
-        } catch (DCInputsReaderException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    private MetadataValueList fromSubmissionDefinition(Context context, List<CrisLayoutBox> boxes, Item item,
-            final List<DCInputSet> dcInputSets, final List<MetadataValue> fullList) {
-
-        Predicate<MetadataValue> inDcInputs = mv -> dcInputSets.stream()
-                .anyMatch((dc) -> {
-                    try {
-                        return dc.isFieldPresent(mv.getMetadataField().toString('.')) ||
-                                checkMetadataFieldVisibilityByBoxes(context, boxes, item, mv.getMetadataField());
-                    } catch (SQLException e) {
-                        return false;
-                    }
-                });
-
-        List<MetadataValue> metadataFields = fullList.stream()
-                                                     .filter(inDcInputs)
-                                                     .collect(Collectors.toList());
-
-        return new MetadataValueList(metadataFields);
     }
 
     private boolean checkMetadataFieldVisibility(Context context, List<CrisLayoutBox> boxes, Item item,
@@ -248,6 +167,21 @@ public class ItemConverter
         return false;
     }
 
+    private List<MetadataField> getPublicMetadata(List<CrisLayoutBox> boxes) {
+        List<MetadataField> publicMetadata = new ArrayList<MetadataField>();
+        for (CrisLayoutBox box : boxes) {
+            if (box.getSecurity() == LayoutSecurity.PUBLIC.getValue()) {
+                List<CrisLayoutField> crisLayoutFields = box.getLayoutFields();
+                for (CrisLayoutField field : crisLayoutFields) {
+                    if (field instanceof CrisLayoutFieldMetadata) {
+                        publicMetadata.add(field.getMetadataField());
+                    }
+                }
+            }
+        }
+        return publicMetadata;
+    }
+
     private List<CrisLayoutBox> getBoxesWithMetadataFieldExcludedPublic(MetadataField metadataField,
             List<CrisLayoutBox> boxes) {
         List<CrisLayoutBox> boxesWithMetadataField = new LinkedList<CrisLayoutBox>();
@@ -281,37 +215,41 @@ public class ItemConverter
         return false;
     }
 
-    private List<MetadataField> getPublicMetadata(List<CrisLayoutBox> boxes) {
-        List<MetadataField> publicMetadata = new ArrayList<MetadataField>();
-        for (CrisLayoutBox box : boxes) {
-            if (box.getSecurity() == LayoutSecurity.PUBLIC.getValue()) {
-                List<CrisLayoutField> crisLayoutFields = box.getLayoutFields();
-                for (CrisLayoutField field : crisLayoutFields) {
-                    if (field instanceof CrisLayoutFieldMetadata) {
-                        publicMetadata.add(field.getMetadataField());
-                    }
-                }
-            }
+    private Optional<List<DCInputSet>> submissionDefinitionInputs() {
+        return Optional.ofNullable(requestService.getCurrentRequest())
+                .map(rq -> (String )rq.getAttribute("submission-name"))
+                .map(this::dcInputsSet);
+    }
+
+    // private method to catch checked exception that might occur during a lambda call
+    private List<DCInputSet> dcInputsSet(final String sd) {
+        final DCInputsReader dcInputsReader;
+        try {
+            dcInputsReader = new DCInputsReader();
+            return dcInputsReader.getInputsBySubmissionName(sd);
+
+        } catch (DCInputsReaderException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
-        return publicMetadata;
     }
 
-    @Override
-    protected ItemRest newInstance() {
-        return new ItemRest();
-    }
-
-    @Override
-    public Class<Item> getModelClass() {
-        return Item.class;
-    }
-
-    @Override
-    public boolean supportsModel(IndexableObject idxo) {
-        return idxo.getIndexedObject() instanceof Item;
+    private List<MetadataValue> fromSubmissionDefinition(Context context, List<CrisLayoutBox> boxes, Item item,
+            final List<DCInputSet> dcInputSets, final List<MetadataValue> fullList) {
+        Predicate<MetadataValue> inDcInputs = mv -> dcInputSets.stream().anyMatch((dc) -> {
+            try {
+                return dc.isFieldPresent(mv.getMetadataField().toString('.'))
+                        || checkMetadataFieldVisibilityByBoxes(context, boxes, item, mv.getMetadataField());
+            } catch (SQLException e) {
+                return false;
+            }
+        });
+        return fullList.stream()
+                       .filter(inDcInputs)
+                       .collect(Collectors.toList());
     }
 
     public MetadataSecurityEvaluation mapBetweenSecurityLevelAndClassSecurityLevel(int securityValue) {
         return securityLevelsMap.get(securityValue + "");
     }
+
 }
