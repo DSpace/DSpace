@@ -43,9 +43,8 @@ public interface ItemService
     public Thumbnail getThumbnail(Context context, Item item, boolean requireOriginal) throws SQLException;
 
     /**
-     * Create a new item, with a new internal ID. This method is not public,
-     * since items need to be created as workspace items. Authorisation is the
-     * responsibility of the caller.
+     * Create a new item, with a new internal ID. Authorization is done
+     * inside of this method.
      *
      * @param context       DSpace context object
      * @param workspaceItem in progress workspace item
@@ -56,9 +55,8 @@ public interface ItemService
     public Item create(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException;
 
     /**
-     * Create a new item, with a provided ID. This method is not public,
-     * since items need to be created as workspace items. Authorisation is the
-     * responsibility of the caller.
+     * Create a new item, with a provided ID. Authorisation is done
+     * inside of this method.
      *
      * @param context DSpace context object
      * @param workspaceItem in progress workspace item

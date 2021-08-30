@@ -132,6 +132,12 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     }
 
+    /**
+     * Takes a pre-determined UUID to be passed to the object to allow for the
+     * restoration of previously defined UUID's.
+     *
+     * @param uuid Takes a uuid to be passed to the Pre-Defined UUID Generator
+     */
     protected Item(UUID uuid) {
         this.predefinedUUID = uuid;
     }
