@@ -176,6 +176,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public Item create(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
+        authorizeService.authorizeAction(context, workspaceItem.getCollection(), Constants.ADD);
         if (workspaceItem.getItem() != null) {
             throw new IllegalArgumentException(
                 "Attempting to create an item for a workspace item that already contains an item");
@@ -193,6 +194,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public Item create(Context context, WorkspaceItem workspaceItem,
                        UUID uuid) throws SQLException, AuthorizeException {
+        authorizeService.authorizeAction(context, workspaceItem.getCollection(), Constants.ADD);
         if (workspaceItem.getItem() != null) {
             throw new IllegalArgumentException(
                     "Attempting to create an item for a workspace item that already contains an item");

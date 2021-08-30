@@ -18,7 +18,7 @@ import org.hibernate.id.UUIDGenerator;
  *
  * @author April Herron
  */
-public class CheckExistingUUIDGenerator extends UUIDGenerator {
+public class PredefinedUUIDGenerator extends UUIDGenerator {
 
     @Override
     public Serializable generate(SharedSessionContractImplementor session, Object object) {
