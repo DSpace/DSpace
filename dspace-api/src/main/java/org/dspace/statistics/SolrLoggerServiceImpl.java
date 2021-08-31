@@ -117,6 +117,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBean {
     private static final Logger log = LogManager.getLogger();
 
+    @Autowired(required = true)
+    protected BitstreamService bitstreamService;
+    @Autowired(required = true)
+    protected ContentServiceFactory contentServiceFactory;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+    @Autowired(required = true)
+    protected ClientInfoService clientInfoService;
+
+    @Autowired(required = true)
+    protected SolrClientFactory solrClientFactory;
+
     private static final String MULTIPLE_VALUES_SPLITTER = "|";
 
     public static final String DATE_FORMAT_8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
@@ -133,16 +145,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     private static final String IP_V4_REGEX = "^((?:\\d{1,3}\\.){3})\\d{1,3}$";
     private static final String IP_V6_REGEX = "^(.*):.*:.*$";
 
-    @Autowired(required = true)
-    protected BitstreamService bitstreamService;
-    @Autowired(required = true)
-    protected ContentServiceFactory contentServiceFactory;
-    @Autowired(required = true)
-    protected ConfigurationService configurationService;
-    @Autowired(required = true)
-    protected ClientInfoService clientInfoService;
-    @Autowired(required = true)
-    protected SolrClientFactory solrClientFactory;
     @Autowired
     protected SolrStatisticsCore solrStatisticsCore;
     @Autowired
