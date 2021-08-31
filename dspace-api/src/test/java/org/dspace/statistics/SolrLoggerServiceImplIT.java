@@ -287,7 +287,7 @@ public class SolrLoggerServiceImplIT
         // Check that the correct documents (and only those) are gone.
         QueryResponse response = instance.query(Q_ALL, null, null,
                 Integer.MAX_VALUE, -1,
-                null, null, null, null, null, true);
+                null, null, null, null, null, true, 0);
         long nDocs = 0;
         for (SolrDocument document : response.getResults()) {
             nDocs++;
