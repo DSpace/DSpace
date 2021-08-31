@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.configuration2.ex.ConversionException;
 import org.apache.commons.lang3.StringUtils;
@@ -73,7 +74,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
      * improve performance and memory footprint further.
      */
     @Override
-    public boolean isSpider(String clientIP, String proxyIPs, String hostname, String agent) {
+    public boolean isSpider(@NotNull String clientIP, String proxyIPs, String hostname, String agent) {
         // See if any agent patterns match
         if (null != agent) {
             synchronized (agents) {
@@ -217,6 +218,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
                 return true;
             }
         } catch (IPTable.IPFormatException e) {
+            log.warn("Assumed not a spider:  {}", e::getMessage);
             return false;
         }
 
