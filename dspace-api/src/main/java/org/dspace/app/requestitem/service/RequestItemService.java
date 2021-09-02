@@ -37,10 +37,17 @@ public interface RequestItemService {
      * @return the token of the request item
      * @throws SQLException if database error
      */
-    public String createRequest(Context context, Bitstream bitstream, Item item, boolean allFiles, String reqEmail,
-                                String reqName, String reqMessage)
+    public String createRequest(Context context, Bitstream bitstream, Item item,
+            boolean allFiles, String reqEmail, String reqName, String reqMessage)
         throws SQLException;
 
+    /**
+     * Retrieve a request by its token.
+     *
+     * @param context current DSpace session.
+     * @param token the token identifying the request.
+     * @return the matching request, or null if not found.
+     */
     public RequestItem findByToken(Context context, String token);
 
     /**

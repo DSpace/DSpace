@@ -69,8 +69,7 @@ public class RequestItemRepository
 
     @Override
     public Page<RequestItemRest> findAll(Context context, Pageable pageable) {
-        // TODO ? There is no enumerator in RequestItemService
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new RepositoryMethodNotImplementedException(RequestItemRest.NAME, "findAll");
     }
 
     @Override
@@ -137,7 +136,7 @@ public class RequestItemRepository
     @Override
     public void delete(Context context, String token)
             throws AuthorizeException, RepositoryMethodNotImplementedException {
-        throw new RepositoryMethodNotImplementedException("RequestItemRest", "delete");
+        throw new RepositoryMethodNotImplementedException(RequestItemRest.NAME, "delete");
     }
 
     @Override
