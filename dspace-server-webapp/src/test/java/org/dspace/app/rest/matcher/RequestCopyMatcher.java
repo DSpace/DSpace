@@ -29,8 +29,6 @@ public class RequestCopyMatcher {
 
     public static Matcher<? super Object> matchRequestCopy(RequestItem request) {
         return allOf(
-                //hasJsonPath("$._links.bitstream", Matchers.not(Matchers.empty())),
-                //hasJsonPath("$._links.item", Matchers.not(Matchers.empty())),
                 hasJsonPath("$.allfiles", is(request.isAllfiles())),
                 hasJsonPath("$.requestEmail", is(request.getReqEmail())),
                 hasJsonPath("$.requestName", is(request.getReqName())),

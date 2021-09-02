@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -26,7 +27,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Map;
 import javax.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,7 +50,6 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MvcResult;
 
 /**
  *
@@ -61,7 +60,7 @@ public class RequestItemRepositoryIT
     /** Where to find {@link RequestItem}s in the local URL namespace. */
     public static final String URI_ROOT = REST_SERVER_URL
             + RequestItemRest.CATEGORY + '/'
-            + RequestItemRest.NAME + 's';
+            + RequestItemRest.PLURAL_NAME;
 
     @Autowired(required = true)
     RequestItemConverter requestItemConverter;
@@ -85,7 +84,7 @@ public class RequestItemRepositoryIT
     @Test
     public void testFindOneAuthenticated()
             throws Exception {
-        System.out.println("findOne");
+        System.out.println("findOne (authenticated)");
 
         context.turnOffAuthorisationSystem();
 
@@ -103,6 +102,8 @@ public class RequestItemRepositoryIT
                 .createRequestItem(context, item, bitstream)
                 .build();
 
+        context.restoreAuthSystemState();
+
         // Test:  can we find it?
         String authToken = getAuthToken(admin.getEmail(), password);
         final String uri = URI_ROOT + '/' + request.getToken();
@@ -111,10 +112,6 @@ public class RequestItemRepositoryIT
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
                        RequestCopyMatcher.matchRequestCopy(request))));
-
-        // Clean up.
-        bitstream.setDeleted(true);
-        context.restoreAuthSystemState();
     }
 
     /**
@@ -125,7 +122,7 @@ public class RequestItemRepositoryIT
     @Test
     public void testFindOneNotAuthenticated()
             throws Exception {
-        System.out.println("findOne");
+        System.out.println("findOne (not authenticated)");
 
         context.turnOffAuthorisationSystem();
 
@@ -143,6 +140,8 @@ public class RequestItemRepositoryIT
                 .createRequestItem(context, item, bitstream)
                 .build();
 
+        context.restoreAuthSystemState();
+
         // Test:  can we find it?
         final String uri = URI_ROOT + '/' + request.getToken();
         getClient().perform(get(uri))
@@ -150,10 +149,6 @@ public class RequestItemRepositoryIT
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
                        RequestCopyMatcher.matchRequestCopy(request))));
-
-        // Clean up.
-        bitstream.setDeleted(true);
-        context.restoreAuthSystemState();
     }
 
     /**
@@ -168,9 +163,9 @@ public class RequestItemRepositoryIT
             throws SQLException, AuthorizeException, IOException, Exception {
         System.out.println("createAndReturn");
 
+        // Create some necessary objects.
         context.turnOffAuthorisationSystem();
 
-        // Create some necessary objects.
         Collection col = CollectionBuilder.createCollection(context,
                 parentCommunity).build();
         Item item = ItemBuilder.createItem(context, col).build();
@@ -179,6 +174,8 @@ public class RequestItemRepositoryIT
                 .withName("/dev/null")
                 .withMimeType("text/plain")
                 .build();
+
+        context.restoreAuthSystemState();
 
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
@@ -192,7 +189,7 @@ public class RequestItemRepositoryIT
         // Create it and see if it was created correctly.
         ObjectMapper mapper = new ObjectMapper();
         String authToken = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(authToken)
+        getClient(authToken)
                 .perform(post(URI_ROOT)
                         .content(mapper.writeValueAsBytes(rir))
                         .contentType(contentType))
@@ -209,16 +206,11 @@ public class RequestItemRepositoryIT
                         hasJsonPath("$.requestDate", not(is(emptyOrNullString()))), // TODO should be an ISO datetime
                         hasJsonPath("$._links.self.href", not(is(emptyOrNullString())))
                 )))
+                .andDo((var result) -> saveToken(read(result.getResponse().getContentAsString(), "token")))
                 .andReturn();
 
         // Clean up the created request.
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String requestToken = String.valueOf(map.get("token"));
-        RequestItem ri = requestItemService.findByToken(context, requestToken);
-        requestItemService.delete(context, ri);
-
-        context.restoreAuthSystemState();
+        RequestItemBuilder.deleteRequestItem(requestToken);
     }
 
     /**
@@ -234,9 +226,9 @@ public class RequestItemRepositoryIT
             throws SQLException, AuthorizeException, IOException, Exception {
         System.out.println("createAndReturn");
 
+        // Create some necessary objects.
         context.turnOffAuthorisationSystem();
 
-        // Create some necessary objects.
         Collection col = CollectionBuilder.createCollection(context,
                 parentCommunity).build();
         Item item = ItemBuilder.createItem(context, col).build();
@@ -245,6 +237,8 @@ public class RequestItemRepositoryIT
                 .withName("/dev/null")
                 .withMimeType("text/plain")
                 .build();
+
+        context.restoreAuthSystemState();
 
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
@@ -257,8 +251,7 @@ public class RequestItemRepositoryIT
 
         // Create it and see if it was created correctly.
         ObjectMapper mapper = new ObjectMapper();
-        MvcResult mvcResult = getClient()
-                .perform(post(URI_ROOT)
+        getClient().perform(post(URI_ROOT)
                         .content(mapper.writeValueAsBytes(rir))
                         .contentType(contentType))
                 .andExpect(status().isCreated())
@@ -274,27 +267,11 @@ public class RequestItemRepositoryIT
                         hasJsonPath("$.requestDate", not(is(emptyOrNullString()))), // TODO should be an ISO datetime
                         hasJsonPath("$._links.self.href", not(is(emptyOrNullString())))
                 )))
+                .andDo((var result) -> saveToken(read(result.getResponse().getContentAsString(), "token")))
                 .andReturn();
 
         // Clean up the created request.
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String requestToken = String.valueOf(map.get("token"));
-        RequestItem ri = requestItemService.findByToken(context, requestToken);
-        requestItemService.delete(context, ri);
-
-        context.restoreAuthSystemState();
-    }
-
-    /**
-     * Test of getDomainClass method, of class RequestItemRepository.
-     */
-    @Test
-    public void testGetDomainClass() {
-        System.out.println("getDomainClass");
-        RequestItemRepository instance = new RequestItemRepository();
-        Class instanceClass = instance.getDomainClass();
-        assertEquals("Wrong domain class", RequestItemRest.class, instanceClass);
+        RequestItemBuilder.deleteRequestItem(requestToken);
     }
 
     /**
@@ -305,7 +282,7 @@ public class RequestItemRepositoryIT
      * @throws java.lang.Exception passed through.
      */
     @Test
-    public void testRefreshTokenWithInvalidCSRF()
+    public void testCreateWithInvalidCSRF()
             throws Exception {
         // Login via password to retrieve a valid token
         String token = getAuthToken(eperson.getEmail(), password);
@@ -317,7 +294,33 @@ public class RequestItemRepositoryIT
         Cookie[] cookies = new Cookie[1];
         cookies[0] = new Cookie(AUTHORIZATION_COOKIE, token);
 
+        // Create some necessary objects.
+        context.turnOffAuthorisationSystem();
+
+        Collection col = CollectionBuilder.createCollection(context,
+                parentCommunity).build();
+        Item item = ItemBuilder.createItem(context, col).build();
+        InputStream is = new ByteArrayInputStream(new byte[0]);
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, is)
+                .withName("/dev/null")
+                .withMimeType("text/plain")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        // Fake up a request in REST form.
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        rir.setRequestEmail(RequestItemBuilder.REQ_EMAIL);
+        rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
+        rir.setRequestName(RequestItemBuilder.REQ_NAME);
+        rir.setAllfiles(false);
+
+        ObjectMapper mapper = new ObjectMapper();
         getClient().perform(post(URI_ROOT)
+                .content(mapper.writeValueAsBytes(rir))
+                .contentType(contentType)
                 .with(csrf().useInvalidToken().asHeader())
                 .secure(true)
                 .cookie(cookies))
@@ -341,7 +344,7 @@ public class RequestItemRepositoryIT
      * @throws java.lang.Exception passed through.
      */
     @Test
-    public void testCannotReuseTokenFromUntrustedOrigin()
+    public void testUntrustedOrigin()
             throws Exception {
         // First, get a valid login token
         String token = getAuthToken(eperson.getEmail(), password);
@@ -364,5 +367,27 @@ public class RequestItemRepositoryIT
         //Logout
         getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
+    }
+
+    /**
+     * Test of getDomainClass method, of class RequestItemRepository.
+     */
+    @Test
+    public void testGetDomainClass() {
+        System.out.println("getDomainClass");
+        RequestItemRepository instance = new RequestItemRepository();
+        Class instanceClass = instance.getDomainClass();
+        assertEquals("Wrong domain class", RequestItemRest.class, instanceClass);
+    }
+
+    /** Saves the request token generated by creating an item request. */
+    private String requestToken;
+
+    /**
+     * Silly work-around because lambdas can't mutate external variables.
+     * @param token a request token to be remembered.
+     */
+    private void saveToken(String token) {
+        requestToken = token;
     }
 }

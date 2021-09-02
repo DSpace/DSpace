@@ -24,7 +24,8 @@ import org.dspace.app.rest.RestResourceController;
     })
 public class RequestItemRest
         extends BaseObjectRest<Integer> {
-    public static final String NAME = "copyrequest";
+    public static final String NAME = "itemrequest";
+    public static final String PLURAL_NAME = NAME + "s";
 
     public static final String CATEGORY = RestAddressableModel.TOOLS;
 

@@ -82,6 +82,18 @@ public class RequestItemBuilder
         requestItemService.delete(context, request);
     }
 
+    /**
+     * Delete a request identified by its token.  If no such token is known,
+     * simply return.
+     * @param token the token identifying the request.
+     */
+    static public void deleteRequestItem(String token) {
+        try (Context context = new Context()) {
+            RequestItem request = requestItemService.findByToken(context, token);
+            requestItemService.delete(context, request);
+        }
+    }
+
     @Override
     protected RequestItemService getService() {
         return requestItemService;
