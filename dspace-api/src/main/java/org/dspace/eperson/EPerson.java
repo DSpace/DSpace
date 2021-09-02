@@ -37,7 +37,6 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * Class representing an e-person.
  *
  * @author David Stuve
- * @version $Revision$
  */
 @Entity
 @Cacheable
@@ -381,6 +380,13 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
         return digestAlgorithm;
     }
 
+    /**
+     * Store the digest algorithm used to hash the password.  You should also
+     * set the {@link setPassword password hash} and the
+     * {@link setDigestAlgorithm digest algorithm}.
+     *
+     * @param digestAlgorithm
+     */
     void setDigestAlgorithm(String digestAlgorithm) {
         this.digestAlgorithm = digestAlgorithm;
     }
@@ -389,6 +395,13 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
         return salt;
     }
 
+    /**
+     * Store the salt used when hashing the password.  You should also set the
+     * {@link setPassword password hash} and the {@link setDigestAlgorithm
+     * digest algorithm}.
+     *
+     * @param salt
+     */
     void setSalt(String salt) {
         this.salt = salt;
     }
@@ -397,6 +410,12 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
         return password;
     }
 
+    /**
+     * Store the <strong>hash of a</strong> password.  You should also set the
+     * {@link setSalt salt} and the {@link setDigestAlgorithm digest algorithm}.
+     *
+     * @param password
+     */
     void setPassword(String password) {
         this.password = password;
     }
