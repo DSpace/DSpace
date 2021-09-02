@@ -524,6 +524,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         // register this as the admin group
         collection.setAdmins(admins);
+        context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, collection.getID(),
+                                              null, getIdentifiers(context, collection)));
         return admins;
     }
 
@@ -540,6 +542,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         // Remove the link to the collection table.
         collection.setAdmins(null);
+        context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, collection.getID(),
+                                              null, getIdentifiers(context, collection)));
     }
 
     @Override
@@ -657,8 +661,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             collection.clearModified();
         }
         if (collection.isMetadataModified()) {
-            collection.clearDetails();
+            context.addEvent(new Event(Event.MODIFY_METADATA, Constants.COLLECTION, collection.getID(),
+                                         collection.getDetails(),getIdentifiers(context, collection)));
+            collection.clearModified();
         }
+        collection.clearDetails();
     }
 
     @Override
