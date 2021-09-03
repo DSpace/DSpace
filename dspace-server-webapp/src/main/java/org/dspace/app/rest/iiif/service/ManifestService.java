@@ -7,14 +7,10 @@
  */
 package org.dspace.app.rest.iiif.service;
 
-import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
 
-import de.digitalcollections.iiif.model.sharedcanvas.AnnotationList;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
-import org.dspace.app.rest.iiif.model.generator.CanvasItemsGenerator;
+import org.dspace.app.rest.iiif.model.generator.AnnotationGenerator;
 import org.dspace.app.rest.iiif.model.generator.ContentSearchGenerator;
 import org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator;
 import org.dspace.app.rest.iiif.model.generator.ManifestGenerator;
@@ -30,19 +26,24 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 
 /**
  * Generates IIIF Manifest JSON response for a DSpace Item.
  */
 @Component
+@RequestScope
 public class ManifestService extends AbstractResourceService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ManifestService.class);
 
-    private static final String PDF_DOWNLOAD_LABEL = "Download as PDF";
+    // TODO i18n
     private static final String RELATED_ITEM_LABEL = "DSpace item view";
     private static final String SEE_ALSO_LABEL = "More descriptions of this resource";
+
+    private final ApplicationContext applicationContext;
 
     @Autowired
     protected ItemService itemService;
@@ -51,13 +52,7 @@ public class ManifestService extends AbstractResourceService {
     CanvasService canvasService;
 
     @Autowired
-    ExternalLinksGenerator otherContentGenerator;
-
-    @Autowired
-    ManifestGenerator manifestGenerator;
-
-    @Autowired
-    CanvasItemsGenerator sequenceGenerator;
+    SequenceService sequenceService;
 
     @Autowired
     RangeGenerator rangeGenerator;
@@ -68,12 +63,17 @@ public class ManifestService extends AbstractResourceService {
     @Autowired
     IIIFUtils utils;
 
+    @Autowired
+    ManifestGenerator manifestGenerator;
+
+
     /**
      * Constructor.
      * @param configurationService the DSpace configuration service.
      */
-    public ManifestService(ConfigurationService configurationService) {
+    public ManifestService(ApplicationContext applicationContext, ConfigurationService configurationService) {
         setConfiguration(configurationService);
+        this.applicationContext = applicationContext;
     }
 
     /**
@@ -84,18 +84,20 @@ public class ManifestService extends AbstractResourceService {
      * @return Manifest as JSON
      */
     public String getManifest(Item item, Context context) {
-        initializeManifest(item, context);
+        populateManifest(item, context);
         return utils.asJson(manifestGenerator.getResource());
     }
 
     /**
-     * Initializes the Manifest for a DSpace item.
+     * Populates the Manifest for a DSpace Item.
      *
      * @param item DSpace Item
      * @param context DSpace context
      * @return manifest object
      */
-    private void initializeManifest(Item item, Context context) {
+    private void populateManifest(Item item, Context context) {
+        // If an IIIF bundle is found it will be used. Otherwise,
+        // images in the ORIGINAL bundle will be used.
         List<Bundle> bundles = utils.getIiifBundle(item, IIIF_BUNDLE);
         List<Bitstream> bitstreams = utils.getBitstreams(bundles);
         Info info = utils.validateInfoForManifest(utils.getInfo(context, item, IIIF_BUNDLE), bitstreams);
@@ -113,19 +115,15 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Returns a single sequence with canvases and a rendering property (optional).
+     * Adds a single sequence with canvases and a rendering property (optional).
      * @param item DSpace Item
      * @param bitstreams list of bitstreams
      * @param context the DSpace context
      * @return a sequence of canvases
      */
     private void addSequence(Item item, List<Bitstream> bitstreams, Context context, Info info) {
-        sequenceGenerator.setIdentifier(IIIF_ENDPOINT + item.getID() + "/sequence/s0");
-        if (bitstreams.size() > 0) {
-            addCanvases(sequenceGenerator, context, item, bitstreams, info);
-        }
-        addRendering(sequenceGenerator, item, context);
-        manifestGenerator.addSequence(sequenceGenerator);
+        manifestGenerator.addSequence(
+                sequenceService.getSequence(item, bitstreams, context, info));
     }
 
     /**
@@ -164,42 +162,11 @@ public class ManifestService extends AbstractResourceService {
      */
     private void addRelated(Item item) {
         String url = CLIENT_URL  + "/items/" + item.getID();
-        otherContentGenerator.setIdentifier(url);
+        ExternalLinksGenerator otherContentGenerator = applicationContext
+                .getBean(ExternalLinksGenerator.class, url);
         otherContentGenerator.setFormat("text/html");
         otherContentGenerator.setLabel(RELATED_ITEM_LABEL);
         manifestGenerator.addRelated(otherContentGenerator);
-    }
-
-    /**
-     * This method adds a canvas to the sequence for each item in the list of DSpace bitstreams.
-     * To be added bitstreams must be on image mime type.
-     *
-     * @param sequence the sequence object
-     * @param context the DSpace context
-     * @param item the DSpace Item
-     * @param bitstreams list of DSpace bitstreams
-     */
-    private void addCanvases(CanvasItemsGenerator sequence, Context context, Item item,
-                             List<Bitstream> bitstreams, Info info) {
-        // TODO: This adds all bitstreams from a bundle.  Consider bitstream pagination.
-        /**
-         * Counter tracks the position of the bitstream in the list and is used to create the canvas identifier.
-         * Bitstream order is determined by position in the IIIF DSpace bundle.
-         */
-        int counter = 0;
-        for (Bitstream bitstream : bitstreams) {
-            UUID bitstreamID = bitstream.getID();
-            String mimeType = utils.getBitstreamMimeType(bitstream, context);
-            if (utils.checkImageMimeType(mimeType)) {
-                CanvasGenerator canvas = canvasService.getCanvas(item.getID().toString(), info, counter);
-                addImage(canvas, mimeType, bitstreamID);
-                if (counter == 2) {
-                    addImage(canvas, mimeType, bitstreamID);
-                }
-                sequence.addCanvas(canvas);
-                counter++;
-            }
-        }
     }
 
     /**
@@ -229,51 +196,11 @@ public class ManifestService extends AbstractResourceService {
         if (bundles.size() == 0) {
             return;
         }
-        otherContentGenerator.setIdentifier(IIIF_ENDPOINT + item.getID() + "/manifest/seeAlso");
-        otherContentGenerator.setType(AnnotationList.TYPE);
+        ExternalLinksGenerator otherContentGenerator = applicationContext
+                .getBean(ExternalLinksGenerator.class, IIIF_ENDPOINT + item.getID() + "/manifest/seeAlso");
+        otherContentGenerator.setType(AnnotationGenerator.TYPE);
         otherContentGenerator.setLabel(SEE_ALSO_LABEL);
         manifestGenerator.addSeeAlso(otherContentGenerator);
-    }
-
-    /**
-     * A link to an external resource intended for display or download by a human user.
-     * This property can be used to link from a manifest, collection or other resource
-     * to the preferred viewing environment for that resource, such as a viewer page on
-     * the publisher’s web site. Other uses include a rendering of a manifest as a PDF
-     * or EPUB.
-     *
-     * This method looks for a PDF rendering in the Item's ORIGINAL bundle and adds
-     * it to the Sequence if found.
-     *
-     * @param sequence Sequence object
-     * @param item DSpace Item
-     * @param context DSpace context
-     */
-    private void addRendering(CanvasItemsGenerator sequence, Item item, Context context) {
-        List<Bundle> bundles = item.getBundles("ORIGINAL");
-        if (bundles.size() == 0) {
-            return;
-        }
-        Bundle bundle = bundles.get(0);
-        List<Bitstream> bitstreams = bundle.getBitstreams();
-        for (Bitstream bitstream : bitstreams) {
-            String mimeType = null;
-            try {
-                mimeType = bitstream.getFormat(context).getMIMEType();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            // If the ORIGINAL bundle contains a PDF, assume that it represents the
-            // item and add to rendering. Ignore other mime-types. This convention should
-            // be documented.
-            if (mimeType != null && mimeType.contentEquals("application/pdf")) {
-                String id = BITSTREAM_PATH_PREFIX + "/" + bitstream.getID() + "/content";
-                otherContentGenerator.setIdentifier(id);
-                otherContentGenerator.setLabel(PDF_DOWNLOAD_LABEL);
-                otherContentGenerator.setFormat(mimeType);
-                sequence.addRendering(otherContentGenerator);
-            }
-        }
     }
 
     /**
@@ -288,7 +215,6 @@ public class ManifestService extends AbstractResourceService {
     private void addSearchService(Item item) {
         if (utils.isSearchable(item)) {
             contentSearchGenerator.setIdentifier(IIIF_ENDPOINT + item.getID() + "/manifest/search");
-            // TODO: get label from configuration then set on generator?
             manifestGenerator.addService(contentSearchGenerator);
         }
     }
@@ -310,7 +236,7 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Sets properties on the RangeFacade.
+     * Sets properties on the Range.
      * @param identifier DSpace item id
      * @param range range from info.json configuration
      * @param pos list position of the range
@@ -339,7 +265,7 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * If the logo is defined in DSpace configuration, add to manifest
+     * If the logo is defined in DSpace configura
      */
     private void setLogoContainer() {
         if (IIIF_LOGO_IMAGE != null) {
@@ -347,4 +273,5 @@ public class ManifestService extends AbstractResourceService {
             manifestGenerator.addLogo(imageContent);
         }
     }
+
 }

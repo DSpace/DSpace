@@ -21,8 +21,9 @@ import org.springframework.web.context.annotation.RequestScope;
 /**
  * Facade for the Search API version 1.0 search service description.
  *
- * Added to the Manifest of items that support full-text searching, identified
- * by the "relationship.type: IIIFSearchable" DSpace metadata field.
+ * Added to the Manifest when the item supports full-text searching, identified
+ * by the "dspace.entity.type: IIIFSearchable" DSpace metadata field. NOTE: the
+ * entity.type is going to be abandoned in favor of another DSO metadata field.
  */
 @Component
 @RequestScope

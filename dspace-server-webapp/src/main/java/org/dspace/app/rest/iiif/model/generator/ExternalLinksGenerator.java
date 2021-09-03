@@ -8,9 +8,8 @@
 package org.dspace.app.rest.iiif.model.generator;
 
 import de.digitalcollections.iiif.model.OtherContent;
-import de.digitalcollections.iiif.model.PropertyValue;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,22 +22,13 @@ import org.springframework.stereotype.Component;
  * and items instead.
  */
 @Component
+@Scope("prototype")
 public class ExternalLinksGenerator implements IIIFResource {
 
-    @Autowired
-    PropertyValueGenerator propertyValue;
+    private OtherContent otherContent;
 
-    private String identifier;
-    private String format;
-    private PropertyValue label;
-    private String type;
-
-    /**
-     * Sets the mandatory identifier.
-     * @param identifier
-     */
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public ExternalLinksGenerator(String identifier) {
+        otherContent = new OtherContent(identifier);
     }
 
     /**
@@ -46,7 +36,7 @@ public class ExternalLinksGenerator implements IIIFResource {
      * @param format
      */
     public void setFormat(String format) {
-        this.format = format;
+        otherContent.setFormat(format);
     }
 
     /**
@@ -54,8 +44,7 @@ public class ExternalLinksGenerator implements IIIFResource {
      * @param label
      */
     public void setLabel(String label) {
-        propertyValue.setPropertyValue(label);
-        this.label = propertyValue.getValue();
+        otherContent.setLabel(new PropertyValueGenerator().getPropertyValue(label).getValue());
     }
 
     /**
@@ -63,30 +52,11 @@ public class ExternalLinksGenerator implements IIIFResource {
      * @param type
      */
     public void setType(String type) {
-        this.type = type;
+        otherContent.setType(type);
     }
 
     @Override
     public Resource<OtherContent> getResource() {
-        OtherContent otherContent;
-        if (format != null) {
-            otherContent = new OtherContent(identifier, format);
-        } else {
-            otherContent = new OtherContent(identifier);
-        }
-        if (label != null) {
-            otherContent.setLabel(label);
-        }
-        if (type != null) {
-            otherContent.setType(type);
-        }
-
-        // Reset facade properties after creating the resource.
-        identifier = null;
-        format = null;
-        label = null;
-        type = null;
-
         return otherContent;
     }
 

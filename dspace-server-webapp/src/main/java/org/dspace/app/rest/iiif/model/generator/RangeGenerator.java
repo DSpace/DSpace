@@ -53,7 +53,7 @@ public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.
      * Adds canvas to Range canvas list.
      * @param canvas
      */
-    public void addCanvas(org.dspace.app.rest.iiif.model.generator.CanvasGenerator canvas) {
+    public void addCanvas(CanvasGenerator canvas) {
         canvasList.add((Canvas) canvas.getResource());
     }
 

@@ -14,7 +14,6 @@ import java.util.UUID;
 import org.dspace.app.rest.iiif.model.generator.AnnotationGenerator;
 import org.dspace.app.rest.iiif.model.generator.AnnotationListGenerator;
 import org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator;
-import org.dspace.app.rest.iiif.model.generator.PropertyValueGenerator;
 import org.dspace.app.rest.iiif.service.util.IIIFUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -26,10 +25,15 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 
 @Component
+@RequestScope
 public class AnnotationListService extends AbstractResourceService {
+
+    ApplicationContext applicationContext;
 
     @Autowired
     IIIFUtils utils;
@@ -44,19 +48,12 @@ public class AnnotationListService extends AbstractResourceService {
     BitstreamFormatService bitstreamFormatService;
 
     @Autowired
-    PropertyValueGenerator propertyValue;
-
-    @Autowired
     AnnotationListGenerator annotationList;
 
-    @Autowired
-    AnnotationGenerator annotation;
+    public AnnotationListService(ApplicationContext applicationContext, ConfigurationService configurationService) {
 
-    @Autowired
-    ExternalLinksGenerator otherContent;
-
-    public AnnotationListService(ConfigurationService configurationService) {
         setConfiguration(configurationService);
+        this.applicationContext = applicationContext;
     }
 
     /**
@@ -73,23 +70,19 @@ public class AnnotationListService extends AbstractResourceService {
      */
     public String getSeeAlsoAnnotations(Context context, UUID id)
             throws RuntimeException {
-        /**
-         * We need the DSpace item to proceed.
-         */
+
+        // We need the DSpace item to proceed
         Item item;
         try {
             item = itemService.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        /**
-         * AnnotationList requires an identifier.
-         */
+        // AnnotationList requires an identifier.
         annotationList.setIdentifier(IIIF_ENDPOINT + id + "/manifest/seeAlso");
-        /**
-         * Get the "OtherContent" bundle for the item. Then add
-         * Annotations for each bitstream found in the bundle.
-         */
+
+        // Get the "OtherContent" bundle for the item. Add
+        // Annotations for each bitstream found in the bundle.
         List<Bundle> bundles = utils.getBundle(item, OTHER_CONTENT_BUNDLE);
         if (bundles.size() > 0) {
             for (Bundle bundle : bundles) {
@@ -103,19 +96,26 @@ public class AnnotationListService extends AbstractResourceService {
                     } catch (SQLException e) {
                         throw new RuntimeException(e.getMessage(), e);
                     }
-                    annotation.setIdentifier(IIIF_ENDPOINT + bitstream.getID() + "/annot");
-                    annotation.setMotivation(AnnotationGenerator.LINKING);
-                    otherContent.setIdentifier(BITSTREAM_PATH_PREFIX
-                            + "/"
-                            + bitstream.getID()
-                            + "/content");
-                    otherContent.setFormat(mimetype);
-                    otherContent.setLabel(bitstream.getName());
-                    annotation.setResource(otherContent);
+                    AnnotationGenerator annotation = applicationContext
+                            .getBean(AnnotationGenerator.class, IIIF_ENDPOINT + bitstream.getID()
+                                    + "/annot", AnnotationGenerator.LINKING);
+                    annotation.setResource(getLinksGenerator(mimetype, bitstream));
                     annotationList.addResource(annotation);
                 }
             }
         }
         return utils.asJson(annotationList.getResource());
+    }
+
+    private ExternalLinksGenerator getLinksGenerator(String mimetype, Bitstream bitstream) {
+        String identifier = BITSTREAM_PATH_PREFIX
+                + "/"
+                + bitstream.getID()
+                + "/content";
+        ExternalLinksGenerator otherContentGenerator = applicationContext
+                .getBean(ExternalLinksGenerator.class, identifier);
+        otherContentGenerator.setFormat(mimetype);
+        otherContentGenerator.setLabel(bitstream.getName());
+        return otherContentGenerator;
     }
 }

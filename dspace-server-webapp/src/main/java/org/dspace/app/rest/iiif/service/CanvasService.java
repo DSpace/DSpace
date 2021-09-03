@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.rest.iiif.model.info.Info;
 import org.dspace.services.ConfigurationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -24,16 +24,15 @@ public class CanvasService extends AbstractResourceService {
     // Default canvas dimensions.
     protected static final Integer DEFAULT_CANVAS_WIDTH = 1200;
     protected static final Integer DEFAULT_CANVAS_HEIGHT = 1600;
-
-    @Autowired
-    CanvasGenerator canvas;
+    ApplicationContext applicationContext;
 
     /**
      * Constructor.
      * @param configurationService the DSpace configuration service.
      */
-    public CanvasService(ConfigurationService configurationService) {
+    public CanvasService(ApplicationContext applicationContext, ConfigurationService configurationService) {
         setConfiguration(configurationService);
+        this.applicationContext = applicationContext;
     }
 
     /**
@@ -47,11 +46,14 @@ public class CanvasService extends AbstractResourceService {
      * @return canvas object
      */
     protected CanvasGenerator getCanvas(String id, Info info, int count) {
+        CanvasGenerator canvas =
+                applicationContext.getBean(CanvasGenerator.class, IIIF_ENDPOINT + id + "/canvas/c" + count);
+        // canvas.setIdentifier(IIIF_ENDPOINT + id + "/canvas/c" + count);
+        int pagePosition = count + 1;
+        String label = "Page " + pagePosition;
         // Defaults settings.
         int canvasWidth = DEFAULT_CANVAS_WIDTH;
         int canvasHeight = DEFAULT_CANVAS_HEIGHT;
-        int pagePosition = count + 1;
-        String label = "Page " + pagePosition;
         // Override with settings from info.json, if available.
         if (info != null && info.getGlobalDefaults() != null && info.getCanvases() != null) {
             // Use global settings if activated.
@@ -71,10 +73,9 @@ public class CanvasService extends AbstractResourceService {
         } else {
             log.info("Correctly formatted info.json was not found for item.  Using application defaults.");
         }
-        canvas.setIdentifier(IIIF_ENDPOINT + id + "/canvas/c" + count);
-        canvas.setLabel(label);
         canvas.setHeight(canvasHeight);
         canvas.setWidth(canvasWidth);
+        canvas.setLabel(label);
         return canvas;
     }
 
@@ -86,7 +87,8 @@ public class CanvasService extends AbstractResourceService {
      * @return
      */
     protected CanvasGenerator getRangeCanvasReference(String identifier, String startCanvas) {
-        canvas.setIdentifier(IIIF_ENDPOINT + identifier + startCanvas);
+        CanvasGenerator canvas =
+                applicationContext.getBean(CanvasGenerator.class, IIIF_ENDPOINT + identifier + startCanvas);
         return canvas;
     }
 

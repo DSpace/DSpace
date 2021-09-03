@@ -14,6 +14,9 @@ import de.digitalcollections.iiif.model.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * A profile for an AnnotationList or Service.
+ */
 @Component
 @Scope("prototype")
 public class ProfileGenerator implements IIIFValue {

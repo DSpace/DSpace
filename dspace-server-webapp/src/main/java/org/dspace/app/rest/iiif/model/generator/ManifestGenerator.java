@@ -22,12 +22,11 @@ import de.digitalcollections.iiif.model.sharedcanvas.Range;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 import de.digitalcollections.iiif.model.sharedcanvas.Sequence;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
- * Facade for the IIIF Presentation API version 2.2.1 domain model.
- *
  * The Manifest is an overall description of the structure and properties of the digital representation
  * of an object. It carries information needed for the viewer to present the digitized content to the user,
  * such as a title and other descriptive information about the object or the intellectual work that
@@ -38,26 +37,22 @@ import org.springframework.web.context.annotation.RequestScope;
 @RequestScope
 public class ManifestGenerator implements IIIFResource {
 
+    //private final Manifest manifest;
+
     private String identifier;
     private String label;
-    private Resource<ImageContent> logo;
-    private OtherContent seeAlso;
-    // Becomes the "items" element in IIIF version 3.0
-    private CanvasItemsGenerator sequence;
-    // Renamed to "homepage" in IIIF version 3.0
-    private OtherContent related;
-    // Renamed to "behavior" with IIIF version 3.0
-    private ViewingHint viewingHint;
-    private Resource<ImageContent> thumbnail;
-    private ContentSearchService searchService;
     private PropertyValue description;
-    private final List<MetadataEntry> metadata = new ArrayList<>();
-    // Renamed to "rights" with IIIF version 3.0
+    private ImageContent logo;
+    private ViewingHint viewingHint;
+    private Sequence sequence;
+    private OtherContent seeAlso;
+    private OtherContent related;
+    private ImageContent thumbnail;
+    private ContentSearchService searchService;
     private final List<URI> license = new ArrayList<>();
+    private final List<MetadataEntry> metadata = new ArrayList<>();
     private List<Range> ranges = new ArrayList<>();
 
-    @Autowired
-    PropertyValueGenerator propertyValue;
 
     @Autowired
     MetadataEntryGenerator metadataEntryGenerator;
@@ -74,7 +69,7 @@ public class ManifestGenerator implements IIIFResource {
     }
 
     /**
-     * Sets the manditory Manifest label.
+     * Sets the Manifest label.
      * @param label
      */
     public void setLabel(String label) {
@@ -82,7 +77,7 @@ public class ManifestGenerator implements IIIFResource {
     }
 
     public void addLogo(ImageContentGenerator logo) {
-        this.logo = logo.getResource();
+        this.logo = (ImageContent) logo.getResource();
     }
 
     /**
@@ -101,7 +96,7 @@ public class ManifestGenerator implements IIIFResource {
      * @param sequence
      */
     public void addSequence(CanvasItemsGenerator sequence) {
-        this.sequence = sequence;
+        this.sequence = (Sequence) sequence.getResource();
     }
 
     /**
@@ -117,7 +112,7 @@ public class ManifestGenerator implements IIIFResource {
      * @param thumbnail
      */
     public void addThumbnail(ImageContentGenerator thumbnail) {
-        this.thumbnail = thumbnail.getResource();
+        this.thumbnail = (ImageContent) thumbnail.getResource();
     }
 
     /**
@@ -161,8 +156,7 @@ public class ManifestGenerator implements IIIFResource {
      * @param value
      */
     public void addDescription(String field, String value) {
-        propertyValue.setPropertyValue(field, value);
-        description = propertyValue.getValue();
+        description = new PropertyValueGenerator().getPropertyValue(field, value).getValue();
     }
 
     /**
@@ -175,6 +169,7 @@ public class ManifestGenerator implements IIIFResource {
 
     @Override
     public Resource<Manifest> getResource() {
+
         if (identifier == null) {
             throw new RuntimeException("The Manifest resource requires an identifier.");
         }
@@ -186,11 +181,11 @@ public class ManifestGenerator implements IIIFResource {
         }
         if (logo != null) {
             List<ImageContent> logos = new ArrayList<>();
-            logos.add((ImageContent) logo);
+            logos.add(logo);
             manifest.setLogos(logos);
         }
         if (sequence != null) {
-            manifest.addSequence((Sequence) sequence.getResource());
+            manifest.addSequence(sequence);
         }
         if (ranges.size() > 0) {
             manifest.setRanges(ranges);
@@ -216,7 +211,7 @@ public class ManifestGenerator implements IIIFResource {
             manifest.setDescription(description);
         }
         if (thumbnail != null) {
-            manifest.addThumbnail((ImageContent) thumbnail);
+            manifest.addThumbnail(thumbnail);
         }
         if (viewingHint != null) {
             manifest.addViewingHint(viewingHint);
