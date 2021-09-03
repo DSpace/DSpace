@@ -17,16 +17,18 @@ public class ObjectMapperFactory {
     private ObjectMapperFactory() {}
 
     /**
-     * Gets the jackson ObjectMapper with iiif configuration.
-     * @return
+     * Gets the jackson ObjectMapper with dbmdz configuration.
+     * https://github.com/dbmdz/iiif-apis/blob/main/src/main/java/de/digitalcollections/iiif/model/jackson/IiifObjectMapper.java
+     * @return jackson mapper
      */
     public static ObjectMapper getIiifObjectMapper() {
         return new IiifObjectMapper();
     }
 
     /**
-     * Gets the jackson SimpleModule with iiif configuration.
-     * @return
+     * Gets the jackson SimpleModule with dbmdz configuration.
+     * https://github.com/dbmdz/iiif-apis/blob/main/src/main/java/de/digitalcollections/iiif/model/jackson/IiifModule.java
+     * @return model
      */
     public static SimpleModule getIiifModule() {
         return new IiifModule();

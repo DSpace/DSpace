@@ -9,7 +9,6 @@ package org.dspace.app.rest.iiif.service;
 
 import java.util.UUID;
 
-import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.rest.iiif.model.generator.ImageContentGenerator;
 import org.dspace.app.rest.iiif.model.generator.ImageServiceGenerator;
 import org.dspace.app.rest.iiif.model.generator.ProfileGenerator;
@@ -84,26 +83,6 @@ public abstract class AbstractResourceService {
     protected String getManifestId(UUID uuid) {
         return IIIF_ENDPOINT + uuid + "/manifest";
     }
-
-    /**
-     * Association of images with their respective canvases is done via annotations.
-     * Only the annotations that associate images or parts of images are included in
-     * the canvas in the images property. If a IIIF Image API service is available for
-     * the image, then a link to the service’s base URI should be included.
-     *
-     * This method adds an image annotations to a canvas for both thumbnail and full size
-     * images. The annotation references the IIIF image service.
-     *
-     * @param canvas the Canvas object.
-     * @param mimeType the image mime type
-     * @param bitstreamID the bitstream uuid
-     */
-//    protected void addImage(CanvasGenerator canvas, String mimeType, UUID bitstreamID) throws
-//            RuntimeException {
-//        canvas.addThumbnail(getThumbnailAnnotation(bitstreamID, mimeType));
-//        // Add image content resource to canvas facade.
-//        canvas.addImage(getImageContent(bitstreamID, mimeType, imageUtil.getImageProfile(), IMAGE_PATH).getResource());
-//    }
 
     /**
      * A small image that depicts or pictorially represents the resource that

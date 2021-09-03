@@ -9,7 +9,7 @@ package org.dspace.app.rest.iiif.service;
 
 import java.util.UUID;
 
-public interface AnnotationService {
+public interface SearchAnnotationService {
 
     void initializeQuery(String endpoint, String manifestId, boolean validationEnabled);
 

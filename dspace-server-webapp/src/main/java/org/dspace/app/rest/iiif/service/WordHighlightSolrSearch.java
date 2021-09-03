@@ -39,7 +39,6 @@ import org.dspace.discovery.SolrSearchCore;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -48,7 +47,7 @@ import org.springframework.web.context.annotation.RequestScope;
  */
 @Component
 @RequestScope
-public class WordHighlightSolrSearch implements AnnotationService {
+public class WordHighlightSolrSearch implements SearchAnnotationService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WordHighlightSolrSearch.class);
 
