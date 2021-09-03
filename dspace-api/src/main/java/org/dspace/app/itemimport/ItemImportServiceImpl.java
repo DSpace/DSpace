@@ -276,12 +276,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 if (skipItems.containsKey(dircontents[i])) {
                     System.out.println("Skipping import of " + dircontents[i]);
 
-                    if (processRelationships) {
-                        //we still need the item in the map for relationship linking
-                        String skippedHandle = skipItems.get(dircontents[i]);
-                        Item skippedItem = (Item) handleService.resolveToObject(c, skippedHandle);
-                        itemFolderMap.put(dircontents[i], skippedItem);
-                    }
+                    //we still need the item in the map for relationship linking
+                    String skippedHandle = skipItems.get(dircontents[i]);
+                    Item skippedItem = (Item) handleService.resolveToObject(c, skippedHandle);
+                    itemFolderMap.put(dircontents[i], skippedItem);
 
                 } else {
                     List<Collection> clist;
@@ -305,19 +303,15 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
                     Item item = addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
 
-                    if (processRelationships) {
-                        itemFolderMap.put(dircontents[i], item);
-                    }
+                    itemFolderMap.put(dircontents[i], item);
 
                     c.uncacheEntity(item);
                     System.out.println(i + " " + dircontents[i]);
                 }
             }
 
-            if (processRelationships) {
-                //now that all items are imported, iterate again to link relationships
-                addRelationships(c, sourceDir);
-            }
+            //now that all items are imported, iterate again to link relationships
+            addRelationships(c, sourceDir);
 
         } finally {
             if (mapOut != null) {
@@ -336,15 +330,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
       */
     protected void addRelationships(Context c, String sourceDir) throws Exception {
 
-        System.out.println("Linking relationships");
-
         for (Map.Entry<String, Item> itemEntry : itemFolderMap.entrySet()) {
 
             String folderName = itemEntry.getKey();
             String path = sourceDir + File.separatorChar + folderName;
             Item item = itemEntry.getValue();
-
-            System.out.println("Adding relationships from directory " + folderName);
 
             //look for a 'relationship' manifest
             Map<String, List<String>> relationships = processRelationshipFile(path, "relationships");
@@ -500,8 +490,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 }
             }
 
-        } else {
-            System.out.println("\tNo relationships file found.");
         }
 
         return result;
