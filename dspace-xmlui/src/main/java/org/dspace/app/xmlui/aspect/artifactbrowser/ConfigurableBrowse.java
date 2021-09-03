@@ -412,7 +412,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         for (Map.Entry<String, String> param : queryParamsPOST.entrySet())
         {
             if (!BrowseParams.STARTS_WITH.equals(param.getKey())) {
-                jump.addHidden(param.getKey()).setValue(param.getValue());
+                jump.addPara().addHidden(param.getKey()).setValue(param.getValue());
             }
         }
 
