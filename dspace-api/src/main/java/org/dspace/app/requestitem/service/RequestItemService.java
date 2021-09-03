@@ -8,6 +8,7 @@
 package org.dspace.app.requestitem.service;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.content.Bitstream;
@@ -40,6 +41,16 @@ public interface RequestItemService {
     public String createRequest(Context context, Bitstream bitstream, Item item,
             boolean allFiles, String reqEmail, String reqName, String reqMessage)
         throws SQLException;
+
+    /**
+     * Fetch all item requests.
+     *
+     * @param context current DSpace session.
+     * @return all item requests.
+     * @throws java.sql.SQLException passed through.
+     */
+    public List<RequestItem> findAll(Context context)
+            throws SQLException;
 
     /**
      * Retrieve a request by its token.

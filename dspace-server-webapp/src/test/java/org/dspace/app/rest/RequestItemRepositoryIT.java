@@ -27,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -68,11 +69,39 @@ public class RequestItemRepositoryIT
     @Autowired(required = true)
     RequestItemService requestItemService;
 
+    private Collection collection;
+
+    private Item item;
+
+    private Bitstream bitstream;
+
     @Before
-    public void init() {
+    public void init()
+            throws SQLException, AuthorizeException, IOException {
         context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context).withName(
-                "Parent Community").build();
+        context.setCurrentUser(eperson);
+
+        parentCommunity = CommunityBuilder
+                .createCommunity(context)
+                .withName("Community")
+                .build();
+
+        collection = CollectionBuilder
+                .createCollection(context, parentCommunity)
+                .withName("Collection")
+                .build();
+
+        item = ItemBuilder
+                .createItem(context, collection)
+                .withTitle("Item")
+                .build();
+
+        InputStream is = new ByteArrayInputStream(new byte[0]);
+        bitstream = BitstreamBuilder
+                .createBitstream(context, item, is)
+                .withName("Bitstream")
+                .build();
+
         context.restoreAuthSystemState();
     }
 
@@ -86,23 +115,10 @@ public class RequestItemRepositoryIT
             throws Exception {
         System.out.println("findOne (authenticated)");
 
-        context.turnOffAuthorisationSystem();
-
-        // Create necessary supporting objects.
-        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                .build();
-        Item item = ItemBuilder.createItem(context, collection)
-                .build();
-        InputStream is = new ByteArrayInputStream(new byte[0]);
-        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, is)
-                .build();
-
         // Create a request.
         RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .build();
-
-        context.restoreAuthSystemState();
 
         // Test:  can we find it?
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -124,23 +140,10 @@ public class RequestItemRepositoryIT
             throws Exception {
         System.out.println("findOne (not authenticated)");
 
-        context.turnOffAuthorisationSystem();
-
-        // Create necessary supporting objects.
-        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                .build();
-        Item item = ItemBuilder.createItem(context, collection)
-                .build();
-        InputStream is = new ByteArrayInputStream(new byte[0]);
-        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, is)
-                .build();
-
         // Create a request.
         RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .build();
-
-        context.restoreAuthSystemState();
 
         // Test:  can we find it?
         final String uri = URI_ROOT + '/' + request.getToken();
@@ -161,21 +164,7 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateAndReturnAuthenticated()
             throws SQLException, AuthorizeException, IOException, Exception {
-        System.out.println("createAndReturn");
-
-        // Create some necessary objects.
-        context.turnOffAuthorisationSystem();
-
-        Collection col = CollectionBuilder.createCollection(context,
-                parentCommunity).build();
-        Item item = ItemBuilder.createItem(context, col).build();
-        InputStream is = new ByteArrayInputStream(new byte[0]);
-        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, is)
-                .withName("/dev/null")
-                .withMimeType("text/plain")
-                .build();
-
-        context.restoreAuthSystemState();
+        System.out.println("createAndReturn (authenticated)");
 
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
@@ -189,28 +178,34 @@ public class RequestItemRepositoryIT
         // Create it and see if it was created correctly.
         ObjectMapper mapper = new ObjectMapper();
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken)
-                .perform(post(URI_ROOT)
-                        .content(mapper.writeValueAsBytes(rir))
-                        .contentType(contentType))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", Matchers.allOf(
-                        hasJsonPath("$.id", not(is(emptyOrNullString()))),
-                        hasJsonPath("$.type", is(RequestItemRest.NAME)),
-                        hasJsonPath("$.token", not(is(emptyOrNullString()))),
-                        hasJsonPath("$.requestEmail", is(RequestItemBuilder.REQ_EMAIL)),
-                        hasJsonPath("$.requestMessage", is(RequestItemBuilder.REQ_MESSAGE)),
-                        hasJsonPath("$.requestName", is(RequestItemBuilder.REQ_NAME)),
-                        hasJsonPath("$.allfiles", is(false)),
-                        hasJsonPath("$.requestDate", not(is(emptyOrNullString()))), // TODO should be an ISO datetime
-                        hasJsonPath("$._links.self.href", not(is(emptyOrNullString())))
-                )))
-                .andDo((var result) -> saveToken(read(result.getResponse().getContentAsString(), "token")))
-                .andReturn();
+        AtomicReference<String> requestTokenRef = new AtomicReference<>();
+        try {
+            getClient(authToken)
+                    .perform(post(URI_ROOT)
+                            .content(mapper.writeValueAsBytes(rir))
+                            .contentType(contentType))
+                    .andExpect(status().isCreated())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$", Matchers.allOf(
+                            hasJsonPath("$.id", not(is(emptyOrNullString()))),
+                            hasJsonPath("$.type", is(RequestItemRest.NAME)),
+                            hasJsonPath("$.token", not(is(emptyOrNullString()))),
+                            hasJsonPath("$.requestEmail", is(RequestItemBuilder.REQ_EMAIL)),
+                            hasJsonPath("$.requestMessage", is(RequestItemBuilder.REQ_MESSAGE)),
+                            hasJsonPath("$.requestName", is(RequestItemBuilder.REQ_NAME)),
+                            hasJsonPath("$.allfiles", is(false)),
+                            // TODO should be an ISO datetime
+                            hasJsonPath("$.requestDate", not(is(emptyOrNullString()))),
+                            hasJsonPath("$._links.self.href", not(is(emptyOrNullString())))
+                    )))
+                    .andDo((var result) -> requestTokenRef.set(
+                            read(result.getResponse().getContentAsString(), "token")))
+                    .andReturn();
 
-        // Clean up the created request.
-        RequestItemBuilder.deleteRequestItem(requestToken);
+        } finally {
+            // Clean up the created request.
+            RequestItemBuilder.deleteRequestItem(requestTokenRef.get());
+        }
     }
 
     /**
@@ -224,21 +219,7 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateAndReturnNotAuthenticated()
             throws SQLException, AuthorizeException, IOException, Exception {
-        System.out.println("createAndReturn");
-
-        // Create some necessary objects.
-        context.turnOffAuthorisationSystem();
-
-        Collection col = CollectionBuilder.createCollection(context,
-                parentCommunity).build();
-        Item item = ItemBuilder.createItem(context, col).build();
-        InputStream is = new ByteArrayInputStream(new byte[0]);
-        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, is)
-                .withName("/dev/null")
-                .withMimeType("text/plain")
-                .build();
-
-        context.restoreAuthSystemState();
+        System.out.println("createAndReturn (not authenticated)");
 
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
@@ -251,27 +232,32 @@ public class RequestItemRepositoryIT
 
         // Create it and see if it was created correctly.
         ObjectMapper mapper = new ObjectMapper();
-        getClient().perform(post(URI_ROOT)
-                        .content(mapper.writeValueAsBytes(rir))
-                        .contentType(contentType))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", Matchers.allOf(
-                        hasJsonPath("$.id", not(is(emptyOrNullString()))),
-                        hasJsonPath("$.type", is(RequestItemRest.NAME)),
-                        hasJsonPath("$.token", not(is(emptyOrNullString()))),
-                        hasJsonPath("$.requestEmail", is(RequestItemBuilder.REQ_EMAIL)),
-                        hasJsonPath("$.requestMessage", is(RequestItemBuilder.REQ_MESSAGE)),
-                        hasJsonPath("$.requestName", is(RequestItemBuilder.REQ_NAME)),
-                        hasJsonPath("$.allfiles", is(false)),
-                        hasJsonPath("$.requestDate", not(is(emptyOrNullString()))), // TODO should be an ISO datetime
-                        hasJsonPath("$._links.self.href", not(is(emptyOrNullString())))
-                )))
-                .andDo((var result) -> saveToken(read(result.getResponse().getContentAsString(), "token")))
-                .andReturn();
-
-        // Clean up the created request.
-        RequestItemBuilder.deleteRequestItem(requestToken);
+        AtomicReference<String> requestTokenRef = new AtomicReference<>();
+        try {
+            getClient().perform(post(URI_ROOT)
+                            .content(mapper.writeValueAsBytes(rir))
+                            .contentType(contentType))
+                    .andExpect(status().isCreated())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$", Matchers.allOf(
+                            hasJsonPath("$.id", not(is(emptyOrNullString()))),
+                            hasJsonPath("$.type", is(RequestItemRest.NAME)),
+                            hasJsonPath("$.token", not(is(emptyOrNullString()))),
+                            hasJsonPath("$.requestEmail", is(RequestItemBuilder.REQ_EMAIL)),
+                            hasJsonPath("$.requestMessage", is(RequestItemBuilder.REQ_MESSAGE)),
+                            hasJsonPath("$.requestName", is(RequestItemBuilder.REQ_NAME)),
+                            hasJsonPath("$.allfiles", is(false)),
+                            // TODO should be an ISO datetime
+                            hasJsonPath("$.requestDate", not(is(emptyOrNullString()))),
+                            hasJsonPath("$._links.self.href", not(is(emptyOrNullString())))
+                    )))
+                    .andDo((var result) -> requestTokenRef.set(
+                            read(result.getResponse().getContentAsString(), "token")))
+                    .andReturn();
+        } finally {
+            // Clean up the created request.
+            RequestItemBuilder.deleteRequestItem(requestTokenRef.get());
+        }
     }
 
     /**
@@ -284,6 +270,8 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateWithInvalidCSRF()
             throws Exception {
+        System.out.println("testCreateWithInvalidCSRF");
+
         // Login via password to retrieve a valid token
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -293,20 +281,6 @@ public class RequestItemRepositoryIT
         // Save token to an Authorization cookie
         Cookie[] cookies = new Cookie[1];
         cookies[0] = new Cookie(AUTHORIZATION_COOKIE, token);
-
-        // Create some necessary objects.
-        context.turnOffAuthorisationSystem();
-
-        Collection col = CollectionBuilder.createCollection(context,
-                parentCommunity).build();
-        Item item = ItemBuilder.createItem(context, col).build();
-        InputStream is = new ByteArrayInputStream(new byte[0]);
-        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, is)
-                .withName("/dev/null")
-                .withMimeType("text/plain")
-                .build();
-
-        context.restoreAuthSystemState();
 
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
@@ -346,6 +320,8 @@ public class RequestItemRepositoryIT
     @Test
     public void testUntrustedOrigin()
             throws Exception {
+        System.out.println("testUntrustedOrigin");
+
         // First, get a valid login token
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -378,16 +354,5 @@ public class RequestItemRepositoryIT
         RequestItemRepository instance = new RequestItemRepository();
         Class instanceClass = instance.getDomainClass();
         assertEquals("Wrong domain class", RequestItemRest.class, instanceClass);
-    }
-
-    /** Saves the request token generated by creating an item request. */
-    private String requestToken;
-
-    /**
-     * Silly work-around because lambdas can't mutate external variables.
-     * @param token a request token to be remembered.
-     */
-    private void saveToken(String token) {
-        requestToken = token;
     }
 }
