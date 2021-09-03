@@ -41,9 +41,9 @@ public class IIIFUtils {
     // The canvas position will be appended to this string.
     private static final String CANVAS_PATH_BASE = "/canvas/c";
 
-    // get dbmdz module subclass.
+    // get module subclass.
     protected SimpleModule iiifModule = ObjectMapperFactory.getIiifModule();
-    // Use the dbmdz object mapper subclass.
+    // Use the object mapper subclass.
     protected ObjectMapper mapper = ObjectMapperFactory.getIiifObjectMapper();
 
     @Autowired
@@ -62,11 +62,12 @@ public class IIIFUtils {
                 .filter(m -> m.getMetadataField().toString().contentEquals("dspace_entity_type"))
                 .anyMatch(m -> m.getValue().contentEquals("IIIF")  ||
                         m.getValue().contentEquals("IIIFSearchable"));
-        List<Bundle> bundles;
+        List<Bundle> bundles = new ArrayList<>();
         if (iiif) {
             bundles = item.getBundles(iiifBundle);
-        } else {
-            bundles = item.getBundles();
+            if (bundles.size() == 0) {
+                bundles = item.getBundles("ORIGINAL");
+            }
         }
         return bundles;
     }

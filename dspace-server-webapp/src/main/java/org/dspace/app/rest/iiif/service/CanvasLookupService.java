@@ -19,11 +19,13 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 
 /**
  * Canvases may be dereferenced separately from the manifest via their IDs.
  */
 @Component
+@RequestScope
 public class CanvasLookupService extends AbstractResourceService {
 
     @Autowired
@@ -48,7 +50,10 @@ public class CanvasLookupService extends AbstractResourceService {
         String mimeType = utils.getBitstreamMimeType(bitstream, context);
         CanvasGenerator canvas = canvasService.getCanvas(item.getID().toString(), info, canvasPosition);
         if (mimeType.contains("image/")) {
-            addImage(canvas, mimeType, bitstreamID);
+            canvas.addThumbnail(getThumbnailAnnotation(bitstreamID, mimeType));
+            canvas.addImage(getImageContent(bitstreamID, mimeType, imageUtil.getImageProfile(), IMAGE_PATH)
+                    .getResource());
+            getImageContent(bitstreamID, mimeType, imageUtil.getImageProfile(), IMAGE_PATH).getResource();
         }
         return utils.asJson(canvas.getResource());
     }

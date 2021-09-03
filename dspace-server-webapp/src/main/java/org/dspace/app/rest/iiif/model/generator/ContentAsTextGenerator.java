@@ -19,6 +19,7 @@ public class ContentAsTextGenerator implements IIIFResource {
     public void setText(String text) {
         this.text = text;
     }
+
     @Override
     public Resource<ContentAsText> getResource() {
         if (text == null) {

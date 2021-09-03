@@ -7,16 +7,16 @@
  */
 package org.dspace.app.rest.iiif.model.generator;
 
-import java.util.ArrayList;
-import java.util.List;
+        import java.util.ArrayList;
+        import java.util.List;
 
-import de.digitalcollections.iiif.model.OtherContent;
-import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
-import de.digitalcollections.iiif.model.sharedcanvas.Resource;
-import de.digitalcollections.iiif.model.sharedcanvas.Sequence;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.RequestScope;
+        import de.digitalcollections.iiif.model.OtherContent;
+        import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
+        import de.digitalcollections.iiif.model.sharedcanvas.Resource;
+        import de.digitalcollections.iiif.model.sharedcanvas.Sequence;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.stereotype.Component;
+        import org.springframework.web.context.annotation.RequestScope;
 
 /**
  * Facade for the current Presentation API version 2.1.1 domain model's Sequence class.
@@ -62,7 +62,6 @@ public class CanvasItemsGenerator implements org.dspace.app.rest.iiif.model.gene
      * @param canvas wrapper for Canvas
      */
     public void addCanvas(org.dspace.app.rest.iiif.model.generator.CanvasGenerator canvas) {
-
         this.canvas.add((Canvas) canvas.getResource());
     }
 

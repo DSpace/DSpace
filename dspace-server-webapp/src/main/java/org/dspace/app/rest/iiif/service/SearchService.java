@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -22,8 +23,10 @@ import org.springframework.web.context.annotation.RequestScope;
 public class SearchService extends AbstractResourceService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SearchService.class);
-
     private final boolean validationEnabled;
+
+    @Autowired
+    WordHighlightSolrSearch annotationService;
 
     public SearchService(ConfigurationService configurationService) {
         validationEnabled = configurationService
@@ -38,10 +41,8 @@ public class SearchService extends AbstractResourceService {
      * @return IIIF search result with page coordinate annotations.
      */
     public String searchWithinManifest(UUID uuid, String query) {
-        // Support for https://github.com/dbmdz/solr-ocrhighlighting
-        AnnotationService annotationService =
-                new WordHighlightSolrSearch(uuid, getManifestId(uuid), IIIF_ENDPOINT, validationEnabled);
-        return annotationService.getSolrSearchResponse(query);
+        annotationService.initializeQuery(IIIF_ENDPOINT, getManifestId(uuid), validationEnabled);
+        return annotationService.getSolrSearchResponse(uuid, query);
     }
 
 }

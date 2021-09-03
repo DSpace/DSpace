@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
- * Facade or Presentation API version 2.1.1 image service property that is added to
+ * Facade for API version 2.1.1 image service property. Added to
  * each image resource.
  */
 @Component

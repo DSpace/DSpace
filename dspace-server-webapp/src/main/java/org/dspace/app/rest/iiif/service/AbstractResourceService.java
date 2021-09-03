@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Base class for IIIF responses.
  */
 public abstract class AbstractResourceService {
-
     /**
      * These values are defined in dspace configuration.
      */
@@ -39,7 +38,6 @@ public abstract class AbstractResourceService {
      */
     protected static String DOCUMENT_VIEWING_HINT;
 
-    // TODO: should these bundle settings be added to dspace configuration or hard-coded here?
     // The DSpace bundle used for IIIF entity types.
     protected static final String IIIF_BUNDLE = "IIIF";
     // The DSpace bundle for other content related to item.
@@ -100,12 +98,12 @@ public abstract class AbstractResourceService {
      * @param mimeType the image mime type
      * @param bitstreamID the bitstream uuid
      */
-    protected void addImage(CanvasGenerator canvas, String mimeType, UUID bitstreamID) throws
-            RuntimeException {
-        canvas.addThumbnail(getThumbnailAnnotation(bitstreamID, mimeType));
-        // Add image content resource to canvas facade.
-        canvas.addImage(getImageContent(bitstreamID, mimeType, imageUtil.getImageProfile(), IMAGE_PATH).getResource());
-    }
+//    protected void addImage(CanvasGenerator canvas, String mimeType, UUID bitstreamID) throws
+//            RuntimeException {
+//        canvas.addThumbnail(getThumbnailAnnotation(bitstreamID, mimeType));
+//        // Add image content resource to canvas facade.
+//        canvas.addImage(getImageContent(bitstreamID, mimeType, imageUtil.getImageProfile(), IMAGE_PATH).getResource());
+//    }
 
     /**
      * A small image that depicts or pictorially represents the resource that
@@ -134,7 +132,7 @@ public abstract class AbstractResourceService {
      * @param path the path component of the identifier
      * @return
      */
-    private ImageContentGenerator getImageContent(UUID uuid, String mimetype, ProfileGenerator profile, String path) {
+    protected ImageContentGenerator getImageContent(UUID uuid, String mimetype, ProfileGenerator profile, String path) {
         imageContent.setFormat(mimetype);
         imageContent.setIdentifier(IMAGE_SERVICE + uuid + path);
         imageContent.addService(getImageService(profile, uuid.toString()));
