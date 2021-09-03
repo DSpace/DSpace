@@ -78,7 +78,7 @@ public class AuthorityChooseServlet extends DSpaceServlet {
         int limit = UIUtil.getIntParameter(request, "limit");
         Collection collection = collectionService.find(context, collectionID);
         
-        Choices result = choiceAuthorityService.getMatches(field, query, collection, start, limit, null);
+        Choices result = choiceAuthorityService.getMatches(field, query, collection, start, limit, null, true);
 //        Choice[] testValues = {
 //            new Choice("rp0001", "VALUE1","TEST LABEL1"),
 //            new Choice("rp0002", "VALUE2","TEST LABEL2"),
