@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component;
 /**
  * Presentation API version 2.1.1 Canvas model.
  *
- * Changes a Presentation API version 3.0 will likely require new fields for
- * this class to support multiple media types.
+ * Changes a Presentation API version 3.0 will likely require updates for
+ * multiple media types, etc.
  */
 @Component
 @Scope("prototype")
