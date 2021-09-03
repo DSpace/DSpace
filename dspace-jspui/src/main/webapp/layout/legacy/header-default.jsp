@@ -111,7 +111,7 @@
                 <td>
                     <a href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/dspace-blue.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="198" height="79" border="0"/></a></td>
                     <td class="tagLine" width="99%"> <%-- Make as wide as possible. cellpadding repeated for broken NS 4.x --%>
-                    <a class="tagLineText" target="_blank" href="http://www.dspace.org/"><fmt:message key="jsp.layout.header-default.about"/></a>
+                    <a class="tagLineText" target="_blank" rel="noopener" href="http://www.dspace.org/"><fmt:message key="jsp.layout.header-default.about"/></a>
                 </td>
                 <td nowrap="nowrap" valign="middle">
                 </td>

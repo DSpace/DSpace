@@ -153,7 +153,7 @@ function AuthorLookup(url, authorityInput, collectionID) {
                         '<label>' + label + ': </label>';
 
                     if(key == 'orcid'){
-                        dataString +='<span><a target="_blank" href="http://orcid.org/' + aData[key] + '">' + aData[key] + '</a></span>';
+                        dataString +='<span><a target="_blank" rel="noopener" href="http://orcid.org/' + aData[key] + '">' + aData[key] + '</a></span>';
                     } else {
                         dataString += '<span>' + aData[key] + '</span>';
                     }
