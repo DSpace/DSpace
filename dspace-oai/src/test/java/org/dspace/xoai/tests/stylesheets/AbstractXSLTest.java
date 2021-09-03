@@ -19,7 +19,8 @@ import java.io.File;
 import java.io.InputStream;
 
 public abstract class AbstractXSLTest {
-    private static final TransformerFactory factory = TransformerFactory.newInstance();
+    private static final TransformerFactory factory = TransformerFactory
+            .newInstance("net.sf.saxon.TransformerFactoryImpl", null);
 
     protected TransformBuilder apply (String xslLocation) throws Exception {
         return new TransformBuilder(xslLocation);

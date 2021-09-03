@@ -25,16 +25,44 @@ div.policy div p img {margin: 10px;display: inline-block;}
 .whiteRomeoPublisher .header, .whiteRomeoPublisher .header a {background-color: white; color: black;}
 .grayRomeoPublisher .header, .grayRomeoPublisher .header a {background-color: grey; color:white;}
 
-.sherpaBox img {
+#sherpaBox {
+	max-height: 50em;
+	overflow: auto;
+}
+
+#sherpaBox img {
 	float: left; 
 	margin: 10px;
 }
 
-.sherpaBox .policy img {
+#sherpaBox .policy img {
 	float: none;
 	margin: 2px;
 }
 
 table.romeoColour {
 	padding: 5px;
+}
+
+.sherpa-conditions, .sherpa-prerequisites, .sherpa-locations, .sherpa-licenses {
+	margin-bottom: 0.5em;
+}
+
+.sherpa-copyright-links {
+	padding-left: 1em;
+}
+
+.sherpa-option {
+	font-style: italic;
+	font-size: 1.08em;
+	margin-bottom: 0.3em;
+}
+
+.sherpa-response {
+	margin-bottom: 1.3em;
+}
+
+.sherpa-journal {
+	background-color: #d9f6ff;
+	border-top: 1px solid #ccc;
 }

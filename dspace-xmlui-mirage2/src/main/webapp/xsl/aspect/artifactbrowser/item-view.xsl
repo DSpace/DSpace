@@ -358,18 +358,39 @@
                                 </xsl:otherwise>
                             </xsl:choose>
                     </xsl:variable>
+                    <!-- Primary bitstream is always first fptr child of mets:div[@TYPE='DSpace Item'] -->
+                    <xsl:variable name="primaryBitstream" select="//mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
 
-                    <xsl:for-each select="//mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE']/mets:file">
-                        <xsl:call-template name="itemSummaryView-DIM-file-section-entry">
-                            <xsl:with-param name="href" select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
-                            <xsl:with-param name="mimetype" select="@MIMETYPE" />
-                            <xsl:with-param name="label-1" select="$label-1" />
-                            <xsl:with-param name="label-2" select="$label-2" />
-                            <xsl:with-param name="title" select="mets:FLocat[@LOCTYPE='URL']/@xlink:title" />
-                            <xsl:with-param name="label" select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" />
-                            <xsl:with-param name="size" select="@SIZE" />
-                        </xsl:call-template>
-                    </xsl:for-each>
+                    <!-- If primary bitstream has text/html MIME type ONLY list that bitstream -->
+                    <xsl:choose>
+                        <xsl:when test="//mets:file[@ID=$primaryBitstream]/@MIMETYPE='text/html'">
+                            <xsl:for-each select="//mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE']/mets:file[@ID=$primaryBitstream]">
+                                <xsl:call-template name="itemSummaryView-DIM-file-section-entry">
+                                    <xsl:with-param name="href" select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
+                                    <xsl:with-param name="mimetype" select="@MIMETYPE" />
+                                    <xsl:with-param name="label-1" select="$label-1" />
+                                    <xsl:with-param name="label-2" select="$label-2" />
+                                    <xsl:with-param name="title" select="mets:FLocat[@LOCTYPE='URL']/@xlink:title" />
+                                    <xsl:with-param name="label" select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" />
+                                    <xsl:with-param name="size" select="@SIZE" />
+                                </xsl:call-template>
+                            </xsl:for-each>
+                        </xsl:when>
+                        <!-- Otherwise, iterate over and display all of them -->
+                        <xsl:otherwise>
+                            <xsl:for-each select="//mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE']/mets:file">
+                                <xsl:call-template name="itemSummaryView-DIM-file-section-entry">
+                                    <xsl:with-param name="href" select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
+                                    <xsl:with-param name="mimetype" select="@MIMETYPE" />
+                                    <xsl:with-param name="label-1" select="$label-1" />
+                                    <xsl:with-param name="label-2" select="$label-2" />
+                                    <xsl:with-param name="title" select="mets:FLocat[@LOCTYPE='URL']/@xlink:title" />
+                                    <xsl:with-param name="label" select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" />
+                                    <xsl:with-param name="size" select="@SIZE" />
+                                </xsl:call-template>
+                            </xsl:for-each>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </div>
             </xsl:when>
             <!-- Special case for handling ORE resource maps stored as DSpace bitstreams -->

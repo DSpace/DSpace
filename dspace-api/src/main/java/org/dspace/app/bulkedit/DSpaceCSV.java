@@ -273,8 +273,8 @@ public class DSpaceCSV implements Serializable
         ignore = new HashMap<>();
 
         // Specify default values
-        String[] defaultValues = new String[]{"dc.date.accessioned, dc.date.available, " +
-                                              "dc.date.updated, dc.description.provenance"};
+        String[] defaultValues = new String[]{"dc.date.accessioned", "dc.date.available", 
+                                              "dc.date.updated", "dc.description.provenance"};
         String[] toIgnoreArray = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("bulkedit.ignore-on-export", defaultValues);
         for (String toIgnoreString : toIgnoreArray)
         {
