@@ -11,8 +11,8 @@ import de.digitalcollections.iiif.model.enums.ViewingHint;
 import org.springframework.stereotype.Component;
 
 /**
- * IIIF Presentation API 2.1.1 ViewingHint is a hint to the client as to the most appropriate method of
- * displaying the resource. This class wraps the ViewingHint enum from the domain model.
+ * API 2.1.1 ViewingHint is a hint to the client that suggests the appropriate method of
+ * displaying the resource.
  *
  * With IIIF Presentation API 3.0 the viewingHint property is renamed to "behavior".
  */

@@ -22,7 +22,6 @@ import de.digitalcollections.iiif.model.sharedcanvas.Range;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 import de.digitalcollections.iiif.model.sharedcanvas.Sequence;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 

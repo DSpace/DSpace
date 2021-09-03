@@ -76,9 +76,6 @@ public class CanvasGenerator implements IIIFResource {
      */
     @Override
     public Resource<Canvas> getResource() {
-//        if (canvas.getHeight() == null || canvas.getWidth() == null) {
-//            throw new RuntimeException("The Canvas resource requires both height and width dimensions.");
-//        }
         return canvas;
     }
 
