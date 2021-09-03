@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -228,6 +229,17 @@ public class InitialQuestionsStep extends AbstractProcessingStep
                 //Set issued date to "today" (NOTE: InstallItem will determine the actual date for us)
                 itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "issued", null, "today");
             }
+        }
+        else {
+            List<MetadataValue> metadata = itemService.getMetadata(item, "dc", "date", "issued", Item.ANY);
+            itemService.clearMetadata(context, item,MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
+
+            for (MetadataValue metadataValue : metadata) {
+                if(!StringUtils.equals(metadataValue.getValue(), "today")){
+                    itemService.addMetadata(context, item,MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY, metadataValue.getValue());
+                }
+            }
+
         }
 
         // commit all changes to DB
