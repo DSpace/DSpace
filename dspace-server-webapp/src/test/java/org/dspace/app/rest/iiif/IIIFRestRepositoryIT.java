@@ -430,6 +430,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withEntityType("IIIF")
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
