@@ -42,11 +42,16 @@ public class RequestItemBuilder
     public void cleanup()
             throws Exception {
         LOG.debug("cleanup()");
-        if (null != requestItem) {
-            delete(context, requestItem);
-            requestItem = null;
-        } else {
-            LOG.debug("nothing to clean up.");
+        try ( Context ctx = new Context(); ) {
+            ctx.turnOffAuthorisationSystem();
+            requestItem = ctx.reloadEntity(requestItem);
+            if (null != requestItem) {
+                delete(ctx, requestItem);
+                ctx.complete();
+                requestItem = null;
+            } else {
+                LOG.debug("nothing to clean up.");
+            }
         }
     }
 
@@ -72,6 +77,13 @@ public class RequestItemBuilder
 
     @Override
     public RequestItem build() {
+        LOG.atDebug()
+                .withLocation()
+                .log("Building request with item ID {}",
+                        () -> requestItem.getItem().getID().toString());
+        System.out.format("Building request with item ID %s%n",
+                requestItem.getItem().getID().toString());
+        new Throwable().printStackTrace(System.out);
         // Nothing to build.
         return requestItem;
     }
@@ -85,12 +97,22 @@ public class RequestItemBuilder
     /**
      * Delete a request identified by its token.  If no such token is known,
      * simply return.
+     *
      * @param token the token identifying the request.
+     * @throws java.sql.SQLException passed through
      */
-    static public void deleteRequestItem(String token) {
+    static public void deleteRequestItem(String token)
+            throws SQLException {
+        LOG.atDebug()
+                .withLocation()
+                .log("Delete RequestItem with token {}", token);
         try (Context context = new Context()) {
             RequestItem request = requestItemService.findByToken(context, token);
+            if (null == request) {
+                return;
+            }
             requestItemService.delete(context, request);
+            context.complete();
         }
     }
 
