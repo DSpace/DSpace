@@ -183,7 +183,7 @@ public class PackageUtils {
                                          Item item, Collection collection)
         throws SQLException, IOException, AuthorizeException {
         if (license == null) {
-            license = collection.getLicenseCollection();
+            license = collectionService.getLicense(collection);
         }
         InputStream lis = new ByteArrayInputStream(license.getBytes());
 
