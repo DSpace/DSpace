@@ -121,7 +121,7 @@
 <script type="text/javascript">
 	var jQ = jQuery.noConflict();
 	jQ(document).ready(function() {
-		jQ( "#spellCheckQuery").click(function(){
+		jQ( "#spellCheckQuery").on("click", function(){
 			jQ("#query").val(jQ(this).attr('data-spell'));
 			jQ("#main-query-submit").click();
 		});
@@ -168,7 +168,7 @@
 
 <h2><fmt:message key="jsp.search.title"/></h2>
 
-<div class="discovery-search-form panel panel-default">
+<div class="discovery-search-form panel panel-default row">
     <%-- Controls for a repeat search --%>
 	<div class="discovery-query panel-heading">
     <form action="simple-search" method="get">
@@ -470,7 +470,7 @@ else if( qResults != null)
 
 %>
 <hr/>
-<div class="discovery-result-pagination row container">
+<div class="discovery-result-pagination row">
 <%
 	long lastHint = qResults.getStart()+qResults.getMaxResults() <= qResults.getTotalSearchResults()?
 	        qResults.getStart()+qResults.getMaxResults():qResults.getTotalSearchResults();
@@ -539,7 +539,7 @@ else if( qResults != null)
 	</ul>
 <!-- give a content to the div -->
 </div>
-<div class="discovery-result-results">
+<div class="discovery-result-results row">
 <% if (communities.size() > 0 ) { %>
     <div class="panel panel-info">
     <div class="panel-heading"><fmt:message key="jsp.search.results.comhits"/></div>

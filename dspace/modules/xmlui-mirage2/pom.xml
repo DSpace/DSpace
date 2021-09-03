@@ -26,8 +26,8 @@
         <!-- These versions should be kept in sync with ./.travis.yml -->
         <sass.version>3.4.25</sass.version>
         <compass.version>1.0.1</compass.version>
-        <node.version>6.5.0</node.version>
-        <npm.version>3.10.8</npm.version>
+        <node.version>8.10.0</node.version>
+        <npm.version>6.5.0</npm.version>
         <!-- Override version of JRuby that gem-maven-plugin installs when "mirage2.deps.included=true" -->
         <jruby.version>9.1.17.0</jruby.version>
     </properties>
@@ -63,57 +63,6 @@
                             <includeArtifactIds>
                                 dspace-xmlui-mirage2
                             </includeArtifactIds>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <phase>process-resources</phase>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/themes</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/src/main/webapp/themes</directory>
-                                    <excludes>
-                                        <exclude>**/*.bmp</exclude>
-                                        <exclude>**/*.jpg</exclude>
-                                        <exclude>**/*.jpeg</exclude>
-                                        <exclude>**/*.gif</exclude>
-                                        <exclude>**/*.png</exclude>
-                                        <exclude>**/*.ico</exclude>
-                                        <exclude>**/*.svg</exclude>
-                                        <exclude>**/*.ttf</exclude>
-                                        <exclude>**/*.woff</exclude>
-                                        <exclude>**/*.eot</exclude>
-                                        <exclude>**/*.xsl</exclude>
-                                    </excludes>
-                                    <filtering>true</filtering>
-                                </resource>
-                                <resource>
-                                    <directory>${basedir}/src/main/webapp/themes</directory>
-                                    <includes>
-                                        <include>**/*.bmp</include>
-                                        <include>**/*.jpg</include>
-                                        <include>**/*.jpeg</include>
-                                        <include>**/*.gif</include>
-                                        <include>**/*.png</include>
-                                        <include>**/*.ico</include>
-                                        <include>**/*.svg</include>
-                                        <include>**/*.ttf</include>
-                                        <include>**/*.woff</include>
-                                        <include>**/*.eot</include>
-                                        <include>**/*.xsl</include>
-                                    </includes>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
                         </configuration>
                     </execution>
                 </executions>
@@ -230,7 +179,6 @@
                                             <goal>copy-resources</goal>
                                             <configuration>
                                                 <outputDirectory>${project.build.directory}/themes/@item@</outputDirectory>
-                                                <overwrite>false</overwrite>
                                                 <resources>
                                                     <resource>
                                                         <directory>${project.build.directory}/mirage2-source-extracted</directory>
@@ -238,6 +186,13 @@
                                                         <excludes>
                                                             <exclude>sitemap.xmap</exclude>
                                                         </excludes>
+                                                    </resource>
+                                                    <resource>
+                                                        <directory>${project.build.directory}/mirage2-source-extracted</directory>
+                                                        <filtering>true</filtering>
+                                                        <includes>
+                                                            <include>sitemap.xmap</include>
+                                                        </includes>
                                                     </resource>
                                                 </resources>
                                             </configuration>
@@ -250,10 +205,17 @@
                                             <goal>copy-resources</goal>
                                             <configuration>
                                                 <outputDirectory>${project.build.directory}/themes/@item@</outputDirectory>
-                                                <overwrite>false</overwrite>
+                                                <overwrite>true</overwrite>
                                                 <resources>
                                                     <resource>
-                                                        <directory>${project.build.directory}/mirage2-source-extracted</directory>
+                                                        <directory>${basedir}/src/main/webapp/themes/@item@</directory>
+                                                        <filtering>false</filtering>
+                                                        <excludes>
+                                                            <exclude>sitemap.xmap</exclude>
+                                                        </excludes>
+                                                    </resource>
+                                                    <resource>
+                                                        <directory>${basedir}/src/main/webapp/themes/@item@</directory>
                                                         <filtering>true</filtering>
                                                         <includes>
                                                             <include>sitemap.xmap</include>
@@ -392,7 +354,6 @@
                                             <goal>copy-resources</goal>
                                             <configuration>
                                                 <outputDirectory>${project.build.directory}/themes/@item@</outputDirectory>
-                                                <overwrite>false</overwrite>
                                                 <resources>
                                                     <resource>
                                                         <directory>${project.build.directory}/mirage2-source-extracted</directory>
@@ -400,6 +361,13 @@
                                                         <excludes>
                                                             <exclude>sitemap.xmap</exclude>
                                                         </excludes>
+                                                    </resource>
+                                                    <resource>
+                                                        <directory>${project.build.directory}/mirage2-source-extracted</directory>
+                                                        <filtering>true</filtering>
+                                                        <includes>
+                                                            <include>sitemap.xmap</include>
+                                                        </includes>
                                                     </resource>
                                                 </resources>
                                             </configuration>
@@ -412,10 +380,17 @@
                                             <goal>copy-resources</goal>
                                             <configuration>
                                                 <outputDirectory>${project.build.directory}/themes/@item@</outputDirectory>
-                                                <overwrite>false</overwrite>
+                                                <overwrite>true</overwrite>
                                                 <resources>
                                                     <resource>
-                                                        <directory>${project.build.directory}/mirage2-source-extracted</directory>
+                                                        <directory>${basedir}/src/main/webapp/themes/@item@</directory>
+                                                        <filtering>false</filtering>
+                                                        <excludes>
+                                                            <exclude>sitemap.xmap</exclude>
+                                                        </excludes>
+                                                    </resource>
+                                                    <resource>
+                                                        <directory>${basedir}/src/main/webapp/themes/@item@</directory>
                                                         <filtering>true</filtering>
                                                         <includes>
                                                             <include>sitemap.xmap</include>

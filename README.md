@@ -3,12 +3,12 @@
 
 [![Build Status](https://travis-ci.org/DSpace/DSpace.png?branch=master)](https://travis-ci.org/DSpace/DSpace)
 
-[DSpace Documentation](https://wiki.duraspace.org/display/DSDOC/) | 
+[DSpace Documentation](https://wiki.duraspace.org/display/DSDOC/) |
 [DSpace Releases](https://github.com/DSpace/DSpace/releases) |
-[DSpace Wiki](https://wiki.duraspace.org/display/DSPACE/Home) | 
+[DSpace Wiki](https://wiki.duraspace.org/display/DSPACE/Home) |
 [Support](https://wiki.duraspace.org/display/DSPACE/Support)
 
-DSpace open source software is a turnkey repository application used by more than 
+DSpace open source software is a turnkey repository application used by more than
 1000+ organizations and institutions worldwide to provide durable access to digital resources.
 For more information, visit http://www.dspace.org/
 
@@ -20,18 +20,21 @@ Past releases are all available via GitHub at https://github.com/DSpace/DSpace/r
 
 ## Documentation / Installation
 
-Documentation for each release may be viewed online or downloaded via our [Documentation Wiki](https://wiki.duraspace.org/display/DSDOC/). 
+Documentation for each release may be viewed online or downloaded via our [Documentation Wiki](https://wiki.duraspace.org/display/DSDOC/).
 
 The latest DSpace Installation instructions are available at:
 https://wiki.duraspace.org/display/DSDOC6x/Installing+DSpace
 
-Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL or Oracle) 
+Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL or Oracle)
 and a servlet container (usually Tomcat) in order to function.
 More information about these and all other prerequisites can be found in the Installation instructions above.
 
+## Running DSpace 6 in Docker
+See [Running DSpace 6 with Docker Compose](dspace/src/main/docker-compose/README.md)
+
 ## Contributing
 
-DSpace is a community built and supported project. We do not have a centralized development or support team, 
+DSpace is a community built and supported project. We do not have a centralized development or support team,
 but have a dedicated group of volunteers who help us improve the software, documentation, resources, etc.
 
 We welcome contributions of any type. Here's a few basic guides that provide suggestions for contributing to DSpace:
@@ -55,8 +58,8 @@ We welcome everyone to participate in these lists:
 
 Additional support options are listed at https://wiki.duraspace.org/display/DSPACE/Support
 
-DSpace also has an active service provider network. If you'd rather hire a service provider to 
-install, upgrade, customize or host DSpace, then we recommend getting in touch with one of our 
+DSpace also has an active service provider network. If you'd rather hire a service provider to
+install, upgrade, customize or host DSpace, then we recommend getting in touch with one of our
 [Registered Service Providers](http://www.dspace.org/service-providers).
 
 ## Issue Tracker

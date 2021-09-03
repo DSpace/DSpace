@@ -4,3 +4,7 @@
 */target/
 dspace/modules/*/target/
 Dockerfile.*
+dspace/src/main/docker/dspace-postgres-pgcrypto
+dspace/src/main/docker/dspace-postgres-pgcrypto-curl
+dspace/src/main/docker/README.md
+dspace/src/main/docker-compose/

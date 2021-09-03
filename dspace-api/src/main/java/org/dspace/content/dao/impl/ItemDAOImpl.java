@@ -19,6 +19,7 @@ import org.dspace.eperson.EPerson;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
@@ -50,14 +51,14 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     @Override
     public Iterator<Item> findAll(Context context, boolean archived) throws SQLException {
-        Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive");
+        Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive order by id");
         query.setParameter("in_archive", archived);
         return iterate(query);
     }
 
     @Override
     public Iterator<Item> findAll(Context context, boolean archived, boolean withdrawn) throws SQLException {
-        Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive or withdrawn = :withdrawn");
+        Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive or withdrawn = :withdrawn order by id");
         query.setParameter("in_archive", archived);
         query.setParameter("withdrawn", withdrawn);
         return iterate(query);
@@ -78,6 +79,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             queryStr.append(" AND last_modified > :last_modified");
         }
 
+        queryStr.append(" order by id");
+
         Query query = createQuery(context, queryStr.toString());
         query.setParameter("in_archive", archived);
         query.setParameter("withdrawn", withdrawn);
@@ -91,7 +94,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     @Override
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException {
-        Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive and submitter= :submitter");
+        Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive and submitter= :submitter order by id");
         query.setParameter("in_archive", true);
         query.setParameter("submitter", eperson);
         return iterate(query);
@@ -122,7 +125,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         {
             hqlQueryString += " AND STR(metadatavalue.value) = :text_value";
         }
-        Query query = createQuery(context, hqlQueryString);
+        Query query = createQuery(context, hqlQueryString + " order by item.id");
 
         query.setParameter("in_archive", inArchive);
         query.setParameter("metadata_field", metadataField);
@@ -195,6 +198,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         		criteria.add(Subqueries.notExists(subcriteria));        		
         	}
         }
+        criteria.addOrder(Order.asc("item.id"));
+
      	log.debug(String.format("Running custom query with %d filters", index));
 
         return list(criteria).iterator();
@@ -202,7 +207,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     @Override
     public Iterator<Item> findByAuthorityValue(Context context, MetadataField metadataField, String authority, boolean inArchive) throws SQLException {
-        Query query = createQuery(context, "SELECT item FROM Item as item join item.metadata metadatavalue WHERE item.inArchive=:in_archive AND metadatavalue.metadataField = :metadata_field AND metadatavalue.authority = :authority");
+        Query query = createQuery(context, "SELECT item FROM Item as item join item.metadata metadatavalue WHERE item.inArchive=:in_archive AND metadatavalue.metadataField = :metadata_field AND metadatavalue.authority = :authority order by item.id");
         query.setParameter("in_archive", inArchive);
         query.setParameter("metadata_field", metadataField);
         query.setParameter("authority", authority);
@@ -211,7 +216,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     @Override
     public Iterator<Item> findArchivedByCollection(Context context, Collection collection, Integer limit, Integer offset) throws SQLException {
-        Query query = createQuery(context, "select i from Item i join i.collections c WHERE :collection IN c AND i.inArchive=:in_archive");
+        Query query = createQuery(context, "select i from Item i join i.collections c WHERE :collection IN c AND i.inArchive=:in_archive order by i.id");
         query.setParameter("collection", collection);
         query.setParameter("in_archive", true);
         if(offset != null)
@@ -227,7 +232,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     @Override
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException {
-        Query query = createQuery(context, "select i from Item i join i.collections c WHERE :collection IN c");
+        Query query = createQuery(context, "select i from Item i join i.collections c WHERE :collection IN c order by i.id");
         query.setParameter("collection", collection);
 
         return iterate(query);
@@ -235,7 +240,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     @Override
     public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset) throws SQLException {
-        Query query = createQuery(context, "select i from Item i join i.collections c WHERE :collection IN c");
+        Query query = createQuery(context, "select i from Item i join i.collections c WHERE :collection IN c order by i.id");
         query.setParameter("collection", collection);
 
         if(offset != null)
@@ -280,7 +285,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     public Iterator<Item> findByLastModifiedSince(Context context, Date since)
             throws SQLException
     {
-        Query query = createQuery(context, "SELECT i FROM item i WHERE last_modified > :last_modified");
+        Query query = createQuery(context, "SELECT i FROM item i WHERE last_modified > :last_modified order by id");
         query.setTimestamp("last_modified", since);
         return iterate(query);
     }

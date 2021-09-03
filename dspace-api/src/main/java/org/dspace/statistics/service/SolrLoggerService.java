@@ -18,6 +18,7 @@ import org.dspace.usage.UsageWorkflowEvent;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -117,6 +118,10 @@ public interface SolrLoggerService {
             List<String> fieldNames, List<List<Object>> fieldValuesList)
             throws SolrServerException, IOException;
 
+    public void update(String query, String action,
+                       List<String> fieldNames, List<List<Object>> fieldValuesList, boolean commit)
+        throws SolrServerException, IOException;
+
     public void query(String query, int max) throws SolrServerException;
 
     /**
@@ -179,6 +184,18 @@ public interface SolrLoggerService {
             String dateEnd, List<String> facetQueries, String sort, boolean ascending)
             throws SolrServerException;
 
+    public QueryResponse query(String query, String filterQuery,
+                               String facetField, int rows, int max, String dateType, String dateStart,
+                               String dateEnd, List<String> facetQueries, String sort, boolean ascending,
+                               boolean defaultFilterQueries)
+            throws SolrServerException;
+
+    public QueryResponse query(String query, String filterQuery,
+                               String facetField, int rows, int max, String dateType, String dateStart,
+                               String dateEnd, List<String> facetQueries, String sort, boolean ascending,
+                               boolean defaultFilterQueries, boolean includeShardField)
+        throws SolrServerException;
+
     /**
      * Returns in a filterQuery string all the ip addresses that should be ignored
      *
@@ -203,5 +220,11 @@ public interface SolrLoggerService {
      * @throws Exception if error
      */
     public void exportHits() throws Exception;
+
+    public void commit() throws Exception;
+
+    public void commitShard(String shard) throws Exception;
+
+    public Object anonymizeIp(String ip) throws UnknownHostException;
 
 }

@@ -12,6 +12,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.dao.MetadataValueDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
+import org.dspace.storage.rdbms.DatabaseUtils;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Query;
@@ -27,6 +28,7 @@ import java.util.List;
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
+ * @author Adán Román Ruiz at arvo.es (DS-3453)
  */
 public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> implements MetadataValueDAO
 {
@@ -71,7 +73,13 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
     public MetadataValue getMinimum(Context context, int metadataFieldId)
             throws SQLException
     {
-        String queryString = "SELECT m FROM MetadataValue m JOIN FETCH m.metadataField WHERE m.metadataField.id = :metadata_field_id ORDER BY text_value";
+        String queryString;
+        if(context.getDbType().equals(DatabaseUtils.DBMS_ORACLE)) {
+            queryString = "SELECT m FROM MetadataValue m JOIN FETCH m.metadataField WHERE m.metadataField.id = :metadata_field_id ORDER BY DBMS_LOB.substr(text_value , 4000 , 1)";
+        } else {
+            queryString = "SELECT m FROM MetadataValue m JOIN FETCH m.metadataField WHERE m.metadataField.id = :metadata_field_id ORDER BY text_value";
+        }
+
         Query query = createQuery(context, queryString);
         query.setParameter("metadata_field_id", metadataFieldId);
         query.setMaxResults(1);

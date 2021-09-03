@@ -333,13 +333,13 @@ public class UploadWithEmbargoStep extends UploadStep
 	            	cell.addContent(" ");
 	            	switch (support)
 	            	{
-	            	case 1:
-	            		cell.addContent(T_supported);
+	            	case BitstreamFormat.KNOWN:
+                        cell.addContent(T_known);
 	            		break;
-	            	case 2:
-	            		cell.addContent(T_known);
+	            	case BitstreamFormat.SUPPORTED:
+                        cell.addContent(T_supported);
 	            		break;
-	            	case 3:
+	            	case BitstreamFormat.UNKNOWN:
 	            		cell.addContent(T_unsupported);
 	            		break;
 	            	}

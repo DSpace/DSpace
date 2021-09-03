@@ -307,8 +307,14 @@
             </xsl:if>
 
             <!-- Add all Google Scholar Metadata values -->
-            <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[substring(@element, 1, 9) = 'citation_']">
-                <meta name="{@element}" content="{.}"></meta>
+            <!-- this is done in text, by design, because disabling output escaping is not allowed on attributes-->
+            <!-- while it is necessary to ensure that author names with special characters pass unescaped-->
+            <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[substring(@element, 1, 9) = 'citation_']" >
+                <xsl:text disable-output-escaping="yes">&lt;meta name="</xsl:text>
+                <xsl:value-of select="@element" />
+                <xsl:text disable-output-escaping="yes">" content="</xsl:text>
+                <xsl:value-of select="." disable-output-escaping="yes" />
+                <xsl:text disable-output-escaping="yes">" /&gt;&#xa;</xsl:text>
             </xsl:for-each>
 
             <!-- Add MathJAX JS library to render scientific formulas-->
@@ -583,11 +589,11 @@
         <div id="ds-footer-wrapper">
             <div id="ds-footer">
                 <div id="ds-footer-left">
-                    <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2016&#160; <a href="http://www.duraspace.org/" target="_blank">DuraSpace</a>
+                    <a href="http://www.dspace.org/" target="_blank" rel="noopener">DSpace software</a> copyright&#160;&#169;&#160;2002-2016&#160; <a href="http://www.duraspace.org/" target="_blank" rel="noopener">DuraSpace</a>
                 </div>
                 <div id="ds-footer-right">
                     <span class="theme-by">Theme by&#160;</span>
-                    <a title="Atmire NV" target="_blank" href="http://atmire.com" id="ds-footer-logo-link">
+                    <a title="Atmire NV" target="_blank" rel="noopener" href="http://atmire.com" id="ds-footer-logo-link">
                     <span id="ds-footer-logo">&#160;</span>
                     </a>
                 </div>
@@ -682,7 +688,7 @@
 
     <xsl:template name="addJavascript">
         <xsl:variable name="jqueryVersion">
-            <xsl:text>1.6.4</xsl:text>
+            <xsl:text>3.4.1</xsl:text>
         </xsl:variable>
 
 

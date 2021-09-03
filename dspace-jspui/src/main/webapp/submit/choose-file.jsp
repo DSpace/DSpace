@@ -66,7 +66,7 @@
                 jQuery(document).ready(function(html){
                     jQuery.ajax({
                         url: '<%= request.getContextPath() + "/tools/sherpaPolicy" %>', 
-                        data: {item_id: <%= subInfo.getSubmissionItem().getItem().getID() %>}})
+                        data: {item_id: "<%= subInfo.getSubmissionItem().getItem().getID() %>"}})
                             .done(function(html) {
                                 jQuery('#sherpaContent').html(html);
                     });
@@ -345,8 +345,22 @@
         </form>
         <iframe id="uploadFormIFrame" name="uploadFormIFrame" style="display: none"> </iframe>
     <% } %>
-    
-    <form id="uploadForm" <%= bSherpa?"class=\"sherpa col-md-8\"":"" %> method="post" 
+    <% if (bSherpa) { %>
+        <div class="col-md-4">
+            <div id="sherpaBox" class="panel panel-info">
+                <div class="panel-heading">
+                    <span id="ui-id-1"><fmt:message key="jsp.sherpa.title" /></span>
+                </div>
+                <div id="sherpaContent" class="panel-body">
+                    <fmt:message key="jsp.sherpa.loading">
+                          <fmt:param value="<%=request.getContextPath()%>" />
+                    </fmt:message>  
+                </div>
+            </div>
+        </div>
+    <% } %>    
+	<div class="col-md-<%= bSherpa?"8":"12" %>">
+    <form id="uploadForm" <%= bSherpa?"class=\"sherpa\"":"" %> method="post" 
     	action="<%= request.getContextPath() %>/submit" enctype="multipart/form-data" 
     	onkeydown="return disableEnterKey(event);">
 
@@ -384,7 +398,7 @@
         </div>
 		<br/>
         
-        <div class="row container">
+        <div class="row">
     		<div class="row">
                     <%-- Document File: --%>
                     <div class="simple-upload">
@@ -416,8 +430,8 @@
                             </td>
                             <td class="progress-text" nowrap="nowrap"></td>
                             <td class="progress-pause" nowrap="nowrap">
-                                <a href="#" onclick="resume(); return(false);" class="progress-resume-link"><img src="image/submit/resume.png" title="Resume upload" /></a>
-                                <a href="#" onclick="r.pause(); return(false);" class="progress-pause-link"><img src="image/submit/pause.png" title="Pause upload" /></a>
+                                <button class="btn btn-link progress-resume-link"><img src="image/submit/resume.png" title="Resume upload" /></button>
+                                <button class="btn btn-link progress-pause-link"><img src="image/submit/pause.png" title="Pause upload" /></button>
                             </td>
                         </tr>
                     </table>
@@ -522,6 +536,15 @@
 
                             
                         }
+                        
+                        $(".progress-pause-link").on("click", function(){
+                        	r.pause();
+                        	return(false);
+                        });
+                        $(".progress-resume-link").on("click", function(){
+                        	resume();
+                        	return(false);
+                        });                        
                     });
 			
 		    function resume() {
@@ -608,20 +631,7 @@
                     %>   
                         <input class="btn btn-primary col-md-<%= 12 / (col + 2) %>" type="submit" name="<%=UploadStep.SUBMIT_UPLOAD_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
             </div> 
-        </div>
     </form>
-    <% if (bSherpa) { %>
-        <div class="col-md-4">
-            <div id="sherpaBox" class="panel panel-info">
-                <div class="panel-heading">
-                    <span id="ui-id-1"><fmt:message key="jsp.sherpa.title" /></span>
-                </div>
-                <div id="sherpaContent" class="panel-body">
-                    <fmt:message key="jsp.sherpa.loading">
-                          <fmt:param value="<%=request.getContextPath()%>" />
-                    </fmt:message>  
-                </div>
-            </div>
-        </div>
-    <% } %>
+    </div>
+
 </dspace:layout>
