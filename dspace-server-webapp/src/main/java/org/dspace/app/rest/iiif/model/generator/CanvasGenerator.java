@@ -7,8 +7,10 @@
  */
 package org.dspace.app.rest.iiif.model.generator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.digitalcollections.iiif.model.ImageContent;
-import de.digitalcollections.iiif.model.PropertyValue;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 import org.springframework.context.annotation.Scope;
@@ -24,50 +26,61 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 public class CanvasGenerator implements IIIFResource {
 
-    Canvas canvas;
+    private String identifier;
+    private String label;
+    private Integer height;
+    private Integer width;
+    private List<ImageContent> images = new ArrayList();
+    private ImageContent thumbnail;
 
-    public CanvasGenerator(String identifier) {
-        this.canvas = new Canvas(identifier);
+    public  CanvasGenerator setIdentifier(String identifier) {
+        this.identifier = identifier;
+        return this;
     }
 
     /**
      * Every canvas must have a label to display.
      * @param label
      */
-    public void setLabel(String label) {
-        canvas.setLabel(new PropertyValue(label));
+    public CanvasGenerator setLabel(String label) {
+        this.label = label;
+        return this;
     }
 
     /**
      * Every canvas must have an integer height.
      * @param height
      */
-    public void setHeight(int height) {
-        canvas.setHeight(height);
+    public CanvasGenerator setHeight(int height) {
+        this.height = height;
+        return this;
     }
 
     /**
      * Every canvas must have an integer width.
      * @param width
      */
-    public void setWidth(int width) {
-        canvas.setWidth(width);
+    public CanvasGenerator setWidth(int width) {
+        this.width = width;
+        return this;
     }
 
     /**
      * Add to ImageContent resources that will be assigned to the canvas.
      * @param imageContent
      */
-    public void addImage(Resource<ImageContent> imageContent) {
-        canvas.addImage((ImageContent) imageContent);
+    public CanvasGenerator addImage(Resource<ImageContent> imageContent) {
+        images.add((ImageContent) imageContent);
+        return this;
     }
 
     /**
      * The Thumbnail resource that will be assigned to the canvas.
      * @param thumbnail
      */
-    public void addThumbnail(ImageContentGenerator thumbnail) {
-        canvas.addThumbnail((ImageContent) thumbnail.getResource());
+    public CanvasGenerator addThumbnail(Resource<ImageContent> thumbnail) {
+        this.thumbnail = (ImageContent) thumbnail;
+        return this;
     }
 
     /**
@@ -76,6 +89,31 @@ public class CanvasGenerator implements IIIFResource {
      */
     @Override
     public Resource<Canvas> getResource() {
+        /**
+         * The Canvas resource typically includes image content.
+         */
+        Canvas canvas;
+        if (identifier == null) {
+            throw new RuntimeException("The Canvas resource requires an identifier.");
+        }
+        if (label != null) {
+            canvas = new Canvas(identifier, label);
+        } else {
+            canvas = new Canvas(identifier);
+        }
+        if (images.size() > 0) {
+            if (height == null || width == null) {
+                throw new RuntimeException("The Canvas resource requires both height and width dimensions.");
+            }
+            canvas.setWidth(width);
+            canvas.setHeight(height);
+            for (ImageContent res : images) {
+                canvas.addImage(res);
+            }
+            if (thumbnail != null) {
+                canvas.addThumbnail(thumbnail);
+            }
+        }
         return canvas;
     }
 

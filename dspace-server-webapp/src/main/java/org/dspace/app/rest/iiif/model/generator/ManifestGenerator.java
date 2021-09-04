@@ -36,8 +36,6 @@ import org.springframework.web.context.annotation.RequestScope;
 @RequestScope
 public class ManifestGenerator implements IIIFResource {
 
-    //private final Manifest manifest;
-
     private String identifier;
     private String label;
     private PropertyValue description;
@@ -50,8 +48,7 @@ public class ManifestGenerator implements IIIFResource {
     private ContentSearchService searchService;
     private final List<URI> license = new ArrayList<>();
     private final List<MetadataEntry> metadata = new ArrayList<>();
-    private List<Range> ranges = new ArrayList<>();
-
+    private List<RangeGenerator> ranges = new ArrayList<>();
 
     @Autowired
     MetadataEntryGenerator metadataEntryGenerator;
@@ -102,7 +99,7 @@ public class ManifestGenerator implements IIIFResource {
      * Add otional seeAlso element to Manifest.
      * @param seeAlso
      */
-    public void addSeeAlso(org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator seeAlso) {
+    public void addSeeAlso(ExternalLinksGenerator seeAlso) {
         this.seeAlso = (OtherContent) seeAlso.getResource();
     }
 
@@ -118,7 +115,7 @@ public class ManifestGenerator implements IIIFResource {
      * Add optional related element to Manifest.
      * @param related
      */
-    public void addRelated(org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator related) {
+    public void addRelated(ExternalLinksGenerator related) {
         this.related = (OtherContent) related.getResource();
     }
 
@@ -126,7 +123,7 @@ public class ManifestGenerator implements IIIFResource {
      * Adds optional search service to Manifest.
      * @param searchService
      */
-    public void addService(org.dspace.app.rest.iiif.model.generator.ContentSearchGenerator searchService) {
+    public void addService(ContentSearchGenerator searchService) {
         this.searchService = (ContentSearchService) searchService.getService();
     }
 
@@ -160,10 +157,10 @@ public class ManifestGenerator implements IIIFResource {
 
     /**
      * Adds optional Range to the manifest's structures element.
-     * @param range
+     * @param rangeGenerator
      */
-    public void addRange(RangeGenerator range) {
-        ranges.add((Range) range.getResource());
+    public void setRange(List<RangeGenerator> rangeGenerator) {
+        ranges =  rangeGenerator;
     }
 
     @Override
@@ -186,8 +183,10 @@ public class ManifestGenerator implements IIIFResource {
         if (sequence != null) {
             manifest.addSequence(sequence);
         }
-        if (ranges.size() > 0) {
-            manifest.setRanges(ranges);
+        if (ranges != null && ranges.size() > 0) {
+            for (RangeGenerator range : ranges) {
+                manifest.addRange((Range) range.getResource());
+            }
         }
         if (metadata.size() > 0) {
             for (MetadataEntry meta : metadata) {
