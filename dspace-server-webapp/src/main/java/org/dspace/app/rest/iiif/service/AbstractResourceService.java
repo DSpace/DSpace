@@ -9,9 +9,6 @@ package org.dspace.app.rest.iiif.service;
 
 import java.util.UUID;
 
-import org.dspace.app.rest.iiif.model.generator.ImageContentGenerator;
-import org.dspace.app.rest.iiif.model.generator.ImageServiceGenerator;
-import org.dspace.app.rest.iiif.model.generator.ProfileGenerator;
 import org.dspace.app.rest.iiif.service.util.IIIFUtils;
 import org.dspace.app.rest.iiif.service.util.ImageProfileUtil;
 import org.dspace.app.rest.iiif.service.util.ThumbProfileUtil;
@@ -55,11 +52,6 @@ public abstract class AbstractResourceService {
     @Autowired
     ImageProfileUtil imageUtil;
 
-    @Autowired
-    ImageContentGenerator imageContent;
-
-    @Autowired
-    ImageServiceGenerator imageService;
 
     /**
      * Set constants using DSpace configuration definitions.
@@ -84,52 +76,5 @@ public abstract class AbstractResourceService {
         return IIIF_ENDPOINT + uuid + "/manifest";
     }
 
-    /**
-     * A small image that depicts or pictorially represents the resource that
-     * the property is attached to, such as the title page, a significant image
-     * or rendering of a canvas with multiple content resources associated with it.
-     * It is recommended that a IIIF Image API service be available for this image for
-     * manipulations such as resizing.
-     *
-     * This method returns a thumbnail annotation that includes the IIIF image service.
-     *
-     * @param uuid the bitstream id
-     * @return thumbnail Annotation
-     */
-    protected ImageContentGenerator getThumbnailAnnotation(UUID uuid, String mimetype) throws
-            RuntimeException {
-        return getImageContent(uuid, mimetype, thumbUtil.getThumbnailProfile(), THUMBNAIL_PATH);
-    }
-
-    /**
-     * Association of images with their respective canvases is done via annotations. The Open Annotation model
-     * allows any resource to be associated with any other resource, or parts thereof, and it is reused for
-     * both commentary and painting resources on the canvas.
-     * @param uuid bitstream uuid
-     * @param mimetype bitstream mimetype
-     * @param profile the service profile
-     * @param path the path component of the identifier
-     * @return
-     */
-    protected ImageContentGenerator getImageContent(UUID uuid, String mimetype, ProfileGenerator profile, String path) {
-        imageContent.setFormat(mimetype);
-        imageContent.setIdentifier(IMAGE_SERVICE + uuid + path);
-        imageContent.addService(getImageService(profile, uuid.toString()));
-        return imageContent;
-    }
-
-    /**
-     * A link to a service that makes more functionality available for the resource,
-     * such as from an image to the base URI of an associated IIIF Image API service.
-     *
-     * @param profile service profile
-     * @param uuid id of the image bitstream
-     * @return object representing the Image Service
-     */
-    private ImageServiceGenerator getImageService(ProfileGenerator profile, String uuid) {
-        imageService.setIdentifier(IMAGE_SERVICE + uuid);
-        imageService.setProfile(profile);
-        return imageService;
-    }
 
 }

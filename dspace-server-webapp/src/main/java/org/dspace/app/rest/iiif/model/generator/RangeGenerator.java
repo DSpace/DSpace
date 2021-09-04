@@ -63,11 +63,6 @@ public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.
         for (Canvas canvas : canvasList) {
             range.addCanvas(canvas);
         }
-        // Reset properties after each use
-        identifier = null;
-        canvasList.clear();
-        label = null;
-
         return range;
     }
 }

@@ -48,10 +48,13 @@ public class AnnotationListService extends AbstractResourceService {
     BitstreamFormatService bitstreamFormatService;
 
     @Autowired
+    ExternalLinksGenerator externalLinksGenerator;
+
+    @Autowired
     AnnotationListGenerator annotationList;
 
-    public AnnotationListService(ApplicationContext applicationContext, ConfigurationService configurationService) {
 
+    public AnnotationListService(ApplicationContext applicationContext, ConfigurationService configurationService) {
         setConfiguration(configurationService);
         this.applicationContext = applicationContext;
     }
@@ -112,10 +115,10 @@ public class AnnotationListService extends AbstractResourceService {
                 + "/"
                 + bitstream.getID()
                 + "/content";
-        ExternalLinksGenerator otherContentGenerator = applicationContext
-                .getBean(ExternalLinksGenerator.class, identifier);
-        otherContentGenerator.setFormat(mimetype);
-        otherContentGenerator.setLabel(bitstream.getName());
-        return otherContentGenerator;
+
+        return externalLinksGenerator
+                .setIdentifier(identifier)
+                .setFormat(mimetype)
+                .setLabel(bitstream.getName());
     }
 }

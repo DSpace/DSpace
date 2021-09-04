@@ -46,16 +46,12 @@ public class CanvasLookupService extends AbstractResourceService {
         }
         Info info =
                 utils.validateInfoForSingleCanvas(utils.getInfo(context, item, IIIF_BUNDLE), canvasPosition);
-        UUID bitstreamID = bitstream.getID();
+        UUID bitstreamId = bitstream.getID();
         String mimeType = utils.getBitstreamMimeType(bitstream, context);
-        CanvasGenerator canvas = canvasService.getCanvas(item.getID().toString(), info, canvasPosition);
-        if (mimeType.contains("image/")) {
-            canvas.addThumbnail(getThumbnailAnnotation(bitstreamID, mimeType));
-            canvas.addImage(getImageContent(bitstreamID, mimeType, imageUtil.getImageProfile(), IMAGE_PATH)
-                    .getResource());
-            getImageContent(bitstreamID, mimeType, imageUtil.getImageProfile(), IMAGE_PATH).getResource();
-        }
-        return utils.asJson(canvas.getResource());
+        CanvasGenerator canvasGenerator =
+                canvasService.getCanvas(item.getID().toString(), bitstreamId, mimeType, info, canvasPosition);
+
+        return utils.asJson(canvasGenerator.getResource());
     }
 
 }

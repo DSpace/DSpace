@@ -11,10 +11,10 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.rest.iiif.model.generator.CanvasItemsGenerator;
 import org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator;
-import org.dspace.app.rest.iiif.model.generator.ImageContentGenerator;
 import org.dspace.app.rest.iiif.model.info.Info;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -30,11 +30,16 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 public class SequenceService  extends AbstractResourceService {
 
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SequenceService.class);
+
     // TODO i18n
     private static final String PDF_DOWNLOAD_LABEL = "Download as PDF";
 
     @Autowired
     CanvasItemsGenerator sequenceGenerator;
+
+    @Autowired
+    ExternalLinksGenerator externalLinksGenerator;
 
     @Autowired
     CanvasService canvasService;
@@ -73,16 +78,18 @@ public class SequenceService  extends AbstractResourceService {
          * bundle.
          */
         int counter = 0;
+        if (bitstreams == null || bitstreams.size() == 0) {
+            throw new RuntimeException("No bitstreams found for " + item.getID()  +
+                    ". Cannot add media content to the manifest.");
+        }
         for (Bitstream bitstream : bitstreams) {
-            UUID bitstreamID = bitstream.getID();
+            UUID bitstreamId = bitstream.getID();
             String mimeType = utils.getBitstreamMimeType(bitstream, context);
             if (utils.checkImageMimeType(mimeType)) {
-                CanvasGenerator canvas = canvasService.getCanvas(item.getID().toString(), info, counter);
-                ImageContentGenerator imageGenerator =
-                        getImageContent(bitstreamID, mimeType, imageUtil.getImageProfile(), IMAGE_PATH);
-                canvas.addImage(imageGenerator.getResource());
-                canvas.addThumbnail(getThumbnailAnnotation(bitstreamID, mimeType));
-                sequenceGenerator.addCanvas(canvas);
+                String manifestId = item.getID().toString();
+                CanvasGenerator canvasGenerator =
+                        canvasService.getCanvas(manifestId, bitstreamId, mimeType, info, counter);
+                sequenceGenerator.addCanvas(canvasGenerator);
                 counter++;
             }
         }
@@ -121,11 +128,12 @@ public class SequenceService  extends AbstractResourceService {
             // field, e.g. iiif.rendering
             if (mimeType != null && mimeType.contentEquals("application/pdf")) {
                 String id = BITSTREAM_PATH_PREFIX + "/" + bitstream.getID() + "/content";
-                ExternalLinksGenerator otherContentGenerator = applicationContext
-                        .getBean(ExternalLinksGenerator.class, id);
-                otherContentGenerator.setLabel(PDF_DOWNLOAD_LABEL);
-                otherContentGenerator.setFormat(mimeType);
-                sequenceGenerator.addRendering(otherContentGenerator);
+                sequenceGenerator.addRendering(
+                        externalLinksGenerator
+                                .setIdentifier(id)
+                                .setLabel(PDF_DOWNLOAD_LABEL)
+                                .setFormat(mimeType)
+                );
             }
         }
     }

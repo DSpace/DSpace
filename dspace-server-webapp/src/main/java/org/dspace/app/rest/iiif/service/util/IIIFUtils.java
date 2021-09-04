@@ -88,10 +88,10 @@ public class IIIFUtils {
      * @return list of bitstreams
      */
     public List<Bitstream> getBitstreams(List<Bundle> bundles) {
-        if (bundles == null || bundles.size() == 0) {
-            throw new RuntimeException("Unable to retrieve DSpace bundle for manifest.");
+        if (bundles != null && bundles.size() > 0) {
+            return bundles.get(0).getBitstreams();
         }
-        return bundles.get(0).getBitstreams();
+        return null;
     }
 
     /**

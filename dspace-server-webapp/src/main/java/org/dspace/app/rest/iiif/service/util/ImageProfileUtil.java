@@ -19,9 +19,6 @@ public class ImageProfileUtil {
 
     /**
      * Utility method for obtaining the image service profile.
-     * Calling from this utility provides a unique instance of the
-     * autowired property. Necessary because a single canvas resource contains
-     * both thumbnail and images.
      *
      * @return  image service profile
      */

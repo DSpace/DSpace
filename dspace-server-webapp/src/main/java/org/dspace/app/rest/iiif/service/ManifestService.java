@@ -10,11 +10,9 @@ package org.dspace.app.rest.iiif.service;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.iiif.model.generator.AnnotationGenerator;
 import org.dspace.app.rest.iiif.model.generator.ContentSearchGenerator;
-import org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator;
+import org.dspace.app.rest.iiif.model.generator.ImageContentGenerator;
 import org.dspace.app.rest.iiif.model.generator.ManifestGenerator;
-import org.dspace.app.rest.iiif.model.generator.RangeGenerator;
 import org.dspace.app.rest.iiif.model.info.Info;
 import org.dspace.app.rest.iiif.model.info.Range;
 import org.dspace.app.rest.iiif.service.util.IIIFUtils;
@@ -26,7 +24,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -39,12 +36,6 @@ public class ManifestService extends AbstractResourceService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ManifestService.class);
 
-    // TODO i18n
-    private static final String RELATED_ITEM_LABEL = "DSpace item view";
-    private static final String SEE_ALSO_LABEL = "More descriptions of this resource";
-
-    private final ApplicationContext applicationContext;
-
     @Autowired
     protected ItemService itemService;
 
@@ -52,16 +43,25 @@ public class ManifestService extends AbstractResourceService {
     CanvasService canvasService;
 
     @Autowired
+    RangeService rangeService;
+
+    @Autowired
     SequenceService sequenceService;
 
     @Autowired
-    RangeGenerator rangeGenerator;
+    RelatedService relatedService;
 
     @Autowired
-    ContentSearchGenerator contentSearchGenerator;
+    SeeAlsoService seeAlsoService;
+
+    @Autowired
+    ImageContentService imageContentService;
 
     @Autowired
     IIIFUtils utils;
+
+    @Autowired
+    ContentSearchGenerator contentSearchGenerator;
 
     @Autowired
     ManifestGenerator manifestGenerator;
@@ -71,9 +71,8 @@ public class ManifestService extends AbstractResourceService {
      * Constructor.
      * @param configurationService the DSpace configuration service.
      */
-    public ManifestService(ApplicationContext applicationContext, ConfigurationService configurationService) {
+    public ManifestService(ConfigurationService configurationService) {
         setConfiguration(configurationService);
-        this.applicationContext = applicationContext;
     }
 
     /**
@@ -100,6 +99,7 @@ public class ManifestService extends AbstractResourceService {
         // images in the ORIGINAL bundle will be used.
         List<Bundle> bundles = utils.getIiifBundle(item, IIIF_BUNDLE);
         List<Bitstream> bitstreams = utils.getBitstreams(bundles);
+        List<Bundle> thumbnailBundle = utils.getBundle(item, "THUMBNAIL");
         Info info = utils.validateInfoForManifest(utils.getInfo(context, item, IIIF_BUNDLE), bitstreams);
         manifestGenerator.setIdentifier(getManifestId(item.getID()));
         manifestGenerator.setLabel(item.getName());
@@ -108,7 +108,7 @@ public class ManifestService extends AbstractResourceService {
         addSearchService(item);
         addMetadata(item.getMetadata());
         addViewingHint(bitstreams.size());
-        addThumbnail(bitstreams, context);
+        addThumbnail(thumbnailBundle, context);
         addSequence(item, bitstreams, context, info);
         addRanges(info, item.getID().toString());
         addSeeAlso(item);
@@ -161,12 +161,7 @@ public class ManifestService extends AbstractResourceService {
      * @param item the DSpace Item
      */
     private void addRelated(Item item) {
-        String url = CLIENT_URL  + "/items/" + item.getID();
-        ExternalLinksGenerator otherContentGenerator = applicationContext
-                .getBean(ExternalLinksGenerator.class, url);
-        otherContentGenerator.setFormat("text/html");
-        otherContentGenerator.setLabel(RELATED_ITEM_LABEL);
-        manifestGenerator.addRelated(otherContentGenerator);
+        manifestGenerator.addRelated(relatedService.getRelated(item));
     }
 
     /**
@@ -193,14 +188,9 @@ public class ManifestService extends AbstractResourceService {
      */
     private void addSeeAlso(Item item) {
         List<Bundle> bundles = utils.getBundle(item, OTHER_CONTENT_BUNDLE);
-        if (bundles.size() == 0) {
-            return;
+        if (bundles.size() > 0) {
+            manifestGenerator.addSeeAlso(seeAlsoService.getSeeAlso(item, bundles));
         }
-        ExternalLinksGenerator otherContentGenerator = applicationContext
-                .getBean(ExternalLinksGenerator.class, IIIF_ENDPOINT + item.getID() + "/manifest/seeAlso");
-        otherContentGenerator.setType(AnnotationGenerator.TYPE);
-        otherContentGenerator.setLabel(SEE_ALSO_LABEL);
-        manifestGenerator.addSeeAlso(otherContentGenerator);
     }
 
     /**
@@ -228,49 +218,35 @@ public class ManifestService extends AbstractResourceService {
     private void addRanges(Info info, String identifier) {
         List<Range> rangesFromConfig = utils.getRangesFromInfoObject(info);
         if (rangesFromConfig != null) {
-            for (int pos = 0; pos < rangesFromConfig.size(); pos++) {
-                setRange(identifier, rangesFromConfig.get(pos), pos);
-                manifestGenerator.addRange(rangeGenerator);
-            }
+            manifestGenerator.setRange(rangeService.getRanges(info, identifier));
         }
     }
 
     /**
-     * Sets properties on the Range.
-     * @param identifier DSpace item id
-     * @param range range from info.json configuration
-     * @param pos list position of the range
+     * Adds thumbnail to the manifest. Uses the thumbnail in DSpace thumbnail bundle.
+     * @param bundles contain the THUMBNAIL bundle
+     * @param context DSpac context
      */
-    private void setRange(String identifier, Range range, int pos) {
-        String id = IIIF_ENDPOINT + identifier + "/r" + pos;
-        String label = range.getLabel();
-        rangeGenerator.setIdentifier(id);
-        rangeGenerator.setLabel(label);
-        String startCanvas = utils.getCanvasId(range.getStart());
-        rangeGenerator.addCanvas(canvasService.getRangeCanvasReference(identifier, startCanvas));
-    }
-
-    /**
-     * Adds thumbnail to the manifest
-     * @param bitstreams
-     * @param context
-     */
-    private void addThumbnail(List<Bitstream> bitstreams, Context context) {
-        if (bitstreams.size() > 0) {
+    private void addThumbnail(List<Bundle> bundles, Context context) {
+        List<Bitstream> bitstreams = utils.getBitstreams(bundles);
+        if (bitstreams != null && bitstreams.size() > 0) {
             String mimeType = utils.getBitstreamMimeType(bitstreams.get(0), context);
             if (utils.checkImageMimeType(mimeType)) {
-                manifestGenerator.addThumbnail(getThumbnailAnnotation(bitstreams.get(0).getID(), mimeType));
+                ImageContentGenerator image = imageContentService
+                        .getImageContent(bitstreams.get(0).getID(), mimeType,
+                                thumbUtil.getThumbnailProfile(), THUMBNAIL_PATH);
+                manifestGenerator.addThumbnail(image);
             }
         }
     }
 
     /**
-     * If the logo is defined in DSpace configura
+     * If the logo is defined in DSpace configuration add to manifest.
      */
     private void setLogoContainer() {
         if (IIIF_LOGO_IMAGE != null) {
-            imageContent.setIdentifier(IIIF_LOGO_IMAGE);
-            manifestGenerator.addLogo(imageContent);
+            ImageContentGenerator logo = new ImageContentGenerator(IIIF_LOGO_IMAGE);
+            manifestGenerator.addLogo(logo);
         }
     }
 
