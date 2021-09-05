@@ -187,7 +187,7 @@ public class SubscribeServiceImpl implements SubscribeService {
 
     @Override
     public Subscription addSubscriptionParameter(Context context, Integer id,
-                                                 SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
+                   SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
         // must be admin or the subscriber of the subscription
         Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
         if (authorizeService.isAdmin(context, context.getCurrentUser())
@@ -202,7 +202,7 @@ public class SubscribeServiceImpl implements SubscribeService {
 
     @Override
     public Subscription removeSubscriptionParameter(Context context, Integer id,
-                                                    SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
+                       SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
         // must be admin or the subscriber of the subscription
         Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
         if (authorizeService.isAdmin(context, context.getCurrentUser())
@@ -239,7 +239,8 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context, String type, String frequencyValue) throws SQLException {
+    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context,
+                                     String type, String frequencyValue) throws SQLException {
         return subscriptionDAO.findAllSubscriptionsByTypeAndFrequency(context, type, frequencyValue);
     }
 
@@ -254,7 +255,8 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public Long countAllByEPersonAndDSO(Context context, EPerson ePerson, DSpaceObject dSpaceObject) throws SQLException {
+    public Long countAllByEPersonAndDSO(Context context,
+           EPerson ePerson, DSpaceObject dSpaceObject) throws SQLException {
         return subscriptionDAO.countAllByEPersonAndDso(context, ePerson, dSpaceObject);
     }
 }

@@ -59,11 +59,11 @@ public class CrisMetricsRestPermissionEvaluatorPlugin extends RestObjectPermissi
 
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
-            DSpaceRestPermission permission) {
+                                       DSpaceRestPermission permission) {
 
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
         if (!DSpaceRestPermission.READ.equals(restPermission)
-            || !StringUtils.equalsIgnoreCase(targetType, CrisMetricsRest.NAME)) {
+                || !StringUtils.equalsIgnoreCase(targetType, CrisMetricsRest.NAME)) {
             return false;
         }
 
