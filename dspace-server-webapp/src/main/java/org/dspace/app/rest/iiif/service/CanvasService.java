@@ -29,9 +29,6 @@ public class CanvasService extends AbstractResourceService {
     protected static final Integer DEFAULT_CANVAS_HEIGHT = 1600;
 
     @Autowired
-    CanvasGenerator canvasGenerator;
-
-    @Autowired
     ImageContentService imageContentService;
 
     /**
@@ -92,7 +89,7 @@ public class CanvasService extends AbstractResourceService {
         ImageContentGenerator thumb = imageContentService
                 .getImageContent(bitstreamId, mimeType, thumbUtil.getThumbnailProfile(), THUMBNAIL_PATH);
 
-        return canvasGenerator.setIdentifier(IIIF_ENDPOINT + manifestId + "/canvas/c" + count)
+        return new CanvasGenerator().setIdentifier(IIIF_ENDPOINT + manifestId + "/canvas/c" + count)
                 .addImage(image.getResource())
                 .addThumbnail(thumb.getResource())
                 .setHeight(canvasHeight)
@@ -108,7 +105,7 @@ public class CanvasService extends AbstractResourceService {
      * @return
      */
     protected CanvasGenerator getRangeCanvasReference(String identifier, String startCanvas) {
-        return canvasGenerator.setIdentifier(IIIF_ENDPOINT + identifier + startCanvas);
+        return new CanvasGenerator().setIdentifier(IIIF_ENDPOINT + identifier + startCanvas);
     }
 
 }

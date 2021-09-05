@@ -13,11 +13,11 @@ import org.dspace.app.rest.iiif.model.generator.ImageContentGenerator;
 import org.dspace.app.rest.iiif.model.generator.ImageServiceGenerator;
 import org.dspace.app.rest.iiif.model.generator.ProfileGenerator;
 import org.dspace.services.ConfigurationService;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.RequestScope;
 
 @Component
-@RequestScope
+@Scope("prototype")
 public class ImageContentService extends AbstractResourceService {
 
 
