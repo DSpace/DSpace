@@ -274,7 +274,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @throws SQLException if database error
      */
     public List<MetadataValue> addMetadata(Context context, T dso, String schema, String element, String qualifier,
-                                           String lang, List<String> values, List<String> authorities, List<Integer> confidences)
+                   String lang, List<String> values, List<String> authorities, List<Integer> confidences)
             throws SQLException;
 
     /**
@@ -295,7 +295,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @throws SQLException if database error
      */
     public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
-                                           List<String> values, List<String> authorities, List<Integer> confidences) throws SQLException;
+             List<String> values, List<String> authorities, List<Integer> confidences) throws SQLException;
 
     /**
      * Shortcut for {@link #addMetadata(Context, DSpaceObject, MetadataField, String, List, List, List)} when a single
@@ -392,10 +392,10 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @throws SQLException if database error
      */
     public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
-                                     String lang, String value, String authority, int confidence, int place) throws SQLException;
+              String lang, String value, String authority, int confidence, int place) throws SQLException;
 
     default public MetadataValue addMetadataInPlaceSecured(Context context, T dso, String schema, String element,
-                                                           String qualifier, String lang, String value, String authority, int confidence, int place, Integer securityValue)
+                    String qualifier, String lang, String value, String authority, int confidence, int place, Integer securityValue)
             throws SQLException {
         return null;
     }
@@ -515,7 +515,8 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     public void updateLastModified(Context context, T dso) throws SQLException, AuthorizeException;
 
-    default void setWithLastModifiedDate(Context context, T dso, Date lastModified) throws SQLException, AuthorizeException {
+    default void setWithLastModifiedDate(Context context, T dso, Date lastModified)
+            throws SQLException, AuthorizeException {
     }
 
     public void update(Context context, T dso) throws SQLException, AuthorizeException;
@@ -549,8 +550,10 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
     void replaceMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
                          String value, String authority, int confidence, int index) throws SQLException;
 
-    void replaceSecuredMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                                String value, String authority, int confidence, int index, Integer securityLevel) throws SQLException;
+    void replaceSecuredMetadata(Context context, T dso, String schema,
+                                String element, String qualifier, String lang,
+                                String value, String authority,
+                                int confidence, int index, Integer securityLevel) throws SQLException;
 
     void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to)
             throws SQLException;
@@ -570,7 +573,8 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
     public void setMetadataModified(T dso);
 
     default public List<MetadataValue> addSecuredMetadata(Context context, T dso, String schema, String element,
-                                                          String qualifier, String lang, String value, String authority, int confidence, Integer securityLevel)
+                                String qualifier, String lang,
+                                String value, String authority, int confidence, Integer securityLevel)
             throws SQLException {
         return Collections.emptyList();
     }

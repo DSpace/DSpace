@@ -197,7 +197,7 @@ public interface SubscribeService {
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public Subscription removeSubscriptionParameter(Context context, Integer id,
-                                                    SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException;
+            SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException;
 
     /**
      * Deletes a subscription
@@ -213,7 +213,8 @@ public interface SubscribeService {
      * @param context DSpace context
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context, String type, String frequencyValue) throws SQLException;
+    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context,
+                          String type, String frequencyValue) throws SQLException;
 
 
     /**
@@ -239,5 +240,6 @@ public interface SubscribeService {
      * @param ePerson      EPerson ePerson
      * @param dSpaceObject DSpaceObject dSpaceObject
      */
-    public Long countAllByEPersonAndDSO(Context context, EPerson ePerson, DSpaceObject dSpaceObject) throws SQLException, AuthorizeException;
+    public Long countAllByEPersonAndDSO(Context context, EPerson ePerson,
+          DSpaceObject dSpaceObject) throws SQLException, AuthorizeException;
 }

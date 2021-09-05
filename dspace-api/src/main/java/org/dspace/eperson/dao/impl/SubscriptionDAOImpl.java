@@ -131,7 +131,8 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
     }
 
     @Override
-    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context, String type, String frequencyValue) throws SQLException {
+    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context,
+                        String type, String frequencyValue) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
         Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
@@ -169,7 +170,8 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
     }
 
     @Override
-    public Long countAllByEPersonAndDso(Context context, EPerson ePerson, DSpaceObject dSpaceObject) throws SQLException {
+    public Long countAllByEPersonAndDso(Context context,
+          EPerson ePerson, DSpaceObject dSpaceObject) throws SQLException {
         CriteriaBuilder qb = getCriteriaBuilder(context);
         CriteriaQuery<Long> cq = qb.createQuery(Long.class);
         Root<Subscription> subscriptionRoot = cq.from(Subscription.class);

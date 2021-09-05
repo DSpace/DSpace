@@ -371,7 +371,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 countQuery.setRows(0);  // don't actually request any data
                 // Get the total amount of results
                 QueryResponse totalResponse = solrSearchCore.getSolr().query(countQuery,
-                                                                             solrSearchCore.REQUEST_METHOD);
+                        solrSearchCore.REQUEST_METHOD);
                 long total = totalResponse.getResults().getNumFound();
 
                 int start = 0;
@@ -380,7 +380,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 // Now get actual Solr Documents in batches
                 SolrQuery query = new SolrQuery();
                 query.setFields(SearchUtils.RESOURCE_UNIQUE_ID, SearchUtils.RESOURCE_ID_FIELD,
-                                SearchUtils.RESOURCE_TYPE_FIELD);
+                        SearchUtils.RESOURCE_TYPE_FIELD);
                 query.addSort(SearchUtils.RESOURCE_UNIQUE_ID, SolrQuery.ORDER.asc);
                 query.setQuery("*:*");
                 query.setRows(batch);
@@ -1200,6 +1200,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             return new ArrayList<>(0);
         }
     }
+
     @Override
     public DiscoverFilterQuery toFilterQuery(Context context, String field, String operator, String value,
         DiscoveryConfiguration config)
