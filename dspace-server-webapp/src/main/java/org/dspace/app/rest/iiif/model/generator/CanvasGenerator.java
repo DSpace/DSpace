@@ -13,8 +13,6 @@ import java.util.List;
 import de.digitalcollections.iiif.model.ImageContent;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * Presentation API version 2.1.1 Canvas model.
@@ -22,8 +20,6 @@ import org.springframework.stereotype.Component;
  * Changes a Presentation API version 3.0 will likely require updates for
  * multiple media types, etc.
  */
-@Component
-@Scope("prototype")
 public class CanvasGenerator implements IIIFResource {
 
     private String identifier;
