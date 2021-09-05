@@ -121,6 +121,11 @@ public class ManifestService extends AbstractResourceService {
      * @return a sequence of canvases
      */
     private void addSequence(Item item, List<Bitstream> bitstreams, Context context, Info info) {
+        // After replacing the info object with DSO metadata we might
+        // update this method to iterate over the bitstreams list, passing
+        // the individual bitstream and position to revised methods in
+        // sequenceService and rangeService. But it's hard to try now without more
+        // work elsewhere.
         manifestGenerator.addSequence(
                 sequenceService.getSequence(item, bitstreams, context, info));
     }
