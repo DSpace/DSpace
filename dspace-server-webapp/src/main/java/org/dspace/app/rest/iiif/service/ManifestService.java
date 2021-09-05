@@ -99,7 +99,7 @@ public class ManifestService extends AbstractResourceService {
         // images in the ORIGINAL bundle will be used.
         List<Bundle> bundles = utils.getIiifBundle(item, IIIF_BUNDLE);
         List<Bitstream> bitstreams = utils.getBitstreams(bundles);
-        List<Bundle> thumbnailBundle = utils.getBundle(item, "THUMBNAIL");
+        // List<Bundle> thumbnailBundle = utils.getBundle(item, "THUMBNAIL");
         Info info = utils.validateInfoForManifest(utils.getInfo(context, item, IIIF_BUNDLE), bitstreams);
         manifestGenerator.setIdentifier(getManifestId(item.getID()));
         manifestGenerator.setLabel(item.getName());
@@ -108,7 +108,7 @@ public class ManifestService extends AbstractResourceService {
         addSearchService(item);
         addMetadata(item.getMetadata());
         addViewingHint(bitstreams.size());
-        addThumbnail(thumbnailBundle, context);
+        addThumbnail(bundles, context);
         addSequence(item, bitstreams, context, info);
         addRanges(info, item.getID().toString());
         addSeeAlso(item);
@@ -223,9 +223,9 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Adds thumbnail to the manifest. Uses the thumbnail in DSpace thumbnail bundle.
-     * @param bundles contain the THUMBNAIL bundle
-     * @param context DSpac context
+     * Adds thumbnail to the manifest. Uses first image in bundle.
+     * @param bundles image bundles
+     * @param context DSpace context
      */
     private void addThumbnail(List<Bundle> bundles, Context context) {
         List<Bitstream> bitstreams = utils.getBitstreams(bundles);
