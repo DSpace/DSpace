@@ -8,37 +8,31 @@
 
 package org.dspace.subscriptions;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-import org.apache.commons.collections.ListUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
-import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.service.SubscribeService;
-import org.dspace.metrics.UpdateCrisMetricsInSolrDocService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.subscriptions.service.DSpaceObjectUpdates;
 import org.dspace.subscriptions.service.SubscriptionGenerator;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.annotation.Resource;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 
 /**
@@ -47,74 +41,85 @@ import java.util.UUID;
  * @author alba aliu
  */
 public class SubscriptionEmailNotificationService {
-    private CrisMetricsService crisMetricsService;
     private static final Logger log = LogManager.getLogger(SubscriptionEmailNotification.class);
-    private UpdateCrisMetricsInSolrDocService updateCrisMetricsInSolrDocService;
-    @Autowired
-    private SubscribeService subscribeService;
-    @Resource(name = "contentUpdates")
-    private final Map<String, DSpaceObjectUpdates> contentUpdates = new HashMap<>();
-    @Resource(name = "generators")
-    private final Map<String, SubscriptionGenerator> generators = new HashMap<>();
-    private List<IndexableObject> communitiesUpdates = new ArrayList<>();
-    private List<IndexableObject> collectionUpdates = new ArrayList<>();
-    private List<IndexableObject> itemUpdates = new ArrayList<>();
+    private final CrisMetricsService crisMetricsService;
+    private final SubscribeService subscribeService;
+    private Map<String, DSpaceObjectUpdates> contentUpdates = new HashMap<>();
+    private Map<String, SubscriptionGenerator> generators = new HashMap<>();
+    private List<IndexableObject> communities = new ArrayList<>();
+    private List<IndexableObject> collections = new ArrayList<>();
+    private List<IndexableObject> items = new ArrayList<>();
 
-    // TODO REFACTOR THIS
     public void perform(Context context, DSpaceRunnableHandler handler, String type, String frequency) {
         try {
             context.turnOffAuthorisationSystem();
             List<Subscription> subscriptionList = findAllSubscriptionsByTypeAndFrequency(context, type, frequency);
-            List<EPerson> ePersonList = new ArrayList<>();
             // if content subscription
-            if (type.equals("content")) {
+            if (type.equals(generators.keySet().toArray()[0])) {
                 // the list of the person who has subscribed
                 int iterator = 0;
                 for (Subscription subscription : subscriptionList) {
-                    HibernateProxy hibernateProxy = (HibernateProxy) subscription.getdSpaceObject();
-                    LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
-                    if (initializer.getImplementation() instanceof Community) {
-                        communitiesUpdates.addAll(contentUpdates.get("community").findUpdates(context, subscription.getdSpaceObject(), frequency));
-                    } else if (initializer.getImplementation() instanceof Collection) {
-                        collectionUpdates.addAll(contentUpdates.get("collection").findUpdates(context, subscription.getdSpaceObject(), frequency));
-                    } else if (initializer.getImplementation() instanceof Item) {
-                        itemUpdates.addAll(contentUpdates.get("item").findUpdates(context, subscription.getdSpaceObject(), frequency));
+                    DSpaceObject dSpaceObject = subscription.getdSpaceObject();
+                    if (subscription.getdSpaceObject() instanceof HibernateProxy) {
+                        HibernateProxy hibernateProxy = (HibernateProxy) subscription.getdSpaceObject();
+                        LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
+                        dSpaceObject = (DSpaceObject) initializer.getImplementation();
                     }
-                    if (iterator == 0) {
-                        ePersonList.add(subscription.getePerson());
-                    } else {
-                        if (!ePersonList.get(ePersonList.size() - 1).equals(subscription.getePerson())) {
-                            ePersonList.add(subscription.getePerson());
+                    if (dSpaceObject instanceof Community) {
+                        communities.addAll(contentUpdates.get(Community.class.getSimpleName().toLowerCase(Locale.ROOT))
+                                .findUpdates(context, subscription.getdSpaceObject(), frequency));
+                    } else if (dSpaceObject instanceof Collection) {
+                        collections.addAll(contentUpdates.get(Collection.class.getSimpleName().toLowerCase(Locale.ROOT))
+                                .findUpdates(context, subscription.getdSpaceObject(), frequency));
+                    } else if (dSpaceObject instanceof Item) {
+                        items.addAll(contentUpdates.get(Item.class.getSimpleName().toLowerCase(Locale.ROOT))
+                                .findUpdates(context, subscription.getdSpaceObject(), frequency));
+                    }
+                    if (iterator < subscriptionList.size() - 1) {
+                        if (subscription.getePerson().equals(subscriptionList.get(iterator + 1).getePerson())) {
+                            iterator++;
+                            continue;
+                        } else {
+                            generators.get(type).notifyForSubscriptions(context, subscription.getePerson(),
+                                    communities, collections, items);
+                            communities.clear();
+                            collections.clear();
+                            items.clear();
                         }
+                    } else {
+                        //in the end of the iteration
+                        generators.get(type).notifyForSubscriptions(context, subscription.getePerson(),
+                                communities, collections, items);
                     }
                     iterator++;
                 }
-                List listmerged = ListUtils.union(communitiesUpdates, collectionUpdates);
-                List listmergedFinal = ListUtils.union(listmerged, itemUpdates);
-                for (EPerson ePerson : ePersonList) {
-                    // generate mail for type content
-                    generators.get(type).notifyForSubscriptions(context, ePerson, listmergedFinal);
-                }
             } else {
+                if (!type.equals(generators.keySet().toArray()[1])) {
+                    throw new IllegalArgumentException("Options type t and frequency f must be set correctly");
+                }
                 int iterator = 0;
                 List<CrisMetrics> crisMetricsList = new ArrayList<>();
                 for (Subscription subscription : subscriptionList) {
                     try {
-                        crisMetricsList.addAll(crisMetricsService.findAllByItem(context, (Item) subscription.getdSpaceObject()));
+                        crisMetricsList.addAll(crisMetricsService.findAllByDSO(context,
+                                subscription.getdSpaceObject()));
                     } catch (Exception e) {
                         log.error(e.getMessage());
                     }
-                    if (iterator == 0) {
-                        ePersonList.add(subscription.getePerson());
-                    } else {
-                        if (!ePersonList.get(ePersonList.size() - 1).equals(subscription.getePerson())) {
-                            ePersonList.add(subscription.getePerson());
+                    if (iterator < subscriptionList.size() - 1) {
+                        if (subscription.getePerson().equals(subscriptionList.get(iterator + 1).getePerson())) {
+                            iterator++;
+                            continue;
+                        } else {
+                            generators.get(type).notifyForSubscriptions(context, subscription.getePerson(),
+                                    crisMetricsList, null, null);
                         }
+                    } else {
+                        //in the end of the iteration
+                        generators.get(type).notifyForSubscriptions(context, subscription.getePerson(),
+                                crisMetricsList, null, null);
                     }
                     iterator++;
-                }
-                for (EPerson ePerson : ePersonList) {
-                    generators.get(type).notifyForSubscriptions(context, ePerson, crisMetricsList);
                 }
             }
         } catch (Exception e) {
@@ -135,7 +140,14 @@ public class SubscriptionEmailNotificationService {
         return null;
     }
 
-    //    public SubscriptionEmailNotificationService(LinkedHashMap<String, ContentGenerator> generators) {
-//        System.out.println(generators);
-//    }
+    public SubscriptionEmailNotificationService(CrisMetricsService crisMetricsService,
+                                                SubscribeService subscribeService,
+                                                Map<String, SubscriptionGenerator> generators,
+                                                Map<String, DSpaceObjectUpdates> contentUpdates) {
+        this.crisMetricsService = crisMetricsService;
+        this.subscribeService = subscribeService;
+        this.generators = generators;
+        this.contentUpdates = contentUpdates;
+    }
+
 }

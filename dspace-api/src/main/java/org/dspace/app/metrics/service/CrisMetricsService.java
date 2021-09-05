@@ -14,14 +14,14 @@ import java.util.UUID;
 
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
 /**
  * Service interface class for the CrisMetrics object.
  * This interface defines the contract of the service that is responsible
  * for all the business logic calls for the cris metrics object.
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 public interface CrisMetricsService {
@@ -30,7 +30,7 @@ public interface CrisMetricsService {
 
     public List<CrisMetrics> findAll(Context context, Integer limit, Integer offset) throws SQLException;
 
-    public List<CrisMetrics> findAllByItem(Context context, Item item) throws SQLException;
+    public List<CrisMetrics> findAllByDSO(Context context, DSpaceObject dSpaceObject) throws SQLException;
 
     public List<CrisMetrics> findAllLast(Context context, Integer limit, Integer offset) throws SQLException;
 
@@ -38,15 +38,17 @@ public interface CrisMetricsService {
 
     public int count(Context context) throws SQLException;
 
-    public CrisMetrics create(Context context, Item item) throws SQLException, AuthorizeException;
+    public CrisMetrics create(Context context, DSpaceObject dSpaceObject) throws SQLException, AuthorizeException;
 
     public void delete(Context context, CrisMetrics crisMetrics) throws SQLException, AuthorizeException;
 
+    public void deleteByResourceID(Context context, DSpaceObject dSpaceObject) throws SQLException, AuthorizeException;
+
     public CrisMetrics findLastMetricByResourceIdAndMetricsTypes(Context context, String metricType, UUID resourceUuid)
-           throws SQLException;
+            throws SQLException;
 
     public CrisMetrics uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType(Context context, String metricType,
-           UUID resourceUuid, boolean last) throws SQLException;
+                             UUID resourceUuid, boolean last) throws SQLException;
 
     public void update(Context context, CrisMetrics crisMetrics) throws SQLException, AuthorizeException;
 
@@ -54,7 +56,7 @@ public interface CrisMetricsService {
 
     /**
      * Search a CrisMetric for a certain period like [week or month] from a certain startDate
-     * 
+     *
      * @param context         DSpace context object
      * @param metricType      the CrisMetric type
      * @param resourceId      the uuid of an DSpace resource
@@ -65,6 +67,6 @@ public interface CrisMetricsService {
      */
     public Optional<CrisMetrics> getCrisMetricByPeriod(Context context,
                                                        String metricType, UUID resourceId,
-                                                       Date startDate,  String period) throws SQLException;
+                                                       Date startDate, String period) throws SQLException;
 
 }

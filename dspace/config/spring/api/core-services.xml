@@ -158,10 +158,7 @@
     <bean class="org.dspace.layout.service.impl.LayoutSecurityServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.CrisLayoutBoxAccessServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.CrisLayoutTabAccessServiceImpl"/>
-    
-    <bean class="org.dspace.content.security.CrisSecurityServiceImpl" />
-
+    <bean class="org.dspace.content.security.CrisSecurityServiceImpl"/>
     <bean class="org.dspace.app.metrics.service.CrisMetricsServiceImpl"/>
-    <bean class="org.dspace.app.util.DiscoverQueryBuilder"/>
 </beans>
 

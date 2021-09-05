@@ -575,7 +575,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
             for (ResourcePolicy rp : collectionsPolicies) {
                 Collection collection = ContentServiceFactory.getInstance().getCollectionService()
-                                                             .find(context, rp.getdSpaceObject().getID());
+                        .find(context, rp.getdSpaceObject().getID());
                 allCollections.add(collection);
             }
 
@@ -736,7 +736,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     protected SolrQuery resolveToSolrQuery(Context context, DiscoverQuery discoveryQuery)
-        throws SearchServiceException {
+            throws SearchServiceException {
         SolrQuery solrQuery = new SolrQuery();
 
         String query = "*:*";
@@ -1027,9 +1027,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             long missing = 0;
                             for (FacetField.Count facetValue : facetValues) {
                                 String displayedValue = transformDisplayedValue(context, facetField.getName(),
-                                                                                facetValue.getName());
+                                        facetValue.getName());
                                 String authorityValue = transformAuthorityValue(context, facetField.getName(),
-                                                                                facetValue.getName());
+                                        facetValue.getName());
                                 String sortValue = transformSortValue(context, facetField.getName(),
                                         facetValue.getName());
                                 String filterValue = displayedValue;
@@ -1535,18 +1535,26 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     @Override
     public void updateMetrics(Context context, CrisMetrics metric) {
         UpdateRequest req = new UpdateRequest();
-        SolrClient solrClient =  solrSearchCore.getSolr();
-        StringBuilder uniqueID = new StringBuilder("Item-");
-        uniqueID.append(metric.getResource().getID());
-
-        try {
-            SolrInputDocument solrInDoc = new SolrInputDocument();
-            solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, uniqueID);
-            req.add(SearchUtils.addMetricFieldsInSolrDoc(metric, solrInDoc));
-            solrClient.request(req);
-            solrClient.commit();
-        } catch (SolrServerException | IOException e) {
-            log.error(e.getMessage(), e);
+        SolrClient solrClient = solrSearchCore.getSolr();
+        StringBuilder uniqueID = new StringBuilder();
+        if (metric.getResource() instanceof Item) {
+            uniqueID = new StringBuilder("Item-");
+        } else if (metric.getResource() instanceof Collection) {
+            uniqueID = new StringBuilder("Collection-");
+        } else {
+            if (metric.getResource() instanceof Community) {
+                uniqueID = new StringBuilder("Community-");
+            }
+            uniqueID.append(metric.getResource().getID());
+            try {
+                SolrInputDocument solrInDoc = new SolrInputDocument();
+                solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, uniqueID);
+                req.add(SearchUtils.addMetricFieldsInSolrDoc(metric, solrInDoc));
+                solrClient.request(req);
+                solrClient.commit();
+            } catch (SolrServerException | IOException e) {
+                log.error(e.getMessage(), e);
+            }
         }
     }
 

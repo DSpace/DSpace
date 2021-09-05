@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.metrics.CrisMetrics;
-import org.dspace.content.Item;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 
@@ -28,7 +28,7 @@ public interface CrisMetricsDAO extends GenericDAO<CrisMetrics> {
 
     public List<CrisMetrics> findAll(Context context, Integer limit, Integer offset) throws SQLException;
 
-    public List<CrisMetrics> findAllByItem(Context context, Item item) throws SQLException;
+    public List<CrisMetrics> findAllByDSO(Context context, DSpaceObject dSpaceObject) throws SQLException;
 
     public List<CrisMetrics> findAllLast(Context context, Integer limit, Integer offset) throws SQLException;
 
@@ -37,6 +37,7 @@ public interface CrisMetricsDAO extends GenericDAO<CrisMetrics> {
     public int countRows(Context context) throws SQLException;
 
     public void delete(Context context, CrisMetrics crisMetrics) throws SQLException;
+    public void deleteByDSO(Context context, DSpaceObject dSpaceObject) throws SQLException;
 
     public CrisMetrics findLastMetricByResourceIdAndMetricsTypes(Context context, String metricType, UUID resourceId)
            throws SQLException;

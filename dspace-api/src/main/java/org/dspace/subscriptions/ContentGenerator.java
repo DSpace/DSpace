@@ -8,29 +8,25 @@
 
 package org.dspace.subscriptions;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import javax.annotation.Resource;
 
 import org.apache.logging.log4j.Logger;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.subscriptions.service.SubscriptionGenerator;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
@@ -43,84 +39,51 @@ import java.util.Locale;
 
 public class ContentGenerator implements SubscriptionGenerator<IndexableObject> {
     private final Logger log = org.apache.logging.log4j.LogManager.getLogger(ContentGenerator.class);
+    @Resource(name = "entityDissemination")
+    private Map<String, StreamDisseminationCrosswalk> mapEntityDisseminatorProperty = new HashMap();
+    @Autowired
+    private ItemService itemService;
 
     @Override
-    public void notifyForSubscriptions(Context c, EPerson ePerson, List<IndexableObject> indexableObjects) {
+    public void notifyForSubscriptions(Context c, EPerson ePerson, List<IndexableObject> indexableComm,
+                                       List<IndexableObject> indexableColl,
+                                       List<IndexableObject> indexableItems) {
         try {
             // send the notification to the user
             if (ePerson != null) {
-                // Get rejector's name
-                String rejector = getEPersonName(ePerson);
                 Locale supportedLocale = I18nUtil.getEPersonLocale(ePerson);
-                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_reject"));
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "subscriptions_content"));
                 email.addRecipient(ePerson.getEmail());
-                email.addAttachment(generateExcel(indexableObjects), "Attachment");
-                email.setContent("Subscriptions", "");
+                email.addArgument(generateHtmlBodyMail(c, indexableComm));
+                email.addArgument(generateHtmlBodyMail(c, indexableColl));
+                email.addArgument(generateHtmlBodyMail(c, indexableItems));
                 email.send();
-            } else {
-                // DO nothing
             }
         } catch (Exception ex) {
             // log this email error
-            log.warn(LogManager.getHeader(c, "notify_of_reject",
-                    "cannot email user" + " eperson_id" + ePerson.getID()
-                            + " eperson_email" + ePerson.getEmail()));
+            log.warn("cannot email user" + " eperson_id" + ePerson.getID()
+                    + " eperson_email" + ePerson.getEmail());
         }
     }
 
-    public String getEPersonName(EPerson ePerson) {
-        String submitter = ePerson.getFullName();
-
-        submitter = submitter + "(" + ePerson.getEmail() + ")";
-
-        return submitter;
-    }
-
-    private File generateExcel(List<IndexableObject> indexableObjects) {
-        Workbook workbook = new HSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Subscription Test");
-        int rowCount = 0;
-        // datas are ordered communities -> collections -> items
-        boolean comm = false;
-        boolean coll = false;
-        boolean items = false;
-        for (IndexableObject indexableObject : indexableObjects) {
-            // for each object add a row
-            if (indexableObject.getType().equals(Community.class.getSimpleName()) || !comm) {
-                Row sheetRow = sheet.createRow(rowCount++);
-                Cell cell = sheetRow.createCell(1);
-                cell.setCellValue("List of changed communities");
-                comm = true;
-                rowCount++;
-            }
-            if (indexableObject.getType().equals(Collection.class.getSimpleName()) || !coll) {
-                Row sheetRow = sheet.createRow(rowCount++);
-                Cell cell = sheetRow.createCell(1);
-                cell.setCellValue("List of changed collections");
-                coll = true;
-                rowCount++;
-            }
-            if (indexableObject.getType().equals(Item.class.getSimpleName()) || !items) {
-                Row sheetRow = sheet.createRow(rowCount++);
-                Cell cell = sheetRow.createCell(1);
-                cell.setCellValue("List of changed items");
-                items = true;
-                rowCount++;
-            }
-            Row sheetRow = sheet.createRow(rowCount);
-            Cell cell = sheetRow.createCell(1);
-            cell.setCellValue("Name");
-            rowCount++;
-        }
+    public String generateHtmlBodyMail(Context context, List<IndexableObject> indexableObjects) {
         try {
-            File file = File.createTempFile("Report", "xlsx");
-            FileOutputStream fileOut = new FileOutputStream(file);
-            workbook.write(fileOut);
-            return file;
-        } catch (IOException ioException) {
-            log.error(ioException.getMessage());
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            out.write("\n".getBytes(StandardCharsets.UTF_8));
+            if (indexableObjects.size() > 0) {
+                for (IndexableObject indexableObject : indexableObjects) {
+                    out.write("\n".getBytes(StandardCharsets.UTF_8));
+                    Item item = (Item) indexableObject.getIndexedObject();
+                    mapEntityDisseminatorProperty.get(itemService.getEntityType(item)).disseminate(context, item, out);
+                }
+                return out.toString();
+            } else {
+                out.write("No items".getBytes(StandardCharsets.UTF_8));
+            }
+            return out.toString();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return null;
         }
-        return null;
     }
-
 }

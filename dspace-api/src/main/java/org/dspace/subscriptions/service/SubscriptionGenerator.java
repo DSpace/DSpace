@@ -22,5 +22,5 @@ import org.dspace.eperson.EPerson;
  * @author Alba Aliu
  */
 public interface SubscriptionGenerator<T> {
-    public void notifyForSubscriptions(Context c, EPerson ePerson, List<T> dSpaceObjectListForContentType);
+    public void notifyForSubscriptions(Context c, EPerson ePerson, List<T> comm, List<T> coll, List<T> items);
 }

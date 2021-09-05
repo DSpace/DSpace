@@ -9,8 +9,6 @@
 package org.dspace.subscriptions;
 
 import org.apache.commons.cli.Options;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
@@ -23,8 +21,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 
 public class SubscriptionEmailNotificationConfiguration<T
         extends SubscriptionEmailNotification> extends ScriptConfiguration<T> {
-    private static final Logger log = LogManager.getLogger(SubscriptionEmailNotificationConfiguration.class);
-    private Context context;
+
     private Class<T> dspaceRunnableClass;
 
     @Override
@@ -39,7 +36,6 @@ public class SubscriptionEmailNotificationConfiguration<T
 
     @Override
     public boolean isAllowedToExecute(Context context) {
-        // TODO control if any limitation on users
         return true;
     }
 

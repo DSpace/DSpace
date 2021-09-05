@@ -32,9 +32,10 @@ public class TotalDownloadsAndVisitsGenerator {
      * @return  Map<String, Integer> with views and downloads
      */
 
-    public  Map<String, Integer> createUsageReport(UUID uuid) throws SolrServerException, IOException, SQLException {
+    public  Map<String, Integer> createUsageReport(UUID uuid, int type)
+            throws SolrServerException, IOException, SQLException {
         // query for item
-        String query = "type:" + Constants.ITEM + " AND id:" + uuid;
+        String query = "type:" + type + " AND id:" + uuid;
         // View and downloads point
         Map<String, Integer> views_downloads = new HashMap<>();
         // first check item visits

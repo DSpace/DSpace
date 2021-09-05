@@ -8,11 +8,19 @@
 
 package org.dspace.subscriptions.dSpaceObjectsUpdates;
 
+import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
-import org.apache.commons.lang.StringUtils;
+import java.sql.SQLException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.util.DiscoverQueryBuilder;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
@@ -23,17 +31,15 @@ import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableCommunity;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.subscriptions.ContentGenerator;
 import org.dspace.subscriptions.service.DSpaceObjectUpdates;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 
 /**
@@ -43,35 +49,26 @@ import java.util.UUID;
  * @author Alba Aliu
  */
 public class ItemsUpdates implements DSpaceObjectUpdates {
-    @Autowired
-    CollectionService collectionService;
-
-    @Autowired
-    CommunityService communityService;
-    @Autowired
-    ItemService itemService;
-    @Autowired
+    private final CollectionService collectionService;
+    private final CommunityService communityService;
+    private final ItemService itemService;
     private DiscoveryConfigurationService searchConfigurationService;
-    @Autowired
-    private DiscoverQueryBuilder discoverQueryBuilder;
-    @Autowired
     private SearchService searchService;
     private final Logger log = org.apache.logging.log4j.LogManager.getLogger(ContentGenerator.class);
 
-    @SuppressWarnings("checkstyle:TodoComment")
+
     @Override
     public List<IndexableObject> findUpdates(Context context, DSpaceObject dSpaceObject, String frequency) {
         List<IndexableObject> list = new ArrayList<>();
         // entity type found
-//        String inverseRelationName = "RELATION" + dSpaceObject.getName();
-        String inverseRelationName = "RELATION" + "Item";
+        String inverseRelationName = "RELATION." + itemService.getEntityType((Item) dSpaceObject);
         List<DiscoveryConfiguration> discoveryConfigurationList = searchConfigurationService.getDiscoveryConfigurationWithPrefixName(inverseRelationName);
         DiscoverQuery discoverQuery = null;
         DiscoverResult searchResult = null;
         IndexableObject indexableObject = resolveScope(context, dSpaceObject.getID().toString());
         try {
             for (DiscoveryConfiguration discoveryConfiguration : discoveryConfigurationList) {
-                discoverQuery = discoverQueryBuilder.buildQuery(context, indexableObject, discoveryConfiguration, null, null, "ITEM");
+                discoverQuery = buildDiscoveryQuery(discoveryConfiguration, indexableObject);
                 discoverQuery.addFilterQueries("lastModified_dt:" + this.findLastFrequency(frequency));
                 searchResult = searchService.search(context, discoverQuery);
                 list.addAll(searchResult.getIndexableObjects());
@@ -82,28 +79,103 @@ public class ItemsUpdates implements DSpaceObjectUpdates {
         return list;
     }
 
+    private IndexableObject<?, ?> resolveScope(Context context, String scope) {
+        IndexableObject<?, ?> scopeObj = null;
+        if (StringUtils.isBlank(scope)) {
+            return scopeObj;
+        }
+        try {
+            UUID uuid = UUID.fromString(scope);
+            scopeObj = new IndexableCommunity(communityService.find(context, uuid));
+            if (scopeObj.getIndexedObject() == null) {
+                scopeObj = new IndexableCollection(collectionService.find(context, uuid));
+            }
+            if (scopeObj.getIndexedObject() == null) {
+                scopeObj = new IndexableItem(itemService.find(context, uuid));
+            }
 
-    public IndexableObject resolveScope(Context context, String scope) {
-        IndexableObject scopeObj = null;
-        if (StringUtils.isNotBlank(scope)) {
-            try {
-                UUID uuid = UUID.fromString(scope);
-                scopeObj = new IndexableCommunity(communityService.find(context, uuid));
-                if (scopeObj.getIndexedObject() == null) {
-                    scopeObj = new IndexableCollection(collectionService.find(context, uuid));
-                }
-                if (scopeObj.getIndexedObject() == null) {
-                    scopeObj = new IndexableItem(itemService.find(context, uuid));
-                }
-            } catch (IllegalArgumentException ex) {
-                log.warn("The given scope string " + StringUtils.trimToEmpty(scope) + " is not a UUID", ex);
-            } catch (SQLException ex) {
-                log.warn(
-                        "Unable to retrieve DSpace Object with ID " + StringUtils.trimToEmpty(scope)
-                                + " from the database",
-                        ex);
+        } catch (IllegalArgumentException ex) {
+            String message = "The given scope string " + trimToEmpty(scope) + " is not a UUID";
+            log.error(message);
+        } catch (SQLException ex) {
+            String message = "Unable to retrieve DSpace Object with ID " + trimToEmpty(scope) + " from the database";
+            log.error(message);
+        }
+
+        return scopeObj;
+    }
+
+    private DiscoverQuery buildDiscoveryQuery(DiscoveryConfiguration discoveryConfiguration,
+                                              IndexableObject<?, ?> scope) throws SQLException {
+
+        DiscoverQuery discoverQuery = buildBaseQuery(discoveryConfiguration, scope);
+        discoverQuery.addDSpaceObjectFilter(IndexableItem.TYPE);
+//        configureSorting(discoverQuery, discoveryConfiguration);
+        return discoverQuery;
+    }
+
+    private void configureSorting(DiscoverQuery discoverQuery, DiscoveryConfiguration discoveryConfiguration) {
+        DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration.getSearchSortConfiguration();
+
+        String sortBy = getDefaultSortField(searchSortConfiguration);
+        String sortOrder = getDefaultSortDirection(searchSortConfiguration);
+        DiscoverySortFieldConfiguration fieldConfig = searchSortConfiguration.getSortFieldConfiguration(sortBy);
+        if (fieldConfig == null) {
+            throw new IllegalArgumentException(sortBy + " is not a valid sort field");
+        }
+        String sortField = searchService.toSortFieldIndex(fieldConfig.getMetadataField(), fieldConfig.getType());
+        if ("asc".equalsIgnoreCase(sortOrder)) {
+            discoverQuery.setSortField(sortField, DiscoverQuery.SORT_ORDER.asc);
+        } else if ("desc".equalsIgnoreCase(sortOrder)) {
+            discoverQuery.setSortField(sortField, DiscoverQuery.SORT_ORDER.desc);
+        } else {
+            throw new IllegalArgumentException(sortOrder + " is not a valid sort order");
+        }
+
+    }
+
+    private String getDefaultSortDirection(DiscoverySortConfiguration searchSortConfiguration) {
+        return searchSortConfiguration.getSortFields().iterator().next().getDefaultSortOrder().toString();
+    }
+
+    private String getDefaultSortField(DiscoverySortConfiguration searchSortConfiguration) {
+        String sortBy;// Attempt to find the default one, if none found we use SCORE
+        sortBy = "score";
+        if (Objects.nonNull(searchSortConfiguration.getSortFields()) &&
+                !searchSortConfiguration.getSortFields().isEmpty()) {
+            DiscoverySortFieldConfiguration defaultSort = searchSortConfiguration.getSortFields().get(0);
+            if (org.apache.commons.lang.StringUtils.isBlank(defaultSort.getMetadataField())) {
+                return sortBy;
+            }
+            sortBy = defaultSort.getMetadataField();
+        }
+        return sortBy;
+    }
+
+    private DiscoverQuery buildBaseQuery(DiscoveryConfiguration discoveryConfiguration, IndexableObject<?, ?> scope) {
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        if (discoveryConfiguration == null) {
+            return discoverQuery;
+        }
+        discoverQuery.setDiscoveryConfigurationName(discoveryConfiguration.getId());
+        List<String> filterQueries = discoveryConfiguration.getDefaultFilterQueries();
+
+        for (String filterQuery : filterQueries) {
+            if (discoveryConfiguration instanceof DiscoveryRelatedItemConfiguration) {
+                discoverQuery.addFilterQueries(MessageFormat.format(filterQuery, scope.getID()));
+            } else {
+                discoverQuery.addFilterQueries(filterQuery);
             }
         }
-        return scopeObj;
+
+        return discoverQuery;
+    }
+
+    public ItemsUpdates(CollectionService collectionService, CommunityService communityService, ItemService itemService, DiscoveryConfigurationService searchConfigurationService, SearchService searchService) {
+        this.collectionService = collectionService;
+        this.communityService = communityService;
+        this.itemService = itemService;
+        this.searchConfigurationService = searchConfigurationService;
+        this.searchService = searchService;
     }
 }

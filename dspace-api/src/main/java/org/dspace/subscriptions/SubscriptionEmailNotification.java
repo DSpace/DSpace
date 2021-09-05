@@ -8,20 +8,17 @@
 
 package org.dspace.subscriptions;
 
+import java.sql.SQLException;
+import java.util.UUID;
+
 import org.apache.commons.cli.ParseException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.subscriptions.service.DSpaceObjectUpdates;
-import org.dspace.subscriptions.service.SubscriptionGenerator;
 import org.dspace.utils.DSpace;
 
-import javax.annotation.Resource;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+
 
 
 /**
@@ -29,13 +26,10 @@ import java.util.UUID;
  *
  * @author alba aliu
  */
-public class SubscriptionEmailNotification extends DSpaceRunnable<SubscriptionEmailNotificationConfiguration<SubscriptionEmailNotification>> {
+public class SubscriptionEmailNotification extends DSpaceRunnable
+        <SubscriptionEmailNotificationConfiguration<SubscriptionEmailNotification>> {
     private Context context;
     private SubscriptionEmailNotificationService subscriptionEmailNotificationService;
-    @Resource(name = "generators")
-    private final Map<String, SubscriptionGenerator> generators = new HashMap<>();
-    @Resource(name = "contentUpdates")
-    private final Map<String, DSpaceObjectUpdates> contentUpdates = new HashMap<>();
 
     @Override
     public SubscriptionEmailNotificationConfiguration<SubscriptionEmailNotification> getScriptConfiguration() {
@@ -53,12 +47,11 @@ public class SubscriptionEmailNotification extends DSpaceRunnable<SubscriptionEm
     public void internalRun() throws Exception {
         assignCurrentUserInContext();
         assignSpecialGroupsInContext();
-
-        if ((commandLine.getOptionValue("t") == null || !generators.keySet().contains(commandLine.getOptionValue("t")))
-                || (commandLine.getOptionValue("f") == null || !contentUpdates.keySet().contains(commandLine.getOptionValue("f")))) {
+        if ((commandLine.getOptionValue("t") == null || (commandLine.getOptionValue("f") == null))) {
             throw new IllegalArgumentException("Options type t and frequency f must be set");
         }
-        subscriptionEmailNotificationService.perform(context, handler, commandLine.getOptionValue("t"), commandLine.getOptionValue("f"));
+        subscriptionEmailNotificationService.perform(getContext(),
+                handler, commandLine.getOptionValue("t"), commandLine.getOptionValue("f"));
     }
 
     protected void assignCurrentUserInContext() throws SQLException {
@@ -74,5 +67,22 @@ public class SubscriptionEmailNotification extends DSpaceRunnable<SubscriptionEm
         for (UUID uuid : handler.getSpecialGroups()) {
             context.setSpecialGroup(uuid);
         }
+    }
+
+    public SubscriptionEmailNotificationService getSubscriptionEmailNotificationService() {
+        return subscriptionEmailNotificationService;
+    }
+
+    public void setSubscriptionEmailNotificationService(SubscriptionEmailNotificationService
+                                                                subscriptionEmailNotificationService) {
+        this.subscriptionEmailNotificationService = subscriptionEmailNotificationService;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
     }
 }

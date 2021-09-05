@@ -21,7 +21,7 @@ import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.metrics.dao.CrisMetricsDAO;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Item;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Service implementation for the CrisMetrics object.
  * This class is responsible for all business logic calls for the CrisMetrics object and is autowired by spring.
  * This class should never be accessed directly.
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 public class CrisMetricsServiceImpl implements CrisMetricsService {
@@ -45,17 +45,17 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
 
     @Override
     public List<CrisMetrics> findAll(Context context) throws SQLException {
-        return  findAll(context, -1, -1);
+        return findAll(context, -1, -1);
     }
 
     @Override
     public List<CrisMetrics> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        return  crisMetricsDAO.findAll(context, limit, offset);
+        return crisMetricsDAO.findAll(context, limit, offset);
     }
 
     @Override
-    public List<CrisMetrics> findAllByItem(Context context, Item item) throws SQLException {
-        return crisMetricsDAO.findAllByItem(context, item);
+    public List<CrisMetrics> findAllByDSO(Context context, DSpaceObject dSpaceObject) throws SQLException {
+        return crisMetricsDAO.findAllByDSO(context, dSpaceObject);
     }
 
     @Override
@@ -73,9 +73,9 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
         return crisMetricsDAO.countRows(context);
     }
 
-    public CrisMetrics create(Context context, Item item) throws SQLException, AuthorizeException {
-        CrisMetrics cm =  new CrisMetrics();
-        cm.setResource(item);
+    public CrisMetrics create(Context context, DSpaceObject dSpaceObject) throws SQLException, AuthorizeException {
+        CrisMetrics cm = new CrisMetrics();
+        cm.setResource(dSpaceObject);
         cm.setAcquisitionDate(new Date());
         CrisMetrics metric = crisMetricsDAO.create(context, cm);
         log.info(LogManager.getHeader(context, "create_cris_metrics", "cris_metrics_id=" + metric.getId()));
@@ -86,6 +86,10 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
         this.crisMetricsDAO.delete(context, crisMetrics);
     }
 
+    public void deleteByResourceID(Context context, DSpaceObject dSpaceObject) throws SQLException, AuthorizeException {
+        this.crisMetricsDAO.deleteByDSO(context, dSpaceObject);
+    }
+
     @Override
     public CrisMetrics findLastMetricByResourceIdAndMetricsTypes(Context context, String metricType, UUID resourceId)
             throws SQLException {
@@ -93,10 +97,10 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
     }
 
     @Override
-    public CrisMetrics uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType(Context context, String metricType,
-            UUID resource, boolean last) throws SQLException {
+    public CrisMetrics uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType(
+            Context context, String metricType, UUID resource, boolean last) throws SQLException {
         return crisMetricsDAO.uniqueLastMetricByResourceIdAndResourceTypeIdAndMetricsType(
-                              context, metricType, resource, last);
+                context, metricType, resource, last);
     }
 
     @Override
@@ -116,7 +120,7 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
 
     @Override
     public Optional<CrisMetrics> getCrisMetricByPeriod(Context context, String metricType, UUID resourceId,
-            Date startDate,  String period) throws SQLException {
+                                                       Date startDate, String period) throws SQLException {
 
         if (StringUtils.equals("week", period)) {
             return getPeriodStatus(context, metricType, resourceId, DateUtils.addDays(startDate, -7));
@@ -130,11 +134,11 @@ public class CrisMetricsServiceImpl implements CrisMetricsService {
     private Optional<CrisMetrics> getPeriodStatus(Context context, String metricType, UUID resourceId, Date date)
             throws SQLException {
         List<CrisMetrics> metrics = crisMetricsDAO.findMetricByResourceIdMetricTypeAndBetweenSomeDate(context,
-                                         metricType, resourceId, getDateByDelta(date, 0), getDateByDelta(date, +1));
+                metricType, resourceId, getDateByDelta(date, 0), getDateByDelta(date, +1));
         return metrics.stream().max(Comparator.comparing(CrisMetrics::getAcquisitionDate));
     }
 
-    private Date getDateByDelta (Date date, int delta) {
+    private Date getDateByDelta(Date date, int delta) {
         return DateUtils.setSeconds(DateUtils.setMinutes(DateUtils.setHours(DateUtils.addDays(date, delta), 0), 0), 0);
     }
 }

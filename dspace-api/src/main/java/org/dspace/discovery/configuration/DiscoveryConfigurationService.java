@@ -161,8 +161,10 @@ public class DiscoveryConfigurationService {
         List<DiscoveryConfiguration> discoveryConfigurationList = new ArrayList<>();
         if (StringUtils.isNotBlank(prefixConfigurationName)) {
             for (String key : map.keySet()) {
-                DiscoveryConfiguration config = map.get(key);
-                discoveryConfigurationList.add(config);
+                if (key.equals(prefixConfigurationName) || key.startsWith(prefixConfigurationName)) {
+                    DiscoveryConfiguration config = map.get(key);
+                    discoveryConfigurationList.add(config);
+                }
             }
         }
         return discoveryConfigurationList;

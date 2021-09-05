@@ -16,8 +16,20 @@
            http://www.springframework.org/schema/util
            http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean  class="org.dspace.subscriptions.SubscriptionEmailNotificationService">
-<!--                <constructor-arg name="generators" ref="generators"/>-->
+    <bean class="org.dspace.subscriptions.SubscriptionEmailNotificationService">
+        <constructor-arg name="generators">
+            <map>
+                <entry key="content" value-ref="contentNotifyGenerator"/>
+                <entry key="statistics" value-ref="statisticsNotifyGenerator"/>
+            </map>
+        </constructor-arg>
+        <constructor-arg name="contentUpdates">
+            <map>
+                <entry key="community" value-ref="communityUpdates"/>
+                <entry key="collection" value-ref="collectionUpdates"/>
+                <entry key="item" value-ref="itemUpdates"/>
+            </map>
+        </constructor-arg>
     </bean>
 
     <util:map id="generators">
@@ -26,8 +38,6 @@
     </util:map>
 
     <bean id="contentNotifyGenerator" name="contentNotifyGenerator" class="org.dspace.subscriptions.ContentGenerator">
-        <!-- this generator will lookup on subscribed dspaceobject and produce mail content for updates for collections, communities and items -->
-<!--                <constructor-arg name="updates" ref="contentUpdates"/>-->
     </bean>
 
     <bean id="statisticsNotifyGenerator" name="statisticsNotifyGenerator"
@@ -40,6 +50,30 @@
         <entry key="collection" value-ref="collectionUpdates"/>
         <entry key="item" value-ref="itemUpdates"/>
     </util:map>
+
+    <util:list id="generalMetadataEntity">
+        <value>dc.title</value>
+    </util:list>
+
+    <util:map id="entityDissemination">
+        <entry key="Publication" value-ref="cslItemDataCrosswalkChicago"/>
+        <entry key="Person" value-ref="basicDissemination"/>
+        <entry key="Journal" value-ref="basicDissemination"/>
+        <entry key="OrgUnit" value-ref="basicDissemination"/>
+        <entry key="Dataset" value-ref="basicDissemination"/>
+        <entry key="Patent" value-ref="basicDissemination"/>
+        <entry key="Event" value-ref="basicDissemination"/>
+        <entry key="Equipment" value-ref="basicDissemination"/>
+        <entry key="JournalVolume" value-ref="basicDissemination"/>
+        <entry key="Project" value-ref="basicDissemination"/>
+        <entry key="PersonCv" value-ref="basicDissemination"/>
+        <entry key="JournalIssue" value-ref="basicDissemination"/>
+        <entry key="Funding" value-ref="basicDissemination"/>
+    </util:map>
+
+    <bean class="org.dspace.content.crosswalk.BasicDisseminator" id="basicDissemination">
+        <property name="metadata" ref ="generalMetadataEntity"/>
+    </bean>
     <bean id="communityUpdates" name="communityUpdates"
           class="org.dspace.subscriptions.dSpaceObjectsUpdates.CommunityUpdates">
     </bean>

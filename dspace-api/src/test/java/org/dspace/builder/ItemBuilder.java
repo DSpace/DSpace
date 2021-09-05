@@ -782,7 +782,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         try {
             installItemService.installItem(context, workspaceItem, this.handle);
             itemService.update(context, item);
-
             //Check if we need to make this item private. This has to be done after item install.
             if (readerGroup != null) {
                 setOnlyReadPermission(workspaceItem.getItem(), readerGroup, null);

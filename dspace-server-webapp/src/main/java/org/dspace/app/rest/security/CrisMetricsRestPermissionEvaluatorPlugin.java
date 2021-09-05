@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * {@link RestPermissionEvaluatorPlugin} class that evaluate READ, WRITE and DELETE permissions over a CrisMetrics
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component
@@ -103,7 +103,12 @@ public class CrisMetricsRestPermissionEvaluatorPlugin extends RestObjectPermissi
         } else {
 
             CrisMetrics metric = crisItemMetricsService.find(context, target.toString());
-            return metric != null ? metric.getResource() : null;
+            if (metric.getResource() instanceof Item) {
+                return metric != null ? (Item) metric.getResource() : null;
+            } else {
+                return null;
+            }
+
         }
     }
 
