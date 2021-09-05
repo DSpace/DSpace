@@ -23,9 +23,6 @@ import org.springframework.web.context.annotation.RequestScope;
 public class RangeService extends AbstractResourceService {
 
     @Autowired
-    RangeGenerator rangeGenerator;
-
-    @Autowired
     CanvasService canvasService;
 
     public RangeService(ConfigurationService configurationService) {
@@ -58,6 +55,7 @@ public class RangeService extends AbstractResourceService {
     private RangeGenerator getRange(String identifier, Range range, int pos) {
         String id = IIIF_ENDPOINT + identifier + "/r" + pos;
         String label = range.getLabel();
+        RangeGenerator rangeGenerator = new RangeGenerator();
         rangeGenerator.setIdentifier(id);
         rangeGenerator.setLabel(label);
         String startCanvas = utils.getCanvasId(range.getStart());

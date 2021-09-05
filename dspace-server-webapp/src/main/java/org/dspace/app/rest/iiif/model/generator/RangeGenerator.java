@@ -13,8 +13,6 @@ import java.util.List;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
 import de.digitalcollections.iiif.model.sharedcanvas.Range;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * In Presentation API version 2.1.1, adding a range to the manifest allows the client to display a structured
@@ -25,8 +23,6 @@ import org.springframework.stereotype.Component;
  * This is used to populate the "structures" element of the Manifest. (The REST API service looks to the "info.json"
  * file for ranges.)
  */
-@Component
-@Scope("prototype")
 public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.IIIFResource {
 
     private String identifier;
@@ -37,24 +33,27 @@ public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.
      * Sets mandatory range identifier.
      * @param identifier
      */
-    public void setIdentifier(String identifier) {
+    public RangeGenerator setIdentifier(String identifier) {
         this.identifier = identifier;
+        return this;
     }
 
     /**
      * Sets mandatory range label.
      * @param label
      */
-    public void setLabel(String label) {
+    public RangeGenerator setLabel(String label) {
         this.label = label;
+        return this;
     }
 
     /**
      * Adds canvas to Range canvas list.
      * @param canvas
      */
-    public void addCanvas(CanvasGenerator canvas) {
+    public RangeGenerator addCanvas(CanvasGenerator canvas) {
         canvasList.add((Canvas) canvas.getResource());
+        return this;
     }
 
     @Override
