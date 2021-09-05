@@ -105,7 +105,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream2 = BitstreamBuilder
-                    .createBitstream(context, publicItem1, is, "THUMBNAIL")
+                    .createBitstream(context, publicItem1, is, IIIFBundle)
                     .withName("Bitstream2")
                     .withMimeType("image/jpeg")
                     .build();
@@ -119,7 +119,7 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
                 .andExpect(jsonPath("$.service.profile", is("http://iiif.io/api/search/0/search")))
                 .andExpect(jsonPath("$.thumbnail.@id", Matchers.containsString("/iiif/2/"
-                        + bitstream2.getID())))
+                        + bitstream1.getID())))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
                         Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Page 1")))
