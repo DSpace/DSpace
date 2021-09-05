@@ -99,7 +99,6 @@ public class ManifestService extends AbstractResourceService {
         // images in the ORIGINAL bundle will be used.
         List<Bundle> bundles = utils.getIiifBundle(item, IIIF_BUNDLE);
         List<Bitstream> bitstreams = utils.getBitstreams(bundles);
-        // List<Bundle> thumbnailBundle = utils.getBundle(item, "THUMBNAIL");
         Info info = utils.validateInfoForManifest(utils.getInfo(context, item, IIIF_BUNDLE), bitstreams);
         manifestGenerator.setIdentifier(getManifestId(item.getID()));
         manifestGenerator.setLabel(item.getName());

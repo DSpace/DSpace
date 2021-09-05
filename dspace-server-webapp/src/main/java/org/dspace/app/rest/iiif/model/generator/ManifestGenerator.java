@@ -89,7 +89,7 @@ public class ManifestGenerator implements IIIFResource {
     /**
      * Use to add single mandatory sequence to Manifest. In IIIF Presentation API 3.0 "sequence"
      * is replaced by "items"
-     * @param sequence
+     * @param sequence canvas list model (sequence)
      */
     public void addSequence(CanvasItemsGenerator sequence) {
         this.sequence = (Sequence) sequence.getResource();
@@ -97,7 +97,7 @@ public class ManifestGenerator implements IIIFResource {
 
     /**
      * Add otional seeAlso element to Manifest.
-     * @param seeAlso
+     * @param seeAlso other content model
      */
     public void addSeeAlso(ExternalLinksGenerator seeAlso) {
         this.seeAlso = (OtherContent) seeAlso.getResource();
@@ -105,7 +105,7 @@ public class ManifestGenerator implements IIIFResource {
 
     /**
      * Add optional thumbnail image to manifest.
-     * @param thumbnail
+     * @param thumbnail image content model
      */
     public void addThumbnail(ImageContentGenerator thumbnail) {
         this.thumbnail = (ImageContent) thumbnail.getResource();
@@ -113,7 +113,7 @@ public class ManifestGenerator implements IIIFResource {
 
     /**
      * Add optional related element to Manifest.
-     * @param related
+     * @param related other content model
      */
     public void addRelated(ExternalLinksGenerator related) {
         this.related = (OtherContent) related.getResource();
@@ -121,7 +121,7 @@ public class ManifestGenerator implements IIIFResource {
 
     /**
      * Adds optional search service to Manifest.
-     * @param searchService
+     * @param searchService search service model
      */
     public void addService(ContentSearchGenerator searchService) {
         this.searchService = (ContentSearchService) searchService.getService();
@@ -129,8 +129,8 @@ public class ManifestGenerator implements IIIFResource {
 
     /**
      * Adds single metadata field to Manifest.
-     * @param field
-     * @param value
+     * @param field property field
+     * @param value property value
      */
     public void addMetadata(String field, String value) {
         metadataEntryGenerator.setField(field);
@@ -148,8 +148,8 @@ public class ManifestGenerator implements IIIFResource {
 
     /**
      * Adds optional description to Manifest.
-     * @param field
-     * @param value
+     * @param field property field
+     * @param value property value
      */
     public void addDescription(String field, String value) {
         description = new PropertyValueGenerator().getPropertyValue(field, value).getValue();
@@ -157,7 +157,7 @@ public class ManifestGenerator implements IIIFResource {
 
     /**
      * Adds optional Range to the manifest's structures element.
-     * @param rangeGenerator
+     * @param rangeGenerator list of range models
      */
     public void setRange(List<RangeGenerator> rangeGenerator) {
         ranges =  rangeGenerator;

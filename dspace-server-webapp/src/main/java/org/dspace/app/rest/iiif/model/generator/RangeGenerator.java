@@ -31,7 +31,7 @@ public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.
 
     /**
      * Sets mandatory range identifier.
-     * @param identifier
+     * @param identifier range identifier
      */
     public RangeGenerator setIdentifier(String identifier) {
         this.identifier = identifier;
@@ -40,7 +40,7 @@ public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.
 
     /**
      * Sets mandatory range label.
-     * @param label
+     * @param label range label
      */
     public RangeGenerator setLabel(String label) {
         this.label = label;
@@ -49,7 +49,7 @@ public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.
 
     /**
      * Adds canvas to Range canvas list.
-     * @param canvas
+     * @param canvas list of canvas models
      */
     public RangeGenerator addCanvas(CanvasGenerator canvas) {
         canvasList.add((Canvas) canvas.getResource());
