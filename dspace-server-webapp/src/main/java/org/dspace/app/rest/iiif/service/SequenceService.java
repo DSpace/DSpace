@@ -44,11 +44,9 @@ public class SequenceService  extends AbstractResourceService {
     @Autowired
     CanvasService canvasService;
 
-    ApplicationContext applicationContext;
 
-    public SequenceService(ApplicationContext applicationContext, ConfigurationService configurationService) {
+    public SequenceService(ConfigurationService configurationService) {
         setConfiguration(configurationService);
-        this.applicationContext = applicationContext;
     }
 
     public CanvasItemsGenerator getSequence(Item item, List<Bitstream> bitstreams, Context context, Info info) {
