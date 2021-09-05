@@ -16,10 +16,18 @@ public class MetadataEntryGenerator implements IIIFValue {
     private String field;
     private String value;
 
+    /**
+     * Set metadata field name.
+     * @param field field name
+     */
     public void setField(String field) {
         this.field = field;
     }
 
+    /**
+     * Set metadata value.
+     * @param value metadata value
+     */
     public void setValue(String value) {
         this.value = value;
     }
