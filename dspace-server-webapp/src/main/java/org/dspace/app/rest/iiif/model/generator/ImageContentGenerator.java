@@ -8,14 +8,14 @@
 package org.dspace.app.rest.iiif.model.generator;
 
 import de.digitalcollections.iiif.model.ImageContent;
-import de.digitalcollections.iiif.model.sharedcanvas.Resource;;
+import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 
 /**
  * POJO for the domain model's ImageContent.
  *
  * Presentation API version 2.1.1: The ImageContent entity is contained in the "resource"
  * field of annotations with motivation "sc:painting". Image resources, and only image resources,
- * are included in the images property of the canvas. This changes in API version 3.0.
+ * are included in the image's property of the canvas. This changes in API version 3.0.
  */
 public class ImageContentGenerator implements IIIFResource  {
 
