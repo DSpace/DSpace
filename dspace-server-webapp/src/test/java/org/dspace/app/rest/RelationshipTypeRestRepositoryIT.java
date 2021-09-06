@@ -254,5 +254,38 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
 
     }
 
+    @Test
+    public void findByEntityTypePublicationTest() throws Exception {
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType")
+                   .param("type", "Publication"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(1,
+                                                 "isAuthorOfPublication", "isPublicationOfAuthor"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(2,
+                                               "isProjectOfPublication", "isPublicationOfProject"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(3,
+                                               "isOrgUnitOfPublication", "isPublicationOfOrgUnit"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(10,
+                                                  "isAuthorOfPublication", "isPublicationOfAuthor"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(11,
+                                       "isPublicationOfJournalIssue", "isJournalIssueOfPublication")
+                           )))
+                   .andExpect(jsonPath("$.page.totalElements", is(5)));
+    }
+
+    @Test
+    public void findByEntityTypeMissingParamTest() throws Exception {
+
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType"))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByEntityTypeInvalidEntityTypeTest() throws Exception {
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType")
+                   .param("type", "WrongEntityType"))
+                   .andExpect(status().isBadRequest());
+    }
 
 }

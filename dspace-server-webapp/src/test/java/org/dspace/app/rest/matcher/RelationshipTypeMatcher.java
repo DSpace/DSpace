@@ -89,4 +89,13 @@ public class RelationshipTypeMatcher {
             ))
         );
     }
+
+    public static Matcher<? super Object> matchExplicitRestrictedRelationshipTypeValues(
+                                      int id, String leftwardType, String rightwardType) {
+        return allOf(hasJsonPath("$.id", is(id)),
+                     hasJsonPath("$.leftwardType", is(leftwardType)),
+                     hasJsonPath("$.rightwardType", is(rightwardType))
+                     );
+    }
+
 }
