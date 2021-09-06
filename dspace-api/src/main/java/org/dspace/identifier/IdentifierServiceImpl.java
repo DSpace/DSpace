@@ -66,9 +66,13 @@ public class IdentifierServiceImpl implements IdentifierService {
     public void reserve(Context context, DSpaceObject dso)
         throws AuthorizeException, SQLException, IdentifierException {
         for (IdentifierProvider service : providers) {
-            String identifier = service.mint(context, dso);
-            if (!StringUtils.isEmpty(identifier)) {
-                service.reserve(context, dso, identifier);
+            try {
+                String identifier = service.mint(context, dso);
+                if (!StringUtils.isEmpty(identifier)) {
+                    service.reserve(context, dso, identifier);
+                }
+            } catch (IdentifierNotApplicableException e) {
+                log.warn("Identifier not reserved (inapplicable): " + e.getMessage());
             }
         }
         //Update our item
@@ -81,7 +85,11 @@ public class IdentifierServiceImpl implements IdentifierService {
         // Next resolve all other services
         for (IdentifierProvider service : providers) {
             if (service.supports(identifier)) {
-                service.reserve(context, dso, identifier);
+                try {
+                    service.reserve(context, dso, identifier);
+                } catch (IdentifierNotApplicableException e) {
+                    log.warn("Identifier not reserved (inapplicable): " + e.getMessage());
+                }
             }
         }
         //Update our item
@@ -94,7 +102,11 @@ public class IdentifierServiceImpl implements IdentifierService {
         //We need to commit our context because one of the providers might require the handle created above
         // Next resolve all other services
         for (IdentifierProvider service : providers) {
-            service.register(context, dso);
+            try {
+                service.register(context, dso);
+            } catch (IdentifierNotApplicableException e) {
+                log.warn("Identifier not registered (inapplicable): " + e.getMessage());
+            }
         }
         //Update our item / collection / community
         contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
@@ -108,8 +120,12 @@ public class IdentifierServiceImpl implements IdentifierService {
         boolean registered = false;
         for (IdentifierProvider service : providers) {
             if (service.supports(identifier)) {
-                service.register(context, object, identifier);
-                registered = true;
+                try {
+                    service.register(context, object, identifier);
+                    registered = true;
+                } catch (IdentifierNotApplicableException e) {
+                    log.warn("Identifier not registered (inapplicable): " + e.getMessage());
+                }
             }
         }
         if (!registered) {
@@ -152,8 +168,7 @@ public class IdentifierServiceImpl implements IdentifierService {
                 if (!StringUtils.isEmpty(result)) {
                     if (log.isDebugEnabled()) {
                         try {
-                            log.debug("Got an identifier from "
-                                          + service.getClass().getCanonicalName() + ".");
+                            log.debug("Got an identifier from " + service.getClass().getCanonicalName() + ".");
                         } catch (NullPointerException ex) {
                             log.debug(ex.getMessage(), ex);
                         }
@@ -176,9 +191,9 @@ public class IdentifierServiceImpl implements IdentifierService {
             String handle = dso.getHandle();
             if (!StringUtils.isEmpty(handle)) {
                 if (!identifiers.contains(handle)
-                    && !identifiers.contains("hdl:" + handle)
-                    && !identifiers.contains(handleService.getCanonicalForm(handle))) {
-                    // The VerionedHandleIdentifierProvider gets loaded by default
+                        && !identifiers.contains("hdl:" + handle)
+                        && !identifiers.contains(handleService.getCanonicalForm(handle))) {
+                    // The VersionedHandleIdentifierProvider gets loaded by default
                     // it returns handles without any scheme (neither hdl: nor http:).
                     // If the VersionedHandleIdentifierProvider is not loaded,
                     // we adds the handle in way it would.
@@ -224,8 +239,7 @@ public class IdentifierServiceImpl implements IdentifierService {
     }
 
     @Override
-    public void delete(Context context, DSpaceObject dso)
-        throws AuthorizeException, SQLException, IdentifierException {
+    public void delete(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException {
         for (IdentifierProvider service : providers) {
             try {
                 service.delete(context, dso);
