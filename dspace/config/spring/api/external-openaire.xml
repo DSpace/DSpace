@@ -5,10 +5,10 @@
 
     <bean id="openAIRERestConnector" class="org.dspace.external.OpenAIRERestConnector">
         <constructor-arg value="${openaire.api.url:https://api.openaire.eu}"/>
-		<property name="tokenUsage" value="${openaire.aai.tokenUsage:false}"/>
-		<property name="tokenServiceUrl" value="${openaire.aai.url:https://aai.openaire.eu/oidc/token}"/>
-		<property name="clientId" value="${openaire.aai.clientId:CLIENT_ID}"/>
-		<property name="clientSecret" value="${openaire.aai.clientSecret:CLIENT_SECRET}"/>
+		<property name="tokenEnabled" value="${openaire.token.enabled:false}"/>
+		<property name="tokenServiceUrl" value="${openaire.token.url:https://aai.openaire.eu/oidc/token}"/>
+		<property name="clientId" value="${openaire.token.clientId:CLIENT_ID}"/>
+		<property name="clientSecret" value="${openaire.token.clientSecret:CLIENT_SECRET}"/>
     </bean>
     <bean class="org.dspace.external.provider.impl.OpenAIREFundingDataProvider" init-method="init">
          <property name="sourceIdentifier" value="openAIREFunding"/>

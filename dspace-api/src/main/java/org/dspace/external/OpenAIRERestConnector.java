@@ -60,7 +60,7 @@ public class OpenAIRERestConnector {
     /**
      * Boolean with token usage definition true if we want to use a token
      */
-    boolean tokenUsage;
+    boolean tokenEnabled;
 
     /**
      * OpenAIRE Authorization and Authentication Token Service URL
@@ -251,7 +251,7 @@ public class OpenAIRERestConnector {
         String queryString = path + ((path.indexOf("?") > 0) ? "&" : "?") + String.join("&", queryStringPagination);
 
         InputStream result = null;
-        if (tokenUsage) {
+        if (tokenEnabled) {
             try {
                 if (accessToken == null) {
                     accessToken = this.grabNewAccessToken();
@@ -332,7 +332,7 @@ public class OpenAIRERestConnector {
      */
     @Autowired(required = false)
     public void setTokenUsage(boolean tokenUsage) {
-        this.tokenUsage = tokenUsage;
+        this.tokenEnabled = tokenUsage;
     }
 
     protected void getGotError(Exception e, String fullPath) {
