@@ -9,8 +9,11 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
@@ -367,4 +370,28 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
         return converter.toRestPage(relationships, pageable, total, utils.obtainProjection());
     }
+
+    @SearchRestMethod(name = "byItemsAndType")
+    public Page<RelationshipRest> findByItemsAndType(
+                                            @Parameter(value = "typeId", required = true) Integer typeId,
+                                            @Parameter(value = "relationshipLabel", required = true) String label,
+                                            @Parameter(value = "focusItem", required = true) UUID focusUUID,
+                                            @Parameter(value = "relatedItem", required = true) Set<UUID> items,
+                                             Pageable pageable) throws SQLException {
+        Context context = obtainContext();
+        List<Relationship> relationships = new LinkedList<>();
+        RelationshipType relationshipType = relationshipTypeService.find(context, typeId);
+        if (Objects.nonNull(relationshipType)) {
+            if (!relationshipType.getLeftwardType().equals(label) &&
+                !relationshipType.getRightwardType().equals(label)) {
+                throw new UnprocessableEntityException("The provided label: " + label +
+                                                       " , does not match any relation!");
+            }
+            relationships = relationshipService.findByItemAndRelationshipTypeAndList(context, focusUUID,
+                       relationshipType, new ArrayList<UUID>(items), relationshipType.getLeftwardType().equals(label));
+
+        }
+        return converter.toRestPage(relationships, pageable, utils.obtainProjection());
+    }
+
 }
