@@ -35,6 +35,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.Util;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -104,7 +105,7 @@ public class OpenAIRERestConnector {
 
         HttpPost httpPost = new HttpPost(tokenServiceUrl);
         httpPost.addHeader("Accept", "application/json");
-        httpPost.addHeader("User-Agent", "DSpace/7.X");
+        httpPost.addHeader("User-Agent", "DSpace/" + Util.getSourceVersion());
         httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
         httpPost.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
 
@@ -201,7 +202,6 @@ public class OpenAIRERestConnector {
             // do not close this httpClient
             result = getResponse.getEntity().getContent();
         } catch (MalformedURLException e1) {
-            // TODO Auto-generated catch block
             getGotError(e1, url + '/' + file);
         } catch (Exception e) {
             getGotError(e, url + '/' + file);
