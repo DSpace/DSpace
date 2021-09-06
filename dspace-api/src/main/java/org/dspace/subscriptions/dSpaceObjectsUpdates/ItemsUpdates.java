@@ -34,12 +34,12 @@ import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortFunctionConfiguration;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableCommunity;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.subscriptions.ContentGenerator;
 import org.dspace.subscriptions.service.DSpaceObjectUpdates;
-
 
 
 /**
@@ -62,7 +62,8 @@ public class ItemsUpdates implements DSpaceObjectUpdates {
         List<IndexableObject> list = new ArrayList<>();
         // entity type found
         String inverseRelationName = "RELATION." + itemService.getEntityType((Item) dSpaceObject);
-        List<DiscoveryConfiguration> discoveryConfigurationList = searchConfigurationService.getDiscoveryConfigurationWithPrefixName(inverseRelationName);
+        List<DiscoveryConfiguration> discoveryConfigurationList =
+                searchConfigurationService.getDiscoveryConfigurationWithPrefixName(inverseRelationName);
         DiscoverQuery discoverQuery = null;
         DiscoverResult searchResult = null;
         IndexableObject indexableObject = resolveScope(context, dSpaceObject.getID().toString());
@@ -110,28 +111,45 @@ public class ItemsUpdates implements DSpaceObjectUpdates {
 
         DiscoverQuery discoverQuery = buildBaseQuery(discoveryConfiguration, scope);
         discoverQuery.addDSpaceObjectFilter(IndexableItem.TYPE);
-//        configureSorting(discoverQuery, discoveryConfiguration);
+        configureSorting(discoverQuery, discoveryConfiguration.getSearchSortConfiguration(), scope);
         return discoverQuery;
     }
 
-    private void configureSorting(DiscoverQuery discoverQuery, DiscoveryConfiguration discoveryConfiguration) {
-        DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration.getSearchSortConfiguration();
 
+    private void configureSorting(DiscoverQuery queryArgs,
+                                  DiscoverySortConfiguration searchSortConfiguration,
+                                  final IndexableObject scope) {
         String sortBy = getDefaultSortField(searchSortConfiguration);
         String sortOrder = getDefaultSortDirection(searchSortConfiguration);
-        DiscoverySortFieldConfiguration fieldConfig = searchSortConfiguration.getSortFieldConfiguration(sortBy);
-        if (fieldConfig == null) {
-            throw new IllegalArgumentException(sortBy + " is not a valid sort field");
-        }
-        String sortField = searchService.toSortFieldIndex(fieldConfig.getMetadataField(), fieldConfig.getType());
-        if ("asc".equalsIgnoreCase(sortOrder)) {
-            discoverQuery.setSortField(sortField, DiscoverQuery.SORT_ORDER.asc);
-        } else if ("desc".equalsIgnoreCase(sortOrder)) {
-            discoverQuery.setSortField(sortField, DiscoverQuery.SORT_ORDER.desc);
-        } else {
-            throw new IllegalArgumentException(sortOrder + " is not a valid sort order");
-        }
+        //Update Discovery query
+        DiscoverySortFieldConfiguration sortFieldConfiguration = searchSortConfiguration
+                .getSortFieldConfiguration(sortBy);
 
+        if (sortFieldConfiguration != null) {
+            String sortField;
+
+            if (DiscoverySortFunctionConfiguration.SORT_FUNCTION.equals(sortFieldConfiguration.getType())) {
+                sortField = MessageFormat.format(
+                        ((DiscoverySortFunctionConfiguration) sortFieldConfiguration).getFunction(scope.getID()),
+                        scope.getID());
+            } else {
+                sortField = searchService
+                        .toSortFieldIndex(
+                                sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
+            }
+
+
+            if ("asc".equalsIgnoreCase(sortOrder)) {
+                queryArgs.setSortField(sortField, DiscoverQuery.SORT_ORDER.asc);
+            } else if ("desc".equalsIgnoreCase(sortOrder)) {
+                queryArgs.setSortField(sortField, DiscoverQuery.SORT_ORDER.desc);
+            } else {
+                log.error(sortOrder + " is not a valid sort order");
+            }
+
+        } else {
+            log.error(sortBy + " is not a valid sort field");
+        }
     }
 
     private String getDefaultSortDirection(DiscoverySortConfiguration searchSortConfiguration) {
@@ -171,7 +189,8 @@ public class ItemsUpdates implements DSpaceObjectUpdates {
         return discoverQuery;
     }
 
-    public ItemsUpdates(CollectionService collectionService, CommunityService communityService, ItemService itemService, DiscoveryConfigurationService searchConfigurationService, SearchService searchService) {
+    public ItemsUpdates(CollectionService collectionService, CommunityService communityService, ItemService itemService,
+                        DiscoveryConfigurationService searchConfigurationService, SearchService searchService) {
         this.collectionService = collectionService;
         this.communityService = communityService;
         this.itemService = itemService;
