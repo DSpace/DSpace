@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -27,6 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.servlet.http.Cookie;
 
@@ -106,6 +108,20 @@ public class RequestItemRepositoryIT
     }
 
     /**
+     * Test of findAll method.
+     *
+     * @throws Exception passed through.
+     */
+    @Test
+    public void testFindAll()
+            throws Exception {
+        System.out.println("findAll");
+
+        getClient().perform(get(URI_ROOT))
+                .andExpect(status().isMethodNotAllowed());
+    }
+
+    /**
      * Test of findOne method, with an authenticated user.
      *
      * @throws java.lang.Exception passed through.
@@ -152,6 +168,21 @@ public class RequestItemRepositoryIT
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
                        RequestCopyMatcher.matchRequestCopy(request))));
+    }
+
+    /**
+     * Test of findOne with an unknown token.
+     *
+     * @throws Exception passed through.
+     */
+    @Test
+    public void testFindOneNonexistent()
+            throws Exception {
+        System.out.println("findOne (nonexistent request)");
+
+        String uri = URI_ROOT + "/impossible";
+        getClient().perform(get(uri))
+                .andExpect(status().isNotFound());
     }
 
     /**
@@ -261,6 +292,82 @@ public class RequestItemRepositoryIT
     }
 
     /**
+     * Test of createAndReturn method, with various errors.
+     *
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     */
+    @Test
+    public void testCreateAndReturnBadRequest()
+            throws SQLException, AuthorizeException, IOException, Exception {
+        System.out.println("createAndReturn (authenticated)");
+
+        // Fake up a request in REST form.
+        RequestItemRest rir = new RequestItemRest();
+        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setItemId(item.getID().toString());
+        rir.setRequestEmail(RequestItemBuilder.REQ_EMAIL);
+        rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
+        rir.setRequestName(RequestItemBuilder.REQ_NAME);
+        rir.setAllfiles(false);
+
+        // Try to create it, with various malformations.
+        ObjectMapper mapper = new ObjectMapper();
+        String authToken = getAuthToken(admin.getEmail(), password);
+        AtomicReference<String> requestTokenRef = new AtomicReference<>();
+
+        try {
+            // Test missing bitstream ID
+            rir.setBitstreamId(null);
+            getClient(authToken)
+                    .perform(post(URI_ROOT)
+                            .content(mapper.writeValueAsBytes(rir))
+                            .contentType(contentType))
+                    .andExpect(status().isUnprocessableEntity());
+
+            // Test unknown bitstream ID
+            rir.setBitstreamId(UUID.randomUUID().toString());
+            getClient(authToken)
+                    .perform(post(URI_ROOT)
+                            .content(mapper.writeValueAsBytes(rir))
+                            .contentType(contentType))
+                    .andExpect(status().isUnprocessableEntity());
+
+            rir.setBitstreamId(bitstream.getID().toString());
+
+            // Test missing item ID
+            rir.setItemId(null);
+            getClient(authToken)
+                    .perform(post(URI_ROOT)
+                            .content(mapper.writeValueAsBytes(rir))
+                            .contentType(contentType))
+                    .andExpect(status().isUnprocessableEntity());
+
+            // Test unknown item ID
+            rir.setItemId(UUID.randomUUID().toString());
+            getClient(authToken)
+                    .perform(post(URI_ROOT)
+                            .content(mapper.writeValueAsBytes(rir))
+                            .contentType(contentType))
+                    .andExpect(status().isUnprocessableEntity());
+
+            rir.setItemId(item.getID().toString());
+
+            // Test missing email
+            rir.setRequestEmail(null);
+            getClient(authToken)
+                    .perform(post(URI_ROOT)
+                            .content(mapper.writeValueAsBytes(rir))
+                            .contentType(contentType))
+                    .andExpect(status().isUnprocessableEntity());
+        } finally {
+            // Clean up the created request.
+            RequestItemBuilder.deleteRequestItem(requestTokenRef.get());
+        }
+    }
+
+    /**
      * Verify that Spring Security's CSRF protection is working as we expect.
      * We must test this using a simple non-GET request, as CSRF Tokens are not
      * validated in a GET request.
@@ -310,6 +417,18 @@ public class RequestItemRepositoryIT
         //Logout
         getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testDelete()
+            throws Exception {
+        System.out.println("delete");
+
+        RequestItem request = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+        getClient().perform(delete(URI_ROOT + '/' + request.getToken()))
+                .andExpect(status().isMethodNotAllowed());
     }
 
     /**
