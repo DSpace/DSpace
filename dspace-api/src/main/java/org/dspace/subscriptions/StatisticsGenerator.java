@@ -22,13 +22,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.dspace.app.metrics.CrisMetrics;
-import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.eperson.EPerson;
 import org.dspace.subscriptions.service.SubscriptionGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
-
 
 
 
@@ -41,9 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class StatisticsGenerator implements SubscriptionGenerator<CrisMetrics> {
     private static final Logger log = LogManager.getLogger(StatisticsGenerator.class);
-    @Autowired
-    private CrisMetricsService crisMetricsService;
-
     @Override
     public void notifyForSubscriptions(Context c, EPerson ePerson, List<CrisMetrics> crisMetricsList,
                                        List<CrisMetrics> crisMetricsList1,

@@ -67,13 +67,13 @@ public class SubscriptionEmailNotificationService {
                     }
                     if (dSpaceObject instanceof Community) {
                         communities.addAll(contentUpdates.get(Community.class.getSimpleName().toLowerCase(Locale.ROOT))
-                                .findUpdates(context, subscription.getdSpaceObject(), frequency));
+                                .findUpdates(context, dSpaceObject, frequency));
                     } else if (dSpaceObject instanceof Collection) {
                         collections.addAll(contentUpdates.get(Collection.class.getSimpleName().toLowerCase(Locale.ROOT))
-                                .findUpdates(context, subscription.getdSpaceObject(), frequency));
+                                .findUpdates(context, dSpaceObject, frequency));
                     } else if (dSpaceObject instanceof Item) {
                         items.addAll(contentUpdates.get(Item.class.getSimpleName().toLowerCase(Locale.ROOT))
-                                .findUpdates(context, subscription.getdSpaceObject(), frequency));
+                                .findUpdates(context, dSpaceObject, frequency));
                     }
                     if (iterator < subscriptionList.size() - 1) {
                         if (subscription.getePerson().equals(subscriptionList.get(iterator + 1).getePerson())) {
