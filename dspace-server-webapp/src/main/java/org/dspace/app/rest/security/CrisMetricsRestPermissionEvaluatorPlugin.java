@@ -16,6 +16,7 @@ import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.rest.model.CrisMetricsRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -26,6 +27,8 @@ import org.dspace.metrics.CrisItemMetricsService;
 import org.dspace.metrics.embeddable.impl.AbstractEmbeddableMetricProvider;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
+import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.proxy.LazyInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,8 +106,14 @@ public class CrisMetricsRestPermissionEvaluatorPlugin extends RestObjectPermissi
         } else {
 
             CrisMetrics metric = crisItemMetricsService.find(context, target.toString());
-            if (metric.getResource() instanceof Item) {
-                return metric != null ? (Item) metric.getResource() : null;
+            DSpaceObject dSpaceObject = metric.getResource();
+            if (dSpaceObject instanceof HibernateProxy) {
+                HibernateProxy hibernateProxy = (HibernateProxy) dSpaceObject;
+                LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
+                dSpaceObject = (DSpaceObject) initializer.getImplementation();
+            }
+            if (dSpaceObject instanceof Item) {
+                return metric != null ? (Item) dSpaceObject : null;
             } else {
                 return null;
             }
