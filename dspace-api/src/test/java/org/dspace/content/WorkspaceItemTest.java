@@ -165,7 +165,6 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     @Test
     public void testCreateAuth() throws Exception {
         // Allow Collection ADD perms
-        //doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
         doNothing().when(authorizeServiceSpy).authorizeAction(any(Context.class),
                                                               any(Collection.class), eq(Constants.ADD));
 
