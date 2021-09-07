@@ -8,8 +8,6 @@
 package org.dspace.storage.rdbms.migration;
 
 import org.dspace.storage.rdbms.DatabaseUtils;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
@@ -26,24 +24,20 @@ public class V7_0_2018_04_03__Upgrade_Workflow_Policy extends BaseJavaMigration 
 
     @Override
     public void migrate(Context context) throws Exception {
-        // Make sure XML Workflow is enabled, shouldn't even be needed since this class is only loaded if the service
-        // is enabled.
-        if (WorkflowServiceFactory.getInstance().getWorkflowService() instanceof XmlWorkflowService) {
-            // Now, check if the XMLWorkflow table (cwf_workflowitem) already exists in this database
-            if (DatabaseUtils.tableExists(context.getConnection(), "cwf_workflowitem")) {
-                String dbtype = DatabaseUtils.getDbType(context.getConnection());
+        // Check if the XMLWorkflow table (cwf_workflowitem) already exists in this database
+        if (DatabaseUtils.tableExists(context.getConnection(), "cwf_workflowitem")) {
+            String dbtype = DatabaseUtils.getDbType(context.getConnection());
 
-                String sqlMigrationPath = "org/dspace/storage/rdbms/sqlmigration/workflow/" + dbtype + "/";
-                String dataMigrateSQL = MigrationUtils.getResourceAsString(
+            String sqlMigrationPath = "org/dspace/storage/rdbms/sqlmigration/workflow/" + dbtype + "/";
+            String dataMigrateSQL = MigrationUtils.getResourceAsString(
                     sqlMigrationPath + "xmlworkflow/V7.0_2018.04.03__upgrade_workflow_policy.sql");
 
-                // Actually execute the Data migration SQL
-                // This will migrate all existing traditional workflows to the new XMLWorkflow system & tables
-                DatabaseUtils.executeSql(context.getConnection(), dataMigrateSQL);
+            // Actually execute the Data migration SQL
+            // This will migrate all existing traditional workflows to the new XMLWorkflow system & tables
+            DatabaseUtils.executeSql(context.getConnection(), dataMigrateSQL);
 
-                // Assuming both succeeded, save the size of the scripts for getChecksum() below
-                migration_file_size = dataMigrateSQL.length();
-            }
+            // Assuming both succeeded, save the size of the scripts for getChecksum() below
+            migration_file_size = dataMigrateSQL.length();
         }
     }
 

@@ -306,7 +306,7 @@ public class DSpaceCSV implements Serializable {
         // Specify default values
         String[] defaultValues =
             new String[] {
-                "dc.date.accessioned, dc.date.available, dc.date.updated, dc.description.provenance"
+                "dc.date.accessioned", "dc.date.available", "dc.date.updated", "dc.description.provenance"
             };
         String[] toIgnoreArray =
             DSpaceServicesFactory.getInstance()

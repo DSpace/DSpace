@@ -107,7 +107,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void relationshipMetadataImportTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collection).withRelationshipType("Publication")
+        Item item = ItemBuilder.createItem(context, collection).withEntityType("Publication")
                                .withTitle("Publication1").build();
         EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
@@ -115,7 +115,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
                                                               "isPublicationOfAuthor", 0, 10, 0, 10);
         context.restoreAuthSystemState();
 
-        String[] csv = {"id,collection,dc.title,relation.isPublicationOfAuthor,relationship.type",
+        String[] csv = {"id,collection,dc.title,relation.isPublicationOfAuthor,dspace.entity.type",
             "+," + collection.getHandle() + ",\"Test Import 1\"," + item.getID() + ",Person"};
         performImportScript(csv);
         Item importedItem = findItemByName("Test Import 1");
@@ -130,11 +130,11 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void relationshipMetadataImporAlreadyExistingItemTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item personItem = ItemBuilder.createItem(context, collection).withRelationshipType("Person")
+        Item personItem = ItemBuilder.createItem(context, collection).withEntityType("Person")
                                      .withTitle("Person1").build();
         List<Relationship> relationshipList = relationshipService.findByItem(context, personItem);
         assertEquals(0, relationshipList.size());
-        Item publicationItem = ItemBuilder.createItem(context, collection).withRelationshipType("Publication")
+        Item publicationItem = ItemBuilder.createItem(context, collection).withEntityType("Publication")
                                           .withTitle("Publication1").build();
 
         EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();

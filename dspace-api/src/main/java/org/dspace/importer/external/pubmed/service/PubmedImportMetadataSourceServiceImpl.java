@@ -51,7 +51,8 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private String baseAddress;
 
-    private WebTarget pubmedWebTarget;
+    // it is protected so that subclass can mock it for testing
+    protected WebTarget pubmedWebTarget;
 
     private List<String> supportedExtensions;
 

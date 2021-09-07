@@ -501,10 +501,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
         // Remove bitstreams
         List<Bitstream> bitstreams = bundle.getBitstreams();
-        bundle.clearBitstreams();
         for (Bitstream bitstream : bitstreams) {
             removeBitstream(context, bundle, bitstream);
         }
+        bundle.clearBitstreams();
 
         List<Item> items = new LinkedList<>(bundle.getItems());
         bundle.getItems().clear();

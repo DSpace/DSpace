@@ -53,8 +53,9 @@ public class SolrServiceIndexCollectionSubmittersPlugin implements SolrServiceIn
                         parent = (Community) ContentServiceFactory.getInstance().getDSpaceObjectService(parent)
                                                                                 .getParentObject(context, parent);
                     }
-                    List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, col,
-                                                    Constants.ADD);
+                    List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context,col,Constants.ADD);
+                    policies.addAll(authorizeService.getPoliciesActionFilter(context, col, Constants.ADMIN));
+
                     for (ResourcePolicy resourcePolicy : policies) {
                         if (resourcePolicy.getGroup() != null) {
                             fieldValue = "g" + resourcePolicy.getGroup().getID();

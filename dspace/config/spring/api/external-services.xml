@@ -5,19 +5,35 @@
 
     <bean class="org.dspace.external.service.impl.ExternalDataServiceImpl"/>
 
-    <bean class="org.dspace.external.provider.impl.SherpaJournalDataProvider" init-method="init">
-        <property name="sourceIdentifier" value="sherpaJournal"/>
-        <property name="url" value="${sherpa.romeo.url}"/>
-        <!-- please register for a free api access key to get many benefits -->
-        <property name="apiKey" value="${sherpa.romeo.apikey}"/>
-
+    <bean class="org.dspace.external.provider.impl.SHERPAv2JournalISSNDataProvider" init-method="init">
+        <property name="sherpaService">
+            <bean class="org.dspace.app.sherpa.SHERPAService">
+                <property name="maxNumberOfTries" value="3"/>
+                <property name="sleepBetweenTimeouts" value="2000"/>
+                <property name="timeout" value="5000"/>
+            </bean>
+        </property>
+        <property name="sourceIdentifier" value="sherpaJournalIssn"/>
     </bean>
-    <bean class="org.dspace.external.provider.impl.SherpaPublisherDataProvider">
+    <bean class="org.dspace.external.provider.impl.SHERPAv2JournalDataProvider" init-method="init">
+        <property name="sourceIdentifier" value="sherpaJournal"/>
+        <property name="sherpaService">
+            <bean class="org.dspace.app.sherpa.SHERPAService">
+                <property name="maxNumberOfTries" value="3"/>
+                <property name="sleepBetweenTimeouts" value="2000"/>
+                <property name="timeout" value="5000"/>
+            </bean>
+        </property>
+    </bean>
+    <bean class="org.dspace.external.provider.impl.SHERPAv2PublisherDataProvider" init-method="init">
         <property name="sourceIdentifier" value="sherpaPublisher"/>
-        <property name="url" value="${sherpa.romeo.url}"/>
-        <!-- please register for a free api access key to get many benefits -->
-        <property name="apiKey" value="${sherpa.romeo.apikey}"/>
-
+        <property name="sherpaService">
+            <bean class="org.dspace.app.sherpa.SHERPAService">
+                <property name="maxNumberOfTries" value="3"/>
+                <property name="sleepBetweenTimeouts" value="2000"/>
+                <property name="timeout" value="5000"/>
+            </bean>
+        </property>
     </bean>
     <bean class="org.dspace.external.provider.impl.OrcidV3AuthorDataProvider" init-method="init">
         <property name="sourceIdentifier" value="orcid"/>

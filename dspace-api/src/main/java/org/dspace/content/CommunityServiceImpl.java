@@ -183,7 +183,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             throws MissingResourceException, SQLException {
         if (field.equals(MD_NAME) && (value == null || value.trim().equals(""))) {
             try {
-                value = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
+                value = I18nUtil.getMessage("org.dspace.content.untitled");
             } catch (MissingResourceException e) {
                 value = "Untitled";
             }

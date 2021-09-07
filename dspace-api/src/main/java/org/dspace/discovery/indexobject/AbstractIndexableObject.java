@@ -30,7 +30,7 @@ public abstract class AbstractIndexableObject<T extends ReloadableEntity<PK>, PK
     @Override
     public boolean equals(Object obj) {
         //Two IndexableObjects of the same DSpaceObject are considered equal
-        if (!(obj instanceof AbstractIndexableObject)) {
+        if (!(obj instanceof IndexableObject)) {
             return false;
         }
         AbstractIndexableObject other = (AbstractIndexableObject) obj;

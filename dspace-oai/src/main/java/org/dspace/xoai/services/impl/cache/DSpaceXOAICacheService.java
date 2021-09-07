@@ -27,8 +27,8 @@ import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
 import com.lyncode.xoai.dataprovider.xml.oaipmh.OAIPMH;
 import com.lyncode.xoai.util.Base64Utils;
 import org.apache.commons.io.FileUtils;
-import org.dspace.services.ConfigurationService;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
+import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -8,7 +8,6 @@
 package org.dspace.app.rest.model;
 
 import java.util.Date;
-import java.util.UUID;
 
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
 
@@ -30,10 +29,6 @@ public class UploadBitstreamAccessConditionDTO  {
 
     private Integer id;
 
-    private UUID groupUUID;
-
-    private UUID epersonUUID;
-
     private String name;
 
     private String description;
@@ -48,22 +43,6 @@ public class UploadBitstreamAccessConditionDTO  {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public UUID getGroupUUID() {
-        return groupUUID;
-    }
-
-    public void setGroupUUID(UUID groupUUID) {
-        this.groupUUID = groupUUID;
-    }
-
-    public UUID getEpersonUUID() {
-        return epersonUUID;
-    }
-
-    public void setEpersonUUID(UUID epersonUUID) {
-        this.epersonUUID = epersonUUID;
     }
 
     public String getName() {

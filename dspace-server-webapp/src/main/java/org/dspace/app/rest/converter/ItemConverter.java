@@ -8,9 +8,13 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataValueList;
@@ -36,9 +40,6 @@ public class ItemConverter
         implements IndexableObjectConverter<Item, ItemRest> {
 
     @Autowired
-    private ConverterService converter;
-
-    @Autowired
     private ItemService itemService;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
@@ -50,6 +51,12 @@ public class ItemConverter
         item.setDiscoverable(obj.isDiscoverable());
         item.setWithdrawn(obj.isWithdrawn());
         item.setLastModified(obj.getLastModified());
+
+        List<MetadataValue> entityTypes =
+            itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
+        if (CollectionUtils.isNotEmpty(entityTypes) && StringUtils.isNotBlank(entityTypes.get(0).getValue())) {
+            item.setEntityType(entityTypes.get(0).getValue());
+        }
 
         return item;
     }
@@ -68,6 +75,10 @@ public class ItemConverter
         List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
         List<MetadataValue> returnList = new LinkedList<>();
         try {
+            if (obj.isWithdrawn() && (Objects.isNull(context) ||
+                                      Objects.isNull(context.getCurrentUser()) || !authorizeService.isAdmin(context))) {
+                return new MetadataValueList(new ArrayList<MetadataValue>());
+            }
             if (context != null && authorizeService.isAdmin(context)) {
                 return new MetadataValueList(fullList);
             }

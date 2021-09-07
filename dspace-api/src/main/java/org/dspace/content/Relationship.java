@@ -164,6 +164,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      */
     public void setLeftPlace(int leftPlace) {
         this.leftPlace = leftPlace;
+        leftItem.setMetadataModified();
     }
 
     /**
@@ -180,6 +181,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      */
     public void setRightPlace(int rightPlace) {
         this.rightPlace = rightPlace;
+        rightItem.setMetadataModified();
     }
 
     /**
