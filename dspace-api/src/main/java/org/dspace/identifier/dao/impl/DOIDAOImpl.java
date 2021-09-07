@@ -24,7 +24,7 @@ import org.dspace.identifier.dao.DOIDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the DOI object.
- * This class is responsible for all database calls for the DOI object and is autowired by spring
+ * This class is responsible for all database calls for the DOI object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -41,7 +41,7 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
         criteriaQuery.select(doiRoot);
         criteriaQuery.where(criteriaBuilder.equal(doiRoot.get(DOI_.doi), doi));
-        return uniqueResult(context, criteriaQuery, false, DOI.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, DOI.class);
     }
 
     @Override
