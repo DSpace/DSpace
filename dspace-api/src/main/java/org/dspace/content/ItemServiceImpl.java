@@ -176,34 +176,28 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public Item create(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
-        authorizeService.authorizeAction(context, workspaceItem.getCollection(), Constants.ADD);
-        if (workspaceItem.getItem() != null) {
-            throw new IllegalArgumentException(
-                "Attempting to create an item for a workspace item that already contains an item");
-        }
-        Item item = createItem(context);
-        workspaceItem.setItem(item);
-
-
-        log.info(LogHelper.getHeader(context, "create_item", "item_id="
-            + item.getID()));
-
-        return item;
+        return create(context, workspaceItem, null);
     }
 
     @Override
     public Item create(Context context, WorkspaceItem workspaceItem,
                        UUID uuid) throws SQLException, AuthorizeException {
-        authorizeService.authorizeAction(context, workspaceItem.getCollection(), Constants.ADD);
+        Collection collection = workspaceItem.getCollection();
+        authorizeService.authorizeAction(context, collection, Constants.ADD);
         if (workspaceItem.getItem() != null) {
             throw new IllegalArgumentException(
                     "Attempting to create an item for a workspace item that already contains an item");
         }
-        Item item = createItem(context, uuid);
+        Item item = null;
+        if (uuid != null) {
+            item = createItem(context, uuid);
+        } else {
+            item = createItem(context);
+        }
         workspaceItem.setItem(item);
 
 
-        log.info(LogManager.getHeader(context, "create_item", "item_id="
+        log.info(LogHelper.getHeader(context, "create_item", "item_id="
                 + item.getID()));
 
         return item;
