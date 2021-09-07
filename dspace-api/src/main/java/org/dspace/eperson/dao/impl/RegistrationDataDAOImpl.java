@@ -21,7 +21,7 @@ import org.dspace.eperson.dao.RegistrationDataDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the RegistrationData object.
- * This class is responsible for all database calls for the RegistrationData object and is autowired by spring
+ * This class is responsible for all database calls for the RegistrationData object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -39,7 +39,7 @@ public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationDa
         Root<RegistrationData> registrationDataRoot = criteriaQuery.from(RegistrationData.class);
         criteriaQuery.select(registrationDataRoot);
         criteriaQuery.where(criteriaBuilder.equal(registrationDataRoot.get(RegistrationData_.email), email));
-        return uniqueResult(context, criteriaQuery, false, RegistrationData.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, RegistrationData.class);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationDa
         Root<RegistrationData> registrationDataRoot = criteriaQuery.from(RegistrationData.class);
         criteriaQuery.select(registrationDataRoot);
         criteriaQuery.where(criteriaBuilder.equal(registrationDataRoot.get(RegistrationData_.token), token));
-        return uniqueResult(context, criteriaQuery, false, RegistrationData.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, RegistrationData.class);
     }
 
     @Override
