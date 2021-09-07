@@ -29,6 +29,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.ScrollableResults;
 
 /**
  * Service interface class for the Item object.
@@ -79,6 +80,8 @@ public interface ItemService
      */
     public Iterator<Item> findAll(Context context) throws SQLException;
 
+    public ScrollableResults findAllReadOnly(Context context) throws SQLException;
+
     /**
      * Get all the items in the archive. Only items with the "in archive" flag
      * set are included. The order of the list is indeterminate.
@@ -100,6 +103,8 @@ public interface ItemService
      * @throws SQLException if database error
      */
     public Iterator<Item> findAllUnfiltered(Context context) throws SQLException;
+
+    public ScrollableResults findAllUnfilteredReadOnly(Context context) throws SQLException;
 
     /**
      * Find all the items in the archive by a given submitter. The order is

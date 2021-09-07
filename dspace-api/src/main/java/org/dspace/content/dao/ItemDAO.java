@@ -19,6 +19,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.hibernate.ScrollableResults;
 
 /**
  * Database Access Object interface class for the Item object.
@@ -30,9 +31,13 @@ import org.dspace.eperson.EPerson;
 public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
     public Iterator<Item> findAll(Context context, boolean archived) throws SQLException;
 
+    public ScrollableResults findAllReadOnly(Context context, boolean archived) throws SQLException;
+
     public Iterator<Item> findAll(Context context, boolean archived, int limit, int offset) throws SQLException;
 
     public Iterator<Item> findAll(Context context, boolean archived, boolean withdrawn) throws SQLException;
+
+    public ScrollableResults findAllReadOnly(Context context, boolean archived, boolean withdrawn) throws SQLException;
 
     /**
      * Find all Items modified since a Date.

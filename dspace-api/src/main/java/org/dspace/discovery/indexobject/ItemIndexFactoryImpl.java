@@ -66,6 +66,7 @@ import org.dspace.util.MultiFormatDateParser;
 import org.dspace.util.SolrUtils;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.hibernate.ScrollableResults;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -100,16 +101,26 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
 
     @Override
     public Iterator<IndexableItem> findAll(Context context) throws SQLException {
-        Iterator<Item> items = itemService.findAllUnfiltered(context);
+        ScrollableResults items = itemService.findAllUnfilteredReadOnly(context);
         return new Iterator<IndexableItem>() {
+            private int counter = 0;
+
             @Override
             public boolean hasNext() {
-                return items.hasNext();
+                return items.next();
             }
 
             @Override
             public IndexableItem next() {
-                return new IndexableItem(items.next());
+                counter++;
+                if (counter % 1000 == 0) {
+                    try {
+                        context.clearDatabaseCache();
+                    } catch (SQLException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                }
+                return new IndexableItem((Item) items.get(0));
             }
         };
     }

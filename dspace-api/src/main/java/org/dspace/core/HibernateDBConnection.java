@@ -337,4 +337,8 @@ public class HibernateDBConnection implements DBConnection<Session> {
             }
         }
     }
+
+    public void clearSession() throws SQLException {
+        this.getSession().clear();
+    }
 }

@@ -59,6 +59,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.hibernate.ScrollableResults;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -217,6 +218,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         return itemDAO.findAll(context, true);
     }
 
+
+    @Override
+    public ScrollableResults findAllReadOnly(Context context) throws SQLException {
+        return itemDAO.findAllReadOnly(context, true);
+    }
     @Override
     public Iterator<Item> findAll(Context context, Integer limit, Integer offset) throws SQLException {
         return itemDAO.findAll(context, true, limit, offset);
@@ -225,6 +231,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public Iterator<Item> findAllUnfiltered(Context context) throws SQLException {
         return itemDAO.findAll(context, true, true);
+    }
+
+    @Override
+    public ScrollableResults findAllUnfilteredReadOnly(Context context) throws SQLException {
+        return itemDAO.findAllReadOnly(context, true, true);
     }
 
     @Override

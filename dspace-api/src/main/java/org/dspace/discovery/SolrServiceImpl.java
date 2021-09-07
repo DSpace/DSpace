@@ -320,9 +320,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     while (indexableObjects.hasNext()) {
                         final IndexableObject indexableObject = indexableObjects.next();
                         indexContent(context, indexableObject, force);
-                        context.uncacheEntity(indexableObject.getIndexedObject());
                     }
                 }
+                context.clearDatabaseCache();
             }
             if (solrSearchCore.getSolr() != null) {
                 solrSearchCore.getSolr().commit();

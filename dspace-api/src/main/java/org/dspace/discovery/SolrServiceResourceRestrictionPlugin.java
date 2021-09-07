@@ -98,9 +98,6 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
 
                         document.addField("read", fieldValue);
                     }
-
-                    //remove the policy from the cache to save memory
-                    context.uncacheEntity(resourcePolicy);
                 }
                  // also index ADMIN policies as ADMIN permissions provides READ access
                 // going up through the hierarchy for communities, collections and items
@@ -121,9 +118,6 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                                 document.addField("read", fieldValue);
                                 document.addField("admin", fieldValue);
                             }
-
-                            // remove the policy from the cache to save memory
-                            context.uncacheEntity(resourcePolicy);
                         }
                     }
                     dso = ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getParentObject(context, dso);

@@ -30,6 +30,9 @@ import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.hibernate.Criteria;
+import org.hibernate.LockMode;
+import org.hibernate.ScrollMode;
+import org.hibernate.ScrollableResults;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
@@ -60,6 +63,15 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
+    public ScrollableResults findAllReadOnly(Context context, boolean archived) throws SQLException {
+        org.hibernate.query.Query query = (org.hibernate.query.Query) createQuery(context, "FROM Item WHERE inArchive= :in_archive");
+        query.setParameter("in_archive", archived);
+        query.setFetchSize(1000);
+        query.setReadOnly(true);
+        return query.scroll(ScrollMode.FORWARD_ONLY);
+    }
+
+    @Override
     public Iterator<Item> findAll(Context context, boolean archived, int limit, int offset) throws SQLException {
         Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive");
         query.setParameter("in_archive", archived);
@@ -75,6 +87,16 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setParameter("in_archive", archived);
         query.setParameter("withdrawn", withdrawn);
         return iterate(query);
+    }
+
+    @Override
+    public ScrollableResults findAllReadOnly(Context context, boolean archived, boolean withdrawn) throws SQLException {
+        org.hibernate.query.Query query = (org.hibernate.query.Query) createQuery(context, "FROM Item WHERE inArchive= :in_archive or withdrawn = :withdrawn");
+        query.setParameter("in_archive", archived);
+        query.setParameter("withdrawn", withdrawn);
+        query.setFetchSize(1000);
+        query.setReadOnly(true);
+        return query.scroll(ScrollMode.FORWARD_ONLY);
     }
 
     @Override

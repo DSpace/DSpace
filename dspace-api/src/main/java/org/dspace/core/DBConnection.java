@@ -148,4 +148,6 @@ public interface DBConnection<T> {
      * @throws java.sql.SQLException passed through.
      */
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException;
+
+    public void clearSession() throws SQLException;
 }

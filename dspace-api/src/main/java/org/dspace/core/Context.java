@@ -889,4 +889,8 @@ public class Context implements AutoCloseable {
         currentUser = reloadEntity(currentUser);
     }
 
+    public void clearDatabaseCache() throws SQLException {
+        this.dbConnection.clearSession();
+    }
+
 }
