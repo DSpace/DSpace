@@ -331,8 +331,8 @@ public class OpenAIRERestConnector {
      * @param tokenUsage
      */
     @Autowired(required = false)
-    public void setTokenUsage(boolean tokenUsage) {
-        this.tokenEnabled = tokenUsage;
+    public void setTokenEnabled(boolean tokenEnabled) {
+        this.tokenEnabled = tokenEnabled;
     }
 
     protected void getGotError(Exception e, String fullPath) {
