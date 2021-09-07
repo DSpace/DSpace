@@ -34,7 +34,7 @@ public class BitstreamFormatLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     BitstreamService bitstreamService;
 
-    @PreAuthorize("hasPermission(#bitstreamId, 'BITSTREAM', 'READ')")
+    @PreAuthorize("hasPermission(#bitstreamId, 'BITSTREAM', 'METADATA_READ')")
     public BitstreamFormatRest getFormat(@Nullable HttpServletRequest request,
                                          UUID bitstreamId,
                                          @Nullable Pageable optionalPageable,

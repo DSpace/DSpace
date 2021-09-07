@@ -33,8 +33,8 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
-import org.dspace.workflowbasic.service.BasicWorkflowItemService;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 
 /**
  * @author LINDAT/CLARIN dev team
@@ -48,8 +48,8 @@ public class ItemCheck extends Check {
     private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    private BasicWorkflowItemService basicWorkflowItemService =
-        BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
+    private XmlWorkflowItemService workflowItemService =
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
     private HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
@@ -95,7 +95,7 @@ public class ItemCheck extends Check {
 
             ret += String.format(
                 "\tWaiting for approval (workflow items): %d\n",
-                basicWorkflowItemService.countTotal(context));
+                workflowItemService.countAll(context));
 
         } catch (SQLException e) {
             error(e);
@@ -132,7 +132,7 @@ public class ItemCheck extends Check {
         sb.append(String.format("Count %-14s: %s\n", "Group",
                                 String.valueOf(groupService.countTotal(context))));
         sb.append(String.format("Count %-14s: %s\n", "BasicWorkflowItem",
-                                String.valueOf(basicWorkflowItemService.countTotal(context))));
+                                String.valueOf(workflowItemService.countAll(context))));
         sb.append(String.format("Count %-14s: %s\n", "WorkspaceItem",
                                 String.valueOf(workspaceItemService.countTotal(context))));
         return sb.toString();

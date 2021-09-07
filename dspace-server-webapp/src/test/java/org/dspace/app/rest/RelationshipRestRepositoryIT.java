@@ -9,6 +9,8 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -18,6 +20,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -33,6 +36,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.RelationshipMatcher;
 import org.dspace.app.rest.model.RelationshipRest;
@@ -41,14 +46,18 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.MetadataFieldBuilder;
 import org.dspace.builder.RelationshipBuilder;
+import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
@@ -59,6 +68,7 @@ import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
+import org.dspace.discovery.MockSolrSearchCore;
 import org.dspace.eperson.EPerson;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,45 +79,47 @@ import org.springframework.test.web.servlet.MvcResult;
 public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest {
 
     @Autowired
-    private RelationshipTypeService relationshipTypeService;
+    protected RelationshipTypeService relationshipTypeService;
 
     @Autowired
-    private EntityTypeService entityTypeService;
+    protected EntityTypeService entityTypeService;
 
     @Autowired
-    private AuthorizeService authorizeService;
+    protected AuthorizeService authorizeService;
 
     @Autowired
-    private ItemService itemService;
+    protected ItemService itemService;
 
     @Autowired
-    private MetadataFieldService metadataFieldService;
+    protected MetadataFieldService metadataFieldService;
 
     @Autowired
-    private MetadataSchemaService metadataSchemaService;
+    protected MetadataSchemaService metadataSchemaService;
 
-    private Community parentCommunity;
-    private Community child1;
+    @Autowired
+    MockSolrSearchCore mockSolrSearchCore;
+    protected Community parentCommunity;
+    protected Community child1;
 
-    private Collection col1;
-    private Collection col2;
-    private Collection col3;
+    protected Collection col1;
+    protected Collection col2;
+    protected Collection col3;
 
-    private Item author1;
-    private Item author2;
-    private Item author3;
+    protected Item author1;
+    protected Item author2;
+    protected Item author3;
 
-    private Item orgUnit1;
-    private Item orgUnit2;
-    private Item orgUnit3;
-    private Item project1;
+    protected Item orgUnit1;
+    protected Item orgUnit2;
+    protected Item orgUnit3;
+    protected Item project1;
 
-    private Item publication1;
-    private Item publication2;
+    protected Item publication1;
+    protected Item publication2;
 
-    private RelationshipType isAuthorOfPublicationRelationshipType;
-    private RelationshipType isOrgUnitOfPersonRelationshipType;
-    private EPerson user1;
+    protected RelationshipType isAuthorOfPublicationRelationshipType;
+    protected RelationshipType isOrgUnitOfPersonRelationshipType;
+    protected EPerson user1;
 
     @Before
     public void setUp() throws Exception {
@@ -132,14 +144,14 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                              .withAuthor("Smith, Donald")
                              .withPersonIdentifierLastName("Smith")
                              .withPersonIdentifierFirstName("Donald")
-                             .withRelationshipType("Person")
+                             .withEntityType("Person")
                              .build();
 
         author2 = ItemBuilder.createItem(context, col2)
                              .withTitle("Author2")
                              .withIssueDate("2016-02-13")
                              .withAuthor("Smith, Maria")
-                             .withRelationshipType("Person")
+                             .withEntityType("Person")
                              .build();
 
         author3 = ItemBuilder.createItem(context, col2)
@@ -147,49 +159,49 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                              .withIssueDate("2016-02-13")
                              .withPersonIdentifierFirstName("Maybe")
                              .withPersonIdentifierLastName("Maybe")
-                             .withRelationshipType("Person")
+                             .withEntityType("Person")
                              .build();
 
         publication1 = ItemBuilder.createItem(context, col3)
                                   .withTitle("Publication1")
                                   .withAuthor("Testy, TEst")
                                   .withIssueDate("2015-01-01")
-                                  .withRelationshipType("Publication")
+                                  .withEntityType("Publication")
                                   .build();
 
         publication2 = ItemBuilder.createItem(context, col3)
                                   .withTitle("Publication2")
                                   .withAuthor("Testy, TEst")
                                   .withIssueDate("2015-01-01")
-                                  .withRelationshipType("Publication")
+                                  .withEntityType("Publication")
                                   .build();
 
         orgUnit1 = ItemBuilder.createItem(context, col3)
                               .withTitle("OrgUnit1")
                               .withAuthor("Testy, TEst")
                               .withIssueDate("2015-01-01")
-                              .withRelationshipType("OrgUnit")
+                              .withEntityType("OrgUnit")
                               .build();
 
         orgUnit2 = ItemBuilder.createItem(context, col3)
                 .withTitle("OrgUnit2")
                 .withAuthor("Testy, TEst")
                 .withIssueDate("2015-01-01")
-                .withRelationshipType("OrgUnit")
+                .withEntityType("OrgUnit")
                 .build();
 
         orgUnit3 = ItemBuilder.createItem(context, col3)
                               .withTitle("OrgUnit3")
                               .withAuthor("Test, Testy")
                               .withIssueDate("2015-02-01")
-                              .withRelationshipType("OrgUnit")
+                              .withEntityType("OrgUnit")
                               .build();
 
         project1 = ItemBuilder.createItem(context, col3)
                               .withTitle("Project1")
                               .withAuthor("Testy, TEst")
                               .withIssueDate("2015-01-01")
-                              .withRelationshipType("Project")
+                              .withEntityType("Project")
                               .build();
 
         isAuthorOfPublicationRelationshipType = relationshipTypeService
@@ -654,7 +666,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2017-10-17")
                                   .withPersonIdentifierFirstName("Donald")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
@@ -662,7 +674,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maria")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
@@ -670,13 +682,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maybe")
                                   .withPersonIdentifierLastName("Maybe")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item publication1 = ItemBuilder.createItem(context, col3)
                                        .withTitle("Publication1")
                                        .withIssueDate("2015-01-01")
-                                       .withRelationshipType("Publication")
+                                       .withEntityType("Publication")
                                        .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
@@ -764,6 +776,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                          .andExpect(status().isCreated())
                    .andDo(result -> idRef2.set(read(result.getResponse().getContentAsString(), "$.id")));
 
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
         // Ensure that we now have three dc.contributor.author mdv ("Smith, Donald", "plain text", "Smith, Maria"
         // In that order which will be checked below the rest call
@@ -790,6 +803,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         itemService.update(context, publication1);
 
         context.restoreAuthSystemState();
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         // Assert that the list of dc.contributor.author mdv is now of size 4 in the following order:
@@ -827,6 +841,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                          .andExpect(status().isCreated())
                    .andDo(result -> idRef3.set(read(result.getResponse().getContentAsString(), "$.id")));
 
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
         // Assert that our dc.contributor.author mdv list is now of size 5
         assertEquals(5, list.size());
@@ -890,6 +905,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         itemService.update(context, publication1);
 
         context.restoreAuthSystemState();
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         assertEquals(10, list.size());
@@ -957,7 +973,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Item publication1 = ItemBuilder.createItem(context, col3)
                                        .withTitle("Publication1")
                                        .withIssueDate("2015-01-01")
-                                       .withRelationshipType("Publication")
+                                       .withEntityType("Publication")
                                        .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
@@ -965,7 +981,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maria")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
@@ -973,7 +989,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maybe")
                                   .withPersonIdentifierLastName("Maybe")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -1170,7 +1186,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Item publication1 = ItemBuilder.createItem(context, col3)
                                        .withTitle("Publication1")
                                        .withIssueDate("2015-01-01")
-                                       .withRelationshipType("Publication")
+                                       .withEntityType("Publication")
                                        .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
@@ -1178,7 +1194,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maria")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
@@ -1186,7 +1202,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maybe")
                                   .withPersonIdentifierLastName("Maybe")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -1384,7 +1400,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maria")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -2374,7 +2390,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withAuthor("Smith, Donald")
                                   .withPersonIdentifierFirstName("testingFirstName")
                                   .withPersonIdentifierLastName("testingLastName")
-                                  .withRelationshipType("Person")
+                                  .withEntityType("Person")
                                   .build();
 
         Relationship relationship3 = RelationshipBuilder
@@ -2673,4 +2689,236 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
             RelationshipBuilder.deleteRelationship(idRef.get());
         }
     }
+
+    @Test
+    public void testVirtualMdInRESTAndSolrDoc() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity types if needed
+        EntityType journalEntityType = entityTypeService.findByEntityType(context, "Journal");
+        if (journalEntityType == null) {
+            journalEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
+        }
+        EntityType journalVolumeEntityType = entityTypeService.findByEntityType(context, "JournalVolume");
+        if (journalVolumeEntityType == null) {
+            journalVolumeEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalVolume").build();
+        }
+        EntityType journalIssueEntityType = entityTypeService.findByEntityType(context, "JournalIssue");
+        if (journalIssueEntityType == null) {
+            journalIssueEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
+        }
+        EntityType publicationEntityType = entityTypeService.findByEntityType(context, "Publication");
+        if (publicationEntityType == null) {
+            publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        }
+
+        // Create relationship types if needed
+        RelationshipType isPublicationOfJournalIssue = relationshipTypeService
+            .findbyTypesAndTypeName(context, journalIssueEntityType, publicationEntityType,
+                "isPublicationOfJournalIssue", "isJournalIssueOfPublication");
+        if (isPublicationOfJournalIssue == null) {
+            isPublicationOfJournalIssue = RelationshipTypeBuilder.createRelationshipTypeBuilder(context,
+                journalIssueEntityType, publicationEntityType, "isPublicationOfJournalIssue",
+                "isJournalIssueOfPublication", null, null, null, null).build();
+        }
+        RelationshipType isIssueOfJournalVolume = relationshipTypeService
+            .findbyTypesAndTypeName(context, journalVolumeEntityType, journalIssueEntityType,
+                "isIssueOfJournalVolume", "isJournalVolumeOfIssue");
+        if (isIssueOfJournalVolume == null) {
+            isIssueOfJournalVolume = RelationshipTypeBuilder.createRelationshipTypeBuilder(context,
+                journalVolumeEntityType, journalIssueEntityType, "isIssueOfJournalVolume",
+                "isJournalVolumeOfIssue", null, null, null, null).build();
+        } else {
+            // Otherwise error in destroy methods when removing Journal Issue-Journal Volume relationship
+            // since the rightMinCardinality constraint would be violated upon deletion
+            isIssueOfJournalVolume.setRightMinCardinality(0);
+        }
+        RelationshipType isVolumeOfJournal = relationshipTypeService
+            .findbyTypesAndTypeName(context, journalEntityType, journalVolumeEntityType,
+                "isVolumeOfJournal", "isJournalOfVolume");
+        if (isVolumeOfJournal == null) {
+            isVolumeOfJournal = RelationshipTypeBuilder.createRelationshipTypeBuilder(context,
+                journalEntityType, journalVolumeEntityType, "isVolumeOfJournal", "isJournalOfVolume",
+                null, null, null, null).build();
+        } else {
+            // Otherwise error in destroy methods when removing Journal Volume - Journal relationship
+            // since the rightMinCardinality constraint would be violated upon deletion
+            isVolumeOfJournal.setRightMinCardinality(0);
+        }
+
+        // Create virtual metadata fields if needed
+        MetadataSchema journalSchema = metadataSchemaService.find(context, "journal");
+        if (journalSchema == null) {
+            journalSchema = metadataSchemaService.create(context, "journal", "journal");
+        }
+        String journalTitleVirtualMdField = "journal.title";
+        MetadataField journalTitleField = metadataFieldService.findByString(context, journalTitleVirtualMdField, '.');
+        if (journalTitleField == null) {
+            metadataFieldService.create(context, journalSchema, "title", null, "Journal Title");
+        }
+
+        String journalTitle = "Journal Title Test";
+
+        // Create entity items
+        Item journal =
+            ItemBuilder.createItem(context, col1).withEntityType("Journal").withTitle(journalTitle).build();
+        Item journalVolume =
+            ItemBuilder.createItem(context, col1).withEntityType("JournalVolume").withTitle("JournalVolume")
+                       .build();
+        Item journalIssue =
+            ItemBuilder.createItem(context, col1).withEntityType("JournalIssue").withTitle("JournalIssue")
+                       .build();
+        Item publication =
+            ItemBuilder.createItem(context, col1).withEntityType("Publication").withTitle("Publication").build();
+
+        // Link Publication-Journal Issue
+        RelationshipBuilder.createRelationshipBuilder(context, journalIssue, publication, isPublicationOfJournalIssue)
+                           .build();
+        // Link Journal Issue-Journal Volume
+        RelationshipBuilder.createRelationshipBuilder(context, journalVolume, journalIssue, isIssueOfJournalVolume)
+                           .build();
+        mockSolrSearchCore.getSolr().commit(false, false);
+
+        // Verify Publication item via REST does not contain virtual md journal.title
+        getClient().perform(get("/api/core/items/" + publication.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata." + journalTitleVirtualMdField).doesNotExist());
+
+        // Verify Publication item via Solr does not contain virtual md journal.title
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("search.resourceid:" + publication.getID());
+        QueryResponse queryResponse = mockSolrSearchCore.getSolr().query(solrQuery);
+        assertThat(queryResponse.getResults().size(), equalTo(1));
+        assertNull(queryResponse.getResults().get(0).getFieldValues(journalTitleVirtualMdField));
+
+        // Link Journal Volume - Journal
+        RelationshipBuilder.createRelationshipBuilder(context, journal, journalVolume, isVolumeOfJournal).build();
+        mockSolrSearchCore.getSolr().commit(false, false);
+
+        // Verify Publication item via REST does contain virtual md journal.title
+        getClient().perform(get("/api/core/items/" + publication.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata", allOf(
+                       matchMetadata(journalTitleVirtualMdField, journalTitle))));
+
+        // Verify Publication item via Solr contains virtual md journal.title
+        queryResponse = mockSolrSearchCore.getSolr().query(solrQuery);
+        assertThat(queryResponse.getResults().size(), equalTo(1));
+        assertEquals(journalTitle,
+            ((List) queryResponse.getResults().get(0).getFieldValues(journalTitleVirtualMdField)).get(0));
+
+        // Verify Journal Volume item via REST also contains virtual md journal.title
+        getClient().perform(get("/api/core/items/" + journalVolume.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata", allOf(
+                       matchMetadata(journalTitleVirtualMdField, journalTitle))));
+
+        // Verify Journal Volume item via Solr also contains virtual md journal.title
+        solrQuery.setQuery("search.resourceid:" + journalVolume.getID());
+        queryResponse = mockSolrSearchCore.getSolr().query(solrQuery);
+        assertThat(queryResponse.getResults().size(), equalTo(1));
+        assertEquals(journalTitle,
+            ((List) queryResponse.getResults().get(0).getFieldValues(journalTitleVirtualMdField)).get(0));
+
+        // Verify Journal Issue item via REST also contains virtual md journal.title
+        getClient().perform(get("/api/core/items/" + journalIssue.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata", allOf(
+                       matchMetadata(journalTitleVirtualMdField, journalTitle))));
+
+        // Verify Journal Issue item via Solr also contains virtual md journal.title
+        solrQuery.setQuery("search.resourceid:" + journalIssue.getID());
+        queryResponse = mockSolrSearchCore.getSolr().query(solrQuery);
+        assertThat(queryResponse.getResults().size(), equalTo(1));
+        assertEquals(journalTitle,
+            ((List) queryResponse.getResults().get(0).getFieldValues(journalTitleVirtualMdField)).get(0));
+
+        context.restoreAuthSystemState();
+    }
+
+    @Test
+    public void findOneTestWrongUUID() throws Exception {
+        getClient().perform(get("/api/core/relationships/" + 1000))
+                .andExpect(status().isNotFound());
+    }
+
+    /**
+     * Verify whether the relationship metadata appears correctly on both members.
+     * {@link #isAuthorOfPublicationRelationshipType} is tested again in
+     * {@link LeftTiltedRelationshipRestRepositoryIT} with tilted set to left.
+     */
+    @Test
+    public void testIsAuthorOfPublicationRelationshipMetadataViaREST() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        RelationshipBuilder.createRelationshipBuilder(
+                context, publication1, author1, isAuthorOfPublicationRelationshipType
+        ).build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // get author metadata using REST
+        getClient(adminToken)
+            .perform(
+                get("/api/core/items/{uuid}", author1.getID())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", matchMetadata(
+                String.format("%s.isPublicationOfAuthor", MetadataSchemaEnum.RELATION.getName()),
+                publication1.getID().toString()
+            )));
+
+        // get publication metadata using REST
+        getClient(adminToken)
+            .perform(
+                get("/api/core/items/{uuid}", publication1.getID())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", matchMetadata(
+                String.format("%s.isAuthorOfPublication", MetadataSchemaEnum.RELATION.getName()),
+                author1.getID().toString()
+            )));
+    }
+
+    /**
+     * Verify whether the relationship metadata appears correctly on both members.
+     * {@link #isOrgUnitOfPersonRelationshipType} is tested again in
+     * {@link RightTiltedRelationshipRestRepositoryIT} with tilted set to right.
+     */
+    @Test
+    public void testIsOrgUnitOfPersonRelationshipMetadataViaREST() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        RelationshipBuilder.createRelationshipBuilder(
+            context, author1, orgUnit1, isOrgUnitOfPersonRelationshipType
+        ).build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // get author metadata using REST
+        getClient(adminToken)
+            .perform(
+                get("/api/core/items/{uuid}", author1.getID())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", matchMetadata(
+                String.format("%s.isOrgUnitOfPerson", MetadataSchemaEnum.RELATION.getName()),
+                orgUnit1.getID().toString()
+            )));
+
+        // get org unit metadata using REST
+        getClient(adminToken)
+            .perform(
+                get("/api/core/items/{uuid}", orgUnit1.getID())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", matchMetadata(
+                String.format("%s.isPersonOfOrgUnit", MetadataSchemaEnum.RELATION.getName()),
+                author1.getID().toString()
+            )));
+    }
+
 }

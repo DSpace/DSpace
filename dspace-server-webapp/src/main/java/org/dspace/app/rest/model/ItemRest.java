@@ -40,6 +40,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         @LinkRest(
                 name = ItemRest.TEMPLATE_ITEM_OF,
                 method = "getTemplateItemOf"
+        ),
+        @LinkRest(
+                name = ItemRest.THUMBNAIL,
+                method = "getThumbnail"
         )
 })
 public class ItemRest extends DSpaceObjectRest {
@@ -53,11 +57,14 @@ public class ItemRest extends DSpaceObjectRest {
     public static final String RELATIONSHIPS = "relationships";
     public static final String VERSION = "version";
     public static final String TEMPLATE_ITEM_OF = "templateItemOf";
+    public static final String THUMBNAIL = "thumbnail";
 
     private boolean inArchive = false;
     private boolean discoverable = false;
     private boolean withdrawn = false;
     private Date lastModified = new Date();
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String entityType = null;
 
     @Override
     public String getCategory() {
@@ -100,5 +107,13 @@ public class ItemRest extends DSpaceObjectRest {
 
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
+    }
+
+    public String getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
     }
 }

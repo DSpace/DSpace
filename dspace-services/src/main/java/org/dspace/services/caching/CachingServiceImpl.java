@@ -23,8 +23,6 @@ import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Statistics;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.kernel.mixins.ConfigChangeListener;
-import org.dspace.kernel.mixins.ServiceChangeListener;
-import org.dspace.providers.CacheProvider;
 import org.dspace.services.CachingService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
@@ -34,7 +32,6 @@ import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
 import org.dspace.services.model.CacheConfig.CacheScope;
 import org.dspace.services.model.RequestInterceptor;
-import org.dspace.utils.servicemanager.ProviderHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class CachingServiceImpl
-    implements CachingService, ConfigChangeListener, ServiceChangeListener {
+    implements CachingService, ConfigChangeListener {
 
     private static final Logger log = LoggerFactory.getLogger(CachingServiceImpl.class);
 
@@ -181,56 +178,6 @@ public final class CachingServiceImpl
         reloadConfig();
     }
 
-    /**
-     * This will make it easier to handle a provider which might go away
-     * because the classloader is gone.
-     */
-    private final ProviderHolder<CacheProvider> provider = new ProviderHolder<>();
-
-    public CacheProvider getCacheProvider() {
-        return provider.getProvider();
-    }
-
-    private void reloadProvider() {
-        boolean current = (getCacheProvider() != null);
-        CacheProvider cacheProvider = serviceManager
-            .getServiceByName(CacheProvider.class.getName(), CacheProvider.class);
-        provider.setProvider(cacheProvider);
-        if (cacheProvider != null) {
-            log.info("Cache Provider loaded: " + cacheProvider.getClass().getName());
-        } else {
-            if (current) {
-                log.info("Cache Provider unloaded");
-            }
-        }
-    }
-
-
-    /* (non-Javadoc)
-     * @see org.dspace.kernel.mixins.ServiceChangeListener#notifyForTypes()
-     */
-    @Override
-    public Class<?>[] notifyForTypes() {
-        return new Class<?>[] {CacheProvider.class};
-    }
-
-    /* (non-Javadoc)
-     * @see org.dspace.kernel.mixins.ServiceChangeListener#serviceRegistered(java.lang.String, java.lang.Object, java
-     * .util.List)
-     */
-    @Override
-    public void serviceRegistered(String serviceName, Object service, List<Class<?>> implementedTypes) {
-        provider.setProvider((CacheProvider) service);
-    }
-
-    /* (non-Javadoc)
-     * @see org.dspace.kernel.mixins.ServiceChangeListener#serviceUnregistered(java.lang.String, java.lang.Object)
-     */
-    @Override
-    public void serviceUnregistered(String serviceName, Object service) {
-        provider.setProvider(null);
-    }
-
     @PostConstruct
     public void init() {
         log.info("init()");
@@ -243,9 +190,6 @@ public final class CachingServiceImpl
             EhcacheCache cache = new EhcacheCache(ehcache, null);
             cacheRecord.put(cache.getName(), cache);
         }
-
-        // load provider
-        reloadProvider();
 
         if (requestService != null) {
             requestService.registerRequestInterceptor(new CachingServiceRequestInterceptor());
@@ -290,15 +234,6 @@ public final class CachingServiceImpl
             throw new IllegalArgumentException("cacheName cannot be null or empty string");
         }
 
-        // handle provider first
-        if (getCacheProvider() != null) {
-            try {
-                getCacheProvider().destroyCache(cacheName);
-            } catch (Exception e) {
-                log.warn("Failure in provider (" + getCacheProvider() + "): " + e.getMessage());
-            }
-        }
-
         EhcacheCache cache = cacheRecord.get(cacheName);
         if (cache != null) {
             cacheManager.removeCache(cacheName);
@@ -335,15 +270,6 @@ public final class CachingServiceImpl
             // find the cache in the records if possible
             cache = this.cacheRecord.get(cacheName);
 
-            // handle provider
-            if (cache == null && getCacheProvider() != null) {
-                try {
-                    cache = getCacheProvider().getCache(cacheName, cacheConfig);
-                } catch (Exception e) {
-                    log.warn("Failure in provider (" + getCacheProvider() + "): " + e.getMessage());
-                }
-            }
-
             if (cache == null) {
                 cache = instantiateEhCache(cacheName, cacheConfig);
             }
@@ -358,13 +284,6 @@ public final class CachingServiceImpl
     @Override
     public List<Cache> getCaches() {
         List<Cache> caches = new ArrayList<>(this.cacheRecord.values());
-        if (getCacheProvider() != null) {
-            try {
-                caches.addAll(getCacheProvider().getCaches());
-            } catch (Exception e) {
-                log.warn("Failure in provider (" + getCacheProvider() + "): " + e.getMessage());
-            }
-        }
 //        TODO implement reporting on request caches?
 //        caches.addAll(this.requestMap.values());
         Collections.sort(caches, new NameComparator());
@@ -438,14 +357,6 @@ public final class CachingServiceImpl
         List<Cache> allCaches = getCaches();
         for (Cache cache : allCaches) {
             cache.clear();
-        }
-
-        if (getCacheProvider() != null) {
-            try {
-                getCacheProvider().resetCaches();
-            } catch (Exception e) {
-                log.warn("Failure in provider (" + getCacheProvider() + "): " + e.getMessage());
-            }
         }
 
         System.runFinalization(); // force the JVM to try to clean up any remaining objects

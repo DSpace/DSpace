@@ -19,8 +19,6 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
-import org.dspace.discovery.SearchUtils;
-import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.indexobject.factory.WorkflowItemIndexFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
@@ -75,10 +73,6 @@ public class WorkflowItemIndexFactoryImpl
         final SolrInputDocument doc = super.buildDocument(context, indexableObject);
         final XmlWorkflowItem workflowItem = indexableObject.getIndexedObject();
         final Item item = workflowItem.getItem();
-        // Add the item metadata as configured
-        List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils
-                .getAllDiscoveryConfigurations(workflowItem);
-        indexableItemService.addDiscoveryFields(doc, context, item, discoveryConfigurations);
 
         String acvalue = DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getProperty("discovery.facet.namedtype.workflow.item");

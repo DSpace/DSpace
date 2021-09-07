@@ -76,10 +76,10 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
                 return false;
             } else if (dsoId.equals(ePerson.getID())) {
                 return true;
-            } else if (authorizeService.isCommunityAdmin(context, ePerson)
+            } else if (authorizeService.isCommunityAdmin(context)
                 && AuthorizeUtil.canCommunityAdminManageAccounts()) {
                 return true;
-            } else if (authorizeService.isCollectionAdmin(context, ePerson)
+            } else if (authorizeService.isCollectionAdmin(context)
                 && AuthorizeUtil.canCollectionAdminManageAccounts()) {
                 return true;
             }

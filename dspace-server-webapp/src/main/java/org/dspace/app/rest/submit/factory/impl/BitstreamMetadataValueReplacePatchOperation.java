@@ -9,6 +9,7 @@ package org.dspace.app.rest.submit.factory.impl;
 
 import java.sql.SQLException;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
@@ -22,7 +23,6 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -43,8 +43,8 @@ public class BitstreamMetadataValueReplacePatchOperation extends MetadataValueRe
     BitstreamMetadataValuePathUtils bitstreamMetadataValuePathUtils;
 
     @Override
-    void replace(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-        throws Exception {
+    void replace(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
+            Object value) throws Exception {
         //"path": "/sections/upload/files/0/metadata/dc.title/2"
         //"abspath": "/files/0/metadata/dc.title/2"
         String absolutePath = getAbsolutePath(path);

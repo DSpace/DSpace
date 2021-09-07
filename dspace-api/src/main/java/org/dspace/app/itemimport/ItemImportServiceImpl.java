@@ -45,13 +45,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import gr.ekt.bte.core.DataLoader;
-import gr.ekt.bte.core.TransformationEngine;
-import gr.ekt.bte.core.TransformationResult;
-import gr.ekt.bte.core.TransformationSpec;
-import gr.ekt.bte.dataloader.FileDataLoader;
-import gr.ekt.bteio.generators.DSpaceOutputGenerator;
-import gr.ekt.bteio.loaders.OAIPMHDataLoader;
 import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.FileUtils;
@@ -96,7 +89,6 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.springframework.beans.factory.InitializingBean;
@@ -160,8 +152,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     @Autowired(required = true)
     protected ConfigurationService configurationService;
 
-    protected final String tempWorkDir
-            = configurationService.getProperty("org.dspace.app.batchitemimport.work.dir");
+    protected String tempWorkDir;
 
     protected boolean isTest = false;
     protected boolean isResume = false;
@@ -171,6 +162,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        tempWorkDir = configurationService.getProperty("org.dspace.app.batchitemimport.work.dir");
         //Ensure tempWorkDir exists
         File tempWorkDirFile = new File(tempWorkDir);
         if (!tempWorkDirFile.exists()) {
@@ -199,100 +191,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         //Protected consumer to ensure that we use spring to create a bean, NEVER make this public
     }
 
-
-    /**
-     * In this method, the BTE is instantiated. THe workflow generates the DSpace files
-     * necessary for the upload, and the default item import method is called
-     *
-     * @param c             The contect
-     * @param mycollections The collections the items are inserted to
-     * @param sourceDir     The filepath to the file to read data from
-     * @param mapFile       The filepath to mapfile to be generated
-     * @param template      whether to use collection template item as starting point
-     * @param inputType     The type of the input data (bibtex, csv, etc.)
-     * @param workingDir    The path to create temporary files (for command line or UI based)
-     * @throws Exception if error occurs
-     */
-    @Override
-    public void addBTEItems(Context c, List<Collection> mycollections,
-                            String sourceDir, String mapFile, boolean template, String inputType, String workingDir)
-        throws Exception {
-        //Determine the folder where BTE will output the results
-        String outputFolder = null;
-        if (workingDir == null) { //This indicates a command line import, create a random path
-            File importDir = new File(configurationService.getProperty("org.dspace.app.batchitemimport.work.dir"));
-            if (!importDir.exists()) {
-                boolean success = importDir.mkdir();
-                if (!success) {
-                    log.info("Cannot create batch import directory!");
-                    throw new Exception("Cannot create batch import directory!");
-                }
-            }
-            //Get a random folder in case two admins batch import data at the same time
-            outputFolder = importDir + File.separator + generateRandomFilename(true);
-        } else { //This indicates a UI import, working dir is preconfigured
-            outputFolder = workingDir;
-        }
-
-        BTEBatchImportService dls = new DSpace().getSingletonService(BTEBatchImportService.class);
-        DataLoader dataLoader = dls.getDataLoaders().get(inputType);
-        Map<String, String> outputMap = dls.getOutputMap();
-        TransformationEngine te = dls.getTransformationEngine();
-
-        if (dataLoader == null) {
-            System.out.println(
-                "ERROR: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML " +
-                    "configuration file!");
-            return;
-        }
-
-        if (outputMap == null) {
-            System.out.println(
-                "ERROR: The key used in -i parameter must match a valid outputMapping in the BTE Spring XML " +
-                    "configuration file!");
-            return;
-        }
-
-        if (dataLoader instanceof FileDataLoader) {
-            FileDataLoader fdl = (FileDataLoader) dataLoader;
-            if (!StringUtils.isBlank(sourceDir)) {
-                System.out.println(
-                    "INFO: Dataloader will load data from the file specified in the command prompt (and not from the " +
-                        "Spring XML configuration file)");
-                fdl.setFilename(sourceDir);
-            }
-        } else if (dataLoader instanceof OAIPMHDataLoader) {
-            OAIPMHDataLoader fdl = (OAIPMHDataLoader) dataLoader;
-            System.out.println(sourceDir);
-            if (!StringUtils.isBlank(sourceDir)) {
-                System.out.println(
-                    "INFO: Dataloader will load data from the address specified in the command prompt (and not from " +
-                        "the Spring XML configuration file)");
-                fdl.setServerAddress(sourceDir);
-            }
-        }
-        if (dataLoader != null) {
-            System.out.println("INFO: Dataloader " + dataLoader.toString() + " will be used for the import!");
-
-            te.setDataLoader(dataLoader);
-
-            DSpaceOutputGenerator outputGenerator = new DSpaceOutputGenerator(outputMap);
-            outputGenerator.setOutputDirectory(outputFolder);
-
-            te.setOutputGenerator(outputGenerator);
-
-            try {
-                TransformationResult res = te.transform(new TransformationSpec());
-                List<String> output = res.getOutput();
-                outputGenerator.writeOutput(output);
-            } catch (Exception e) {
-                System.err.println("Exception");
-                e.printStackTrace();
-                throw e;
-            }
-            addItems(c, mycollections, outputFolder, mapFile, template);
-        }
-    }
 
     @Override
     public void addItemsAtomic(Context c, List<Collection> mycollections, String sourceDir, String mapFile,
@@ -1739,9 +1637,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     if (theInputType.equals("saf") || theInputType
                         .equals("safupload")) { //In case of Simple Archive Format import
                         addItems(context, finalCollections, dataDir, mapFilePath, template);
-                    } else { // For all other imports (via BTE)
-                        addBTEItems(context, finalCollections, theFilePath, mapFilePath, useTemplateItem, theInputType,
-                                    dataDir);
                     }
 
                     // email message letting user know the file is ready for
