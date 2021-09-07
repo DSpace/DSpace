@@ -2944,7 +2944,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         // by left relation
         getClient().perform(get("/api/core/relationships/search/byItemsAndType")
-                   .param("typeId", "1")
+                   .param("typeId", isAuthorOfPublicationRelationshipType.getID().toString())
                    .param("relationshipLabel", "isAuthorOfPublication")
                    .param("focusItem", publication1.getID().toString())
                    .param("relatedItem", author1.getID().toString(),
@@ -2960,7 +2960,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         // by right relation
         getClient().perform(get("/api/core/relationships/search/byItemsAndType")
-                   .param("typeId", "1")
+                   .param("typeId", isAuthorOfPublicationRelationshipType.getID().toString())
                    .param("relationshipLabel", "isPublicationOfAuthor")
                    .param("focusItem", author1.getID().toString())
                    .param("relatedItem", publication1.getID().toString()))
