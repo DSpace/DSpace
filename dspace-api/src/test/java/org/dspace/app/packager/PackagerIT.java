@@ -8,7 +8,9 @@
 package org.dspace.app.packager;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -26,12 +28,15 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.packager.METSManifest;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Element;
@@ -42,6 +47,9 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    private WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected static final InstallItemService installItemService = ContentServiceFactory.getInstance()
+            .getInstallItemService();
     protected ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
     protected Community child1;
     protected Collection col1;
@@ -134,6 +142,29 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         }
     }
 
+    @Test
+    public void packagerUUIDAlreadyExistWithoutForceTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        createTemplate();
+        createFiles();
+        try {
+            //should fail to restore the item because the uuid already exists.
+            performExportScript(article.getHandle(), tempFile);
+            UUID id = article.getID();
+            itemService.delete(context, article);
+            WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, id, false);
+            installItemService.installItem(context, workspaceItem, "123456789/100");
+            performImportNoForceScript(tempFile);
+            Iterator<Item> items = itemService.findByCollection(context, col1);
+            Item testItem = items.next();
+            assertFalse(items.hasNext()); //check to make sure there is only 1 item
+            assertSame("123456789/100", testItem.getHandle()); //check to make sure the item wasn't overwritten as
+            // it would have the old handle.
+        } finally {
+            tempFile.delete();
+        }
+    }
+
     protected void createTemplate() {
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
@@ -176,6 +207,11 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
 
     private void performExportScript(String handle, File outputFile) throws Exception {
         runDSpaceScript("packager", "-d", "-e", "admin@email.com", "-i", handle, "-t",
+                "AIP", outputFile.getPath());
+    }
+
+    private void performImportNoForceScript(File outputFile) throws Exception {
+        runDSpaceScript("packager", "-r", "-u", "-e", "admin@email.com", "-t",
                 "AIP", outputFile.getPath());
     }
 
