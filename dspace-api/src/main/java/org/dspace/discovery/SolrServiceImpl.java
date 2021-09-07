@@ -394,7 +394,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         String uniqueID = (String) doc.getFieldValue(SearchUtils.RESOURCE_UNIQUE_ID);
 
                         IndexableObject o = findIndexableObject(context, doc);
-
+                        context.uncacheEntity(o.getIndexedObject());
                         if (o == null) {
                             log.info("Deleting: " + uniqueID);
                             /*
