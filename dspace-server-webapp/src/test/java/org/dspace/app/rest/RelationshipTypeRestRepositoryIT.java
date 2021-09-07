@@ -260,16 +260,16 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
                    .param("type", "Publication"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
-                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(1,
-                                                 "isAuthorOfPublication", "isPublicationOfAuthor"),
-                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(2,
-                                               "isProjectOfPublication", "isPublicationOfProject"),
-                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(3,
-                                               "isOrgUnitOfPublication", "isPublicationOfOrgUnit"),
-                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(10,
-                                                  "isAuthorOfPublication", "isPublicationOfAuthor"),
-                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(11,
-                                       "isPublicationOfJournalIssue", "isJournalIssueOfPublication")
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                                "isAuthorOfPublication", "isPublicationOfAuthor"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                              "isProjectOfPublication", "isPublicationOfProject"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                              "isOrgUnitOfPublication", "isPublicationOfOrgUnit"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                                "isAuthorOfPublication", "isPublicationOfAuthor"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                    "isPublicationOfJournalIssue", "isJournalIssueOfPublication")
                            )))
                    .andExpect(jsonPath("$.page.totalElements", is(5)));
     }
