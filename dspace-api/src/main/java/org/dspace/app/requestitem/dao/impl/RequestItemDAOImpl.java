@@ -37,7 +37,7 @@ public class RequestItemDAOImpl extends AbstractHibernateDAO<RequestItem> implem
         Root<RequestItem> requestItemRoot = criteriaQuery.from(RequestItem.class);
         criteriaQuery.select(requestItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(requestItemRoot.get(RequestItem_.token), token));
-        return uniqueResult(context, criteriaQuery, false, RequestItem.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, RequestItem.class);
     }
 
 

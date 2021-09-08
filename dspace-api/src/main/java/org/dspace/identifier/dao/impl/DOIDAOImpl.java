@@ -41,7 +41,7 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
         criteriaQuery.select(doiRoot);
         criteriaQuery.where(criteriaBuilder.equal(doiRoot.get(DOI_.doi), doi));
-        return uniqueResult(context, criteriaQuery, false, DOI.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, DOI.class);
     }
 
     @Override

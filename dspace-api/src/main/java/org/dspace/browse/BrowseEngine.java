@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -381,7 +380,7 @@ public class BrowseEngine {
             // this is the distinct table constrained to either community or collection
             dao.setTable(browseIndex.getDistinctTableName());
 
-            dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
+            dao.setStartsWith(normalizeJumpToValue(scope.getStartsWith()));
             // remind the DAO that this is a distinct value browse, so it knows what sort
             // of query to build
             dao.setDistinct(true);

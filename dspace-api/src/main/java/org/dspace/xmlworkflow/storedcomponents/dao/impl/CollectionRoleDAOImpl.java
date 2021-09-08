@@ -24,7 +24,7 @@ import org.dspace.xmlworkflow.storedcomponents.dao.CollectionRoleDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the CollectionRole object.
- * This class is responsible for all database calls for the CollectionRole object and is autowired by spring
+ * This class is responsible for all database calls for the CollectionRole object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -66,7 +66,7 @@ public class CollectionRoleDAOImpl extends AbstractHibernateDAO<CollectionRole> 
                                 criteriaBuilder.equal(collectionRoleRoot.get(CollectionRole_.roleId), role)
             )
         );
-        return uniqueResult(context, criteriaQuery, false, CollectionRole.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, CollectionRole.class);
 
     }
 
