@@ -31,18 +31,18 @@ import org.springframework.stereotype.Component;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-@Component(VersionHistoryRest.CATEGORY + "." + VersionHistoryRest.NAME + "." + VersionHistoryRest.LAST_VERSION)
-public class VersionHistoryLastVersionLinkRepository extends AbstractDSpaceRestRepository
+@Component(VersionHistoryRest.CATEGORY + "." + VersionHistoryRest.NAME + "." + VersionHistoryRest.DRAFT_VERSION)
+public class VersionHistoryDraftVersionLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 
     @Autowired
     private VersionHistoryService versionHistoryService;
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    public VersionRest getLastVersion(@Nullable HttpServletRequest request,
-                                                Integer versionHistoryId,
-                                      @Nullable Pageable optionalPageable,
-                                                Projection projection) throws SQLException {
+    public VersionRest getDraftVersion(@Nullable HttpServletRequest request,
+                                                 Integer versionHistoryId,
+                                       @Nullable Pageable optionalPageable,
+                                                 Projection projection) throws SQLException {
         Context context = obtainContext();
         if (Objects.isNull(versionHistoryId) || versionHistoryId < 0) {
             throw new DSpaceBadRequestException("Provied id is not correct!");
