@@ -30,7 +30,6 @@ import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.hibernate.Criteria;
-import org.hibernate.LockMode;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.criterion.Criterion;
@@ -60,15 +59,6 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive");
         query.setParameter("in_archive", archived);
         return iterate(query);
-    }
-
-    @Override
-    public ScrollableResults findAllReadOnly(Context context, boolean archived) throws SQLException {
-        org.hibernate.query.Query query = (org.hibernate.query.Query) createQuery(context, "FROM Item WHERE inArchive= :in_archive");
-        query.setParameter("in_archive", archived);
-        query.setFetchSize(1000);
-        query.setReadOnly(true);
-        return query.scroll(ScrollMode.FORWARD_ONLY);
     }
 
     @Override

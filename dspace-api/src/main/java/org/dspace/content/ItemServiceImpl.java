@@ -218,11 +218,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         return itemDAO.findAll(context, true);
     }
 
-
-    @Override
-    public ScrollableResults findAllReadOnly(Context context) throws SQLException {
-        return itemDAO.findAllReadOnly(context, true);
-    }
     @Override
     public Iterator<Item> findAll(Context context, Integer limit, Integer offset) throws SQLException {
         return itemDAO.findAll(context, true, limit, offset);

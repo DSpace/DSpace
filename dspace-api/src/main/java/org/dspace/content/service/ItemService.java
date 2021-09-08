@@ -80,8 +80,6 @@ public interface ItemService
      */
     public Iterator<Item> findAll(Context context) throws SQLException;
 
-    public ScrollableResults findAllReadOnly(Context context) throws SQLException;
-
     /**
      * Get all the items in the archive. Only items with the "in archive" flag
      * set are included. The order of the list is indeterminate.
