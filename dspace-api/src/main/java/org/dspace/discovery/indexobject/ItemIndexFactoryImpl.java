@@ -107,11 +107,6 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
 
             @Override
             public boolean hasNext() {
-                return items.next();
-            }
-
-            @Override
-            public IndexableItem next() {
                 counter++;
                 if (counter % 1000 == 0) {
                     try {
@@ -120,6 +115,11 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                         log.error(e.getMessage(), e);
                     }
                 }
+                return items.next();
+            }
+
+            @Override
+            public IndexableItem next() {
                 return new IndexableItem((Item) items.get(0));
             }
         };
