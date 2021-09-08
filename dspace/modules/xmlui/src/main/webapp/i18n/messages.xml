@@ -710,7 +710,7 @@
     <message key="xmlui.Submission.submit.progressbar.upload">Upload</message>
 	<message key="xmlui.Submission.submit.progressbar.verify">Review</message>
 	<message key="xmlui.Submission.submit.progressbar.creative-commons">Creative Commons</message>
-	<message key="xmlui.Submission.submit.progressbar.CClicense">CC License</message>
+	<message key="xmlui.Submission.submit.progressbar.CClicense">Data License</message>
     <message key="xmlui.Submission.submit.progressbar.license">License</message>
 	<message key="xmlui.Submission.submit.progressbar.complete">Complete</message>
 
@@ -741,6 +741,9 @@
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles">Multiple titles</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_help">The item has more than one title, <em>e.g. a translated title</em></message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_note">If the checkbox above is unchecked then the following title(s) will be removed from the item: </message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.is_dataset">Dataset</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.is_dataset_help">This item includes a research dataset or software</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.is_dataset_note">TBD</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before">Published</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_help">The item has been published or publicly distributed before</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_note">If the checkbox above is unchecked then the following will be removed from the item:</message>
@@ -898,6 +901,7 @@
 	<message key="xmlui.Submission.submit.ReviewStep.head2">Describe Page {0}</message>
 	<message key="xmlui.Submission.submit.ReviewStep.head3">Uploaded Files</message>
 	<message key="xmlui.Submission.submit.ReviewStep.multiple_titles">Multiple titles</message>
+	<message key="xmlui.Submission.submit.ReviewStep.is_dataset">Dataset</message>
 	<message key="xmlui.Submission.submit.ReviewStep.published_before">Published before</message>
 	<message key="xmlui.Submission.submit.ReviewStep.no_metadata">-</message>
 	<message key="xmlui.Submission.submit.ReviewStep.unknown">unknown</message>
@@ -907,7 +911,7 @@
 	<!-- org.dspace.app.xmlui.Submission.submit.CCLicenseStep -->
         <message key="xmlui.Submission.submit.CCLicenseStep.ccws_error">An error occurred ... {0}</message>
         <message key="xmlui.Submission.submit.CCLicenseStep.head">License Your Work</message>
-        <message key="xmlui.Submission.submit.CCLicenseStep.info1">If you wish, you may add a <a href="http://creativecommons.org/">Creative Commons</a> License to your item. <strong>Creative Commons licenses govern what people who read your work may then do with it.</strong></message>
+        <message key="xmlui.Submission.submit.CCLicenseStep.info1">You may add a Creative Commons License to your item. These licenses help inform others how the item may or may not be used. View the <a href="https://creativecommons.org/faq/" target="_blank">Creative Commons FAQ</a> for more information about licensing options. <br/><br/> <ul><li><a href="https://creativecommons.org/about/pdm/" target="_blank">Public domain</a> – choose this option if copyright has expired on the item you are submitting or if the item is a part of the public domain.</li><li><a href="https://creativecommons.org/about/cc0/" target="_blank">CC0</a> – choose this option to waive all copyrights to the item.</li><li>Creative Commons – choose this option to further specify if commercial uses or modifications of this item are allowed. (<a href="https://en.wikipedia.org/wiki/Share-alike" target="_blank">Learn more about the Creative Commons“ShareAlike” model.</a>)</li><li>No Creative Commons License – choose this option if you do not wish to specify a Creative Commons license.</li></ul></message>
         <message key="xmlui.Submission.submit.CCLicenseStep.submit_choose_creative_commons">Choose a license</message>
         <message key="xmlui.Submission.submit.CCLicenseStep.submit_to_creative_commons">Proceed to Creative Commons website to select a license</message>
         <message key="xmlui.Submission.submit.CCLicenseStep.license">License Type</message>

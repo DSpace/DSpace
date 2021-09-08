@@ -102,9 +102,80 @@
 
     </xsl:template>
 
+    <!-- Customization for LIBDRUM-628 -->
+    <xsl:template name="schema-org-json-ld">
+        <xsl:variable name="sch_type" select="dim:field[@element='type'][not(@qualifier)][1]/node()" />
+        <xsl:if test="$sch_type='Dataset'">
+            <xsl:variable name="sch_name" select="dim:field[@element='title'][not(@qualifier)][1]/node()" />
+            <xsl:variable name="sch_description">
+                <xsl:for-each select="dim:field[@element='description' and @qualifier='abstract']">
+                    <xsl:choose>
+                        <xsl:when test="node()">
+                                <xsl:apply-templates select="node()" mode="urltext"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:text>&#160;</xsl:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:if test="count(following-sibling::dim:field[@element='description' and @qualifier='abstract']) != 0">
+                        <xsl:text>&#160;</xsl:text>
+                    </xsl:if>
+                </xsl:for-each>
+            </xsl:variable>
+            <xsl:variable name="baseUrl" select="confman:getProperty('dspace.baseUrl')" />
+            <xsl:variable name="sch_url">
+                <xsl:value-of select="$baseUrl" />
+                <xsl:if test="substring($baseUrl, string-length($baseUrl), 1) != '/'">/</xsl:if>
+                <xsl:value-of select="$request-uri" />
+            </xsl:variable>
+            <xsl:variable name="sch_date" select="dim:field[@element='date' and @qualifier='issued']" />
+            <xsl:variable name="sch_license" select="dim:field[@element='rights' and @qualifier='uri']" />
+            <script type="application/ld+json"><xsl:text>
+                {  "@context" : "http://schema.org",
+                    "@type" : "</xsl:text><xsl:value-of select="$sch_type" /><xsl:text>",
+                    "name":"</xsl:text><xsl:value-of select="$sch_name" /><xsl:text>",
+                    "description":"</xsl:text><xsl:value-of select="substring($sch_description,0,5000)" /><xsl:text>",
+                    "url":"</xsl:text><xsl:value-of select="$sch_url" /><xsl:text>",
+                    "temporalCoverage":"</xsl:text><xsl:value-of select="$sch_date" /><xsl:text>",
+                    "creator": [
+                    </xsl:text>
+                    <xsl:for-each select="dim:field[@element='contributor'][@qualifier='author']"><xsl:text>
+                        {
+                            "@type": "Person",
+                            "name": "</xsl:text><xsl:copy-of select="node()"/><xsl:text>"
+                        }</xsl:text><xsl:if test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author']) != 0">
+                            <xsl:text>,</xsl:text>
+                        </xsl:if><xsl:text>
+                    </xsl:text></xsl:for-each>
+                    <xsl:text>
+                    ],
+                    "identifier": [
+                    </xsl:text>
+                    <xsl:for-each select="dim:field[@element='identifier' and @qualifier='uri']">
+                        <xsl:text>"</xsl:text><xsl:copy-of select="node()"/><xsl:text>"</xsl:text><xsl:if 
+                            test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author']) != 0">
+                            <xsl:text>,</xsl:text>
+                        </xsl:if></xsl:for-each><xsl:if 
+                    test="count(dim:field[@element='identifier'][not(@qualifier)]) != 0">
+                    <xsl:text>,</xsl:text>
+                </xsl:if>
+                    <xsl:for-each select="dim:field[@element='identifier'][not(@qualifier)]">
+                        <xsl:text>"</xsl:text><xsl:copy-of select="node()"/><xsl:text>"</xsl:text><xsl:if 
+                            test="count(following-sibling::dim:field[@element='identifier'][not(@qualifier)]) != 0">
+                            <xsl:text>,</xsl:text>
+                        </xsl:if></xsl:for-each>
+                    <xsl:text>
+                    ],
+                    "license": "</xsl:text><xsl:value-of select="$sch_license" /><xsl:text>"
+                }
+            </xsl:text></script>
+        </xsl:if>
+    </xsl:template>
+    <!-- End customization for LIBDRUM-628 -->
 
     <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
         <div class="item-summary-view-metadata">
+            <xsl:call-template name="schema-org-json-ld"/> <!-- Customization for LIBDRUM-628 -->
             <xsl:call-template name="itemSummaryView-DIM-title"/>
             <div class="row">
                 <div class="col-sm-4">
@@ -543,6 +614,7 @@
     </xsl:template>
 
     <xsl:template match="dim:dim" mode="itemDetailView-DIM">
+        <xsl:call-template name="schema-org-json-ld"/> <!-- Customization for LIBDRUM-628 -->
         <xsl:call-template name="itemSummaryView-DIM-title"/>
         <div class="ds-table-responsive">
             <table class="ds-includeSet-table detailtable table table-striped table-hover">
@@ -821,7 +893,19 @@
 
     <!-- Generate the license information from the file section -->
     <xsl:template match="mets:fileGrp[@USE='CC-LICENSE']" mode="simple">
-        <li><a href="{mets:file/mets:FLocat[@xlink:title='license_text']/@xlink:href}"><i18n:text>xmlui.dri2xhtml.structural.link_cc</i18n:text></a></li>
+        <!-- UMD Customization for LIBDRUM-628 -->
+        <xsl:variable name="license_text_url" select="mets:file/mets:FLocat[@xlink:title='license_text']/@xlink:href" />
+        <li>
+            <xsl:choose>
+                <xsl:when test="$license_text_url != ''">
+                     <a href="{$license_text_url}"><i18n:text>xmlui.dri2xhtml.structural.link_cc</i18n:text></a>
+                </xsl:when>
+                <xsl:otherwise>
+                    <i18n:text>xmlui.dri2xhtml.structural.link_cc</i18n:text>
+                </xsl:otherwise>
+            </xsl:choose>
+        </li>
+        <!-- End UMD Customization for LIBDRUM-628 -->
     </xsl:template>
 
     <!-- Generate the license information from the file section -->
@@ -912,13 +996,16 @@
 
     <!-- Template to display rights metadata -->
     <xsl:template name="itemSummaryView-DIM-rights">
-        <xsl:if test="dim:field[@element='rights' and descendant::text()]">
-            <div class="simple-item-view-rights item-page-field-wrapper table">
-                <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-rights</i18n:text></h5>
-                <xsl:for-each select="dim:field[@element='rights']">
-                    <span>
-                        <xsl:copy-of select="node()"/>
-                    </span>
+        <xsl:if test="dim:field[(@element='rights' or @element='accessRights') and descendant::text()]">
+            <div class="simple-item-view-rights word-break item-page-field-wrapper table">
+                <h5>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-rights</i18n:text>
+                </h5>
+                <xsl:for-each select="dim:field[@element='rights' or @element='accessRights']">
+                    <xsl:copy-of select="./node()"/>
+                    <xsl:if test="count(following-sibling::dim:field[@element='rights' or @element='accessRights']) != 0">
+                        <br/>
+                    </xsl:if>
                 </xsl:for-each>
             </div>
         </xsl:if>

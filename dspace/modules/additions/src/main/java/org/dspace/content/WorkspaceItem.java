@@ -63,6 +63,11 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
     @Column(name = "multiple_titles")
     private boolean multipleTitles = false;
 
+    // Customization for LIBDRUM-628
+    @Column(name = "is_dataset")
+    private boolean isDataset = false;
+    // End customization for LIBDRUM-628
+
     @Column(name = "published_before")
     private boolean publishedBefore = false;
 
@@ -232,6 +237,20 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
     {
         multipleTitles = b;
     }
+
+    // Customization for LIBDRUM-628
+    @Override
+    public boolean isDataset()
+    {
+        return isDataset;
+    }
+
+    @Override
+    public void setDataset(boolean b)
+    {
+        isDataset = b;
+    }
+    // End customization for LIBDRUM-628
 
     @Override
     public boolean isPublishedBefore()

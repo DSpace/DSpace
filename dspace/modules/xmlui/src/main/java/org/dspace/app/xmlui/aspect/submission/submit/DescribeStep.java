@@ -168,7 +168,7 @@ public class DescribeStep extends AbstractSubmissionStep
         try
         {
             inputSet = inputsReader.getInputs(submission.getCollection().getHandle());
-            inputs = inputSet.getPageRows(getPage() - 1, submission.hasMultipleTitles(), submission.isPublishedBefore());
+            inputs = inputSet.getPageRows(getPage() - 1, submission.hasMultipleTitles(), submission.isDataset(), submission.isPublishedBefore()); // Customization for LIBDRUM-628
         }
         catch (DCInputsReaderException se)
         {
@@ -339,7 +339,7 @@ public class DescribeStep extends AbstractSubmissionStep
             throw new UIException(se);
         }
 
-        DCInput[] inputs = inputSet.getPageRows(getPage() - 1, submission.hasMultipleTitles(), submission.isPublishedBefore());
+        DCInput[] inputs = inputSet.getPageRows(getPage() - 1, submission.hasMultipleTitles(), submission.isDataset(), submission.isPublishedBefore()); // Customization for LIBDRUM-628
 
         for (DCInput input : inputs)
         {
