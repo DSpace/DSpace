@@ -320,12 +320,19 @@ public class Context implements AutoCloseable {
             StackTraceElement[] stackTrace = currThread.getStackTrace();
             String caller = stackTrace[stackTrace.length - 1].getClassName();
 
-            String previousCaller = (String) authStateClassCallHistory.pop();
+            String previousCaller;
+            try {
+                previousCaller = (String) authStateClassCallHistory.pop();
+            } catch (NoSuchElementException ex) {
+                previousCaller = "none";
+                log.warn(LogManager.getHeader(this, "restore_auth_sys_state",
+                        "no previous caller info available:  {}"),
+                        ex::getLocalizedMessage);
+            }
 
             // if previousCaller is not the current caller *only* log a warning
             if (!previousCaller.equals(caller)) {
-                log.warn(LogManager
-                              .getHeader(
+                log.warn(LogManager.getHeader(
                                   this,
                                   "restore_auth_sys_state",
                                   "Class: "
