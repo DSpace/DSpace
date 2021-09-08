@@ -7,7 +7,7 @@
  */
 package org.dspace.scripts;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -181,7 +181,7 @@ public class Process implements ReloadableEntity<Integer> {
      */
     public List<Bitstream> getBitstreams() {
         if (bitstreams == null) {
-            bitstreams = Collections.EMPTY_LIST;
+            bitstreams = new ArrayList<>();
         }
         return bitstreams;
     }
