@@ -287,6 +287,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         // register this as the admin group
         community.setAdmins(admins);
+        context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, community.getID(),
+                                             null, getIdentifiers(context, community)));
         return admins;
     }
 
@@ -302,6 +304,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         // Remove the link to the community table.
         community.setAdmins(null);
+        context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, community.getID(),
+                                             null, getIdentifiers(context, community)));
     }
 
     @Override

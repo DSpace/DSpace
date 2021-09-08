@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -28,6 +29,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.util.ConsoleService;
+import org.dspace.util.ConsoleServiceImpl;
 
 public class EPersonCLITool {
 
@@ -57,13 +60,22 @@ public class EPersonCLITool {
 
     private static final Option OPT_NEW_EMAIL = new Option("i", "newEmail", true, "new email address");
     private static final Option OPT_NEW_NETID = new Option("I", "newNetid", true, "new network ID");
+    private static final Option OPT_NEW_PASSWORD
+            = new Option("w", "newPassword", false, "prompt for new password");
 
-    private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    static final String ERR_PASSWORD_EMPTY = "The new password may not be empty.";
+    static final String ERR_PASSWORD_NOMATCH = "Passwords do not match.  Password not set";
+
+    private static final EPersonService ePersonService
+            = EPersonServiceFactory.getInstance().getEPersonService();
+
+    private static ConsoleService consoleService
+            = new ConsoleServiceImpl();
 
     /**
      * Default constructor
      */
-    private EPersonCLITool() { }
+    EPersonCLITool() { }
 
     /**
      * Tool for manipulating user accounts.
@@ -110,7 +122,6 @@ public class EPersonCLITool {
             new HelpFormatter().printHelp("user [options]", globalOptions);
             context.abort();
             status = 1;
-            throw new IllegalArgumentException();
         }
 
         if (context.isValid()) {
@@ -120,6 +131,8 @@ public class EPersonCLITool {
                 System.err.println(ex.getMessage());
             }
         }
+
+        System.exit(status);
     }
 
     /**
@@ -177,11 +190,11 @@ public class EPersonCLITool {
         EPerson eperson = null;
         try {
             eperson = ePersonService.create(context);
-        } catch (SQLException ex) {
+        } catch (SQLException | AuthorizeException ex) {
             context.abort();
             System.err.println(ex.getMessage());
             return 1;
-        } catch (AuthorizeException ex) { /* XXX SNH */ }
+        }
         eperson.setCanLogIn(true);
         eperson.setSelfRegistered(false);
 
@@ -204,11 +217,11 @@ public class EPersonCLITool {
         try {
             ePersonService.update(context, eperson);
             System.out.printf("Created EPerson %s\n", eperson.getID().toString());
-        } catch (SQLException ex) {
+        } catch (SQLException | AuthorizeException ex) {
             context.abort();
             System.err.println(ex.getMessage());
             return 1;
-        } catch (AuthorizeException ex) { /* XXX SNH */ }
+        }
 
         return 0;
     }
@@ -315,6 +328,7 @@ public class EPersonCLITool {
         options.addOption(OPT_CAN_LOGIN);
         options.addOption(OPT_NEW_EMAIL);
         options.addOption(OPT_NEW_NETID);
+        options.addOption(OPT_NEW_PASSWORD);
 
         options.addOption("h", "help", false, "explain --modify options");
 
@@ -334,11 +348,14 @@ public class EPersonCLITool {
 
         // Modify!
         EPerson eperson = null;
+        String userName = null;
         try {
             if (command.hasOption(OPT_NETID.getOpt())) {
-                eperson = ePersonService.findByNetid(context, command.getOptionValue(OPT_NETID.getOpt()));
+                userName = command.getOptionValue(OPT_NETID.getOpt());
+                eperson = ePersonService.findByNetid(context, userName);
             } else if (command.hasOption(OPT_EMAIL.getOpt())) {
-                eperson = ePersonService.findByEmail(context, command.getOptionValue(OPT_EMAIL.getOpt()));
+                userName = command.getOptionValue(OPT_EMAIL.getOpt());
+                eperson = ePersonService.findByEmail(context, userName);
             } else {
                 System.err.println("No EPerson selected");
                 return 1;
@@ -360,6 +377,25 @@ public class EPersonCLITool {
             if (command.hasOption(OPT_NEW_NETID.getOpt())) {
                 eperson.setNetid(command.getOptionValue(OPT_NEW_NETID.getOpt()));
                 modified = true;
+            }
+            if (command.hasOption(OPT_NEW_PASSWORD.getOpt())) {
+                char[] password1 = consoleService.readPassword(
+                        "Enter new password for user '%s':  ", userName);
+                char[] password2 = consoleService.readPassword(
+                        "Enter new password again to verify:  ");
+                if (password1.length <= 0 || password2.length <= 0) {
+                    System.err.println(ERR_PASSWORD_EMPTY);
+                } else if (Arrays.equals(password1, password2)) {
+                    PasswordHash newHashedPassword = new PasswordHash(String.valueOf(password1));
+                    Arrays.fill(password1, '\0'); // Obliterate cleartext passwords
+                    Arrays.fill(password2, '\0');
+                    eperson.setPassword(newHashedPassword.getHashString());
+                    eperson.setSalt(newHashedPassword.getSaltString());
+                    eperson.setDigestAlgorithm(newHashedPassword.getAlgorithm());
+                    modified = true;
+                } else {
+                    System.err.println(ERR_PASSWORD_NOMATCH);
+                }
             }
             if (command.hasOption(OPT_GIVENNAME.getOpt())) {
                 eperson.setFirstName(context, command.getOptionValue(OPT_GIVENNAME.getOpt()));
@@ -387,15 +423,16 @@ public class EPersonCLITool {
                 eperson.setCanLogIn(Boolean.valueOf(command.getOptionValue(OPT_CAN_LOGIN.getOpt())));
                 modified = true;
             }
+
             if (modified) {
                 try {
                     ePersonService.update(context, eperson);
                     System.out.printf("Modified EPerson %s\n", eperson.getID().toString());
-                } catch (SQLException ex) {
+                } catch (SQLException | AuthorizeException ex) {
                     context.abort();
                     System.err.println(ex.getMessage());
                     return 1;
-                } catch (AuthorizeException ex) { /* XXX SNH */ }
+                }
             } else {
                 System.out.println("No changes.");
             }
@@ -407,6 +444,7 @@ public class EPersonCLITool {
     /**
      * Command to list known EPersons.
      */
+    @SuppressWarnings("unused")
     private static int cmdList(Context context, String[] argv) {
         // XXX ideas:
         // specific user/netid
@@ -426,5 +464,14 @@ public class EPersonCLITool {
         }
 
         return 0;
+    }
+
+    /**
+     * Replace the ConsoleService for testing.
+     *
+     * @param service new ConsoleService to be used henceforth.
+     */
+    void setConsoleService(ConsoleService service) {
+        consoleService = service;
     }
 }
