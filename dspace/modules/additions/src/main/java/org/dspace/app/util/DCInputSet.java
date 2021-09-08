@@ -74,7 +74,7 @@ public class DCInputSet
      */
 	
 	public DCInput[] getPageRows(int pageNum, boolean addTitleAlternative,
-		      					 boolean addPublishedBefore)
+										boolean isDataset, boolean addPublishedBefore) // Customization for LIBDRUM-628
 	{
 		List<DCInput> filteredInputs = new ArrayList<DCInput>();
 		if ( pageNum < inputPages.length )
@@ -82,7 +82,7 @@ public class DCInputSet
 			for (int i = 0; i < inputPages[pageNum].length; i++ )
 			{
 				DCInput input = inputPages[pageNum][i];
-				if (doField(input, addTitleAlternative, addPublishedBefore))
+				if (doField(input, addTitleAlternative, isDataset, addPublishedBefore)) // Customization for LIBDRUM-628
 				{
 					filteredInputs.add(input);
 				}
@@ -174,7 +174,7 @@ public class DCInputSet
      }
     
     protected boolean doField(DCInput dcf, boolean addTitleAlternative,
-		    					   boolean addPublishedBefore)
+		    					   boolean isDataset, boolean addPublishedBefore)
     {
     	String rowName = dcf.getElement() + "." + dcf.getQualifier();
     	if ( rowName.equals("title.alternative") && ! addTitleAlternative )
@@ -189,6 +189,32 @@ public class DCInputSet
     	// {
     	// 	return false;
     	// }
+			 // Customization for LIBDRUM-628
+			if ( rowName.equals("relation.ispartofseries") && isDataset )
+    	{
+    		return false;
+      }
+			if ( rowName.equals("identifier.null") && isDataset )
+    	{
+    		return false;
+      }
+			if ( rowName.equals("description.null") && dcf.getLabel().equals("Description") && isDataset )
+    	{
+    		return false;
+      }
+			if ( rowName.equals("description.null") && ! dcf.getLabel().equals("Description") && ! isDataset )
+    	{
+    		return false;
+      }
+			if ( rowName.equals("type.null") && dcf.getPairsType().equals("common_types") && isDataset )
+    	{
+    		return false;
+      }
+			if ( rowName.equals("type.null") && dcf.getPairsType().equals("data_types") && ! isDataset )
+    	{
+    		return false;
+      }
+			 // End customization for LIBDRUM-628
     	if (rowName.equals("publisher.null") && ! addPublishedBefore )
     	{
     		return false;

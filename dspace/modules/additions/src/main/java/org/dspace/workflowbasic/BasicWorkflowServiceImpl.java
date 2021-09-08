@@ -250,6 +250,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         BasicWorkflowItem wfi = workflowItemService.create(context, myitem, collection);
         wfi.setMultipleFiles(wsi.hasMultipleFiles());
         wfi.setMultipleTitles(wsi.hasMultipleTitles());
+        wfi.setDataset(wsi.isDataset()); // Customization for LIBDRUM-628
         wfi.setPublishedBefore(wsi.isPublishedBefore());
 
         // Begin UMD customization
@@ -892,6 +893,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
 
         workspaceItem.setMultipleFiles(wfi.hasMultipleFiles());
         workspaceItem.setMultipleTitles(wfi.hasMultipleTitles());
+        workspaceItem.setDataset(wfi.isDataset()); // Customization for LIBDRUM-628
         workspaceItem.setPublishedBefore(wfi.isPublishedBefore());
         workspaceItemService.update(c, workspaceItem);
 
