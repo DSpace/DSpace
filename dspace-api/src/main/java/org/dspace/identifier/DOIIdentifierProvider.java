@@ -180,6 +180,11 @@ public class DOIIdentifierProvider
                     + ", the DSO does not meet the conditions that the repository imposes to have doi");
             return null;
         }
+        if (doiFilterService.hasExternalDOI(dso)) {
+            log.info("Couldn't register doi for DSO with handle " + dso.getHandle()
+                + ", the DSO already has an external DOI.");
+            return null;
+        }
         String doi = mint(context, dso);
         // register tries to reserve doi if it's not already.
         // So we don't have to reserve it here.
@@ -196,6 +201,11 @@ public class DOIIdentifierProvider
         if (!doiFilterService.isEligibleDSO(dso)) {
             log.info("Couldn't register doi for DSO with handle " + dso.getHandle()
                     + ", the DSO does not meet the conditions that the repository imposes to have doi");
+            return;
+        }
+        if (doiFilterService.hasExternalDOI(dso)) {
+            log.info("Couldn't register doi for DSO with handle " + dso.getHandle()
+                + ", the DSO already has an external DOI.");
             return;
         }
         String doi = DOI.formatIdentifier(identifier);

@@ -91,7 +91,7 @@ public class DOIConsumer implements Consumer
         }
         catch (IdentifierNotFoundException ex)
         {
-            if ( doiFilterService.isEligibleDSO(dso)) {
+            if ( doiFilterService.isEligibleDSO(dso) && !doiFilterService.hasExternalDOI(dso)) {
                 log.warn("DOIConsumer cannot handles items without DOIs, skipping: "
                         + event.toString());
             }
