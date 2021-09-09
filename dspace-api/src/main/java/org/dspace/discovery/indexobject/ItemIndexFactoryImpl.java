@@ -102,7 +102,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     @Override
     public Iterator<IndexableItem> findAll(Context context) throws SQLException {
         ScrollableResults items = itemService.findAllUnfilteredReadOnly(context);
-        return new Iterator<IndexableItem>() {
+        return new Iterator<>() {
             private int counter = 0;
 
             @Override
@@ -115,7 +115,11 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                         log.error(e.getMessage(), e);
                     }
                 }
-                return items.next();
+                final boolean next = items.next();
+                if (!next) {
+                    items.close();
+                }
+                return next;
             }
 
             @Override
