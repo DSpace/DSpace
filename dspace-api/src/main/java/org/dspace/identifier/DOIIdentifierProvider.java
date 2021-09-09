@@ -316,6 +316,10 @@ public class DOIIdentifierProvider
     public void registerOnline(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException, IllegalArgumentException, SQLException
     {
+        if (doiFilterService.hasExternalDOI(dso)) {
+            throw new DOIIdentifierException("Cannot register for new DOI when item "
+                    + "already has an external DOI.", DOIIdentifierException.FOREIGN_DOI);
+        }
         String doi = DOI.formatIdentifier(identifier);
         // get TableRow and ensure DOI belongs to dso regarding our db
         TableRow doiRow = loadOrCreateDOI(context, dso, doi);
