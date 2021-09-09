@@ -81,7 +81,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     @Override
     public ScrollableResults findAllReadOnly(Context context, boolean archived, boolean withdrawn) throws SQLException {
-        org.hibernate.query.Query query = (org.hibernate.query.Query) createQuery(context, "FROM Item WHERE inArchive= :in_archive or withdrawn = :withdrawn");
+        org.hibernate.query.Query query = (org.hibernate.query.Query) createQuery(context,
+                "FROM Item WHERE inArchive= :in_archive or withdrawn = :withdrawn");
         query.setParameter("in_archive", archived);
         query.setParameter("withdrawn", withdrawn);
         query.setFetchSize(1000);
