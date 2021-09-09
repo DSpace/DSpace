@@ -9,6 +9,7 @@ package org.dspace.authority.orcid;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authority.AuthorityValue;
@@ -24,6 +25,8 @@ import java.util.*;
  * @author Jonas Van Goolen (jonas at atmire dot com)
  */
 public class Orcidv2AuthorityValue extends PersonAuthorityValue {
+
+    private static Logger log = Logger.getLogger(Orcidv2AuthorityValue.class);
 
     /*
      * The ORCID identifier
@@ -84,9 +87,12 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue {
             return null;
         }
         Orcidv2AuthorityValue authority = Orcidv2AuthorityValue.create();
-
-        authority.setValues(person);
-
+        try {
+            authority.setValues(person);
+        } catch (NullPointerException npe) {
+            log.error("Could not set values for Orcid Id: " + person.getPath());
+            return null;
+        }
         return authority;
     }
 
