@@ -143,6 +143,22 @@ public interface HandleService {
     public DSpaceObject resolveToObject(Context context, String handle)
         throws IllegalStateException, SQLException;
 
+    /**
+     * Return the object which handle maps to, or null. This is the object
+     * itself, not a URL which points to it.
+     *
+     * @param context DSpace context
+     * @param handle The handle to resolve
+     * @param fallbackResolvingToMostRecentVersion  When set to true, resolving a non-versioned handle
+     * prefix/suffix will fall back to the most recent version, if the specified handle does not exist
+     * in its verbatim form. Supply true value only in handle resolving context. Supply false value
+     * e.g. for exsistence checks upon handle creation.
+     * @return The object which handle maps to, or null if handle is not mapped to any object.
+     * @exception IllegalStateException If handle was found but is not bound to an object
+     * @exception SQLException If a database error occurs
+     */
+    public DSpaceObject resolveToObject(Context context, String handle, boolean fallbackResolvingToMostRecentVersion)
+            throws IllegalStateException, SQLException;
 
     /**
      * Return the handle for an Object, or null if the Object has no handle.

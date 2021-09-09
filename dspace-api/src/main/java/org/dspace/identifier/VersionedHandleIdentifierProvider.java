@@ -383,7 +383,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         }
 
         // Ensure this handle does not exist already.
-        if (handleService.resolveToObject(context, identifier) == null) {
+        if (handleService.resolveToObject(context, identifier, false) == null) {
             handleService.createHandle(context, dso, identifier);
         } else {
             throw new IllegalStateException("A versioned handle is used for another version already!");
