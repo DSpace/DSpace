@@ -820,4 +820,10 @@ public class ContainerAdapter extends AbstractAdapter
         // Close out field
         endElement(DIM,"field");
     }  
+
+    @Override
+    public boolean isAuthorized() throws SQLException
+    {
+        return authorizeService.authorizeActionBoolean(dspaceContext, dso, Constants.READ);
+    }
 }

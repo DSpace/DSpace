@@ -280,6 +280,12 @@ public class RepositoryAdapter extends AbstractAdapter
         
     }
 
+    @Override
+    public boolean isAuthorized()
+    {
+        return true;
+    }
+
     /**
      * 
      * 
