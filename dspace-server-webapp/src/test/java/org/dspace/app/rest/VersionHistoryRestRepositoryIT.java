@@ -210,6 +210,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
     @Test
     public void findVersionsOfVersionHistoryUnauthorizedTest() throws Exception {
+        configurationService.setProperty("versioning.item.history.view.admin", true);
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
@@ -232,6 +233,8 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         getClient().perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
                    .andExpect(status().isUnauthorized());
+
+        configurationService.setProperty("versioning.item.history.view.admin", true);
     }
 
     @Test
