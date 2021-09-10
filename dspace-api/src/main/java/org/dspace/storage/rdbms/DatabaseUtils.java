@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -133,7 +134,7 @@ public class DatabaseUtils {
                     System.err.println("\nError running 'test': ");
                     System.err.println(" - " + sqle);
                     System.err.println("\nPlease see the DSpace documentation for assistance.\n");
-                    sqle.printStackTrace();
+                    sqle.printStackTrace(System.err);
                     System.exit(1);
                 }
             } else if (argv[0].equalsIgnoreCase("info") || argv[0].equalsIgnoreCase("status")) {
@@ -173,7 +174,7 @@ public class DatabaseUtils {
                     }
                 } catch (SQLException e) {
                     System.err.println("Info exception:");
-                    e.printStackTrace();
+                    e.printStackTrace(System.err);
                     System.exit(1);
                 }
             } else if (argv[0].equalsIgnoreCase("migrate")) {
@@ -195,7 +196,8 @@ public class DatabaseUtils {
                             // Otherwise, we assume "argv[1]" is a valid migration version number
                             // This is only for testing! Never specify for Production!
                             String migrationVersion = argv[1];
-                            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+                            BufferedReader input = new BufferedReader(
+                                    new InputStreamReader(System.in, StandardCharsets.UTF_8));
 
                             System.out.println(
                                 "You've specified to migrate your database ONLY to version " + migrationVersion + " " +
@@ -231,7 +233,7 @@ public class DatabaseUtils {
                     System.exit(0);
                 } catch (SQLException e) {
                     System.err.println("Migration exception:");
-                    e.printStackTrace();
+                    e.printStackTrace(System.err);
                     System.exit(1);
                 }
             } else if (argv[0].equalsIgnoreCase("repair")) {
@@ -247,7 +249,7 @@ public class DatabaseUtils {
                     System.exit(0);
                 } catch (SQLException | FlywayException e) {
                     System.err.println("Repair exception:");
-                    e.printStackTrace();
+                    e.printStackTrace(System.err);
                     System.exit(1);
                 }
             } else if (argv[0].equalsIgnoreCase("validate")) {
@@ -262,7 +264,7 @@ public class DatabaseUtils {
                     System.exit(0);
                 } catch (SQLException | FlywayException e) {
                     System.err.println("Validation exception:");
-                    e.printStackTrace();
+                    e.printStackTrace(System.err);
                     System.exit(1);
                 }
             } else if (argv[0].equalsIgnoreCase("clean")) {
@@ -305,7 +307,7 @@ public class DatabaseUtils {
                         }
                     }
 
-                    BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+                    BufferedReader input = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
 
                     System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
                     System.out
@@ -332,7 +334,7 @@ public class DatabaseUtils {
                     }
                 } catch (SQLException e) {
                     System.err.println("Clean exception:");
-                    e.printStackTrace();
+                    e.printStackTrace(System.err);
                     System.exit(1);
                 }
             } else if (argv[0].equalsIgnoreCase("update-sequences")) {
@@ -384,14 +386,14 @@ public class DatabaseUtils {
 
         } catch (Exception e) {
             System.err.println("Caught exception:");
-            e.printStackTrace();
+            e.printStackTrace(System.err);
             System.exit(1);
         }
     }
 
     /**
      * Print basic information about the current database to System.out.
-     * This is utilized by both the 'test' and 'info' commandline options.
+     * This is utilized by both the 'test' and 'info' command line options.
      *
      * @param connection current database connection
      * @throws SQLException if database error occurs

@@ -73,6 +73,7 @@ public class SHERPAService {
     /**
      * Complete initialization of the Bean.
      */
+    @SuppressWarnings("unused")
     @PostConstruct
     private void init() {
         // Get endoint and API key from configuration
