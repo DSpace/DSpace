@@ -18,7 +18,6 @@ package org.dspace.content;
  * <em>FIXME:  No policy for dealing with "van"/"van der" and "Jr."</em>
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 public class DCPersonName {
     /**
@@ -89,8 +88,9 @@ public class DCPersonName {
      *
      * @return the name, suitable for putting in the database
      */
+    @Override
     public String toString() {
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
 
         if (lastName != null) {
             out.append(lastName);

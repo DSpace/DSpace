@@ -33,7 +33,7 @@ public abstract class AbstractIndexableObject<T extends ReloadableEntity<PK>, PK
         if (!(obj instanceof IndexableObject)) {
             return false;
         }
-        AbstractIndexableObject other = (AbstractIndexableObject) obj;
+        IndexableObject other = (IndexableObject) obj;
         return other.getIndexedObject().equals(getIndexedObject());
     }
 
