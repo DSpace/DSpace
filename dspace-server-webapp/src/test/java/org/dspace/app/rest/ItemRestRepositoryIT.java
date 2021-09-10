@@ -79,8 +79,6 @@ import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.versioning.Version;
-import org.dspace.versioning.VersionHistory;
-import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.workflow.WorkflowItem;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -92,9 +90,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private CollectionService collectionService;
-
-    @Autowired
-    private VersionHistoryService versionHistoryService;
 
     private Item publication1;
     private Item author1;
@@ -4090,7 +4085,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void versionHistoryForItemTest() throws Exception {
+    public void finadVersionForItemTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -4098,7 +4093,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test").build();
+                                          .withName("Collection test")
+                                          .build();
 
         Item item = ItemBuilder.createItem(context, col)
                           .withTitle("Public test item")
@@ -4107,38 +4103,24 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                           .withSubject("ExtraEntry")
                           .build();
 
-        Item item2 = ItemBuilder.createItem(context, col)
-                                .withTitle("Public test item 2")
-                                .withAuthor("Doe, John")
-                                .withSubject("ExtraEntry")
-                                .build();
-
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v77 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 10)
-                                    .build();
-        Version v98 = VersionBuilder.createVersionWithVersionHistory(context, item2, "test 2", versionHistory, 11)
-                                    .build();
+        Version v2 = VersionBuilder.createVersion(context, item, "test").build();
 
         context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(adminToken).perform(get("/api/core/items/" + item2.getID() + "/versionhistory"))
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID() + "/version"))
                              .andExpect(content().contentType(contentType))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.allOf(
-                                        hasJsonPath("$.id", is(versionHistory.getID())),
-                                        hasJsonPath("$.type", is("versionhistory"))
-                                        )))
-                             .andExpect(jsonPath("$._links.self.href", Matchers.allOf(Matchers.containsString(
-                                        "api/versioning/versionhistories/" + versionHistory.getID())
-                                        )))
-                             .andExpect(jsonPath("$._links.versions.href", Matchers.allOf(Matchers.containsString(
-                                        "api/versioning/versionhistories/" + versionHistory.getID() + "/versions")
-                                        )));
+                                     hasJsonPath("$.version", is(1)),
+                                     hasJsonPath("$.summary", emptyOrNullString()),
+                                     hasJsonPath("$.submitterName", is("first last")),
+                                     hasJsonPath("$.type", is("version"))
+                                     )));
     }
 
     @Test
-    public void versionHistoryForItemNotFoundTest() throws Exception {
+    public void findVersionOfItemNoContentTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -4146,24 +4128,25 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test").build();
+                                          .withName("Collection test")
+                                          .build();
 
         Item item = ItemBuilder.createItem(context, col)
-                          .withTitle("Public test item")
-                          .withIssueDate("2021-04-27")
-                          .withAuthor("Doe, John")
-                          .withSubject("ExtraEntry")
-                          .build();
+                               .withTitle("Public test item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
 
         context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(adminToken).perform(get("/api/core/items/" + item.getID() + "/versionhistory"))
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID() + "/version"))
                              .andExpect(status().isNoContent());
     }
 
     @Test
-    public void versionHistoryForItemUnauthorizedTest() throws Exception {
+    public void findVersionItemUnauthorizedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -4174,24 +4157,22 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                           .withName("Collection test").build();
 
         Item item = ItemBuilder.createItem(context, col)
-                          .withTitle("Public test item")
-                          .withIssueDate("2021-04-27")
-                          .withAuthor("Doe, John")
-                          .withSubject("ExtraEntry")
-                          .build();
+                               .withTitle("Public test item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v77 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 10)
-                                    .build();
+        VersionBuilder.createVersion(context, item, "test").build();
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/items/" + item.getID() + "/versionhistory"))
+        getClient().perform(get("/api/core/items/" + item.getID() + "/version"))
                    .andExpect(status().isUnauthorized());
     }
 
     @Test
-    public void versionHistoryForItemForbiddenTest() throws Exception {
+    public void findVersionForItemForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -4199,23 +4180,22 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test").build();
+                                          .withName("Collection test")
+                                          .build();
 
         Item item = ItemBuilder.createItem(context, col)
-                          .withTitle("Public test item")
-                          .withIssueDate("2021-04-27")
-                          .withAuthor("Doe, John")
-                          .withSubject("ExtraEntry")
-                          .build();
+                               .withTitle("Public test item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v77 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 10)
-                                    .build();
+        VersionBuilder.createVersion(context, item, "test").build();
 
         context.restoreAuthSystemState();
 
         String epersonToken = getAuthToken(eperson.getEmail(), password);
-        getClient(epersonToken).perform(get("/api/core/items/" + item.getID() + "/versionhistory"))
-                             .andExpect(status().isForbidden());
+        getClient(epersonToken).perform(get("/api/core/items/" + item.getID() + "/version"))
+                               .andExpect(status().isForbidden());
     }
 }

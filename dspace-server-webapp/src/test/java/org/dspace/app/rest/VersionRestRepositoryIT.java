@@ -6,6 +6,7 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
+import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.is;
@@ -20,6 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.VersionMatcher;
@@ -80,6 +82,8 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Before
     public void setup() throws SQLException, AuthorizeException {
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -255,18 +259,25 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(adminToken).perform(post("/api/versioning/versions")
-                             .param("summary", "test summary!")
-                             .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                             .content("/api/core/items/" + item.getID()))
-                             .andExpect(status().isCreated())
-                             .andExpect(jsonPath("$", Matchers.allOf(
-                                        hasJsonPath("$.version", is(2)),
-                                        hasJsonPath("$.summary", is("test summary!")),
-                                        hasJsonPath("$.submitterName", is("first (admin) last (admin)")),
-                                        hasJsonPath("$.type", is("version"))
-                                        )));
+
+        try {
+            getClient(adminToken).perform(post("/api/versioning/versions")
+                                 .param("summary", "test summary!")
+                                 .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                 .content("/api/core/items/" + item.getID()))
+                                 .andExpect(status().isCreated())
+                                 .andExpect(jsonPath("$", Matchers.allOf(
+                                            hasJsonPath("$.version", is(2)),
+                                            hasJsonPath("$.summary", is("test summary!")),
+                                            hasJsonPath("$.submitterName", is("first (admin) last (admin)")),
+                                            hasJsonPath("$.type", is("version"))
+                                            )))
+                                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+        } finally {
+            VersionBuilder.delete(idRef.get());
+        }
     }
 
     @Test
@@ -307,7 +318,9 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                           .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test").build();
+                                          .withName("Collection test")
+                                          .withSubmitterGroup(admin)
+                                          .build();
 
         Item item = ItemBuilder.createItem(context, col)
                           .withTitle("Public test item")
@@ -316,23 +329,52 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                           .withSubject("ExtraEntry")
                           .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v10 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 10).build();
+        Version v2 = VersionBuilder.createVersion(context, item, "test").build();
+        Item lastVersionItem = v2.getItem();
 
         context.restoreAuthSystemState();
 
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(adminToken).perform(post("/api/versioning/versions")
-                             .param("summary", "test summary.")
-                             .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                             .content("/api/core/items/" + v10.getItem().getID()))
-                             .andExpect(status().isCreated())
-                             .andExpect(jsonPath("$", Matchers.allOf(
-                                        hasJsonPath("$.version", is(11)),
-                                        hasJsonPath("$.summary", is("test summary.")),
-                                        hasJsonPath("$.submitterName", is("first (admin) last (admin)")),
-                                        hasJsonPath("$.type", is("version"))
-                                        )));
+
+        // item that linked last version is not archived
+        getClient(adminToken).perform(get("/api/core/items/" + lastVersionItem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+
+        // retrieve the workspace item
+        getClient(adminToken).perform(get("/api/submission/workspaceitems/search/item")
+                             .param("uuid", String.valueOf(lastVersionItem.getID())))
+                             .andExpect(status().isOk())
+                             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+        // submit the workspaceitem to complete the deposit
+        getClient(adminToken).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + idRef.get())
+                             .contentType(textUriContentType))
+                             .andExpect(status().isCreated());
+
+        // now the item is archived
+        getClient(adminToken).perform(get("/api/core/items/" + lastVersionItem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+
+        try {
+            getClient(adminToken).perform(post("/api/versioning/versions")
+                                 .param("summary", "test summary.")
+                                 .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                 .content("/api/core/items/" + v2.getItem().getID()))
+                                 .andExpect(status().isCreated())
+                                 .andExpect(jsonPath("$", Matchers.allOf(
+                                            hasJsonPath("$.version", is(3)),
+                                            hasJsonPath("$.summary", is("test summary.")),
+                                            hasJsonPath("$.submitterName", is("first (admin) last (admin)")),
+                                            hasJsonPath("$.type", is("version"))
+                                            )))
+                                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+        } finally {
+            VersionBuilder.delete(idRef.get());
+        }
     }
 
     @Test
@@ -354,23 +396,63 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 2).build();
+        Version v2 = VersionBuilder.createVersion(context, item, "test").build();
+        Item lastVersionItem = v2.getItem();
 
         context.restoreAuthSystemState();
 
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // the first version item is archived
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+
+        // item that linked last version is not archived
+        getClient(adminToken).perform(get("/api/core/items/" + lastVersionItem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+
+        // if there is item not archived, we can not create new version
         getClient(adminToken).perform(post("/api/versioning/versions")
                              .param("summary", "check first version")
                              .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
                              .content("/api/core/items/" + item.getID()))
-                             .andExpect(status().isCreated())
-                             .andExpect(jsonPath("$", Matchers.allOf(
-                                        hasJsonPath("$.version", is(3)),
-                                        hasJsonPath("$.summary", is("check first version")),
-                                        hasJsonPath("$.submitterName", is("first (admin) last (admin)")),
-                                        hasJsonPath("$.type", is("version"))
-                                        )));
+                             .andExpect(status().isUnprocessableEntity());
+
+        // retrieve the workspace item
+        getClient(adminToken).perform(get("/api/submission/workspaceitems/search/item")
+                             .param("uuid", String.valueOf(lastVersionItem.getID())))
+                             .andExpect(status().isOk())
+                             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+        // submit the workspaceitem to complete the deposit
+        getClient(adminToken).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + idRef.get())
+                             .contentType(textUriContentType))
+                             .andExpect(status().isCreated());
+
+        // now the item is archived
+        getClient(adminToken).perform(get("/api/core/items/" + lastVersionItem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+
+        try {
+            getClient(adminToken).perform(post("/api/versioning/versions")
+                                 .param("summary", "check first version")
+                                 .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                 .content("/api/core/items/" + item.getID()))
+                                 .andExpect(status().isCreated())
+                                 .andExpect(jsonPath("$", Matchers.allOf(
+                                            hasJsonPath("$.version", is(3)),
+                                            hasJsonPath("$.summary", is("check first version")),
+                                            hasJsonPath("$.submitterName", is("first (admin) last (admin)")),
+                                            hasJsonPath("$.type", is("version"))
+                                            )));
+        } finally {
+            VersionBuilder.delete(idRef.get());
+        }
     }
 
     @Test
@@ -500,18 +582,23 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         String epersonToken = getAuthToken(eperson.getEmail(), password);
-        getClient(epersonToken).perform(post("/api/versioning/versions")
-                               .param("summary", "test summary!")
-                               .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                               .content("/api/core/items/" + itemA.getID()))
-                               .andExpect(status().isCreated())
-                               .andExpect(jsonPath("$", Matchers.allOf(
-                                          hasJsonPath("$.version", is(2)),
-                                          hasJsonPath("$.summary", is("test summary!")),
-                                          hasJsonPath("$.type", is("version"))
-                                          )));
-
+        try {
+            getClient(epersonToken).perform(post("/api/versioning/versions")
+                                   .param("summary", "test summary!")
+                                   .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                   .content("/api/core/items/" + itemA.getID()))
+                                   .andExpect(status().isCreated())
+                                   .andExpect(jsonPath("$", Matchers.allOf(
+                                              hasJsonPath("$.version", is(2)),
+                                              hasJsonPath("$.summary", is("test summary!")),
+                                              hasJsonPath("$.type", is("version"))
+                                              )))
+                                   .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+        } finally {
+            VersionBuilder.delete(idRef.get());
+        }
         configurationService.setProperty("versioning.submitterCanCreateNewVersion", false);
     }
 
@@ -565,8 +652,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                           .withSubject("ExtraEntry")
                           .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v77 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 77)
+        Version v2 = VersionBuilder.createVersion(context, item, "test")
                                     .build();
 
         context.restoreAuthSystemState();
@@ -578,21 +664,21 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = getPatchContent(ops);
 
         String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(adminToken).perform(patch("/api/versioning/versions/" + v77.getID())
+        getClient(adminToken).perform(patch("/api/versioning/versions/" + v2.getID())
                              .content(patchBody)
                              .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.allOf(
-                                     hasJsonPath("$.version", is(v77.getVersionNumber())),
+                                     hasJsonPath("$.version", is(v2.getVersionNumber())),
                                      hasJsonPath("$.summary", is(newSummary)),
                                      hasJsonPath("$.submitterName", is("first last")),
                                      hasJsonPath("$.type", is("version"))
                                      )))
                              .andExpect(jsonPath("$._links.self.href", Matchers.allOf(Matchers.containsString(
-                                                 "api/versioning/versions/" + v77.getID())
+                                                 "api/versioning/versions/" + v2.getID())
                                                  )))
                              .andExpect(jsonPath("$._links.item.href", Matchers.allOf(Matchers.containsString(
-                                                 "api/versioning/versions/" + v77.getID() + "/item")
+                                                 "api/versioning/versions/" + v2.getID() + "/item")
                                                  )));
 
     }
@@ -615,9 +701,8 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                           .withSubject("ExtraEntry")
                           .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v77 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 77)
-                                    .build();
+        Version v2 = VersionBuilder.createVersion(context, item, "test")
+                                   .build();
 
         context.restoreAuthSystemState();
 
@@ -627,21 +712,21 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = getPatchContent(ops);
 
         String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(adminToken).perform(patch("/api/versioning/versions/" + v77.getID())
+        getClient(adminToken).perform(patch("/api/versioning/versions/" + v2.getID())
                              .content(patchBody)
                              .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.allOf(
-                                     hasJsonPath("$.version", is(v77.getVersionNumber())),
+                                     hasJsonPath("$.version", is(v2.getVersionNumber())),
                                      hasJsonPath("$.summary", emptyString()),
                                      hasJsonPath("$.submitterName", is("first last")),
                                      hasJsonPath("$.type", is("version"))
                                      )))
                            .andExpect(jsonPath("$._links.self.href", Matchers.allOf(Matchers.containsString(
-                                               "api/versioning/versions/" + v77.getID())
+                                               "api/versioning/versions/" + v2.getID())
                                                )))
                            .andExpect(jsonPath("$._links.item.href", Matchers.allOf(Matchers.containsString(
-                                               "api/versioning/versions/" + v77.getID() + "/item")
+                                               "api/versioning/versions/" + v2.getID() + "/item")
                                                )));
 
     }
@@ -664,9 +749,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                           .withSubject("ExtraEntry")
                           .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v77 = VersionBuilder.createVersionWithVersionHistory(context, item, "", versionHistory, 77)
-                                    .build();
+        Version v2 = VersionBuilder.createVersion(context, item, "").build();
 
         context.restoreAuthSystemState();
 
@@ -677,21 +760,21 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = getPatchContent(ops);
 
         String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(adminToken).perform(patch("/api/versioning/versions/" + v77.getID())
+        getClient(adminToken).perform(patch("/api/versioning/versions/" + v2.getID())
                              .content(patchBody)
                              .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.allOf(
-                                        hasJsonPath("$.version", is(v77.getVersionNumber())),
+                                        hasJsonPath("$.version", is(v2.getVersionNumber())),
                                         hasJsonPath("$.summary", is(summary)),
                                         hasJsonPath("$.submitterName", is("first last")),
                                         hasJsonPath("$.type", is("version"))
                                         )))
                              .andExpect(jsonPath("$._links.self.href", Matchers.allOf(Matchers.containsString(
-                                                 "api/versioning/versions/" + v77.getID())
+                                                 "api/versioning/versions/" + v2.getID())
                                                  )))
                              .andExpect(jsonPath("$._links.item.href", Matchers.allOf(Matchers.containsString(
-                                                 "api/versioning/versions/" + v77.getID() + "/item")
+                                                 "api/versioning/versions/" + v2.getID() + "/item")
                                                  )));
     }
 
@@ -728,9 +811,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                           .withSubject("ExtraEntry")
                           .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v77 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 77)
-                                    .build();
+        Version v2 = VersionBuilder.createVersion(context, item, "test").build();
 
         context.restoreAuthSystemState();
 
@@ -741,7 +822,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = getPatchContent(ops);
 
         String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(adminToken).perform(patch("/api/versioning/versions/" + v77.getID())
+        getClient(adminToken).perform(patch("/api/versioning/versions/" + v2.getID())
                              .content(patchBody)
                              .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isBadRequest());
@@ -765,9 +846,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                           .withSubject("ExtraEntry")
                           .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v77 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 77)
-                                    .build();
+        Version v2 = VersionBuilder.createVersion(context, item, "test").build();
 
         context.restoreAuthSystemState();
 
@@ -778,7 +857,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = getPatchContent(ops);
 
         String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(adminToken).perform(patch("/api/versioning/versions/" + v77.getID())
+        getClient(adminToken).perform(patch("/api/versioning/versions/" + v2.getID())
                              .content(patchBody)
                              .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isUnprocessableEntity());
@@ -802,8 +881,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v77 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 77).build();
+        Version v2 = VersionBuilder.createVersion(context, item, "test").build();
 
         context.restoreAuthSystemState();
 
@@ -814,7 +892,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = getPatchContent(ops);
 
         String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(adminToken).perform(patch("/api/versioning/versions/" + v77.getID())
+        getClient(adminToken).perform(patch("/api/versioning/versions/" + v2.getID())
                              .content(patchBody)
                              .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isUnprocessableEntity());
@@ -839,8 +917,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v77 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 77).build();
+        Version v2 = VersionBuilder.createVersion(context, item, "test").build();
 
         context.restoreAuthSystemState();
 
@@ -850,7 +927,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
-        getClient().perform(patch("/api/versioning/versions/" + v77.getID())
+        getClient().perform(patch("/api/versioning/versions/" + v2.getID())
                    .content(patchBody)
                    .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                    .andExpect(status().isUnauthorized());
@@ -874,8 +951,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v77 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 77).build();
+        Version v2 = VersionBuilder.createVersion(context, item, "test").build();
 
         context.restoreAuthSystemState();
 
@@ -884,7 +960,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
-        getClient().perform(patch("/api/versioning/versions/" + v77.getID())
+        getClient().perform(patch("/api/versioning/versions/" + v2.getID())
                    .content(patchBody)
                    .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                    .andExpect(status().isUnauthorized());
@@ -908,8 +984,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                           .withSubject("ExtraEntry")
                           .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v77 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 77).build();
+        Version v2 = VersionBuilder.createVersion(context, item, "test").build();
 
         context.restoreAuthSystemState();
 
@@ -919,7 +994,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = getPatchContent(ops);
 
         String epersonToken = getAuthToken(eperson.getEmail(), password);
-        getClient(epersonToken).perform(patch("/api/versioning/versions/" + v77.getID())
+        getClient(epersonToken).perform(patch("/api/versioning/versions/" + v2.getID())
                                .content(patchBody)
                                .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                                .andExpect(status().isForbidden());
@@ -944,8 +1019,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v77 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 77).build();
+        Version v2 = VersionBuilder.createVersion(context, item, "test").build();
 
         context.restoreAuthSystemState();
 
@@ -956,12 +1030,12 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = getPatchContent(ops);
 
         String colAdminToken = getAuthToken(eperson.getEmail(), password);
-        getClient(colAdminToken).perform(patch("/api/versioning/versions/" + v77.getID())
+        getClient(colAdminToken).perform(patch("/api/versioning/versions/" + v2.getID())
                                 .content(patchBody)
                                 .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$", Matchers.allOf(
-                                        hasJsonPath("$.version", is(v77.getVersionNumber())),
+                                        hasJsonPath("$.version", is(v2.getVersionNumber())),
                                         hasJsonPath("$.summary", is(newSummary)),
                                         hasJsonPath("$.type", is("version"))
                                         )));
@@ -1005,8 +1079,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v77 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 77).build();
+        Version v2 = VersionBuilder.createVersion(context, item, "test").build();
 
         context.restoreAuthSystemState();
 
@@ -1019,24 +1092,24 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         String adminCommAToken = getAuthToken(adminCommA.getEmail(), password);
         String adminCommBToken = getAuthToken(adminCommB.getEmail(), password);
 
-        getClient(adminCommBToken).perform(patch("/api/versioning/versions/" + v77.getID())
+        getClient(adminCommBToken).perform(patch("/api/versioning/versions/" + v2.getID())
                                   .content(patchBody)
                                   .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                                   .andExpect(status().isForbidden());
 
-        getClient(adminCommAToken).perform(get("/api/versioning/versions/" + v77.getID()))
+        getClient(adminCommAToken).perform(get("/api/versioning/versions/" + v2.getID()))
                                   .andExpect(status().isOk())
-                                  .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(v77))));
+                                  .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(v2))));
 
-        getClient(adminCommAToken).perform(patch("/api/versioning/versions/" + v77.getID())
+        getClient(adminCommAToken).perform(patch("/api/versioning/versions/" + v2.getID())
                                   .content(patchBody)
                                   .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                                   .andExpect(status().isOk());
 
-        getClient(adminCommAToken).perform(get("/api/versioning/versions/" + v77.getID()))
+        getClient(adminCommAToken).perform(get("/api/versioning/versions/" + v2.getID()))
                                   .andExpect(status().isOk())
                                   .andExpect(jsonPath("$", Matchers.allOf(
-                                          hasJsonPath("$.version", is(v77.getVersionNumber())),
+                                          hasJsonPath("$.version", is(v2.getVersionNumber())),
                                           hasJsonPath("$.summary", is(newSummary)),
                                           hasJsonPath("$.type", is("version"))
                                           )));
@@ -1052,6 +1125,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
                                           .withName("Collection test")
+                                          .withSubmitterGroup(admin)
                                           .build();
 
         Item item = ItemBuilder.createItem(context, col)
@@ -1061,13 +1135,37 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
-        VersionHistory versionHistory = versionHistoryService.create(context);
-        Version v2 = VersionBuilder.createVersionWithVersionHistory(context, item, "test", versionHistory, 2).build();
+        Version v2 = VersionBuilder.createVersion(context, item, "test").build();
+        VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
+        Item lastVersionItem = v2.getItem();
 
         context.restoreAuthSystemState();
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         String adminToken = getAuthToken(admin.getEmail(), password);
         Integer versionID = v2.getID();
         Item versionItem = v2.getItem();
+
+        // item that linked last version is not archived
+        getClient(adminToken).perform(get("/api/core/items/" + lastVersionItem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+
+        // retrieve the workspace item
+        getClient(adminToken).perform(get("/api/submission/workspaceitems/search/item")
+                             .param("uuid", String.valueOf(lastVersionItem.getID())))
+                             .andExpect(status().isOk())
+                             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+        // submit the workspaceitem to complete the deposit
+        getClient(adminToken).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + idRef.get())
+                             .contentType(textUriContentType))
+                             .andExpect(status().isCreated());
+
+        // now the item is archived
+        getClient(adminToken).perform(get("/api/core/items/" + lastVersionItem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
 
         getClient(adminToken).perform(get("/api/versioning/versions/" + versionID))
                              .andExpect(status().isOk())
@@ -1082,9 +1180,6 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         // To delete a version you need to delete the item linked to it.
         getClient(adminToken).perform(delete("/api/core/items/" + versionItem.getID()))
                              .andExpect(status().is(204));
-
-        getClient(adminToken).perform(get("/api/versioning/versions/" + versionID))
-                             .andExpect(status().isNotFound());
     }
 
 }
