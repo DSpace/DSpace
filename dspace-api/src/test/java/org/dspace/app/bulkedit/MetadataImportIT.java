@@ -187,7 +187,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             item.getID().toString() + "," + collection.getHandle() + "," + item.getName() + ","};
         performImportScript(csv);
         item = findItemByName("title");
-        assertEquals(itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size(), 0);
+        assertEquals(0, itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size());
     }
 
     private Item findItemByName(String name) throws SQLException {
@@ -203,6 +203,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
     /**
      * Import mocked CSVs to test item creation behavior, deleting temporary file afterward.
+     * @param csv content for test file.
+     * @throws java.lang.Exception passed through.
      */
     public void performImportScript(String[] csv) throws Exception {
         File csvFile = File.createTempFile("dspace-test-import", "csv");
