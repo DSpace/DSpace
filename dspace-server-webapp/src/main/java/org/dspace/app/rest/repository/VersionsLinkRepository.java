@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,6 +52,7 @@ public class VersionsLinkRepository extends AbstractDSpaceRestRepository
      * @return                  The page containing relevant VersionRest objects
      * @throws SQLException     If something goes wrong
      */
+    @PreAuthorize("hasPermission(#versionHistoryId, 'VERSIONHISTORY', 'READ')")
     public Page<VersionRest> getVersions(@Nullable HttpServletRequest request,
                                                Integer versionHistoryId,
                                                @Nullable Pageable optionalPageable,

@@ -20,10 +20,11 @@ import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.apache.logging.log4j.Logger;
+import com.amazonaws.util.CollectionUtils;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.hibernate.proxy.HibernateProxyHelper;
+
 
 /**
  * @author Fabio Bolognesi (fabio at atmire dot com)
@@ -34,8 +35,6 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Entity
 @Table(name = "versionhistory")
 public class VersionHistory implements ReloadableEntity<Integer> {
-
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(VersionHistory.class);
 
     @Id
     @Column(name = "versionhistory_id")
@@ -85,6 +84,13 @@ public class VersionHistory implements ReloadableEntity<Integer> {
 
     void removeVersion(Version version) {
         this.versions.remove(version);
+    }
+
+    public boolean hasDraftVersion() {
+        if (!CollectionUtils.isNullOrEmpty(versions)) {
+            return !versions.get(0).getItem().isArchived();
+        }
+        return false;
     }
 
     @Override

@@ -12,13 +12,17 @@ import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.model.AInprogressSubmissionRest;
 import org.dspace.app.rest.model.VersionHistoryRest;
-import org.dspace.app.rest.model.VersionRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -38,11 +42,19 @@ public class VersionHistoryDraftVersionLinkRepository extends AbstractDSpaceRest
     @Autowired
     private VersionHistoryService versionHistoryService;
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public VersionRest getDraftVersion(@Nullable HttpServletRequest request,
-                                                 Integer versionHistoryId,
-                                       @Nullable Pageable optionalPageable,
-                                                 Projection projection) throws SQLException {
+    @Autowired
+    private WorkspaceItemService workspaceItemService;
+
+    @SuppressWarnings("rawtypes")
+    @Autowired(required = true)
+    private WorkflowItemService workflowItemService;
+
+    @PreAuthorize("hasPermission(@extractorOf.getAInprogressSubmissionID(#request, #versionHistoryId), "
+                + "@extractorOf.getAInprogressSubmissionTarget(#request, #versionHistoryId), 'READ')")
+    public AInprogressSubmissionRest getDraftVersion(@Nullable HttpServletRequest request,
+                                                               Integer versionHistoryId,
+                                                     @Nullable Pageable optionalPageable,
+                                                               Projection projection) throws SQLException {
         Context context = obtainContext();
         if (Objects.isNull(versionHistoryId) || versionHistoryId < 0) {
             throw new DSpaceBadRequestException("Provied id is not correct!");
@@ -52,10 +64,16 @@ public class VersionHistoryDraftVersionLinkRepository extends AbstractDSpaceRest
             throw new ResourceNotFoundException("No such versio found");
         }
         Version oldestVersion = versionHistoryService.getLatestVersion(context, versionHistory);
-        if (Objects.isNull(oldestVersion)) {
-            throw new ResourceNotFoundException("No such version for versionhistory with id:" + versionHistoryId);
+
+        WorkflowItem workflowItem = workflowItemService.findByItem(context, oldestVersion.getItem());
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, oldestVersion.getItem());
+        if (Objects.nonNull(workflowItem)) {
+            return converter.toRest(workflowItem, projection);
         }
-        return converter.toRest(oldestVersion, projection);
+        if (Objects.nonNull(workspaceItem)) {
+            return converter.toRest(workspaceItem, projection);
+        }
+        return null;
     }
 
 }
