@@ -51,7 +51,7 @@ public class JsonPostProcessor implements Consumer<List<String>> {
     }
 
     private String cleanUpString(String str) {
-        return str.replace("\r", "").replace("\n", "").replace("\t", "");
+        return str.replace("\r", "").replace("\n", "").replace("\t", "").trim();
     }
 
 }
