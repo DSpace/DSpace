@@ -481,6 +481,7 @@
 				<entry key="personName" value-ref="virtualFieldPersonName" />
 				<entry key="date" value-ref="virtualFieldDateFormatter" />
 				<entry key="vocabulary" value-ref="virtualFieldVocabulary" />
+                <entry key="metric" value-ref="virtualFieldMetric" />
 			</map>
 		</constructor-arg>
 	</bean>
@@ -504,6 +505,7 @@
 	</bean>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldDateFormatter" id="virtualFieldDateFormatter"/>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldVocabulary" id="virtualFieldVocabulary"/>
+    <bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMetric" id="virtualFieldMetric"/>
 	
 	<!-- MapConverter configuration -->
 
