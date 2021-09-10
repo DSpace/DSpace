@@ -6,8 +6,8 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.builder;
+import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.Objects;
 
 import org.apache.commons.lang.StringUtils;
@@ -15,8 +15,8 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.versioning.Version;
-import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersioningService;
 
 /**
@@ -36,28 +36,16 @@ public class VersionBuilder extends AbstractBuilder<Version, VersioningService> 
 
     public static VersionBuilder createVersion(Context context, Item item, String summary) {
         VersionBuilder builder = new VersionBuilder(context);
-        return builder.create(context, item, summary, null, 0);
+        return builder.create(context, item, summary);
     }
 
-    public static VersionBuilder createVersionWithVersionHistory(Context context,
-                  Item item, String summary, VersionHistory versionHistory, int versionNumber) {
-        VersionBuilder builder = new VersionBuilder(context);
-        return builder.create(context, item, summary, versionHistory, versionNumber);
-    }
-
-    private VersionBuilder create(Context context, Item item, String summary,
-                                  VersionHistory versionHistory, int versionNumber) {
+    private VersionBuilder create(Context context, Item item, String summary) {
         try {
             this.context = context;
-            if (Objects.nonNull(versionHistory)) {
-                this.version = getService().createNewVersion(context, versionHistory, item, summary,
-                                                             new Date(), versionNumber);
+            if (StringUtils.isNotBlank(summary)) {
+                this.version = getService().createNewVersion(context, item, summary);
             } else {
-                if (StringUtils.isNotBlank(summary)) {
-                    this.version = getService().createNewVersion(context, item, summary);
-                } else {
-                    this.version = getService().createNewVersion(context, item);
-                }
+                this.version = getService().createNewVersion(context, item);
             }
         } catch (Exception e) {
             log.error("Error in VersionBuilder.create(..), error: ", e);
@@ -100,6 +88,19 @@ public class VersionBuilder extends AbstractBuilder<Version, VersioningService> 
             Version attachedTab = context.reloadEntity(version);
             if (attachedTab != null) {
                 getService().delete(context, attachedTab);
+            }
+            context.complete();
+        }
+        indexingService.commit();
+    }
+
+    public static void delete(Integer id)
+            throws SQLException, IOException, SearchServiceException {
+        try (Context context = new Context()) {
+            context.turnOffAuthorisationSystem();
+            Version version = versioningService.getVersion(context, id);
+            if (version != null) {
+                versioningService.delete(context, version);
             }
             context.complete();
         }
