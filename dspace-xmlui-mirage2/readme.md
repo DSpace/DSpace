@@ -33,12 +33,12 @@ If you don't have git installed, go to the [git downloads page](http://git-scm.c
 
 ### Node ###
 
-We recommend using [nvm](https://github.com/creationix/nvm) (Node Version Manager) to install [Node.js](http://nodejs.org/), because it makes it easy to install, use and upgrade node without super user rights.
+We recommend using [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager) to install [Node.js](http://nodejs.org/), because it makes it easy to install, use and upgrade node without super user rights.
 
 First download and install nvm:
 
 ```bash
-    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.7/install.sh | bash 
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 ```
 
 Then, close and reopen your terminal, and install a node version. We used v6.5.0 during the development of the theme, but it builds successfully with current [long-term support version](https://github.com/nodejs/Release#release-schedule) 12.x as well.
