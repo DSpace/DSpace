@@ -3130,13 +3130,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    .param("relationshipLabel", "isAuthorOfPublication")
                    .param("focusItem", publication1.getID().toString())
                    .param("size", "1")
-                   .param("sort", "id, DESC")
                    .param("relatedItem", author1.getID().toString(),
                                          author2.getID().toString(),
                                          author3.getID().toString()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", contains(
-                              RelationshipMatcher.matchRelationshipValues(relationship2)
+                              RelationshipMatcher.matchRelationshipValues(relationship1)
                               )))
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(jsonPath("$.page.totalPages", is(2)))
@@ -3148,13 +3147,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    .param("focusItem", publication1.getID().toString())
                    .param("page", "1")
                    .param("size", "1")
-                   .param("sort", "id, DESC")
                    .param("relatedItem", author1.getID().toString(),
                                          author2.getID().toString(),
                                          author3.getID().toString()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", contains(
-                              RelationshipMatcher.matchRelationshipValues(relationship1)
+                              RelationshipMatcher.matchRelationshipValues(relationship2)
                               )))
                    .andExpect(jsonPath("$.page.number", is(1)))
                    .andExpect(jsonPath("$.page.totalPages", is(2)))

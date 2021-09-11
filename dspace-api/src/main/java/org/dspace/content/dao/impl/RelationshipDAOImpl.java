@@ -275,7 +275,8 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         Query query = createQuery(context, "FROM " + Relationship.class.getSimpleName() +
                                           " WHERE type_id = (:typeId) " +
                                            "AND " + side + " = (:focusUUID) " +
-                                           "AND " + otherSide + " in (:list)");
+                                           "AND " + otherSide + " in (:list) " +
+                                           "ORDER BY id");
         query.setParameter("typeId", relationshipType.getID());
         query.setParameter("focusUUID", focusUUID);
         query.setParameter("list", items);
