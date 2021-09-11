@@ -711,8 +711,16 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public List<Relationship> findByItemAndRelationshipTypeAndList(Context context, UUID focusUUID,
-            RelationshipType relationshipType, List<UUID> items, boolean isLeft) throws SQLException {
+            RelationshipType relationshipType, List<UUID> items, boolean isLeft,
+            int offset, int limit) throws SQLException {
         return relationshipDAO
-               .findByItemAndRelationshipTypeAndList(context, focusUUID, relationshipType, items, isLeft);
+               .findByItemAndRelationshipTypeAndList(context, focusUUID, relationshipType, items, isLeft, offset,limit);
+    }
+
+    @Override
+    public int countByItemAndRelationshipTypeAndList(Context context, UUID focusUUID, RelationshipType relationshipType,
+            List<UUID> items, boolean isLeft) throws SQLException {
+        return relationshipDAO
+               .countByItemAndRelationshipTypeAndList(context, focusUUID, relationshipType, items, isLeft);
     }
 }

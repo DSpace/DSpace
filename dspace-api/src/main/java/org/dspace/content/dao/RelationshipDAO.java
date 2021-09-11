@@ -218,6 +218,28 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
             throws SQLException;
 
     /**
+     * This method is used to retrieve relationships that match focusItem
+     * on the one hand and matches list of related items elsewhere.
+     *
+     * @param context            DSpace context object
+     * @param focusUUID          UUID of Item that will match left side if the param isLeft is true otherwise right side
+     * @param relationshipType   Relationship type to filter by
+     * @param items              List of UUID that will use to filter other side respect the focusUUID
+     * @param isLeft             Indicating whether the counted Relationships should have
+     *                           the given Item on the left side or not
+     * @param limit              paging limit
+     * @param offset             paging offset
+     * @return
+     * @throws SQLException      If database error
+     */
+    List<Relationship> findByItemAndRelationshipTypeAndList(Context context, UUID focusUUID,
+            RelationshipType relationshipType, List<UUID> items, boolean isLeft,
+            int offset, int limit) throws SQLException;
+
+    /**
+     * Count total number of relationships that match focusItem
+     * on the one hand and matches list of related items elsewhere.
+     *
      * @param context            DSpace context object
      * @param focusUUID          UUID of Item that will match left side if the param isLeft is true otherwise right side
      * @param relationshipType   Relationship type to filter by
@@ -227,6 +249,6 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      * @return
      * @throws SQLException      If database error
      */
-    List<Relationship> findByItemAndRelationshipTypeAndList(Context context, UUID focusUUID,
-            RelationshipType relationshipType, List<UUID> items, boolean isLeft) throws SQLException;
+    int countByItemAndRelationshipTypeAndList(Context context, UUID focusUUID, RelationshipType relationshipType,
+                                               List<UUID> items, boolean isLeft) throws SQLException;
 }

@@ -205,6 +205,22 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     }
 
     /**
+     * This method will return a list of results for the given Query and parameters
+     * 
+     * @param query     The query for which the resulting list will be returned
+     * @param limit     The maximum amount of results to be returned
+     * @param offset    The offset to be used for the Query
+     * @return          A list of results determined by the Query and parameters
+     */
+    public List<T> list(Query query, int limit, int offset) {
+        query.setFirstResult(offset);
+        query.setMaxResults(limit);
+        @SuppressWarnings("unchecked")
+        List<T> result = (List<T>) query.getResultList();
+        return result;
+    }
+
+    /**
      * Retrieve a unique result from the query.  If multiple results CAN be
      * retrieved an exception will be thrown, so only use when the criteria
      * state uniqueness in the database.

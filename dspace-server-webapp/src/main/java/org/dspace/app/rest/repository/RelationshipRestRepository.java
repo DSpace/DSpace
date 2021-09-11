@@ -379,6 +379,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                                             @Parameter(value = "relatedItem", required = true) Set<UUID> items,
                                              Pageable pageable) throws SQLException {
         Context context = obtainContext();
+        int total = 0;
         List<Relationship> relationships = new LinkedList<>();
         RelationshipType relationshipType = relationshipTypeService.find(context, typeId);
         if (Objects.nonNull(relationshipType)) {
@@ -388,10 +389,14 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                                                        " , does not match any relation!");
             }
             relationships = relationshipService.findByItemAndRelationshipTypeAndList(context, focusUUID,
-                       relationshipType, new ArrayList<UUID>(items), relationshipType.getLeftwardType().equals(label));
+                       relationshipType, new ArrayList<UUID>(items), relationshipType.getLeftwardType().equals(label),
+                       Math.toIntExact(pageable.getOffset()),
+                       Math.toIntExact(pageable.getPageSize()));
 
+            total = relationshipService.countByItemAndRelationshipTypeAndList(context, focusUUID,
+                       relationshipType, new ArrayList<UUID>(items), relationshipType.getLeftwardType().equals(label));
         }
-        return converter.toRestPage(relationships, pageable, utils.obtainProjection());
+        return converter.toRestPage(relationships, pageable, total, utils.obtainProjection());
     }
 
 }
