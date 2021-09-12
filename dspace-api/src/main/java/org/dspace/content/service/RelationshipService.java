@@ -352,7 +352,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @return
      * @throws SQLException      If database error
      */
-    public List<Relationship> findByItemAndRelationshipTypeAndList(Context context, UUID focusUUID,
+    public List<Relationship> findByItemRelationshipTypeAndRelatedList(Context context, UUID focusUUID,
                 RelationshipType relationshipType, List<UUID> items, boolean isLeft,
                 int offset, int limit) throws SQLException;
 
@@ -369,7 +369,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @return
      * @throws SQLException      If database error
      */
-    public int countByItemAndRelationshipTypeAndList(Context context, UUID focusUUID, RelationshipType relationshipType,
-                                                     List<UUID> items, boolean isLeft) throws SQLException;
+    public int countByItemRelationshipTypeAndRelatedList(Context context, UUID focusUUID,
+           RelationshipType relationshipType, List<UUID> items, boolean isLeft) throws SQLException;
 
 }
