@@ -388,12 +388,12 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 throw new UnprocessableEntityException("The provided label: " + label +
                                                        " , does not match any relation!");
             }
-            relationships = relationshipService.findByItemAndRelationshipTypeAndList(context, focusUUID,
+            relationships = relationshipService.findByItemRelationshipTypeAndRelatedList(context, focusUUID,
                        relationshipType, new ArrayList<UUID>(items), relationshipType.getLeftwardType().equals(label),
                        Math.toIntExact(pageable.getOffset()),
                        Math.toIntExact(pageable.getPageSize()));
 
-            total = relationshipService.countByItemAndRelationshipTypeAndList(context, focusUUID,
+            total = relationshipService.countByItemRelationshipTypeAndRelatedList(context, focusUUID,
                        relationshipType, new ArrayList<UUID>(items), relationshipType.getLeftwardType().equals(label));
         }
         return converter.toRestPage(relationships, pageable, total, utils.obtainProjection());
