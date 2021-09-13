@@ -46,10 +46,10 @@ public interface VersioningService {
      * Delete a Version
      *
      * @param context        context
-     * @param Version        version
+     * @param version        version
      * @throws SQLException  if database error
      */
-    public void delete(Context c, Version version) throws SQLException;
+    public void delete(Context context, Version version) throws SQLException;
 
     void removeVersion(Context c, Item item) throws SQLException;
 
@@ -70,7 +70,7 @@ public interface VersioningService {
      * Update the Version
      *
      * @param context        context
-     * @param Version        version
+     * @param version        version
      * @throws SQLException  if database error
      */
     public void update(Context context, Version version) throws SQLException;
