@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -194,7 +194,7 @@ public class IPAuthentication implements AuthenticationMethod {
 
                                 groups.add(group);
                             } else {
-                                log.warn(LogManager.getHeader(context,
+                                log.warn(LogHelper.getHeader(context,
                                                               "configuration_error", "unknown_group="
                                                                   + groupName));
                             }
@@ -202,7 +202,7 @@ public class IPAuthentication implements AuthenticationMethod {
                     }
                 }
             } catch (IPMatcherException ipme) {
-                log.warn(LogManager.getHeader(context, "configuration_error",
+                log.warn(LogHelper.getHeader(context, "configuration_error",
                                               "bad_ip=" + addr), ipme);
             }
         }
@@ -228,7 +228,7 @@ public class IPAuthentication implements AuthenticationMethod {
 
                                 groups.remove(group);
                             } else {
-                                log.warn(LogManager.getHeader(context,
+                                log.warn(LogHelper.getHeader(context,
                                                               "configuration_error", "unknown_group="
                                                                   + groupName));
                             }
@@ -236,7 +236,7 @@ public class IPAuthentication implements AuthenticationMethod {
                     }
                 }
             } catch (IPMatcherException ipme) {
-                log.warn(LogManager.getHeader(context, "configuration_error",
+                log.warn(LogHelper.getHeader(context, "configuration_error",
                                               "bad_ip=" + addr), ipme);
             }
         }
@@ -248,7 +248,7 @@ public class IPAuthentication implements AuthenticationMethod {
                 gsb.append(group.getID()).append(", ");
             }
 
-            log.debug(LogManager.getHeader(context, "authenticated",
+            log.debug(LogHelper.getHeader(context, "authenticated",
                                            "special_groups=" + gsb.toString()
                                            + " (by IP=" + addr + ", useProxies=" + useProxies.toString() + ")"
                                           ));
