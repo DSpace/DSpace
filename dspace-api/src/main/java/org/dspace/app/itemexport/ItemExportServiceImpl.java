@@ -51,7 +51,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
@@ -936,7 +936,7 @@ public class ItemExportServiceImpl implements ItemExportService {
 
             email.send();
         } catch (Exception e) {
-            log.warn(LogManager.getHeader(context, "emailSuccessMessage", "cannot notify user of export"), e);
+            log.warn(LogHelper.getHeader(context, "emailSuccessMessage", "cannot notify user of export"), e);
         }
     }
 
