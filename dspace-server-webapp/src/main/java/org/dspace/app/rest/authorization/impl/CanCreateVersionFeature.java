@@ -45,6 +45,7 @@ public class CanCreateVersionFeature implements AuthorizationFeature {
     private ItemService itemService;
 
     @Override
+    @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         if (object instanceof ItemRest) {
             EPerson currentUser = context.getCurrentUser();
@@ -54,12 +55,16 @@ public class CanCreateVersionFeature implements AuthorizationFeature {
             if (authorizeService.isAdmin(context)) {
                 return true;
             }
-            if (configurationService.getBooleanProperty("versioning.submitterCanCreateNewVersion")) {
-                Item item = itemService.find(context, UUID.fromString(((ItemRest) object).getUuid()));
-                EPerson submitter = item.getSubmitter();
-                return Objects.nonNull(submitter) && currentUser.getID().equals(submitter.getID());
+            Item item = itemService.find(context, UUID.fromString(((ItemRest) object).getUuid()));
+            if (Objects.nonNull(item)) {
+                if (authorizeService.isAdmin(context, item)) {
+                    return true;
+                }
+                if (configurationService.getBooleanProperty("versioning.submitterCanCreateNewVersion")) {
+                    EPerson submitter = item.getSubmitter();
+                    return Objects.nonNull(submitter) && currentUser.getID().equals(submitter.getID());
+                }
             }
-
         }
         return false;
     }
