@@ -8,19 +8,25 @@
 package org.dspace.app.rest.security;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.UUID;
 import javax.annotation.Nullable;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.services.RequestService;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +47,15 @@ public class ExtractorOfAInprogressSubmissionInformations {
 
     @Autowired
     private VersionHistoryService versionHistoryService;
+
+    @Autowired
+    private VersioningService versionService;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private RequestService requestService;
 
     public Integer getAInprogressSubmissionID(@Nullable HttpServletRequest request, Integer versionHistoryId) {
         Context context = getContext(request);
@@ -88,8 +103,26 @@ public class ExtractorOfAInprogressSubmissionInformations {
         return StringUtils.EMPTY;
     }
 
+    public Integer getVersionIdByItemUUID(@Nullable HttpServletRequest request, UUID uuid) {
+        Context context = getContext(request);
+        if (Objects.nonNull(uuid)) {
+            try {
+                Item item = itemService.find(context, uuid);
+                if (Objects.nonNull(item)) {
+                    Version version = versionService.getVersion(context, item);
+                    return Objects.nonNull(version) ? version.getID() : null;
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
+        return null;
+    }
+
     private Context getContext(HttpServletRequest request) {
-        return Objects.nonNull(request) ? ContextUtil.obtainContext(request) : null;
+        ServletRequest currentRequest = requestService.getCurrentRequest().getServletRequest();
+        return Objects.nonNull(request) ? ContextUtil.obtainContext(request)
+                                        : ContextUtil.obtainContext(currentRequest);
     }
 
 }

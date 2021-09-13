@@ -78,6 +78,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
 import org.dspace.workflow.WorkflowItem;
 import org.hamcrest.Matcher;
@@ -90,6 +91,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private CollectionService collectionService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     private Item publication1;
     private Item author1;
@@ -4147,6 +4151,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findVersionItemUnauthorizedTest() throws Exception {
+        configurationService.setProperty("versioning.item.history.view.admin", true);
+
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -4169,10 +4175,14 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/core/items/" + item.getID() + "/version"))
                    .andExpect(status().isUnauthorized());
+
+        configurationService.setProperty("versioning.item.history.view.admin", true);
     }
 
     @Test
     public void findVersionForItemForbiddenTest() throws Exception {
+        configurationService.setProperty("versioning.item.history.view.admin", true);
+
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -4197,5 +4207,39 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(get("/api/core/items/" + item.getID() + "/version"))
                                .andExpect(status().isForbidden());
+
+        configurationService.setProperty("versioning.item.history.view.admin", true);
     }
+
+    @Test
+    public void findVersionForItemBadRequestTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection test")
+                                          .build();
+
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Public test item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        VersionBuilder.createVersion(context, item, "test").build();
+
+        context.restoreAuthSystemState();
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(epersonToken).perform(get("/api/core/items/wrongID/version"))
+                               .andExpect(status().isBadRequest());
+
+        getClient(epersonToken).perform(get("/api/core/items/1/version"))
+                               .andExpect(status().isBadRequest());
+    }
+
 }

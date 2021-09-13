@@ -49,7 +49,7 @@ public class ItemVersionLinkRepository extends AbstractDSpaceRestRepository
      *                          itemUuid param as UUID
      * @throws SQLException     If something goes wrong
      */
-    @PreAuthorize("hasPermission(#itemUuid, 'ITEM', 'READ')")
+    @PreAuthorize("hasPermission(@extractorOf.getVersionIdByItemUUID(#request, #itemUuid), 'VERSION', 'READ')")
     public VersionRest getItemVersion(@Nullable HttpServletRequest request,
                                       UUID itemUuid,
                                       @Nullable Pageable optionalPageable,
