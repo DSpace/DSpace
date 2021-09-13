@@ -83,7 +83,7 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
     public VersionRest findOne(Context context, Integer id) {
         try {
             Version version = versioningService.getVersion(context, id);
-            if (version == null) {
+            if (Objects.isNull(version) || Objects.isNull(version.getItem())) {
                 throw new ResourceNotFoundException("Couldn't find version for id: " + id);
             }
             return converterService.toRest(version, utils.obtainProjection());

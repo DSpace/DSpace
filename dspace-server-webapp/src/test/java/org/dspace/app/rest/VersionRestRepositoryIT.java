@@ -47,8 +47,6 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
-import org.dspace.versioning.VersionHistory;
-import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -76,9 +74,6 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private WorkspaceItemService workspaceItemService;
-
-    @Autowired
-    private VersionHistoryService versionHistoryService;
 
     @Before
     public void setup() throws SQLException, AuthorizeException {
@@ -511,6 +506,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                           .withName("Parent Community")
                                           .build();
 
+        @SuppressWarnings("deprecation")
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
                                           .withWorkflowGroup(1, admin)
                                           .withName("Collection test").build();
@@ -1136,7 +1132,6 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .build();
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();
-        VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
         Item lastVersionItem = v2.getItem();
 
         context.restoreAuthSystemState();
@@ -1180,6 +1175,9 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         // To delete a version you need to delete the item linked to it.
         getClient(adminToken).perform(delete("/api/core/items/" + versionItem.getID()))
                              .andExpect(status().is(204));
+
+        getClient(adminToken).perform(get("/api/versioning/versions/" + versionID))
+                             .andExpect(status().isNotFound());
     }
 
 }
