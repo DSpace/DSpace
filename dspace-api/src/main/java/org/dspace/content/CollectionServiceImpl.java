@@ -39,7 +39,7 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.core.service.LicenseService;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
@@ -167,7 +167,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                                    newCollection.getID(), newCollection.getHandle(),
                                    getIdentifiers(context, newCollection)));
 
-        log.info(LogManager.getHeader(context, "create_collection",
+        log.info(LogHelper.getHeader(context, "create_collection",
                                       "collection_id=" + newCollection.getID())
                      + ",handle=" + newCollection.getHandle());
 
@@ -345,7 +345,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         if (is == null) {
             collection.setLogo(null);
-            log.info(LogManager.getHeader(context, "remove_logo",
+            log.info(LogHelper.getHeader(context, "remove_logo",
                                           "collection_id=" + collection.getID()));
         } else {
             Bitstream newLogo = bitstreamService.create(context, is);
@@ -357,7 +357,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 .getPoliciesActionFilter(context, collection, Constants.READ);
             authorizeService.addPolicies(context, policies, newLogo);
 
-            log.info(LogManager.getHeader(context, "set_logo",
+            log.info(LogHelper.getHeader(context, "set_logo",
                                           "collection_id=" + collection.getID() + "logo_bitstream_id="
                                               + newLogo.getID()));
         }
@@ -393,7 +393,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         try {
             workflow = workflowFactory.getWorkflow(collection);
         } catch (WorkflowConfigurationException e) {
-            log.error(LogManager.getHeader(context, "setWorkflowGroup",
+            log.error(LogHelper.getHeader(context, "setWorkflowGroup",
                     "collection_id=" + collection.getID() + " " + e.getMessage()), e);
         }
         if (!StringUtils.equals(workflowFactory.getDefaultWorkflow().getID(), workflow.getID())) {
@@ -524,6 +524,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         // register this as the admin group
         collection.setAdmins(admins);
+        context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, collection.getID(),
+                                              null, getIdentifiers(context, collection)));
         return admins;
     }
 
@@ -540,6 +542,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         // Remove the link to the collection table.
         collection.setAdmins(null);
+        context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, collection.getID(),
+                                              null, getIdentifiers(context, collection)));
     }
 
     @Override
@@ -569,7 +573,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             Item template = itemService.createTemplateItem(context, collection);
             collection.setTemplateItem(template);
 
-            log.info(LogManager.getHeader(context, "create_template_item",
+            log.info(LogHelper.getHeader(context, "create_template_item",
                                           "collection_id=" + collection.getID() + ",template_item_id="
                                               + template.getID()));
         }
@@ -584,7 +588,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         Item template = collection.getTemplateItem();
 
         if (template != null) {
-            log.info(LogManager.getHeader(context, "remove_template_item",
+            log.info(LogHelper.getHeader(context, "remove_template_item",
                                           "collection_id=" + collection.getID() + ",template_item_id="
                                               + template.getID()));
             // temporarily turn off auth system, we have already checked the permission on the top of the method
@@ -604,7 +608,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Check authorisation
         authorizeService.authorizeAction(context, collection, Constants.ADD);
 
-        log.info(LogManager.getHeader(context, "add_item", "collection_id="
+        log.info(LogHelper.getHeader(context, "add_item", "collection_id="
             + collection.getID() + ",item_id=" + item.getID()));
 
         // Create mapping
@@ -645,7 +649,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Check authorisation
         canEdit(context, collection, true);
 
-        log.info(LogManager.getHeader(context, "update_collection",
+        log.info(LogHelper.getHeader(context, "update_collection",
                                       "collection_id=" + collection.getID()));
 
         super.update(context, collection);
@@ -657,8 +661,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             collection.clearModified();
         }
         if (collection.isMetadataModified()) {
-            collection.clearDetails();
+            context.addEvent(new Event(Event.MODIFY_METADATA, Constants.COLLECTION, collection.getID(),
+                                         collection.getDetails(),getIdentifiers(context, collection)));
+            collection.clearModified();
         }
+        collection.clearDetails();
     }
 
     @Override
@@ -702,7 +709,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public void delete(Context context, Collection collection) throws SQLException, AuthorizeException, IOException {
-        log.info(LogManager.getHeader(context, "delete_collection",
+        log.info(LogHelper.getHeader(context, "delete_collection",
                                       "collection_id=" + collection.getID()));
 
         // remove harvested collections.

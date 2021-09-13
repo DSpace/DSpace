@@ -339,7 +339,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Override
     public void delete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
         throws SQLException, AuthorizeException {
-        log.info(org.dspace.core.LogManager.getHeader(context, "delete_relationship",
+        log.info(org.dspace.core.LogHelper.getHeader(context, "delete_relationship",
                                                       "relationship_id=" + relationship.getID() + "&" +
                                                           "copyMetadataValuesToLeftItem=" + copyToLeftItem + "&" +
                                                           "copyMetadataValuesToRightItem=" + copyToRightItem));
@@ -356,7 +356,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Override
     public void forceDelete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
         throws SQLException, AuthorizeException {
-        log.info(org.dspace.core.LogManager.getHeader(context, "delete_relationship",
+        log.info(org.dspace.core.LogHelper.getHeader(context, "delete_relationship",
                                                       "relationship_id=" + relationship.getID() + "&" +
                                                           "copyMetadataValuesToLeftItem=" + copyToLeftItem + "&" +
                                                           "copyMetadataValuesToRightItem=" + copyToRightItem));
