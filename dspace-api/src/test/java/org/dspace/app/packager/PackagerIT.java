@@ -42,6 +42,11 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Element;
 import org.junit.Test;
 
+/**
+ * Basic integration testing for the Packager restore feature
+ *
+ * @author Nathan Buckingham
+ */
 public class PackagerIT extends AbstractIntegrationTestWithDatabase {
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
