@@ -41,7 +41,6 @@ import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -413,8 +412,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    @Ignore
-    public void deleteVersionXXXXTest() throws Exception {
+    public void findVersionsOfVersionHistoryCheckPaginationAfterDelitingOfVersionTest() throws Exception {
         //disable file upload mandatory
         configurationService.setProperty("webui.submit.upload.required", false);
         context.turnOffAuthorisationSystem();
