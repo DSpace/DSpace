@@ -10,7 +10,6 @@ package org.dspace.app.packager;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -163,7 +162,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
             Iterator<Item> items = itemService.findByCollection(context, col1);
             Item testItem = items.next();
             assertFalse(items.hasNext()); //check to make sure there is only 1 item
-            assertSame("123456789/100", testItem.getHandle()); //check to make sure the item wasn't overwritten as
+            assertEquals("123456789/100", testItem.getHandle()); //check to make sure the item wasn't overwritten as
             // it would have the old handle.
         } finally {
             tempFile.delete();
