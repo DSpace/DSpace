@@ -32,19 +32,18 @@ jobs:
         with:
           ruby-version: 2.4
 
-      - name: Install Node.js v6.5 (for Mirage 2)
+      - name: Install Node.js v12 (for Mirage 2)
         shell: bash -l {0}
-        run: nvm install 6.5.0
+        run: nvm install 12.22.4
 
       # Install prerequisites for building Mirage2 more rapidly
-      # Includes NPM, Bower, Grunt, Ruby, Sass, Compass
+      # Includes NPM, Bower, Ruby, Sass, Compass
       # These versions should be kept in sync with ./dspace/modules/xml-mirage2/pom.xml
       - name: Install Mirage 2 prerequisites
         run: |
-          sudo npm install -g npm@3.10.8
+          sudo npm install -g npm@6.14.14
           npm --version
           sudo npm install -g bower
-          sudo npm install -g grunt && sudo npm install -g grunt-cli
           grunt --version
           gem install sass -v 3.4.25
           sass -v
