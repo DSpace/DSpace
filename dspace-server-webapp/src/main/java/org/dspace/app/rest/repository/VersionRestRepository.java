@@ -49,7 +49,8 @@ import org.springframework.stereotype.Component;
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component(VersionRest.CATEGORY + "." + VersionRest.NAME)
-public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Integer> {
+public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Integer>
+                                    implements ReloadableEntityObjectRepository<Version, Integer> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(VersionRestRepository.class);
 
@@ -178,6 +179,16 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
     @Override
     public Class<VersionRest> getDomainClass() {
         return VersionRest.class;
+    }
+
+    @Override
+    public Version findDomainObjectByPk(Context context, Integer id) throws SQLException {
+        return versioningService.getVersion(context, id);
+    }
+
+    @Override
+    public Class<Integer> getPKClass() {
+        return Integer.class;
     }
 
 }
