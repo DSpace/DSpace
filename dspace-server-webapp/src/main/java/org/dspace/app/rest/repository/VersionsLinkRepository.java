@@ -66,10 +66,10 @@ public class VersionsLinkRepository extends AbstractDSpaceRestRepository
                                                     " couldn't be found");
         }
         Pageable pageable = optionalPageable != null ? optionalPageable : PageRequest.of(0, 20);
-        List<Version> versions = versioningService.getVersionsByHistory(context, versionHistory,
+        List<Version> versions = versioningService.getVersionsByHistoryWithItems(context, versionHistory,
                                                    Math.toIntExact(pageable.getOffset()),
                                                    Math.toIntExact(pageable.getPageSize()));
-        total = versioningService.countVersionsByHistory(context, versionHistory);
+        total = versioningService.countVersionsByHistoryWithItem(context, versionHistory);
         return converter.toRestPage(versions, pageable, total, projection);
     }
 }

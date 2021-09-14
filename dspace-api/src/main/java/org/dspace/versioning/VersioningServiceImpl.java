@@ -232,7 +232,8 @@ public class VersioningServiceImpl implements VersioningService {
     }
 
     @Override
-    public List<Version> getVersionsByHistory(Context c, VersionHistory vh, int offset, int limit) throws SQLException {
+    public List<Version> getVersionsByHistoryWithItems(Context c, VersionHistory vh, int offset, int limit)
+           throws SQLException {
         return versionDAO.findVersionsWithItems(c, vh, offset, limit);
     }
 
@@ -263,8 +264,8 @@ public class VersioningServiceImpl implements VersioningService {
     }
 
     @Override
-    public int countVersionsByHistory(Context context, VersionHistory versionHistory) throws SQLException {
-        return versionDAO.countVersionsByHistory(context, versionHistory);
+    public int countVersionsByHistoryWithItem(Context context, VersionHistory versionHistory) throws SQLException {
+        return versionDAO.countVersionsByHistoryWithItem(context, versionHistory);
     }
 
 }

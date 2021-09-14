@@ -44,6 +44,6 @@ public interface VersionDAO extends GenericDAO<Version> {
 
     public int getNextVersionNumber(Context c, VersionHistory vh) throws SQLException;
 
-    public int countVersionsByHistory(Context context, VersionHistory versionHistory) throws SQLException;
+    public int countVersionsByHistoryWithItem(Context context, VersionHistory versionHistory) throws SQLException;
 
 }
