@@ -65,15 +65,15 @@ public class VersionHistoryDraftVersionLinkRepository extends AbstractDSpaceRest
         }
         Version oldestVersion = versionHistoryService.getLatestVersion(context, versionHistory);
 
-        if(Objects.nonNull(oldestVersion) && Objects.nonNull(oldestVersion.getItem())) {
-	        WorkflowItem workflowItem = workflowItemService.findByItem(context, oldestVersion.getItem());
-	        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, oldestVersion.getItem());
-	        if (Objects.nonNull(workflowItem)) {
-	            return converter.toRest(workflowItem, projection);
-	        }
-	        if (Objects.nonNull(workspaceItem)) {
-	            return converter.toRest(workspaceItem, projection);
-	        }
+        if (Objects.nonNull(oldestVersion) && Objects.nonNull(oldestVersion.getItem())) {
+            WorkflowItem workflowItem = workflowItemService.findByItem(context, oldestVersion.getItem());
+            WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, oldestVersion.getItem());
+            if (Objects.nonNull(workflowItem)) {
+                return converter.toRest(workflowItem, projection);
+            }
+            if (Objects.nonNull(workspaceItem)) {
+                return converter.toRest(workspaceItem, projection);
+            }
         }
         return null;
     }

@@ -9,6 +9,7 @@ package org.dspace.versioning;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -86,8 +87,13 @@ public class VersionHistory implements ReloadableEntity<Integer> {
         this.versions.remove(version);
     }
 
+    /**
+     * Verify if there is a version's item in submission.
+     * 
+     * @return true if the last version in submission, otherwise false.
+     */
     public boolean hasDraftVersion() {
-        if (!CollectionUtils.isNullOrEmpty(versions)) {
+        if (!CollectionUtils.isNullOrEmpty(versions) && Objects.nonNull(versions.get(0).getItem())) {
             return !versions.get(0).getItem().isArchived();
         }
         return false;

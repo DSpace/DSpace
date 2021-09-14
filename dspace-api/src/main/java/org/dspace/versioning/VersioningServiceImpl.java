@@ -258,9 +258,7 @@ public class VersioningServiceImpl implements VersioningService {
 
     @Override
     public void update(Context context, Version version) throws SQLException {
-        if (version != null) {
-            versionDAO.save(context, version);
-        }
+        versionDAO.save(context, version);
     }
 
     @Override
