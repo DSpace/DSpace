@@ -11,13 +11,14 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.dao.RequestItemDAO;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class RequestItemServiceImpl implements RequestItemService {
 
-    private final Logger log = org.apache.logging.log4j.LogManager.getLogger();
+    private final Logger log = LogManager.getLogger();
 
     @Autowired(required = true)
     protected RequestItemDAO requestItemDAO;
@@ -88,7 +89,7 @@ public class RequestItemServiceImpl implements RequestItemService {
 
     @Override
     public void delete(Context context, RequestItem requestItem) {
-        log.debug(LogManager.getHeader(context, "delete_itemrequest", "request_id={}"),
+        log.debug(LogHelper.getHeader(context, "delete_itemrequest", "request_id={}"),
                 requestItem.getID());
         try {
             requestItemDAO.delete(context, requestItem);
