@@ -30,15 +30,28 @@ public class RequestItemRest
     public static final String CATEGORY = RestAddressableModel.TOOLS;
 
     protected String bitstream_id;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     protected Date decisionDate;
+
     protected Date expires;
+
     protected String item_id;
+
     protected String reqEmail;
+
     protected String reqMessage;
+
     protected String reqName;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     protected Date requestDate;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     protected String token;
+
     protected boolean acceptRequest;
+
     protected boolean allfiles;
 
     /**
