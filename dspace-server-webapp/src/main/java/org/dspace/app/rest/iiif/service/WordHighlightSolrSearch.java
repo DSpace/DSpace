@@ -36,9 +36,9 @@ import org.dspace.app.rest.iiif.model.generator.ManifestGenerator;
 import org.dspace.app.rest.iiif.model.generator.SearchResultGenerator;
 import org.dspace.app.rest.iiif.service.util.IIIFUtils;
 import org.dspace.discovery.SolrSearchCore;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -51,7 +51,6 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WordHighlightSolrSearch.class);
 
-    private final ApplicationContext applicationContext;
     private String endpoint;
     private String manifestId;
     private  boolean validationEnabled;
@@ -68,14 +67,22 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
     @Autowired
     SolrSearchCore solrSearchCore;
 
+    @Autowired
+    ManifestGenerator manifestGenerator;
 
-    public WordHighlightSolrSearch(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
 
     @Override
-    public void initializeQuery(String endpoint, String manifestId, boolean validationEnabled) {
-        this.validationEnabled = validationEnabled;
+    public boolean getSearchPlugin(String className) {
+        return className.contentEquals(WordHighlightSolrSearch.class.getSimpleName());
+    }
+
+    /**
+     * The query requires these values before it can execute
+     * @param endpoint the search service endpoint
+     * @param manifestId the idea of the manifest to search within
+     */
+    @Override
+    public void initializeQuerySettings(String endpoint, String manifestId) {
         this.endpoint = endpoint;
         this.manifestId = manifestId;
     }
@@ -89,10 +96,12 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
     @Override
     public String getSolrSearchResponse(UUID uuid, String query) {
         String json = "";
-        String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
-                .getProperty("iiif.solr.search.url");
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String solrService = configurationService.getProperty("iiif.search.url");
+        boolean validationEnabled =  configurationService
+                .getBooleanProperty("discovery.solr.url.validation.enabled");
         UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
-        if (urlValidator.isValid(solrService) || this.validationEnabled) {
+        if (urlValidator.isValid(solrService) || validationEnabled) {
             HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
             solrServer.setUseMultiPartPost(true);
             SolrQuery solrQuery = getSolrQuery(adjustQuery(query), manifestId);
@@ -157,9 +166,8 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
      * The identifier values must be aligned with zero-based IIIF canvas identifiers:
      * c0, c1, c2....
      *
-     * The convention convention for Alto IDs must be followed when indexing ALTO files
-     * into the word_highlighting solr index. If it is not, search responses will not
-     * match canvases.
+     * This convention must be followed when indexing ALTO files into the word_highlighting
+     * solr index. If it is not followed, word highlights will not align canvases.
      *
      * @param json solr search result
      * @param query the solr query
@@ -217,7 +225,11 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
     }
 
     /**
-     * Returns position of canvas by extracting from the pages id element.
+     * Returns position of canvas. Uses the "pages" id attribute.
+     * This method assumes that the solr response includes a "page" id attribute that is
+     * delimited with a "." and that the integer corresponds to the
+     * canvas identifier in the manifest. For METS/ALTO documents, the page
+     * order can be derived from the METS file when loading the solr index.
      * @param element the pages element
      * @return canvas id
      */
@@ -240,24 +252,24 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
      */
     private AnnotationGenerator createSearchResultAnnotation(String params, String text, String pageId, UUID uuid) {
         String identifier = this.endpoint + uuid + "/annot/" + pageId + "-" + params;
-        AnnotationGenerator annotation = applicationContext
-                .getBean(AnnotationGenerator.class, identifier, AnnotationGenerator.PAINTING);
-        CanvasGenerator canvas =
-                applicationContext.getBean(CanvasGenerator.class, identifier);
-        annotation.setOnCanvas(canvas);
         contentAsText.setText(text);
-        annotation.setResource(contentAsText);
-        annotation.setWithin(getWithinManifest());
-        return annotation;
+        CanvasGenerator canvas = new CanvasGenerator().setIdentifier(identifier);
+
+        AnnotationGenerator annotationGenerator = new AnnotationGenerator()
+                .setMotivation(AnnotationGenerator.PAINTING)
+                .setIdentifier(identifier)
+                .setOnCanvas(canvas)
+                .setResource(contentAsText)
+                .setWithin(getWithinManifest());
+
+        return annotationGenerator;
     }
 
     private List<ManifestGenerator> getWithinManifest() {
         List<ManifestGenerator> withinList = new ArrayList<>();
-        ManifestGenerator manifestGenerator = applicationContext.getBean(ManifestGenerator.class, manifestId);
-        manifestGenerator.setLabel("Search within manifest.");
+        manifestGenerator.setIdentifier(manifestId);
         withinList.add(manifestGenerator);
         return withinList;
-
     }
 
 }
