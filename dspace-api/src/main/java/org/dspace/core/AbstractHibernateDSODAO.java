@@ -48,7 +48,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, clazz);
         Root<T> root = criteriaQuery.from(clazz);
         criteriaQuery.where(criteriaBuilder.equal(root.get("legacyId"), legacyId));
-        return uniqueResult(context, criteriaQuery, false, clazz, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, clazz);
     }
 
     /**
