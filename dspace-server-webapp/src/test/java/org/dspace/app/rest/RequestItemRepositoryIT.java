@@ -361,6 +361,14 @@ public class RequestItemRepositoryIT
                             .content(mapper.writeValueAsBytes(rir))
                             .contentType(contentType))
                     .andExpect(status().isUnprocessableEntity());
+
+            // Test bad email
+            rir.setRequestEmail("<script>window.location='http://evil.example.com/';</script>");
+            getClient(authToken)
+                    .perform(post(URI_ROOT)
+                            .content(mapper.writeValueAsBytes(rir))
+                            .contentType(contentType))
+                    .andExpect(status().isUnprocessableEntity());
         } finally {
             // Clean up the created request.
             RequestItemBuilder.deleteRequestItem(requestTokenRef.get());

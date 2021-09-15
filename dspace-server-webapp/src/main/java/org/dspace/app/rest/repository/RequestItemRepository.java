@@ -16,6 +16,8 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.converter.RequestItemConverter;
@@ -23,7 +25,7 @@ import org.dspace.app.rest.exception.IncompleteItemRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RequestItemRest;
-import org.dspace.app.rest.projection.DefaultProjection;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
@@ -56,14 +58,18 @@ public class RequestItemRepository
     @Autowired(required = true)
     protected RequestItemConverter requestItemConverter;
 
-    @Override
+    /*
+     * DSpaceRestRepository
+     */
+
     @PreAuthorize("permitAll()")
-    public RequestItemRest findOne(Context context, String id) {
-        RequestItem requestItem = requestItemService.findByToken(context, id);
+    @Override
+    public RequestItemRest findOne(Context context, String token) {
+        RequestItem requestItem = requestItemService.findByToken(context, token);
         if (null == requestItem) {
             return null;
         } else {
-            return requestItemConverter.convert(requestItem, new DefaultProjection());
+            return requestItemConverter.convert(requestItem, Projection.DEFAULT);
         }
     }
 
@@ -114,9 +120,16 @@ public class RequestItemRepository
             if (isBlank(email)) {
                 throw new IncompleteItemRequestException("A submitter's email address is required");
             }
+            EmailValidator emailValidator = EmailValidator.getInstance(false, false);
+            if (!emailValidator.isValid(email)) {
+                throw new UnprocessableEntityException("Invalid email address");
+            }
 
-            String username = rir.getRequestName();
-            String message = rir.getRequestMessage();
+            // Escape username to evade nasty XSS attempts
+            String username = StringEscapeUtils.escapeHtml4(rir.getRequestName());
+
+            // Escape message text to evade nasty XSS attempts
+            String message = StringEscapeUtils.escapeHtml4(rir.getRequestMessage());
 
             token = requestItemService.createRequest(ctx, bitstream, item,
                     allFiles, email, username, message);
@@ -129,7 +142,7 @@ public class RequestItemRepository
         RequestItem ri = requestItemService.findByToken(ctx, token);
         ri.setAccept_request(false); // Not accepted yet.  Must set:  DS-4032
         requestItemService.update(ctx, ri);
-        return requestItemConverter.convert(ri, new DefaultProjection());
+        return requestItemConverter.convert(ri, Projection.DEFAULT);
     }
 
     // NOTICE:  there is no service method for this -- requests are never deleted?
