@@ -1218,7 +1218,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                               .map(facet -> facet.getType().equals(DiscoveryConfigurationParameters.TYPE_STANDARD))
                               .orElse(false);
                 if (!isStandardField) {
-                    filterQuery.append("_keyword");
+                    filterQuery.append("_filter");
                 }
             } else if (operator.endsWith("authority")) {
                 filterQuery.append("_authority");
