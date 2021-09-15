@@ -25,7 +25,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -33,7 +32,6 @@ import org.springframework.web.context.annotation.RequestScope;
 @RequestScope
 public class AnnotationListService extends AbstractResourceService {
 
-    ApplicationContext applicationContext;
 
     @Autowired
     IIIFUtils utils;
@@ -54,9 +52,8 @@ public class AnnotationListService extends AbstractResourceService {
     AnnotationListGenerator annotationList;
 
 
-    public AnnotationListService(ApplicationContext applicationContext, ConfigurationService configurationService) {
+    public AnnotationListService(ConfigurationService configurationService) {
         setConfiguration(configurationService);
-        this.applicationContext = applicationContext;
     }
 
     /**
@@ -99,11 +96,11 @@ public class AnnotationListService extends AbstractResourceService {
                     } catch (SQLException e) {
                         throw new RuntimeException(e.getMessage(), e);
                     }
-                    AnnotationGenerator annotation = applicationContext
-                            .getBean(AnnotationGenerator.class, IIIF_ENDPOINT + bitstream.getID()
-                                    + "/annot", AnnotationGenerator.LINKING);
-                    annotation.setResource(getLinksGenerator(mimetype, bitstream));
-                    annotationList.addResource(annotation);
+                    AnnotationGenerator annotationGenerator = new AnnotationGenerator()
+                            .setIdentifier(IIIF_ENDPOINT + bitstream.getID() + "/annot")
+                            .setMotivation(AnnotationGenerator.LINKING)
+                            .setResource(getLinksGenerator(mimetype, bitstream));
+                    annotationList.addResource(annotationGenerator);
                 }
             }
         }

@@ -60,7 +60,7 @@ public abstract class AbstractResourceService {
     protected void setConfiguration(ConfigurationService configurationService) {
         IIIF_ENDPOINT = configurationService.getProperty("iiif.url");
         IMAGE_SERVICE = configurationService.getProperty("iiif.image.server");
-        SEARCH_URL = configurationService.getProperty("iiif.solr.search.url");
+        SEARCH_URL = configurationService.getProperty("iiif.search.url");
         BITSTREAM_PATH_PREFIX = configurationService.getProperty("iiif.bitstream.url");
         DOCUMENT_VIEWING_HINT = configurationService.getProperty("iiif.document.viewing.hint");
         CLIENT_URL = configurationService.getProperty("dspace.ui.url");

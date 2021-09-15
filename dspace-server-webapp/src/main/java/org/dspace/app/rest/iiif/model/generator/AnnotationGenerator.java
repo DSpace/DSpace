@@ -13,15 +13,12 @@ import java.util.List;
 import de.digitalcollections.iiif.model.Motivation;
 import de.digitalcollections.iiif.model.openannotation.Annotation;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
 
 /**
  * Annotations associate content resources and commentary with a canvas.
  * This is used for the otherContent AnnotationList and Search response.
  */
-@Component
-@Scope("prototype")
 public class AnnotationGenerator implements IIIFResource {
 
     public static final String TYPE = "sc:AnnotationList";
@@ -29,35 +26,94 @@ public class AnnotationGenerator implements IIIFResource {
     public static final Motivation COMMENTING = new Motivation("oa:commenting");
     public static final Motivation LINKING = new Motivation("oa:linking");
 
-    private Annotation annotation;
+    private Motivation motivation;
+    private String identifier;
+    private CanvasGenerator canvasGenerator;
+    private ContentAsTextGenerator contentAsTextGenerator;
+    private ExternalLinksGenerator externalLinksGenerator;
+    List<Resource> manifests = new ArrayList<>();
 
-    public AnnotationGenerator(String identifier, Motivation motivation) {
-        annotation = new Annotation(identifier, motivation);
+
+    /**
+     * Set the annotation identifier. Required.
+     * @param identifier
+     * @return
+     */
+    public AnnotationGenerator setIdentifier(String identifier) {
+        this.identifier = identifier;
+        return this;
     }
 
-    public void setOnCanvas(CanvasGenerator canvas) {
-        annotation.setOn(canvas.getResource());
+    /**
+     * Sets the annotation motivtion. Required.
+     * @param motivation
+     * @return
+     */
+    public AnnotationGenerator setMotivation(Motivation motivation) {
+        this.motivation = motivation;
+        return this;
     }
 
-    public void setResource(org.dspace.app.rest.iiif.model.generator.ContentAsTextGenerator contentAsText) {
-        annotation.setResource(contentAsText.getResource());
+    /**
+     * Set the canvas for this annotation.
+     * @param canvas
+     * @return
+     */
+    public AnnotationGenerator setOnCanvas(CanvasGenerator canvas) {
+        this.canvasGenerator = canvas;
+        return this;
     }
 
-    public void setResource(org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator otherContent) {
-        annotation.setResource(otherContent.getResource());
+    /**
+     * Set a text resource for this annotation.
+     * @param contentAsText
+     * @return
+     */
+    public AnnotationGenerator setResource(ContentAsTextGenerator contentAsText) {
+        this.contentAsTextGenerator = contentAsText;
+        return this;
     }
 
-    public void setWithin(List<ManifestGenerator> within) {
-        List<Resource> manifests = new ArrayList<>();
+    /**
+     * Set the external link for this annotation.
+     * @param otherContent
+     * @return
+     */
+    public AnnotationGenerator setResource(ExternalLinksGenerator otherContent) {
+        this.externalLinksGenerator = otherContent;
+        return this;
+    }
+
+    /**
+     * Set the within property for this annotation. This property
+     * is a list of manifests. The property is renamed to partOf in v3
+     * @param within
+     * @return
+     */
+    public AnnotationGenerator setWithin(List<ManifestGenerator> within) {
         for (ManifestGenerator manifest : within) {
-            manifests.add(manifest.getResource());
+            this.manifests.add(manifest.getResource());
         }
-        // property renamed to partOf in v3
-        annotation.setWithin(manifests);
+        return this;
     }
 
     @Override
     public Resource<Annotation> getResource() {
+        if (identifier == null || motivation == null) {
+            throw new RuntimeException("Annotations require both an identifier and a motivation");
+        }
+        Annotation annotation = new Annotation(identifier, motivation);
+        annotation.setWithin(manifests);
+        // These optional annotation fields vary with the context.
+        if (canvasGenerator != null) {
+            annotation.setOn(canvasGenerator.getResource());
+        }
+        if (externalLinksGenerator != null) {
+            annotation.setResource(externalLinksGenerator.getResource());
+        }
+        if (contentAsTextGenerator != null) {
+            annotation.setResource(contentAsTextGenerator.getResource());
+        }
         return annotation;
     }
 }

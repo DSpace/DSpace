@@ -193,7 +193,7 @@ public class ManifestService extends AbstractResourceService {
     private void addSeeAlso(Item item) {
         List<Bundle> bundles = utils.getBundle(item, OTHER_CONTENT_BUNDLE);
         if (bundles.size() > 0) {
-            manifestGenerator.addSeeAlso(seeAlsoService.getSeeAlso(item, bundles));
+            manifestGenerator.addSeeAlso(seeAlsoService.getSeeAlso(item.getID()));
         }
     }
 
