@@ -33,7 +33,7 @@ import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
@@ -128,7 +128,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
                     getIdentifiers(context, newCommunity)));
         }
 
-        log.info(LogManager.getHeader(context, "create_community",
+        log.info(LogHelper.getHeader(context, "create_community",
                                       "community_id=" + newCommunity.getID())
                      + ",handle=" + newCommunity.getHandle());
 
@@ -218,7 +218,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         // First, delete any existing logo
         Bitstream oldLogo = community.getLogo();
         if (oldLogo != null) {
-            log.info(LogManager.getHeader(context, "remove_logo",
+            log.info(LogHelper.getHeader(context, "remove_logo",
                                           "community_id=" + community.getID()));
             community.setLogo(null);
             bitstreamService.delete(context, oldLogo);
@@ -234,7 +234,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
                 .getPoliciesActionFilter(context, community, Constants.READ);
             authorizeService.addPolicies(context, policies, newLogo);
 
-            log.info(LogManager.getHeader(context, "set_logo",
+            log.info(LogHelper.getHeader(context, "set_logo",
                                           "community_id=" + community.getID() + "logo_bitstream_id="
                                               + newLogo.getID()));
         }
@@ -247,7 +247,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         // Check authorisation
         canEdit(context, community);
 
-        log.info(LogManager.getHeader(context, "update_community",
+        log.info(LogHelper.getHeader(context, "update_community",
                                       "community_id=" + community.getID()));
 
         super.update(context, community);
@@ -287,6 +287,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         // register this as the admin group
         community.setAdmins(admins);
+        context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, community.getID(),
+                                             null, getIdentifiers(context, community)));
         return admins;
     }
 
@@ -302,6 +304,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         // Remove the link to the community table.
         community.setAdmins(null);
+        context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, community.getID(),
+                                             null, getIdentifiers(context, community)));
     }
 
     @Override
@@ -365,7 +369,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         // Check authorisation
         authorizeService.authorizeAction(context, community, Constants.ADD);
 
-        log.info(LogManager.getHeader(context, "add_collection",
+        log.info(LogHelper.getHeader(context, "add_collection",
                                       "community_id=" + community.getID() + ",collection_id=" + collection.getID()));
 
         if (!community.getCollections().contains(collection)) {
@@ -401,7 +405,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         // Check authorisation
         authorizeService.authorizeAction(context, parentCommunity, Constants.ADD);
 
-        log.info(LogManager.getHeader(context, "add_subcommunity",
+        log.info(LogHelper.getHeader(context, "add_subcommunity",
                                       "parent_comm_id=" + parentCommunity.getID() + ",child_comm_id=" + childCommunity
                                           .getID()));
 
@@ -431,7 +435,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             collection.removeCommunity(community);
         }
 
-        log.info(LogManager.getHeader(context, "remove_collection",
+        log.info(LogHelper.getHeader(context, "remove_collection",
                                       "community_id=" + community.getID() + ",collection_id=" + collection.getID()));
 
         // Remove any mappings
@@ -451,7 +455,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         rawDelete(context, childCommunity);
 
-        log.info(LogManager.getHeader(context, "remove_subcommunity",
+        log.info(LogHelper.getHeader(context, "remove_subcommunity",
                                       "parent_comm_id=" + parentCommunity.getID() + ",child_comm_id=" + childCommunity
                                           .getID()));
 
@@ -519,7 +523,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
      */
     protected void rawDelete(Context context, Community community)
         throws SQLException, AuthorizeException, IOException {
-        log.info(LogManager.getHeader(context, "delete_community",
+        log.info(LogHelper.getHeader(context, "delete_community",
                                       "community_id=" + community.getID()));
 
         context.addEvent(new Event(Event.DELETE, Constants.COMMUNITY, community.getID(), community.getHandle(),

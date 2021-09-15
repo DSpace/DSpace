@@ -23,7 +23,7 @@ import org.dspace.core.Context;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the BitstreamFormat object.
- * This class is responsible for all database calls for the BitstreamFormat object and is autowired by spring
+ * This class is responsible for all database calls for the BitstreamFormat object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -86,7 +86,7 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
         Root<BitstreamFormat> bitstreamFormatRoot = criteriaQuery.from(BitstreamFormat.class);
         criteriaQuery.select(bitstreamFormatRoot);
         criteriaQuery.where(criteriaBuilder.equal(bitstreamFormatRoot.get(BitstreamFormat_.shortDescription), desc));
-        return uniqueResult(context, criteriaQuery, false, BitstreamFormat.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, BitstreamFormat.class);
     }
 
     @Override

@@ -28,7 +28,7 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.DepositResponse;
@@ -125,7 +125,7 @@ public class DepositManager {
             if (swordContext.getOnBehalfOf() != null) {
                 oboEmail = swordContext.getOnBehalfOf().getEmail();
             }
-            log.info(LogManager.getHeader(context,
+            log.info(LogHelper.getHeader(context,
                                           "deposit_failed_authorisation",
                                           "user=" + swordContext.getAuthenticated().getEmail() +
                                               ",on_behalf_of=" + oboEmail));

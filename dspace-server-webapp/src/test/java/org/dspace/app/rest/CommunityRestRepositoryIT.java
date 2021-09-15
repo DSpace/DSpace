@@ -16,6 +16,8 @@ import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataStringEnd
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
+import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -39,6 +41,7 @@ import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.projection.Projection;
@@ -2590,6 +2593,91 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$.page.size", is(1)))
                    .andExpect(jsonPath("$.page.totalPages", is(2)))
                    .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void removeComAdminGroupToCheckReindexingTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Root Community")
+                                                  .build();
+
+        Community subCommunity = CommunityBuilder.createSubCommunity(context, rootCommunity)
+                                                 .withName("MyTestCom")
+                                                 .withAdminGroup(eperson)
+                                                 .build();
+        context.restoreAuthSystemState();
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(epersonToken).perform(get("/api/core/communities/search/findAdminAuthorized")
+                               .param("query", "MyTestCom"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$._embedded.communities", Matchers.contains(CommunityMatcher
+                                          .matchProperties(subCommunity.getName(),
+                                                           subCommunity.getID(),
+                                                           subCommunity.getHandle())
+                                          )))
+                               .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(delete("/api/core/communities/" + subCommunity.getID() + "/adminGroup"))
+                        .andExpect(status().isNoContent());
+
+        getClient(epersonToken).perform(get("/api/core/communities/search/findAdminAuthorized")
+                               .param("query", "MyTestCom"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$._embedded").doesNotExist())
+                               .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    @Test
+    public void addComAdminGroupToCheckReindexingTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Root Community")
+                                                  .build();
+
+        Community subCommunity = CommunityBuilder.createSubCommunity(context, rootCommunity)
+                                                 .withName("MyTestCom")
+                                                 .build();
+
+        context.restoreAuthSystemState();
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(epersonToken).perform(get("/api/core/communities/search/findAdminAuthorized")
+                               .param("query", "MyTestCom"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$._embedded").doesNotExist())
+                               .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/communities/" + subCommunity.getID() + "/adminGroup")
+                        .content(mapper.writeValueAsBytes(groupRest))
+                        .contentType(contentType))
+                        .andExpect(status().isCreated())
+                        .andDo(result -> idRef.set(
+                               UUID.fromString(read(result.getResponse().getContentAsString(), "$.id")))
+                        );
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(post("/api/eperson/groups/" + idRef.get() + "/epersons")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content(REST_SERVER_URL + "eperson/groups/" + eperson.getID()
+                             ));
+
+        getClient(epersonToken).perform(get("/api/core/communities/search/findAdminAuthorized")
+                               .param("query", "MyTestCom"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$._embedded.communities", Matchers.contains(CommunityMatcher
+                                           .matchProperties(subCommunity.getName(),
+                                                            subCommunity.getID(),
+                                                            subCommunity.getHandle())
+                                           )))
+                               .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
 }
