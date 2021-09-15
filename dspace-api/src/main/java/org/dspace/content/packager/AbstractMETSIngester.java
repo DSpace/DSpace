@@ -43,7 +43,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
@@ -210,7 +210,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         DSpaceObject dso = null;
 
         try {
-            log.info(LogManager.getHeader(context, "package_parse",
+            log.info(LogHelper.getHeader(context, "package_parse",
                                           "Parsing package for ingest, file=" + pkgFile.getName()));
 
             // Parse our ingest package, extracting out the METS manifest in the
@@ -257,7 +257,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 if (params.restoreModeEnabled()) {
                     action = "package_restore";
                 }
-                log.info(LogManager.getHeader(context, action,
+                log.info(LogHelper.getHeader(context, action,
                                               "Created new Object, type="
                                                   + Constants.typeText[dso.getType()] + ", handle="
                                                   + dso.getHandle() + ", dbID="
@@ -387,7 +387,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 //If user specified to skip item ingest if any "missing parent" error message occur
                 if (params.getBooleanProperty("skipIfParentMissing", false)) {
                     //log a warning instead of throwing an error
-                    log.warn(LogManager.getHeader(context, "package_ingest",
+                    log.warn(LogHelper.getHeader(context, "package_ingest",
                                                   "SKIPPING ingest of object '" + manifest.getObjID()
                                                       + "' as parent DSpace Object could not be found. "
                                                       + "If you are running a recursive ingest, it is likely this " +
@@ -1025,7 +1025,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         DSpaceObject dso = null;
 
         try {
-            log.info(LogManager.getHeader(context, "package_parse",
+            log.info(LogHelper.getHeader(context, "package_parse",
                                           "Parsing package for replace, file=" + pkgFile.getName()));
 
             // Parse our ingest package, extracting out the METS manifest in the
@@ -1077,7 +1077,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 //if ingestion was successful
                 if (dso != null) {
                     // Log that we created an object
-                    log.info(LogManager.getHeader(context, "package_replace",
+                    log.info(LogHelper.getHeader(context, "package_replace",
                                                   "Created new Object, type="
                                                       + Constants.typeText[dso.getType()]
                                                       + ", handle=" + dso.getHandle() + ", dbID="
@@ -1093,7 +1093,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                                     params, null);
 
                 // Log that we replaced an object
-                log.info(LogManager.getHeader(context, "package_replace",
+                log.info(LogHelper.getHeader(context, "package_replace",
                                               "Replaced Object, type="
                                                   + Constants.typeText[dso.getType()]
                                                   + ", handle=" + dso.getHandle() + ", dbID="

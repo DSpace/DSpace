@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.services.model.Event;
 import org.dspace.usage.UsageEvent.Action;
 
@@ -33,7 +33,7 @@ public class LoggerUsageEventListener extends AbstractUsageEventListener {
         if (event instanceof UsageEvent && !(event instanceof UsageSearchEvent)) {
             UsageEvent ue = (UsageEvent) event;
 
-            log.info(LogManager.getHeader(
+            log.info(LogHelper.getHeader(
                 ue.getContext(),
                 formatAction(ue.getAction(), ue.getObject()),
                 formatMessage(ue.getObject()))

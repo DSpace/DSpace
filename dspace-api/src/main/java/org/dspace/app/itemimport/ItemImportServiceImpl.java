@@ -82,7 +82,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
@@ -1689,7 +1689,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             email.send();
         } catch (Exception e) {
-            log.warn(LogManager.getHeader(context, "emailSuccessMessage", "cannot notify user of import"), e);
+            log.warn(LogHelper.getHeader(context, "emailSuccessMessage", "cannot notify user of import"), e);
         }
     }
 

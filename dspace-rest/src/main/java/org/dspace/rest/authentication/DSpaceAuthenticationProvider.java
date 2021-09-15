@@ -13,12 +13,13 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.utils.DSpace;
@@ -40,7 +41,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
  */
 public class DSpaceAuthenticationProvider implements AuthenticationProvider {
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceAuthenticationProvider.class);
+    private static final Logger log = LogManager.getLogger();
 
     protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance()
                                                                                       .getAuthenticationService();
@@ -62,7 +63,7 @@ public class DSpaceAuthenticationProvider implements AuthenticationProvider {
                 .authenticateImplicit(context, null, null, null, httpServletRequest);
 
             if (implicitStatus == AuthenticationMethod.SUCCESS) {
-                log.info(LogManager.getHeader(context, "login", "type=implicit"));
+                log.info(LogHelper.getHeader(context, "login", "type=implicit"));
                 addSpecialGroupsToGrantedAuthorityList(context, httpServletRequest, grantedAuthorities);
                 return createAuthenticationToken(password, context, grantedAuthorities);
 
@@ -72,15 +73,13 @@ public class DSpaceAuthenticationProvider implements AuthenticationProvider {
                 if (AuthenticationMethod.SUCCESS == authenticateResult) {
                     addSpecialGroupsToGrantedAuthorityList(context, httpServletRequest, grantedAuthorities);
 
-                    log.info(LogManager
-                                 .getHeader(context, "login", "type=explicit"));
+                    log.info(LogHelper.getHeader(context, "login", "type=explicit"));
 
                     return createAuthenticationToken(password, context, grantedAuthorities);
 
                 } else {
-                    log.info(LogManager.getHeader(context, "failed_login", "email="
-                        + name + ", result="
-                        + authenticateResult));
+                    log.info(LogHelper.getHeader(context, "failed_login",
+                            "email=" + name + ", result=" + authenticateResult));
                     throw new BadCredentialsException("Login failed");
                 }
             }
@@ -117,8 +116,8 @@ public class DSpaceAuthenticationProvider implements AuthenticationProvider {
             return new UsernamePasswordAuthenticationToken(ePerson.getEmail(), password, grantedAuthorities);
 
         } else {
-            log.info(
-                LogManager.getHeader(context, "failed_login", "No eperson with an non-blank e-mail address found"));
+            log.info(LogHelper.getHeader(context, "failed_login",
+                    "No eperson with an non-blank e-mail address found"));
             throw new BadCredentialsException("Login failed");
         }
     }
