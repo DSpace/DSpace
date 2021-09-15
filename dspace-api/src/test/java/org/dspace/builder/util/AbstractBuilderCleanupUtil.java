@@ -65,12 +65,12 @@ public class AbstractBuilderCleanupUtil {
         map.put(BitstreamBuilder.class.getName(), new LinkedList<>());
         map.put(BitstreamFormatBuilder.class.getName(), new LinkedList<>());
         map.put(ClaimedTaskBuilder.class.getName(), new LinkedList<>());
-        map.put(CollectionBuilder.class.getName(), new LinkedList<>());
-        map.put(CommunityBuilder.class.getName(), new LinkedList<>());
-        map.put(EPersonBuilder.class.getName(), new LinkedList<>());
-        map.put(GroupBuilder.class.getName(), new LinkedList<>());
         map.put(BundleBuilder.class.getName(), new LinkedList<>());
         map.put(ItemBuilder.class.getName(), new LinkedList<>());
+        map.put(CollectionBuilder.class.getName(), new LinkedList<>());
+        map.put(CommunityBuilder.class.getName(), new LinkedList<>());
+        map.put(GroupBuilder.class.getName(), new LinkedList<>());
+        map.put(EPersonBuilder.class.getName(), new LinkedList<>());
         map.put(MetadataFieldBuilder.class.getName(), new LinkedList<>());
         map.put(MetadataSchemaBuilder.class.getName(), new LinkedList<>());
         map.put(SiteBuilder.class.getName(), new LinkedList<>());

@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -147,7 +147,7 @@ public class PasswordAuthentication
                                                               .findByName(context, groupName);
                     if (specialGroup == null) {
                         // Oops - the group isn't there.
-                        log.warn(LogManager.getHeader(context,
+                        log.warn(LogHelper.getHeader(context,
                                                       "password_specialgroup",
                                                       "Group defined in modules/authentication-password.cfg login" +
                                                           ".specialgroup does not exist"));
@@ -158,7 +158,7 @@ public class PasswordAuthentication
                 }
             }
         } catch (Exception e) {
-            log.error(LogManager.getHeader(context, "getSpecialGroups", ""), e);
+            log.error(LogHelper.getHeader(context, "getSpecialGroups", ""), e);
         }
         return Collections.EMPTY_LIST;
     }
@@ -196,7 +196,7 @@ public class PasswordAuthentication
         throws SQLException {
         if (username != null && password != null) {
             EPerson eperson = null;
-            log.info(LogManager.getHeader(context, "authenticate", "attempting password auth of user=" + username));
+            log.info(LogHelper.getHeader(context, "authenticate", "attempting password auth of user=" + username));
             eperson = EPersonServiceFactory.getInstance().getEPersonService()
                                            .findByEmail(context, username.toLowerCase());
 
@@ -208,7 +208,7 @@ public class PasswordAuthentication
                 return BAD_ARGS;
             } else if (eperson.getRequireCertificate()) {
                 // this user can only login with x.509 certificate
-                log.warn(LogManager.getHeader(context, "authenticate",
+                log.warn(LogHelper.getHeader(context, "authenticate",
                                               "rejecting PasswordAuthentication because " + username + " requires " +
                                                   "certificate."));
                 return CERT_REQUIRED;
@@ -216,7 +216,7 @@ public class PasswordAuthentication
                                             .checkPassword(context, eperson, password)) {
                 // login is ok if password matches:
                 context.setCurrentUser(eperson);
-                log.info(LogManager.getHeader(context, "authenticate", "type=PasswordAuthentication"));
+                log.info(LogHelper.getHeader(context, "authenticate", "type=PasswordAuthentication"));
                 return SUCCESS;
             } else {
                 return BAD_CREDENTIALS;

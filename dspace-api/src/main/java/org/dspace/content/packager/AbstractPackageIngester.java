@@ -27,7 +27,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.workflow.WorkflowException;
@@ -147,7 +147,7 @@ public abstract class AbstractPackageIngester
 
                 //if we are skipping over (i.e. keeping) existing objects
                 if (params.keepExistingModeEnabled()) {
-                    log.warn(LogManager.getHeader(context, "skip_package_ingest",
+                    log.warn(LogHelper.getHeader(context, "skip_package_ingest",
                                                   "Object already exists, package-skipped=" + pkgFile.getName()));
                 } else {
                     // Pass this exception on -- which essentially causes a full rollback of all changes (this is
@@ -156,7 +156,7 @@ public abstract class AbstractPackageIngester
                 }
             }
         } else {
-            log.info(LogManager.getHeader(context, "skip_package_ingest",
+            log.info(LogHelper.getHeader(context, "skip_package_ingest",
                                           "Object was already ingested, package-skipped=" + pkgFile.getName()));
         }
 
@@ -274,7 +274,7 @@ public abstract class AbstractPackageIngester
             //      the object to be replaced from the package itself.
             replacedDso = replace(context, dso, pkgFile, params);
         } else {
-            log.info(LogManager.getHeader(context, "skip_package_replace",
+            log.info(LogHelper.getHeader(context, "skip_package_replace",
                                           "Object was already replaced, package-skipped=" + pkgFile.getName()));
         }
 

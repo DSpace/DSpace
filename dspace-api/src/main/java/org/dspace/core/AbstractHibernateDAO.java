@@ -212,16 +212,14 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * @param criteriaQuery JPA criteria
      * @param cacheable whether or not this query should be cacheable.
      * @param clazz type of object that should match the query.
-     * @param maxResults return at most this many results.
-     * @param offset skip this many leading results.
      * @return the single model object specified by the criteria,
      *          or {@code null} if none match.
      * @throws java.sql.SQLException passed through.
      * @throws IllegalArgumentException if multiple objects match.
      */
-    public T uniqueResult(Context context, CriteriaQuery criteriaQuery, boolean cacheable, Class<T> clazz,
-                          int maxResults, int offset) throws SQLException {
-        List<T> list = list(context, criteriaQuery, cacheable, clazz, maxResults, offset);
+    public T uniqueResult(Context context, CriteriaQuery criteriaQuery,
+            boolean cacheable, Class<T> clazz) throws SQLException {
+        List<T> list = list(context, criteriaQuery, cacheable, clazz, -1, -1);
         if (CollectionUtils.isNotEmpty(list)) {
             if (list.size() == 1) {
                 return list.get(0);

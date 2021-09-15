@@ -35,7 +35,7 @@ import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -286,7 +286,7 @@ public class X509Authentication implements AuthenticationMethod {
         try {
             certificate.checkValidity();
         } catch (CertificateException e) {
-            log.info(LogManager.getHeader(context, "authentication",
+            log.info(LogHelper.getHeader(context, "authentication",
                                           "X.509 Certificate is EXPIRED or PREMATURE: "
                                               + e.toString()));
             return false;
@@ -298,7 +298,7 @@ public class X509Authentication implements AuthenticationMethod {
                 certificate.verify(caPublicKey);
                 return true;
             } catch (GeneralSecurityException e) {
-                log.info(LogManager.getHeader(context, "authentication",
+                log.info(LogHelper.getHeader(context, "authentication",
                                               "X.509 Certificate FAILED SIGNATURE check: "
                                                   + e.toString()));
             }
@@ -322,11 +322,11 @@ public class X509Authentication implements AuthenticationMethod {
                     }
                 }
                 log
-                    .info(LogManager
+                    .info(LogHelper
                               .getHeader(context, "authentication",
                                          "Keystore method FAILED SIGNATURE check on client cert."));
             } catch (GeneralSecurityException e) {
-                log.info(LogManager.getHeader(context, "authentication",
+                log.info(LogHelper.getHeader(context, "authentication",
                                               "X.509 Certificate FAILED SIGNATURE check: "
                                                   + e.toString()));
             }
@@ -461,7 +461,7 @@ public class X509Authentication implements AuthenticationMethod {
                         if (group != null) {
                             groups.add(group);
                         } else {
-                            log.warn(LogManager.getHeader(context,
+                            log.warn(LogHelper.getHeader(context,
                                                           "configuration_error", "unknown_group="
                                                               + groupName));
                         }
@@ -513,7 +513,7 @@ public class X509Authentication implements AuthenticationMethod {
             try {
                 if (!isValid(context, certs[0])) {
                     log
-                        .warn(LogManager
+                        .warn(LogHelper
                                   .getHeader(context, "authenticate",
                                              "type=x509certificate, status=BAD_CREDENTIALS (not valid)"));
                     return BAD_CREDENTIALS;
@@ -530,7 +530,7 @@ public class X509Authentication implements AuthenticationMethod {
                     if (email != null
                         && canSelfRegister(context, request, null)) {
                         // Register the new user automatically
-                        log.info(LogManager.getHeader(context, "autoregister",
+                        log.info(LogHelper.getHeader(context, "autoregister",
                                                       "from=x.509, email=" + email));
 
                         // TEMPORARILY turn off authorisation
@@ -549,25 +549,25 @@ public class X509Authentication implements AuthenticationMethod {
                     } else {
                         // No auto-registration for valid certs
                         log
-                            .warn(LogManager
+                            .warn(LogHelper
                                       .getHeader(context, "authenticate",
                                                  "type=cert_but_no_record, cannot auto-register"));
                         return NO_SUCH_USER;
                     }
                 } else if (!eperson.canLogIn()) { // make sure this is a login account
-                    log.warn(LogManager.getHeader(context, "authenticate",
+                    log.warn(LogHelper.getHeader(context, "authenticate",
                                                   "type=x509certificate, email=" + email
                                                       + ", canLogIn=false, rejecting."));
                     return BAD_ARGS;
                 } else {
-                    log.info(LogManager.getHeader(context, "login",
+                    log.info(LogHelper.getHeader(context, "login",
                                                   "type=x509certificate"));
                     context.setCurrentUser(eperson);
                     setSpecialGroupsFlag(request, email);
                     return SUCCESS;
                 }
             } catch (AuthorizeException ce) {
-                log.warn(LogManager.getHeader(context, "authorize_exception",
+                log.warn(LogHelper.getHeader(context, "authorize_exception",
                                               ""), ce);
             }
 

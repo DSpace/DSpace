@@ -33,7 +33,7 @@ import org.dspace.eperson.dao.EPersonDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the EPerson object.
- * This class is responsible for all database calls for the EPerson object and is autowired by spring
+ * This class is responsible for all database calls for the EPerson object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -50,7 +50,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         Root<EPerson> ePersonRoot = criteriaQuery.from(EPerson.class);
         criteriaQuery.select(ePersonRoot);
         criteriaQuery.where(criteriaBuilder.equal(ePersonRoot.get(EPerson_.email), email.toLowerCase()));
-        return uniqueResult(context, criteriaQuery, true, EPerson.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, true, EPerson.class);
     }
 
 
@@ -61,7 +61,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         Root<EPerson> ePersonRoot = criteriaQuery.from(EPerson.class);
         criteriaQuery.select(ePersonRoot);
         criteriaQuery.where((criteriaBuilder.equal(ePersonRoot.get(EPerson_.netid), netid)));
-        return uniqueResult(context, criteriaQuery, true, EPerson.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, true, EPerson.class);
     }
 
     @Override
