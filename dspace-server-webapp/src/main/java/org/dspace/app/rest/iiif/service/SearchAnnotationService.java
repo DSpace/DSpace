@@ -11,8 +11,10 @@ import java.util.UUID;
 
 public interface SearchAnnotationService {
 
-    void initializeQuery(String endpoint, String manifestId, boolean validationEnabled);
+    void initializeQuerySettings(String endpoint, String manifestId);
 
     String getSolrSearchResponse(UUID uuid, String query);
+
+    boolean getSearchPlugin(String className);
 
 }

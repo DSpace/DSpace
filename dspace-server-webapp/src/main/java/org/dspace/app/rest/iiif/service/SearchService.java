@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.iiif.service;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
@@ -23,14 +24,16 @@ import org.springframework.web.context.annotation.RequestScope;
 public class SearchService extends AbstractResourceService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SearchService.class);
-    private final boolean validationEnabled;
+
+    private final String searchPlugin;
 
     @Autowired
-    WordHighlightSolrSearch annotationService;
+    List<SearchAnnotationService> annotationService;
 
     public SearchService(ConfigurationService configurationService) {
-        validationEnabled = configurationService
-                .getBooleanProperty("discovery.solr.url.validation.enabled", true);
+        setConfiguration(configurationService);
+        // The search service to use is defined in dspace configuration.
+        searchPlugin = configurationService.getProperty("iiif.search.plugin");
     }
 
     /**
@@ -41,8 +44,15 @@ public class SearchService extends AbstractResourceService {
      * @return IIIF search result with page coordinate annotations.
      */
     public String searchWithinManifest(UUID uuid, String query) {
-        annotationService.initializeQuery(IIIF_ENDPOINT, getManifestId(uuid), validationEnabled);
-        return annotationService.getSolrSearchResponse(uuid, query);
+        for (SearchAnnotationService service : annotationService) {
+            if (service.getSearchPlugin(searchPlugin)) {
+                service.initializeQuerySettings(IIIF_ENDPOINT, getManifestId(uuid));
+                return service.getSolrSearchResponse(uuid, query);
+            }
+        }
+        throw new RuntimeException(
+                "IIIF search plugin was not found."
+        );
     }
 
 }
