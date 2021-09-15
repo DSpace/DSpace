@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
- * Facade for the IIIF Presentation API version 2.1.1 "OtherContent" domain model class.
+ * Facade for the API version 2.1.1 "OtherContent" domain model.
  *
  * This is the type for Content resources such as images or texts that are associated with a canvas.
  * Used in the "related", "renderings" and "otherContent" fields of IIIF resources.
@@ -69,6 +69,9 @@ public class ExternalLinksGenerator implements IIIFResource {
 
     @Override
     public Resource<OtherContent> getResource() {
+        if (identifier == null) {
+            throw new RuntimeException("Annotation requires an identifier");
+        }
         OtherContent otherContent;
         if (format != null) {
             otherContent = new OtherContent(identifier, format);

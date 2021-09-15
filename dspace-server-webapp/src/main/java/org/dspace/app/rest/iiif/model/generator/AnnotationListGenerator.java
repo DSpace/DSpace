@@ -37,7 +37,7 @@ public class AnnotationListGenerator implements org.dspace.app.rest.iiif.model.g
      * Adds Annotation resource to the annotation list.
      * @param annotation the Annotation Resource
      */
-    public void addResource(org.dspace.app.rest.iiif.model.generator.AnnotationGenerator annotation) {
+    public void addResource(AnnotationGenerator annotation) {
         this.annotations.add((Annotation) annotation.getResource());
     }
 
