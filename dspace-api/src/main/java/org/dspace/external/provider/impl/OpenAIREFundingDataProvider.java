@@ -12,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -80,13 +81,19 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
 
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String id) {
-        Response response = searchByProjectURI(id);
+        
+        // we use base64 encoding in order to use slashes / and other
+        // characters that must be escaped for the <:entry-id>
+        String decodedId = new String(Base64.getDecoder().decode(id));
+        Response response = searchByProjectURI(decodedId);
 
         try {
             if (response.getHeader() != null && Integer.parseInt(response.getHeader().getTotal()) > 0) {
                 Project project = response.getResults().getResult().get(0).getMetadata().getEntity().getProject();
-                ExternalDataObject externalDataObject = new OpenAIREFundingDataProvider.ExternalDataObjectBuilder(
-                        project).setId(generateProjectURI(project)).setSource(sourceIdentifier).build();
+                ExternalDataObject externalDataObject = new OpenAIREFundingDataProvider.ExternalDataObjectBuilder(project)
+                        .setId(generateProjectURI(project))
+                        .setSource(sourceIdentifier)
+                        .build();
                 return Optional.of(externalDataObject);
             }
         } catch (NumberFormatException e) {
@@ -130,7 +137,9 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
         if (projects.size() > 0) {
             return projects.stream()
                     .map(project -> new OpenAIREFundingDataProvider.ExternalDataObjectBuilder(project)
-                            .setId(generateProjectURI(project)).setSource(sourceIdentifier).build())
+                            .setId(generateProjectURI(project))
+                            .setSource(sourceIdentifier)
+                            .build())
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();
@@ -337,7 +346,11 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
          * @return ExternalDataObjectBuilder
          */
         public ExternalDataObjectBuilder setId(String id) {
-            this.externalDataObject.setId(id);
+
+            // we use base64 encoding in order to use slashes / and other
+            // characters that must be escaped for the <:entry-id>
+            String base64Id = Base64.getEncoder().encodeToString(id.getBytes());
+            this.externalDataObject.setId(base64Id);
             return this;
         }
 
