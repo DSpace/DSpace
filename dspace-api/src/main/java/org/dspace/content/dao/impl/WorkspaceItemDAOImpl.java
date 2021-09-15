@@ -31,7 +31,7 @@ import org.dspace.eperson.Group;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the WorkspaceItem object.
- * This class is responsible for all database calls for the WorkspaceItem object and is autowired by spring
+ * This class is responsible for all database calls for the WorkspaceItem object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -81,7 +81,7 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
         criteriaQuery.select(workspaceItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(workspaceItemRoot.get(WorkspaceItem_.item), i));
-        return uniqueResult(context, criteriaQuery, false, WorkspaceItem.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, WorkspaceItem.class);
     }
 
     @Override

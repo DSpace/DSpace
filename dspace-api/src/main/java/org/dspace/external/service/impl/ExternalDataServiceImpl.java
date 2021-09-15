@@ -21,7 +21,7 @@ import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.service.ExternalDataService;
@@ -105,7 +105,7 @@ public class ExternalDataServiceImpl implements ExternalDataService {
                                     metadataValueDTO.getConfidence());
         }
 
-        log.info(LogManager.getHeader(context, "create_item_from_externalDataObject", "Created item" +
+        log.info(LogHelper.getHeader(context, "create_item_from_externalDataObject", "Created item" +
             "with id: " + item.getID() + " from source: " + externalDataObject.getSource() + " with identifier: " +
             externalDataObject.getId()));
         return workspaceItem;
