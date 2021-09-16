@@ -54,6 +54,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.SolrUtils;
@@ -67,6 +68,7 @@ import org.dspace.xoai.services.api.solr.SolrServerResolver;
 import org.dspace.xoai.solr.DSpaceSolrSearch;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrIndexerException;
+import org.hibernate.ScrollableResults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -239,8 +241,35 @@ public class XOAI {
             // Index both in_archive items AND withdrawn items. Withdrawn items
             // will be flagged withdrawn
             // (in order to notify external OAI harvesters of their new status)
-            Iterator<Item> discoverableItems = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
-                    null);
+            // TODO REINSTATE THE METHOD ABOVE WITH READ ONLY !!!
+//            Iterator<Item> discoverableItems = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
+//                    null);
+            ScrollableResults items = itemService.findAllUnfilteredReadOnly(context);
+            Iterator<Item> discoverableItems =  new Iterator<>() {
+                private int counter = 0;
+                @Override
+                public boolean hasNext() {
+                    counter++;
+                    if (counter % 1000 == 0) {
+                        try {
+                            context.clearDatabaseCache();
+                        } catch (SQLException e) {
+                            log.error(e.getMessage(), e);
+                        }
+                    }
+                    final boolean next = items.next();
+                    if (!next) {
+                        items.close();
+                    }
+                    return next;
+                }
+
+                @Override
+                public Item next() {
+                    return (Item) items.get(0);
+                }
+            };
+
             Iterator<Item> nonDiscoverableItems = itemService
                     .findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context, null);
             return this.index(discoverableItems) + this.index(nonDiscoverableItems);
