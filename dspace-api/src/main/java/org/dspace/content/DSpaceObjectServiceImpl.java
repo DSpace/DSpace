@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.NotImplementedException;
@@ -742,12 +743,15 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to)
             throws SQLException, IllegalArgumentException {
-
         if (from == to) {
             throw new IllegalArgumentException("The \"from\" location MUST be different from \"to\" location");
         }
 
-        List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
+        List<MetadataValue> list =
+            getMetadata(dso, schema, element, qualifier).stream()
+                                                        .sorted(Comparator.comparing(MetadataValue::getPlace))
+                                                        .collect(Collectors.toList());
+
 
         if (from >= list.size() || to >= list.size() || to < 0 || from < 0) {
             throw new IllegalArgumentException(
