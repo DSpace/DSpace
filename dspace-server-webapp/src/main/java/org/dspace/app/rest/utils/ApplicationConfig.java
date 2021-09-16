@@ -45,7 +45,7 @@ public class ApplicationConfig {
     // Whether to allow credentials (cookies) in CORS requests ("Access-Control-Allow-Credentials" header)
     // Defaults to true. Can be overridden in DSpace configuration
     @Value("${iiif.cors.allow-credentials:true}")
-    private boolean iiifCAllowCredentials;
+    private boolean iiifCorsAllowCredentials;
 
     // Configured User Interface URL (default: http://localhost:4000)
     @Value("${dspace.ui.url:http://localhost:4000}")
@@ -107,6 +107,6 @@ public class ApplicationConfig {
      * @return true or false
      */
     public boolean getIiifAllowCredentials() {
-        return corsAllowCredentials;
+        return iiifCorsAllowCredentials;
     }
 }
