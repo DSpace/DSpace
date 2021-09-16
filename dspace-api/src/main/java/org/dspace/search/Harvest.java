@@ -42,7 +42,6 @@ import org.dspace.handle.service.HandleService;
  * withdrawn within a particular range of dates.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 public class Harvest {
     /**
@@ -229,7 +228,6 @@ public class Harvest {
     /**
      * Fill out the containers field of the HarvestedItemInfo object
      *
-     * @param context  DSpace context
      * @param itemInfo HarvestedItemInfo object to fill out
      * @throws SQLException if database error
      */
