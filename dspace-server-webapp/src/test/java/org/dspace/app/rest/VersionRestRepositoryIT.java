@@ -631,6 +631,130 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void createFirstVersionItemWithentityTypeByAdminAndPropertyBlockEntityEnableTest() throws Exception {
+        configurationService.setProperty("versioning.block.entity", true);
+        context.turnOffAuthorisationSystem();
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Parent Community")
+                                                  .build();
+
+        Collection col = CollectionBuilder.createCollection(context, rootCommunity)
+                                          .withName("Collection 1")
+                                          .build();
+
+        Item itemA = ItemBuilder.createItem(context, col)
+                               .withTitle("Public item")
+                               .withIssueDate("2021-04-19")
+                               .withAuthor("Doe, John")
+                               .withEntityType("Publication")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(post("/api/versioning/versions")
+                             .param("summary", "test summary!")
+                             .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                             .content("/api/core/items/" + itemA.getID()))
+                             .andExpect(status().isForbidden());
+
+        configurationService.setProperty("versioning.block.entity", "");
+    }
+
+    @Test
+    public void createFirstVersionItemWithEntityTypeAndPropertyBlockEntityDisabledTest() throws Exception {
+        configurationService.setProperty("versioning.block.entity", false);
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection test")
+                                          .build();
+
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Public test item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .withEntityType("Publication")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        try {
+            getClient(adminToken).perform(post("/api/versioning/versions")
+                                 .param("summary", "test summary!")
+                                 .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                 .content("/api/core/items/" + item.getID()))
+                                 .andExpect(status().isCreated())
+                                 .andExpect(jsonPath("$", Matchers.allOf(
+                                            hasJsonPath("$.version", is(2)),
+                                            hasJsonPath("$.summary", is("test summary!")),
+                                            hasJsonPath("$.submitterName", is("first (admin) last (admin)")),
+                                            hasJsonPath("$.type", is("version"))
+                                            )))
+                                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+        } finally {
+            VersionBuilder.delete(idRef.get());
+        }
+
+        configurationService.setProperty("versioning.block.entity", "");
+    }
+
+    @Test
+    public void createFirstVersionItemWithEntityTypeBySubmitterAndPropertyBlockEntityDisabledTest() throws Exception {
+        configurationService.setProperty("versioning.submitterCanCreateNewVersion", true);
+        configurationService.setProperty("versioning.block.entity", false);
+        context.turnOffAuthorisationSystem();
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Parent Community")
+                                                  .build();
+
+        Collection col = CollectionBuilder.createCollection(context, rootCommunity)
+                                          .withName("Collection 1")
+                                          .withSubmitterGroup(eperson)
+                                          .build();
+
+        Item itemA = ItemBuilder.createItem(context, col)
+                               .withTitle("Public item")
+                               .withIssueDate("2021-04-19")
+                               .withAuthor("Doe, John")
+                               .withEntityType("Publication")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        itemA.setSubmitter(eperson);
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        try {
+            getClient(epersonToken).perform(post("/api/versioning/versions")
+                                   .param("summary", "test summary!")
+                                   .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                   .content("/api/core/items/" + itemA.getID()))
+                                   .andExpect(status().isCreated())
+                                   .andExpect(jsonPath("$", Matchers.allOf(
+                                              hasJsonPath("$.version", is(2)),
+                                              hasJsonPath("$.summary", is("test summary!")),
+                                              hasJsonPath("$.type", is("version"))
+                                              )))
+                                   .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+        } finally {
+            VersionBuilder.delete(idRef.get());
+        }
+        configurationService.setProperty("versioning.submitterCanCreateNewVersion", false);
+        configurationService.setProperty("versioning.block.entity", "");
+    }
+
+    @Test
     public void patchReplaceSummaryTest() throws Exception {
         context.turnOffAuthorisationSystem();
 

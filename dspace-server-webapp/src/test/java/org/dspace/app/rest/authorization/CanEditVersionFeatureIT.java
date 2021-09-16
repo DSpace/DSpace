@@ -25,6 +25,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -40,6 +41,8 @@ public class CanEditVersionFeatureIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private VersionConverter versionConverter;
+    @Autowired
+    private ConfigurationService configurationService;
     @Autowired
     private AuthorizationFeatureService authorizationFeatureService;
 
@@ -196,6 +199,152 @@ public class CanEditVersionFeatureIT extends AbstractControllerIntegrationTest {
 
         getClient(tokenAdminCol2).perform(get("/api/authz/authorizations/" + adminOfCol2ToVersion.getID()))
                                  .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void canEditVersionsFeatureByColAndComAdminsAndPropertyBlockEntityEnableTest() throws Exception {
+        configurationService.setProperty("versioning.block.entity", true);
+        context.turnOffAuthorisationSystem();
+        EPerson adminComA = EPersonBuilder.createEPerson(context)
+                                          .withEmail("testComAdminA@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson adminCol1 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("testCol1Admin@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Parent Community")
+                                                  .build();
+
+        Community subCommunityA = CommunityBuilder.createSubCommunity(context, rootCommunity)
+                                                  .withName("Sub Community A")
+                                                  .withAdminGroup(adminComA)
+                                                  .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, subCommunityA)
+                                           .withName("Collection 1")
+                                           .withSubmitterGroup(eperson)
+                                           .withAdminGroup(adminCol1)
+                                           .build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item")
+                               .withIssueDate("2021-04-19")
+                               .withAuthor("Doe, John")
+                               .withEntityType("Publication")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        Version version = VersionBuilder.createVersion(context, item, "My test summary").build();
+
+        context.restoreAuthSystemState();
+
+        VersionRest versionRest = versionConverter.convert(version, DefaultProjection.DEFAULT);
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenAdminComA = getAuthToken(adminComA.getEmail(), password);
+        String tokenAdminCol1 = getAuthToken(adminCol1.getEmail(), password);
+
+        // define authorization that we know not exists
+        Authorization adminOfComAToVersion = new Authorization(adminComA, canEditVersionFeature, versionRest);
+        Authorization adminOfCol1ToVersion = new Authorization(adminCol1, canEditVersionFeature, versionRest);
+        Authorization adminToVersion = new Authorization(admin, canEditVersionFeature, versionRest);
+
+        getClient(tokenAdminComA).perform(get("/api/authz/authorizations/" + adminOfComAToVersion.getID()))
+                                 .andExpect(status().isNotFound());
+
+        getClient(tokenAdminCol1).perform(get("/api/authz/authorizations/" + adminOfCol1ToVersion.getID()))
+                                 .andExpect(status().isNotFound());
+
+        getClient(tokenAdmin).perform(get("/api/authz/authorizations/" + adminToVersion.getID()))
+                             .andExpect(status().isNotFound());
+
+        configurationService.setProperty("versioning.block.entity", "");
+    }
+
+    @Test
+    public void canEditVersionsFeatureByColAndComAdminsAndPropertyBlockEntityDisabledTest() throws Exception {
+        configurationService.setProperty("versioning.block.entity", false);
+        context.turnOffAuthorisationSystem();
+        EPerson adminComA = EPersonBuilder.createEPerson(context)
+                                          .withEmail("testComAdminA@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson adminCol1 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("testCol1Admin@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Parent Community")
+                                                  .build();
+
+        Community subCommunityA = CommunityBuilder.createSubCommunity(context, rootCommunity)
+                                                  .withName("Sub Community A")
+                                                  .withAdminGroup(adminComA)
+                                                  .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, subCommunityA)
+                                           .withName("Collection 1")
+                                           .withSubmitterGroup(eperson)
+                                           .withAdminGroup(adminCol1)
+                                           .build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item")
+                               .withIssueDate("2021-04-19")
+                               .withAuthor("Doe, John")
+                               .withEntityType("Publication")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        Version version = VersionBuilder.createVersion(context, item, "My test summary").build();
+
+        context.restoreAuthSystemState();
+
+        VersionRest versionRest = versionConverter.convert(version, DefaultProjection.DEFAULT);
+
+        String tokenAdminComA = getAuthToken(adminComA.getEmail(), password);
+        String tokenAdminCol1 = getAuthToken(adminCol1.getEmail(), password);
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenEPErson = getAuthToken(eperson.getEmail(), password);
+
+        // define authorizations that we know must exists
+        Authorization adminOfComAToVersion = new Authorization(adminComA, canEditVersionFeature, versionRest);
+        Authorization adminOfCol1ToVersion = new Authorization(adminCol1, canEditVersionFeature, versionRest);
+        Authorization adminToVersion = new Authorization(admin, canEditVersionFeature, versionRest);
+
+        // define authorization that we know not exists
+        Authorization epersonToVersion = new Authorization(eperson, canEditVersionFeature, versionRest);
+        Authorization anonymousToVersion = new Authorization(null, canEditVersionFeature, versionRest);
+
+        getClient(tokenAdminComA).perform(get("/api/authz/authorizations/" + adminOfComAToVersion.getID()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$", Matchers.is(
+                                            AuthorizationMatcher.matchAuthorization(adminOfComAToVersion))));
+
+        getClient(tokenAdminCol1).perform(get("/api/authz/authorizations/" + adminOfCol1ToVersion.getID()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$", Matchers.is(
+                                            AuthorizationMatcher.matchAuthorization(adminOfCol1ToVersion))));
+
+        getClient(tokenAdmin).perform(get("/api/authz/authorizations/" + adminToVersion.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$", Matchers.is(
+                                        AuthorizationMatcher.matchAuthorization(adminToVersion))));
+
+        getClient(tokenEPErson).perform(get("/api/authz/authorizations/" + epersonToVersion.getID()))
+                               .andExpect(status().isNotFound());
+
+        getClient().perform(get("/api/authz/authorizations/" + anonymousToVersion.getID()))
+                   .andExpect(status().isNotFound());
+
+        configurationService.setProperty("versioning.block.entity", "");
     }
 
 }
