@@ -166,12 +166,12 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         UUID id = article.getID();
         itemService.delete(context, article);
         WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, id, false);
-        installItemService.installItem(context, workspaceItem, "123456789/100");
+        installItemService.installItem(context, workspaceItem, "123456789/0100");
         performImportNoForceScript(tempFile);
         Iterator<Item> items = itemService.findByCollection(context, col1);
         Item testItem = items.next();
         assertFalse(items.hasNext()); //check to make sure there is only 1 item
-        assertEquals("123456789/100", testItem.getHandle()); //check to make sure the item wasn't overwritten as
+        assertEquals("123456789/0100", testItem.getHandle()); //check to make sure the item wasn't overwritten as
         // it would have the old handle.
         itemService.delete(context, testItem);
     }
