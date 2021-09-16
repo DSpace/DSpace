@@ -23,12 +23,20 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.dspace.app.rest.authorization.Authorization;
+import org.dspace.app.rest.authorization.AuthorizationFeature;
+import org.dspace.app.rest.authorization.AuthorizationFeatureService;
+import org.dspace.app.rest.authorization.impl.CanDeleteVersionFeature;
+import org.dspace.app.rest.converter.VersionConverter;
+import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.VersionMatcher;
+import org.dspace.app.rest.model.VersionRest;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
+import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
@@ -47,6 +55,7 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
+import org.dspace.versioning.service.VersioningService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -67,6 +76,12 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
     private Version version;
 
     @Autowired
+    private VersioningService versioningService;
+
+    @Autowired
+    private VersionConverter versionConverter;
+
+    @Autowired
     private ConfigurationService configurationService;
 
     @Autowired
@@ -74,6 +89,9 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private WorkspaceItemService workspaceItemService;
+
+    @Autowired
+    private AuthorizationFeatureService authorizationFeatureService;
 
     @Before
     public void setup() throws SQLException, AuthorizeException {
@@ -1302,6 +1320,77 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(adminToken).perform(get("/api/versioning/versions/" + versionID))
                              .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void checkDeleteOfMultipleVersionWithAuthorizationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        AuthorizationFeature canDeleteVersionFeature = authorizationFeatureService.find(CanDeleteVersionFeature.NAME);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection test")
+                                          .build();
+
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Public test item")
+                               .withIssueDate("2021-03-20")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        Version v2 = VersionBuilder.createVersion(context, item, "test").build();
+        Item lastVersionItem = v2.getItem();
+        Version v1 = versioningService.getVersion(context, item);
+        VersionRest versionRest = versionConverter.convert(v1, DefaultProjection.DEFAULT);
+        Authorization admin2ItemA = new Authorization(admin, canDeleteVersionFeature, versionRest);
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // the first version item is archived
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+
+        // item that linked last version is not archived
+        getClient(adminToken).perform(get("/api/core/items/" + lastVersionItem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+
+        // retrieve the workspace item
+        getClient(adminToken).perform(get("/api/submission/workspaceitems/search/item")
+                             .param("uuid", String.valueOf(lastVersionItem.getID())))
+                             .andExpect(status().isOk())
+                             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+        // submit the workspaceitem to complete the deposit
+        getClient(adminToken).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + idRef.get())
+                             .contentType(textUriContentType))
+                             .andExpect(status().isCreated());
+
+        // now the last version item is archived
+        getClient(adminToken).perform(get("/api/core/items/" + lastVersionItem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+
+        // the first version item is not archived, but is not in ProgressSubmission
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+
+        // check authorization that first version is possible to delete
+        getClient(adminToken).perform(get("/api/authz/authorizations/" + admin2ItemA.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$",
+                                        Matchers.is(AuthorizationMatcher.matchAuthorization(admin2ItemA))));
     }
 
 }
