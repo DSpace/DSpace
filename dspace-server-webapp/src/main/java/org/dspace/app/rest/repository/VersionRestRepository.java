@@ -26,6 +26,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -53,6 +54,9 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
                                     implements ReloadableEntityObjectRepository<Version, Integer> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(VersionRestRepository.class);
+
+    @Autowired
+    private ItemService itemService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -107,10 +111,17 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
             throw new UnprocessableEntityException("The given URI list could not be properly parsed to one result");
         }
 
+        boolean hasEntityType = StringUtils.isNotBlank(itemService.
+                            getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY));
+        String stringBlockEntity = configurationService.getProperty("versioning.block.entity");
+
         EPerson submitter = item.getSubmitter();
         boolean isAdmin = authorizeService.isAdmin(context);
         boolean canCreateVersion = configurationService.getBooleanProperty("versioning.submitterCanCreateNewVersion");
-        if (!isAdmin && !(canCreateVersion && Objects.equals(submitter, context.getCurrentUser()))) {
+        boolean isBlockEntity = StringUtils.isNotBlank(stringBlockEntity) ? Boolean.valueOf(stringBlockEntity) : true;
+
+        if (!isAdmin && !(canCreateVersion && Objects.equals(submitter, context.getCurrentUser())) ||
+            (hasEntityType  && isBlockEntity)) {
             throw new DSpaceForbiddenException("");
         }
 

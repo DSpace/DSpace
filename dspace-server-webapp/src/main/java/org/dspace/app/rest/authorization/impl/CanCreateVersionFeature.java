@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -54,6 +55,14 @@ public class CanCreateVersionFeature implements AuthorizationFeature {
             }
             Item item = itemService.find(context, UUID.fromString(((ItemRest) object).getUuid()));
             if (Objects.nonNull(item)) {
+                String stringBlockEntity = configurationService.getProperty("versioning.block.entity");
+                boolean isBlockEntity = StringUtils.isNotBlank(stringBlockEntity) ?
+                                               Boolean.valueOf(stringBlockEntity) : true;
+                boolean hasEntityType = StringUtils.isNotBlank(itemService.
+                                        getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY));
+                if (isBlockEntity && hasEntityType) {
+                    return false;
+                }
                 if (authorizeService.isAdmin(context, item)) {
                     return true;
                 }

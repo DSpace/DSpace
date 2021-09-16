@@ -9,13 +9,17 @@ package org.dspace.app.rest.authorization.impl;
 import java.sql.SQLException;
 import java.util.Objects;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.VersionRest;
 import org.dspace.app.rest.projection.DefaultProjection;
+import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.service.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +37,13 @@ import org.springframework.stereotype.Component;
 public class CanDeleteVersionFeature extends DeleteFeature {
 
     @Autowired
+    private ItemService itemService;
+    @Autowired
     private ItemConverter itemConverter;
     @Autowired
     private VersioningService versioningService;
+    @Autowired
+    private ConfigurationService configurationService;
 
     public static final String NAME = "canDeleteVersion";
 
@@ -46,6 +54,14 @@ public class CanDeleteVersionFeature extends DeleteFeature {
             Version version = versioningService.getVersion(context, ((VersionRest)object).getId());
             if (Objects.nonNull(version) && Objects.nonNull(version.getItem())) {
                 ItemRest itemRest = itemConverter.convert(version.getItem(), DefaultProjection.DEFAULT);
+                String stringBlockEntity = configurationService.getProperty("versioning.block.entity");
+                boolean isBlockEntity = StringUtils.isNotBlank(stringBlockEntity) ?
+                                               Boolean.valueOf(stringBlockEntity) : true;
+                boolean hasEntityType = StringUtils.isNotBlank(
+                        itemService.getMetadataFirstValue(version.getItem(), "dspace", "entity", "type", Item.ANY));
+                if (isBlockEntity && hasEntityType) {
+                    return false;
+                }
                 return super.isAuthorized(context, itemRest);
             }
         }

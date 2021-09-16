@@ -9,6 +9,7 @@ package org.dspace.app.rest.authorization.impl;
 import java.sql.SQLException;
 import java.util.Objects;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -18,6 +19,7 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.service.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,8 @@ public class CanEditVersionFeature implements AuthorizationFeature {
     private AuthorizeService authorizeService;
     @Autowired
     private VersioningService versioningService;
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Override
     @SuppressWarnings("rawtypes")
@@ -53,8 +57,15 @@ public class CanEditVersionFeature implements AuthorizationFeature {
             }
             Version version = versioningService.getVersion(context, (((VersionRest) object).getId()));
             if (Objects.nonNull(version) && Objects.nonNull(version.getItem())) {
-                Item item = itemService.find(context, version.getItem().getID());
-                return Objects.nonNull(item) ? authorizeService.isAdmin(context, item) : false;
+                String stringBlockEntity = configurationService.getProperty("versioning.block.entity");
+                boolean isBlockEntity = StringUtils.isNotBlank(stringBlockEntity) ?
+                                               Boolean.valueOf(stringBlockEntity) : true;
+                boolean hasEntityType = StringUtils.isNotBlank(
+                        itemService.getMetadataFirstValue(version.getItem(), "dspace", "entity", "type", Item.ANY));
+                if (isBlockEntity && hasEntityType) {
+                    return false;
+                }
+                return authorizeService.isAdmin(context, version.getItem());
             }
         }
         return false;
