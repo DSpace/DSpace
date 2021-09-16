@@ -63,6 +63,10 @@ public class XOAICerifItemCompilePlugin implements XOAIExtensionItemCompilePlugi
         this.fieldName = fieldName;
     }
 
+    public void setePersonName(String ePersonName) {
+        this.ePersonName = ePersonName;
+    }
+
     @Override
     public Metadata additionalMetadata(Context context, Metadata metadata, Item item) {
         EPerson currentUser = context.getCurrentUser();
