@@ -53,7 +53,6 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
 
     private String endpoint;
     private String manifestId;
-    private  boolean validationEnabled;
 
     @Autowired
     IIIFUtils utils;
@@ -251,13 +250,14 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
      * @return a single annotation object that contains word highlights on a single page (canvas)
      */
     private AnnotationGenerator createSearchResultAnnotation(String params, String text, String pageId, UUID uuid) {
-        String identifier = this.endpoint + uuid + "/annot/" + pageId + "-" + params;
+        String annotationIdentifier = this.endpoint + uuid + "/annot/" + pageId + "-" + params;
+        String canvasIdentifier = this.endpoint + uuid + "/canvas/" + pageId + "#xywh=" + params;
         contentAsText.setText(text);
-        CanvasGenerator canvas = new CanvasGenerator().setIdentifier(identifier);
+        CanvasGenerator canvas = new CanvasGenerator().setIdentifier(canvasIdentifier);
 
         AnnotationGenerator annotationGenerator = new AnnotationGenerator()
                 .setMotivation(AnnotationGenerator.PAINTING)
-                .setIdentifier(identifier)
+                .setIdentifier(annotationIdentifier)
                 .setOnCanvas(canvas)
                 .setResource(contentAsText)
                 .setWithin(getWithinManifest());
