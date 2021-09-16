@@ -1215,10 +1215,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 final boolean isStandardField
                     = Optional.ofNullable(config)
                               .flatMap(c -> Optional.ofNullable(c.getSidebarFacet(field)))
-                              .map(facet -> facet.getType().equals(DiscoveryConfigurationParameters.TYPE_STANDARD))
+                              .map(facet -> facet.getType().startsWith(GraphDiscoverSearchFilterFacet.TYPE_PREFIX))
                               .orElse(false);
-                if (!isStandardField) {
+                if (isStandardField) {
                     filterQuery.append("_filter");
+                } else {
+                    filterQuery.append("_keyword");
                 }
             } else if (operator.endsWith("authority")) {
                 filterQuery.append("_authority");
