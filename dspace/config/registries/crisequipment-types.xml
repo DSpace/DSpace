@@ -44,4 +44,25 @@
         <scope_note></scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>crisequipment</schema>
+        <element>activation</element>
+        <qualifier>date</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisequipment</schema>
+        <element>manifactured</element>
+        <qualifier>date</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>crisequipment</schema>
+        <element>serialNumber</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
 </dspace-dc-types>

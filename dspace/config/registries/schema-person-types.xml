@@ -135,5 +135,29 @@
         <qualifier>isni</qualifier>
         <scope_note>International Standard Name Identifier</scope_note>
     </dc-type>
+    
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>research-gate-id</qualifier>
+    </dc-type>
+    
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>twitter-id</qualifier>
+    </dc-type>
+    
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>facebook-id</qualifier>
+    </dc-type>
+    
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <qualifier>linkedin-id</qualifier>
+    </dc-type>
 
 </dspace-dc-types>
