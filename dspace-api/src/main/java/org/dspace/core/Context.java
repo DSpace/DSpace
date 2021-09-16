@@ -10,7 +10,6 @@ package org.dspace.core;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.EmptyStackException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -310,10 +309,10 @@ public class Context implements AutoCloseable {
         Boolean previousState;
         try {
             previousState = authStateChangeHistory.pop();
-        } catch (EmptyStackException ex) {
+        } catch (NoSuchElementException ex) {
             log.warn(LogHelper.getHeader(this, "restore_auth_sys_state",
-                                          "not previous state info available "
-                                              + ex.getLocalizedMessage()));
+                    "not previous state info available:  {}"),
+                    ex::getLocalizedMessage);
             previousState = Boolean.FALSE;
         }
         if (log.isDebugEnabled()) {
