@@ -936,7 +936,7 @@ public class DCInputsReader {
     }
 
     private boolean isGroupType(DCInput dcInput) {
-        return "group".equals(dcInput.getInputType());
+        return "group".equals(dcInput.getInputType()) || "inline-group".equals(dcInput.getInputType());
     }
 
 }
