@@ -14,6 +14,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
@@ -39,6 +40,8 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Element;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -60,116 +63,9 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     protected Item article;
     File tempFile;
 
-    @Test
-    public void packagerExportUUIDTest() throws Exception {
+    @Before
+    public void setup() throws IOException {
         context.turnOffAuthorisationSystem();
-        createTemplate();
-        createFiles();
-        try {
-            performExportScript(article.getHandle(), tempFile);
-            assertTrue(tempFile.length() > 0);
-            String idStr = getID();
-            assertEquals(idStr, article.getID().toString());
-        } finally {
-            tempFile.delete();
-        }
-    }
-
-    @Test
-    public void packagerImportUUIDTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        createTemplate();
-        createFiles();
-        try {
-            //Item
-            performExportScript(article.getHandle(), tempFile);
-            String idStr = getID();
-            itemService.delete(context, article);
-            performImportScript(tempFile);
-            Item item = itemService.find(context, UUID.fromString(idStr));
-            assertNotNull(item);
-        } finally {
-            tempFile.delete();
-        }
-    }
-
-    @Test
-    public void packagerImportColUUIDTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        createTemplate();
-        createFiles();
-        configService.setProperty("upload.temp.dir",tempFile.getParent());
-        try {
-            performExportScript(col1.getHandle(), tempFile);
-            String idStr = getID();
-            collectionService.delete(context, col1);
-            performImportScript(tempFile);
-            Collection collection = collectionService.find(context, UUID.fromString(idStr));
-            assertNotNull(collection);
-        } finally {
-            tempFile.delete();
-        }
-    }
-
-    @Test
-    public void packagerImportComUUIDTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        createTemplate();
-        createFiles();
-        configService.setProperty("upload.temp.dir",tempFile.getParent());
-        try {
-            //Community
-            performExportScript(child1.getHandle(), tempFile);
-            String idStr = getID();
-            communityService.delete(context, child1);
-            performImportScript(tempFile);
-            Community community = communityService.find(context, UUID.fromString(idStr));
-            assertNotNull(community);
-        } finally {
-            tempFile.delete();
-        }
-    }
-
-    @Test
-    public void packagerUUIDAlreadyExistTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        createTemplate();
-        createFiles();
-        try {
-            //Item should be overwritten if UUID already Exists
-            performExportScript(article.getHandle(), tempFile);
-            performImportScript(tempFile);
-            Iterator<Item> items = itemService.findByCollection(context, col1);
-            assertEquals(1, Iterators.size(items));
-        } finally {
-            tempFile.delete();
-        }
-    }
-
-    @Test
-    public void packagerUUIDAlreadyExistWithoutForceTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        createTemplate();
-        createFiles();
-        try {
-            //should fail to restore the item because the uuid already exists.
-            performExportScript(article.getHandle(), tempFile);
-            UUID id = article.getID();
-            itemService.delete(context, article);
-            WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, id, false);
-            installItemService.installItem(context, workspaceItem, "123456789/100");
-            performImportNoForceScript(tempFile);
-            Iterator<Item> items = itemService.findByCollection(context, col1);
-            Item testItem = items.next();
-            assertFalse(items.hasNext()); //check to make sure there is only 1 item
-            assertEquals("123456789/100", testItem.getHandle()); //check to make sure the item wasn't overwritten as
-            // it would have the old handle.
-        } finally {
-            tempFile.delete();
-        }
-    }
-
-    protected void createTemplate() {
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
@@ -184,10 +80,100 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
                 .withIssueDate("2017-10-17")
                 .withEntityType("Publication")
                 .build();
+
+        tempFile = File.createTempFile("packagerExportTest", ".zip");
+        context.restoreAuthSystemState();
     }
 
-    protected void createFiles() throws IOException {
-        tempFile = File.createTempFile("packagerExportTest", ".zip");
+    @After
+    public void destroy() throws SQLException, IOException {
+        context.turnOffAuthorisationSystem();
+        CommunityBuilder.deleteCommunity(parentCommunity.getID());
+        CommunityBuilder.deleteCommunity(child1.getID());
+        CommunityBuilder.deleteCommunity(col1.getID());
+        CommunityBuilder.deleteCommunity(article.getID());
+        CommunityBuilder.deleteCommunity(article.getID());
+        tempFile.delete();
+        context.restoreAuthSystemState();
+    }
+
+    @Test
+    public void packagerExportUUIDTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        performExportScript(article.getHandle(), tempFile);
+        assertTrue(tempFile.length() > 0);
+        String idStr = getID();
+        assertEquals(idStr, article.getID().toString());
+    }
+
+    @Test
+    public void packagerImportUUIDTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //Item
+        performExportScript(article.getHandle(), tempFile);
+        String idStr = getID();
+        itemService.delete(context, article);
+        performImportScript(tempFile);
+        Item item = itemService.find(context, UUID.fromString(idStr));
+        assertNotNull(item);
+    }
+
+    @Test
+    public void packagerImportColUUIDTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        configService.setProperty("upload.temp.dir",tempFile.getParent());
+
+        performExportScript(col1.getHandle(), tempFile);
+        String idStr = getID();
+        collectionService.delete(context, col1);
+        performImportScript(tempFile);
+        Collection collection = collectionService.find(context, UUID.fromString(idStr));
+        assertNotNull(collection);
+    }
+
+    @Test
+    public void packagerImportComUUIDTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        configService.setProperty("upload.temp.dir",tempFile.getParent());
+
+        //Community
+        performExportScript(child1.getHandle(), tempFile);
+        String idStr = getID();
+        communityService.delete(context, child1);
+        performImportScript(tempFile);
+        Community community = communityService.find(context, UUID.fromString(idStr));
+        assertNotNull(community);
+    }
+
+    @Test
+    public void packagerUUIDAlreadyExistTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //Item should be overwritten if UUID already Exists
+        performExportScript(article.getHandle(), tempFile);
+        performImportScript(tempFile);
+        Iterator<Item> items = itemService.findByCollection(context, col1);
+        assertEquals(1, Iterators.size(items));
+    }
+
+    @Test
+    public void packagerUUIDAlreadyExistWithoutForceTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //should fail to restore the item because the uuid already exists.
+        performExportScript(article.getHandle(), tempFile);
+        UUID id = article.getID();
+        itemService.delete(context, article);
+        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, id, false);
+        installItemService.installItem(context, workspaceItem, "123456789/100");
+        performImportNoForceScript(tempFile);
+        Iterator<Item> items = itemService.findByCollection(context, col1);
+        Item testItem = items.next();
+        assertFalse(items.hasNext()); //check to make sure there is only 1 item
+        assertEquals("123456789/100", testItem.getHandle()); //check to make sure the item wasn't overwritten as
+        // it would have the old handle.
+        itemService.delete(context, testItem);
     }
 
     private String getID() throws IOException, MetadataValidationException {
