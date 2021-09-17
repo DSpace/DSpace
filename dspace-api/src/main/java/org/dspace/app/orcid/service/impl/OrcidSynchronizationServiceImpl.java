@@ -43,6 +43,8 @@ import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResultItemIterator;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -66,9 +68,11 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     @Autowired
     private OrcidWebhookService orcidWebhookService;
 
+    @Autowired
+    private EPersonService ePersonService;
+
     @Override
-    public void linkProfile(Context context, Item profile, OrcidTokenResponseDTO token)
-        throws SQLException {
+    public void linkProfile(Context context, Item profile, OrcidTokenResponseDTO token) throws SQLException {
 
         String orcid = token.getOrcid();
         String accessToken = token.getAccessToken();
@@ -86,6 +90,13 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         if (isBlank(itemService.getMetadataFirstValue(profile, "cris", "orcid", "authenticated", Item.ANY))) {
             String currentDate = ISO_DATE_TIME.format(now());
             itemService.setMetadataSingleValue(context, profile, "cris", "orcid", "authenticated", null, currentDate);
+        }
+
+        EPerson ePerson = ePersonService.findByProfileItem(context, profile);
+        EPerson ePersonByOrcid = ePersonService.findByNetid(context, orcid);
+        if (ePerson != null && ePersonByOrcid == null && isBlank(ePerson.getNetid())) {
+            ePerson.setNetid(orcid);
+            updateEPerson(context, ePerson);
         }
 
         updateItem(context, profile);
@@ -110,6 +121,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         for (OrcidQueue queueRecord : queueRecords) {
             orcidQueueService.delete(context, queueRecord);
         }
+
     }
 
     @Override
@@ -283,6 +295,17 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         try {
             context.turnOffAuthorisationSystem();
             itemService.update(context, item);
+        } catch (AuthorizeException e) {
+            throw new RuntimeException(e);
+        } finally {
+            context.restoreAuthSystemState();
+        }
+    }
+
+    private void updateEPerson(Context context, EPerson ePerson) throws SQLException {
+        try {
+            context.turnOffAuthorisationSystem();
+            ePersonService.update(context, ePerson);
         } catch (AuthorizeException e) {
             throw new RuntimeException(e);
         } finally {

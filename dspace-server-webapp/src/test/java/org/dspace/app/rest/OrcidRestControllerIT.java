@@ -14,7 +14,9 @@ import static org.dspace.app.matcher.MetadataValueMatcher.with;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -44,11 +46,13 @@ import org.dspace.app.suggestion.Suggestion;
 import org.dspace.app.suggestion.orcid.OrcidPublicationLoader;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.dto.MetadataValueDTO;
+import org.dspace.eperson.EPerson;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.services.ConfigurationService;
@@ -99,6 +103,8 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
 
     private Collection profileCollection;
 
+    private EPerson user;
+
     @Before
     public void setup() {
         orcidRestController.setOrcidClient(orcidClientMock);
@@ -112,6 +118,12 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
             .thenReturn(originalExternalDataProvider.getSourceIdentifier());
 
         context.turnOffAuthorisationSystem();
+
+        user = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withPassword(password)
+            .withEmail("test@user.it")
+            .build();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Parent community")
@@ -131,6 +143,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
         checkOrcidAuthorization.setOrcidClient(orcidClient);
         orcidWebhookService.setOrcidClient(orcidClient);
         orcidPublicationLoader.setProvider(originalExternalDataProvider);
+
     }
 
     @Test
@@ -140,7 +153,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
 
         Item profileItem = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test user")
-            .withCrisOwner("Test User", eperson.getID().toString())
+            .withCrisOwner("Test User", user.getID().toString())
             .build();
 
         context.restoreAuthSystemState();
@@ -163,6 +176,51 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
         assertThat(profileItem.getMetadata(), hasItem(with("cris.orcid.refresh-token", REFRESH_TOKEN)));
         assertThat(profileItem.getMetadata(), hasItem(with("cris.orcid.scope", ORCID_SCOPES[0], 0)));
         assertThat(profileItem.getMetadata(), hasItem(with("cris.orcid.scope", ORCID_SCOPES[1], 1)));
+
+        user = context.reloadEntity(user);
+        assertThat(user.getNetid(), is(ORCID));
+    }
+
+    @Test
+    public void testLinkProfileFromCodeProfileConfigurationWithAnotherEPersonWithSameNetId() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profileItem = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test user")
+            .withCrisOwner("Test User", user.getID().toString())
+            .build();
+
+        EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withPassword(password)
+            .withEmail("test@anotherUser.it")
+            .withNetId(ORCID)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
+
+        getClient().perform(get("/api/" + RestModel.CRIS + "/orcid/{itemId}", profileItem.getID())
+            .param("code", CODE)
+            .param("url", "/home"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl(configurationService.getProperty("dspace.ui.url") + "/home"));
+
+        verify(orcidClientMock).getAccessToken(CODE);
+        verifyNoMoreInteractions(orcidClientMock);
+
+        profileItem = context.reloadEntity(profileItem);
+        assertThat(profileItem, notNullValue());
+        assertThat(profileItem.getMetadata(), hasItem(with("person.identifier.orcid", ORCID)));
+        assertThat(profileItem.getMetadata(), hasItem(with("cris.orcid.access-token", ACCESS_TOKEN)));
+        assertThat(profileItem.getMetadata(), hasItem(with("cris.orcid.refresh-token", REFRESH_TOKEN)));
+        assertThat(profileItem.getMetadata(), hasItem(with("cris.orcid.scope", ORCID_SCOPES[0], 0)));
+        assertThat(profileItem.getMetadata(), hasItem(with("cris.orcid.scope", ORCID_SCOPES[1], 1)));
+
+        user = context.reloadEntity(user);
+        assertThat(user.getNetid(), nullValue());
     }
 
     @Test
@@ -172,7 +230,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
 
         Item profileItem = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test user")
-            .withCrisOwner("Test User", eperson.getID().toString())
+            .withCrisOwner("Test User", user.getID().toString())
             .build();
 
         context.restoreAuthSystemState();
@@ -193,7 +251,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
 
         Item profileItem = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test user")
-            .withCrisOwner("Test User", eperson.getID().toString())
+            .withCrisOwner("Test User", user.getID().toString())
             .build();
 
         context.restoreAuthSystemState();
