@@ -180,8 +180,9 @@ public class DatabaseUtils {
                 try (Connection connection = dataSource.getConnection()) {
                     System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
 
-                    // "migrate" allows for an OPTIONAL second argument:
+                    // "migrate" allows for an OPTIONAL second argument (only one may be specified):
                     //    - "ignored" = Also run any previously "ignored" migrations during the migration
+                    //    - "force" = Even if no pending migrations exist, still run a migration to trigger callbacks.
                     //    - [version] = ONLY run migrations up to a specific DSpace version (ONLY FOR TESTING)
                     if (argv.length == 2) {
                         if (argv[1].equalsIgnoreCase("ignored")) {
@@ -191,6 +192,8 @@ public class DatabaseUtils {
                             // Update the database to latest version, but set "outOfOrder=true"
                             // This will ensure any old migrations in the "ignored" state are now run
                             updateDatabase(dataSource, connection, null, true);
+                        } else if (argv[1].equalsIgnoreCase("force")) {
+                            updateDatabase(dataSource, connection, null, false, true);
                         } else {
                             // Otherwise, we assume "argv[1]" is a valid migration version number
                             // This is only for testing! Never specify for Production!
@@ -654,6 +657,34 @@ public class DatabaseUtils {
     protected static synchronized void updateDatabase(DataSource datasource,
                                                       Connection connection, String targetVersion, boolean outOfOrder)
         throws SQLException {
+        updateDatabase(datasource, connection, targetVersion, outOfOrder, false);
+    }
+
+    /**
+     * Ensures the current database is up-to-date with regards
+     * to the latest DSpace DB schema. If the scheme is not up-to-date,
+     * then any necessary database migrations are performed.
+     * <P>
+     * FlywayDB (http://flywaydb.org/) is used to perform database migrations.
+     * If a Flyway DB migration fails it will be rolled back to the last
+     * successful migration, and any errors will be logged.
+     *
+     * @param datasource    DataSource object (retrieved from DatabaseManager())
+     * @param connection    Database connection
+     * @param targetVersion If specified, only migrate the database to a particular *version* of DSpace. This is
+     *                      just useful for testing migrations, and should NOT be used in Production.
+     *                      If null, the database is migrated to the latest version.
+     * @param outOfOrder    If true, Flyway will run any lower version migrations that were previously "ignored".
+     *                      If false, Flyway will only run new migrations with a higher version number.
+     * @param forceMigrate  If true, always run a Flyway migration, even if no "Pending" migrations exist. This can be
+     *                      used to trigger Flyway Callbacks manually.
+     *                      If false, only run migration if pending migrations exist, otherwise do nothing.
+     * @throws SQLException if database error
+     *                      If database cannot be upgraded.
+     */
+    protected static synchronized void updateDatabase(DataSource datasource, Connection connection,
+                                                      String targetVersion, boolean outOfOrder, boolean forceMigrate)
+        throws SQLException {
         if (null == datasource) {
             throw new SQLException("The datasource is a null reference -- cannot continue.");
         }
@@ -730,6 +761,10 @@ public class DatabaseUtils {
 
                 // Flag that Discovery will need reindexing, since database was updated
                 setReindexDiscovery(reindexAfterUpdate);
+            } else if (forceMigrate) {
+                log.info("DSpace database schema is up to date, but 'force' was specified. " +
+                        "Running migrate command to trigger callbacks.");
+                flyway.migrate();
             } else {
                 log.info("DSpace database schema is up to date");
             }
