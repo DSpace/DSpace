@@ -47,8 +47,13 @@ public class SubscriptionEmailNotification extends DSpaceRunnable
     public void internalRun() throws Exception {
         assignCurrentUserInContext();
         assignSpecialGroupsInContext();
-        if ((commandLine.getOptionValue("t") == null || (commandLine.getOptionValue("f") == null))) {
+        String typeOptions = commandLine.getOptionValue("t");
+        String frequencyOptions = commandLine.getOptionValue("f");
+        if (typeOptions == null || frequencyOptions == null) {
             throw new IllegalArgumentException("Options type t and frequency f must be set");
+        }
+        if (!frequencyOptions.equals("D") && !frequencyOptions.equals("M") && !frequencyOptions.equals("W")) {
+            throw new IllegalArgumentException("Option f must be D, M or W");
         }
         subscriptionEmailNotificationService.perform(getContext(),
                 handler, commandLine.getOptionValue("t"), commandLine.getOptionValue("f"));

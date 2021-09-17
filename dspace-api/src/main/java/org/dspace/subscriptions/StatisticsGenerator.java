@@ -81,10 +81,10 @@ public class StatisticsGenerator implements SubscriptionGenerator<CrisMetrics> {
             cellTitleCount.setCellValue("Value");
             Cell cellTitleDeltaP1 = sheetRow.createCell(4);
             cellTitleCount.setCellStyle(style);
-            cellTitleDeltaP1.setCellValue("Delta Period 1");
+            cellTitleDeltaP1.setCellValue("Last Week");
             cellTitleDeltaP1.setCellStyle(style);
             Cell cellTitleDeltaP2 = sheetRow.createCell(5);
-            cellTitleDeltaP2.setCellValue("Delta Period 2");
+            cellTitleDeltaP2.setCellValue("Last Month");
             cellTitleDeltaP2.setCellStyle(style);
             int rowCount = 2;
             for (CrisMetrics crisMetrics : crisMetricsList) {

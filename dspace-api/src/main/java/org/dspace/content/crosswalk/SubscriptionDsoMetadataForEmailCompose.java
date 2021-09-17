@@ -31,12 +31,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Alba Aliu at (atis.al)
  */
-public class BasicDisseminator implements StreamDisseminationCrosswalk {
+public class SubscriptionDsoMetadataForEmailCompose implements StreamDisseminationCrosswalk {
     /**
      * log4j logger
      */
     private static Logger log =
-            org.apache.logging.log4j.LogManager.getLogger(BasicDisseminator.class);
+            org.apache.logging.log4j.LogManager.getLogger(SubscriptionDsoMetadataForEmailCompose.class);
 
     private List<String> metadata = new ArrayList<>();
     @Autowired

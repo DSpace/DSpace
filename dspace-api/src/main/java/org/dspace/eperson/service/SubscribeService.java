@@ -203,6 +203,7 @@ public interface SubscribeService {
      * Deletes a subscription
      *
      * @param context DSpace context
+     * @param id Integer id of subscription
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public void deleteSubscription(Context context, Integer id) throws SQLException, AuthorizeException;
@@ -211,6 +212,8 @@ public interface SubscribeService {
      * Deletes a subscription
      *
      * @param context DSpace context
+     * @param type String type of subscription
+     * @param frequencyValue String frequency value of subscription
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context,

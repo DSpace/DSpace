@@ -44,10 +44,10 @@ public class SubscriptionEmailNotificationConfiguration<T
         if (options == null) {
             Options options = new Options();
             options.addOption("t", "Type", true,
-                    "Subscription type");
+                    "Subscription type, It can have values content or statistics");
             options.getOption("t").setRequired(true);
             options.addOption("f", "Frequency", true,
-                    "Subscription frequency");
+                    "Subscription frequency. It can have value D, M or W");
             options.getOption("f").setRequired(true);
             super.options = options;
         }

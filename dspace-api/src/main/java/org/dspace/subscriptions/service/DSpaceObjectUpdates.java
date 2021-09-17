@@ -41,12 +41,12 @@ public interface DSpaceObjectUpdates {
         SimpleDateFormat fullIsoStart = new SimpleDateFormat("yyyy-MM-dd'T'00:00:00'Z'");
         SimpleDateFormat fullIsoEnd = new SimpleDateFormat("yyyy-MM-dd'T'23:59:59'Z'");
         switch (frequency) {
-            case "daily":
+            case "D":
                 cal.add(Calendar.DAY_OF_MONTH, -1);
                 endDate = fullIsoEnd.format(cal.getTime());
                 startDate = fullIsoStart.format(cal.getTime());
                 break;
-            case "monthly":
+            case "M":
                 int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
                 cal.add(Calendar.DAY_OF_MONTH, -dayOfMonth);
                 endDate = fullIsoEnd.format(cal.getTime());
@@ -54,7 +54,7 @@ public interface DSpaceObjectUpdates {
                 cal.add(Calendar.DAY_OF_MONTH, 1);
                 startDate = fullIsoStart.format(cal.getTime());
                 break;
-            case "weekly":
+            case "W":
                 cal.add(Calendar.DAY_OF_WEEK, -1);
                 int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK) - 1;
                 cal.add(Calendar.DAY_OF_WEEK, -dayOfWeek);

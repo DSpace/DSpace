@@ -139,7 +139,7 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
         criteriaQuery.select(subscriptionRoot);
         Join<Subscription, SubscriptionParameter> childJoin = subscriptionRoot.join("subscriptionParameterList");
         criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.TYPE), type),
-                criteriaBuilder.equal(childJoin.get(SubscriptionParameter_.name), "frequence"),
+                criteriaBuilder.equal(childJoin.get(SubscriptionParameter_.name), "frequency"),
                 criteriaBuilder.equal(childJoin.get(SubscriptionParameter_.value), frequencyValue)
                 ));
         List<javax.persistence.criteria.Order> orderList = new LinkedList<>();

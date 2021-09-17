@@ -57,6 +57,7 @@ public class SubscriptionEmailNotificationService {
             context.turnOffAuthorisationSystem();
             List<Subscription> subscriptionList = findAllSubscriptionsByTypeAndFrequency(context, type, frequency);
             // if content subscription
+            // Here is verified if type is "content" Or "statistics" as them are configured
             if (type.equals(generators.keySet().toArray()[0])) {
                 // the list of the person who has subscribed
                 int iterator = 0;

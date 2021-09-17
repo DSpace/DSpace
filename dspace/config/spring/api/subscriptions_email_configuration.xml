@@ -57,21 +57,21 @@
 
     <util:map id="entityDissemination">
         <entry key="Publication" value-ref="cslItemDataCrosswalkChicago"/>
-        <entry key="Person" value-ref="basicDissemination"/>
-        <entry key="Journal" value-ref="basicDissemination"/>
-        <entry key="OrgUnit" value-ref="basicDissemination"/>
-        <entry key="Dataset" value-ref="basicDissemination"/>
-        <entry key="Patent" value-ref="basicDissemination"/>
-        <entry key="Event" value-ref="basicDissemination"/>
-        <entry key="Equipment" value-ref="basicDissemination"/>
-        <entry key="JournalVolume" value-ref="basicDissemination"/>
-        <entry key="Project" value-ref="basicDissemination"/>
-        <entry key="PersonCv" value-ref="basicDissemination"/>
-        <entry key="JournalIssue" value-ref="basicDissemination"/>
-        <entry key="Funding" value-ref="basicDissemination"/>
+        <entry key="Person" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="Journal" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="OrgUnit" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="Dataset" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="Patent" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="Event" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="Equipment" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="JournalVolume" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="Project" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="PersonCv" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="JournalIssue" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="Funding" value-ref="subscriptionDsoMetadataForEmailCompose"/>
     </util:map>
 
-    <bean class="org.dspace.content.crosswalk.BasicDisseminator" id="basicDissemination">
+    <bean class="org.dspace.content.crosswalk.SubscriptionDsoMetadataForEmailCompose" id="subscriptionDsoMetadataForEmailCompose">
         <property name="metadata" ref ="generalMetadataEntity"/>
     </bean>
     <bean id="communityUpdates" name="communityUpdates"

@@ -91,11 +91,11 @@ public class StoreViewDownloadsCrisMetrics extends
 
     private void performUpdateAndStorage(Context context) {
         try {
-            storeMetricsForCommunitiesAndCollections(context, findItems(context),
+            storeMetricsForDso(context, findItems(context),
                     Item.class.getSimpleName() + "s", Constants.ITEM);
-            storeMetricsForCommunitiesAndCollections(context, findDSO(context, IndexableCollection.TYPE),
+            storeMetricsForDso(context, findDSO(context, IndexableCollection.TYPE),
                     Collection.class.getSimpleName() + "s", Constants.COLLECTION);
-            storeMetricsForCommunitiesAndCollections(context, findDSO(context, IndexableCommunity.TYPE),
+            storeMetricsForDso(context, findDSO(context, IndexableCommunity.TYPE),
                     "Communities", Constants.COMMUNITY);
         } catch (SearchServiceException | SolrServerException | SQLException | IOException exception) {
             log.error(exception.getMessage());
@@ -174,7 +174,7 @@ public class StoreViewDownloadsCrisMetrics extends
         return metricLast.map(CrisMetrics::getMetricCount).orElse(null);
     }
 
-    private void storeMetricsForCommunitiesAndCollections(Context context, Iterator<DSpaceObject>
+    private void storeMetricsForDso(Context context, Iterator<DSpaceObject>
             dSpaceObjectIterator, String title, int type) throws SQLException, SolrServerException, IOException {
         int count = 0;
         int countFoundItems = 0;

@@ -33,7 +33,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
 import org.dspace.eperson.service.SubscribeService;
-import org.dspace.eperson.service.SubscriptionParameterService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.subscriptions.ContentGenerator;
 import org.dspace.subscriptions.StatisticsGenerator;
@@ -49,7 +48,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -67,7 +65,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 /**
- * Test for script of sending subscriptions for items/collections/cummunities
+ * Test for script of sending subscriptions for items/collections/communities
+ *  @author Alba Aliu (alba.aliu at atis.al)
  */
 
 public class SubscriptionsSendEmailNotificationIT extends AbstractControllerIntegrationTest {
@@ -75,11 +74,9 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
     @Autowired
     ConfigurationService configurationService;
     @Autowired
-    SubscribeService subscribeService1;
+    SubscribeService subscribeService;
     @Autowired
-    SubscriptionParameterService subscriptionParameterService;
-    @Autowired
-    CrisMetricsService crisMetricsService1;
+    CrisMetricsService crisMetricsService;
     @Autowired
     CollectionService collectionService;
     @Autowired
@@ -90,17 +87,12 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
     SearchService searchService;
     @Autowired
     DiscoveryConfigurationService discoveryConfigurationService;
-    CrisMetricsService crisMetricsService = mock(CrisMetricsService.class);
-    @Mock
-    SubscribeService subscribeService;
     StatisticsGenerator statisticsGenerator = mock(StatisticsGenerator.class);
     ContentGenerator contentGenerator = mock(ContentGenerator.class);
     ItemsUpdates itemsUpdates;
     CollectionsUpdates collectionsUpdates;
     CommunityUpdates communityUpdates;
     SubscriptionEmailNotification subscriptionEmailNotification;
-    @Mock
-    private List<EPerson> listEPerson;
 
     @Captor
     private ArgumentCaptor<EPerson> personArgumentCaptor;
@@ -122,7 +114,7 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         contentUpdateMap.put("item", itemsUpdates);
         // Explicitly use solr commit in SolrLoggerServiceImpl#postView
         configurationService.setProperty("solr-statistics.autoCommit", false);
-        this.subscriptionEmailNotificationService = new SubscriptionEmailNotificationService(crisMetricsService1, subscribeService1, generatorMap, contentUpdateMap);
+        this.subscriptionEmailNotificationService = new SubscriptionEmailNotificationService(crisMetricsService, subscribeService, generatorMap, contentUpdateMap);
         subscriptionEmailNotification = new SubscriptionEmailNotification();
     }
 
@@ -137,21 +129,19 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Collection col2 = CollectionBuilder.createCollection(context, community).build();
         Item orgUnit = ItemBuilder.createItem(context, col1)
                 .withEntityType("OrgUnit").withFullName("4Science")
-                .withTitle("4Science").build();
+                .withTitle("4Science").buildWithLastModifiedDate( generateTimeOnBasedFrequency("W"));
         //person item for relation inverse
         //it has as affiliation 4Science
         Item person = ItemBuilder.createItem(context, col2)
                 .withEntityType("Person").withFullName("testPerson")
                 .withTitle("testPerson")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).build();
-        itemService.setWithLastModifiedDate(context, person, generateTimeOnBasedFrequency("weekly"));
-        itemService.setWithLastModifiedDate(context, orgUnit, generateTimeOnBasedFrequency("weekly"));
+                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("W"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, eperson, generateSubscriptionParameterListFrequency("weekly")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "content", community, eperson, generateSubscriptionParameterListFrequency("daily")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "content", col1, eperson, generateSubscriptionParameterListFrequency("weekly")).build();
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, eperson, generateSubscriptionParameterListFrequency("W")).build();
+        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "content", community, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "content", col1, eperson, generateSubscriptionParameterListFrequency("W")).build();
         context.restoreAuthSystemState();
-        String[] args = new String[]{"subscription-send", "-t", "content", "-f", "weekly"};
+        String[] args = new String[]{"subscription-send", "-t", "content", "-f", "W"};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         subscriptionEmailNotification.initialize(args, handler, eperson);
         // attach service class
@@ -181,21 +171,19 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Collection col2 = CollectionBuilder.createCollection(context, community).build();
         Item orgUnit = ItemBuilder.createItem(context, col1)
                 .withEntityType("OrgUnit").withFullName("4Science")
-                .withTitle("4Science").build();
+                .withTitle("4Science").buildWithLastModifiedDate(generateTimeOnBasedFrequency("W"));
         //person item for relation inverse
         //it has as affiliation 4Science
         Item person = ItemBuilder.createItem(context, col2)
                 .withEntityType("Person").withFullName("testPerson")
                 .withTitle("testPerson")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).build();
-        itemService.setWithLastModifiedDate(context, person, generateTimeOnBasedFrequency("weekly"));
-        itemService.setWithLastModifiedDate(context, orgUnit, generateTimeOnBasedFrequency("weekly"));
+                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("W"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "statistics", orgUnit, eperson, generateSubscriptionParameterListFrequency("weekly")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "statistics", community, eperson, generateSubscriptionParameterListFrequency("daily")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "statistics", col1, eperson, generateSubscriptionParameterListFrequency("weekly")).build();
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "statistics", orgUnit, eperson, generateSubscriptionParameterListFrequency("W")).build();
+        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "statistics", community, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "statistics", col1, eperson, generateSubscriptionParameterListFrequency("W")).build();
         context.restoreAuthSystemState();
-        String[] args = new String[]{"subscription-send", "-t", "content", "-f", "weekly"};
+        String[] args = new String[]{"subscription-send", "-t", "content", "-f", "W"};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         subscriptionEmailNotification.initialize(args, handler, eperson);
         // attach service class
@@ -216,21 +204,19 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Collection col2 = CollectionBuilder.createCollection(context, community).build();
         Item orgUnit = ItemBuilder.createItem(context, col1)
                 .withEntityType("OrgUnit").withFullName("4Science")
-                .withTitle("4Science").build();
+                .withTitle("4Science").buildWithLastModifiedDate(generateTimeOnBasedFrequency("W"));
         //person item for relation inverse
         //it has as affiliation 4Science
         Item person = ItemBuilder.createItem(context, col2)
                 .withEntityType("Person").withFullName("testPerson")
                 .withTitle("testPerson")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).build();
-        itemService.setWithLastModifiedDate(context, person, generateTimeOnBasedFrequency("weekly"));
-        itemService.setWithLastModifiedDate(context, orgUnit, generateTimeOnBasedFrequency("weekly"));
+                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("W"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, admin, generateSubscriptionParameterListFrequency("weekly")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "content", community, eperson, generateSubscriptionParameterListFrequency("daily")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, eperson, generateSubscriptionParameterListFrequency("weekly")).build();
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, admin, generateSubscriptionParameterListFrequency("W")).build();
+        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "content", community, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, eperson, generateSubscriptionParameterListFrequency("W")).build();
         context.restoreAuthSystemState();
-        String[] args = new String[]{"subscription-send", "-t", "content", "-f", "weekly"};
+        String[] args = new String[]{"subscription-send", "-t", "content", "-f", "W"};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         subscriptionEmailNotification.initialize(args, handler, eperson);
         // attach service class
@@ -261,27 +247,24 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Collection col3 = CollectionBuilder.createCollection(context, community).build();
         Item orgUnit = ItemBuilder.createItem(context, col1)
                 .withEntityType("OrgUnit").withFullName("orgUnit")
-                .withTitle("orgUnit").build();
+                .withTitle("orgUnit").buildWithLastModifiedDate(generateTimeOnBasedFrequency("M"));
         //person item for relation inverse
         //it has as affiliation 4Science
         Item person = ItemBuilder.createItem(context, col3)
                 .withEntityType("Person").withFullName("personTest")
                 .withTitle("personTest")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).build();
+                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("M"));
 
         Item itemOfComm = ItemBuilder.createItem(context, col2)
                 .withEntityType("Equipment").withFullName("testEquipment")
                 .withTitle("testEquipment")
-                .build();
-        itemService.setWithLastModifiedDate(context, person, generateTimeOnBasedFrequency("monthly"));
-        itemService.setWithLastModifiedDate(context, orgUnit, generateTimeOnBasedFrequency("monthly"));
-        itemService.setWithLastModifiedDate(context, itemOfComm, generateTimeOnBasedFrequency("monthly"));
+                .buildWithLastModifiedDate(generateTimeOnBasedFrequency("M"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, eperson, generateSubscriptionParameterListFrequency("monthly")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "content", community, eperson, generateSubscriptionParameterListFrequency("daily")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "content", col1, eperson, generateSubscriptionParameterListFrequency("monthly")).build();
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, eperson, generateSubscriptionParameterListFrequency("M")).build();
+        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "content", community, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "content", col1, eperson, generateSubscriptionParameterListFrequency("M")).build();
         context.restoreAuthSystemState();
-        String[] args = new String[]{"subscription-send", "-t", "content", "-f", "monthly"};
+        String[] args = new String[]{"subscription-send", "-t", "content", "-f", "M"};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         subscriptionEmailNotification.initialize(args, handler, eperson);
         // attach service class
@@ -314,22 +297,19 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Collection col2 = CollectionBuilder.createCollection(context, community).build();
         Item orgUnit = ItemBuilder.createItem(context, col1)
                 .withEntityType("OrgUnit").withFullName("orgUnit")
-                .withTitle("orgUnit").build();
+                .withTitle("orgUnit").buildWithLastModifiedDate(generateTimeOnBasedFrequency("D"));
         //person item for relation inverse
         //it has as affiliation 4Science
         Item person = ItemBuilder.createItem(context, col2)
                 .withEntityType("Person").withFullName("person")
                 .withTitle("person")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).build();
-
-        itemService.setWithLastModifiedDate(context, person, generateTimeOnBasedFrequency("daily"));
-        itemService.setWithLastModifiedDate(context, orgUnit, generateTimeOnBasedFrequency("daily"));
+                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("D"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, eperson, generateSubscriptionParameterListFrequency("daily")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "content", community, eperson, generateSubscriptionParameterListFrequency("weekly")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "content", col1, eperson, generateSubscriptionParameterListFrequency("daily")).build();
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "content", community, eperson, generateSubscriptionParameterListFrequency("W")).build();
+        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "content", col1, eperson, generateSubscriptionParameterListFrequency("D")).build();
         context.restoreAuthSystemState();
-        String[] args = new String[]{"subscription-send", "-t", "content", "-f", "daily"};
+        String[] args = new String[]{"subscription-send", "-t", "content", "-f", "D"};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         subscriptionEmailNotification.initialize(args, handler, eperson);
         // attach service class
@@ -357,19 +337,17 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Collection col1 = CollectionBuilder.createCollection(context, community).build();
         Item orgUnit = ItemBuilder.createItem(context, col1)
                 .withEntityType("OrgUnit").withFullName("4Science")
-                .withTitle("4Science").build();
+                .withTitle("4Science").buildWithLastModifiedDate(generateTimeOnBasedFrequency("D"));
         //person item for relation inverse
         //it has as affiliation 4Science
         Item person = ItemBuilder.createItem(context, col1)
                 .withEntityType("Person").withFullName("testPerson")
                 .withTitle("testPerson")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).build();
-        itemService.setWithLastModifiedDate(context, person, generateTimeOnBasedFrequency("daily"));
-        itemService.setWithLastModifiedDate(context, orgUnit, generateTimeOnBasedFrequency("daily"));
+                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("D"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "statistics", orgUnit, eperson, generateSubscriptionParameterListFrequency("daily")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "statistics", community, eperson, generateSubscriptionParameterListFrequency("daily")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "statistics", col1, eperson, generateSubscriptionParameterListFrequency("daily")).build();
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "statistics", orgUnit, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "statistics", community, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "statistics", col1, eperson, generateSubscriptionParameterListFrequency("D")).build();
         //create cris metrics related with dso
         CrisMetrics crisMetricsComm = CrisMetricsBuilder.createCrisMetrics(context, community)
                 .withMetricType("view")
@@ -397,7 +375,7 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
                         DateUtils.addDays(new Date(), -7))
                 .isLast(true).build();
         context.restoreAuthSystemState();
-        String[] args = new String[]{"subscription-send", "-t", "statistics", "-f", "daily"};
+        String[] args = new String[]{"subscription-send", "-t", "statistics", "-f", "D"};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         subscriptionEmailNotification.initialize(args, handler, eperson);
         // attach service class
@@ -421,19 +399,17 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Collection col1 = CollectionBuilder.createCollection(context, community).build();
         Item orgUnit = ItemBuilder.createItem(context, col1)
                 .withEntityType("OrgUnit").withFullName("4Science")
-                .withTitle("4Science").build();
+                .withTitle("4Science").buildWithLastModifiedDate(generateTimeOnBasedFrequency("M"));
         //person item for relation inverse
         //it has as affiliation 4Science
         Item person = ItemBuilder.createItem(context, col1)
                 .withEntityType("Person").withFullName("testPerson")
                 .withTitle("testPerson")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).build();
-        itemService.setWithLastModifiedDate(context, person, generateTimeOnBasedFrequency("monthly"));
-        itemService.setWithLastModifiedDate(context, orgUnit, generateTimeOnBasedFrequency("monthly"));
+                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("M"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "statistics", orgUnit, eperson, generateSubscriptionParameterListFrequency("monthly")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "statistics", community, eperson, generateSubscriptionParameterListFrequency("daily")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "statistics", col1, eperson, generateSubscriptionParameterListFrequency("daily")).build();
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "statistics", orgUnit, eperson, generateSubscriptionParameterListFrequency("M")).build();
+        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "statistics", community, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "statistics", col1, eperson, generateSubscriptionParameterListFrequency("D")).build();
         //create cris metrics related with dso
         CrisMetrics crisMetricsComm = CrisMetricsBuilder.createCrisMetrics(context, community)
                 .withMetricType("view")
@@ -461,7 +437,7 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
                         DateUtils.addDays(new Date(), -7))
                 .isLast(true).build();
         context.restoreAuthSystemState();
-        String[] args = new String[]{"subscription-send", "-t", "statistics", "-f", "monthly"};
+        String[] args = new String[]{"subscription-send", "-t", "statistics", "-f", "M"};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         subscriptionEmailNotification.initialize(args, handler, eperson);
         // attach service class
@@ -483,19 +459,17 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Collection col1 = CollectionBuilder.createCollection(context, community).build();
         Item orgUnit = ItemBuilder.createItem(context, col1)
                 .withEntityType("OrgUnit").withFullName("4Science")
-                .withTitle("4Science").build();
+                .withTitle("4Science").buildWithLastModifiedDate(generateTimeOnBasedFrequency("D"));
         //person item for relation inverse
         //it has as affiliation 4Science
         Item person = ItemBuilder.createItem(context, col1)
                 .withEntityType("Person").withFullName("testPerson")
                 .withTitle("testPerson")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).build();
-        itemService.setWithLastModifiedDate(context, person, generateTimeOnBasedFrequency("daily"));
-        itemService.setWithLastModifiedDate(context, orgUnit, generateTimeOnBasedFrequency("daily"));
+                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("D"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "statistics", orgUnit, eperson, generateSubscriptionParameterListFrequency("daily")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "statistics", community, eperson, generateSubscriptionParameterListFrequency("daily")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "statistics", col1, eperson, generateSubscriptionParameterListFrequency("daily")).build();
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "statistics", orgUnit, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "statistics", community, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "statistics", col1, eperson, generateSubscriptionParameterListFrequency("D")).build();
         //create cris metrics related with dso
         CrisMetrics crisMetricsComm = CrisMetricsBuilder.createCrisMetrics(context, community)
                 .withMetricType("view")
@@ -523,7 +497,7 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
                         DateUtils.addDays(new Date(), -7))
                 .isLast(true).build();
         context.restoreAuthSystemState();
-        String[] args = new String[]{"subscription-send", "-t", "statistics", "-f", "daily"};
+        String[] args = new String[]{"subscription-send", "-t", "statistics", "-f", "D"};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
         subscriptionEmailNotification.initialize(args, handler, eperson);
         // attach service class
@@ -541,7 +515,7 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
     private List<SubscriptionParameter> generateSubscriptionParameterListFrequency(String frequencyValue) {
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-        subscriptionParameter.setName("frequence");
+        subscriptionParameter.setName("frequency");
         subscriptionParameter.setValue(frequencyValue);
         subscriptionParameterList.add(subscriptionParameter);
         return subscriptionParameterList;
@@ -554,13 +528,13 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         localCalendar.setTimeZone(utcZone);
         // Now set the UTC equivalent.
         switch (frequency) {
-            case "daily":
+            case "D":
                 localCalendar.add(GregorianCalendar.DAY_OF_YEAR, -1);
                 break;
-            case "monthly":
+            case "M":
                 localCalendar.add(GregorianCalendar.MONTH, -1);
                 break;
-            case "weekly":
+            case "W":
                 localCalendar.add(GregorianCalendar.WEEK_OF_MONTH, -1);
                 break;
             default:
