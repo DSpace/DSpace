@@ -15,7 +15,7 @@
                             <property name="name" value="FULL" />
                             <property name="security">
                                 <value type="org.dspace.content.security.CrisSecurity">
-                                    ADMIN
+                                    ITEM_ADMIN
                                 </value>
                             </property>
                             <property name="submissionDefinition" value="publication-edit" />
@@ -28,7 +28,7 @@
                             <property name="name" value="FULL" />
                             <property name="security">
                                 <value type="org.dspace.content.security.CrisSecurity">
-                                    ADMIN
+                                    ITEM_ADMIN
                                 </value>
                             </property>
                             <property name="submissionDefinition" value="admin-person-edit" />
@@ -50,7 +50,7 @@
                             <property name="name" value="FULL" />
                             <property name="security">
                                 <value type="org.dspace.content.security.CrisSecurity">
-                                    ADMIN
+                                    ITEM_ADMIN
                                 </value>
                             </property>
                             <property name="submissionDefinition" value="equipment-edit" />
@@ -63,7 +63,7 @@
                             <property name="name" value="FULL" />
                             <property name="security">
                                 <value type="org.dspace.content.security.CrisSecurity">
-                                    ADMIN
+                                    ITEM_ADMIN
                                 </value>
                             </property>
                             <property name="submissionDefinition" value="funding-edit" />
@@ -90,7 +90,7 @@
                             <property name="name" value="FULL" />
                             <property name="security">
                                 <value type="org.dspace.content.security.CrisSecurity">
-                                    ADMIN
+                                    ITEM_ADMIN
                                 </value>
                             </property>
                             <property name="submissionDefinition" value="orgunit-edit" />
@@ -117,7 +117,7 @@
                             <property name="name" value="FULL" />
                             <property name="security">
                                 <value type="org.dspace.content.security.CrisSecurity">
-                                    ADMIN
+                                    ITEM_ADMIN
                                 </value>
                             </property>
                             <property name="submissionDefinition" value="patent-edit" />
@@ -130,7 +130,7 @@
                             <property name="name" value="FULL" />
                             <property name="security">
                                 <value type="org.dspace.content.security.CrisSecurity">
-                                    ADMIN
+                                    ITEM_ADMIN
                                 </value>
                             </property>
                             <property name="submissionDefinition" value="project-edit" />
@@ -157,7 +157,7 @@
                             <property name="name" value="FULL" />
                             <property name="security">
                                 <value type="org.dspace.content.security.CrisSecurity">
-                                    ADMIN
+                                    ITEM_ADMIN
                                 </value>
                             </property>
                             <property name="submissionDefinition" value="product-edit" />
@@ -170,7 +170,7 @@
                             <property name="name" value="FULL" />
                             <property name="security">
                                 <value type="org.dspace.content.security.CrisSecurity">
-                                    ADMIN
+                                    ITEM_ADMIN
                                 </value>
                             </property>
                             <property name="submissionDefinition" value="journal-edit" />
@@ -183,7 +183,7 @@
                             <property name="name" value="FULL" />
                             <property name="security">
                                 <value type="org.dspace.content.security.CrisSecurity">
-                                    ADMIN
+                                    ITEM_ADMIN
                                 </value>
                             </property>
                             <property name="submissionDefinition" value="event-edit" />
