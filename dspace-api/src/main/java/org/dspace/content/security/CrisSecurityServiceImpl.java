@@ -71,6 +71,10 @@ public class CrisSecurityServiceImpl implements CrisSecurityService {
             return true;
         }
 
+        if (security == CrisSecurity.ITEM_ADMIN) {
+            return authorizeService.isAdmin(context, user, item);
+        }
+
         if (security == CrisSecurity.CUSTOM) {
 
             boolean hasAccessByGroup = hasAccessByGroup(context, item, user, accessMode.getGroupMetadataFields());

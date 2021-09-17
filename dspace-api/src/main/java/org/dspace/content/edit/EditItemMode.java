@@ -78,6 +78,9 @@ public class EditItemMode implements AccessItemMode {
                 case "4":
                     this.setSecurity(CrisSecurity.CUSTOM);
                     break;
+                case "5":
+                    this.setSecurity(CrisSecurity.ITEM_ADMIN);
+                    break;
                 default:
                     this.setSecurity(CrisSecurity.NONE);
             }

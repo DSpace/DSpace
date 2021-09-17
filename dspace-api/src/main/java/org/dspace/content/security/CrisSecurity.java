@@ -20,5 +20,6 @@ public enum CrisSecurity {
     ADMIN,
     OWNER,
     ADMIN_OWNER,
+    ITEM_ADMIN,
     CUSTOM;
 }

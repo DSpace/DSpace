@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
@@ -44,6 +45,10 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
 
     private EPerson owner;
 
+    private EPerson collectionAdmin;
+
+    private EPerson communityAdmin;
+
     @Override
     @Before
     public void setUp() throws Exception {
@@ -51,13 +56,23 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
 
         context.turnOffAuthorisationSystem();
 
+        communityAdmin = EPersonBuilder.createEPerson(context)
+            .withEmail("communityAdmin@test.it")
+            .build();
+
         parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Test community")
+            .withAdminGroup(communityAdmin)
+            .build();
+
+        collectionAdmin = EPersonBuilder.createEPerson(context)
+            .withEmail("collectionAdmin@test.it")
             .build();
 
         collection = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Test collection")
             .withEntityType("Publication")
+            .withAdminGroup(collectionAdmin)
             .build();
 
         owner = EPersonBuilder.createEPerson(context)
@@ -88,6 +103,12 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
 
         boolean hasOwnerAccess = crisSecurityService.hasAccess(context, item, owner, accessMode);
         assertThat(hasOwnerAccess, is(false));
+
+        boolean hasCollectionAdminAccess = crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode);
+        assertThat(hasCollectionAdminAccess, is(false));
+
+        boolean hasCommunityAdminAccess = crisSecurityService.hasAccess(context, item, communityAdmin, accessMode);
+        assertThat(hasCommunityAdminAccess, is(false));
     }
 
     @Test
@@ -112,6 +133,12 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
 
         boolean hasOwnerAccess = crisSecurityService.hasAccess(context, item, owner, accessMode);
         assertThat(hasOwnerAccess, is(true));
+
+        boolean hasCollectionAdminAccess = crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode);
+        assertThat(hasCollectionAdminAccess, is(false));
+
+        boolean hasCommunityAdminAccess = crisSecurityService.hasAccess(context, item, communityAdmin, accessMode);
+        assertThat(hasCommunityAdminAccess, is(false));
     }
 
     @Test
@@ -136,6 +163,12 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
 
         boolean hasOwnerAccess = crisSecurityService.hasAccess(context, item, owner, accessMode);
         assertThat(hasOwnerAccess, is(true));
+
+        boolean hasCollectionAdminAccess = crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode);
+        assertThat(hasCollectionAdminAccess, is(false));
+
+        boolean hasCommunityAdminAccess = crisSecurityService.hasAccess(context, item, communityAdmin, accessMode);
+        assertThat(hasCommunityAdminAccess, is(false));
     }
 
     @Test
@@ -194,6 +227,9 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
         assertThat(crisSecurityService.hasAccess(context, item, eperson, accessMode), is(false));
         assertThat(crisSecurityService.hasAccess(context, item, admin, accessMode), is(false));
         assertThat(crisSecurityService.hasAccess(context, item, owner, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, communityAdmin, accessMode), is(false));
+
         assertThat(crisSecurityService.hasAccess(context, item, firstUser, accessMode), is(true));
         assertThat(crisSecurityService.hasAccess(context, item, secondUser, accessMode), is(true));
         assertThat(crisSecurityService.hasAccess(context, item, thirdUser, accessMode), is(true));
@@ -203,6 +239,36 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
         assertThat(crisSecurityService.hasAccess(context, item, thirdUser, accessMode), is(true));
         assertThat(crisSecurityService.hasAccess(context, item, fourthUser, accessMode), is(true));
 
+    }
+
+    @Test
+    public void testHasAccessWithItemAdminConfig() throws SQLException, AuthorizeException {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Test item")
+            .withCrisOwner("Owner", owner.getID().toString())
+            .build();
+
+        context.restoreAuthSystemState();
+
+        AccessItemMode accessMode = buildAccessItemMode(CrisSecurity.ITEM_ADMIN);
+
+        boolean hasAccess = crisSecurityService.hasAccess(context, item, eperson, accessMode);
+        assertThat(hasAccess, is(false));
+
+        boolean hasAdminAccess = crisSecurityService.hasAccess(context, item, admin, accessMode);
+        assertThat(hasAdminAccess, is(true));
+
+        boolean hasOwnerAccess = crisSecurityService.hasAccess(context, item, owner, accessMode);
+        assertThat(hasOwnerAccess, is(false));
+
+        boolean hasCollectionAdminAccess = crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode);
+        assertThat(hasCollectionAdminAccess, is(true));
+
+        boolean hasCommunityAdminAccess = crisSecurityService.hasAccess(context, item, communityAdmin, accessMode);
+        assertThat(hasCommunityAdminAccess, is(true));
     }
 
     private AccessItemMode buildAccessItemMode(CrisSecurity security) {
