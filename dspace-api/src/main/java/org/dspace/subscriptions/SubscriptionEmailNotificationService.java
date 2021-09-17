@@ -10,10 +10,12 @@ package org.dspace.subscriptions;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,12 +61,7 @@ public class SubscriptionEmailNotificationService {
                 // the list of the person who has subscribed
                 int iterator = 0;
                 for (Subscription subscription : subscriptionList) {
-                    DSpaceObject dSpaceObject = subscription.getdSpaceObject();
-                    if (subscription.getdSpaceObject() instanceof HibernateProxy) {
-                        HibernateProxy hibernateProxy = (HibernateProxy) subscription.getdSpaceObject();
-                        LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
-                        dSpaceObject = (DSpaceObject) initializer.getImplementation();
-                    }
+                    DSpaceObject dSpaceObject = getdSpaceObject(subscription);
                     if (dSpaceObject instanceof Community) {
                         communities.addAll(contentUpdates.get(Community.class.getSimpleName().toLowerCase(Locale.ROOT))
                                 .findUpdates(context, dSpaceObject, frequency));
@@ -95,7 +92,9 @@ public class SubscriptionEmailNotificationService {
                 }
             } else {
                 if (!type.equals(generators.keySet().toArray()[1])) {
-                    throw new IllegalArgumentException("Options type t and frequency f must be set correctly");
+                    //TODO: add possible frequency values, after having defined them into an Enum
+                    throw new IllegalArgumentException("Options type t and frequency f must be set correctly, type must be one of: "
+                    + String.join(",", generators.keySet()));
                 }
                 int iterator = 0;
                 List<CrisMetrics> crisMetricsList = new ArrayList<>();
@@ -131,9 +130,22 @@ public class SubscriptionEmailNotificationService {
         }
     }
 
+    private DSpaceObject getdSpaceObject(Subscription subscription) {
+        DSpaceObject dSpaceObject = subscription.getdSpaceObject();
+        if (subscription.getdSpaceObject() instanceof HibernateProxy) {
+            HibernateProxy hibernateProxy = (HibernateProxy) subscription.getdSpaceObject();
+            LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
+            dSpaceObject = (DSpaceObject) initializer.getImplementation();
+        }
+        return dSpaceObject;
+    }
+
     private List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context, String type, String frequency) {
         try {
-            return this.subscribeService.findAllSubscriptionsByTypeAndFrequency(context, type, frequency);
+            return this.subscribeService.findAllSubscriptionsByTypeAndFrequency(context, type, frequency)
+                .stream()
+                .sorted(Comparator.comparing(s -> s.getePerson().getID()))
+                .collect(Collectors.toList());
         } catch (SQLException sqlException) {
             log.error(sqlException.getMessage());
         }
