@@ -41,10 +41,12 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -111,6 +113,9 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
     @Autowired
     private CollectionRoleService collectionRoleService;
+
+    @Autowired
+    private EntityTypeService entityTypeService;
 
     @Autowired
     SearchService searchService;
@@ -212,6 +217,28 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             long tot = authorizeService.countAdminAuthorizedCollection(context, query);
             return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
         } catch (SearchServiceException | SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @SearchRestMethod(name = "findSubmitAuthorizedByEntityType")
+    public Page<CollectionRest> findSubmitAuthorizedByEntityType(
+           @Parameter(value = "query") String query,
+           @Parameter(value = "entityType", required = true) String entityTypeLabel,
+           Pageable pageable)
+          throws SearchServiceException {
+        try {
+            Context context = obtainContext();
+            EntityType entityType = this.entityTypeService.findByEntityType(context, entityTypeLabel);
+            if (entityType == null) {
+                throw new ResourceNotFoundException("There was no entityType found with label: " + entityTypeLabel);
+            }
+            List<Collection> collections = cs.findCollectionsWithSubmit(query, context, null, entityTypeLabel,
+                                              Math.toIntExact(pageable.getOffset()),
+                                              Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+            int tot = cs.countCollectionsWithSubmit(query, context, null, entityTypeLabel);
+            return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
+        } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

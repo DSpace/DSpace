@@ -111,6 +111,7 @@ public class CollectionIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Ind
                 CollectionService.MD_LICENSE, Item.ANY);
         String title = collectionService.getMetadataFirstValue(collection,
                 CollectionService.MD_NAME, Item.ANY);
+        String relation = collectionService.getMetadataFirstValue(collection, "dspace", "entity", "type", Item.ANY);
 
         List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(collection.getType());
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.description",
@@ -125,6 +126,7 @@ public class CollectionIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Ind
                                   rights_license);
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.title", title);
         doc.addField("dc.title_sort", title);
+        addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields,"dspace.entity.type",relation);
 
         return doc;
     }
