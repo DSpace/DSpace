@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -284,6 +285,46 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                  .andExpect(jsonPath("$", Matchers.allOf(
                                             hasJsonPath("$.version", is(2)),
                                             hasJsonPath("$.summary", is("test summary!")),
+                                            hasJsonPath("$.submitterName", is("first (admin) last (admin)")),
+                                            hasJsonPath("$.type", is("version"))
+                                            )))
+                                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+        } finally {
+            VersionBuilder.delete(idRef.get());
+        }
+    }
+
+    @Test
+    public void createFirstVersionWithoutSummaryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection test")
+                                          .build();
+
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Public test item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        try {
+            getClient(adminToken).perform(post("/api/versioning/versions")
+                                 .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                 .content("/api/core/items/" + item.getID()))
+                                 .andExpect(status().isCreated())
+                                 .andExpect(jsonPath("$", Matchers.allOf(
+                                            hasJsonPath("$.version", is(2)),
+                                            hasJsonPath("$.summary", emptyOrNullString()),
                                             hasJsonPath("$.submitterName", is("first (admin) last (admin)")),
                                             hasJsonPath("$.type", is("version"))
                                             )))

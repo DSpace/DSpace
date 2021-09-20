@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.dspace.app.rest.matcher.VersionHistoryMatcher;
 import org.dspace.app.rest.matcher.VersionMatcher;
+import org.dspace.app.rest.matcher.WorkflowItemMatcher;
 import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
@@ -29,6 +30,7 @@ import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.VersionBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -39,6 +41,7 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -381,6 +384,119 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
+    public void findDraftOfVersionNotFoundTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection test")
+                                          .build();
+
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Public test item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        VersionBuilder.createVersion(context, item, "test").build();
+        context.turnOffAuthorisationSystem();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + Integer.MAX_VALUE + "/draftVersion"))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void findDraftOfVersionNoContentTest() throws Exception {
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection test")
+                                          .withSubmitterGroup(admin)
+                                          .build();
+
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Public test item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        Version version = VersionBuilder.createVersion(context, item, "test").build();
+        VersionHistory vh = versionHistoryService.findByItem(context, version.getItem());
+        context.turnOffAuthorisationSystem();
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        // retrieve the workspace item
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/search/item")
+                             .param("uuid", String.valueOf(version.getItem().getID())))
+                             .andExpect(status().isOk())
+                             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+        // submit the workspaceitem to complete the deposit
+        getClient(tokenAdmin).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + idRef.get())
+                             .contentType(textUriContentType))
+                             .andExpect(status().isCreated());
+
+        getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + vh.getID() + "/draftVersion"))
+                             .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void findWorkflowItemOfDraftVersionAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection 1")
+                                          .withWorkflowGroup(1, admin)
+                                          .build();
+
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Public test item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col)
+                                                   .withTitle("Workflow Item 1")
+                                                   .withIssueDate("2017-10-17")
+                                                   .withAuthor("Doe, John")
+                                                   .withSubject("ExtraEntry")
+                                                   .build();
+
+        Version version = VersionBuilder.createVersion(context, item, "test").build();
+        version.setItem(witem.getItem());
+        VersionHistory vh = versionHistoryService.findByItem(context, version.getItem());
+        context.turnOffAuthorisationSystem();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + vh.getID() + "/draftVersion"))
+                             .andExpect(jsonPath("$", Matchers.is(
+                                        WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                                        "Workflow Item 1", "2017-10-17", "ExtraEntry"))));
+    }
+
+    @Test
     public void findWorkspaceItemOfDraftVersionLoggedUserTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -412,7 +528,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void findVersionsOfVersionHistoryCheckPaginationAfterDelitingOfVersionTest() throws Exception {
+    public void findVersionsOfVersionHistoryCheckPaginationAfterDeletingOfVersionTest() throws Exception {
         //disable file upload mandatory
         configurationService.setProperty("webui.submit.upload.required", false);
         context.turnOffAuthorisationSystem();

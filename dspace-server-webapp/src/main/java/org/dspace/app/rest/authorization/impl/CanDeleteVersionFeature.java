@@ -54,9 +54,7 @@ public class CanDeleteVersionFeature extends DeleteFeature {
             Version version = versioningService.getVersion(context, ((VersionRest)object).getId());
             if (Objects.nonNull(version) && Objects.nonNull(version.getItem())) {
                 ItemRest itemRest = itemConverter.convert(version.getItem(), DefaultProjection.DEFAULT);
-                String stringBlockEntity = configurationService.getProperty("versioning.block.entity");
-                boolean isBlockEntity = StringUtils.isNotBlank(stringBlockEntity) ?
-                                               Boolean.valueOf(stringBlockEntity) : true;
+                boolean isBlockEntity = configurationService.getBooleanProperty("versioning.block.entity", true);
                 boolean hasEntityType = StringUtils.isNotBlank(
                         itemService.getMetadataFirstValue(version.getItem(), "dspace", "entity", "type", Item.ANY));
                 if (isBlockEntity && hasEntityType) {

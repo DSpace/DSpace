@@ -67,4 +67,6 @@ public interface VersionHistoryService extends DSpaceCRUDService<VersionHistory>
 
     public void remove(VersionHistory versionHistory, Version version);
 
+    public boolean canSeeDraftVersion(Context context, VersionHistory versionHistory) throws SQLException;
+
 }

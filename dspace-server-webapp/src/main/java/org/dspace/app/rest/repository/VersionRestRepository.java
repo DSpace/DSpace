@@ -15,7 +15,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.exception.DSpaceForbiddenException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.VersionRest;
@@ -112,17 +111,16 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
         }
 
         boolean hasEntityType = StringUtils.isNotBlank(itemService.
-                            getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY));
-        String stringBlockEntity = configurationService.getProperty("versioning.block.entity");
+                                getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY));
+        boolean isBlockEntity = configurationService.getBooleanProperty("versioning.block.entity", true);
 
         EPerson submitter = item.getSubmitter();
         boolean isAdmin = authorizeService.isAdmin(context);
         boolean canCreateVersion = configurationService.getBooleanProperty("versioning.submitterCanCreateNewVersion");
-        boolean isBlockEntity = StringUtils.isNotBlank(stringBlockEntity) ? Boolean.valueOf(stringBlockEntity) : true;
 
         if (!isAdmin && !(canCreateVersion && Objects.equals(submitter, context.getCurrentUser())) ||
             (hasEntityType  && isBlockEntity)) {
-            throw new DSpaceForbiddenException("");
+            throw new AuthorizeException();
         }
 
         WorkflowItem workflowItem = null;
@@ -140,7 +138,8 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
         }
 
         if (Objects.nonNull(workflowItem) || Objects.nonNull(workspaceItem)) {
-            throw new UnprocessableEntityException("");
+            throw new UnprocessableEntityException("It is not possible to create a new version"
+                                                         + " if the latest one in submisssion!");
         }
 
         Version version = StringUtils.isNotBlank(summary) ?
@@ -168,8 +167,8 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
                     break;
                 case "add":
                     if (StringUtils.isNotBlank(version.getSummary())) {
-                        throw new DSpaceBadRequestException("The 'summary' property is setted with value:"
-                                          + version.getSummary() + ", it is not possible to add new value");
+                        throw new DSpaceBadRequestException("The 'summary' already contains the value: "
+                                     + version.getSummary() + ", it is not possible to add a new value.");
                     }
                     version.setSummary(operation.getValue().toString());
                     break;

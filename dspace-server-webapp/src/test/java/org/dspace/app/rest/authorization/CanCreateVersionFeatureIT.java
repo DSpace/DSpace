@@ -409,7 +409,7 @@ public class CanCreateVersionFeatureIT extends AbstractControllerIntegrationTest
         context.turnOffAuthorisationSystem();
 
         configurationService.setProperty("versioning.submitterCanCreateNewVersion", true);
-        configurationService.setProperty("versioning.block.entity", "");
+        configurationService.setProperty("versioning.block.entity", null);
 
         Community rootCommunity = CommunityBuilder.createCommunity(context)
                                                   .withName("Parent Community")
@@ -417,7 +417,6 @@ public class CanCreateVersionFeatureIT extends AbstractControllerIntegrationTest
 
         Collection col = CollectionBuilder.createCollection(context, rootCommunity)
                                           .withName("Collection 1")
-                                          .withAdminGroup(eperson)
                                           .withSubmitterGroup(eperson)
                                           .build();
 
