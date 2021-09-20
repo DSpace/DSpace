@@ -158,7 +158,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#itemId, 'ITEM', 'READ')")
     protected SubscriptionRest createAndReturn(Context context) throws SQLException, AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         String epersonId = req.getParameter("eperson_id");
