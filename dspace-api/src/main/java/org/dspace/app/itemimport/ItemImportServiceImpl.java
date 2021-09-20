@@ -172,7 +172,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected boolean useWorkflow = false;
     protected boolean useWorkflowSendEmail = false;
     protected boolean isQuiet = false;
-    protected boolean processRelationships = false;
 
     //remember which folder item was imported from
     Map<String, Item> itemFolderMap = null;
@@ -2119,11 +2118,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     @Override
     public void setQuiet(boolean isQuiet) {
         this.isQuiet = isQuiet;
-    }
-
-    @Override
-    public void setProcessRelationships(boolean processRelationships) {
-        this.processRelationships = processRelationships;
     }
 
 }
