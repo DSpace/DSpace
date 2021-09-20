@@ -268,7 +268,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
                 .findByElement(context, MetadataSchemaEnum.DC.getName(), "date", "accessioned");
         if (metadataField == null) {
             throw new IllegalArgumentException(
-                    "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".date.accessioned' doesn't exist!");
+                    "Required metadata field '" +
+                        MetadataSchemaEnum.DC.getName() + ".date.accessioned' doesn't exist!");
         }
 
         return itemDAO.findBySubmitter(context, eperson, metadataField, limit);
@@ -328,7 +329,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public void updateLastModifiedDate(Context context, Item item, Date lastModifiedDate) throws SQLException, AuthorizeException {
+    public void updateLastModifiedDate(Context context, Item item, Date lastModifiedDate)
+        throws SQLException, AuthorizeException {
 
         if (!canEdit(context, item)) {
             authorizeService.authorizeAction(context, item, Constants.WRITE);
@@ -824,7 +826,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         log.info(LogManager.getHeader(context, "remove_bundle", "item_id="
                 + item.getID() + ",bundle_id=" + b.getID()));
         context
-                .addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(), Constants.BUNDLE, b.getID(), b.getName()));
+                .addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(),
+                    Constants.BUNDLE, b.getID(), b.getName()));
     }
 
     protected void removeVersion(Context context, Item item) throws AuthorizeException, SQLException {
@@ -1159,7 +1162,8 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     @Override
     public Iterator<Item> findUnfilteredByMetadataField(Context context, String schema, String element,
-                                                        String qualifier, String value) throws SQLException, AuthorizeException {
+                                                        String qualifier, String value)
+        throws SQLException, AuthorizeException {
         MetadataSchema mds = metadataSchemaService.find(context, schema);
         if (mds == null) {
             throw new IllegalArgumentException("No such metadata schema: " + schema);
@@ -1536,14 +1540,16 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     @Override
     public MetadataValue addMetadata(Context context, Item dso, String schema, String element, String qualifier,
-                                     String lang, String value, String authority, int confidence, int place) throws SQLException {
+                                     String lang, String value, String authority,
+                                     int confidence, int place) throws SQLException {
 
         // We will not verify that they are valid entries in the registry
         // until update() is called.
         MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
         if (metadataField == null) {
             throw new SQLException(
-                    "bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not " +
+                    "bad_dublin_core schema=" + schema + "." + element + "." +
+                        qualifier + ". Metadata field does not " +
                             "exist!");
         }
 
@@ -1556,7 +1562,9 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     @Override
     public MetadataValue addMetadataInPlaceSecured(Context context, Item dso, String schema, String element,
-                                                   String qualifier, String lang, String value, String authority, int confidence, int place, Integer securityValue)
+                                                   String qualifier, String lang, String value,
+                                                   String authority, int confidence, int place,
+                                                   Integer securityValue)
         throws SQLException {
 
         // We will not verify that they are valid entries in the registry

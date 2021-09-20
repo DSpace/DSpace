@@ -395,7 +395,8 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
               String lang, String value, String authority, int confidence, int place) throws SQLException;
 
     default public MetadataValue addMetadataInPlaceSecured(Context context, T dso, String schema, String element,
-                    String qualifier, String lang, String value, String authority, int confidence, int place, Integer securityValue)
+                    String qualifier, String lang, String value, String authority,
+                    int confidence, int place, Integer securityValue)
             throws SQLException {
         return null;
     }
@@ -580,7 +581,8 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
     }
 
     default void addAndShiftRightSecuredMetadata(Context context, T dso, String schema, String element,
-                                                 String qualifier, String lang, String value, String authority, int confidence, int index, Integer securitylevel)
+                                                 String qualifier, String lang, String value,
+                                                 String authority, int confidence, int index, Integer securitylevel)
             throws SQLException {
 
     }

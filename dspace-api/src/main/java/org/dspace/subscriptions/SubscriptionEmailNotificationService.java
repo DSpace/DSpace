@@ -10,6 +10,7 @@ package org.dspace.subscriptions;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +45,7 @@ import org.hibernate.proxy.LazyInitializer;
  */
 public class SubscriptionEmailNotificationService {
     private static final Logger log = LogManager.getLogger(SubscriptionEmailNotification.class);
+    public static final List<String> FREQUENCIES = Arrays.asList("D", "W", "M");
     private final CrisMetricsService crisMetricsService;
     private final SubscribeService subscribeService;
     private Map<String, DSpaceObjectUpdates> contentUpdates = new HashMap<>();
@@ -93,9 +95,10 @@ public class SubscriptionEmailNotificationService {
                 }
             } else {
                 if (!type.equals(generators.keySet().toArray()[1])) {
-                    //TODO: add possible frequency values, after having defined them into an Enum
-                    throw new IllegalArgumentException("Options type t and frequency f must be set correctly, type must be one of: "
-                    + String.join(",", generators.keySet()));
+                    throw new IllegalArgumentException("Options type t and frequency f must be set correctly, " +
+                        "type must be one of: "
+                    + String.join(",", generators.keySet()) + " frequency one of: "
+                    + String.join(", ", FREQUENCIES));
                 }
                 int iterator = 0;
                 List<CrisMetrics> crisMetricsList = new ArrayList<>();
