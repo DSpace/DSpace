@@ -320,11 +320,11 @@ public class I18nUtil {
             fileType = "";
         }
 
-        if (!"".equals(locale.getCountry())) {
+        if (!locale.getCountry().isEmpty()) {
             fileNameLC = fileName + "_" + locale.getLanguage() + "_"
                 + locale.getCountry();
 
-            if (!"".equals(locale.getVariant())) {
+            if (!locale.getVariant().isEmpty()) {
                 fileNameLCV = fileName + "_" + locale.getLanguage() + "_"
                     + locale.getCountry() + "_" + locale.getVariant();
             }
