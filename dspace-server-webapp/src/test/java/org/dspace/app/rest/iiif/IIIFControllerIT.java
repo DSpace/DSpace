@@ -27,7 +27,7 @@ import org.dspace.content.Item;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
-public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
+public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 
     public static final String IIIFBundle = "IIIF";
 
