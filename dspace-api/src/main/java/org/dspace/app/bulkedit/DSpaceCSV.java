@@ -577,7 +577,7 @@ public class DSpaceCSV implements Serializable {
                 csvLine.add(headings.get(i - 1), null);
                 String[] elements = part.split(escapedValueSeparator);
                 for (String element : elements) {
-                    if ((element != null) && !"".equals(element)) {
+                    if ((element != null) && !element.isEmpty()) {
                         csvLine.add(headings.get(i - 1), element);
                     }
                 }
