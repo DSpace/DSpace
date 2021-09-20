@@ -66,7 +66,7 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
         }
     }
 
-    public String generateHtmlBodyMail(Context context, List<IndexableObject> indexableObjects) {
+    private String generateHtmlBodyMail(Context context, List<IndexableObject> indexableObjects) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             out.write("\n".getBytes(StandardCharsets.UTF_8));

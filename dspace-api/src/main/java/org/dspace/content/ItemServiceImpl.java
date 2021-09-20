@@ -328,7 +328,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public void setWithLastModifiedDate(Context context, Item item, Date lastModifiedDate) throws SQLException, AuthorizeException {
+    public void updateLastModifiedDate(Context context, Item item, Date lastModifiedDate) throws SQLException, AuthorizeException {
 
         if (!canEdit(context, item)) {
             authorizeService.authorizeAction(context, item, Constants.WRITE);
@@ -1557,7 +1557,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     @Override
     public MetadataValue addMetadataInPlaceSecured(Context context, Item dso, String schema, String element,
                                                    String qualifier, String lang, String value, String authority, int confidence, int place, Integer securityValue)
-            throws SQLException {
+        throws SQLException {
 
         // We will not verify that they are valid entries in the registry
         // until update() is called.

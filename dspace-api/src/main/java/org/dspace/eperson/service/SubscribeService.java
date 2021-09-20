@@ -209,7 +209,7 @@ public interface SubscribeService {
     public void deleteSubscription(Context context, Integer id) throws SQLException, AuthorizeException;
 
     /**
-     * Deletes a subscription
+     * Finds all subscriptions having given type and frequency
      *
      * @param context DSpace context
      * @param type String type of subscription

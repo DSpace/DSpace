@@ -515,7 +515,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     public void updateLastModified(Context context, T dso) throws SQLException, AuthorizeException;
 
-    default void setWithLastModifiedDate(Context context, T dso, Date lastModified)
+    default void updateLastModifiedDate(Context context, T dso, Date lastModified)
             throws SQLException, AuthorizeException {
     }
 
