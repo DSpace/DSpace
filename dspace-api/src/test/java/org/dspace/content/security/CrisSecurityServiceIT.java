@@ -45,6 +45,10 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
 
     private EPerson owner;
 
+    private EPerson submitter;
+
+    private EPerson anotherSubmitter;
+
     private EPerson collectionAdmin;
 
     private EPerson communityAdmin;
@@ -60,6 +64,16 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
             .withEmail("communityAdmin@test.it")
             .build();
 
+        submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@mail.it")
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        anotherSubmitter = EPersonBuilder.createEPerson(context)
+            .withEmail("anotherSubmitter@mail.it")
+            .build();
+
         parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Test community")
             .withAdminGroup(communityAdmin)
@@ -73,6 +87,7 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
             .withName("Test collection")
             .withEntityType("Publication")
             .withAdminGroup(collectionAdmin)
+            .withSubmitterGroup(submitter, anotherSubmitter)
             .build();
 
         owner = EPersonBuilder.createEPerson(context)
@@ -95,20 +110,14 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
 
         AccessItemMode accessMode = buildAccessItemMode(CrisSecurity.ADMIN);
 
-        boolean hasAccess = crisSecurityService.hasAccess(context, item, eperson, accessMode);
-        assertThat(hasAccess, is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, eperson, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, admin, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, owner, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, communityAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, submitter, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, anotherSubmitter, accessMode), is(false));
 
-        boolean hasAdminAccess = crisSecurityService.hasAccess(context, item, admin, accessMode);
-        assertThat(hasAdminAccess, is(true));
-
-        boolean hasOwnerAccess = crisSecurityService.hasAccess(context, item, owner, accessMode);
-        assertThat(hasOwnerAccess, is(false));
-
-        boolean hasCollectionAdminAccess = crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode);
-        assertThat(hasCollectionAdminAccess, is(false));
-
-        boolean hasCommunityAdminAccess = crisSecurityService.hasAccess(context, item, communityAdmin, accessMode);
-        assertThat(hasCommunityAdminAccess, is(false));
     }
 
     @Test
@@ -125,20 +134,13 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
 
         AccessItemMode accessMode = buildAccessItemMode(CrisSecurity.ADMIN_OWNER);
 
-        boolean hasAccess = crisSecurityService.hasAccess(context, item, eperson, accessMode);
-        assertThat(hasAccess, is(false));
-
-        boolean hasAdminAccess = crisSecurityService.hasAccess(context, item, admin, accessMode);
-        assertThat(hasAdminAccess, is(true));
-
-        boolean hasOwnerAccess = crisSecurityService.hasAccess(context, item, owner, accessMode);
-        assertThat(hasOwnerAccess, is(true));
-
-        boolean hasCollectionAdminAccess = crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode);
-        assertThat(hasCollectionAdminAccess, is(false));
-
-        boolean hasCommunityAdminAccess = crisSecurityService.hasAccess(context, item, communityAdmin, accessMode);
-        assertThat(hasCommunityAdminAccess, is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, eperson, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, admin, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, owner, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, communityAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, submitter, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, anotherSubmitter, accessMode), is(false));
     }
 
     @Test
@@ -155,20 +157,13 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
 
         AccessItemMode accessMode = buildAccessItemMode(CrisSecurity.OWNER);
 
-        boolean hasAccess = crisSecurityService.hasAccess(context, item, eperson, accessMode);
-        assertThat(hasAccess, is(false));
-
-        boolean hasAdminAccess = crisSecurityService.hasAccess(context, item, admin, accessMode);
-        assertThat(hasAdminAccess, is(false));
-
-        boolean hasOwnerAccess = crisSecurityService.hasAccess(context, item, owner, accessMode);
-        assertThat(hasOwnerAccess, is(true));
-
-        boolean hasCollectionAdminAccess = crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode);
-        assertThat(hasCollectionAdminAccess, is(false));
-
-        boolean hasCommunityAdminAccess = crisSecurityService.hasAccess(context, item, communityAdmin, accessMode);
-        assertThat(hasCommunityAdminAccess, is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, eperson, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, admin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, owner, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, communityAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, submitter, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, anotherSubmitter, accessMode), is(false));
     }
 
     @Test
@@ -229,6 +224,8 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
         assertThat(crisSecurityService.hasAccess(context, item, owner, accessMode), is(false));
         assertThat(crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode), is(false));
         assertThat(crisSecurityService.hasAccess(context, item, communityAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, submitter, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, anotherSubmitter, accessMode), is(false));
 
         assertThat(crisSecurityService.hasAccess(context, item, firstUser, accessMode), is(true));
         assertThat(crisSecurityService.hasAccess(context, item, secondUser, accessMode), is(true));
@@ -255,20 +252,120 @@ public class CrisSecurityServiceIT extends AbstractIntegrationTestWithDatabase {
 
         AccessItemMode accessMode = buildAccessItemMode(CrisSecurity.ITEM_ADMIN);
 
-        boolean hasAccess = crisSecurityService.hasAccess(context, item, eperson, accessMode);
-        assertThat(hasAccess, is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, eperson, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, admin, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, owner, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, communityAdmin, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, submitter, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, anotherSubmitter, accessMode), is(false));
+    }
 
-        boolean hasAdminAccess = crisSecurityService.hasAccess(context, item, admin, accessMode);
-        assertThat(hasAdminAccess, is(true));
+    @Test
+    public void testHasAccessWithSubmitterConfig() throws SQLException, AuthorizeException {
 
-        boolean hasOwnerAccess = crisSecurityService.hasAccess(context, item, owner, accessMode);
-        assertThat(hasOwnerAccess, is(false));
+        context.turnOffAuthorisationSystem();
 
-        boolean hasCollectionAdminAccess = crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode);
-        assertThat(hasCollectionAdminAccess, is(true));
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Test item")
+            .withCrisOwner("Owner", owner.getID().toString())
+            .build();
 
-        boolean hasCommunityAdminAccess = crisSecurityService.hasAccess(context, item, communityAdmin, accessMode);
-        assertThat(hasCommunityAdminAccess, is(true));
+        context.restoreAuthSystemState();
+
+        AccessItemMode accessMode = buildAccessItemMode(CrisSecurity.SUBMITTER);
+
+        assertThat(crisSecurityService.hasAccess(context, item, eperson, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, admin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, owner, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, communityAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, submitter, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, anotherSubmitter, accessMode), is(false));
+    }
+
+    @Test
+    public void testHasAccessWithSubmitterGroupConfig() throws SQLException, AuthorizeException {
+
+        context.turnOffAuthorisationSystem();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Test item")
+            .withCrisOwner("Owner", owner.getID().toString())
+            .build();
+
+        context.restoreAuthSystemState();
+
+        AccessItemMode accessMode = buildAccessItemMode(CrisSecurity.SUBMITTER_GROUP);
+
+        assertThat(crisSecurityService.hasAccess(context, item, eperson, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, admin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, owner, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, communityAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, submitter, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, anotherSubmitter, accessMode), is(true));
+    }
+
+    @Test
+    public void testHasAccessWithGroupConfig() throws SQLException, AuthorizeException {
+
+        context.turnOffAuthorisationSystem();
+
+        Group firstGroup = GroupBuilder.createGroup(context)
+            .withName("Group 1")
+            .build();
+
+        Group secondGroup = GroupBuilder.createGroup(context)
+            .withName("Group 2")
+            .build();
+
+        Group thirdGroup = GroupBuilder.createGroup(context)
+            .withName("Group 3")
+            .build();
+
+        EPerson firstUser = EPersonBuilder.createEPerson(context)
+            .withEmail("user@mail.it")
+            .withGroupMembership(firstGroup)
+            .build();
+
+        EPerson secondUser = EPersonBuilder.createEPerson(context)
+            .withEmail("user2@mail.it")
+            .withGroupMembership(secondGroup)
+            .build();
+
+        EPerson thirdUser = EPersonBuilder.createEPerson(context)
+            .withEmail("user3@mail.it")
+            .withGroupMembership(thirdGroup)
+            .build();
+
+        EPerson fourthUser = EPersonBuilder.createEPerson(context)
+            .withEmail("user4@mail.it")
+            .withGroupMembership(thirdGroup)
+            .build();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Test item")
+            .withCrisOwner("Owner", owner.getID().toString())
+            .build();
+
+        context.restoreAuthSystemState();
+
+        AccessItemMode accessMode = buildAccessItemMode(CrisSecurity.GROUP);
+        when(accessMode.getGroups()).thenReturn(List.of("Group 1", thirdGroup.getID().toString()));
+
+        assertThat(crisSecurityService.hasAccess(context, item, eperson, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, admin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, owner, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, collectionAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, communityAdmin, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, submitter, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, anotherSubmitter, accessMode), is(false));
+
+        assertThat(crisSecurityService.hasAccess(context, item, firstUser, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, secondUser, accessMode), is(false));
+        assertThat(crisSecurityService.hasAccess(context, item, thirdUser, accessMode), is(true));
+        assertThat(crisSecurityService.hasAccess(context, item, fourthUser, accessMode), is(true));
     }
 
     private AccessItemMode buildAccessItemMode(CrisSecurity security) {

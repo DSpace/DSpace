@@ -44,4 +44,10 @@ public interface AccessItemMode {
      * @return the metadata fields list
      */
     public List<String> getItemMetadataFields();
+
+    /**
+     * Returns the configured groups name/uuid for the GROUP security.
+     * @return the group list
+     */
+    public List<String> getGroups();
 }
