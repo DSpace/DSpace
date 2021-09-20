@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
 
 import org.dspace.content.Item;
 import org.dspace.content.vo.MetadataValueVO;
@@ -35,8 +36,11 @@ public class DateValueGeneratorTest {
         final Item templateItem = mock(Item.class);
         final String extraParams = "";
 
-        final MetadataValueVO generatedValue = dateGenerator.generator(context, item, templateItem, extraParams);
+        final List<MetadataValueVO> generatedValueList =
+                dateGenerator.generator(context, item, templateItem, extraParams);
+        final MetadataValueVO generatedValue = generatedValueList.get(0);
 
+        assertThat(generatedValueList.size(), is(1));
         assertThat(generatedValue.getValue(), is(new Date().toString()));
         assertThat(generatedValue.getAuthority(), nullValue());
         assertThat(generatedValue.getConfidence(), is(-1));
@@ -49,8 +53,11 @@ public class DateValueGeneratorTest {
         final Item templateItem = mock(Item.class);
         final String extraParams = "yyyy-MM-dd";
 
-        final MetadataValueVO generatedValue = dateGenerator.generator(context, item, templateItem, extraParams);
+        final List<MetadataValueVO> generatedValueList =
+                dateGenerator.generator(context, item, templateItem, extraParams);
+        final MetadataValueVO generatedValue = generatedValueList.get(0);
 
+        assertThat(generatedValueList.size(), is(1));
         assertThat(generatedValue.getValue(), is(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now())));
         assertThat(generatedValue.getAuthority(), nullValue());
         assertThat(generatedValue.getConfidence(), is(-1));

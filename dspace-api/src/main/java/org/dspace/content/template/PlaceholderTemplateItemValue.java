@@ -7,6 +7,7 @@
  */
 package org.dspace.content.template;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,7 +41,7 @@ public class PlaceholderTemplateItemValue implements TemplateItemValue {
     }
 
     @Override
-    public MetadataValueVO value(final Context context, final Item targetItem,
+    public List<MetadataValueVO> values(final Context context, final Item targetItem,
                                final Item templateItem, final MetadataValue metadataValue) {
         if (!appliesTo(metadataValue.getValue())) {
             throw new IllegalArgumentException("Metadata value " + metadataValue.getValue() +
@@ -55,7 +56,7 @@ public class PlaceholderTemplateItemValue implements TemplateItemValue {
 
     }
 
-    private MetadataValueVO generateValue(final Context context, final Item targetItem, final Item templateItem,
+    private List<MetadataValueVO> generateValue(final Context context, final Item targetItem, final Item templateItem,
                                         final MetadataValue metadataValue, final String[] splitted,
                                         final TemplateValueGenerator gen) {
         String extraParams = null;
