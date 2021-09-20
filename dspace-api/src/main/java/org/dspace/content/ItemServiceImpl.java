@@ -1524,14 +1524,14 @@ prevent the generation of resource policy entry values with null dspace_object a
      */
     private List<MetadataValue> sortMetadataValueList(List<MetadataValue> listToReturn) {
         Comparator<MetadataValue> comparator = Comparator.comparing(
-                metadataValue -> metadataValue.getMetadataField().getMetadataSchema().getName(),
-                Comparator.nullsFirst(Comparator.naturalOrder()));
+            metadataValue -> metadataValue.getMetadataField().getMetadataSchema().getName(),
+            Comparator.nullsFirst(Comparator.naturalOrder()));
         comparator = comparator.thenComparing(metadataValue -> metadataValue.getMetadataField().getElement(),
-                Comparator.nullsFirst(Comparator.naturalOrder()));
+            Comparator.nullsFirst(Comparator.naturalOrder()));
         comparator = comparator.thenComparing(metadataValue -> metadataValue.getMetadataField().getQualifier(),
-                Comparator.nullsFirst(Comparator.naturalOrder()));
+            Comparator.nullsFirst(Comparator.naturalOrder()));
         comparator = comparator.thenComparing(metadataValue -> metadataValue.getPlace(),
-                Comparator.nullsFirst(Comparator.naturalOrder()));
+            Comparator.nullsFirst(Comparator.naturalOrder()));
 
         Stream<MetadataValue> metadataValueStream = listToReturn.stream().sorted(comparator);
         listToReturn = metadataValueStream.collect(Collectors.toList());

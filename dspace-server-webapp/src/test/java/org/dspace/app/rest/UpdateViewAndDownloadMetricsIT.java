@@ -418,10 +418,12 @@ public class UpdateViewAndDownloadMetricsIT extends AbstractControllerIntegratio
         CrisMetrics metrics_views_comm = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(
                 context, "view", community.getID());
         // find previous metrics
-        CrisMetrics old_metric_views_month = crisMetriscService.find(context, crisMetrics_previous_month_views_comm.getID());
-        CrisMetrics old_metric_views_week = crisMetriscService.find(context,  crisMetrics_previous_week_views_comm.getID());
+        CrisMetrics old_metric_views_month = crisMetriscService.find(context,
+            crisMetrics_previous_month_views_comm.getID());
+        CrisMetrics old_metric_views_week = crisMetriscService.find(context,
+            crisMetrics_previous_week_views_comm.getID());
         CrisMetrics old_metric_downloads_week = crisMetriscService.find(context,
-                crisMetrics_previous_week_downloads.getID());
+            crisMetrics_previous_week_downloads.getID());
 
 
         //control download values
@@ -563,8 +565,10 @@ public class UpdateViewAndDownloadMetricsIT extends AbstractControllerIntegratio
         CrisMetrics metrics_views_cols = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(
                 context, "view", col1.getID());
         // find previous metrics
-        CrisMetrics old_metric_views_month = crisMetriscService.find(context, crisMetrics_previous_month_views_comm.getID());
-        CrisMetrics old_metric_views_week = crisMetriscService.find(context,  crisMetrics_previous_week_views_comm.getID());
+        CrisMetrics old_metric_views_month = crisMetriscService.find(context,
+            crisMetrics_previous_month_views_comm.getID());
+        CrisMetrics old_metric_views_week = crisMetriscService.find(context,
+            crisMetrics_previous_week_views_comm.getID());
         CrisMetrics old_metric_downloads_week = crisMetriscService.find(context,
                 crisMetrics_previous_week_downloads.getID());
         CrisMetrics old_metric_view_week_items = crisMetriscService.find(context,
@@ -687,12 +691,14 @@ public class UpdateViewAndDownloadMetricsIT extends AbstractControllerIntegratio
         CrisMetrics metrics_views_cols = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(
                 context, "view", col1.getID());
         // find previous metrics
-        CrisMetrics old_metric_views_month = crisMetriscService.find(context, crisMetrics_previous_month_views_comm.getID());
-        CrisMetrics old_metric_views_week = crisMetriscService.find(context,  crisMetrics_previous_week_views_comm.getID());
+        CrisMetrics old_metric_views_month = crisMetriscService.find(context,
+            crisMetrics_previous_month_views_comm.getID());
+        CrisMetrics old_metric_views_week = crisMetriscService.find(context,
+            crisMetrics_previous_week_views_comm.getID());
         CrisMetrics old_metric_view_week_col = crisMetriscService.find(context,
-                crisMetrics_previous_week_views_col.getID());
+            crisMetrics_previous_week_views_col.getID());
         CrisMetrics old_metric_view_month_col = crisMetriscService.find(context,
-                crisMetrics_previous_month_views_col.getID());
+            crisMetrics_previous_month_views_col.getID());
 
 
         assertEquals("view", metrics_views_comm.getMetricType());

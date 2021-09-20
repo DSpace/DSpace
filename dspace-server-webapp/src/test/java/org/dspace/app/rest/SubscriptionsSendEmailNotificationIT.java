@@ -7,7 +7,20 @@
  */
 package org.dspace.app.rest;
 
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.dspace.app.metrics.CrisMetrics;
@@ -50,20 +63,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
-
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-
 /**
  * Test for script of sending subscriptions for items/collections/communities
  *  @author Alba Aliu (alba.aliu at atis.al)
@@ -101,10 +100,12 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        itemsUpdates = new ItemsUpdates(collectionService, communityService, itemService, discoveryConfigurationService, searchService);
+        itemsUpdates = new ItemsUpdates(collectionService, communityService,
+            itemService, discoveryConfigurationService, searchService);
         collectionsUpdates = new CollectionsUpdates(searchService);
         communityUpdates = new CommunityUpdates(searchService);
-        itemsUpdates = new ItemsUpdates(collectionService, communityService, itemService, discoveryConfigurationService, searchService);
+        itemsUpdates = new ItemsUpdates(collectionService, communityService, itemService,
+            discoveryConfigurationService, searchService);
         Map<String, SubscriptionGenerator> generatorMap = new HashMap<>();
         generatorMap.put("content", contentGenerator);
         generatorMap.put("statistics", statisticsGenerator);
@@ -114,7 +115,8 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         contentUpdateMap.put("item", itemsUpdates);
         // Explicitly use solr commit in SolrLoggerServiceImpl#postView
         configurationService.setProperty("solr-statistics.autoCommit", false);
-        this.subscriptionEmailNotificationService = new SubscriptionEmailNotificationService(crisMetricsService, subscribeService, generatorMap, contentUpdateMap);
+        this.subscriptionEmailNotificationService = new SubscriptionEmailNotificationService(
+            crisMetricsService, subscribeService, generatorMap, contentUpdateMap);
         subscriptionEmailNotification = new SubscriptionEmailNotification();
     }
 
@@ -135,11 +137,19 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Item person = ItemBuilder.createItem(context, col2)
                 .withEntityType("Person").withFullName("testPerson")
                 .withTitle("testPerson")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("W"));
+                .withAffiliation(orgUnit.getName(),
+                    orgUnit.getID().toString())
+            .buildWithLastModifiedDate(generateTimeOnBasedFrequency("W"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, eperson, generateSubscriptionParameterListFrequency("W")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "content", community, eperson, generateSubscriptionParameterListFrequency("D")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "content", col1, eperson, generateSubscriptionParameterListFrequency("W")).build();
+        Subscription subscription = SubscribeBuilder
+            .subscribeBuilder(context, "content", orgUnit, eperson,
+                generateSubscriptionParameterListFrequency("W")).build();
+        Subscription subscriptionComm = SubscribeBuilder
+            .subscribeBuilder(context, "content", community,
+                eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionColl = SubscribeBuilder
+            .subscribeBuilder(context, "content", col1, eperson,
+                generateSubscriptionParameterListFrequency("W")).build();
         context.restoreAuthSystemState();
         String[] args = new String[]{"subscription-send", "-t", "content", "-f", "W"};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
@@ -156,7 +166,9 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         IndexableItem indexableObject1 = new IndexableItem(orgUnit);
         collections.add(indexableObject1);
         // verify that method in invoked correctly
-        verify(contentGenerator).notifyForSubscriptions(subscriptionEmailNotification.getContext(), eperson, new ArrayList<>(), collections, items);
+        verify(contentGenerator).notifyForSubscriptions(
+            subscriptionEmailNotification.getContext(), eperson, new ArrayList<>(),
+            collections, items);
         verifyNoMoreInteractions(contentGenerator);
     }
 
@@ -177,11 +189,19 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Item person = ItemBuilder.createItem(context, col2)
                 .withEntityType("Person").withFullName("testPerson")
                 .withTitle("testPerson")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("W"));
+                .withAffiliation(orgUnit.getName(),
+                    orgUnit.getID().toString())
+            .buildWithLastModifiedDate(generateTimeOnBasedFrequency("W"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "statistics", orgUnit, eperson, generateSubscriptionParameterListFrequency("W")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "statistics", community, eperson, generateSubscriptionParameterListFrequency("D")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "statistics", col1, eperson, generateSubscriptionParameterListFrequency("W")).build();
+        Subscription subscription = SubscribeBuilder
+            .subscribeBuilder(context, "statistics",
+                orgUnit, eperson, generateSubscriptionParameterListFrequency("W")).build();
+        Subscription subscriptionComm = SubscribeBuilder
+            .subscribeBuilder(context, "statistics", community,
+                eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionColl = SubscribeBuilder
+            .subscribeBuilder(context, "statistics", col1, eperson,
+                generateSubscriptionParameterListFrequency("W")).build();
         context.restoreAuthSystemState();
         String[] args = new String[]{"subscription-send", "-t", "content", "-f", "W"};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
@@ -194,7 +214,8 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         verifyZeroInteractions(statisticsGenerator);
     }
 
-    //verify that method that invokes mail send is called correctly for type content and frequence weekly for two different users
+    //verify that method that invokes mail send is called correctly for type
+    // content and frequence weekly for two different users
     @Test
     public void sendSubscriptionMailTypeContentWeeklyForTwoPersons() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -210,11 +231,19 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Item person = ItemBuilder.createItem(context, col2)
                 .withEntityType("Person").withFullName("testPerson")
                 .withTitle("testPerson")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("W"));
+                .withAffiliation(orgUnit.getName(),
+                    orgUnit.getID().toString()).buildWithLastModifiedDate(
+                        generateTimeOnBasedFrequency("W"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, admin, generateSubscriptionParameterListFrequency("W")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "content", community, eperson, generateSubscriptionParameterListFrequency("D")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, eperson, generateSubscriptionParameterListFrequency("W")).build();
+        Subscription subscription = SubscribeBuilder
+            .subscribeBuilder(context, "content", orgUnit,
+                admin, generateSubscriptionParameterListFrequency("W")).build();
+        Subscription subscriptionComm = SubscribeBuilder
+            .subscribeBuilder(context, "content", community, eperson,
+                generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionColl = SubscribeBuilder
+            .subscribeBuilder(context, "content", orgUnit, eperson,
+                generateSubscriptionParameterListFrequency("W")).build();
         context.restoreAuthSystemState();
         String[] args = new String[]{"subscription-send", "-t", "content", "-f", "W"};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
@@ -227,7 +256,12 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         IndexableItem indexableObject = new IndexableItem(person);
         items.add(indexableObject);
         // verify that method is invoked twice for different users
-        verify(contentGenerator, times(2)).notifyForSubscriptions(eq(subscriptionEmailNotification.getContext()), personArgumentCaptor.capture(), eq(new ArrayList<>()), eq(new ArrayList<>()), eq(items));
+        verify(contentGenerator,
+            times(2))
+            .notifyForSubscriptions(
+                eq(subscriptionEmailNotification.getContext()),
+                personArgumentCaptor.capture(), eq(new ArrayList<>()),
+                eq(new ArrayList<>()), eq(items));
         List<EPerson> allValues = personArgumentCaptor.getAllValues();
         List<EPerson> personList = new ArrayList<>();
         personList.add(admin);
@@ -253,16 +287,24 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Item person = ItemBuilder.createItem(context, col3)
                 .withEntityType("Person").withFullName("personTest")
                 .withTitle("personTest")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("M"));
+                .withAffiliation(orgUnit.getName(),
+                    orgUnit.getID().toString())
+            .buildWithLastModifiedDate(generateTimeOnBasedFrequency("M"));
 
         Item itemOfComm = ItemBuilder.createItem(context, col2)
                 .withEntityType("Equipment").withFullName("testEquipment")
                 .withTitle("testEquipment")
                 .buildWithLastModifiedDate(generateTimeOnBasedFrequency("M"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, eperson, generateSubscriptionParameterListFrequency("M")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "content", community, eperson, generateSubscriptionParameterListFrequency("D")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "content", col1, eperson, generateSubscriptionParameterListFrequency("M")).build();
+        Subscription subscription = SubscribeBuilder
+            .subscribeBuilder(context, "content", orgUnit, eperson,
+                generateSubscriptionParameterListFrequency("M")).build();
+        Subscription subscriptionComm = SubscribeBuilder
+            .subscribeBuilder(context, "content",
+                community, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionColl = SubscribeBuilder
+            .subscribeBuilder(context, "content", col1, eperson,
+                generateSubscriptionParameterListFrequency("M")).build();
         context.restoreAuthSystemState();
         String[] args = new String[]{"subscription-send", "-t", "content", "-f", "M"};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
@@ -282,7 +324,9 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         List<IndexableObject> communities = new ArrayList<>();
 
         // verify that method in invoked correctly
-        verify(contentGenerator).notifyForSubscriptions(subscriptionEmailNotification.getContext(), eperson, communities, collections, items);
+        verify(contentGenerator)
+            .notifyForSubscriptions(subscriptionEmailNotification.getContext(),
+                eperson, communities, collections, items);
         verifyNoMoreInteractions(contentGenerator);
     }
 
@@ -303,11 +347,19 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Item person = ItemBuilder.createItem(context, col2)
                 .withEntityType("Person").withFullName("person")
                 .withTitle("person")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("D"));
+                .withAffiliation(orgUnit.getName(),
+                    orgUnit.getID().toString())
+            .buildWithLastModifiedDate(generateTimeOnBasedFrequency("D"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "content", orgUnit, eperson, generateSubscriptionParameterListFrequency("D")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "content", community, eperson, generateSubscriptionParameterListFrequency("W")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "content", col1, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscription = SubscribeBuilder
+            .subscribeBuilder(context, "content", orgUnit,
+                eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionComm = SubscribeBuilder
+            .subscribeBuilder(context, "content", community,
+                eperson, generateSubscriptionParameterListFrequency("W")).build();
+        Subscription subscriptionColl = SubscribeBuilder
+            .subscribeBuilder(context, "content", col1, eperson,
+                generateSubscriptionParameterListFrequency("D")).build();
         context.restoreAuthSystemState();
         String[] args = new String[]{"subscription-send", "-t", "content", "-f", "D"};
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
@@ -323,7 +375,9 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         IndexableItem indexableObject1 = new IndexableItem(orgUnit);
         collections.add(indexableObject1);
         // verify that method in invoked correctly
-        verify(contentGenerator).notifyForSubscriptions(subscriptionEmailNotification.getContext(), eperson, new ArrayList<>(), collections, items);
+        verify(contentGenerator)
+            .notifyForSubscriptions(subscriptionEmailNotification.getContext(),
+                eperson, new ArrayList<>(), collections, items);
         verifyNoMoreInteractions(contentGenerator);
 
     }
@@ -343,11 +397,19 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Item person = ItemBuilder.createItem(context, col1)
                 .withEntityType("Person").withFullName("testPerson")
                 .withTitle("testPerson")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("D"));
+                .withAffiliation(orgUnit.getName(),
+                    orgUnit.getID().toString())
+            .buildWithLastModifiedDate(generateTimeOnBasedFrequency("D"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "statistics", orgUnit, eperson, generateSubscriptionParameterListFrequency("D")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "statistics", community, eperson, generateSubscriptionParameterListFrequency("D")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "statistics", col1, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscription = SubscribeBuilder
+            .subscribeBuilder(context, "statistics",
+                orgUnit, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionComm = SubscribeBuilder
+            .subscribeBuilder(context, "statistics", community, eperson,
+                generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionColl = SubscribeBuilder
+            .subscribeBuilder(context, "statistics", col1, eperson,
+                generateSubscriptionParameterListFrequency("D")).build();
         //create cris metrics related with dso
         CrisMetrics crisMetricsComm = CrisMetricsBuilder.createCrisMetrics(context, community)
                 .withMetricType("view")
@@ -387,7 +449,9 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         crisMetrics.add(crisMetricsComm);
         crisMetrics.add(crisMetricsColl);
         // verify that method in invoked correctly
-        verify(statisticsGenerator).notifyForSubscriptions(subscriptionEmailNotification.getContext(), eperson, crisMetrics, null, null);
+        verify(statisticsGenerator)
+            .notifyForSubscriptions(subscriptionEmailNotification.getContext(),
+                eperson, crisMetrics, null, null);
     }
 
     //verify that method that invokes mail send is called correctly for type statistics and frequence monthly
@@ -405,11 +469,18 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Item person = ItemBuilder.createItem(context, col1)
                 .withEntityType("Person").withFullName("testPerson")
                 .withTitle("testPerson")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("M"));
+                .withAffiliation(orgUnit.getName(),
+                    orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("M"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "statistics", orgUnit, eperson, generateSubscriptionParameterListFrequency("M")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "statistics", community, eperson, generateSubscriptionParameterListFrequency("D")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "statistics", col1, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscription = SubscribeBuilder
+            .subscribeBuilder(context, "statistics",
+                orgUnit, eperson, generateSubscriptionParameterListFrequency("M")).build();
+        Subscription subscriptionComm = SubscribeBuilder
+            .subscribeBuilder(context, "statistics", community,
+                eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionColl = SubscribeBuilder
+            .subscribeBuilder(context, "statistics", col1, eperson,
+                generateSubscriptionParameterListFrequency("D")).build();
         //create cris metrics related with dso
         CrisMetrics crisMetricsComm = CrisMetricsBuilder.createCrisMetrics(context, community)
                 .withMetricType("view")
@@ -447,7 +518,8 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         List<CrisMetrics> crisMetrics = new ArrayList<>();
         crisMetrics.add(crisMetricsItem);
         // verify that method in invoked correctly
-        verify(statisticsGenerator).notifyForSubscriptions(subscriptionEmailNotification.getContext(), eperson, crisMetrics, null, null);
+        verify(statisticsGenerator)
+            .notifyForSubscriptions(subscriptionEmailNotification.getContext(), eperson, crisMetrics, null, null);
     }
 
     //verify that method that invokes mail send is called correctly for type statistics and frequence monthly
@@ -465,11 +537,18 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         Item person = ItemBuilder.createItem(context, col1)
                 .withEntityType("Person").withFullName("testPerson")
                 .withTitle("testPerson")
-                .withAffiliation(orgUnit.getName(), orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("D"));
+                .withAffiliation(orgUnit.getName(),
+                    orgUnit.getID().toString()).buildWithLastModifiedDate(generateTimeOnBasedFrequency("D"));
         // subscription with dso of type item
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "statistics", orgUnit, eperson, generateSubscriptionParameterListFrequency("D")).build();
-        Subscription subscriptionComm = SubscribeBuilder.subscribeBuilder(context, "statistics", community, eperson, generateSubscriptionParameterListFrequency("D")).build();
-        Subscription subscriptionColl = SubscribeBuilder.subscribeBuilder(context, "statistics", col1, eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscription = SubscribeBuilder
+            .subscribeBuilder(context, "statistics", orgUnit,
+                eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionComm = SubscribeBuilder
+            .subscribeBuilder(context, "statistics", community,
+                eperson, generateSubscriptionParameterListFrequency("D")).build();
+        Subscription subscriptionColl = SubscribeBuilder
+            .subscribeBuilder(context, "statistics", col1, eperson,
+                generateSubscriptionParameterListFrequency("D")).build();
         //create cris metrics related with dso
         CrisMetrics crisMetricsComm = CrisMetricsBuilder.createCrisMetrics(context, community)
                 .withMetricType("view")
@@ -509,7 +588,8 @@ public class SubscriptionsSendEmailNotificationIT extends AbstractControllerInte
         crisMetrics.add(crisMetricsComm);
         crisMetrics.add(crisMetricsColl);
         // verify that method in invoked correctly
-        verify(statisticsGenerator).notifyForSubscriptions(subscriptionEmailNotification.getContext(), eperson, crisMetrics, null, null);
+        verify(statisticsGenerator)
+            .notifyForSubscriptions(subscriptionEmailNotification.getContext(), eperson, crisMetrics, null, null);
     }
 
     private List<SubscriptionParameter> generateSubscriptionParameterListFrequency(String frequencyValue) {
