@@ -286,9 +286,11 @@ public class IIIFUtils {
     }
 
     /**
-     * Serializes the json response.
+     * Serializes the resource. This method uses a customized
+     * object mapper instead of the Spring default to serialize the
+     * iiif response.
      * @param resource to be serialized
-     * @return
+     * @return json string
      */
     public String asJson(Resource<?> resource) {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
