@@ -15,13 +15,9 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.VersionHistoryRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
-import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,23 +35,21 @@ public class VersionHistoryConverter implements DSpaceConverter<VersionHistory, 
     private RequestService requestService;
 
     @Autowired
-    private AuthorizeService authorizeService;
-
-    @Autowired
-    private ConfigurationService configurationService;
-
-    @Autowired
     private VersionHistoryService versionHistoryService;
 
     @Override
     public VersionHistoryRest convert(VersionHistory modelObject, Projection projection) {
         Context context = getContext();
         VersionHistoryRest versionHistoryRest = new VersionHistoryRest();
-        versionHistoryRest.setId(modelObject.getID());
-        if (Objects.nonNull(context.getCurrentUser())) {
-            if (canSeeDraftVersion(context, modelObject)) {
-                versionHistoryRest.setDraftVersion(modelObject.hasDraftVersion());
+        try {
+            versionHistoryRest.setId(modelObject.getID());
+            if (Objects.nonNull(context.getCurrentUser())) {
+                if (versionHistoryService.canSeeDraftVersion(context, modelObject)) {
+                    versionHistoryRest.setDraftVersion(modelObject.hasDraftVersion());
+                }
             }
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
         }
         return versionHistoryRest;
     }
@@ -63,25 +57,6 @@ public class VersionHistoryConverter implements DSpaceConverter<VersionHistory, 
     @Override
     public Class<VersionHistory> getModelClass() {
         return VersionHistory.class;
-    }
-
-    private boolean canSeeDraftVersion(Context context, VersionHistory versionHistory) {
-        try {
-            Version version = versionHistoryService.getLatestVersion(context, versionHistory);
-            if (Objects.nonNull(version)) {
-                EPerson submitter = version.getItem().getSubmitter();
-                boolean isAdmin = authorizeService.isAdmin(context);
-                boolean canCreateVersion = configurationService
-                        .getBooleanProperty("versioning.submitterCanCreateNewVersion");
-                if (!isAdmin && !(canCreateVersion && Objects.equals(submitter, context.getCurrentUser()))) {
-                    return false;
-                }
-                return true;
-            }
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-        }
-        return false;
     }
 
     /**

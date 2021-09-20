@@ -57,11 +57,11 @@ public class VersionHistoryDraftVersionLinkRepository extends AbstractDSpaceRest
                                                                Projection projection) throws SQLException {
         Context context = obtainContext();
         if (Objects.isNull(versionHistoryId) || versionHistoryId < 0) {
-            throw new DSpaceBadRequestException("Provied id is not correct!");
+            throw new DSpaceBadRequestException("Provided id is not correct!");
         }
         VersionHistory versionHistory = versionHistoryService.find(context, versionHistoryId);
         if (Objects.isNull(versionHistory)) {
-            throw new ResourceNotFoundException("No such versio found");
+            throw new ResourceNotFoundException("No such version found");
         }
         Version oldestVersion = versionHistoryService.getLatestVersion(context, versionHistory);
 
