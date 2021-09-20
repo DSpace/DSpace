@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.handle.Handle;
 
 /**
  * Interface to the <a href="http://www.handle.net" target=_new>CNRI Handle
@@ -192,4 +193,6 @@ public interface HandleService {
      * @return
      */
     String parseHandle(String identifier);
+
+    List<Handle> getDeletedItemHandles(Context context) throws SQLException;
 }

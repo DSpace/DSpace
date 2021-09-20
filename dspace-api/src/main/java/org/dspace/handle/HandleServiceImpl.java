@@ -420,4 +420,18 @@ public class HandleServiceImpl implements HandleService {
 
         return null;
     }
+
+    /**
+     * Returns a list of handles of items that have been deleted.
+     *
+     * @param context
+     *            DSpace context
+     * @return The handle for object, or null if the object has no handle.
+     * @exception SQLException
+     *                If a database error occurs
+     */
+    @Override
+    public List<Handle> getDeletedItemHandles(Context context) throws SQLException {
+        return handleDAO.getDeletedItemHandles(context);
+    }
 }
