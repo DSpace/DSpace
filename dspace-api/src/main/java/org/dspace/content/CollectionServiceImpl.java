@@ -992,4 +992,89 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         DiscoverResult resp = searchService.search(context, discoverQuery);
         return resp;
     }
+
+    /**
+     * Finds all Indexed Collections where the current user has submit rights. If the user is an Admin,
+     * this is all Indexed Collections. Otherwise, it includes those collections where
+     * an indexed "submit" policy lists either the eperson or one of the eperson's groups
+     * 
+     * @param context                    DSpace context
+     * @param discoverQuery
+     * @param entityType                 limit the returned collection to those related to given entity type
+     * @param community                  parent community, could be null
+     * @param q                          limit the returned collection to those with metadata values matching the query
+     *                                   terms. The terms are used to make also a prefix query on SOLR
+     *                                   so it can be used to implement an autosuggest feature over the collection name
+     * @return                           discovery search result objects
+     * @throws SQLException              if something goes wrong
+     * @throws SearchServiceException    if search error
+     */
+    private DiscoverResult retrieveCollectionsWithSubmit(Context context, DiscoverQuery discoverQuery,
+        String entityType, Community community, String q)
+        throws SQLException, SearchServiceException {
+
+        StringBuilder query = new StringBuilder();
+        EPerson currentUser = context.getCurrentUser();
+        if (!authorizeService.isAdmin(context)) {
+            String userId = "";
+            if (currentUser != null) {
+                userId = currentUser.getID().toString();
+            }
+            query.append("submit:(e").append(userId);
+
+            Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
+            for (Group group : groups) {
+                query.append(" OR g").append(group.getID());
+            }
+            query.append(")");
+            discoverQuery.addFilterQueries(query.toString());
+        }
+        StringBuilder buildFilter = new StringBuilder();
+        if (community != null) {
+            buildFilter.append("location.comm:").append(community.getID().toString());
+        }
+        if (StringUtils.isNotBlank(entityType)) {
+            if (buildFilter.length() > 0) {
+                buildFilter.append(" AND ");
+            }
+            buildFilter.append("dspace.entity.type:").append(entityType);
+        }
+        if (StringUtils.isNotBlank(q)) {
+            StringBuilder buildQuery = new StringBuilder();
+            String escapedQuery = ClientUtils.escapeQueryChars(q);
+            buildQuery.append(escapedQuery).append(" OR ").append(escapedQuery).append("*");
+            discoverQuery.setQuery(buildQuery.toString());
+        }
+        discoverQuery.addFilterQueries(buildFilter.toString());
+        DiscoverResult resp = searchService.search(context, discoverQuery);
+        return resp;
+    }
+
+    @Override
+    public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community, String entityType,
+            int offset, int limit) throws SQLException, SearchServiceException {
+        List<Collection> collections = new ArrayList<>();
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        discoverQuery.setStart(offset);
+        discoverQuery.setMaxResults(limit);
+        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery,
+                entityType, community, q);
+        for (IndexableObject solrCollections : resp.getIndexableObjects()) {
+            Collection c = ((IndexableCollection) solrCollections).getIndexedObject();
+            collections.add(c);
+        }
+        return collections;
+    }
+
+    @Override
+    public int countCollectionsWithSubmit(String q, Context context, Community community, String entityType)
+            throws SQLException, SearchServiceException {
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setMaxResults(0);
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery, entityType, community, q);
+        return (int) resp.getTotalSearchResults();
+    }
+
 }
