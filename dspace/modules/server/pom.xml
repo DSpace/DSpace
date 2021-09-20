@@ -13,7 +13,7 @@ just adding new jar in the classloader</description>
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>cris-2021.01.01-SNAPSHOT</version>
+        <version>cris-2021.01.02-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 

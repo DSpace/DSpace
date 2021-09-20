@@ -229,7 +229,28 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-
+    @SearchRestMethod(name = "findAdministeredByEntityType")
+    public Page<CollectionRest> findAdministeredByEntityType(
+            @Parameter(value = "query") String query,
+            @Parameter(value = "entityType", required = true) String entityTypeLabel,
+            Pageable pageable)
+            throws SearchServiceException {
+        try {
+            Context context = obtainContext();
+            EntityType entityType = this.entityTypeService.findByEntityType(context, entityTypeLabel);
+            if (entityType == null) {
+                throw new ResourceNotFoundException("There was no entityType found with label: " + entityTypeLabel);
+            }
+            List<Collection> collections = cs.findCollectionsAdministeredByEntityType(
+                    query,entityTypeLabel, context,
+                    Math.toIntExact(pageable.getOffset()),
+                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+            int tot = cs.countCollectionsAdministeredByEntityType(query, entityTypeLabel, context);
+            return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
     @SearchRestMethod(name = "findSubmitAuthorizedByCommunityAndEntityType")
     public Page<CollectionRest> findSubmitAuthorizedByCommunityAndEntityType(
             @Parameter(value = "query") String query,

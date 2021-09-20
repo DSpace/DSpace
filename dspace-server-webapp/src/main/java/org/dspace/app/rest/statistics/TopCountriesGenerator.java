@@ -18,6 +18,7 @@ import org.dspace.app.rest.utils.UsageReportUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.statistics.Dataset;
+import org.dspace.statistics.util.LocationUtils;
 
 /**
  * This report generator provides the TopCountries that have visited the given DSO.
@@ -46,7 +47,10 @@ public class TopCountriesGenerator extends AbstractTopSolrStatsFieldGenerator {
         UsageReportRest usageReportRest = new UsageReportRest();
         for (int i = 0; i < dataset.getColLabels().size(); i++) {
             UsageReportPointCountryRest countryPoint = new UsageReportPointCountryRest();
-            countryPoint.setLabel(dataset.getColLabels().get(i));
+            final String countryCode = dataset.getColLabels().get(i);
+            countryPoint.setIdAndLabel(countryCode,
+                                       LocationUtils.getCountryName(countryCode,
+                                                                    context.getCurrentLocale()));
             countryPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][i]));
             usageReportRest.addPoint(countryPoint);
         }

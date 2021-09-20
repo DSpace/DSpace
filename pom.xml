@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>cris-2021.01.01-SNAPSHOT</version>
+    <version>cris-2021.01.02-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace-CRIS is an open source extension of DSpace (http://www.dspace.org) providing out of box support for the CRIS / RIMS and moder Institution Repository use cases with advanced features and optimized configurations
@@ -248,9 +248,9 @@
                             <id>verify-style</id>
                             <!-- Bind to verify so it runs after package & unit tests, but before install -->
                             <phase>verify</phase>
-                            <!-- <goals>
+                            <goals>
                                 <goal>check</goal>
-                            </goals> -->
+                            </goals>
                         </execution>
                     </executions>
                     <configuration>
@@ -827,14 +827,14 @@
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>cris-2021.01.01-SNAPSHOT</version>
+                       <version>cris-2021.01.02-SNAPSHOT</version>
                        <type>jar</type>
                        <classifier>classes</classifier>
                    </dependency>
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>cris-2021.01.01-SNAPSHOT</version>
+                       <version>cris-2021.01.02-SNAPSHOT</version>
                        <type>war</type>
                    </dependency>
                </dependencies>
@@ -981,64 +981,64 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>cris-2021.01.01-SNAPSHOT</version>
+                <version>cris-2021.01.02-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>cris-2021.01.01-SNAPSHOT</version>
+                <version>cris-2021.01.02-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>cris-2021.01.01-SNAPSHOT</version>
+                <version>cris-2021.01.02-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>cris-2021.01.01-SNAPSHOT</version>
+                <version>cris-2021.01.02-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>cris-2021.01.01-SNAPSHOT</version>
+                <version>cris-2021.01.02-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>cris-2021.01.01-SNAPSHOT</version>
+                <version>cris-2021.01.02-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>cris-2021.01.01-SNAPSHOT</version>
+                <version>cris-2021.01.02-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>cris-2021.01.01-SNAPSHOT</version>
+                <version>cris-2021.01.02-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>cris-2021.01.01-SNAPSHOT</version>
+                <version>cris-2021.01.02-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>cris-2021.01.01-SNAPSHOT</version>
+                <version>cris-2021.01.02-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>cris-2021.01.01-SNAPSHOT</version>
+                <version>cris-2021.01.02-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
@@ -1820,7 +1820,7 @@
         <connection>scm:git:git@github.com:4Science/DSpace.git</connection>
         <developerConnection>scm:git:git@github.com:4Science/DSpace.git</developerConnection>
         <url>git@github.com:4Science/DSpace.git</url>
-        <tag>dspace-cris-2021.01.00</tag>
+        <tag>dspace-cris-2021.01.01</tag>
     </scm>
 
 

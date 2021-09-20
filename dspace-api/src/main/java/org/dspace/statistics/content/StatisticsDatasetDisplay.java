@@ -150,8 +150,8 @@ public class StatisticsDatasetDisplay {
             value = LocationUtils.getContinentName(value, context
                     .getCurrentLocale());
         } else if ("countryCode".equals(queryName)) {
-            value = LocationUtils.getCountryName(value, context
-                    .getCurrentLocale());
+            // no operations needed in case of countryCode
+
         } else {
             //TODO: CHANGE & THROW AWAY THIS ENTIRE METHOD
             //Check if int

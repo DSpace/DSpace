@@ -28,6 +28,11 @@
 
     <dc-type>
         <schema>organization</schema>
+        <element>endDate</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>organization</schema>
         <element>address</element>
         <qualifier>addressLocality</qualifier>
         <scope_note>Physical address locality (ex. Mountain View) of the organization.</scope_note>

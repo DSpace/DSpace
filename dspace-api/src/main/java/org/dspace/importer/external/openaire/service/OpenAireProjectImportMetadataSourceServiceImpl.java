@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.importer.external.openAire.service;
+package org.dspace.importer.external.openaire.service;
 
 import java.io.InputStream;
 import java.io.StringReader;
