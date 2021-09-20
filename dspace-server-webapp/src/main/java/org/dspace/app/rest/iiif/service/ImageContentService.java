@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.iiif.service;
 
+import java.util.Date;
 import java.util.UUID;
 
 import org.dspace.app.rest.iiif.model.generator.ImageContentGenerator;
@@ -22,6 +23,7 @@ public class ImageContentService extends AbstractResourceService {
 
 
     public ImageContentService(ConfigurationService configurationService) {
+        System.out.println("ImageContentService " + new Date().toString());
         setConfiguration(configurationService);
     }
 

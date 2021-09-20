@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.iiif.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
