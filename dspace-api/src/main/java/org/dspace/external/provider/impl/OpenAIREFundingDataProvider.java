@@ -18,6 +18,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
+import org.dspace.content.dto.MetadataValueDTO;
+import org.dspace.external.OpenAIRERestConnector;
+import org.dspace.external.model.ExternalDataObject;
+import org.dspace.external.provider.ExternalDataProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import eu.openaire.jaxb.helper.FundingHelper;
 import eu.openaire.jaxb.helper.ProjectHelper;
 import eu.openaire.jaxb.model.Response;
@@ -26,13 +33,6 @@ import eu.openaire.oaf.model.base.FunderType;
 import eu.openaire.oaf.model.base.FundingTreeType;
 import eu.openaire.oaf.model.base.FundingType;
 import eu.openaire.oaf.model.base.Project;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Logger;
-import org.dspace.content.dto.MetadataValueDTO;
-import org.dspace.external.OpenAIRERestConnector;
-import org.dspace.external.model.ExternalDataObject;
-import org.dspace.external.provider.ExternalDataProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that
@@ -81,7 +81,7 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
 
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String id) {
-        
+
         // we use base64 encoding in order to use slashes / and other
         // characters that must be escaped for the <:entry-id>
         String decodedId = new String(Base64.getDecoder().decode(id));
@@ -90,10 +90,8 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
         try {
             if (response.getHeader() != null && Integer.parseInt(response.getHeader().getTotal()) > 0) {
                 Project project = response.getResults().getResult().get(0).getMetadata().getEntity().getProject();
-                ExternalDataObject externalDataObject = new OpenAIREFundingDataProvider.ExternalDataObjectBuilder(project)
-                        .setId(generateProjectURI(project))
-                        .setSource(sourceIdentifier)
-                        .build();
+                ExternalDataObject externalDataObject = new OpenAIREFundingDataProvider.ExternalDataObjectBuilder(
+                        project).setId(generateProjectURI(project)).setSource(sourceIdentifier).build();
                 return Optional.of(externalDataObject);
             }
         } catch (NumberFormatException e) {
@@ -137,9 +135,7 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
         if (projects.size() > 0) {
             return projects.stream()
                     .map(project -> new OpenAIREFundingDataProvider.ExternalDataObjectBuilder(project)
-                            .setId(generateProjectURI(project))
-                            .setSource(sourceIdentifier)
-                            .build())
+                            .setId(generateProjectURI(project)).setSource(sourceIdentifier).build())
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();
