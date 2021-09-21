@@ -53,22 +53,26 @@ public class OpenAIRERestConnector {
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OpenAIRERestConnector.class);
 
     /**
-     * OpenAIRE API Url
+     * OpenAIRE API Url 
+     *  and can be configured with: openaire.api.url 
      */
-    private String url;
+    private String url = "https://api.openaire.eu";
 
     /**
      * Boolean with token usage definition true if we want to use a token
+     *  and can be configured with: openaire.token.enabled
      */
-    boolean tokenEnabled;
+    boolean tokenEnabled = false;
 
     /**
      * OpenAIRE Authorization and Authentication Token Service URL
+     *  and can be configured with: openaire.token.url
      */
     private String tokenServiceUrl;
 
     /**
      * OpenAIRE clientId
+     *  and can be configured with: openaire.token.clientId
      */
     private String clientId;
 
@@ -79,12 +83,15 @@ public class OpenAIRERestConnector {
 
     /**
      * OpenAIRE clientSecret
+     *  and can be configured with: openaire.token.clientSecret
      */
     private String clientSecret;
+        
 
     public OpenAIRERestConnector(String url) {
         this.url = url;
     }
+
 
     /**
      * This method grabs an accessToken an sets the expiration time Based.<br/>
