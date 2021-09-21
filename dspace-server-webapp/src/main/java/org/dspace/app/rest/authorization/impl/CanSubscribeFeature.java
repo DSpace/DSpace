@@ -13,14 +13,9 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
-import org.dspace.app.rest.model.BitstreamRest;
-import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.app.rest.model.EPersonRest;
-import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
@@ -59,12 +54,7 @@ public class CanSubscribeFeature implements AuthorizationFeature {
         return new String[]{
             CommunityRest.CATEGORY + "." + CommunityRest.NAME,
             CollectionRest.CATEGORY + "." + CollectionRest.NAME,
-            ItemRest.CATEGORY + "." + ItemRest.NAME,
-            SiteRest.CATEGORY + "." + SiteRest.NAME,
-            BundleRest.CATEGORY + "." + BundleRest.NAME,
-            BitstreamRest.CATEGORY + "." + BitstreamRest.NAME,
-            EPersonRest.CATEGORY + "." + EPersonRest.NAME,
-            GroupRest.CATEGORY + "." + GroupRest.NAME
+            ItemRest.CATEGORY + "." + ItemRest.NAME
         };
     }
 }
