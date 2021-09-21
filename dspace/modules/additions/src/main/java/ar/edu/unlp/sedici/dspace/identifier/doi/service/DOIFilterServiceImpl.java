@@ -37,14 +37,16 @@ public class DOIFilterServiceImpl implements DOIFilterService {
         Metadatum[] metadataList = dso.getMetadataByMetadataString(this.externalDOImetadata);
         if (metadataList.length > 0) {
             for (Metadatum md : metadataList) {
-                try {
-                    String doi = DOI.formatIdentifier(md.value);
-                    if (!doi.isEmpty()) {
-                        //If metadata can be parsed, then it is an external DOI
-                        return true;
+                if (md.value != null && !md.value.isEmpty() && md.value.contains("doi")) {
+                    try {
+                        String doi = DOI.formatIdentifier(md.value);
+                        if (!doi.isEmpty()) {
+                            //If metadata can be parsed, then it is an external DOI
+                            return true;
+                        }
+                    } catch (DOIIdentifierException e) {
+                        //Do Nothing, proceed with next instance if available.
                     }
-                } catch (DOIIdentifierException e) {
-                    //Do Nothing, proceed with next instance if available.
                 }
             }
         }
