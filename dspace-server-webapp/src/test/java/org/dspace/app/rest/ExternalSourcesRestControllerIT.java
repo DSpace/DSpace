@@ -125,4 +125,61 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
         getClient().perform(get("/api/integration/externalsources/mock/entries"))
                    .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void findExternalSourcesByEntityTypeTest() throws Exception {
+        getClient().perform(get("/api/integration/externalsources/search/findByEntityType")
+                   .param("entityType", "Publication"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.externalsources", Matchers.contains(
+                              ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
+                              ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false),
+                              ExternalSourceMatcher.matchExternalSource("pubmed", "pubmed", false)
+                              )))
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+
+        getClient().perform(get("/api/integration/externalsources/search/findByEntityType")
+                   .param("entityType", "Journal"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.externalsources", Matchers.contains(
+                              ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
+                              ExternalSourceMatcher.matchExternalSource("sherpaJournalIssn", "sherpaJournalIssn",false),
+                              ExternalSourceMatcher.matchExternalSource("sherpaJournal", "sherpaJournal", false),
+                              ExternalSourceMatcher.matchExternalSource("pubmed", "pubmed", false)
+                              )))
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
+    }
+
+    @Test
+    public void findExternalSourcesByEntityTypeBadRequestTest() throws Exception {
+        getClient().perform(get("/api/integration/externalsources/search/findByEntityType"))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findExternalSourcesByEntityTypePaginationTest() throws Exception {
+        getClient().perform(get("/api/integration/externalsources/search/findByEntityType")
+                   .param("entityType", "Journal")
+                   .param("size", "2"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.externalsources", Matchers.contains(
+                              ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
+                              ExternalSourceMatcher.matchExternalSource("sherpaJournalIssn", "sherpaJournalIssn",false)
+                              )))
+                   .andExpect(jsonPath("$.page.totalPages", Matchers.is(2)))
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
+
+        getClient().perform(get("/api/integration/externalsources/search/findByEntityType")
+                   .param("entityType", "Journal")
+                   .param("page", "1")
+                   .param("size", "2"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.externalsources", Matchers.contains(
+                              ExternalSourceMatcher.matchExternalSource("sherpaJournal", "sherpaJournal", false),
+                              ExternalSourceMatcher.matchExternalSource("pubmed", "pubmed", false)
+                              )))
+                   .andExpect(jsonPath("$.page.totalPages", Matchers.is(2)))
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
+    }
+
 }

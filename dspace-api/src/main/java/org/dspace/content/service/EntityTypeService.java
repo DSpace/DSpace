@@ -7,9 +7,11 @@
  */
 package org.dspace.content.service;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
 import org.dspace.core.Context;
@@ -56,4 +58,7 @@ public interface EntityTypeService extends DSpaceCRUDService<EntityType> {
      * @throws AuthorizeException   If something geos wrong with authorizations
      */
     public EntityType create(Context context, String entityTypeString) throws SQLException, AuthorizeException;
+
+    public List<String> getSubmitAuthorizedTypes(Context context) throws SQLException, SolrServerException, IOException;
+
 }
