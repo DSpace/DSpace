@@ -1,7 +1,7 @@
 /**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available oncommandLine at
+ * tree and available online at
  *
  * http://www.dspace.org/license/
  */
@@ -185,24 +185,30 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
                 throw new UnsupportedOperationException("A target collection must be provided");
             }
             if (oaiSource == null || oaiSetID == null) {
-                handler.logError("Both the OAI server address and OAI set id must be specified (run with -h flag for details)");
+                handler.logError(
+                        "Both the OAI server address and OAI set id must be specified (run with -h flag for details)");
                 throw new UnsupportedOperationException("Both the OAI server address and OAI set id must be specified");
             }
             if (metadataKey == null) {
-                handler.logError("A metadata key (commonly the prefix) must be specified for this collection (run with -h flag for details)");
-                throw new UnsupportedOperationException("A metadata key (commonly the prefix) must be specified for this collection");
+                handler.logError(
+                        "A metadata key (commonly the prefix) must be specified for this collection (run with -h flag" +
+                                " for details)");
+                throw new UnsupportedOperationException(
+                        "A metadata key (commonly the prefix) must be specified for this collection");
             }
 
             configureCollection(context, collection, harvestType, oaiSource, oaiSetID, metadataKey);
         } else if ("ping".equals(command)) {
             if (oaiSource == null || oaiSetID == null) {
-                handler.logError("Both the OAI server address and OAI set id must be specified  (run with -h flag for details)");
+                handler.logError(
+                        "Both the OAI server address and OAI set id must be specified  (run with -h flag for details)");
                 throw new UnsupportedOperationException("Both the OAI server address and OAI set id must be specified");
             }
 
             pingResponder(oaiSource, oaiSetID, metadataKey);
         } else {
-            handler.logError("Your command '" + command + "' was not recoginzed properly (run with -h flag for details)");
+            handler.logError(
+                    "Your command '" + command + "' was not recoginzed properly (run with -h flag for details)");
             throw new UnsupportedOperationException("\"Your command '\" + command + \"' was not recoginzed properly\"");
         }
 
