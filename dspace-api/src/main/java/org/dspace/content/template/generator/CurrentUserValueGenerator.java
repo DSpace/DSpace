@@ -7,6 +7,9 @@
  */
 package org.dspace.content.template.generator;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.dspace.content.Item;
 import org.dspace.content.vo.MetadataValueVO;
 import org.dspace.core.Context;
@@ -22,13 +25,13 @@ import org.dspace.eperson.EPerson;
 public class CurrentUserValueGenerator implements TemplateValueGenerator {
 
     @Override
-    public MetadataValueVO generator(Context context, Item targetItem, Item templateItem, String extraParams) {
+    public List<MetadataValueVO> generator(Context context, Item targetItem, Item templateItem, String extraParams) {
         EPerson currentUser = context.getCurrentUser();
-        if (currentUser == null) {
-            return new MetadataValueVO("");
-        }
-
-        return new MetadataValueVO(currentUser.getName(), currentUser.getID().toString());
+        return Arrays.asList(
+            currentUser == null ?
+                new MetadataValueVO("") :
+                new MetadataValueVO(currentUser.getName(), currentUser.getID().toString())
+        );
     }
 
 }

@@ -7,6 +7,9 @@
  */
 package org.dspace.content.template.generator;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.vo.MetadataValueVO;
@@ -27,9 +30,9 @@ public class SubmitterValueGenerator implements TemplateValueGenerator {
     private EPersonService ePersonService;
 
     @Override
-    public MetadataValueVO generator(Context context, Item targetItem, Item templateItem, String extraParams) {
+    public List<MetadataValueVO> generator(Context context, Item targetItem, Item templateItem, String extraParams) {
         EPerson eperson = targetItem.getSubmitter();
-        return new MetadataValueVO(getValue(eperson, extraParams), eperson.getID().toString());
+        return Arrays.asList(new MetadataValueVO(getValue(eperson, extraParams), eperson.getID().toString()));
     }
 
     private String getValue(EPerson eperson, String extraParams) {

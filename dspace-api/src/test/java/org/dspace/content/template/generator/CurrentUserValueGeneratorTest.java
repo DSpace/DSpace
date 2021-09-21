@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.dspace.content.Item;
@@ -50,8 +51,10 @@ public class CurrentUserValueGeneratorTest {
     @Test
     public void testWithoutUserInTheContext() {
 
-        MetadataValueVO metadataValue = generator.generator(context, targetItem, templateItem, extraParams);
+        List<MetadataValueVO> metadataValueList = generator.generator(context, targetItem, templateItem, extraParams);
+        MetadataValueVO metadataValue = metadataValueList.get(0);
 
+        assertThat(metadataValueList.size(), is(1));
         assertThat(metadataValue, notNullValue());
         assertThat(metadataValue.getValue(), is(""));
         assertThat(metadataValue.getAuthority(), nullValue());
@@ -65,8 +68,10 @@ public class CurrentUserValueGeneratorTest {
         EPerson currentUser = buildEPersonMock("25ad8d1a-e00f-4077-b2a2-326822d6aea4", "User");
         when(context.getCurrentUser()).thenReturn(currentUser);
 
-        MetadataValueVO metadataValue = generator.generator(context, targetItem, templateItem, extraParams);
+        List<MetadataValueVO> metadataValueList = generator.generator(context, targetItem, templateItem, extraParams);
+        MetadataValueVO metadataValue = metadataValueList.get(0);
 
+        assertThat(metadataValueList.size(), is(1));
         assertThat(metadataValue, notNullValue());
         assertThat(metadataValue.getValue(), is("User"));
         assertThat(metadataValue.getAuthority(), is("25ad8d1a-e00f-4077-b2a2-326822d6aea4"));

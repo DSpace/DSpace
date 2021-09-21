@@ -12,8 +12,10 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.dspace.content.Item;
@@ -38,7 +40,7 @@ public class PlaceholderTemplateItemValueTest {
     @Test(expected = IllegalArgumentException.class)
     public void tryingToGetValueForASimpleMetadataThrowsException() {
 
-        new PlaceholderTemplateItemValue(Collections.emptyMap()).value(
+        new PlaceholderTemplateItemValue(Collections.emptyMap()).values(
             mock(Context.class),
             mock(Item.class),
             mock(Item.class),
@@ -57,7 +59,7 @@ public class PlaceholderTemplateItemValueTest {
             Collections.singletonMap("dummy", generator("returned value"))
         );
 
-        templateItemValue.value(context, item, templateItem, metadataValue);
+        templateItemValue.values(context, item, templateItem, metadataValue);
     }
 
     @Test
@@ -71,12 +73,14 @@ public class PlaceholderTemplateItemValueTest {
         generatorMap.put("dummy", generator("from dummy"));
         generatorMap.put("placeholder", generator("something done", "authority"));
 
-
         final PlaceholderTemplateItemValue templateItemValue = new PlaceholderTemplateItemValue(generatorMap);
 
         final boolean appliesTo = templateItemValue.appliesTo(metadataValue.getValue());
-        final MetadataValueVO actualValue = templateItemValue.value(context, item, templateItem, metadataValue);
+        final List<MetadataValueVO> actualValueList =
+                templateItemValue.values(context, item, templateItem, metadataValue);
+        final MetadataValueVO actualValue = actualValueList.get(0);
 
+        assertThat(actualValueList.size(), is(1));
         assertThat(appliesTo, is(true));
         assertThat(actualValue.getValue(), is("something done"));
         assertThat(actualValue.getAuthority(), is("authority"));
@@ -93,6 +97,7 @@ public class PlaceholderTemplateItemValueTest {
     }
 
     private TemplateValueGenerator generator(String expectedValue, String expectedAuthority) {
-        return (context, item, templateItem, extraParams) -> new MetadataValueVO(expectedValue, expectedAuthority);
+        return (context, item, templateItem, extraParams) ->
+                Arrays.asList(new MetadataValueVO(expectedValue, expectedAuthority));
     }
 }

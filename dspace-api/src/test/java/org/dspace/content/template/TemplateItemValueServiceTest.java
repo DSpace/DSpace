@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -49,9 +50,12 @@ public class TemplateItemValueServiceTest {
         final TemplateItemValueService templateItemValueService = new TemplateItemValueService(
             Collections.singletonList(fakeTemplateItemValue(false, "value", null)));
 
-        final MetadataValueVO value = templateItemValueService.value(context, item, templateItem,
+        final List<MetadataValueVO> valueList = templateItemValueService.value(context, item, templateItem,
             metadataValue("aValue", "authority"));
 
+        final MetadataValueVO value = valueList.get(0);
+
+        assertThat(valueList.size(), is(1));
         assertThat(value.getValue(), is("aValue"));
         assertThat(value.getAuthority(), is("authority"));
 
@@ -69,9 +73,12 @@ public class TemplateItemValueServiceTest {
                 fakeTemplateItemValue(false, "NOTReturnedValue", null),
                 fakeTemplateItemValue(true, "RETURNED Value", "7fefea3a-757b-4bf4-a8c5-bc478214700f")));
 
-        final MetadataValueVO valueFromService = templateItemValueService.value(context, item, templateItem,
+        final List<MetadataValueVO> valueFromServiceList = templateItemValueService.value(context, item, templateItem,
             metadataValue("aValue"));
 
+        final MetadataValueVO valueFromService = valueFromServiceList.get(0);
+
+        assertThat(valueFromServiceList.size(), is(1));
         assertThat(valueFromService.getValue(), is("RETURNED Value"));
         assertThat(valueFromService.getAuthority(), is("7fefea3a-757b-4bf4-a8c5-bc478214700f"));
 
@@ -82,9 +89,9 @@ public class TemplateItemValueServiceTest {
         return new TemplateItemValue() {
 
             @Override
-            public MetadataValueVO value(final Context context, final Item targetItem,
+            public List<MetadataValueVO> values(final Context context, final Item targetItem,
                                        final Item templateItem, final MetadataValue metadataValue) {
-                return new MetadataValueVO(returnedValue, returnedAuthority);
+                return Arrays.asList(new MetadataValueVO(returnedValue, returnedAuthority));
             }
 
             @Override

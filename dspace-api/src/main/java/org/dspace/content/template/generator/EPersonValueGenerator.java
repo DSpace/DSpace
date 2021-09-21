@@ -8,6 +8,8 @@
 package org.dspace.content.template.generator;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
@@ -36,7 +38,7 @@ public class EPersonValueGenerator implements TemplateValueGenerator {
 
 
     @Override
-    public MetadataValueVO generator(Context context, Item targetItem, Item templateItem, String extraParams) {
+    public List<MetadataValueVO> generator(Context context, Item targetItem, Item templateItem, String extraParams) {
         String[] params = StringUtils.split(extraParams, "\\.");
         String prefix = params[0];
         String suffix = "";
@@ -65,6 +67,7 @@ public class EPersonValueGenerator implements TemplateValueGenerator {
             log.error(e.getMessage(), e);
         }
 
-        return ePerson != null ? new MetadataValueVO(value, ePerson.getID().toString()) : new MetadataValueVO("");
+        return Arrays.asList(ePerson != null ?
+                new MetadataValueVO(value, ePerson.getID().toString()) : new MetadataValueVO(""));
     }
 }
