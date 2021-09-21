@@ -1537,25 +1537,20 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     public void updateMetrics(Context context, CrisMetrics metric) {
         UpdateRequest req = new UpdateRequest();
         SolrClient solrClient = solrSearchCore.getSolr();
-        StringBuilder uniqueID = new StringBuilder();
-        if (metric.getResource() instanceof Item) {
-            uniqueID = new StringBuilder("Item-");
-        } else if (metric.getResource() instanceof Collection) {
-            uniqueID = new StringBuilder("Collection-");
-        } else {
-            if (metric.getResource() instanceof Community) {
-                uniqueID = new StringBuilder("Community-");
-            }
-            uniqueID.append(metric.getResource().getID());
-            try {
-                SolrInputDocument solrInDoc = new SolrInputDocument();
-                solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, uniqueID);
-                req.add(SearchUtils.addMetricFieldsInSolrDoc(metric, solrInDoc));
-                solrClient.request(req);
-                solrClient.commit();
-            } catch (SolrServerException | IOException e) {
-                log.error(e.getMessage(), e);
-            }
+        Optional<String> id = findUniqueId(metric);
+        if (id.isEmpty()) {
+            log.warn("Unable to define unique id for item {}", metric.getResource().getID());
+        }
+        try {
+            SolrInputDocument solrInDoc = new SolrInputDocument();
+            solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, id.get());
+            solrInDoc.addField(SearchUtils.RESOURCE_TYPE_FIELD, itemType(metric.getResource()));
+            solrInDoc.addField(SearchUtils.RESOURCE_ID_FIELD, metric.getResource().getID());
+            req.add(SearchUtils.addMetricFieldsInSolrDoc(metric, solrInDoc));
+            solrClient.request(req);
+            solrClient.commit();
+        } catch (SolrServerException | IOException e) {
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -1594,5 +1589,35 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         } catch (SolrServerException | SolrException | IOException e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    private String itemType(DSpaceObject resource) {
+        if (resource instanceof Item) {
+            return IndexableItem.TYPE;
+        }
+        if (resource instanceof Collection) {
+            return IndexableCollection.TYPE;
+        }
+        if (resource instanceof Community) {
+            return IndexableCommunity.TYPE;
+        }
+        throw new RuntimeException(
+            String.format("resource with id %s is of unsupported type: %s",
+                resource.getID(), resource.getClass().getSimpleName()));
+    }
+
+    private Optional<String> findUniqueId(CrisMetrics metric) {
+        StringBuilder uniqueID = new StringBuilder();
+        if (metric.getResource() instanceof Item) {
+            uniqueID.append("Item-");
+        } else if (metric.getResource() instanceof Collection) {
+            uniqueID.append("Collection-");
+        } else if (metric.getResource() instanceof Community) {
+            uniqueID.append("Community-");
+        } else {
+            return Optional.empty();
+        }
+        uniqueID.append(metric.getResource().getID());
+        return Optional.of(uniqueID.toString());
     }
 }
