@@ -249,6 +249,7 @@
 					<dc-schema>sedici</dc-schema>
 					<dc-element>creator</dc-element>
 					<dc-qualifier>corporate</dc-qualifier>
+					<repeatable>true</repeatable>
 					<label>Autor Institucional</label>
 					<input-type>onebox</input-type>
 					<hint>Institución,empresa u organización creadora del recurso</hint>
@@ -527,10 +528,9 @@
 					<dc-schema>dc</dc-schema>
 					<dc-element>subject</dc-element>
 					<repeatable>true</repeatable>
-					<label>Palabras claves (*)</label>
+					<label>Palabras claves</label>
 					<input-type>onebox</input-type>
 					<hint>Descriptores</hint>
-					<visibility-on-group>Bibliotecarios</visibility-on-group>
 				</field>
 
 				<!-- Materia (categoria 5 del Tesauro) -->
@@ -934,10 +934,20 @@
 					<label>Editorial</label>
 					<input-type>onebox</input-type>
 					<hint>Editorial encargada de la publicación de la obra</hint>
-					<type-bind>Tesis,Libro,Publicacion seriada</type-bind>
+					<type-bind>Tesis,Publicacion seriada</type-bind>
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
 				</field>
-				
+				<!-- Editorial obligatorio para libros -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>publisher</dc-element>
+					<label>Editorial (*)</label>
+					<input-type>onebox</input-type>
+					<hint>Editorial encargada de la publicación de la obra</hint>
+					<type-bind>Libro</type-bind>
+					<required-on-group>Bibliotecarios</required-on-group>
+					<visibility-on-group>Bibliotecarios</visibility-on-group>
+				</field>
 				<!-- Produccion -->
 				<field>
 					<dc-schema>dc</dc-schema>
