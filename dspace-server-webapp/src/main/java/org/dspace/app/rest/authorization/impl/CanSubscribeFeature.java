@@ -9,6 +9,7 @@ package org.dspace.app.rest.authorization.impl;
 
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -17,6 +18,7 @@ import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.utils.Utils;
@@ -36,12 +38,10 @@ import org.springframework.stereotype.Component;
 @AuthorizationFeatureDocumentation(name = CanSubscribeFeature.NAME,
         description = "Used to verify if the given user can subscribe to a dataspace object")
 public class CanSubscribeFeature implements AuthorizationFeature {
-
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CanSubscribeFeature.class);
     public static final String NAME = "canSubscribeDso";
-
     @Autowired
     private AuthorizeService authorizeService;
-
     @Autowired
     private Utils utils;
 
@@ -54,13 +54,17 @@ public class CanSubscribeFeature implements AuthorizationFeature {
 
     }
 
-    @SuppressWarnings("checkstyle:Indentation")
     @Override
     public String[] getSupportedTypes() {
-        return new String[]{CollectionRest.CATEGORY + "." + CollectionRest.NAME, ItemRest.CATEGORY + "." +
-                ItemRest.NAME, CommunityRest.CATEGORY + "." + CommunityRest.NAME,
-                SiteRest.CATEGORY + "." + SiteRest.NAME,  EPersonRest.CATEGORY + "." + EPersonRest.NAME,
-                BundleRest.CATEGORY + "." + BundleRest.NAME, BitstreamRest.CATEGORY + "." + BitstreamRest.NAME
+        return new String[]{
+            CommunityRest.CATEGORY + "." + CommunityRest.NAME,
+            CollectionRest.CATEGORY + "." + CollectionRest.NAME,
+            ItemRest.CATEGORY + "." + ItemRest.NAME,
+            SiteRest.CATEGORY + "." + SiteRest.NAME,
+            BundleRest.CATEGORY + "." + BundleRest.NAME,
+            BitstreamRest.CATEGORY + "." + BitstreamRest.NAME,
+            EPersonRest.CATEGORY + "." + EPersonRest.NAME,
+            GroupRest.CATEGORY + "." + GroupRest.NAME
         };
     }
 }

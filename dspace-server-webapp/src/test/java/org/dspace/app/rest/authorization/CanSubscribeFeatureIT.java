@@ -16,6 +16,7 @@ import org.dspace.app.rest.converter.BundleConverter;
 import org.dspace.app.rest.converter.CollectionConverter;
 import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.converter.EPersonConverter;
+import org.dspace.app.rest.converter.GroupConverter;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.model.BitstreamRest;
@@ -23,6 +24,7 @@ import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.projection.DefaultProjection;
@@ -42,6 +44,7 @@ import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.builder.SiteBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -49,6 +52,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.discovery.SearchServiceException;
@@ -71,17 +75,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Test of Profile Subscribe Dso Feature implementation.
+ * Test of Subscribe Dso Feature implementation.
  *
  * @author Alba Aliu (alba.aliu at 4science.it)
  */
 public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrSuggestionProvider.class);
-    private Item collectionAProfile;
-    private Item collectionBProfile;
-
-    @Autowired
-    private ConfigurationService configurationService;
 
     @Autowired
     private ItemConverter itemConverter;
@@ -101,9 +100,10 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
     private BundleConverter bundleConverter;
     @Autowired
     private BitstreamConverter bitstreamConverter;
-    private Collection collection;
-    private Collection collectionA;
-    private Community communityA;
+    @Autowired
+    private GroupConverter groupConverter;
+    private Collection collectionAuthorized;
+    private Community communityAuthorized;
     private AuthorizationFeature canSubscribeFeature;
     @Autowired
     private AuthorizationFeatureService authorizationFeatureService;
@@ -116,17 +116,13 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
         super.setUp();
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Community").build();
-        Community community1 = CommunityBuilder.createCommunity(context).withName("Community").build();
-        collection = CollectionBuilder.createCollection(context, parentCommunity).withEntityType("Person")
-                .withName("collection").build();
-        communityA = CommunityBuilder.createCommunity(context)
+        communityAuthorized = CommunityBuilder.createCommunity(context)
                 .withName("communityA")
                 .withAdminGroup(admin).build();
 
-        collectionA = CollectionBuilder.createCollection(context, communityA)
+        collectionAuthorized = CollectionBuilder.createCollection(context, communityAuthorized)
                 .withName("Collection A")
                 .withAdminGroup(admin).build();
-
         context.restoreAuthSystemState();
         canSubscribeFeature = authorizationFeatureService.find(CanSubscribeFeature.NAME);
     }
@@ -134,12 +130,12 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
     @Test
     public void testCanSubscribeCommunity() throws Exception {
         context.turnOffAuthorisationSystem();
-        EPerson ePersona = EPersonBuilder.createEPerson(context)
+        EPerson ePersonAuthorized = EPersonBuilder.createEPerson(context)
                 .withCanLogin(true)
                 .withPassword(password)
                 .withEmail("test@email.it")
                 .build();
-        String token = getAuthToken(ePersona.getEmail(), password);
+        String token = getAuthToken(ePersonAuthorized.getEmail(), password);
         CommunityRest comRest = communityConverter.convert(parentCommunity, DefaultProjection.DEFAULT);
         String comUri = utils.linkToSingleResource(comRest, "self").getHref();
         context.restoreAuthSystemState();
@@ -166,12 +162,10 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
                 .withName("Group A")
                 .addMember(admin)
                 .build();
-        Item item = ItemBuilder.createItem(context, collectionA)
+        Item item = ItemBuilder.createItem(context, collectionAuthorized)
                 .withTitle("Test item")
                 .build();
         cleanUpPermissions(resourcePolicyService.find(context, item));
-//        resourcePolicyService.delete(context, resourcePolicyService.find(context, item).get(0));
-//        resourcePolicyService.find(context, item);
         setPermissions(item, groupWithReadPermission, Constants.READ);
         item.setSubmitter(eperson);
         context.restoreAuthSystemState();
@@ -195,7 +189,7 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
     @Test
     public void testCanNotSubscribeCollection() throws Exception {
         context.turnOffAuthorisationSystem();
-        Collection collectionWithReadPermission = CollectionBuilder.createCollection(context, communityA).withAdminGroup(admin).build();
+        Collection collectionWithReadPermission = CollectionBuilder.createCollection(context, communityAuthorized).withAdminGroup(admin).build();
         EPerson ePersonNotSubscribePermission = EPersonBuilder.createEPerson(context)
                 .withCanLogin(true)
                 .withPassword(password)
@@ -265,21 +259,14 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
     public void testCanSubscribeSite() throws Exception {
         context.turnOffAuthorisationSystem();
         Site site = SiteBuilder.createSite(context).build();
-        EPerson ePersonNotSubscribePermission = EPersonBuilder.createEPerson(context)
+        EPerson ePersonCanSubscribePermission = EPersonBuilder.createEPerson(context)
                 .withCanLogin(true)
                 .withPassword(password)
                 .withEmail("test@email.it")
                 .build();
-        // the user to be tested is not part of the group with read permission
-        Group groupWithReadPermission = GroupBuilder.createGroup(context)
-                .withName("Group A")
-                .addMember(admin)
-                .addMember(eperson)
-                .build();
-
         SiteRest siteRest = siteConverter.convert(site, Projection.DEFAULT);
         context.restoreAuthSystemState();
-        String token = getAuthToken(ePersonNotSubscribePermission.getEmail(), password);
+        String token = getAuthToken(ePersonCanSubscribePermission.getEmail(), password);
         String comUri = utils.linkToSingleResource(siteRest, "self").getHref();
         context.restoreAuthSystemState();
         getClient(token).perform(get("/api/authz/authorizations/search/object")
@@ -333,7 +320,7 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
     @Test
     public void testCanNotSubscribeBundle() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collectionA)
+        Item item = ItemBuilder.createItem(context, collectionAuthorized)
                 .withTitle("Test item")
                 .build();
         Bundle bundle = BundleBuilder.createBundle(context, item).withName("TestBundle").build();
@@ -371,7 +358,7 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
     @Test
     public void testCanNotSubscribeBitstream() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collectionA)
+        Item item = ItemBuilder.createItem(context, collectionAuthorized)
                 .withTitle("Test item")
                 .build();
         String bitstreamContent = "testString";
@@ -411,7 +398,7 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
     @Test
     public void testCanSubscribeBitstream() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collectionA)
+        Item item = ItemBuilder.createItem(context, collectionAuthorized)
                 .withTitle("Test item")
                 .build();
         String bitstreamContent = "testString";
@@ -449,7 +436,7 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
     @Test
     public void testCanSubscribeBundle() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collectionA)
+        Item item = ItemBuilder.createItem(context, collectionAuthorized)
                 .withTitle("Test item")
                 .build();
         Bundle bundle = BundleBuilder.createBundle(context, item).withName("TestBundle").build();
@@ -520,7 +507,7 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
     @Test
     public void testCanSubscribeCollection() throws Exception {
         context.turnOffAuthorisationSystem();
-        Collection collectionWithReadPermission = CollectionBuilder.createCollection(context, communityA).withAdminGroup(admin).build();
+        Collection collectionWithReadPermission = CollectionBuilder.createCollection(context, communityAuthorized).withAdminGroup(admin).build();
         EPerson ePersonSubscribePermission = EPersonBuilder.createEPerson(context)
                 .withCanLogin(true)
                 .withPassword(password)
@@ -548,7 +535,7 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
                 .withPassword(password)
                 .withEmail("test@email.it")
                 .build();
-        Item item = ItemBuilder.createItem(context, collectionA)
+        Item item = ItemBuilder.createItem(context, collectionAuthorized)
                 .withTitle("Test item")
                 .build();
         context.restoreAuthSystemState();
@@ -563,6 +550,71 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded").exists())
                 .andExpect(jsonPath("$.page.totalElements", greaterThan(0)));
+    }
+
+    @Test
+    public void testCanSubscribeGroup() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group group = GroupBuilder.createGroup(context).build();
+        EPerson ePersonCanSubscribePermission = EPersonBuilder.createEPerson(context)
+                .withCanLogin(true)
+                .withPassword(password)
+                .withEmail("test@email.it")
+                .build();
+        // the user to be tested is not part of the group with read permission
+        Group groupWithReadPermission = GroupBuilder.createGroup(context)
+                .withName("Group A")
+                .addMember(admin)
+                .addMember(eperson)
+                .addMember(ePersonCanSubscribePermission)
+                .build();
+        cleanUpPermissions(resourcePolicyService.find(context, group));
+        setPermissions(group, groupWithReadPermission, Constants.READ);
+        GroupRest groupRest = groupConverter.convert(group, Projection.DEFAULT);
+        String token = getAuthToken(ePersonCanSubscribePermission.getEmail(), password);
+        String comUri = utils.linkToSingleResource(groupRest, "self").getHref();
+        context.restoreAuthSystemState();
+        getClient(token).perform(get("/api/authz/authorizations/search/object")
+                        .param("uri", comUri)
+                        .param("feature", canSubscribeFeature.getName())
+                        .param("embed", "feature"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded").exists())
+                .andExpect(jsonPath("$.page.totalElements", greaterThan(0)));
+    }
+
+    @Test
+    public void testCanNotSubscribeGroup() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group group = GroupBuilder.createGroup(context).build();
+        EPerson ePersonCanSubscribePermission = EPersonBuilder.createEPerson(context)
+                .withCanLogin(true)
+                .withPassword(password)
+                .withEmail("test@email.it")
+                .build();
+        // the user to be tested is not part of the group with read permission
+        Group groupWithReadPermission = GroupBuilder.createGroup(context)
+                .withName("Group A")
+                .addMember(admin)
+                .addMember(eperson)
+                .build();
+        cleanUpPermissions(resourcePolicyService.find(context, group));
+        setPermissions(group, groupWithReadPermission, Constants.READ);
+        GroupRest groupRest = groupConverter.convert(group, Projection.DEFAULT);
+        String token = getAuthToken(ePersonCanSubscribePermission.getEmail(), password);
+        String comUri = utils.linkToSingleResource(groupRest, "self").getHref();
+        context.restoreAuthSystemState();
+        getClient(token).perform(get("/api/authz/authorizations/search/object")
+                        .param("uri", comUri)
+                        .param("feature", canSubscribeFeature.getName())
+                        .param("embed", "feature"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page").exists())
+                .andExpect(jsonPath("$.page.totalElements", is(0)))
+                .andExpect(jsonPath("$.page.totalPages", is(0)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+                // default value of page size
+                .andExpect(jsonPath("$.page.size", is(20)));
     }
 
     private void setPermissions(DSpaceObject dSpaceObject, Group group, Integer permissions) {
