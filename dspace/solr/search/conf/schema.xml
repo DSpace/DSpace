@@ -265,7 +265,7 @@
     <field name="submit" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
 
     <!-- used to track entity type of collections -->
-    <field name="dspace.entity.type" type="string" indexed="true" stored="true" required="false" />
+    <field name="search.entitytype" type="string" indexed="true" stored="true" required="false" />
    
     <!-- Community and collection hierarchy of the Item of interest (candidate for hierarchical facetting ) -->
     <field name="location" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
@@ -345,5 +345,6 @@
         or to add multiple fields to the same field for easier/faster searching.  -->
 
  <copyField source="*" dest="search_text"/>
+ <copyField source="dspace.entity.type" dest="search.entitytype"/>
 
 </schema>
