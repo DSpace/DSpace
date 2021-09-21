@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
@@ -235,10 +236,37 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             }
             List<Collection> collections = cs.findCollectionsWithSubmit(query, context, null, entityTypeLabel,
                                               Math.toIntExact(pageable.getOffset()),
-                                              Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                                              Math.toIntExact(pageable.getPageSize()));
             int tot = cs.countCollectionsWithSubmit(query, context, null, entityTypeLabel);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @SearchRestMethod(name = "findSubmitAuthorizedByCommunityAndEntityType")
+    public Page<CollectionRest> findSubmitAuthorizedByCommunityAndEntityType(
+          @Parameter(value = "query") String query,
+          @Parameter(value = "uuid", required = true) UUID communityUuid,
+          @Parameter(value = "entityType", required = true) String entityTypeLabel,
+           Pageable pageable) {
+        try {
+            Context context = obtainContext();
+            EntityType entityType = entityTypeService.findByEntityType(context, entityTypeLabel);
+            if (Objects.isNull(entityType)) {
+                throw new ResourceNotFoundException("There was no entityType found with label: " + entityTypeLabel);
+            }
+            Community community = communityService.find(context, communityUuid);
+            if (Objects.isNull(community)) {
+                throw new ResourceNotFoundException(
+                    CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid + " not found");
+            }
+            List<Collection> collections = cs.findCollectionsWithSubmit(query, context, community, entityTypeLabel,
+                                              Math.toIntExact(pageable.getOffset()),
+                                              Math.toIntExact(pageable.getPageSize()));
+            int total = cs.countCollectionsWithSubmit(query, context, community, entityTypeLabel);
+            return converter.toRestPage(collections, pageable, total, utils.obtainProjection());
+        } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

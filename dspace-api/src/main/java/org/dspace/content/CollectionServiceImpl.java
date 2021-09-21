@@ -1037,7 +1037,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             if (buildFilter.length() > 0) {
                 buildFilter.append(" AND ");
             }
-            buildFilter.append("dspace.entity.type:").append(entityType);
+            buildFilter.append("search.entitytype:").append(entityType);
         }
         if (StringUtils.isNotBlank(q)) {
             StringBuilder buildQuery = new StringBuilder();
