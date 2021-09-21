@@ -8,10 +8,14 @@
 
 package org.dspace.subscriptions;
 
+import java.sql.SQLException;
+
 import org.apache.commons.cli.Options;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link DSpaceRunnable} to find subscribed objects and send notification mails about them
@@ -23,6 +27,9 @@ public class SubscriptionEmailNotificationConfiguration<T
         extends SubscriptionEmailNotification> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
+
+    @Autowired
+    private AuthorizeServiceImpl authorizeService;
 
     @Override
     public Class<T> getDspaceRunnableClass() {
@@ -36,7 +43,11 @@ public class SubscriptionEmailNotificationConfiguration<T
 
     @Override
     public boolean isAllowedToExecute(Context context) {
-        return true;
+        try {
+            return authorizeService.isAdmin(context);
+        } catch (SQLException e) {
+            throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
+        }
     }
 
     @Override
