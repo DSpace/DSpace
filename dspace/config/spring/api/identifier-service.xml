@@ -51,6 +51,7 @@
          class="ar.edu.unlp.sedici.dspace.identifier.doi.service.DOIFilterServiceImpl"
          scope="singleton">
          <property name="mainFilter" ref="DOIMainFilter"/>
+         <property name="externalDOImetadata" value="sedici.identifier.other"/>
      </bean>
      
     <!-- Tendria que ser prototype este bean?? -->

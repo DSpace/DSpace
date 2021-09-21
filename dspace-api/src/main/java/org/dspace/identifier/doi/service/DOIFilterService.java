@@ -11,5 +11,13 @@ public interface DOIFilterService {
      * @return false if the item does not apply any filters conditions. Else, return true.
      */
     public boolean isEligibleDSO(DSpaceObject dso);
+    
+    /**
+     * Determine if DSO has external DOI among it metadata. External DOIs are those that not match the
+     * DOI prefix of the repository (set at "identifier.doi.prefix").
+     * @param dso
+     * @return false if the item does not have external DOI. Else, return true.
+     */
+    public boolean hasExternalDOI(DSpaceObject dso);
 
 }
