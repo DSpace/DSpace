@@ -378,7 +378,11 @@ public class OAIHarvester {
     }
 
     private Item searchItem(Context context, Element record, String repositoryId, Collection collection) {
-        Item item = itemSearchService.search(context, calculateCrisSourceId(record, repositoryId));
+        Optional<String> crisSourceId = calculateCrisSourceId(record, repositoryId);
+        if (crisSourceId.isEmpty()) {
+            return null;
+        }
+        Item item = itemSearchService.search(context, crisSourceId.get());
         return item != null && collection.equals(item.getOwningCollection()) ? item : null;
     }
 
@@ -553,8 +557,10 @@ public class OAIHarvester {
         }
 
         if (CollectionUtils.isEmpty(itemService.getMetadata(item, CRIS.getName(), "sourceId", null, null))) {
-            String crisSourceId = calculateCrisSourceId(record, repositoryId);
-            itemService.addMetadata(context, item, CRIS.getName(), "sourceId", null, null, crisSourceId);
+            Optional<String> crisSourceId = calculateCrisSourceId(record, repositoryId);
+            if (crisSourceId.isPresent()) {
+                itemService.addMetadata(context, item, CRIS.getName(), "sourceId", null, null, crisSourceId.get());
+            }
         }
 
         itemService.update(context, item);
@@ -581,8 +587,8 @@ public class OAIHarvester {
         itemService.addMetadata(context, item, "dc", "description", "provenance", "en", provenanceMsg);
     }
 
-    private String calculateCrisSourceId(Element record, String repositoryId) {
-        return repositoryId + SPLIT + getMetadataIdentifier(record);
+    private Optional<String> calculateCrisSourceId(Element record, String repositoryId) {
+        return getMetadataIdentifier(record).map(identifier -> repositoryId + SPLIT + identifier);
     }
 
     private Set<String> getMetadataFieldsToKeep() {
@@ -843,13 +849,13 @@ public class OAIHarvester {
         return getHeader(record).getChild("identifier", OAI_NS).getText();
     }
 
-    private String getMetadataIdentifier(Element record) {
+    private Optional<String> getMetadataIdentifier(Element record) {
         List<Element> metadataElements = getMetadataElements(record);
         if (CollectionUtils.isEmpty(metadataElements)) {
-            return null;
+            return Optional.empty();
         }
 
-        return metadataElements.get(0).getAttributeValue("id");
+        return Optional.ofNullable(metadataElements.get(0).getAttributeValue("id"));
     }
 
     /**

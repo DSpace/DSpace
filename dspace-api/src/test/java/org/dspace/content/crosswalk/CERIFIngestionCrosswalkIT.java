@@ -514,6 +514,30 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
         assertThat(values, hasItems(with("oairecerif.internalid", "TEST-ID")));
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testProductIngest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection).withEntityType("Product").build();
+        context.restoreAuthSystemState();
+
+        Document document = readDocument(OAI_PMH_DIR_PATH, "sample-product.xml");
+        crosswalk.ingest(context, item, document.getRootElement(), false);
+
+        List<MetadataValue> values = item.getMetadata();
+        assertThat(values, hasSize(14));
+        assertThat(values, hasItems(with("dc.type", "Controlled Vocabulary for Resource Type Genres::image::"
+            + "moving image::video")));
+        assertThat(values, hasItems(with("dc.title", "PLOS and Open Access")));
+        assertThat(values, hasItems(with("dc.contributor.author", "Zivkovic, Bora")));
+        assertThat(values, hasItems(with("dc.publisher", "EUT Edizioni Università di Trieste")));
+        assertThat(values, hasItems(with("dc.subject", "open access")));
+        assertThat(values, hasItems(with("dc.subject", "accesso aperto", 1)));
+        assertThat(values, hasItems(with("dc.subject", "Comunicazione scientifica", 2)));
+        assertThat(values, hasItems(with("dc.relation.conference", "Trieste Next 2014 - EnergETHIC")));
+
+    }
+
     private Document readDocument(String dir, String name) throws Exception {
         try (InputStream inputStream = new FileInputStream(new File(dir, name))) {
             return builder.build(inputStream);

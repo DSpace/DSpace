@@ -1,0 +1,32 @@
+<oai_cerif:Product
+    xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/1.1/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:doc="http://www.lyncode.com/xoai" id="10077/2646">
+    <oai_cerif:Type xmlns:oai_cerif="https://www.openaire.eu/cerif-profile/vocab/COAR_Product_Types">http://purl.org/coar/resource_type/c_12ce</oai_cerif:Type>
+    <oai_cerif:Name xml:lang="en">PLOS and Open Access</oai_cerif:Name>
+    <oai_cerif:Handle>10077/2646</oai_cerif:Handle>
+    <oai_cerif:URN>http://hdl.handle.net/10077/2646</oai_cerif:URN>
+    <oai_cerif:Creators>
+        <oai_cerif:Creator>
+            <oai_cerif:DisplayName>Zivkovic, Bora</oai_cerif:DisplayName>
+            <oai_cerif:Person />
+        </oai_cerif:Creator>
+    </oai_cerif:Creators>
+    <oai_cerif:Publishers>
+      <oai_cerif:Publisher>
+         <oai_cerif:DisplayName>EUT Edizioni Università di Trieste</oai_cerif:DisplayName>
+         <oai_cerif:OrgUnit />
+      </oai_cerif:Publisher>
+   </oai_cerif:Publishers>
+   <oai_cerif:Keyword xml:lang="en">open access</oai_cerif:Keyword>
+   <oai_cerif:Keyword xml:lang="en">accesso aperto</oai_cerif:Keyword>
+   <oai_cerif:Keyword xml:lang="en">Comunicazione scientifica</oai_cerif:Keyword>
+   <oai_cerif:PresentedAt>
+      <oai_cerif:Event id="33b4fa8c-2efa-4e05-bcc4-1c8dc24b8af3">
+         <oai_cerif:Name xml:lang="en">Trieste Next 2014 - EnergETHIC</oai_cerif:Name>
+         <oai_cerif:StartDate>2014-09-26</oai_cerif:StartDate>
+         <oai_cerif:EndDate>2014-09-28</oai_cerif:EndDate>
+      </oai_cerif:Event>
+    </oai_cerif:PresentedAt>
+   <ns4:Access xmlns:ns4="http://purl.org/coar/access_right">http://purl.org/coar/access_right/c_abf2</ns4:Access>
+</oai_cerif:Product>

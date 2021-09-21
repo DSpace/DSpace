@@ -13,12 +13,12 @@
 	
 	<xsl:template match="cerif:Publication">
 		<dim:dim>
-			
-			<xsl:if test="pt:Type">
-				<dim:field mdschema="dc" element="type" >
-					<xsl:value-of select="concat('coarToPublicationTypes',$converterSeparator,pt:Type)" />
-				</dim:field>
-			</xsl:if>
+        
+            <xsl:for-each select="pt:Type">
+                <dim:field mdschema="dc" element="type" >
+                    <xsl:value-of select="concat('coarToPublicationTypes',$converterSeparator,current())" />
+                </dim:field>
+            </xsl:for-each>
 		
 			<dim:field mdschema="dc" element="language" qualifier="iso">
 				<xsl:value-of select="cerif:Language" />
@@ -53,17 +53,19 @@
 			<dim:field mdschema="dc" element="relation" qualifier="doi" >
 				<xsl:value-of select="cerif:PublishedIn/cerif:Publication/cerif:DOI" />
 			</dim:field>
-			
-			<dim:field mdschema="dc" element="publisher" >
-				<xsl:choose>
-					<xsl:when test="cerif:Publishers/cerif:Publisher/cerif:DisplayName">
-						<xsl:value-of select="cerif:Publishers/cerif:Publisher/cerif:DisplayName" />
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:value-of select="cerif:Publishers/cerif:Publisher/cerif:OrgUnit/cerif:Name"/> 
-					</xsl:otherwise>
-				</xsl:choose>
-			</dim:field>
+            
+            <xsl:for-each select="cerif:Publishers">
+                <dim:field mdschema="dc" element="publisher" >
+                    <xsl:choose>
+                        <xsl:when test="cerif:Publisher/cerif:DisplayName">
+                            <xsl:value-of select="cerif:Publisher/cerif:DisplayName" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="cerif:Publisher/cerif:OrgUnit/cerif:Name"/> 
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </dim:field>
+            </xsl:for-each>
 			
 			<dim:field mdschema="dc" element="date" qualifier="issued" >
 				<xsl:value-of select="cerif:PublicationDate" />
