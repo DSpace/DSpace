@@ -87,14 +87,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
 
     @After
     public void destroy() throws SQLException, IOException {
-        context.turnOffAuthorisationSystem();
-        CommunityBuilder.deleteCommunity(parentCommunity.getID());
-        CommunityBuilder.deleteCommunity(child1.getID());
-        CommunityBuilder.deleteCommunity(col1.getID());
-        CommunityBuilder.deleteCommunity(article.getID());
-        CommunityBuilder.deleteCommunity(article.getID());
         tempFile.delete();
-        context.restoreAuthSystemState();
     }
 
     @Test
