@@ -61,4 +61,25 @@ public interface EntityTypeService extends DSpaceCRUDService<EntityType> {
 
     public List<String> getSubmitAuthorizedTypes(Context context) throws SQLException, SolrServerException, IOException;
 
+    /**
+     * 
+     * @param context          DSpace context object
+     * @param names            List of Entity type names that you want to retrieve
+     * @param limit            paging limit
+     * @param offset           the position of the first result to return
+     * @return
+     * @throws SQLException    if database error
+     */
+    public List<EntityType> getEntityTypesByNames(Context context, List<String> names,Integer limit, Integer offset)
+           throws SQLException;
+
+    /**
+     * 
+     * @param context          DSpace context object
+     * @param names            List of Entity type names that you want to retrieve
+     * @return
+     * @throws SQLException    if database error
+     */
+    public int countEntityTypesByNames(Context context, List<String> names) throws SQLException;
+
 }
