@@ -16,6 +16,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import eu.openaire.jaxb.helper.FundingHelper;
@@ -85,6 +86,10 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
         // we use base64 encoding in order to use slashes / and other
         // characters that must be escaped for the <:entry-id>
         String decodedId = new String(Base64.getDecoder().decode(id));
+        if (!isValidProjectURI(decodedId)) {
+            log.error("Invalid ID for OpenAIREFunding - " + id);
+            return Optional.empty();
+        }
         Response response = searchByProjectURI(decodedId);
 
         try {
@@ -195,6 +200,16 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
     public Response searchByProjectURI(String projectURI) {
         String[] splittedURI = projectURI.replaceAll(PREFIX, "").split("/");
         return connector.searchProjectByIDAndFunder(splittedURI[3], splittedURI[1], 1, 1);
+    }
+
+    /**
+     * Validates if the project has the correct format
+     * 
+     * @param projectURI
+     * @return true if the URI is valid
+     */
+    private static boolean isValidProjectURI(String projectURI) {
+        return Pattern.matches(PREFIX + "/.+/.+/.*", projectURI);
     }
 
     /**
