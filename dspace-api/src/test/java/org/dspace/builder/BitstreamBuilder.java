@@ -136,6 +136,27 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         return this;
     }
 
+
+    public BitstreamBuilder withIIIFLabel(String label) throws SQLException {
+        bitstreamService.addMetadata(context, bitstream, "iiif", "label", null, null, label);
+        return this;
+    }
+
+    public BitstreamBuilder withIIIFCanvasWidth(int i) throws SQLException {
+        bitstreamService.addMetadata(context, bitstream, "iiif", "image", "width", null, String.valueOf(i));
+        return this;
+    }
+
+    public BitstreamBuilder withIIIFCanvasHeight(int i) throws SQLException {
+        bitstreamService.addMetadata(context, bitstream, "iiif", "image", "height", null, String.valueOf(i));
+        return this;
+    }
+
+    public BitstreamBuilder withIIIFToC(String toc) throws SQLException {
+        bitstreamService.addMetadata(context, bitstream, "iiif", "toc", null, null, toc);
+        return this;
+    }
+
     private Bundle getOriginalBundle(Item item) throws SQLException, AuthorizeException {
         List<Bundle> bundles = itemService.getBundles(item, ORIGINAL);
         Bundle targetBundle = null;
@@ -199,4 +220,5 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
     protected DSpaceObjectService<Bitstream> getService() {
         return bitstreamService;
     }
+
 }

@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
@@ -31,33 +32,8 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 
     public static final String IIIFBundle = "IIIF";
 
-    /**
-     * info.json set for individual canvases.
-     */
-    String info = "{\"globalDefaults\":{\"activated\": false,\"label\": \"\",\"width\": 0,\"height\": 0}," +
-            "\"canvases\":[{\"label\": \"Custom Label\", \"width\": 3163, \"height\": 4220, \"pos\": 0}]" +
-            ",\"structures\": []}";
-
-    /**
-     * info.json with structures and global canvas setting.
-     */
-    String infoWithStructures = "{\"globalDefaults\":" +
-            "{\"activated\": true,\"label\": \"Global\",\"width\": 2000,\"height\": 3000}," +
-            "\"canvases\":[]," +
-            "\"structures\": " +
-            "[{\"label\":\"Section 1\",\"start\":1}," +
-            "{\"label\":\"Section 2\",\"start\":2}]" +
-            "}";
-
-    /**
-     * info.json defaulting to global canvas settings.
-     */
-    String globalInfoConfig = "{\"globalDefaults\":{\"activated\": true,\"label\": \"Global\",\"width\": 2000," +
-            "\"height\": 3000}, \"canvases\":[{\"label\": \"Custom Label\", \"width\": 3163, " +
-            "\"height\": 4220, \"pos\": 0}],\"structures\": []}";
-
     @Test
-    public void missingBundleTest() throws Exception {
+    public void disabledTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
@@ -68,13 +44,28 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withEntityType("IIIFSearchable")
                 .build();
-        context.restoreAuthSystemState();
-        // Status 500
-        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
-                .andExpect(status().is(500));
 
+        Item publicItem2 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 2")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .disableIIIF()
+                .build();
+
+        context.restoreAuthSystemState();
+        // Status 404
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                .andExpect(status().is(404));
+        getClient().perform(get("/iiif/" + publicItem2.getID() + "/manifest"))
+                .andExpect(status().is(404));
+    }
+
+    @Test
+    public void notFoundTest() throws Exception {
+        // Status 404
+        getClient().perform(get("/iiif/" + UUID.randomUUID().toString() + "/manifest"))
+                .andExpect(status().is(404));
     }
 
     @Test
@@ -89,7 +80,8 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withEntityType("IIIFSearchable")
+                .enableIIIF()
+                .enableIIIFSearch()
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
@@ -97,8 +89,8 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         Bitstream bitstream2 = null;
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream1 = BitstreamBuilder
-                    .createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("Bitstream1")
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Bitstream1.jpg")
                     .withMimeType("image/jpeg")
                     .build();
         }
@@ -106,8 +98,8 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream2 = BitstreamBuilder
                     .createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("Bitstream2")
-                    .withMimeType("image/jpeg")
+                    .withName("Bitstream2.png")
+                    .withMimeType("image/png")
                     .build();
         }
 
@@ -124,6 +116,13 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                         Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Page 1")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(1200)))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].images[0].resource.service.@id",
+                        Matchers.endsWith(bitstream1.getID().toString())))
+                .andExpect(jsonPath("$.sequences[0].canvases[1].@id",
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c1")))
+                .andExpect(jsonPath("$.sequences[0].canvases[1].label", is("Page 2")))
+                .andExpect(jsonPath("$.sequences[0].canvases[1].images[0].resource.service.@id",
+                        Matchers.endsWith(bitstream2.getID().toString())))
                 .andExpect(jsonPath("$.related.@id",
                         Matchers.containsString("/items/" + publicItem1.getID())));
     }
@@ -140,6 +139,9 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .enableIIIF()
+                .withIIIFCanvasWidth(2000)
+                .withIIIFCanvasHeight(3000)
                 .withEntityType("IIIFSearchable")
                 .build();
 
@@ -147,19 +149,14 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             BitstreamBuilder
                     .createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("Bitstream1")
+                    .withName("Bitstream1.jpg")
                     .withMimeType("image/jpeg")
+                    .withIIIFLabel("Custom Label")
+                    .withIIIFCanvasWidth(3163)
+                    .withIIIFCanvasHeight(4220)
+                    //.withMimeType("image/jpeg")
                     .build();
         }
-
-        try (InputStream is = IOUtils.toInputStream(this.globalInfoConfig, CharEncoding.UTF_8)) {
-            BitstreamBuilder.
-                    createBitstream(context, publicItem1, is, "IIIF")
-                    .withName("info.json")
-                    .withMimeType("application/json")
-                    .build();
-        }
-
         context.restoreAuthSystemState();
         // Expect canvas label, width and height to match bitstream description.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
@@ -185,23 +182,19 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withEntityType("IIIFSearchable")
+                .enableIIIF()
+                .enableIIIFSearch()
                 .build();
 
         String bitstreamContent = "ThisIsSomeText";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             BitstreamBuilder
                     .createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("Bitstream1")
-                    .withMimeType("image/jpeg")
-                    .build();
-        }
-
-        try (InputStream is = IOUtils.toInputStream(this.info, CharEncoding.UTF_8)) {
-            BitstreamBuilder.
-                    createBitstream(context, publicItem1, is, "IIIF")
-                    .withName("info.json")
-                    .withMimeType("application/json")
+                    .withName("Bitstream1.png")
+                    .withMimeType("image/png")
+                    .withIIIFLabel("Custom Label")
+                    .withIIIFCanvasWidth(3163)
+                    .withIIIFCanvasHeight(4220)
                     .build();
         }
 
@@ -231,14 +224,14 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withMetadata("dc", "rights", "uri", "https://license.org")
-                .withEntityType("IIIF")
+                .enableIIIF()
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             BitstreamBuilder.
                     createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("Bitstream1")
+                    .withName("Bitstream1.jpg")
                     .withMimeType("image/jpeg")
                     .build();
         }
@@ -247,8 +240,8 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         try (InputStream is = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
             BitstreamBuilder.
                     createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("Bitstream2")
-                    .withMimeType("image/jpeg")
+                    .withName("Bitstream2.png")
+                    .withMimeType("image/png")
                     .build();
         }
 
@@ -256,8 +249,8 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         try (InputStream is = IOUtils.toInputStream(bitstreamContent3, CharEncoding.UTF_8)) {
             BitstreamBuilder.
                     createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("Bitstream3")
-                    .withMimeType("image/jpeg")
+                    .withName("Bitstream3.tiff")
+                    .withMimeType("image/tiff")
                     .build();
         }
 
@@ -292,37 +285,36 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withEntityType("IIIFSearchable")
+                .withIIIFCanvasHeight(3000)
+                .withIIIFCanvasWidth(2000)
+                .withIIIFCanvasLabel("Global")
+                .enableIIIF()
+                .enableIIIFSearch()
                 .build();
 
         String bitstreamContent = "ThisIsSomeText";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             BitstreamBuilder
                     .createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("Bitstream1")
+                    .withName("Bitstream1.jpg")
                     .withMimeType("image/jpeg")
+                    .withIIIFToC("Section 1")
                     .build();
         }
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             BitstreamBuilder
                     .createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("Bitstream2")
-                    .withMimeType("image/jpeg")
+                    .withName("Bitstream2.png")
+                    .withMimeType("image/png")
+                    .withIIIFToC("Section 2")
                     .build();
         }
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             BitstreamBuilder
                     .createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("Bitstream3")
-                    .withMimeType("image/jpeg")
-                    .build();
-        }
-
-        try (InputStream is = IOUtils.toInputStream(this.infoWithStructures, CharEncoding.UTF_8)) {
-            BitstreamBuilder.
-                    createBitstream(context, publicItem1, is, "IIIF")
-                    .withName("info.json")
-                    .withMimeType("application/json")
+                    .withName("Bitstream3.tiff")
+                    .withMimeType("image/tiff")
+                    .withIIIFToC("Section 2")
                     .build();
         }
 
@@ -355,14 +347,14 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withMetadata("dc", "rights", "uri", "https://license.org")
-                .withEntityType("IIIF")
+                .enableIIIF()
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             BitstreamBuilder.
-                    createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("Bitstream1")
+                    createBitstream(context, publicItem1, is)
+                    .withName("Bitstream1.jpg")
                     .withMimeType("image/jpeg")
                     .build();
         }
@@ -393,14 +385,14 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withMetadata("dc", "rights", "uri", "https://license.org")
-                .withEntityType("IIIF")
+                .enableIIIF()
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             BitstreamBuilder.
-                    createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("Bitstream1")
+                    createBitstream(context, publicItem1, is)
+                    .withName("Bitstream1.jpg")
                     .withMimeType("image/jpeg")
                     .build();
         }
@@ -439,21 +431,21 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withEntityType("IIIF")
+                .enableIIIF()
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             BitstreamBuilder.
                     createBitstream(context, publicItem1, is)
-                    .withName("Bitstream1")
+                    .withName("Bitstream1.jpg")
                     .withMimeType("image/jpeg")
                     .build();
         }
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             BitstreamBuilder.
                     createBitstream(context, publicItem1, is)
-                    .withName("Bitstream1")
+                    .withName("Bitstream2.pdf")
                     .withMimeType("application/pdf")
                     .build();
         }
@@ -484,14 +476,14 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withEntityType("IIIF")
+                .enableIIIF()
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             BitstreamBuilder.
-                    createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("IMG1")
+                    createBitstream(context, publicItem1, is)
+                    .withName("IMG1.jpg")
                     .withMimeType("image/jpeg")
                     .build();
         }
@@ -516,21 +508,21 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withEntityType("IIIF")
+                .enableIIIF()
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             BitstreamBuilder.
-                    createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("IMG1")
+                    createBitstream(context, publicItem1, is)
+                    .withName("IMG1.jpg")
                     .withMimeType("image/jpeg")
                     .build();
         }
         context.restoreAuthSystemState();
-        // Status 500.  The item contains only one bitstream. The item manifest likewise contains one canvas.
+        // Status 404.  The item contains only one bitstream. The item manifest likewise contains one canvas.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/canvas/c2"))
-                .andExpect(status().is(500));
+                .andExpect(status().is(404));
     }
 
     @Test
@@ -545,14 +537,14 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withEntityType("IIIF")
+                .enableIIIF()
                 .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             BitstreamBuilder.
-                    createBitstream(context, publicItem1, is, IIIFBundle)
-                    .withName("IMG1")
+                    createBitstream(context, publicItem1, is)
+                    .withName("IMG1.jpg")
                     .withMimeType("image/jpeg")
                     .build();
         }

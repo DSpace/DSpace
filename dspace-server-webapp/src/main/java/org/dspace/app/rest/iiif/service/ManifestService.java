@@ -7,16 +7,21 @@
  */
 package org.dspace.app.rest.iiif.service;
 
-import java.util.Date;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.rest.iiif.model.generator.ContentSearchGenerator;
 import org.dspace.app.rest.iiif.model.generator.ImageContentGenerator;
 import org.dspace.app.rest.iiif.model.generator.ManifestGenerator;
-import org.dspace.app.rest.iiif.model.info.Info;
-import org.dspace.app.rest.iiif.model.info.Range;
+import org.dspace.app.rest.iiif.model.generator.RangeGenerator;
 import org.dspace.app.rest.iiif.service.util.IIIFUtils;
+import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -67,13 +72,17 @@ public class ManifestService extends AbstractResourceService {
     @Autowired
     ManifestGenerator manifestGenerator;
 
+    @Autowired
+    MetadataExposureService metadataExposureService;
 
+    protected String[] METADATA_FIELDS;
     /**
      * Constructor.
      * @param configurationService the DSpace configuration service.
      */
     public ManifestService(ConfigurationService configurationService) {
         setConfiguration(configurationService);
+        METADATA_FIELDS = configurationService.getArrayProperty("iiif.metadata.item");
     }
 
     /**
@@ -98,59 +107,125 @@ public class ManifestService extends AbstractResourceService {
     private void populateManifest(Item item, Context context) {
         // If an IIIF bundle is found it will be used. Otherwise,
         // images in the ORIGINAL bundle will be used.
-        List<Bundle> bundles = utils.getIiifBundle(item, IIIF_BUNDLE);
-        List<Bitstream> bitstreams = utils.getBitstreams(bundles);
-        Info info = utils.validateInfoForManifest(utils.getInfo(context, item, IIIF_BUNDLE), bitstreams);
-        manifestGenerator.setIdentifier(getManifestId(item.getID()));
+        List<Bundle> bundles = utils.getIiifBundles(item);
+        String manifestId = getManifestId(item.getID());
+        manifestGenerator.setIdentifier(manifestId);
         manifestGenerator.setLabel(item.getName());
         setLogoContainer();
         addRelated(item);
         addSearchService(item);
-        addMetadata(item.getMetadata());
-        addViewingHint(bitstreams.size());
-        addThumbnail(bundles, context);
-        addSequence(item, bitstreams, context, info);
-        addRanges(info, item.getID().toString());
+        addMetadata(context, item);
+        addViewingHint(item);
+        addThumbnail(item, context);
+
+//        List<RangeGenerator> seqs = new ArrayList<RangeGenerator>();
+        RangeGenerator root = new RangeGenerator();
+        root.setLabel("Table of Contents");
+        root.setIdentifier(manifestId + "/range/r0");
+//      seqs.add(root);
+        manifestGenerator.addRange(root);
+
+        Map<String, RangeGenerator> tocRanges = new HashMap<String, RangeGenerator>();
+        for (Bundle bnd : bundles) {
+            String bundleToCPrefix = utils.getIIIFFirstToC(bnd);
+            RangeGenerator lastRange = root;
+            for (Bitstream b : utils.getIiifBitstreams(context, bnd)) {
+                CanvasGenerator canvasId = sequenceService.addCanvas(context, item, bnd, b);
+                List<String> tocs = utils.getIIIFToCs(b, bundleToCPrefix);
+                if (tocs.size() > 0) {
+                    for (String toc : tocs) {
+                        RangeGenerator currRange = root;
+                        String[] parts = toc.split(IIIFUtils.TOC_SEPARATOR_REGEX);
+                        String key = "";
+                        for (int pIdx = 0; pIdx < parts.length; pIdx++) {
+                            if (pIdx > 0) {
+                                key += IIIFUtils.TOC_SEPARATOR;
+                            }
+                            key += parts[pIdx];
+                            if (tocRanges.get(key) != null) {
+                                currRange = tocRanges.get(key);
+                            } else {
+                                // create the sub range
+                                RangeGenerator range = new RangeGenerator();
+                                range.setLabel(parts[pIdx]);
+                                range.addCanvas(
+                                        canvasService.getRangeCanvasReference(manifestId, canvasId.getIdentifier()));
+
+                                // add the range reference to the currRange so to get an identifier
+                                currRange.addSubRange(rangeService.getRangeReference(range));
+
+                                // add the range to the manifest
+                                manifestGenerator.addRange(range);
+
+                                // move the current range
+                                currRange = range;
+                                tocRanges.put(key, range);
+                            }
+                        }
+                        // add the bitstream canvas to the currRange
+                        currRange.addCanvas(canvasId);
+                        lastRange = currRange;
+                    }
+                } else {
+                    lastRange.addCanvas(canvasService.getRangeCanvasReference(manifestId, canvasId.getIdentifier()));
+                }
+            }
+        }
+        manifestGenerator.addSequence(
+                sequenceService.getSequence(item, context));
+        //manifestGenerator.setRange(rangeService.getRanges(info, manifestId));
+
         addSeeAlso(item);
     }
 
     /**
-     * Adds a single sequence with canvases and a rendering property (optional).
-     * @param item DSpace Item
-     * @param bitstreams list of bitstreams
-     * @param context the DSpace context
-     * @return a sequence of canvases
-     */
-    private void addSequence(Item item, List<Bitstream> bitstreams, Context context, Info info) {
-        // After replacing the info object with DSO metadata we might
-        // update this method to iterate over the bitstreams list, passing
-        // the individual bitstream and position to revised methods in
-        // sequenceService and rangeService. But it's hard to try now without more
-        // work elsewhere.
-        manifestGenerator.addSequence(
-                sequenceService.getSequence(item, bitstreams, context, info));
-    }
-
-    /**
      * Adds DSpace Item metadata to the manifest.
-     *
-     * @param metadata list of DSpace metadata values
+     * 
+     * @param context the DSpace Context
+     * @param item the DSpace item
      */
-    private void addMetadata(List<MetadataValue> metadata) {
-        for (MetadataValue meta : metadata) {
-            String field = utils.getMetadataFieldName(meta);
-            if (field.contentEquals("rights.uri")) {
-                manifestGenerator.addMetadata(field, meta.getValue());
-                manifestGenerator.addLicense(meta.getValue());
-            } else if (field.contentEquals("description")) {
-                // Add manifest description field.
-                manifestGenerator.addDescription(field, meta.getValue());
-            } else {
-                // Exclude DSpace description.provenance field.
-                if (!field.contentEquals("description.provenance")) {
-                    // Everything else, add to manifest metadata fields.
-                    manifestGenerator.addMetadata(field, meta.getValue());
+    private void addMetadata(Context context, Item item) {
+        for (String field : METADATA_FIELDS) {
+            String[] eq = field.split("\\.");
+            String schema = eq[0];
+            String element = eq[1];
+            String qualifier = null;
+            if (eq.length > 2) {
+                qualifier = eq[2];
+            }
+            List<MetadataValue> metadata = item.getItemService().getMetadata(item, schema, element, qualifier,
+                    Item.ANY);
+            List<String> values = new ArrayList<String>();
+            for (MetadataValue meta : metadata) {
+                // we need to perform the check here as the configuration can include jolly
+                // characters (i.e. dc.description.*) and we need to be sure to hide qualified
+                // metadata (dc.description.provenance)
+                try {
+                    if (metadataExposureService.isHidden(context, meta.getMetadataField().getMetadataSchema().getName(),
+                            meta.getMetadataField().getElement(), meta.getMetadataField().getQualifier())) {
+                        continue;
+                    }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
                 }
+                values.add(meta.getValue());
+            }
+            if (values.size() > 0) {
+                if (values.size() > 1) {
+                    manifestGenerator.addMetadata(field, values.get(0),
+                            values.subList(1, values.size()).toArray(new String[values.size() - 1]));
+                } else {
+                    manifestGenerator.addMetadata(field, values.get(0));
+                }
+            }
+            String descrValue = item.getItemService().getMetadataFirstValue(item, "dc", "description", null, Item.ANY);
+            if (StringUtils.isNotBlank(descrValue)) {
+                manifestGenerator.addDescription(descrValue);
+            }
+
+            String licenseUriValue = item.getItemService().getMetadataFirstValue(item, "dc", "rights", "uri", Item.ANY);
+            if (StringUtils.isNotBlank(licenseUriValue)) {
+                manifestGenerator.addLicense(licenseUriValue);
             }
         }
     }
@@ -172,12 +247,10 @@ public class ManifestService extends AbstractResourceService {
     /**
      * A hint to the client as to the most appropriate method of displaying the resource.
      *
-     * @param bitstreamCount count of bitstreams in the IIIF bundle.
+     * @param item the DSpace Item
      */
-    private void addViewingHint(int bitstreamCount) {
-        if (bitstreamCount > 2) {
-            manifestGenerator.addViewingHint(DOCUMENT_VIEWING_HINT);
-        }
+    private void addViewingHint(Item item) {
+        manifestGenerator.addViewingHint(utils.getIIIFViewingHint(item, DOCUMENT_VIEWING_HINT));
     }
 
     /**
@@ -192,10 +265,7 @@ public class ManifestService extends AbstractResourceService {
      * @param item the DSpace Item.
      */
     private void addSeeAlso(Item item) {
-        List<Bundle> bundles = utils.getBundle(item, OTHER_CONTENT_BUNDLE);
-        if (bundles.size() > 0) {
-            manifestGenerator.addSeeAlso(seeAlsoService.getSeeAlso(item, bundles));
-        }
+        manifestGenerator.addSeeAlso(seeAlsoService.getSeeAlso(item));
     }
 
     /**
@@ -215,33 +285,18 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Adds Ranges to manifest structures element.
-     * Ranges are defined in the info.json file.
-     * @param info
-     * @param identifier
-     */
-    private void addRanges(Info info, String identifier) {
-        List<Range> rangesFromConfig = utils.getRangesFromInfoObject(info);
-        if (rangesFromConfig != null) {
-            manifestGenerator.setRange(rangeService.getRanges(info, identifier));
-        }
-    }
-
-    /**
-     * Adds thumbnail to the manifest. Uses first image in bundle.
-     * @param bundles image bundles
+     * Adds thumbnail to the manifest. Uses first image in the manifest.
+     * @param item the DSpace Item
      * @param context DSpace context
      */
-    private void addThumbnail(List<Bundle> bundles, Context context) {
-        List<Bitstream> bitstreams = utils.getBitstreams(bundles);
+    private void addThumbnail(Item item, Context context) {
+        List<Bitstream> bitstreams = utils.getIiifBitstreams(context, item);
         if (bitstreams != null && bitstreams.size() > 0) {
             String mimeType = utils.getBitstreamMimeType(bitstreams.get(0), context);
-            if (utils.checkImageMimeType(mimeType)) {
-                ImageContentGenerator image = imageContentService
-                        .getImageContent(bitstreams.get(0).getID(), mimeType,
-                                thumbUtil.getThumbnailProfile(), THUMBNAIL_PATH);
-                manifestGenerator.addThumbnail(image);
-            }
+            ImageContentGenerator image = imageContentService
+                    .getImageContent(bitstreams.get(0).getID(), mimeType,
+                            thumbUtil.getThumbnailProfile(), THUMBNAIL_PATH);
+            manifestGenerator.addThumbnail(image);
         }
     }
 

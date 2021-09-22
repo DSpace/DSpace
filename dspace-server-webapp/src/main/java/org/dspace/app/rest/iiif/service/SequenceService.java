@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.rest.iiif.model.generator.CanvasItemsGenerator;
 import org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator;
-import org.dspace.app.rest.iiif.model.info.Info;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -34,6 +33,13 @@ public class SequenceService  extends AbstractResourceService {
     // TODO i18n
     private static final String PDF_DOWNLOAD_LABEL = "Download as PDF";
 
+    /*
+     * The counter tracks the position of the bitstream in the list and is used to create the canvas identifier.
+     * The order of bitstreams (and thus page order in documents) is determined by position in the DSpace
+     * bundle.
+     */
+    int counter = 0;
+
     @Autowired
     CanvasItemsGenerator sequenceGenerator;
 
@@ -48,12 +54,9 @@ public class SequenceService  extends AbstractResourceService {
         setConfiguration(configurationService);
     }
 
-    public CanvasItemsGenerator getSequence(Item item, List<Bitstream> bitstreams, Context context, Info info) {
+    public CanvasItemsGenerator getSequence(Item item, Context context) {
 
         sequenceGenerator.setIdentifier(IIIF_ENDPOINT + item.getID() + "/sequence/s0");
-        if (bitstreams.size() > 0) {
-            addCanvases(context, item, bitstreams, info);
-        }
         addRendering(item, context);
 
         return sequenceGenerator;
@@ -67,29 +70,15 @@ public class SequenceService  extends AbstractResourceService {
      * @param item the DSpace Item
      * @param bitstreams list of DSpace bitstreams
      */
-    private void addCanvases(Context context, Item item,
-                             List<Bitstream> bitstreams, Info info) {
-        /*
-         * The counter tracks the position of the bitstream in the list and is used to create the canvas identifier.
-         * The order of bitstreams (and thus page order in documents) is determined by position in the DSpace
-         * bundle.
-         */
-        int counter = 0;
-        if (bitstreams == null || bitstreams.size() == 0) {
-            throw new RuntimeException("No bitstreams found for " + item.getID()  +
-                    ". Cannot add media content to the manifest.");
-        }
-        for (Bitstream bitstream : bitstreams) {
-            UUID bitstreamId = bitstream.getID();
-            String mimeType = utils.getBitstreamMimeType(bitstream, context);
-            if (utils.checkImageMimeType(mimeType)) {
-                String manifestId = item.getID().toString();
-                CanvasGenerator canvasGenerator =
-                        canvasService.getCanvas(manifestId, bitstreamId, mimeType, info, counter);
-                sequenceGenerator.addCanvas(canvasGenerator);
-                counter++;
-            }
-        }
+    public CanvasGenerator addCanvas(Context context, Item item, Bundle bnd, Bitstream bitstream) {
+        UUID bitstreamId = bitstream.getID();
+        String mimeType = utils.getBitstreamMimeType(bitstream, context);
+        String manifestId = item.getID().toString();
+        CanvasGenerator canvasGenerator =
+                canvasService.getCanvas(manifestId, bitstream, bnd, item, counter, mimeType);
+        String canvasIdentifier = sequenceGenerator.addCanvas(canvasGenerator);
+        counter++;
+        return canvasGenerator;
     }
 
     /**

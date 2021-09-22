@@ -12,7 +12,10 @@ import java.util.UUID;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.rest.iiif.model.generator.ImageContentGenerator;
-import org.dspace.app.rest.iiif.model.info.Info;
+import org.dspace.app.rest.iiif.service.util.IIIFUtils;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -24,15 +27,15 @@ public class CanvasService extends AbstractResourceService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CanvasService.class);
 
-    // Default canvas dimensions.
-    protected static final Integer DEFAULT_CANVAS_WIDTH = 1200;
-    protected static final Integer DEFAULT_CANVAS_HEIGHT = 1600;
-
     @Autowired
     ImageContentService imageContentService;
 
+    @Autowired
+    IIIFUtils utils;
+
     /**
      * Constructor.
+     * 
      * @param configurationService the DSpace configuration service.
      */
     public CanvasService(ConfigurationService configurationService) {
@@ -40,67 +43,44 @@ public class CanvasService extends AbstractResourceService {
     }
 
     /**
-     * Creates a single Canvas object. If canvas parameters are provided by the
-     * Info object they are used. If canvas parameters are unavailable, default values
+     * Creates a single Canvas object. If canvas parameters are provided by the Info
+     * object they are used. If canvas parameters are unavailable, default values
      * are used instead.
      *
-     * Note that info.json is going to be replaced with metadata in the bitstream DSO.
+     * Note that info.json is going to be replaced with metadata in the bitstream
+     * DSO.
      *
-     * @param manifestId manifest id
+     * @param manifestId  manifest id
      * @param bitstreamId uuid of the bitstream
-     * @param mimeType the mimetype of the bitstream
-     * @param info parameters for this canvas
-     * @param count the canvas position in the sequence.
+     * @param mimeType    the mimetype of the bitstream
+     * @param info        parameters for this canvas
+     * @param count       the canvas position in the sequence.
      * @return canvas object
      */
-    protected CanvasGenerator getCanvas(String manifestId, UUID bitstreamId, String mimeType, Info info, int count) {
+    protected CanvasGenerator getCanvas(String manifestId, Bitstream bitstream, Bundle bundle, Item item, int count,
+            String mimeType) {
         int pagePosition = count + 1;
 
-        // Defaults settings. Used if no info.json is provided.
-        String label = "Page " + pagePosition;
-        int canvasWidth = DEFAULT_CANVAS_WIDTH;
-        int canvasHeight = DEFAULT_CANVAS_HEIGHT;
+        String label = utils.getIIIFLabel(bitstream, "Page " + pagePosition);
+        int canvasWidth = utils.getCanvasWidth(bitstream, bundle, item, DEFAULT_CANVAS_WIDTH);
+        int canvasHeight = utils.getCanvasHeight(bitstream, bundle, item, DEFAULT_CANVAS_HEIGHT);
+        UUID bitstreamId = bitstream.getID();
 
-        // Override with settings from info.json, if available.
-        if (info != null && info.getGlobalDefaults() != null && info.getCanvases() != null) {
-            // The info.json file can request global defaults for canvas
-            // height, width and labels. Use global settings if activated in info.json.
-            if (info.getGlobalDefaults().isActivated()) {
-                // Create unique label by appending position to the default label.
-                label = info.getGlobalDefaults().getLabel() + " " + pagePosition;
-                canvasWidth = info.getGlobalDefaults().getWidth();
-                canvasHeight = info.getGlobalDefaults().getHeight();
-            } else if (info.getCanvases().get(count) != null) {
-                if (info.getCanvases().get(count).getLabel().length() > 0) {
-                    // Labels assumed unique and are not incremented
-                    // when info.json provides individual canvas metadata.
-                    label = info.getCanvases().get(count).getLabel();
-                }
-                canvasWidth = info.getCanvases().get(count).getWidth();
-                canvasHeight = info.getCanvases().get(count).getHeight();
-            }
-        } else {
-            log.info("Correctly formatted info.json was not found for item.  Using application defaults.");
-        }
+        ImageContentGenerator image = imageContentService.getImageContent(bitstreamId, mimeType,
+                imageUtil.getImageProfile(), IMAGE_PATH);
 
-        ImageContentGenerator image = imageContentService
-                .getImageContent(bitstreamId, mimeType, imageUtil.getImageProfile(), IMAGE_PATH);
-
-        ImageContentGenerator thumb = imageContentService
-                .getImageContent(bitstreamId, mimeType, thumbUtil.getThumbnailProfile(), THUMBNAIL_PATH);
+        ImageContentGenerator thumb = imageContentService.getImageContent(bitstreamId, mimeType,
+                thumbUtil.getThumbnailProfile(), THUMBNAIL_PATH);
 
         return new CanvasGenerator().setIdentifier(IIIF_ENDPOINT + manifestId + "/canvas/c" + count)
-                .addImage(image.getResource())
-                .addThumbnail(thumb.getResource())
-                .setHeight(canvasHeight)
-                .setWidth(canvasWidth)
-                .setLabel(label);
+                .addImage(image.getResource()).addThumbnail(thumb.getResource()).setHeight(canvasHeight)
+                .setWidth(canvasWidth).setLabel(label);
     }
-
 
     /**
      * Ranges expect the Canvas object to have only an identifier.
-     * @param identifier the DSpace item identifier
+     * 
+     * @param identifier  the DSpace item identifier
      * @param startCanvas the position of the canvas in list
      * @return
      */

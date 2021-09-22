@@ -20,14 +20,15 @@ import de.digitalcollections.iiif.model.sharedcanvas.Resource;
  * The rationale for separating ranges from sequences is that there is likely to be overlap between different ranges,
  * such as the physical structure of a book compared to the textual structure of the work.
  *
- * This is used to populate the "structures" element of the Manifest. (The REST API service looks to the "info.json"
- * file for ranges.)
+ * This is used to populate the "structures" element of the Manifest. The structure is derived from the iiif.toc
+ * metadata and the ordered sequence of bitstreams (canvases)
  */
 public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.IIIFResource {
 
     private String identifier;
     private String label;
     private final List<Canvas> canvasList = new ArrayList<>();
+    private final List<RangeGenerator> rangesList = new ArrayList<>();
 
     /**
      * Sets mandatory range identifier.
@@ -36,6 +37,10 @@ public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.
     public RangeGenerator setIdentifier(String identifier) {
         this.identifier = identifier;
         return this;
+    }
+
+    public String getIdentifier() {
+        return identifier;
     }
 
     /**
@@ -62,6 +67,14 @@ public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.
         for (Canvas canvas : canvasList) {
             range.addCanvas(canvas);
         }
+        for (RangeGenerator rg : rangesList) {
+            range.addRange((Range) rg.getResource());
+        }
         return range;
+    }
+
+    public void addSubRange(RangeGenerator range) {
+        range.setIdentifier(identifier + "-" + rangesList.size());
+        rangesList.add(range);
     }
 }
