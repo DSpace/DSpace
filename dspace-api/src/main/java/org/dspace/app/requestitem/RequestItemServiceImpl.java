@@ -15,8 +15,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.dao.RequestItemDAO;
 import org.dspace.app.requestitem.service.RequestItemService;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
@@ -37,13 +42,20 @@ public class RequestItemServiceImpl implements RequestItemService {
     @Autowired(required = true)
     protected RequestItemDAO requestItemDAO;
 
+    @Autowired(required = true)
+    protected AuthorizeService authorizeService;
+
+    @Autowired(required = true)
+    protected ResourcePolicyService resourcePolicyService;
+
     protected RequestItemServiceImpl() {
 
     }
 
     @Override
-    public String createRequest(Context context, Bitstream bitstream, Item item, boolean allFiles, String reqEmail,
-                                String reqName, String reqMessage) throws SQLException {
+    public String createRequest(Context context, Bitstream bitstream, Item item,
+            boolean allFiles, String reqEmail, String reqName, String reqMessage)
+            throws SQLException {
         RequestItem requestItem = requestItemDAO.create(context, new RequestItem());
 
         requestItem.setToken(Utils.generateHexKey());
@@ -96,5 +108,18 @@ public class RequestItemServiceImpl implements RequestItemService {
         } catch (SQLException e) {
             log.error(e.getMessage());
         }
+    }
+
+    @Override
+    public boolean isRestricted(Context context, DSpaceObject o)
+            throws SQLException {
+        List<ResourcePolicy> policies = authorizeService
+                .getPoliciesActionFilter(context, o, Constants.READ);
+        for (ResourcePolicy rp : policies) {
+            if (resourcePolicyService.isDateValid(rp)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

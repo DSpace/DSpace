@@ -11,14 +11,25 @@ package org.dspace.app.rest.repository;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
+import org.dspace.app.requestitem.RequestItemAuthor;
+import org.dspace.app.requestitem.RequestItemAuthorExtractor;
+import org.dspace.app.requestitem.RequestItemEmailNotifier;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.converter.RequestItemConverter;
 import org.dspace.app.rest.exception.IncompleteItemRequestException;
@@ -32,6 +43,8 @@ import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +59,8 @@ import org.springframework.stereotype.Component;
 @Component(RequestItemRest.CATEGORY + '.' + RequestItemRest.NAME)
 public class RequestItemRepository
         extends DSpaceRestRepository<RequestItemRest, String> {
+    private static final Logger LOG = LogManager.getLogger();
+
     @Autowired(required = true)
     protected RequestItemService requestItemService;
 
@@ -57,6 +72,12 @@ public class RequestItemRepository
 
     @Autowired(required = true)
     protected RequestItemConverter requestItemConverter;
+
+    @Autowired(required = true)
+    protected RequestItemAuthorExtractor requestItemAuthorExtractor;
+
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     /*
      * DSpaceRestRepository
@@ -80,7 +101,8 @@ public class RequestItemRepository
 
     @Override
     @PreAuthorize("permitAll()")
-    public RequestItemRest createAndReturn(Context ctx) {
+    public RequestItemRest createAndReturn(Context ctx)
+            throws AuthorizeException, SQLException {
         // Fill a RequestItemRest from the client's HTTP request.
         HttpServletRequest req = getRequestService()
                 .getCurrentRequest()
@@ -93,55 +115,84 @@ public class RequestItemRepository
             throw new UnprocessableEntityException("error parsing the body", ex);
         }
 
-        // Create the item request model object from the REST object.
-        String token;
-        try {
-            String bitstreamId = rir.getBitstreamId();
-            if (isBlank(bitstreamId)) {
-                throw new IncompleteItemRequestException("A bitstream ID is required");
-            }
-            Bitstream bitstream = bitstreamService.find(ctx, UUID.fromString(bitstreamId));
-            if (null == bitstream) {
-                throw new IncompleteItemRequestException("That bitstream does not exist");
-            }
-
-            String itemId = rir.getItemId();
-            if (isBlank(itemId)) {
-                throw new IncompleteItemRequestException("An item ID is required");
-            }
-            Item item = itemService.find(ctx, UUID.fromString(itemId));
-            if (null == item) {
-                throw new IncompleteItemRequestException("That item does not exist");
-            }
-
-            boolean allFiles = rir.isAllfiles();
-
-            String email = rir.getRequestEmail();
-            if (isBlank(email)) {
-                throw new IncompleteItemRequestException("A submitter's email address is required");
-            }
-            EmailValidator emailValidator = EmailValidator.getInstance(false, false);
-            if (!emailValidator.isValid(email)) {
-                throw new UnprocessableEntityException("Invalid email address");
-            }
-
-            // Escape username to evade nasty XSS attempts
-            String username = StringEscapeUtils.escapeHtml4(rir.getRequestName());
-
-            // Escape message text to evade nasty XSS attempts
-            String message = StringEscapeUtils.escapeHtml4(rir.getRequestMessage());
-
-            token = requestItemService.createRequest(ctx, bitstream, item,
-                    allFiles, email, username, message);
-        } catch (SQLException ex) {
-            throw new RuntimeException("Item request not created.", ex);
+        // Check request.item.type:
+        // "all" = anyone can request.
+        // "logged" = only authenticated user can request.
+        EPerson user = ctx.getCurrentUser();
+        String allowed = configurationService.getProperty("request.item.type", "logged");
+        if ("logged".equalsIgnoreCase(allowed) && null == user) {
+            throw new AuthorizeException("Anonymous requests are not permitted.");
         }
 
+        // Create the item request model object from the REST object.
+        String token;
+        String bitstreamId = rir.getBitstreamId();
+        if (isBlank(bitstreamId)) {
+            throw new IncompleteItemRequestException("A bitstream ID is required");
+        }
+        Bitstream bitstream = bitstreamService.find(ctx, UUID.fromString(bitstreamId));
+        if (null == bitstream) {
+            throw new IncompleteItemRequestException("That bitstream does not exist");
+        }
+
+        String itemId = rir.getItemId();
+        if (isBlank(itemId)) {
+            throw new IncompleteItemRequestException("An item ID is required");
+        }
+        Item item = itemService.find(ctx, UUID.fromString(itemId));
+        if (null == item) {
+            throw new IncompleteItemRequestException("That item does not exist");
+        }
+
+        boolean allFiles = rir.isAllfiles();
+
+        String email = rir.getRequestEmail();
+        if (isBlank(email)) {
+            throw new IncompleteItemRequestException("A submitter's email address is required");
+        }
+        EmailValidator emailValidator = EmailValidator.getInstance(false, false);
+        if (!emailValidator.isValid(email)) {
+            throw new UnprocessableEntityException("Invalid email address");
+        }
+
+        // If there is a current user, replace email and name
+        String username;
+        if (null != user) {
+            username = user.getFullName();
+            email = user.getEmail();
+        } else {
+            // Escape username to evade nasty XSS attempts
+            username = StringEscapeUtils.escapeHtml4(rir.getRequestName());
+        }
+
+        // Escape message text to evade nasty XSS attempts
+        String message = StringEscapeUtils.escapeHtml4(rir.getRequestMessage());
+
+        token = requestItemService.createRequest(ctx, bitstream, item,
+                allFiles, email, username, message);
 
         // Some fields are given values during creation, so return created request.
         RequestItem ri = requestItemService.findByToken(ctx, token);
         ri.setAccept_request(false); // Not accepted yet.  Must set:  DS-4032
         requestItemService.update(ctx, ri);
+
+        // Create a link back to DSpace for the approver's response.
+        String responseLink;
+        try {
+            responseLink = getLinkTokenEmail(ri.getToken());
+        } catch (URISyntaxException | MalformedURLException e) {
+            LOG.warn("Impossible URL error while composing email:  {}",
+                    e.getMessage());
+            throw new RuntimeException("Request not sent:  " + e.getMessage());
+        }
+
+        // Send the request email
+        try {
+            RequestItemEmailNotifier.sendRequest(ctx, ri, responseLink);
+        } catch (IOException | SQLException ex) {
+            throw new RuntimeException("Request not sent.", ex);
+        }
+
         return requestItemConverter.convert(ri, Projection.DEFAULT);
     }
 
@@ -153,7 +204,77 @@ public class RequestItemRepository
     }
 
     @Override
+    @PreAuthorize("permitAll()")
+    public RequestItemRest put(Context context, HttpServletRequest request,
+            String apiCategory, String model, String token, JsonNode requestBody) {
+        RequestItem ri = requestItemService.findByToken(context, token);
+        if (null == ri) {
+            throw new UnprocessableEntityException("Item request not found");
+        }
+
+        // Check for authorized user
+        RequestItemAuthor authorizer;
+        try {
+            authorizer = requestItemAuthorExtractor.getRequestItemAuthor(context, ri.getItem());
+        } catch (SQLException ex) {
+            LOG.warn("Failed to find an authorizer:  {}", ex.getMessage());
+            authorizer = new RequestItemAuthor("", "");
+        }
+        if (!authorizer.getEmail().equals(context.getCurrentUser().getEmail())) {
+            throw new RuntimeException("Not authorized to approve this request");
+        }
+
+        // Make the changes
+        JsonNode acceptRequestNode = requestBody.findValue("acceptRequest");
+        if (null == acceptRequestNode) {
+            throw new UnprocessableEntityException("acceptRequest is required");
+        } else {
+            ri.setAccept_request(acceptRequestNode.asBoolean());
+        }
+
+        JsonNode responseMessageNode = requestBody.findValue("responseMessage");
+        String message = responseMessageNode.asText();
+
+        ri.setDecision_date(new Date());
+        requestItemService.update(context, ri);
+
+        // Send the response email
+        String subject = requestBody.findValue("subject").asText();
+        try {
+            RequestItemEmailNotifier.sendResponse(context, ri, subject, message);
+        } catch (IOException ex) {
+            throw new RuntimeException("Response not sent", ex);
+        }
+
+        RequestItemRest rir = requestItemConverter.convert(ri, Projection.DEFAULT);
+        return rir;
+    }
+
+    @Override
     public Class<RequestItemRest> getDomainClass() {
         return RequestItemRest.class;
+    }
+
+
+    /**
+     * Generate a link back to DSpace, to act on a request.
+     *
+     * @param token identifies the request.
+     * @return URL to the item request API, with the token as request parameter
+     *          "token".
+     * @throws URISyntaxException passed through.
+     * @throws MalformedURLException passed through.
+     */
+    private String getLinkTokenEmail(String token)
+            throws URISyntaxException, MalformedURLException {
+        String base = configurationService.getProperty("dspace.server.url");
+
+        URI link = new URIBuilder(base)
+                .setPath("/api/" + RequestItemRest.CATEGORY
+                        + '/' + RequestItemRest.PLURAL_NAME)
+                .addParameter("token", token)
+                .build();
+
+        return link.toURL().toExternalForm();
     }
 }
