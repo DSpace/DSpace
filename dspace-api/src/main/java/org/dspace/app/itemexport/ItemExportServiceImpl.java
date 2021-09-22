@@ -16,6 +16,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -129,7 +130,7 @@ public class ItemExportServiceImpl implements ItemExportService {
 
         while (i.hasNext()) {
             if (SUBDIR_LIMIT > 0 && ++counter == SUBDIR_LIMIT) {
-                subdir = Integer.valueOf(subDirSuffix++).toString();
+                subdir = Integer.toString(subDirSuffix++);
                 fullPath = destDirName + File.separatorChar + subdir;
                 counter = 0;
 
@@ -191,7 +192,7 @@ public class ItemExportServiceImpl implements ItemExportService {
      */
     protected void writeMetadata(Context c, Item i, File destDir, boolean migrate)
         throws Exception {
-        Set<String> schemas = new HashSet<String>();
+        Set<String> schemas = new HashSet<>();
         List<MetadataValue> dcValues = itemService.getMetadata(i, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (MetadataValue metadataValue : dcValues) {
             schemas.add(metadataValue.getMetadataField().getMetadataSchema().getName());
@@ -267,7 +268,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                     + Utils.addEntities(dcv.getValue()) + "</dcvalue>\n")
                     .getBytes("UTF-8");
 
-                if ((!migrate) ||
+                if (!migrate ||
                     (migrate && !(
                         ("date".equals(metadataField.getElement()) && "issued".equals(qualifier)) ||
                             ("date".equals(metadataField.getElement()) && "accessioned".equals(qualifier)) ||
@@ -292,10 +293,10 @@ public class ItemExportServiceImpl implements ItemExportService {
             }
 
             // When migrating, only keep date.issued if it is different to date.accessioned
-            if ((migrate) &&
+            if (migrate &&
                 (dateIssued != null) &&
                 (dateAccessioned != null) &&
-                (!dateIssued.equals(dateAccessioned))) {
+                !dateIssued.equals(dateAccessioned)) {
                 utf8 = ("  <dcvalue element=\"date\" "
                     + "qualifier=\"issued\">"
                     + Utils.addEntities(dateIssued) + "</dcvalue>\n")
@@ -330,7 +331,7 @@ public class ItemExportServiceImpl implements ItemExportService {
         File outFile = new File(destDir, filename);
 
         if (outFile.createNewFile()) {
-            PrintWriter out = new PrintWriter(new FileWriter(outFile));
+            PrintWriter out = new PrintWriter(new FileWriter(outFile, StandardCharsets.UTF_8));
 
             out.println(i.getHandle());
 
@@ -360,7 +361,7 @@ public class ItemExportServiceImpl implements ItemExportService {
         File outFile = new File(destDir, "contents");
 
         if (outFile.createNewFile()) {
-            PrintWriter out = new PrintWriter(new FileWriter(outFile));
+            PrintWriter out = new PrintWriter(new FileWriter(outFile, StandardCharsets.UTF_8));
 
             List<Bundle> bundles = i.getBundles();
 
@@ -474,7 +475,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     public void createDownloadableExport(DSpaceObject dso,
                                          Context context, boolean migrate) throws Exception {
         EPerson eperson = context.getCurrentUser();
-        ArrayList<DSpaceObject> list = new ArrayList<DSpaceObject>(1);
+        ArrayList<DSpaceObject> list = new ArrayList<>(1);
         list.add(dso);
         processDownloadableExport(list, context, eperson == null ? null
             : eperson.getEmail(), migrate);
@@ -491,7 +492,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     @Override
     public void createDownloadableExport(DSpaceObject dso,
                                          Context context, String additionalEmail, boolean migrate) throws Exception {
-        ArrayList<DSpaceObject> list = new ArrayList<DSpaceObject>(1);
+        ArrayList<DSpaceObject> list = new ArrayList<>(1);
         list.add(dso);
         processDownloadableExport(list, context, additionalEmail, migrate);
     }
@@ -652,7 +653,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                         while (iter.hasNext()) {
                             String keyName = iter.next();
                             List<UUID> uuids = itemsMap.get(keyName);
-                            List<Item> items = new ArrayList<Item>();
+                            List<Item> items = new ArrayList<>();
                             for (UUID uuid : uuids) {
                                 items.add(itemService.find(context, uuid));
                             }
@@ -876,7 +877,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             .getIntProperty("org.dspace.app.itemexport.life.span.hours");
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
-        now.add(Calendar.HOUR, (-hours));
+        now.add(Calendar.HOUR, -hours);
         File downloadDir = new File(getExportDownloadDirectory(eperson));
         if (downloadDir.exists()) {
             File[] files = downloadDir.listFiles();
@@ -896,7 +897,7 @@ public class ItemExportServiceImpl implements ItemExportService {
         int hours = configurationService.getIntProperty("org.dspace.app.itemexport.life.span.hours");
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
-        now.add(Calendar.HOUR, (-hours));
+        now.add(Calendar.HOUR, -hours);
         File downloadDir = new File(configurationService.getProperty("org.dspace.app.itemexport.download.dir"));
         if (downloadDir.exists()) {
             // Get a list of all the sub-directories, potentially one for each ePerson.
