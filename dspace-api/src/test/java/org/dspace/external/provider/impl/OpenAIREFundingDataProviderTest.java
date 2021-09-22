@@ -15,13 +15,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.dspace.AbstractDSpaceTest;
-import org.dspace.external.MockOpenAIRERestConnector;
+import org.dspace.external.factory.ExternalServiceFactory;
 import org.dspace.external.model.ExternalDataObject;
+import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.service.ExternalDataService;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * Unit tests for OpenAIREFundingDataProvider
@@ -29,11 +28,10 @@ import org.mockito.junit.MockitoJUnitRunner;
  * @author pgraca
  *
  */
-@RunWith(MockitoJUnitRunner.class)
 public class OpenAIREFundingDataProviderTest extends AbstractDSpaceTest {
 
-    @InjectMocks
-    OpenAIREFundingDataProvider openAIREFundingDataProvider;
+    ExternalDataService externalDataService;
+    ExternalDataProvider openAIREFundingDataProvider;
 
     /**
      * This method will be run before every test as per @Before. It will initialize
@@ -44,8 +42,9 @@ public class OpenAIREFundingDataProviderTest extends AbstractDSpaceTest {
      */
     @Before
     public void init() {
-        openAIREFundingDataProvider.setSourceIdentifier("openAIREFunding");
-        openAIREFundingDataProvider.setConnector(new MockOpenAIRERestConnector("https://api.openaire.eu"));
+        // Set up External Service Factory and set data providers
+        externalDataService = ExternalServiceFactory.getInstance().getExternalDataService();
+        openAIREFundingDataProvider = externalDataService.getExternalDataProvider("openAIREFunding");
     }
 
     @Test
