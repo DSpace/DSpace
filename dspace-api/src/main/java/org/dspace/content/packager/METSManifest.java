@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -656,7 +657,7 @@ public class METSManifest {
 
                         String mimeType = mdWrap.getAttributeValue("MIMETYPE");
                         if (mimeType != null && mimeType.equalsIgnoreCase("text/xml")) {
-                            byte value[] = Base64.decodeBase64(bin.getText().getBytes());
+                            byte value[] = Base64.decodeBase64(bin.getText().getBytes(StandardCharsets.UTF_8));
                             Document mdd = parser.build(new ByteArrayInputStream(value));
                             List<Element> result = new ArrayList<>(1);
                             result.add(mdd.getRootElement());
@@ -724,13 +725,13 @@ public class METSManifest {
                     throw new MetadataValidationException(
                         "Invalid METS Manifest: mdWrap element with neither xmlData nor binData child.");
                 } else {
-                    byte value[] = Base64.decodeBase64(bin.getText().getBytes());
+                    byte value[] = Base64.decodeBase64(bin.getText().getBytes(StandardCharsets.UTF_8));
                     return new ByteArrayInputStream(value);
                 }
             } else {
                 XMLOutputter outputPretty = new XMLOutputter(Format.getPrettyFormat());
                 return new ByteArrayInputStream(
-                    outputPretty.outputString(xmlData.getChildren()).getBytes());
+                    outputPretty.outputString(xmlData.getChildren()).getBytes(StandardCharsets.UTF_8));
             }
         } else {
             mdRef = mdSec.getChild("mdRef", metsNS);
@@ -1176,7 +1177,7 @@ public class METSManifest {
                                     "Invalid METS Manifest: mdWrap element for streaming crosswalk without binData " +
                                         "child.");
                             } else {
-                                byte value[] = Base64.decodeBase64(bin.getText().getBytes());
+                                byte value[] = Base64.decodeBase64(bin.getText().getBytes(StandardCharsets.UTF_8));
                                 sxwalk.ingest(context, dso,
                                               new ByteArrayInputStream(value),
                                               mdWrap.getAttributeValue("MIMETYPE"));
@@ -1302,6 +1303,6 @@ public class METSManifest {
         XMLOutputter outputPretty = new XMLOutputter(Format.getPrettyFormat());
 
         return new ByteArrayInputStream(
-            outputPretty.outputString(mets).getBytes());
+            outputPretty.outputString(mets).getBytes(StandardCharsets.UTF_8));
     }
 }
