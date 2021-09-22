@@ -18,6 +18,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -28,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.servlet.http.Cookie;
@@ -64,6 +66,10 @@ public class RequestItemRepositoryIT
     public static final String URI_ROOT = REST_SERVER_URL
             + RequestItemRest.CATEGORY + '/'
             + RequestItemRest.PLURAL_NAME;
+
+    public static final String URI_SINGULAR_ROOT = REST_SERVER_URL
+            + RequestItemRest.CATEGORY + '/'
+            + RequestItemRest.NAME;
 
     @Autowired(required = true)
     RequestItemConverter requestItemConverter;
@@ -137,7 +143,7 @@ public class RequestItemRepositoryIT
                 .build();
 
         // Test:  can we find it?
-        String authToken = getAuthToken(admin.getEmail(), password);
+        String authToken = getAuthToken(eperson.getEmail(), password);
         final String uri = URI_ROOT + '/' + request.getToken();
         getClient(authToken).perform(get(uri))
                    .andExpect(status().isOk()) // Can we find it?
@@ -201,14 +207,14 @@ public class RequestItemRepositoryIT
         RequestItemRest rir = new RequestItemRest();
         rir.setBitstreamId(bitstream.getID().toString());
         rir.setItemId(item.getID().toString());
-        rir.setRequestEmail(RequestItemBuilder.REQ_EMAIL);
+        rir.setRequestEmail(eperson.getEmail());
         rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
-        rir.setRequestName(RequestItemBuilder.REQ_NAME);
+        rir.setRequestName(eperson.getFullName());
         rir.setAllfiles(false);
 
         // Create it and see if it was created correctly.
         ObjectMapper mapper = new ObjectMapper();
-        String authToken = getAuthToken(admin.getEmail(), password);
+        String authToken = getAuthToken(eperson.getEmail(), password);
         AtomicReference<String> requestTokenRef = new AtomicReference<>();
         try {
             getClient(authToken)
@@ -221,9 +227,9 @@ public class RequestItemRepositoryIT
                             hasJsonPath("$.id", not(is(emptyOrNullString()))),
                             hasJsonPath("$.type", is(RequestItemRest.NAME)),
                             hasJsonPath("$.token", not(is(emptyOrNullString()))),
-                            hasJsonPath("$.requestEmail", is(RequestItemBuilder.REQ_EMAIL)),
+                            hasJsonPath("$.requestEmail", is(eperson.getEmail())),
                             hasJsonPath("$.requestMessage", is(RequestItemBuilder.REQ_MESSAGE)),
-                            hasJsonPath("$.requestName", is(RequestItemBuilder.REQ_NAME)),
+                            hasJsonPath("$.requestName", is(eperson.getFullName())),
                             hasJsonPath("$.allfiles", is(false)),
                             // TODO should be an ISO datetime
                             hasJsonPath("$.requestDate", not(is(emptyOrNullString()))),
@@ -307,72 +313,66 @@ public class RequestItemRepositoryIT
         RequestItemRest rir = new RequestItemRest();
         rir.setBitstreamId(bitstream.getID().toString());
         rir.setItemId(item.getID().toString());
-        rir.setRequestEmail(RequestItemBuilder.REQ_EMAIL);
+        rir.setRequestEmail(eperson.getEmail());
         rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
-        rir.setRequestName(RequestItemBuilder.REQ_NAME);
+        rir.setRequestName(eperson.getFullName());
         rir.setAllfiles(false);
 
         // Try to create it, with various malformations.
         ObjectMapper mapper = new ObjectMapper();
-        String authToken = getAuthToken(admin.getEmail(), password);
-        AtomicReference<String> requestTokenRef = new AtomicReference<>();
+        String authToken = getAuthToken(eperson.getEmail(), password);
 
-        try {
-            // Test missing bitstream ID
-            rir.setBitstreamId(null);
-            getClient(authToken)
-                    .perform(post(URI_ROOT)
-                            .content(mapper.writeValueAsBytes(rir))
-                            .contentType(contentType))
-                    .andExpect(status().isUnprocessableEntity());
+        // Test missing bitstream ID
+        rir.setBitstreamId(null);
+        getClient(authToken)
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
 
-            // Test unknown bitstream ID
-            rir.setBitstreamId(UUID.randomUUID().toString());
-            getClient(authToken)
-                    .perform(post(URI_ROOT)
-                            .content(mapper.writeValueAsBytes(rir))
-                            .contentType(contentType))
-                    .andExpect(status().isUnprocessableEntity());
+        // Test unknown bitstream ID
+        rir.setBitstreamId(UUID.randomUUID().toString());
+        getClient(authToken)
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
 
-            rir.setBitstreamId(bitstream.getID().toString());
+        rir.setBitstreamId(bitstream.getID().toString());
 
-            // Test missing item ID
-            rir.setItemId(null);
-            getClient(authToken)
-                    .perform(post(URI_ROOT)
-                            .content(mapper.writeValueAsBytes(rir))
-                            .contentType(contentType))
-                    .andExpect(status().isUnprocessableEntity());
+        // Test missing item ID
+        rir.setItemId(null);
+        getClient(authToken)
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
 
-            // Test unknown item ID
-            rir.setItemId(UUID.randomUUID().toString());
-            getClient(authToken)
-                    .perform(post(URI_ROOT)
-                            .content(mapper.writeValueAsBytes(rir))
-                            .contentType(contentType))
-                    .andExpect(status().isUnprocessableEntity());
+        // Test unknown item ID
+        rir.setItemId(UUID.randomUUID().toString());
+        getClient(authToken)
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
 
-            rir.setItemId(item.getID().toString());
+        rir.setItemId(item.getID().toString());
 
-            // Test missing email
-            rir.setRequestEmail(null);
-            getClient(authToken)
-                    .perform(post(URI_ROOT)
-                            .content(mapper.writeValueAsBytes(rir))
-                            .contentType(contentType))
-                    .andExpect(status().isUnprocessableEntity());
+        // Test missing email
+        rir.setRequestEmail(null);
+        getClient(authToken)
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
 
-            // Test bad email
-            rir.setRequestEmail("<script>window.location='http://evil.example.com/';</script>");
-            getClient(authToken)
-                    .perform(post(URI_ROOT)
-                            .content(mapper.writeValueAsBytes(rir))
-                            .contentType(contentType))
-                    .andExpect(status().isUnprocessableEntity());
-        } finally {
-            // Clean up the created request.
-            RequestItemBuilder.deleteRequestItem(requestTokenRef.get());
-        }
+        // Test bad email
+        rir.setRequestEmail("<script>window.location='http://evil.example.com/';</script>");
+        getClient(authToken)
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isUnprocessableEntity());
     }
 
     /**
@@ -470,6 +470,37 @@ public class RequestItemRepositoryIT
         //Logout
         getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
+    }
+
+    /**
+     * Test of put method, of class RequestItemRepository.
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testPut()
+            throws Exception {
+        System.out.println("put");
+
+        // Create an item request to approve.
+        RequestItem itemRequest = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        // Create the HTTP request body.
+        Map<String, String> parameters = Map.of(
+                "acceptRequest", "true",
+                "subject", "subject",
+                "responseMessage", "Request accepted");
+        String content = new ObjectMapper()
+                .writer()
+                .writeValueAsString(parameters);
+
+        // Send the request.
+        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
+                .contentType(contentType)
+                .content(content))
+                .andExpect(status().isOk()
+                );
     }
 
     /**

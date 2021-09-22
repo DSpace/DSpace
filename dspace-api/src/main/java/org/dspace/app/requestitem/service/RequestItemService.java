@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.content.Bitstream;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -76,4 +77,14 @@ public interface RequestItemService {
      * @param request record to be removed.
      */
     public void delete(Context context, RequestItem request);
+
+    /**
+     * Is there at least one valid READ resource policy for this object?
+     * @param context current DSpace session.
+     * @param o the object.
+     * @return true if a READ policy applies.
+     * @throws SQLException passed through.
+     */
+    public boolean isRestricted(Context context, DSpaceObject o)
+            throws SQLException;
 }

@@ -5,7 +5,6 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.requestitem;
 
 /**
  * Feature for conveying a request that materials forbidden to the requester
@@ -13,9 +12,10 @@ package org.dspace.app.requestitem;
  * e-mailed to a responsible party for consideration and action.  Find details
  * in the user documentation under the rubric "Request a Copy".
  *
- * This package includes several "strategy" classes which discover responsible
+ * <p>This package includes several "strategy" classes which discover responsible
  * parties in various ways.  See {@link RequestItemSubmitterStrategy} and the
  * classes which extend it.  A strategy class must be configured and identified
  * as {@link RequestItemAuthorExtractor} for injection into code which requires
  * Request a Copy services.
  */
+package org.dspace.app.requestitem;
