@@ -7,11 +7,8 @@
  */
 package org.dspace.app.rest.iiif.service;
 
-import java.util.List;
-
 import org.dspace.app.rest.iiif.model.generator.AnnotationGenerator;
 import org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator;
-import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +28,7 @@ public class SeeAlsoService extends AbstractResourceService {
     @Autowired
     ExternalLinksGenerator externalLinksGenerator;
 
-    public ExternalLinksGenerator getSeeAlso(Item item, List<Bundle> bundles) {
+    public ExternalLinksGenerator getSeeAlso(Item item) {
         return externalLinksGenerator.setIdentifier(IIIF_ENDPOINT + item.getID() + "/manifest/seeAlso")
                 .setType(AnnotationGenerator.TYPE)
                 .setLabel(SEE_ALSO_LABEL);

@@ -132,9 +132,9 @@ public class ManifestGenerator implements IIIFResource {
      * @param field property field
      * @param value property value
      */
-    public void addMetadata(String field, String value) {
+    public void addMetadata(String field, String value, String... rest) {
         metadataEntryGenerator.setField(field);
-        metadataEntryGenerator.setValue(value);
+        metadataEntryGenerator.setValue(value, rest);
         metadata.add(metadataEntryGenerator.getValue());
     }
 
@@ -148,19 +148,18 @@ public class ManifestGenerator implements IIIFResource {
 
     /**
      * Adds optional description to Manifest.
-     * @param field property field
-     * @param value property value
+     * @param value the description value
      */
-    public void addDescription(String field, String value) {
-        description = new PropertyValueGenerator().getPropertyValue(field, value).getValue();
+    public void addDescription(String value) {
+        description = new PropertyValueGenerator().getPropertyValue(value).getValue();
     }
 
     /**
      * Adds optional Range to the manifest's structures element.
-     * @param rangeGenerator list of range models
+     * @param rangeGenerator to add
      */
-    public void setRange(List<RangeGenerator> rangeGenerator) {
-        ranges =  rangeGenerator;
+    public void addRange(RangeGenerator rangeGenerator) {
+        ranges.add(rangeGenerator);
     }
 
     @Override

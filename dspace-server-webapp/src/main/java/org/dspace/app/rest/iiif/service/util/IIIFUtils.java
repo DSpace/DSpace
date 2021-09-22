@@ -7,29 +7,29 @@
  */
 package org.dspace.app.rest.iiif.service.util;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.iiif.model.ObjectMapperFactory;
-import org.dspace.app.rest.iiif.model.info.Info;
-import org.dspace.app.rest.iiif.model.info.Range;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.license.CreativeCommonsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +41,18 @@ public class IIIFUtils {
     // The canvas position will be appended to this string.
     private static final String CANVAS_PATH_BASE = "/canvas/c";
 
+    public static final String METADATA_IIIF_ENABLED = "dspace.iiif.enabled";
+    public static final String METADATA_IIIF_SEARCH_ENABLED = "iiif.search.enabled";
+    public static final String METADATA_IIIF_LABEL = "iiif.label";
+    public static final String METADATA_IIIF_DESCRIPTION = "iiif.description";
+    public static final String METADATA_IIIF_TOC = "iiif.toc";
+    public static final String METADATA_IIIF_VIEWING_HINT  = "iiif.viewing.hint";
+    public static final String METADATA_IMAGE_WIDTH = "iiif.image.width";
+    public static final String METADATA_IMAGE_HEIGTH = "iiif.image.heigth";
+
+    public static final String TOC_SEPARATOR = "|||";
+    public static final String TOC_SEPARATOR_REGEX = "\\|\\|\\|";
+
     // get module subclass.
     protected SimpleModule iiifModule = ObjectMapperFactory.getIiifModule();
     // Use the object mapper subclass.
@@ -50,48 +62,55 @@ public class IIIFUtils {
     protected BitstreamService bitstreamService;
 
     /**
-     * For IIIF entities, this method returns the bundle assigned to IIIF
-     * bitstreams. If the item is not an IIIF entity, the default (ORIGINAL)
-     * bundle list is returned instead.
+     * This method returns the bundles holding IIIF resources if any.
+     * If there is no IIIF content available an empty bundle list is returned.
      * @param item the DSpace item
-     * @param iiifBundle the name of the IIIF bundle
-     * @return DSpace bundle
+     * 
+     * @return list of DSpace bundles with IIIF content
      */
-    public List<Bundle> getIiifBundle(Item item, String iiifBundle) {
-        boolean iiif = item.getMetadata().stream()
-                .filter(m -> m.getMetadataField().toString().contentEquals("dspace_entity_type"))
-                .anyMatch(m -> m.getValue().contentEquals("IIIF")  ||
-                        m.getValue().contentEquals("IIIFSearchable"));
+    public List<Bundle> getIiifBundles(Item item) {
+        boolean iiif = isIIIFEnabled(item);
         List<Bundle> bundles = new ArrayList<>();
         if (iiif) {
-            bundles = item.getBundles(iiifBundle);
-            if (bundles.size() == 0) {
-                bundles = item.getBundles("ORIGINAL");
-            }
+            bundles = item.getBundles().stream().filter(b -> isIIIFBundle(b)).collect(Collectors.toList());
         }
         return bundles;
     }
 
-    /**
-     * Returns the requested bundle.
-     * @param item DSpace item
-     * @param name bundle name
-     * @return
-     */
-    public List<Bundle> getBundle(Item item, String name) {
-        return item.getBundles(name);
+    public boolean isIIIFEnabled(Item item) {
+        return item.getMetadata().stream()
+                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
+                .anyMatch(m -> m.getValue().equalsIgnoreCase("true")  ||
+                        m.getValue().equalsIgnoreCase("yes"));
     }
 
-    /**
-     * Returns bitstreams for the first bundle in the list.
-     * @param bundles list of DSpace bundles
-     * @return list of bitstreams
-     */
-    public List<Bitstream> getBitstreams(List<Bundle> bundles) {
-        if (bundles != null && bundles.size() > 0) {
-            return bundles.get(0).getBitstreams();
+    private boolean isIIIFBundle(Bundle b) {
+        return !StringUtils.equalsAnyIgnoreCase(b.getName(), Constants.LICENSE_BUNDLE_NAME,
+                Constants.METADATA_BUNDLE_NAME, CreativeCommonsServiceImpl.CC_BUNDLE_NAME, "THUMBNAIL",
+                "BRANDED_PREVIEW", "TEXT")
+                && b.getMetadata().stream()
+                        .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
+                        .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
+    }
+
+    public List<Bitstream> getIiifBitstreams(Context context, Item item) {
+        List<Bitstream> bitstreams = new ArrayList<Bitstream>();
+        for (Bundle bnd : getIiifBundles(item)) {
+            bitstreams
+                    .addAll(getIiifBitstreams(context, bnd));
         }
-        return null;
+        return bitstreams;
+    }
+
+    public List<Bitstream> getIiifBitstreams(Context context, Bundle bundle) {
+        return bundle.getBitstreams().stream().filter(b -> isIiifBitstream(context, b))
+                .collect(Collectors.toList());
+    }
+
+    private boolean isIiifBitstream(Context context, Bitstream b) {
+        return checkImageMimeType(getBitstreamMimeType(b, context)) && b.getMetadata().stream()
+                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
+                .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
     }
 
     /**
@@ -105,99 +124,37 @@ public class IIIFUtils {
             BitstreamFormat bitstreamFormat = bitstream.getFormat(context);
             return bitstreamFormat.getMIMEType();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         return null;
     }
 
     /**
-     * Checks to see if the item is searchable. Based on the entity type.
+     * Checks to see if the item is searchable. Based on the {@link #METADATA_IIIF_SEARCH_ENABLED} metadata.
      * @param item DSpace item
-     * @return true if searchable
+     * @return true if the iiif search is enabled
      */
     public boolean isSearchable(Item item) {
         return item.getMetadata().stream()
-                .filter(m -> m.getMetadataField().toString().contentEquals("dspace_entity_type"))
-                .anyMatch(m -> m.getValue().contentEquals("IIIFSearchable"));
-    }
-
-    /**
-     * Returns a metadata field name.
-     * @param meta the DSpace metadata value object
-     * @return field name as string
-     */
-    public String getMetadataFieldName(MetadataValue meta) {
-        String element = meta.getMetadataField().getElement();
-        String qualifier = meta.getMetadataField().getQualifier();
-        // Need to distinguish DC type from DSpace relationship.type.
-        // Setting element to be the schema name.
-        if (meta.getMetadataField().getMetadataSchema().getName().contentEquals("relationship")) {
-            qualifier = element;
-            element = meta.getMetadataField().getMetadataSchema().getName();
-        }
-        String field = element;
-        // Add qualifier if defined.
-        if (qualifier != null) {
-            field = field + "." + qualifier;
-        }
-        return field;
+                .filter(m -> m.getMetadataField().toString('.').contentEquals("iiif.search.enabled"))
+                .anyMatch(m -> m.getValue().equalsIgnoreCase("true")  ||
+                        m.getValue().equalsIgnoreCase("yes"));
     }
 
     /**
      * Retrives a bitstream based on its position in the IIIF bundle.
+     * @param context DSpace Context
      * @param item DSpace Item
      * @param canvasPosition bitstream position
      * @return bitstream
      */
-    public Bitstream getBitstreamForCanvas(Item item, String bundleName, int canvasPosition) {
-        List<Bundle> bundles = item.getBundles(bundleName);
-        if (bundles.size() == 0) {
-            return null;
-        }
-        List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
+    public Bitstream getBitstreamForCanvas(Context context, Item item, int canvasPosition) {
+        List<Bitstream> bitstreams = getIiifBitstreams(context, item);
         try {
-            return bitstreams.get(canvasPosition);
+            return bitstreams.size() > canvasPosition ? bitstreams.get(canvasPosition) : null;
         } catch (RuntimeException e) {
             throw new RuntimeException("The requested canvas is not available", e);
         }
-    }
-
-    /**
-     * Attempts to find info.json file in the bitstream bundle and convert
-     * the json into the Info.class domain model for canvas and range parameters.
-     * @param context DSpace context
-     * @param bundleName the IIIF bundle
-     * @return info domain model
-     */
-    public Info getInfo(Context context, Item item, String bundleName) {
-        Info info = null;
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            // Look for expected json file bitstream in bundle.
-            Bitstream infoBitstream = bitstreamService
-                    .getBitstreamByName(item, bundleName, "info.json");
-            if (infoBitstream != null)  {
-                InputStream is = bitstreamService.retrieve(context, infoBitstream);
-                info = mapper.readValue(is, Info.class);
-            }
-        } catch (IOException | SQLException e) {
-            log.warn("Unable to read info.json file.", e);
-        } catch (AuthorizeException e) {
-            log.warn("Not authorized to access info.json file.", e);
-        }
-        return info;
-    }
-
-    /**
-     * Returns the range parameter List or null
-     * @param info the parameters model
-     * @return list of range models
-     */
-    public List<Range> getRangesFromInfoObject(Info info) {
-        if (info != null) {
-            return info.getStructures();
-        }
-        return null;
     }
 
     /**
@@ -217,72 +174,6 @@ public class IIIFUtils {
      */
     public String getCanvasId(int position) {
         return CANVAS_PATH_BASE + position;
-    }
-
-    /**
-     * Convenience method to compare canvas parameter and bitstream list size.
-     * @param info the parameter model
-     * @param bitstreams the list of DSpace bitstreams
-     * @return true if sizes match
-     */
-    public boolean isListSizeMatch(Info info, List<Bitstream> bitstreams) {
-        // If Info is not null then the bitstream bundle contains info.json; exclude
-        // the file from comparison.
-        if (info != null && info.getCanvases().size() == bitstreams.size() - 1) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Convenience method verifies that the requested canvas exists in the
-     * parameters model object.
-     * @param info parameter model
-     * @param canvasPosition requested canvas position
-     * @return true if index is in bounds
-     */
-    public boolean canvasOutOfBounds(Info info, int canvasPosition) {
-        return canvasPosition < 0 || canvasPosition >= info.getCanvases().size();
-    }
-
-    /**
-     * Validates info.json for a single canvas.
-     * Unless global settings are being used, when canvas information is not available
-     * use defaults. The canvas information is defined in the info.json file.
-     * @param info the information model
-     * @param position the position of the requested canvas
-     * @return information model
-     */
-    public Info validateInfoForSingleCanvas(Info info, int position) {
-        if (info != null && info.getGlobalDefaults() != null) {
-            if (canvasOutOfBounds(info, position) && !info.getGlobalDefaults().isActivated()) {
-                log.warn("Canvas for position " + position + " not defined.\n" +
-                        "Ignoring info.json canvas definitions and using defaults. " +
-                        "Any other canvas-level annotations will also be ignored.");
-                info.setCanvases(new ArrayList<>());
-            }
-        }
-        return info;
-    }
-
-    /**
-     * Unless global settings are being used, when canvas information list size does
-     * not match the number of bitstreams use defaults. The canvas information is
-     * defined in the info.json file.
-     * @param info the information model
-     * @param bitstreams the list of bitstreams
-     * @return information model
-     */
-    public Info validateInfoForManifest(Info info, List<Bitstream> bitstreams) {
-        if (info != null && info.getGlobalDefaults() != null) {
-            if (!isListSizeMatch(info, bitstreams) && !info.getGlobalDefaults().isActivated()) {
-                log.warn("Mismatch between info.json canvases and DSpace bitstream count.\n" +
-                        "Ignoring info.json canvas definitions and using defaults." +
-                        "Any other canvas-level annotations will also be ignored.");
-                info.setCanvases(new ArrayList<>());
-            }
-        }
-        return info;
     }
 
     /**
@@ -312,4 +203,73 @@ public class IIIFUtils {
         }
         return false;
     }
+
+    public List<Bitstream> getSeeAlsoBitstreams(Item item) {
+        return new ArrayList<Bitstream>();
+    }
+
+    public String getIIIFLabel(DSpaceObject dso, String defaultLabel) {
+        return dso.getMetadata().stream()
+                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_LABEL))
+                .findFirst().map(m -> m.getValue()).orElse(defaultLabel);
+    }
+
+    public String getIIIFDescription(DSpaceObject dso, String defaultDescription) {
+        return dso.getMetadata().stream()
+                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_DESCRIPTION))
+                .findFirst().map(m -> m.getValue()).orElse(defaultDescription);
+    }
+
+    public List<String> getIIIFToCs(DSpaceObject dso, String prefix) {
+        List<String> tocs = dso.getMetadata().stream()
+                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_TOC))
+                .map(m -> StringUtils.isNotBlank(prefix) ? prefix + TOC_SEPARATOR + m.getValue() : m.getValue())
+                .collect(Collectors.toList());
+        if (tocs.size() == 0 && StringUtils.isNotBlank(prefix)) {
+            return List.of(prefix);
+        } else {
+            return tocs;
+        }
+    }
+
+    public String getIIIFFirstToC(DSpaceObject dso) {
+        return dso.getMetadata().stream()
+                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_TOC))
+                .findFirst().map(m -> m.getValue()).orElse(null);
+    }
+
+    public String getIIIFViewingHint(Item item, String defaultHint) {
+        return item.getMetadata().stream()
+                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_VIEWING_HINT))
+                .findFirst().map(m -> m.getValue()).orElse(defaultHint);
+    }
+
+    public int getCanvasWidth(Bitstream bitstream, Bundle bundle, Item item, int defaultWidth) {
+        return getSizeFromMetadata(bitstream, METADATA_IMAGE_WIDTH,
+                    getSizeFromMetadata(bundle, METADATA_IMAGE_WIDTH,
+                        getSizeFromMetadata(item, METADATA_IMAGE_WIDTH, defaultWidth)));
+    }
+
+    public int getCanvasHeight(Bitstream bitstream, Bundle bundle, Item item, int defaultHeight) {
+        return getSizeFromMetadata(bitstream, METADATA_IMAGE_HEIGTH,
+                getSizeFromMetadata(bundle, METADATA_IMAGE_HEIGTH,
+                    getSizeFromMetadata(item, METADATA_IMAGE_HEIGTH, defaultHeight)));
+    }
+
+    private int getSizeFromMetadata(DSpaceObject dso, String metadata, int defaultValue) {
+        return dso.getMetadata().stream()
+                .filter(m -> m.getMetadataField().toString('.').contentEquals(metadata))
+                .findFirst().map(m -> castToInt(m, defaultValue)).orElse(defaultValue);
+    }
+
+    private int castToInt(MetadataValue m, int defaultWidth) {
+        try {
+            Integer.parseInt(m.getValue());
+        } catch (NumberFormatException e) {
+            log.error("Error parsing " + m.getMetadataField().toString('.') + " of " + m.getDSpaceObject().getID()
+                    + " the value " + m.getValue() + " is not an integer. Returning the default.");
+        }
+        return defaultWidth;
+    }
+
 }

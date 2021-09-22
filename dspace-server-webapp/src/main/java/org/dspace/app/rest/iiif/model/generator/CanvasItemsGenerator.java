@@ -61,8 +61,10 @@ public class CanvasItemsGenerator implements org.dspace.app.rest.iiif.model.gene
      * Add a Canvas to the sequence.
      * @param canvas wrapper for Canvas
      */
-    public void addCanvas(org.dspace.app.rest.iiif.model.generator.CanvasGenerator canvas) {
-        this.canvas.add((Canvas) canvas.getResource());
+    public String addCanvas(org.dspace.app.rest.iiif.model.generator.CanvasGenerator canvas) {
+        Canvas resource = (Canvas) canvas.getResource();
+        this.canvas.add(resource);
+        return resource.getIdentifier().toString();
     }
 
     @Override

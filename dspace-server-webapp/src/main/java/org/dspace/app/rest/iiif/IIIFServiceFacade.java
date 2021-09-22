@@ -14,6 +14,7 @@ import org.dspace.app.rest.iiif.service.AnnotationListService;
 import org.dspace.app.rest.iiif.service.CanvasLookupService;
 import org.dspace.app.rest.iiif.service.ManifestService;
 import org.dspace.app.rest.iiif.service.SearchService;
+import org.dspace.app.rest.iiif.service.util.IIIFUtils;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
@@ -48,6 +49,8 @@ public class IIIFServiceFacade {
     @Autowired
     CanvasLookupService canvasLookupService;
 
+    @Autowired
+    IIIFUtils utils;
 
     /**
      * The manifest response contains sufficient information for the client to initialize itself
@@ -71,7 +74,7 @@ public class IIIFServiceFacade {
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        if (item == null) {
+        if (item == null || !utils.isIIIFEnabled(item)) {
             throw new ResourceNotFoundException("IIIF manifest for  id " + id + " not found");
         }
         return manifestService.getManifest(item, context);

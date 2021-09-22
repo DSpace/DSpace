@@ -34,6 +34,10 @@ public class CanvasGenerator implements IIIFResource {
         return this;
     }
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
     /**
      * Every canvas must have a label to display.
      * @param label
