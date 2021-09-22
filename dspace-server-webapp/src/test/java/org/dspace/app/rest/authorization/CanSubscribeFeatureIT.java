@@ -7,16 +7,21 @@
  */
 package org.dspace.app.rest.authorization;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.authorization.impl.CanSubscribeFeature;
-import org.dspace.app.rest.converter.BitstreamConverter;
-import org.dspace.app.rest.converter.BundleConverter;
 import org.dspace.app.rest.converter.CollectionConverter;
 import org.dspace.app.rest.converter.CommunityConverter;
-import org.dspace.app.rest.converter.EPersonConverter;
-import org.dspace.app.rest.converter.GroupConverter;
 import org.dspace.app.rest.converter.ItemConverter;
-import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.ItemRest;
@@ -38,7 +43,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
@@ -47,15 +51,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test of Subscribe Dso Feature implementation.
@@ -160,7 +155,8 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
     @Test
     public void testCanNotSubscribeCollection() throws Exception {
         context.turnOffAuthorisationSystem();
-        Collection collectionWithReadPermission = CollectionBuilder.createCollection(context, communityAuthorized).withAdminGroup(admin).build();
+        Collection collectionWithReadPermission = CollectionBuilder.createCollection(context, communityAuthorized)
+                .withAdminGroup(admin).build();
         EPerson ePersonNotSubscribePermission = EPersonBuilder.createEPerson(context)
                 .withCanLogin(true)
                 .withPassword(password)
@@ -229,7 +225,8 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
     @Test
     public void testCanSubscribeCollection() throws Exception {
         context.turnOffAuthorisationSystem();
-        Collection collectionWithReadPermission = CollectionBuilder.createCollection(context, communityAuthorized).withAdminGroup(admin).build();
+        Collection collectionWithReadPermission = CollectionBuilder.createCollection(context, communityAuthorized)
+                .withAdminGroup(admin).build();
         EPerson ePersonSubscribePermission = EPersonBuilder.createEPerson(context)
                 .withCanLogin(true)
                 .withPassword(password)
