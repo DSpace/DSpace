@@ -158,6 +158,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * Spring will use this setter to set the filter from the configured property in identifier-services.xml
      * @param filterService - an object implementing the org.dspace.content.logic.Filter interface
      */
+    @Override
     public void setFilterService(Filter filterService) {
         this.filterService = filterService;
     }
@@ -319,7 +320,6 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @param skipFilter - boolean indicating whether to skip any filtering of items before performing reservation
      * @throws IdentifierException
      * @throws IllegalArgumentException
-     * @throws SQLException
      */
     @Override
     public void reserve(Context context, DSpaceObject dso, String identifier, boolean skipFilter)
@@ -367,6 +367,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @param context       - DSpace context
      * @param dso           - DSpaceObject identified by this DOI
      * @param identifier    - String containing the DOI to reserve
+     * @param skipFilter    - skip the filters for {@link checkMintable(Context, DSpaceObject)}
      * @throws IdentifierException
      * @throws IllegalArgumentException
      * @throws SQLException
@@ -410,6 +411,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @param context       - DSpace context
      * @param dso           - DSpaceObject identified by this DOI
      * @param identifier    - String containing the DOI to register
+     * @param skipFilter    - skip filters for {@link checkMintable(Context, DSpaceObject)}
      * @throws IdentifierException
      * @throws IllegalArgumentException
      * @throws SQLException
@@ -785,7 +787,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * Delete a specific DOI in the registration agency records via the DOI Connector
      * @param context    - DSpace context
      * @param identifier - String containing identifier to delete
-     * @throws IdentifierException
+     * @throws DOIIdentifierException
      */
     public void deleteOnline(Context context, String identifier) throws DOIIdentifierException {
         String doi = doiService.formatIdentifier(identifier);
@@ -826,7 +828,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      *                   {@link org.dspace.identifier.service.DOIService#formatIdentifier(String)}.
      * @return Null if the DOI couldn't be found or the associated DSpaceObject.
      * @throws SQLException if database error
-     * @throws IdentifierException If {@code identifier} is null or an empty string.
+     * @throws DOIIdentifierException If {@code identifier} is null or an empty string.
      * @throws IllegalArgumentException If the identifier couldn't be recognized as DOI.
      */
     public DSpaceObject getObjectByDOI(Context context, String identifier)
@@ -876,10 +878,10 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     }
 
     /**
-     * Load a DOI from the database or creates it if it does not exist. This
-     * method can be used to ensure that a DOI exists in the database and to
-     * load the appropriate TableRow. As protected method we don't check if the
-     * DOI is in a decent format, use DOI.formatIdentifier(String) if necessary.
+     * Load a DOI from the database or creates it if it does not exist.
+     * This method can be used to ensure that a DOI exists in the database and
+     * to load the appropriate TableRow. As protected method we don't check if
+     * the DOI is in a decent format, use DOI.formatIdentifier(String) if necessary.
      *
      * @param context       The relevant DSpace Context.
      * @param dso           The DSpaceObject the DOI should be loaded or created for.
@@ -889,6 +891,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @throws SQLException           In case of an error using the database.
      * @throws DOIIdentifierException If {@code doi} is not part of our prefix or
      *                                DOI is registered for another object already.
+     * @throws IdentifierNotApplicableException passed through.
      */
     protected DOI loadOrCreateDOI(Context context, DSpaceObject dso, String doiIdentifier)
             throws SQLException, DOIIdentifierException, IdentifierNotApplicableException {
@@ -896,11 +899,13 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     }
 
     /**
-     * Load DOI from database, or create one if it doesn't yet exist
-     * We need to distinguish several cases. LoadOrCreate can be called with a specifid identifier to load or create.
-     * It can also be used to create a new unspecified identifier. In the latter case doiIdentifier is set null.
-     * If doiIdentifier is set, we know which doi we should try to load or create, but even in sucha situation
-     * we might be able to find it in the database or might have to create it.
+     * Load DOI from database, or create one if it doesn't yet exist.
+     * We need to distinguish several cases.LoadOrCreate can be called with a
+     * specified identifier to load or create. It can also be used to create a
+     * new unspecified identifier. In the latter case doiIdentifier is set null.
+     * If doiIdentifier is set, we know which doi we should try to load or
+     * create, but even in such a situation we might be able to find it in the
+     * database or might have to create it.
      *
      * @param context       - DSpace context
      * @param dso           - DSpaceObject to identify
@@ -909,6 +914,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @return
      * @throws SQLException
      * @throws DOIIdentifierException
+     * @throws org.dspace.identifier.IdentifierNotApplicableException passed through.
      */
     protected DOI loadOrCreateDOI(Context context, DSpaceObject dso, String doiIdentifier, boolean skipFilter)
         throws SQLException, DOIIdentifierException, IdentifierNotApplicableException {
@@ -929,11 +935,11 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
                         && doi.getResourceTypeId() != dso.getType()) {
                         // doi was assigned to another resource type. Don't
                         // reactivate it
-                        throw new DOIIdentifierException("Cannot reassing "
-                            + "previously deleted DOI " + doiIdentifier
-                            + " as the resource types of the object it was "
-                            + "previously assigned to and the object it "
-                            + "shall be assigned to now divert (was: "
+                        throw new DOIIdentifierException("Cannot reassign"
+                            + " previously deleted DOI " + doiIdentifier
+                            + " as the resource types of the object it was"
+                            + " previously assigned to and the object it"
+                            + " shall be assigned to now differ (was: "
                             + Constants.typeText[doi.getResourceTypeId()]
                             + ", trying to assign to "
                             + Constants.typeText[dso.getType()] + ").",
