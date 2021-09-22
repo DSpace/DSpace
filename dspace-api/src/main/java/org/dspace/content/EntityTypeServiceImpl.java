@@ -156,4 +156,16 @@ public class EntityTypeServiceImpl implements EntityTypeService {
         }
         return types;
     }
+
+    @Override
+    public List<EntityType> getEntityTypesByNames(Context context, List<String> names, Integer limit, Integer offset)
+            throws SQLException {
+        return entityTypeDAO.getEntityTypesByNames(context, names, limit, offset);
+    }
+
+    @Override
+    public int countEntityTypesByNames(Context context, List<String> names) throws SQLException {
+        return entityTypeDAO.countEntityTypesByNames(context, names);
+    }
+
 }
