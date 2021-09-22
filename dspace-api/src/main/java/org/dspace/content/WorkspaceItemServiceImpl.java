@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
@@ -107,6 +108,22 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         authorizeService
             .addPolicy(context, item, Constants.DELETE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
 
+
+        Optional<MetadataValue> optionalType = collection.getMetadata()
+                                                         .stream()
+                                                         .filter(x -> x.getMetadataField().toString('.')
+                                                                       .equalsIgnoreCase("dspace.entity.type"))
+                                                         .findFirst();
+
+        if (optionalType.isPresent()) {
+            MetadataValue original = optionalType.get();
+            MetadataField metadataField = original.getMetadataField();
+            MetadataSchema metadataSchema = metadataField.getMetadataSchema();
+            itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
+                                    metadataField.getQualifier(), original.getLanguage(), original.getValue());
+        } else {
+            itemService.addMetadata(context, item, "dspace", "entity", "type", null, Constants.UNSET_ENTITY_TYPE);
+        }
 
         // Copy template if appropriate
         Item templateItem = collection.getTemplateItem();
