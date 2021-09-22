@@ -18,13 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Logger;
-import org.dspace.content.dto.MetadataValueDTO;
-import org.dspace.external.OpenAIRERestConnector;
-import org.dspace.external.model.ExternalDataObject;
-import org.dspace.external.provider.ExternalDataProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import eu.openaire.jaxb.helper.FundingHelper;
 import eu.openaire.jaxb.helper.ProjectHelper;
 import eu.openaire.jaxb.model.Response;
@@ -33,6 +26,13 @@ import eu.openaire.oaf.model.base.FunderType;
 import eu.openaire.oaf.model.base.FundingTreeType;
 import eu.openaire.oaf.model.base.FundingType;
 import eu.openaire.oaf.model.base.Project;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
+import org.dspace.content.dto.MetadataValueDTO;
+import org.dspace.external.OpenAIRERestConnector;
+import org.dspace.external.model.ExternalDataObject;
+import org.dspace.external.provider.ExternalDataProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that
@@ -154,7 +154,10 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
 
     @Override
     public int getNumberOfResults(String query) {
-        Response projectResponse = connector.searchProjectByKeywords(0, 0, query);
+        // escaping query
+        String encodedQuery = encodeValue(query);
+
+        Response projectResponse = connector.searchProjectByKeywords(0, 0, encodedQuery);
         return Integer.parseInt(projectResponse.getHeader().getTotal());
     }
 
