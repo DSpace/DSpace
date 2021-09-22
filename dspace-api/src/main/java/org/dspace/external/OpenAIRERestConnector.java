@@ -53,8 +53,8 @@ public class OpenAIRERestConnector {
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OpenAIRERestConnector.class);
 
     /**
-     * OpenAIRE API Url 
-     *  and can be configured with: openaire.api.url 
+     * OpenAIRE API Url
+     *  and can be configured with: openaire.api.url
      */
     private String url = "https://api.openaire.eu";
 
@@ -86,7 +86,7 @@ public class OpenAIRERestConnector {
      *  and can be configured with: openaire.token.clientSecret
      */
     private String clientSecret;
-        
+
 
     public OpenAIRERestConnector(String url) {
         this.url = url;
