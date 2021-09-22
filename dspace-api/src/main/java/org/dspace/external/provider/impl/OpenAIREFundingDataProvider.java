@@ -90,8 +90,11 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
         try {
             if (response.getHeader() != null && Integer.parseInt(response.getHeader().getTotal()) > 0) {
                 Project project = response.getResults().getResult().get(0).getMetadata().getEntity().getProject();
-                ExternalDataObject externalDataObject = new OpenAIREFundingDataProvider.ExternalDataObjectBuilder(
-                        project).setId(generateProjectURI(project)).setSource(sourceIdentifier).build();
+                ExternalDataObject externalDataObject = new OpenAIREFundingDataProvider
+                        .ExternalDataObjectBuilder(project)
+                        .setId(generateProjectURI(project))
+                        .setSource(sourceIdentifier)
+                        .build();
                 return Optional.of(externalDataObject);
             }
         } catch (NumberFormatException e) {
@@ -134,8 +137,11 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
 
         if (projects.size() > 0) {
             return projects.stream()
-                    .map(project -> new OpenAIREFundingDataProvider.ExternalDataObjectBuilder(project)
-                            .setId(generateProjectURI(project)).setSource(sourceIdentifier).build())
+                    .map(project -> new OpenAIREFundingDataProvider
+                            .ExternalDataObjectBuilder(project)
+                            .setId(generateProjectURI(project))
+                            .setSource(sourceIdentifier)
+                            .build())
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();
