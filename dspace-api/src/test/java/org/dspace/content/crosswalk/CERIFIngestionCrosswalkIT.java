@@ -84,7 +84,7 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
         crosswalk.ingest(context, item, document.getRootElement(), false);
 
         List<MetadataValue> values = item.getMetadata();
-        assertThat(values, hasSize(22));
+        assertThat(values, hasSize(23));
 
         assertThat(values, hasItems(with("dc.type",
             "Controlled Vocabulary for Resource Type Genres::text::conference object::conference proceedings"
@@ -95,8 +95,8 @@ public class CERIFIngestionCrosswalkIT extends AbstractIntegrationTestWithDataba
         assertThat(values, hasItems(with("dc.title.alternative",
             "6th Research Conference, MTSR 2012, Cádiz, Spain, November 28-30, 2012. Proceedings")));
 
-        assertThat(values, hasItems(with("dc.relation.ispartof",
-            "The International Journal of Digital Curation")));
+        assertThat(values, hasItems(with("dc.relation.ispartof", "The International Journal of Digital Curation")));
+        assertThat(values, hasItems(with("dc.relation.ispartof", "Digital Curation", 1)));
 
         assertThat(values, hasItems(with("dc.date.issued", "2020-03-30")));
         assertThat(values, hasItems(with("oaire.citation.startPage", "10")));

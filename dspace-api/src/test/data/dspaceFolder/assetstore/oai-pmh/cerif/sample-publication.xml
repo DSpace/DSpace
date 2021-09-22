@@ -10,6 +10,9 @@
          <oai_cerif:ISSN>1746-8256</oai_cerif:ISSN>
       </oai_cerif:Publication>
    </oai_cerif:PartOf>
+   <oai_cerif:PartOf>
+      <oai_cerif:DisplayName>Digital Curation</oai_cerif:DisplayName>
+   </oai_cerif:PartOf>
    <oai_cerif:PublicationDate>2020-03-30</oai_cerif:PublicationDate>
    <oai_cerif:StartPage>10</oai_cerif:StartPage>
    <oai_cerif:EndPage>20</oai_cerif:EndPage>

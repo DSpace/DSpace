@@ -37,10 +37,12 @@
 			<dim:field mdschema="dc" element="relation" qualifier="publication" >
 				<xsl:value-of select="cerif:PublishedIn/cerif:Publication/cerif:Title" />
 			</dim:field>
-			
-			<dim:field mdschema="dc" element="relation" qualifier="ispartof" >
-				<xsl:value-of select="cerif:PartOf/cerif:DisplayName" />
-			</dim:field>
+            
+            <xsl:for-each select="//cerif:PartOf/cerif:DisplayName">
+    		    <dim:field mdschema="dc" element="relation" qualifier="ispartof" >
+                    <xsl:value-of select="current()" />
+                </dim:field>
+            </xsl:for-each>
 			
 			<dim:field mdschema="dc" element="relation" qualifier="issn" >
 				<xsl:value-of select="cerif:PublishedIn/cerif:Publication/cerif:ISSN" />
