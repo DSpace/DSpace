@@ -123,6 +123,7 @@
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 
     <bean class="org.dspace.metadataSecurity.MetadataSecurityService"/>
+    <bean class="org.dspace.metricsSecurity.BoxMetricsLayoutConfigurationService"/>
 
     <!-- Configurable workflow services -->
     <bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
