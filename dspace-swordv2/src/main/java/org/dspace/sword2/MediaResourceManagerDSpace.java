@@ -27,7 +27,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.Deposit;
 import org.swordapp.server.DepositReceipt;
@@ -267,7 +267,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
             Context context = sc.getContext();
 
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(context, "sword_replace", ""));
+                log.debug(LogHelper.getHeader(context, "sword_replace", ""));
             }
 
             DepositReceipt receipt;
@@ -348,7 +348,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
                     if (sc.getOnBehalfOf() != null) {
                         oboEmail = sc.getOnBehalfOf().getEmail();
                     }
-                    log.info(LogManager
+                    log.info(LogHelper
                                  .getHeader(context, "replace_failed_authorisation",
                                             "user=" +
                                                 sc.getAuthenticated().getEmail() +
@@ -435,7 +435,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
             Context context = sc.getContext();
 
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(context, "sword_delete", ""));
+                log.debug(LogHelper.getHeader(context, "sword_delete", ""));
             }
 
             SwordUrlManager urlManager = config.getUrlManager(context, config);
@@ -492,7 +492,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
                     if (sc.getOnBehalfOf() != null) {
                         oboEmail = sc.getOnBehalfOf().getEmail();
                     }
-                    log.info(LogManager
+                    log.info(LogHelper
                                  .getHeader(context, "replace_failed_authorisation",
                                             "user=" +
                                                 sc.getAuthenticated().getEmail() +
@@ -565,7 +565,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
             Context context = sc.getContext();
 
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(context, "sword_add", ""));
+                log.debug(LogHelper.getHeader(context, "sword_add", ""));
             }
 
             // get the deposit target
@@ -588,7 +588,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
                 if (sc.getOnBehalfOf() != null) {
                     oboEmail = sc.getOnBehalfOf().getEmail();
                 }
-                log.info(LogManager
+                log.info(LogHelper
                              .getHeader(context, "replace_failed_authorisation",
                                         "user=" +
                                             sc.getAuthenticated().getEmail() +
@@ -872,7 +872,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
             if (sc.getOnBehalfOf() != null) {
                 oboEmail = sc.getOnBehalfOf().getEmail();
             }
-            log.info(LogManager
+            log.info(LogHelper
                          .getHeader(context, "replace_failed_authorisation",
                                     "user=" +
                                         sc.getAuthenticated().getEmail() +

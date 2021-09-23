@@ -138,7 +138,7 @@ public class DSpaceCSV implements Serializable {
     /**
      * Create a new instance, reading the lines in from file
      *
-     * @param inputStream the inputstream to read from
+     * @param inputStream the input stream to read from
      * @param c The DSpace Context
      * @throws Exception thrown if there is an error reading or processing the file
      */
@@ -159,7 +159,7 @@ public class DSpaceCSV implements Serializable {
                 columnCounter++;
 
                 // Remove surrounding quotes if there are any
-                if ((element.startsWith("\"")) && (element.endsWith("\""))) {
+                if (element.startsWith("\"") && element.endsWith("\"")) {
                     element = element.substring(1, element.length() - 1);
                 }
 
@@ -337,15 +337,15 @@ public class DSpaceCSV implements Serializable {
     /**
      * Set the value separator for multiple values stored in one csv value.
      *
-     * Is set in bulkedit.cfg as valueseparator
+     * Is set in {@code bulkedit.cfg} as {@code valueseparator}.
      *
-     * If not set, defaults to double pipe '||'
+     * If not set, defaults to double pipe '||'.
      */
     private void setValueSeparator() {
         // Get the value separator
         valueSeparator = DSpaceServicesFactory.getInstance().getConfigurationService()
                                               .getProperty("bulkedit.valueseparator");
-        if ((valueSeparator != null) && (!"".equals(valueSeparator.trim()))) {
+        if ((valueSeparator != null) && !valueSeparator.trim().isEmpty()) {
             valueSeparator = valueSeparator.trim();
         } else {
             valueSeparator = "||";
@@ -360,7 +360,7 @@ public class DSpaceCSV implements Serializable {
     /**
      * Set the field separator use to separate fields in the csv.
      *
-     * Is set in bulkedit.cfg as fieldseparator
+     * Is set in {@code bulkedit.cfg} as {@code fieldseparator}.
      *
      * If not set, defaults to comma ','.
      *
@@ -371,7 +371,7 @@ public class DSpaceCSV implements Serializable {
         // Get the value separator
         fieldSeparator = DSpaceServicesFactory.getInstance().getConfigurationService()
                                               .getProperty("bulkedit.fieldseparator");
-        if ((fieldSeparator != null) && (!"".equals(fieldSeparator.trim()))) {
+        if ((fieldSeparator != null) && !fieldSeparator.trim().isEmpty()) {
             fieldSeparator = fieldSeparator.trim();
             if ("tab".equals(fieldSeparator)) {
                 fieldSeparator = "\t";
@@ -395,15 +395,15 @@ public class DSpaceCSV implements Serializable {
     /**
      * Set the authority separator for value with authority data.
      *
-     * Is set in dspace.cfg as bulkedit.authorityseparator
+     * Is set in {@code dspace.cfg} as {@code bulkedit.authorityseparator}.
      *
-     * If not set, defaults to double colon '::'
+     * If not set, defaults to double colon '::'.
      */
     private void setAuthoritySeparator() {
         // Get the value separator
         authoritySeparator = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                   .getProperty("bulkedit.authorityseparator");
-        if ((authoritySeparator != null) && (!"".equals(authoritySeparator.trim()))) {
+        if ((authoritySeparator != null) && !authoritySeparator.trim().isEmpty()) {
             authoritySeparator = authoritySeparator.trim();
         } else {
             authoritySeparator = "::";
@@ -508,7 +508,7 @@ public class DSpaceCSV implements Serializable {
             int i = 0;
             for (String part : bits) {
                 int bitcounter = part.length() - part.replaceAll("\"", "").length();
-                if ((part.startsWith("\"")) && ((!part.endsWith("\"")) || ((bitcounter & 1) == 1))) {
+                if (part.startsWith("\"") && (!part.endsWith("\"") || ((bitcounter & 1) == 1))) {
                     found = true;
                     String add = bits.get(i) + fieldSeparator + bits.get(i + 1);
                     bits.remove(i);
@@ -524,7 +524,7 @@ public class DSpaceCSV implements Serializable {
         // Deal with quotes around the elements
         int i = 0;
         for (String part : bits) {
-            if ((part.startsWith("\"")) && (part.endsWith("\""))) {
+            if (part.startsWith("\"") && part.endsWith("\"")) {
                 part = part.substring(1, part.length() - 1);
                 bits.set(i, part);
             }
@@ -564,7 +564,7 @@ public class DSpaceCSV implements Serializable {
         for (String part : bits) {
             if (i > 0) {
                 // Is this a last empty item?
-                if ((last) && (i == headings.size())) {
+                if (last && (i == headings.size())) {
                     part = "";
                 }
 
@@ -577,7 +577,7 @@ public class DSpaceCSV implements Serializable {
                 csvLine.add(headings.get(i - 1), null);
                 String[] elements = part.split(escapedValueSeparator);
                 for (String element : elements) {
-                    if ((element != null) && (!"".equals(element))) {
+                    if ((element != null) && !element.isEmpty()) {
                         csvLine.add(headings.get(i - 1), element);
                     }
                 }
@@ -629,18 +629,18 @@ public class DSpaceCSV implements Serializable {
     public InputStream getInputStream() {
         StringBuilder stringBuilder = new StringBuilder();
         for (String csvLine : getCSVLinesAsStringArray()) {
-            stringBuilder.append(csvLine + "\n");
+            stringBuilder.append(csvLine).append("\n");
         }
         return IOUtils.toInputStream(stringBuilder.toString(), StandardCharsets.UTF_8);
     }
 
     /**
-     * Is it Ok to export this value? When exportAll is set to false, we don't export
+     * Is it okay to export this value? When exportAll is set to false, we don't export
      * some of the metadata elements.
      *
-     * The list can be configured via the key ignore-on-export in bulkedit.cfg
+     * The list can be configured via the key ignore-on-export in {@code bulkedit.cfg}.
      *
-     * @param md The Metadatum to examine
+     * @param md The MetadataField to examine
      * @return Whether or not it is OK to export this element
      */
     protected boolean okToExport(MetadataField md) {
@@ -649,12 +649,8 @@ public class DSpaceCSV implements Serializable {
         if (md.getQualifier() != null) {
             key += "." + md.getQualifier();
         }
-        if (ignore.get(key) != null) {
-            return false;
-        }
-
         // Must be OK, so don't ignore
-        return true;
+        return ignore.get(key) == null;
     }
 
     /**

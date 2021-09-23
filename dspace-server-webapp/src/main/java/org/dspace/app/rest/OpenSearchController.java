@@ -32,7 +32,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
@@ -125,8 +125,7 @@ public class OpenSearchController {
                 qResults = SearchUtils.getSearchService().search(context,
                     container, queryArgs);
             } catch (SearchServiceException e) {
-                log.error(
-                    LogManager.getHeader(context, "opensearch", "query="
+                log.error(LogHelper.getHeader(context, "opensearch", "query="
                             + queryArgs.getQuery()
                             + ",error=" + e.getMessage()), e);
                 throw new RuntimeException(e.getMessage(), e);

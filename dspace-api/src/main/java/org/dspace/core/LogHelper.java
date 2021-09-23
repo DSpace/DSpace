@@ -16,12 +16,12 @@ import org.dspace.eperson.EPerson;
  * @author Robert Tansley
  * @version $Revision$
  */
-public class LogManager {
+public class LogHelper {
 
     /**
      * Default constructor
      */
-    private LogManager() { }
+    private LogHelper() { }
 
     /**
      * Generate the log header

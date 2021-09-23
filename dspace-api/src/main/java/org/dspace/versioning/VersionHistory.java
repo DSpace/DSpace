@@ -56,6 +56,7 @@ public class VersionHistory implements ReloadableEntity<Integer> {
 
     }
 
+    @Override
     public Integer getID() {
         return id;
     }
@@ -110,11 +111,7 @@ public class VersionHistory implements ReloadableEntity<Integer> {
         }
 
         final VersionHistory that = (VersionHistory) o;
-        if (!this.getID().equals(that.getID())) {
-            return false;
-        }
-
-        return true;
+        return this.getID().equals(that.getID());
     }
 
     @Override
