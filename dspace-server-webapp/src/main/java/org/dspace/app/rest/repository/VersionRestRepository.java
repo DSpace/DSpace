@@ -118,9 +118,12 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
         boolean isAdmin = authorizeService.isAdmin(context);
         boolean canCreateVersion = configurationService.getBooleanProperty("versioning.submitterCanCreateNewVersion");
 
-        if (!isAdmin && !(canCreateVersion && Objects.equals(submitter, context.getCurrentUser())) ||
-            (hasEntityType  && isBlockEntity)) {
-            throw new AuthorizeException();
+        if (!isAdmin && !(canCreateVersion && Objects.equals(submitter, context.getCurrentUser()))) {
+            throw new AuthorizeException("The logged user doesn't have the rights to create a new version.");
+        }
+        if (hasEntityType  && isBlockEntity) {
+            throw new AuthorizeException("You are trying to create a new version for an entity" +
+                                         " which is blocked by the configuration");
         }
 
         WorkflowItem workflowItem = null;
