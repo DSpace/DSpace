@@ -79,11 +79,10 @@ public class RequestItemBuilder
     public RequestItem build() {
         LOG.atDebug()
                 .withLocation()
-                .log("Building request with item ID {}",
-                        () -> requestItem.getItem().getID().toString());
-        System.out.format("Building request with item ID %s%n",
-                requestItem.getItem().getID().toString());
-        new Throwable().printStackTrace(System.out);
+                .log("Building request with item ID {} and bitstream ID {}",
+                        () -> requestItem.getItem().getID().toString(),
+                        () -> requestItem.getBitstream().getID().toString());
+
         // Nothing to build.
         return requestItem;
     }
