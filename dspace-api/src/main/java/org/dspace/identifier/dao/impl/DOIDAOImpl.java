@@ -8,7 +8,7 @@
 package org.dspace.identifier.dao.impl;
 
 import java.sql.SQLException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -52,7 +52,7 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
         criteriaQuery.select(doiRoot);
 
-        List<Predicate> listToIncludeInOrPredicate = new LinkedList<>();
+        List<Predicate> listToIncludeInOrPredicate = new ArrayList<>(statusToExclude.size() + 1);
 
         for (Integer status : statusToExclude) {
             listToIncludeInOrPredicate.add(criteriaBuilder.notEqual(doiRoot.get(DOI_.status), status));
@@ -75,7 +75,7 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
         criteriaQuery.select(doiRoot);
-        List<Predicate> orPredicates = new LinkedList<>();
+        List<Predicate> orPredicates = new ArrayList<>(statuses.size());
         for (Integer status : statuses) {
             orPredicates.add(criteriaBuilder.equal(doiRoot.get(DOI_.status), status));
         }
@@ -92,13 +92,13 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
         criteriaQuery.select(doiRoot);
 
-        List<Predicate> listToIncludeInOrPredicate = new LinkedList<>();
+        List<Predicate> listToIncludeInOrPredicate = new ArrayList<>(excludedStatuses.size());
 
         for (Integer status : excludedStatuses) {
             listToIncludeInOrPredicate.add(criteriaBuilder.notEqual(doiRoot.get(DOI_.status), status));
         }
 
-        List<Predicate> listToIncludeInAndPredicate = new LinkedList<>();
+        List<Predicate> listToIncludeInAndPredicate = new ArrayList<>();
 
         listToIncludeInAndPredicate.add(criteriaBuilder.like(doiRoot.get(DOI_.doi), doi));
         listToIncludeInAndPredicate.add(criteriaBuilder.or(listToIncludeInOrPredicate.toArray(new Predicate[] {})));
@@ -107,8 +107,6 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
         }
         criteriaQuery.where(listToIncludeInAndPredicate.toArray(new Predicate[] {}));
         return list(context, criteriaQuery, false, DOI.class, -1, -1);
-
-
     }
 
     @Override

@@ -56,14 +56,16 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     //Common collection to utilize for test
     private Collection col1;
 
-    private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-
+    private final RelationshipService relationshipService
+            = ContentServiceFactory.getInstance().getRelationshipService();
+    private final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
 
     Community parentCommunity;
 
     /**
-     * Setup testing enviorment
+     * Setup testing environment.
+     * @throws java.sql.SQLException passed through.
      */
     @Before
     public void setup() throws SQLException {
@@ -80,7 +82,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
         EntityType project = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
-        EntityType orgUnit = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
+        EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
 
         RelationshipTypeBuilder
             .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
@@ -350,11 +352,12 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
 
     /**
      * Test failure when referring to item by non unique metadata in the database.
+     * @throws java.lang.Exception passed through.
      */
     @Test(expected = MetadataImportException.class)
     public void testNonUniqueMDRefInDb() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item person = ItemBuilder.createItem(context, col1)
+        ItemBuilder.createItem(context, col1)
                                  .withTitle("Person")
                                  .withIssueDate("2017-10-17")
                                  .withAuthor("Smith, Donald")
@@ -363,7 +366,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withEntityType("Person")
                                  .withIdentifierOther("1")
                                  .build();
-        Item person2 = ItemBuilder.createItem(context, col1)
+        ItemBuilder.createItem(context, col1)
                                  .withTitle("Person2")
                                  .withIssueDate("2017-10-17")
                                  .withAuthor("Smith, John")
@@ -385,7 +388,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     @Test(expected = MetadataImportException.class)
     public void testNonUniqueMDRefInBoth() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item person = ItemBuilder.createItem(context, col1)
+        ItemBuilder.createItem(context, col1)
                                  .withTitle("Person")
                                  .withIssueDate("2017-10-17")
                                  .withAuthor("Smith, Donald")
@@ -402,7 +405,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     }
 
     /**
-     * Test failure when refering to item by metadata that does not exist in the relation column
+     * Test failure when referring to item by metadata that does not exist in the relation column
      */
     @Test(expected = Exception.class)
     public void testNonExistMdRef() throws Exception {
@@ -413,7 +416,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     }
 
     /**
-     * Test failure when refering to an item in the CSV that hasn't been created yet due to it's order in the CSV
+     * Test failure when referring to an item in the CSV that hasn't been created yet due to it's order in the CSV
      */
     @Test(expected = Exception.class)
     public void testCSVImportWrongOrder() throws Exception {
@@ -424,7 +427,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     }
 
     /**
-     * Test failure when refering to an item in the CSV that hasn't been created yet due to it's order in the CSV
+     * Test failure when referring to an item in the CSV that hasn't been created yet due to it's order in the CSV
      */
     @Test(expected = Exception.class)
     public void testCSVImportWrongOrderRowName() throws Exception {
@@ -446,7 +449,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     }
 
     /**
-     * Test relationship validation with invalid relationship definition and with an archived origin referer
+     * Test relationship validation with invalid relationship definition and with an archived origin referrer.
      */
     @Test(expected = MetadataImportInvalidHeadingException.class)
     public void testInvalidRelationshipArchivedOrigin() throws Exception {
