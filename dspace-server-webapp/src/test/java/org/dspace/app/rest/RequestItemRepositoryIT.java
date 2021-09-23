@@ -97,6 +97,7 @@ public class RequestItemRepositoryIT
         collection = CollectionBuilder
                 .createCollection(context, parentCommunity)
                 .withName("Collection")
+                .withAdminGroup(eperson)
                 .build();
 
         item = ItemBuilder
@@ -496,10 +497,12 @@ public class RequestItemRepositoryIT
                 .writeValueAsString(parameters);
 
         // Send the request.
-        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(put(URI_ROOT + '/' + itemRequest.getToken())
                 .contentType(contentType)
                 .content(content))
                 .andExpect(status().isOk()
+                // .andMore?
                 );
     }
 

@@ -204,7 +204,7 @@ public class RequestItemRepository
     }
 
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("isAuthenticated()")
     public RequestItemRest put(Context context, HttpServletRequest request,
             String apiCategory, String model, String token, JsonNode requestBody) {
         RequestItem ri = requestItemService.findByToken(context, token);
