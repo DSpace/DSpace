@@ -161,7 +161,7 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
         Query query = createQuery(context,
                 "SELECT h " +
                         "FROM Handle h " +
-                        "WHERE h.resource_id is null");
+                        "WHERE h.dso is null");
 
         return list(query);
     }
