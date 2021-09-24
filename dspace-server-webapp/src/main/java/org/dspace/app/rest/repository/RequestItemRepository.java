@@ -124,17 +124,27 @@ public class RequestItemRepository
             throw new AuthorizeException("Anonymous requests are not permitted.");
         }
 
-        // Create the item request model object from the REST object.
-        String token;
-        String bitstreamId = rir.getBitstreamId();
-        if (isBlank(bitstreamId)) {
-            throw new IncompleteItemRequestException("A bitstream ID is required");
-        }
-        Bitstream bitstream = bitstreamService.find(ctx, UUID.fromString(bitstreamId));
-        if (null == bitstream) {
-            throw new IncompleteItemRequestException("That bitstream does not exist");
+        /* Create the item request model object from the REST object. */
+
+        // Requesting all bitstreams of an item, or a single bitstream?
+        boolean allFiles = rir.isAllfiles();
+
+        // Requested bitstream.  Ignored if all files requested, otherwise required.
+        Bitstream bitstream;
+        if (!allFiles) {
+            String bitstreamId = rir.getBitstreamId();
+            if (isBlank(bitstreamId)) {
+                throw new IncompleteItemRequestException("A bitstream ID is required");
+            }
+            bitstream = bitstreamService.find(ctx, UUID.fromString(bitstreamId));
+            if (null == bitstream) {
+                throw new IncompleteItemRequestException("That bitstream does not exist");
+            }
+        } else {
+            bitstream = null;
         }
 
+        // Requested item.
         String itemId = rir.getItemId();
         if (isBlank(itemId)) {
             throw new IncompleteItemRequestException("An item ID is required");
@@ -144,30 +154,35 @@ public class RequestItemRepository
             throw new IncompleteItemRequestException("That item does not exist");
         }
 
-        boolean allFiles = rir.isAllfiles();
-
-        String email = rir.getRequestEmail();
-        if (isBlank(email)) {
-            throw new IncompleteItemRequestException("A submitter's email address is required");
-        }
-        EmailValidator emailValidator = EmailValidator.getInstance(false, false);
-        if (!emailValidator.isValid(email)) {
-            throw new UnprocessableEntityException("Invalid email address");
-        }
-
-        // If there is a current user, replace email and name
-        String username;
-        if (null != user) {
-            username = user.getFullName();
+        // Requester's email address.
+        String email;
+        if (null != user) { // Prefer authenticated user's email.
             email = user.getEmail();
-        } else {
+        } else { // Require an anonymous session to provide an email address.
+            email = rir.getRequestEmail();
+            if (isBlank(email)) {
+                throw new IncompleteItemRequestException("A submitter's email address is required");
+            }
+            EmailValidator emailValidator = EmailValidator.getInstance(false, false);
+            if (!emailValidator.isValid(email)) {
+                throw new UnprocessableEntityException("Invalid email address");
+            }
+        }
+
+        // Requester's human-readable name.
+        String username;
+        if (null != user) { // Prefer authenticated user's name.
+            username = user.getFullName();
+        } else { // An anonymous session may provide a name.
             // Escape username to evade nasty XSS attempts
             username = StringEscapeUtils.escapeHtml4(rir.getRequestName());
         }
 
-        // Escape message text to evade nasty XSS attempts
+        // Requester's message text, escaped to evade nasty XSS attempts
         String message = StringEscapeUtils.escapeHtml4(rir.getRequestMessage());
 
+        // Create the request.
+        String token;
         token = requestItemService.createRequest(ctx, bitstream, item,
                 allFiles, email, username, message);
 

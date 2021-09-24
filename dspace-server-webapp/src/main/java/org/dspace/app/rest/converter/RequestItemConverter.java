@@ -11,11 +11,9 @@ package org.dspace.app.rest.converter;
 import javax.inject.Named;
 
 import org.dspace.app.requestitem.RequestItem;
-import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.model.RequestItemRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.services.RequestService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.dspace.content.Bitstream;
 
 /**
  * Convert between {@link org.dspace.app.requestitem.RequestItem} and
@@ -26,18 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Named
 public class RequestItemConverter
         implements DSpaceConverter<RequestItem, RequestItemRest> {
-    @Autowired(required = true)
-    protected BitstreamConverter bitstreamConverter;
-
-    @Autowired(required = true)
-    protected ItemConverter itemConverter;
-
-    @Autowired(required = true)
-    protected RequestItemService requestItemService;
-
-    @Autowired(required = true)
-    protected RequestService requestService;
-
     @Override
     public RequestItemRest convert(RequestItem requestItem, Projection projection) {
         RequestItemRest requestItemRest = new RequestItemRest();
@@ -45,7 +31,12 @@ public class RequestItemConverter
 
         requestItemRest.setAcceptRequest(requestItem.isAccept_request());
         requestItemRest.setAllfiles(requestItem.isAllfiles());
-        requestItemRest.setBitstreamId(requestItem.getBitstream().getID().toString());
+        Bitstream bitstream = requestItem.getBitstream();
+        if (null == bitstream) {
+            requestItemRest.setBitstreamId(null);
+        } else {
+            requestItemRest.setBitstreamId(requestItem.getBitstream().getID().toString());
+        }
         requestItemRest.setDecisionDate(requestItem.getDecision_date());
         requestItemRest.setExpires(requestItem.getExpires());
         requestItemRest.setId(requestItem.getID());
