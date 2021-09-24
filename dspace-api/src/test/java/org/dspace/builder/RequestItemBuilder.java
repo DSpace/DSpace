@@ -9,6 +9,7 @@
 package org.dspace.builder;
 
 import java.sql.SQLException;
+import javax.validation.constraints.NotNull;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,8 +56,16 @@ public class RequestItemBuilder
         }
     }
 
-    public static RequestItemBuilder createRequestItem(Context ctx, Item item,
-            Bitstream bitstream) {
+    /**
+     * Initialize a RequestItem.
+     *
+     * @param ctx current DSpace session.
+     * @param item the requested Item.
+     * @param bitstream the single requested Bitstream, or null for "all files".
+     * @return a builder initialized for this request.
+     */
+    public static RequestItemBuilder createRequestItem(Context ctx,
+            @NotNull Item item, Bitstream bitstream) {
         RequestItemBuilder builder = new RequestItemBuilder(ctx);
         return builder.create(item, bitstream);
     }
@@ -64,8 +73,9 @@ public class RequestItemBuilder
     private RequestItemBuilder create(Item item, Bitstream bitstream) {
         String token;
         try {
-            token = requestItemService.createRequest(context, bitstream,
-                    item, true, REQ_EMAIL, REQ_NAME, REQ_MESSAGE);
+            token = requestItemService.createRequest(context, bitstream, item,
+                    (null == bitstream),
+                    REQ_EMAIL, REQ_NAME, REQ_MESSAGE);
         } catch (SQLException ex) {
             return handleException(ex);
         }

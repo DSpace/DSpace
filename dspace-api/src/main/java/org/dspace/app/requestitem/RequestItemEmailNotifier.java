@@ -98,14 +98,21 @@ public class RequestItemEmailNotifier {
         email.addArgument(authorEmail); // {8} corresponding author email
         email.addArgument(configurationService.getProperty("dspace.name"));
         email.addArgument(configurationService.getProperty("mail.helpdesk"));
+
         // Send the email.
         try {
             email.send();
+            Bitstream bitstream = ri.getBitstream();
+            String bitstreamID;
+            if (null == bitstream) {
+                bitstreamID = "null";
+            } else {
+                bitstreamID = ri.getBitstream().getID().toString();
+            }
             LOG.info(LogHelper.getHeader(context,
                     "sent_email_requestItem",
                     "submitter_id={},bitstream_id={},requestEmail={}"),
-                    ri.getReqEmail(), ri.getBitstream().getID().toString(),
-                    ri.getReqEmail());
+                    ri.getReqEmail(), bitstreamID, ri.getReqEmail());
         } catch (MessagingException e) {
             LOG.warn(LogHelper.getHeader(context,
                     "error_mailing_requestItem", e.getMessage()));

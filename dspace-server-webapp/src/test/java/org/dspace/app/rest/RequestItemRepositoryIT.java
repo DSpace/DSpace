@@ -206,12 +206,11 @@ public class RequestItemRepositoryIT
 
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
-        rir.setBitstreamId(bitstream.getID().toString());
+        rir.setAllfiles(true);
         rir.setItemId(item.getID().toString());
         rir.setRequestEmail(eperson.getEmail());
-        rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
         rir.setRequestName(eperson.getFullName());
-        rir.setAllfiles(false);
+        rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
 
         // Create it and see if it was created correctly.
         ObjectMapper mapper = new ObjectMapper();
@@ -231,7 +230,7 @@ public class RequestItemRepositoryIT
                             hasJsonPath("$.requestEmail", is(eperson.getEmail())),
                             hasJsonPath("$.requestMessage", is(RequestItemBuilder.REQ_MESSAGE)),
                             hasJsonPath("$.requestName", is(eperson.getFullName())),
-                            hasJsonPath("$.allfiles", is(false)),
+                            hasJsonPath("$.allfiles", is(true)),
                             // TODO should be an ISO datetime
                             hasJsonPath("$.requestDate", not(is(emptyOrNullString()))),
                             hasJsonPath("$._links.self.href", not(is(emptyOrNullString())))
@@ -261,12 +260,12 @@ public class RequestItemRepositoryIT
 
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
+        rir.setAllfiles(false);
         rir.setBitstreamId(bitstream.getID().toString());
         rir.setItemId(item.getID().toString());
         rir.setRequestEmail(RequestItemBuilder.REQ_EMAIL);
         rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
         rir.setRequestName(RequestItemBuilder.REQ_NAME);
-        rir.setAllfiles(false);
 
         // Create it and see if it was created correctly.
         ObjectMapper mapper = new ObjectMapper();
