@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -2414,16 +2415,34 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                                        .withName("Mapped Collection")
                                                        .build();
 
+        List<Item> items = new ArrayList();
+        // This comparator is used to sort our test Items by java.util.UUID (which sorts them based on the RFC
+        // and not based on String comparison, see also https://stackoverflow.com/a/51031298/3750035 )
+        Comparator<Item> compareByUUID = Comparator.comparing(i -> i.getID());
+
         Item item0 = ItemBuilder.createItem(context, collection).withTitle("Item 0").build();
+        items.add(item0);
         Item item1 = ItemBuilder.createItem(context, collection).withTitle("Item 1").build();
+        items.add(item1);
         Item item2 = ItemBuilder.createItem(context, collection).withTitle("Item 2").build();
+        items.add(item2);
         Item item3 = ItemBuilder.createItem(context, collection).withTitle("Item 3").build();
+        items.add(item3);
         Item item4 = ItemBuilder.createItem(context, collection).withTitle("Item 4").build();
+        items.add(item4);
         Item item5 = ItemBuilder.createItem(context, collection).withTitle("Item 5").build();
+        items.add(item5);
         Item item6 = ItemBuilder.createItem(context, collection).withTitle("Item 6").build();
+        items.add(item6);
         Item item7 = ItemBuilder.createItem(context, collection).withTitle("Item 7").build();
+        items.add(item7);
         Item item8 = ItemBuilder.createItem(context, collection).withTitle("Item 8").build();
+        items.add(item8);
         Item item9 = ItemBuilder.createItem(context, collection).withTitle("Item 9").build();
+        items.add(item9);
+
+        // sort items list by UUID (as Items will come back ordered by UUID)
+        items.sort(compareByUUID);
 
         collectionService.addItem(context, mappedCollection, item0);
         collectionService.addItem(context, mappedCollection, item1);
@@ -2445,12 +2464,13 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                     .param("embed.size", "mappedItems=5"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", CollectionMatcher.matchCollection(mappedCollection)))
-                   .andExpect(jsonPath("$._embedded.mappedItems._embedded.mappedItems", Matchers.containsInAnyOrder(
-                           ItemMatcher.matchItemProperties(item0),
-                           ItemMatcher.matchItemProperties(item1),
-                           ItemMatcher.matchItemProperties(item2),
-                           ItemMatcher.matchItemProperties(item3),
-                           ItemMatcher.matchItemProperties(item4)
+                   .andExpect(jsonPath("$._embedded.mappedItems._embedded.mappedItems",
+                       Matchers.containsInRelativeOrder(
+                           ItemMatcher.matchItemProperties(items.get(0)),
+                           ItemMatcher.matchItemProperties(items.get(1)),
+                           ItemMatcher.matchItemProperties(items.get(2)),
+                           ItemMatcher.matchItemProperties(items.get(3)),
+                           ItemMatcher.matchItemProperties(items.get(4))
                    )))
                    .andExpect(jsonPath("$._links.self.href",
                                        Matchers.containsString("/api/core/collections/" + mappedCollection.getID())))
