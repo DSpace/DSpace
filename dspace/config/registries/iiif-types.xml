@@ -31,7 +31,7 @@
     <dc-type>
         <schema>iiif</schema>
         <element>canvas</element>
-        <qualifier>label</qualifier>
+        <qualifier>naming</qualifier>
         <scope_note>Metadata field used to set the base label used to name all the canvas in the Item. The canvas label will be generated using the value of this metadata as prefix and the canvas position</scope_note>
     </dc-type>
 

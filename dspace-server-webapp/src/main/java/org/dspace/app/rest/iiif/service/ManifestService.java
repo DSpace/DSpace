@@ -118,16 +118,17 @@ public class ManifestService extends AbstractResourceService {
         addViewingHint(item);
         addThumbnail(item, context);
 
-//        List<RangeGenerator> seqs = new ArrayList<RangeGenerator>();
-        RangeGenerator root = new RangeGenerator();
+        RangeGenerator root = new RangeGenerator(rangeService);
         root.setLabel("Table of Contents");
         root.setIdentifier(manifestId + "/range/r0");
-//      seqs.add(root);
         manifestGenerator.addRange(root);
 
         Map<String, RangeGenerator> tocRanges = new HashMap<String, RangeGenerator>();
         for (Bundle bnd : bundles) {
-            String bundleToCPrefix = utils.getIIIFFirstToC(bnd);
+            String bundleToCPrefix = null;
+            if (bundles.size() > 1) {
+                bundleToCPrefix = utils.getIIIFFirstToC(bnd);
+            }
             RangeGenerator lastRange = root;
             for (Bitstream b : utils.getIiifBitstreams(context, bnd)) {
                 CanvasGenerator canvasId = sequenceService.addCanvas(context, item, bnd, b);
@@ -146,13 +147,10 @@ public class ManifestService extends AbstractResourceService {
                                 currRange = tocRanges.get(key);
                             } else {
                                 // create the sub range
-                                RangeGenerator range = new RangeGenerator();
+                                RangeGenerator range = new RangeGenerator(rangeService);
                                 range.setLabel(parts[pIdx]);
-                                range.addCanvas(
-                                        canvasService.getRangeCanvasReference(manifestId, canvasId.getIdentifier()));
-
                                 // add the range reference to the currRange so to get an identifier
-                                currRange.addSubRange(rangeService.getRangeReference(range));
+                                currRange.addSubRange(range);
 
                                 // add the range to the manifest
                                 manifestGenerator.addRange(range);
@@ -163,7 +161,8 @@ public class ManifestService extends AbstractResourceService {
                             }
                         }
                         // add the bitstream canvas to the currRange
-                        currRange.addCanvas(canvasId);
+                        currRange
+                                .addCanvas(canvasService.getRangeCanvasReference(manifestId, canvasId.getIdentifier()));
                         lastRange = currRange;
                     }
                 } else {
@@ -173,7 +172,6 @@ public class ManifestService extends AbstractResourceService {
         }
         manifestGenerator.addSequence(
                 sequenceService.getSequence(item, context));
-        //manifestGenerator.setRange(rangeService.getRanges(info, manifestId));
 
         addSeeAlso(item);
     }

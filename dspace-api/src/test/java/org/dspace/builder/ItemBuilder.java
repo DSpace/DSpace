@@ -127,8 +127,8 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "iiif", "search", "enabled", "true");
     }
 
-    public ItemBuilder withIIIFCanvasLabel(String label) {
-        return addMetadataValue(item, "iiif", "canvas", "label", label);
+    public ItemBuilder withIIIFCanvasNaming(String naming) {
+        return addMetadataValue(item, "iiif", "canvas", "naming", naming);
     }
 
     public ItemBuilder withIIIFCanvasWidth(int i) {

@@ -67,7 +67,7 @@ public abstract class AbstractResourceService {
         IIIF_LOGO_IMAGE = configurationService.getProperty("iiif.logo.image");
         DEFAULT_CANVAS_WIDTH = configurationService.getIntProperty("iiif.canvas.default-width",
                 DEFAULT_CANVAS_WIDTH_FALLBACK);
-        DEFAULT_CANVAS_HEIGHT = configurationService.getIntProperty("iiif.canvas.default-heigth",
+        DEFAULT_CANVAS_HEIGHT = configurationService.getIntProperty("iiif.canvas.default-height",
                 DEFAULT_CANVAS_HEIGHT_FALLBACK);
     }
 

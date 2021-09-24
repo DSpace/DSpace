@@ -61,7 +61,8 @@ public class CanvasService extends AbstractResourceService {
             String mimeType) {
         int pagePosition = count + 1;
 
-        String label = utils.getIIIFLabel(bitstream, "Page " + pagePosition);
+        String canvasNaming = utils.getCanvasNaming(item, "Page");
+        String label = utils.getIIIFLabel(bitstream, canvasNaming + " " + pagePosition);
         int canvasWidth = utils.getCanvasWidth(bitstream, bundle, item, DEFAULT_CANVAS_WIDTH);
         int canvasHeight = utils.getCanvasHeight(bitstream, bundle, item, DEFAULT_CANVAS_HEIGHT);
         UUID bitstreamId = bitstream.getID();
