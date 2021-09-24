@@ -76,6 +76,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     private WorkspaceItemService workspaceItemService;
 
     private Collection collection;
+    private Collection collection2;
     private WorkspaceItem publicationItem;
     private Item personItem1;
     private Item personItem2;
@@ -102,6 +103,11 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                 .build();
         collection = CollectionBuilder.createCollection(context, community)
                 .withName("Collection")
+                .withEntityType("Person")
+                .build();
+        collection2 = CollectionBuilder.createCollection(context, community)
+                .withName("Collection")
+                .withEntityType("Publication")
                 .build();
 
         context.restoreAuthSystemState();
@@ -143,17 +149,14 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                 .withTitle("Person 1")
                 .withPersonIdentifierFirstName("Sarah")
                 .withPersonIdentifierLastName("Dahlen")
-                .withEntityType("Person")
                 .build();
         personItem2 = ItemBuilder.createItem(context, collection)
                 .withTitle("Person 2")
                 .withPersonIdentifierFirstName("Oliver")
                 .withPersonIdentifierLastName("Linton")
-                .withEntityType("Person")
                 .build();
-        publicationItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+        publicationItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection2)
                 .withTitle("Publication 1")
-                .withEntityType("Publication")
                 .build();
         publicationPersonRelationshipType = relationshipTypeService.findbyTypesAndTypeName(context,
                 entityTypeService.findByEntityType(context, "Publication"),

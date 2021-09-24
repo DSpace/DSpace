@@ -5181,8 +5181,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
-        Collection col1 = CollectionBuilder
-            .createCollection(context, parentCommunity).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .withEntityType("Person").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author1")
@@ -5190,14 +5190,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                   .withAuthor("Smith, Donald")
                                   .withPersonIdentifierLastName("Smith")
                                   .withPersonIdentifierFirstName("Donald")
-                                  .withEntityType("Person")
                                   .build();
 
         Item author2 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author2")
                                   .withIssueDate("2016-02-13")
                                   .withAuthor("Smith, Maria")
-                                  .withEntityType("Person")
                                   .build();
 
         //2. One workspace item.
