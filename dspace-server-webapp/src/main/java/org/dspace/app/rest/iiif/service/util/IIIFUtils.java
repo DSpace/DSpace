@@ -46,9 +46,10 @@ public class IIIFUtils {
     public static final String METADATA_IIIF_LABEL = "iiif.label";
     public static final String METADATA_IIIF_DESCRIPTION = "iiif.description";
     public static final String METADATA_IIIF_TOC = "iiif.toc";
+    public static final String METADATA_IIIF_CANVAS_NAMING = "iiif.canvas.naming";
     public static final String METADATA_IIIF_VIEWING_HINT  = "iiif.viewing.hint";
     public static final String METADATA_IMAGE_WIDTH = "iiif.image.width";
-    public static final String METADATA_IMAGE_HEIGTH = "iiif.image.heigth";
+    public static final String METADATA_IMAGE_HEIGTH = "iiif.image.height";
 
     public static final String TOC_SEPARATOR = "|||";
     public static final String TOC_SEPARATOR_REGEX = "\\|\\|\\|";
@@ -232,10 +233,13 @@ public class IIIFUtils {
         }
     }
 
-    public String getIIIFFirstToC(DSpaceObject dso) {
-        return dso.getMetadata().stream()
+    public String getIIIFFirstToC(Bundle bundle) {
+        String label = bundle.getMetadata().stream()
+                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_LABEL))
+                .findFirst().map(m -> m.getValue()).orElse(bundle.getName());
+        return bundle.getMetadata().stream()
                 .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_TOC))
-                .findFirst().map(m -> m.getValue()).orElse(null);
+                .findFirst().map(m -> m.getValue() + TOC_SEPARATOR + label).orElse(label);
     }
 
     public String getIIIFViewingHint(Item item, String defaultHint) {
@@ -264,12 +268,18 @@ public class IIIFUtils {
 
     private int castToInt(MetadataValue m, int defaultWidth) {
         try {
-            Integer.parseInt(m.getValue());
+            return Integer.parseInt(m.getValue());
         } catch (NumberFormatException e) {
             log.error("Error parsing " + m.getMetadataField().toString('.') + " of " + m.getDSpaceObject().getID()
                     + " the value " + m.getValue() + " is not an integer. Returning the default.");
         }
         return defaultWidth;
+    }
+
+    public String getCanvasNaming(Item item, String defaultNaming) {
+        return item.getMetadata().stream()
+                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_CANVAS_NAMING))
+                .findFirst().map(m -> m.getValue()).orElse(defaultNaming);
     }
 
 }

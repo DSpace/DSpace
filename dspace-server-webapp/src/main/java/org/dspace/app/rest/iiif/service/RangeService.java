@@ -31,6 +31,6 @@ public class RangeService extends AbstractResourceService {
      * @return RangeGenerator able to create the reference
      */
     public RangeGenerator getRangeReference(RangeGenerator range) {
-        return new RangeGenerator().setIdentifier(range.getIdentifier());
+        return new RangeGenerator(this).setIdentifier(range.getIdentifier());
     }
 }

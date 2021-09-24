@@ -13,6 +13,7 @@ import java.util.List;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
 import de.digitalcollections.iiif.model.sharedcanvas.Range;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
+import org.dspace.app.rest.iiif.service.RangeService;
 
 /**
  * In Presentation API version 2.1.1, adding a range to the manifest allows the client to display a structured
@@ -29,6 +30,11 @@ public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.
     private String label;
     private final List<Canvas> canvasList = new ArrayList<>();
     private final List<RangeGenerator> rangesList = new ArrayList<>();
+    private RangeService rangeService;
+
+    public RangeGenerator(RangeService rangeService) {
+        this.rangeService = rangeService;
+    }
 
     /**
      * Sets mandatory range identifier.
@@ -63,7 +69,12 @@ public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.
 
     @Override
     public Resource<Range> getResource() {
-        Range range = new Range(identifier, label);
+        Range range;
+        if (label != null) {
+            range = new Range(identifier, label);
+        } else {
+            range = new Range(identifier);
+        }
         for (Canvas canvas : canvasList) {
             range.addCanvas(canvas);
         }
@@ -75,6 +86,7 @@ public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.
 
     public void addSubRange(RangeGenerator range) {
         range.setIdentifier(identifier + "-" + rangesList.size());
-        rangesList.add(range);
+        RangeGenerator rangeReference = rangeService.getRangeReference(range);
+        rangesList.add(rangeReference);
     }
 }

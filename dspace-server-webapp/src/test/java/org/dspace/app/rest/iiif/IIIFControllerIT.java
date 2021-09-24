@@ -287,7 +287,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withIIIFCanvasHeight(3000)
                 .withIIIFCanvasWidth(2000)
-                .withIIIFCanvasLabel("Global")
+                .withIIIFCanvasNaming("Global")
                 .enableIIIF()
                 .enableIIIFSearch()
                 .build();
@@ -328,8 +328,26 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Global 1")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(2000)))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].height", is(3000)))
-                .andExpect(jsonPath("$.structures[1].label", is("Section 2")))
+                .andExpect(jsonPath("$.sequences[0].canvases[1].label", is("Global 2")))
+                .andExpect(jsonPath("$.sequences[0].canvases[2].label", is("Global 3")))
+                .andExpect(jsonPath("$.structures[0].@id",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0")))
+                .andExpect(jsonPath("$.structures[0].label", is("Table of Contents")))
+                .andExpect(jsonPath("$.structures[0].ranges[0]",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-0")))
+                .andExpect(jsonPath("$.structures[0].ranges[1]",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-1")))
+                .andExpect(jsonPath("$.structures[1].@id",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-0")))
+                .andExpect(jsonPath("$.structures[1].label", is("Section 1")))
                 .andExpect(jsonPath("$.structures[1].canvases[0]",
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                .andExpect(jsonPath("$.structures[2].@id",
+                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-1")))
+                .andExpect(jsonPath("$.structures[2].label", is("Section 2")))
+                .andExpect(jsonPath("$.structures[2].canvases[0]",
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c1")))
+                .andExpect(jsonPath("$.structures[2].canvases[1]",
                         Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c2")))
                 .andExpect(jsonPath("$.service").exists());
     }
