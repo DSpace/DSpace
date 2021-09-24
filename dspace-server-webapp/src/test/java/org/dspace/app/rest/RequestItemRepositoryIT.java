@@ -360,7 +360,7 @@ public class RequestItemRepositoryIT
 
         // Test missing email
         rir.setRequestEmail(null);
-        getClient(authToken)
+        getClient() // Unauthenticated so that email is required.
                 .perform(post(URI_ROOT)
                         .content(mapper.writeValueAsBytes(rir))
                         .contentType(contentType))
@@ -368,7 +368,7 @@ public class RequestItemRepositoryIT
 
         // Test bad email
         rir.setRequestEmail("<script>window.location='http://evil.example.com/';</script>");
-        getClient(authToken)
+        getClient() // Unauthenticated so that email is required.
                 .perform(post(URI_ROOT)
                         .content(mapper.writeValueAsBytes(rir))
                         .contentType(contentType))
