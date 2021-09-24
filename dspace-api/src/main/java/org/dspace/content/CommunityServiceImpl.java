@@ -195,7 +195,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
          * whitespace.
          */
         if (value == null) {
-            clearMetadata(context, community, field.SCHEMA, field.ELEMENT, field.QUALIFIER, Item.ANY);
+            clearMetadata(context, community, field.schema, field.element, field.qualifier, Item.ANY);
             community.setMetadataModified();
         } else {
             super.setMetadataSingleValue(context, community, field, null, value);

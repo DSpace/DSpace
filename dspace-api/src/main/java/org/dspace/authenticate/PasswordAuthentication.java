@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
@@ -41,7 +42,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * Basic Auth username and password to the <code>AuthenticationManager</code>.
  *
  * @author Larry Stone
- * @version $Revision$
  */
 public class PasswordAuthentication
     implements AuthenticationMethod {
@@ -49,7 +49,7 @@ public class PasswordAuthentication
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(PasswordAuthentication.class);
+    private static final Logger log = LogManager.getLogger();
 
 
     /**
@@ -142,7 +142,7 @@ public class PasswordAuthentication
                                      .toString())) {
                 String groupName = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                         .getProperty("authentication-password.login.specialgroup");
-                if ((groupName != null) && (!groupName.trim().equals(""))) {
+                if ((groupName != null) && !groupName.trim().isEmpty()) {
                     Group specialGroup = EPersonServiceFactory.getInstance().getGroupService()
                                                               .findByName(context, groupName);
                     if (specialGroup == null) {
@@ -181,7 +181,7 @@ public class PasswordAuthentication
      * SUCCESS, BAD_CREDENTIALS, CERT_REQUIRED, NO_SUCH_USER, BAD_ARGS
      * <p>Meaning:
      * <br>SUCCESS         - authenticated OK.
-     * <br>BAD_CREDENTIALS - user exists, but assword doesn't match
+     * <br>BAD_CREDENTIALS - user exists, but password doesn't match
      * <br>CERT_REQUIRED   - not allowed to login this way without X.509 cert.
      * <br>NO_SUCH_USER    - no EPerson with matching email address.
      * <br>BAD_ARGS        - missing username, or user matched but cannot login.

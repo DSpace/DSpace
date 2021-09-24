@@ -8,7 +8,6 @@
 package org.dspace.content.virtual;
 
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.dspace.content.Item;
@@ -24,9 +23,7 @@ public class UUIDValue implements VirtualMetadataConfiguration {
 
     @Override
     public List<String> getValues(Context context, Item item) throws SQLException {
-        List<String> list = new LinkedList<>();
-        list.add(String.valueOf(item.getID()));
-        return list;
+        return List.of(String.valueOf(item.getID()));
     }
 
     @Override

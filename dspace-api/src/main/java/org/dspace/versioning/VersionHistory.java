@@ -20,7 +20,6 @@ import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.hibernate.proxy.HibernateProxyHelper;
@@ -34,8 +33,6 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Entity
 @Table(name = "versionhistory")
 public class VersionHistory implements ReloadableEntity<Integer> {
-
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(VersionHistory.class);
 
     @Id
     @Column(name = "versionhistory_id")
@@ -56,6 +53,7 @@ public class VersionHistory implements ReloadableEntity<Integer> {
 
     }
 
+    @Override
     public Integer getID() {
         return id;
     }
@@ -98,11 +96,7 @@ public class VersionHistory implements ReloadableEntity<Integer> {
         }
 
         final VersionHistory that = (VersionHistory) o;
-        if (!this.getID().equals(that.getID())) {
-            return false;
-        }
-
-        return true;
+        return this.getID().equals(that.getID());
     }
 
     @Override
