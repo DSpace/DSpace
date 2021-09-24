@@ -121,8 +121,6 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
             MetadataSchema metadataSchema = metadataField.getMetadataSchema();
             itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
                                     metadataField.getQualifier(), original.getLanguage(), original.getValue());
-        } else {
-            itemService.addMetadata(context, item, "dspace", "entity", "type", null, Constants.UNSET_ENTITY_TYPE);
         }
 
         // Copy template if appropriate
