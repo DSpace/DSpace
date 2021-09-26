@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.digitalcollections.iiif.model.ImageContent;
+import de.digitalcollections.iiif.model.MetadataEntry;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 
@@ -28,6 +29,8 @@ public class CanvasGenerator implements IIIFResource {
     private Integer width;
     private List<ImageContent> images = new ArrayList();
     private ImageContent thumbnail;
+
+    private final List<MetadataEntry> metadata = new ArrayList<>();
 
     public  CanvasGenerator setIdentifier(String identifier) {
         this.identifier = identifier;
@@ -84,6 +87,18 @@ public class CanvasGenerator implements IIIFResource {
     }
 
     /**
+     * Adds single metadata field to Manifest.
+     * @param field property field
+     * @param value property value
+     */
+    public void addMetadata(String field, String value, String... rest) {
+        MetadataEntryGenerator metadataEntryGenerator = new MetadataEntryGenerator();
+        metadataEntryGenerator.setField(field);
+        metadataEntryGenerator.setValue(value, rest);
+        metadata.add(metadataEntryGenerator.getValue());
+    }
+
+    /**
      * Returns the canvas.
      * @return canvas model
      */
@@ -112,6 +127,11 @@ public class CanvasGenerator implements IIIFResource {
             }
             if (thumbnail != null) {
                 canvas.addThumbnail(thumbnail);
+            }
+        }
+        if (metadata.size() > 0) {
+            for (MetadataEntry meta : metadata) {
+                canvas.addMetadata(meta);
             }
         }
         return canvas;

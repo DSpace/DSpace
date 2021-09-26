@@ -9,7 +9,7 @@ package org.dspace.app.rest.iiif.service;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,13 +28,22 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
- * Generates IIIF Manifest JSON response for a DSpace Item.
+ * Generates IIIF Manifest JSON response for a DSpace Item. Please note that
+ * this is a request scoped bean. This mean that for each http request a
+ * different instance will be initialized by Spring and used to serve this
+ * specific request. This is needed because some configuration are cached in the
+ * instance. Moreover, many injected dependencies are also request scoped or
+ * prototype (that will turn in a request scope when injected in a request scope
+ * bean). The generators need to be request scoped as they act as builder
+ * storing the object state during each incremental building step until the
+ * final object is returned (IIIF Resource)
  */
 @Component
 @RequestScope
@@ -105,9 +114,6 @@ public class ManifestService extends AbstractResourceService {
      * @return manifest object
      */
     private void populateManifest(Item item, Context context) {
-        // If an IIIF bundle is found it will be used. Otherwise,
-        // images in the ORIGINAL bundle will be used.
-        List<Bundle> bundles = utils.getIiifBundles(item);
         String manifestId = getManifestId(item.getID());
         manifestGenerator.setIdentifier(manifestId);
         manifestGenerator.setLabel(item.getName());
@@ -117,20 +123,35 @@ public class ManifestService extends AbstractResourceService {
         addMetadata(context, item);
         addViewingHint(item);
         addThumbnail(item, context);
+        addRanges(context, item, manifestId);
+        manifestGenerator.addSequence(
+                sequenceService.getSequence(item, context));
+        addSeeAlso(item);
+    }
 
+    /**
+     * Add the ranges to the manifest structure. Ranges are generated from the
+     * iiif.toc metadata
+     * 
+     * @param context the DSpace Context
+     * @param item the DSpace Item to represent
+     * @param manifestId the generated manifestId
+     */
+    private void addRanges(Context context, Item item, String manifestId) {
+        List<Bundle> bundles = utils.getIIIFBundles(item);
         RangeGenerator root = new RangeGenerator(rangeService);
-        root.setLabel("Table of Contents");
+        root.setLabel(I18nUtil.getMessage("iiif.toc.root-label"));
         root.setIdentifier(manifestId + "/range/r0");
-        manifestGenerator.addRange(root);
+//        manifestGenerator.addRange(root);
 
-        Map<String, RangeGenerator> tocRanges = new HashMap<String, RangeGenerator>();
+        Map<String, RangeGenerator> tocRanges = new LinkedHashMap<String, RangeGenerator>();
         for (Bundle bnd : bundles) {
             String bundleToCPrefix = null;
             if (bundles.size() > 1) {
-                bundleToCPrefix = utils.getIIIFFirstToC(bnd);
+                bundleToCPrefix = utils.getBundleIIIFToC(bnd);
             }
             RangeGenerator lastRange = root;
-            for (Bitstream b : utils.getIiifBitstreams(context, bnd)) {
+            for (Bitstream b : utils.getIIIFBitstreams(context, bnd)) {
                 CanvasGenerator canvasId = sequenceService.addCanvas(context, item, bnd, b);
                 List<String> tocs = utils.getIIIFToCs(b, bundleToCPrefix);
                 if (tocs.size() > 0) {
@@ -153,7 +174,7 @@ public class ManifestService extends AbstractResourceService {
                                 currRange.addSubRange(range);
 
                                 // add the range to the manifest
-                                manifestGenerator.addRange(range);
+//                                manifestGenerator.addRange(range);
 
                                 // move the current range
                                 currRange = range;
@@ -170,10 +191,12 @@ public class ManifestService extends AbstractResourceService {
                 }
             }
         }
-        manifestGenerator.addSequence(
-                sequenceService.getSequence(item, context));
-
-        addSeeAlso(item);
+        if (tocRanges.size() > 0) {
+            manifestGenerator.addRange(root);
+            for (RangeGenerator range : tocRanges.values()) {
+                manifestGenerator.addRange(range);
+            }
+        }
     }
 
     /**
@@ -216,15 +239,15 @@ public class ManifestService extends AbstractResourceService {
                     manifestGenerator.addMetadata(field, values.get(0));
                 }
             }
-            String descrValue = item.getItemService().getMetadataFirstValue(item, "dc", "description", null, Item.ANY);
-            if (StringUtils.isNotBlank(descrValue)) {
-                manifestGenerator.addDescription(descrValue);
-            }
+        }
+        String descrValue = item.getItemService().getMetadataFirstValue(item, "dc", "description", null, Item.ANY);
+        if (StringUtils.isNotBlank(descrValue)) {
+            manifestGenerator.addDescription(descrValue);
+        }
 
-            String licenseUriValue = item.getItemService().getMetadataFirstValue(item, "dc", "rights", "uri", Item.ANY);
-            if (StringUtils.isNotBlank(licenseUriValue)) {
-                manifestGenerator.addLicense(licenseUriValue);
-            }
+        String licenseUriValue = item.getItemService().getMetadataFirstValue(item, "dc", "rights", "uri", Item.ANY);
+        if (StringUtils.isNotBlank(licenseUriValue)) {
+            manifestGenerator.addLicense(licenseUriValue);
         }
     }
 
@@ -288,7 +311,7 @@ public class ManifestService extends AbstractResourceService {
      * @param context DSpace context
      */
     private void addThumbnail(Item item, Context context) {
-        List<Bitstream> bitstreams = utils.getIiifBitstreams(context, item);
+        List<Bitstream> bitstreams = utils.getIIIFBitstreams(context, item);
         if (bitstreams != null && bitstreams.size() > 0) {
             String mimeType = utils.getBitstreamMimeType(bitstreams.get(0), context);
             ImageContentGenerator image = imageContentService

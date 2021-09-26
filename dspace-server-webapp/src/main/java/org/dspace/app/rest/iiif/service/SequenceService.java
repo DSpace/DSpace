@@ -9,7 +9,6 @@ package org.dspace.app.rest.iiif.service;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
@@ -26,12 +25,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("prototype")
-public class SequenceService  extends AbstractResourceService {
+public class SequenceService extends AbstractResourceService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SequenceService.class);
-
-    // TODO i18n
-    private static final String PDF_DOWNLOAD_LABEL = "Download as PDF";
 
     /*
      * The counter tracks the position of the bitstream in the list and is used to create the canvas identifier.
@@ -48,7 +44,6 @@ public class SequenceService  extends AbstractResourceService {
 
     @Autowired
     CanvasService canvasService;
-
 
     public SequenceService(ConfigurationService configurationService) {
         setConfiguration(configurationService);
@@ -71,12 +66,11 @@ public class SequenceService  extends AbstractResourceService {
      * @param bitstreams list of DSpace bitstreams
      */
     public CanvasGenerator addCanvas(Context context, Item item, Bundle bnd, Bitstream bitstream) {
-        UUID bitstreamId = bitstream.getID();
         String mimeType = utils.getBitstreamMimeType(bitstream, context);
         String manifestId = item.getID().toString();
         CanvasGenerator canvasGenerator =
-                canvasService.getCanvas(manifestId, bitstream, bnd, item, counter, mimeType);
-        String canvasIdentifier = sequenceGenerator.addCanvas(canvasGenerator);
+                canvasService.getCanvas(context, manifestId, bitstream, bnd, item, counter, mimeType);
+        sequenceGenerator.addCanvas(canvasGenerator);
         counter++;
         return canvasGenerator;
     }
@@ -95,32 +89,31 @@ public class SequenceService  extends AbstractResourceService {
      * @param context DSpace context
      */
     private void addRendering(Item item, Context context) {
-        List<Bundle> bundles = item.getBundles("ORIGINAL");
-        if (bundles.size() == 0) {
-            return;
-        }
-        Bundle bundle = bundles.get(0);
-        List<Bitstream> bitstreams = bundle.getBitstreams();
-        for (Bitstream bitstream : bitstreams) {
-            String mimeType = null;
-            try {
-                mimeType = bitstream.getFormat(context).getMIMEType();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            // If the ORIGINAL bundle contains a PDF, assume that it represents the
-            // item and add to rendering. Ignore other mime-types. Other options
-            // might be using the primary bitstream or relying on a bitstream metadata
-            // field, e.g. iiif.rendering
-            if (mimeType != null && mimeType.contentEquals("application/pdf")) {
-                String id = BITSTREAM_PATH_PREFIX + "/" + bitstream.getID() + "/content";
-                sequenceGenerator.addRendering(
-                        externalLinksGenerator
-                                .setIdentifier(id)
-                                .setLabel(PDF_DOWNLOAD_LABEL)
-                                .setFormat(mimeType)
-                );
+        List<Bundle> bundles = utils.getIIIFBundles(item);
+        for (Bundle bundle : bundles) {
+            List<Bitstream> bitstreams = bundle.getBitstreams();
+            for (Bitstream bitstream : bitstreams) {
+                String mimeType = null;
+                try {
+                    mimeType = bitstream.getFormat(context).getMIMEType();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                // If the  bundle contains a PDF, assume that it represents the
+                // item and add to rendering. Ignore other mime-types. Other options
+                // might be using the primary bitstream or relying on a bitstream metadata
+                // field, e.g. iiif.rendering
+                if (mimeType != null && mimeType.contentEquals("application/pdf")) {
+                    String id = BITSTREAM_PATH_PREFIX + "/" + bitstream.getID() + "/content";
+                    sequenceGenerator.addRendering(
+                            externalLinksGenerator
+                                    .setIdentifier(id)
+                                    .setLabel(utils.getIIIFLabel(bitstream, bitstream.getName()))
+                                    .setFormat(mimeType)
+                    );
+                }
             }
         }
     }
+
 }
