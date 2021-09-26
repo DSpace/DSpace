@@ -19,8 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.content.DCDate;
 import org.dspace.content.Entity;
 import org.dspace.content.EntityType;
@@ -41,8 +39,6 @@ import org.dspace.statistics.export.service.OpenUrlService;
  * from the IrusExportUsageEventListener
  */
 public abstract class ExportEventProcessor {
-
-    private static final Logger log = LogManager.getLogger();
 
     protected static final String ENTITY_TYPE_DEFAULT = "Publication";
 
@@ -130,8 +126,10 @@ public abstract class ExportEventProcessor {
 
         //Start adding our data
         StringBuilder data = new StringBuilder();
-        data.append(URLEncoder.encode("url_ver", UTF_8) + "=" +
-                    URLEncoder.encode(configurationService.getProperty("irus.statistics.tracker.urlversion"), UTF_8));
+        data.append(URLEncoder.encode("url_ver", UTF_8))
+                .append("=")
+                .append(URLEncoder.encode(configurationService.getProperty("irus.statistics.tracker.urlversion"),
+                        UTF_8));
         data.append("&").append(URLEncoder.encode("req_id", UTF_8)).append("=")
             .append(URLEncoder.encode(clientIP, UTF_8));
         data.append("&").append(URLEncoder.encode("req_dat", UTF_8)).append("=")
