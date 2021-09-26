@@ -77,7 +77,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
 
     @Override
     public boolean getSearchPlugin(String className) {
-        return className.contentEquals(WordHighlightSolrSearch.class.getSimpleName());
+        return className.contentEquals(WordHighlightSolrSearch.class.getCanonicalName());
     }
 
     /**
