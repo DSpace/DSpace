@@ -46,8 +46,8 @@ public class CanvasLookupService extends AbstractResourceService {
         String mimeType = utils.getBitstreamMimeType(bitstream, context);
         CanvasGenerator canvasGenerator;
         try {
-            canvasGenerator = canvasService.getCanvas(item.getID().toString(), bitstream, bitstream.getBundles().get(0),
-                    item, canvasPosition, mimeType);
+            canvasGenerator = canvasService.getCanvas(context, item.getID().toString(), bitstream,
+                    bitstream.getBundles().get(0), item, canvasPosition, mimeType);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

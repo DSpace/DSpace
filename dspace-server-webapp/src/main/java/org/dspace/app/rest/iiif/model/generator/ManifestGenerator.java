@@ -31,6 +31,9 @@ import org.springframework.web.context.annotation.RequestScope;
  * such as a title and other descriptive information about the object or the intellectual work that
  * it conveys. Each manifest describes how to present a single object such as a book, a photograph,
  * or a statue.
+ * 
+ * Please note that this is a request scoped bean. This mean that for each http request a
+ * different instance will be initialized by Spring and used to serve this specific request.
  */
 @Component
 @RequestScope
@@ -48,7 +51,7 @@ public class ManifestGenerator implements IIIFResource {
     private ContentSearchService searchService;
     private final List<URI> license = new ArrayList<>();
     private final List<MetadataEntry> metadata = new ArrayList<>();
-    private List<RangeGenerator> ranges = new ArrayList<>();
+    private final List<RangeGenerator> ranges = new ArrayList<>();
 
     @Autowired
     MetadataEntryGenerator metadataEntryGenerator;

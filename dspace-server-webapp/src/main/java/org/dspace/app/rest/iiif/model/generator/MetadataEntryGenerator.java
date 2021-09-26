@@ -9,6 +9,7 @@ package org.dspace.app.rest.iiif.model.generator;
 
 import de.digitalcollections.iiif.model.MetadataEntry;
 import de.digitalcollections.iiif.model.PropertyValue;
+import org.dspace.core.I18nUtil;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -43,6 +44,6 @@ public class MetadataEntryGenerator implements IIIFValue {
         } else {
             metadataValues = new PropertyValue(value);
         }
-        return new MetadataEntry(new PropertyValue(field), metadataValues);
+        return new MetadataEntry(new PropertyValue(I18nUtil.getMessage("metadata." + field)), metadataValues);
     }
 }

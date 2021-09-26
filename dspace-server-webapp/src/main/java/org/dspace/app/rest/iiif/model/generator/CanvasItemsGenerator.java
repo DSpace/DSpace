@@ -32,7 +32,7 @@ import org.springframework.web.context.annotation.RequestScope;
 public class CanvasItemsGenerator implements org.dspace.app.rest.iiif.model.generator.IIIFResource {
 
     private String identifier;
-    private OtherContent rendering;
+    private final List<OtherContent> renderings = new ArrayList<>();
     private final List<Canvas> canvas = new ArrayList<>();
 
     @Autowired
@@ -53,8 +53,7 @@ public class CanvasItemsGenerator implements org.dspace.app.rest.iiif.model.gene
      * @param otherContent wrapper for OtherContent
      */
     public void addRendering(org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator otherContent) {
-
-        this.rendering = (OtherContent) otherContent.getResource();
+        this.renderings.add((OtherContent) otherContent.getResource());
     }
 
     /**
@@ -70,8 +69,8 @@ public class CanvasItemsGenerator implements org.dspace.app.rest.iiif.model.gene
     @Override
     public Resource<Sequence> getResource() {
         Sequence items = new Sequence(identifier);
-        if (rendering != null) {
-            items.addRendering(rendering);
+        for (OtherContent r : renderings) {
+            items.addRendering(r);
         }
         items.setCanvases(canvas);
         return items;
