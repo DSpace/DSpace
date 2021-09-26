@@ -7,11 +7,13 @@
  */
 package org.dspace.app.rest.iiif.model.generator;
 
+import javax.validation.constraints.NotNull;
+
 import de.digitalcollections.iiif.model.ImageContent;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 
 /**
- * POJO for the domain model's ImageContent.
+ * This service generator wraps the image content model.
  *
  * Presentation API version 2.1.1: The ImageContent entity is contained in the "resource"
  * field of annotations with motivation "sc:painting". Image resources, and only image resources,
@@ -22,7 +24,7 @@ public class ImageContentGenerator implements IIIFResource  {
     private org.dspace.app.rest.iiif.model.generator.ImageServiceGenerator imageService;
     private final ImageContent imageContent;
 
-    public ImageContentGenerator(String identifier) {
+    public ImageContentGenerator(@NotNull String identifier) {
         imageContent = new ImageContent(identifier);
     }
 
@@ -36,16 +38,16 @@ public class ImageContentGenerator implements IIIFResource  {
     }
 
     /**
-     * Sets the image service that the client will use to retrieve images.
+     * Adds the IIIF image service annotation.
      * @param imageService
      */
     public ImageContentGenerator addService(ImageServiceGenerator imageService) {
-        this.imageContent.addService(imageService.getService());
+        this.imageContent.addService(imageService.generate());
         return this;
     }
 
     @Override
-    public Resource<ImageContent> getResource() {
+    public Resource<ImageContent> generate() {
         return imageContent;
     }
 }

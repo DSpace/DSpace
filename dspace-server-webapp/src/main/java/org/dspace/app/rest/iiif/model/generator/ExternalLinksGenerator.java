@@ -7,42 +7,35 @@
  */
 package org.dspace.app.rest.iiif.model.generator;
 
+import javax.validation.constraints.NotNull;
+
 import de.digitalcollections.iiif.model.OtherContent;
 import de.digitalcollections.iiif.model.PropertyValue;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
- * Facade for the API version 2.1.1 "OtherContent" domain model.
+ * This generator wraps the other content domain model.
  *
- * This is the type for Content resources such as images or texts that are associated with a canvas.
- * Used in the "related", "renderings" and "otherContent" fields of IIIF resources.
- *
- * IIIF Presentation API version 3.0 removes the otherContent property and uses annotations
- * and items instead.
+ * This is the type for related content resources. Used in the "related", "renderings" and
+ * "seeAlso" fields of IIIF resources.
  */
-@Component
-@Scope("prototype")
 public class ExternalLinksGenerator implements IIIFResource {
 
-    private String identifier;
+    private final String identifier;
     private String format;
     private String label;
     private String type;
 
-    /**
-     * Sets the mandatory identifier.
-     * @param identifier
-     */
-    public ExternalLinksGenerator setIdentifier(String identifier) {
+    public ExternalLinksGenerator(@NotNull String identifier) {
+        if (identifier.isEmpty()) {
+            throw new RuntimeException("Mandatory external links identifier cannot be an empty string");
+        }
         this.identifier = identifier;
-        return this;
     }
 
     /**
-     * Sets the optional format.
-     * @param format
+     * Sets the optional format value.
+     * @param format the mimetype
      */
     public ExternalLinksGenerator setFormat(String format) {
         this.format = format;
@@ -51,7 +44,7 @@ public class ExternalLinksGenerator implements IIIFResource {
 
     /**
      * Sets the optional label.
-     * @param label
+     * @param label annotation label
      */
     public ExternalLinksGenerator setLabel(String label) {
         this.label = label;
@@ -60,7 +53,7 @@ public class ExternalLinksGenerator implements IIIFResource {
 
     /**
      * Sets the optional type.
-     * @param type
+     * @param type the annotation type
      */
     public ExternalLinksGenerator setType(String type) {
         this.type = type;
@@ -68,9 +61,9 @@ public class ExternalLinksGenerator implements IIIFResource {
     }
 
     @Override
-    public Resource<OtherContent> getResource() {
+    public Resource<OtherContent> generate() {
         if (identifier == null) {
-            throw new RuntimeException("Annotation requires an identifier");
+            throw new RuntimeException("External links annotation requires an identifier");
         }
         OtherContent otherContent;
         if (format != null) {

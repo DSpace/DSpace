@@ -10,32 +10,37 @@ package org.dspace.app.rest.iiif.model.generator;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import de.digitalcollections.iiif.model.ImageContent;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 
 /**
- * Presentation API version 2.1.1 Canvas model.
- *
- * Changes a Presentation API version 3.0 will likely require updates for
- * multiple media types, etc.
+ * This generator wraps the domain model for a single {@code Canvas}.
  */
 public class CanvasGenerator implements IIIFResource {
 
-    private String identifier;
+    private final String identifier;
+    private final List<ImageContent> images = new ArrayList();
     private String label;
     private Integer height;
     private Integer width;
-    private List<ImageContent> images = new ArrayList();
     private ImageContent thumbnail;
 
-    public  CanvasGenerator setIdentifier(String identifier) {
+    /**
+     * Constructor
+     * @param identifier the canvas identifier
+     */
+    public CanvasGenerator(@NotNull String identifier) {
+        if (identifier.isEmpty()) {
+            throw new RuntimeException("Invalid canvas identifier. Cannot be an empty string.");
+        }
         this.identifier = identifier;
-        return this;
     }
 
     /**
-     * Every canvas must have a label to display.
+     * Adds a canvas label.
      * @param label
      */
     public CanvasGenerator setLabel(String label) {
@@ -44,8 +49,8 @@ public class CanvasGenerator implements IIIFResource {
     }
 
     /**
-     * Every canvas must have an integer height.
-     * @param height
+     * Sets the canvas height. A canvas annotation with motivation {@code sc:painting} must have an pixel height.
+     * @param height canvas height in pixels
      */
     public CanvasGenerator setHeight(int height) {
         this.height = height;
@@ -53,8 +58,8 @@ public class CanvasGenerator implements IIIFResource {
     }
 
     /**
-     * Every canvas must have an integer width.
-     * @param width
+     * Sets the canvas width. A canvas annotation with motivation {@code sc:painting} must have a pixel width.
+     * @param width canvas width in pixels
      */
     public CanvasGenerator setWidth(int width) {
         this.width = width;
@@ -62,8 +67,8 @@ public class CanvasGenerator implements IIIFResource {
     }
 
     /**
-     * Add to ImageContent resources that will be assigned to the canvas.
-     * @param imageContent
+     * Add to the list of image content resources for the canvas.
+     * @param imageContent image content model
      */
     public CanvasGenerator addImage(Resource<ImageContent> imageContent) {
         images.add((ImageContent) imageContent);
@@ -71,8 +76,8 @@ public class CanvasGenerator implements IIIFResource {
     }
 
     /**
-     * The Thumbnail resource that will be assigned to the canvas.
-     * @param thumbnail
+     * Adds the thumbnail resource that will be assigned to the canvas.
+     * @param thumbnail image content model
      */
     public CanvasGenerator addThumbnail(Resource<ImageContent> thumbnail) {
         this.thumbnail = (ImageContent) thumbnail;
@@ -80,11 +85,11 @@ public class CanvasGenerator implements IIIFResource {
     }
 
     /**
-     * Returns the canvas.
+     * Creates the canvas domain model object.
      * @return canvas model
      */
     @Override
-    public Resource<Canvas> getResource() {
+    public Resource<Canvas> generate() {
         /**
          * The Canvas resource typically includes image content.
          */

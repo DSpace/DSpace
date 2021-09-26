@@ -9,8 +9,13 @@ package org.dspace.app.rest.iiif.model.generator;
 
 import de.digitalcollections.iiif.model.openannotation.ContentAsText;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * Generator for a text annotation.
+ */
+@Scope("prototype")
 @Component
 public class ContentAsTextGenerator implements IIIFResource {
 
@@ -21,9 +26,9 @@ public class ContentAsTextGenerator implements IIIFResource {
     }
 
     @Override
-    public Resource<ContentAsText> getResource() {
+    public Resource<ContentAsText> generate() {
         if (text == null) {
-            throw new RuntimeException("ContextAsText requires text input.");
+            throw new RuntimeException("Missing required text for the text annotation.");
         }
         return new ContentAsText(text);
     }

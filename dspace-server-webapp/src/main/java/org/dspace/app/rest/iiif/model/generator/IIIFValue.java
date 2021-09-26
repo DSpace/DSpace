@@ -10,8 +10,8 @@ package org.dspace.app.rest.iiif.model.generator;
 public interface IIIFValue {
 
     /**
-     * Returns a value object.
-     * @return
+     * creates and returns a value model.
+     * @return a value model.
      */
-    Object getValue();
+    Object generate();
 }

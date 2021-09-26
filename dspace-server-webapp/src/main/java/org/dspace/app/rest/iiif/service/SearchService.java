@@ -17,10 +17,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
- * Implements IIIF Search API queries and responses.
+ * This service provides methods for creating {@code Search API} response. There should be a single instance of
+ * this service per request. The {@code @RequestScope} provides a single instance created and available during
+ * complete lifecycle of the HTTP request.
  */
-@Component
 @RequestScope
+@Component
 public class SearchService extends AbstractResourceService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SearchService.class);

@@ -10,14 +10,16 @@ package org.dspace.app.rest.iiif.model.generator;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import de.digitalcollections.iiif.model.Motivation;
 import de.digitalcollections.iiif.model.openannotation.Annotation;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 
 
 /**
- * Annotations associate content resources and commentary with a canvas.
- * This is used for the otherContent AnnotationList and Search response.
+ * Generator for an {@code annotation} model. Annotations associate content resources and commentary with a canvas.
+ * This is used for the {@code seeAlso} annotation and Search response.
  */
 public class AnnotationGenerator implements IIIFResource {
 
@@ -34,28 +36,33 @@ public class AnnotationGenerator implements IIIFResource {
     List<Resource> manifests = new ArrayList<>();
 
 
-    /**
-     * Set the annotation identifier. Required.
-     * @param identifier
-     * @return
-     */
-    public AnnotationGenerator setIdentifier(String identifier) {
+    public AnnotationGenerator(@NotNull String identifier) {
+        if (identifier.isEmpty()) {
+            throw new RuntimeException("Invalid annotation identifier. Cannot be an empty string.");
+        }
         this.identifier = identifier;
-        return this;
+    }
+
+    public AnnotationGenerator(@NotNull String identifier, @NotNull Motivation motivation) {
+        if (identifier.isEmpty()) {
+            throw new RuntimeException("Invalid annotation identifier. Cannot be an empty string.");
+        }
+        this.identifier = identifier;
+        this.motivation = motivation;
     }
 
     /**
-     * Sets the annotation motivtion. Required.
-     * @param motivation
+     * Sets the motivation field. Required.
+     * @param motivation the motivation
      * @return
      */
-    public AnnotationGenerator setMotivation(Motivation motivation) {
+    public AnnotationGenerator setMotivation(@NotNull Motivation motivation) {
         this.motivation = motivation;
         return this;
     }
 
     /**
-     * Set the canvas for this annotation.
+     * Sets the canvas that is associated with this annotation.
      * @param canvas
      * @return
      */
@@ -65,7 +72,7 @@ public class AnnotationGenerator implements IIIFResource {
     }
 
     /**
-     * Set a text resource for this annotation.
+     * Sets a text resource for this annotation.
      * @param contentAsText
      * @return
      */
@@ -75,8 +82,8 @@ public class AnnotationGenerator implements IIIFResource {
     }
 
     /**
-     * Set the external link for this annotation.
-     * @param otherContent
+     * Sets an external link for this annotation.
+     * @param otherContent external link generator
      * @return
      */
     public AnnotationGenerator setResource(ExternalLinksGenerator otherContent) {
@@ -87,32 +94,34 @@ public class AnnotationGenerator implements IIIFResource {
     /**
      * Set the within property for this annotation. This property
      * is a list of manifests. The property is renamed to partOf in v3
+     * <p>Used by search result annotations.</p>
      * @param within
      * @return
      */
     public AnnotationGenerator setWithin(List<ManifestGenerator> within) {
         for (ManifestGenerator manifest : within) {
-            this.manifests.add(manifest.getResource());
+            this.manifests.add(manifest.generate());
         }
         return this;
     }
 
     @Override
-    public Resource<Annotation> getResource() {
+    public Resource<Annotation> generate() {
         if (identifier == null || motivation == null) {
             throw new RuntimeException("Annotations require both an identifier and a motivation");
         }
         Annotation annotation = new Annotation(identifier, motivation);
+
         annotation.setWithin(manifests);
         // These optional annotation fields vary with the context.
         if (canvasGenerator != null) {
-            annotation.setOn(canvasGenerator.getResource());
+            annotation.setOn(canvasGenerator.generate());
         }
         if (externalLinksGenerator != null) {
-            annotation.setResource(externalLinksGenerator.getResource());
+            annotation.setResource(externalLinksGenerator.generate());
         }
         if (contentAsTextGenerator != null) {
-            annotation.setResource(contentAsTextGenerator.getResource());
+            annotation.setResource(contentAsTextGenerator.generate());
         }
         return annotation;
     }

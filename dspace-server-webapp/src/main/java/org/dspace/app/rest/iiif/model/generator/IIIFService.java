@@ -12,8 +12,8 @@ import de.digitalcollections.iiif.model.Service;
 public interface IIIFService {
 
     /**
-     * Returns a Service for serialization.
-     * @return
+     * Creates and returns a service model
+     * @return a service model
      */
-    Service getService();
+    Service generate();
 }

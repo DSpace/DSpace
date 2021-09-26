@@ -28,10 +28,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
- * Generates IIIF Manifest JSON response for a DSpace Item.
+ * This service creates the manifest. There should be a single instance of this service per request.
+ * The {@code @RequestScope} provides a single instance created and available during complete lifecycle
+ * of the HTTP request.
  */
-@Component
 @RequestScope
+@Component
 public class ManifestService extends AbstractResourceService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ManifestService.class);
@@ -76,27 +78,25 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Returns serialized Manifest response for a DSpace item.
+     * Returns JSON manifest response for a DSpace item.
      *
      * @param item the DSpace Item
      * @param context the DSpace context
-     * @return Manifest as JSON
+     * @return manifest as JSON
      */
     public String getManifest(Item item, Context context) {
         populateManifest(item, context);
-        return utils.asJson(manifestGenerator.getResource());
+        return utils.asJson(manifestGenerator.generate());
     }
 
     /**
-     * Populates the Manifest for a DSpace Item.
+     * Populates the manifest for a DSpace Item.
      *
-     * @param item DSpace Item
-     * @param context DSpace context
-     * @return manifest object
+     * @param item the DSpace Item
+     * @param context the DSpace context
+     * @return manifest domain object
      */
     private void populateManifest(Item item, Context context) {
-        // If an IIIF bundle is found it will be used. Otherwise,
-        // images in the ORIGINAL bundle will be used.
         List<Bundle> bundles = utils.getIiifBundle(item, IIIF_BUNDLE);
         List<Bitstream> bitstreams = utils.getBitstreams(bundles);
         Info info = utils.validateInfoForManifest(utils.getInfo(context, item, IIIF_BUNDLE), bitstreams);
@@ -114,25 +114,18 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Adds a single sequence with canvases and a rendering property (optional).
+     * Adds a single IIIF sequence with canvases and rendering (optional) to the manifest.
      * @param item DSpace Item
      * @param bitstreams list of bitstreams
      * @param context the DSpace context
-     * @return a sequence of canvases
      */
     private void addSequence(Item item, List<Bitstream> bitstreams, Context context, Info info) {
-        // After replacing the info object with DSO metadata we might
-        // update this method to iterate over the bitstreams list, passing
-        // the individual bitstream and position to revised methods in
-        // sequenceService and rangeService. But it's hard to try now without more
-        // work elsewhere.
         manifestGenerator.addSequence(
                 sequenceService.getSequence(item, bitstreams, context, info));
     }
 
     /**
      * Adds DSpace Item metadata to the manifest.
-     *
      * @param metadata list of DSpace metadata values
      */
     private void addMetadata(List<MetadataValue> metadata) {
@@ -155,12 +148,8 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * A link to an external resource intended to be displayed directly to the user,
-     * and is related to the resource that has the related property. Examples might
-     * include a video or academic paper about the resource, a website, an HTML
-     * description, and so forth.
-     *
-     * This method adds a link to the Item represented in the DSpace Angular UI.
+     * Adds a related item property to the manifest. The property provides a link
+     * to the Item record in the DSpace Angular UI.
      *
      * @param item the DSpace Item
      */
@@ -169,7 +158,8 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * A hint to the client as to the most appropriate method of displaying the resource.
+     * Adds a viewing hint to the manifest. This is a hint to the client as to the most
+     * appropriate method of displaying the resource.
      *
      * @param bitstreamCount count of bitstreams in the IIIF bundle.
      */
@@ -180,13 +170,9 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * A link to a machine readable document that semantically describes the resource with
-     * the seeAlso property, such as an XML or RDF description. This document could be used
-     * for search and discovery or inferencing purposes, or just to provide a longer
-     * description of the resource. May have one or more external descriptions related to it.
-     *
-     * This method appends an AnnotationList of resources found in the Item's OtherContent bundle.
-     * A typical use case would be METS or ALTO files that describe the resource.
+     * This method adds into the manifest a {@code seeAlso} reference to additional
+     * resources found in the Item bundle(s). A typical use case would be METS / ALTO files
+     * that describe the resource.
      *
      * @param item the DSpace Item.
      */
@@ -198,13 +184,10 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * A link to a service that makes more functionality available for the resource,
-     * such as the base URI of an associated IIIF Search API service.
+     * This method adds a search service definition to the manifest when
+     * the item metadata includes {@code iiif.search.enabled}.
      *
-     * This method returns a search service definition. Search scope is the manifest.
-     *
-     * @param item DSpace Item
-     * @return the IIIF search service definition for the item
+     * @param item the DSpace Item
      */
     private void addSearchService(Item item) {
         if (utils.isSearchable(item)) {
@@ -214,8 +197,7 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Adds Ranges to manifest structures element.
-     * Ranges are defined in the info.json file.
+     * Adds structure element and Range to the manifest. (Removed in 4Science PR)
      * @param info
      * @param identifier
      */
@@ -227,7 +209,7 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Adds thumbnail to the manifest. Uses first image in bundle.
+     * Adds thumbnail to the manifest. Uses first image bitstream.
      * @param bundles image bundles
      * @param context DSpace context
      */
@@ -245,7 +227,7 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * If the logo is defined in DSpace configuration add to manifest.
+     * Adds the logo to the manifest when it is defined in DSpace configuration.
      */
     private void setLogoContainer() {
         if (IIIF_LOGO_IMAGE != null) {

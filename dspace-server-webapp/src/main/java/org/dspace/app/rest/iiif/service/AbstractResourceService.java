@@ -16,7 +16,7 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Base class for IIIF responses.
+ * Base class for services.
  */
 public abstract class AbstractResourceService {
     /**

@@ -10,6 +10,11 @@ package org.dspace.app.rest.iiif.cache;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Enables Spring cache support. The configuration file is defined in
+ * application properties. Cache size limits are defined there.
+ * <p>spring.cache.jcache.config=classpath:iiif/cache/ehcache.xml</p>
+ */
 @Configuration
 @EnableCaching
 public class CacheConfig {

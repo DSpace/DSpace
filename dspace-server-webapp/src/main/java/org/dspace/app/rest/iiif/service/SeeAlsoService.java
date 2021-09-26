@@ -16,13 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
-
-@Component
+/**
+ * This service provides methods for creating {@code seAlso} external link. There should be a single instance of
+ * this service per request. The {@code @RequestScope} provides a single instance created and available during
+ * complete lifecycle of the HTTP request.
+ */
 @RequestScope
+@Component
 public class SeeAlsoService extends AbstractResourceService {
-
-    @Autowired
-    ExternalLinksGenerator externalLinksGenerator;
 
     private static final String SEE_ALSO_LABEL = "More descriptions of this resource";
 
@@ -31,7 +32,7 @@ public class SeeAlsoService extends AbstractResourceService {
     }
 
     public ExternalLinksGenerator getSeeAlso(UUID itemId) {
-        return externalLinksGenerator.setIdentifier(IIIF_ENDPOINT + itemId + "/manifest/seeAlso")
+        return new ExternalLinksGenerator(IIIF_ENDPOINT + itemId + "/manifest/seeAlso")
                 .setType(AnnotationGenerator.TYPE)
                 .setLabel(SEE_ALSO_LABEL);
 

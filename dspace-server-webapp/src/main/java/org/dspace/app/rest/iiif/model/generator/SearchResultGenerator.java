@@ -17,10 +17,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
- * Facade for the AnnotationList that contains hits for a given search query.
+ * This generator wraps a domain model for a {@code SearchResult}. There should be a single instance of
+ * this object per search request. The {@code @RequestScope} provides a single instance created and available during
+ * complete lifecycle of the HTTP request.
  */
-@Component
 @RequestScope
+@Component
 public class SearchResultGenerator implements IIIFResource {
 
     private String identifier;
@@ -31,11 +33,11 @@ public class SearchResultGenerator implements IIIFResource {
     }
 
     public void addResource(AnnotationGenerator annotation) {
-        annotations.add((Annotation) annotation.getResource());
+        annotations.add((Annotation) annotation.generate());
     }
 
     @Override
-    public Resource<Annotation> getResource() {
+    public Resource<Annotation> generate() {
         SearchResult searchResult = new SearchResult(identifier);
         searchResult.setResources(annotations);
         return searchResult;

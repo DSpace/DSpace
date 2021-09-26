@@ -10,7 +10,9 @@ package org.dspace.app.rest.iiif.model.generator;
 import de.digitalcollections.iiif.model.MetadataEntry;
 import org.springframework.stereotype.Component;
 
-@Component
+/**
+ * Wraps the domain model metadata property.
+ */
 public class MetadataEntryGenerator implements IIIFValue {
 
     private String field;
@@ -20,20 +22,22 @@ public class MetadataEntryGenerator implements IIIFValue {
      * Set metadata field name.
      * @param field field name
      */
-    public void setField(String field) {
+    public MetadataEntryGenerator setField(String field) {
         this.field = field;
+        return this;
     }
 
     /**
      * Set metadata value.
      * @param value metadata value
      */
-    public void setValue(String value) {
+    public MetadataEntryGenerator setValue(String value) {
         this.value = value;
+        return this;
     }
 
     @Override
-    public MetadataEntry getValue() {
+    public MetadataEntry generate() {
         return new MetadataEntry(field, value);
     }
 }
