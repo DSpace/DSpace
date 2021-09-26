@@ -14,59 +14,57 @@ import de.digitalcollections.iiif.model.OtherContent;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 import de.digitalcollections.iiif.model.sharedcanvas.Sequence;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
- * Facade for the current Presentation API version 2.1.1 domain model's Sequence class.
- *
- * In Presentation API version 2.1.1, each Manifest includes a single Sequence that defines
- * the order of the views of the object.
- *
- * Sequence is removed with Presentation API version 3.0. Canvases are added to the Manifest
- * items property instead.
+ * This generator wraps the domain model for a Presentation API 2.1.1 {@code Sequence}. There must be a single
+ * instance of this object per request. The {@code @RequestScope} provides a single instance created and available
+ * during complete lifecycle of the HTTP request.
+ * <p>
+ * The IIIF sequence conveys the ordering of the views of the object.
+ * </p>
+ * <p>
+ * Sequence is removed with Presentation API version 3.0. Canvases are added to the Manifest items property instead.
+ * </p>
  */
-@Component
 @RequestScope
-public class CanvasItemsGenerator implements org.dspace.app.rest.iiif.model.generator.IIIFResource {
+@Component
+public class CanvasItemsGenerator implements IIIFResource {
 
     private String identifier;
     private OtherContent rendering;
     private final List<Canvas> canvas = new ArrayList<>();
 
-    @Autowired
-    org.dspace.app.rest.iiif.model.generator.BehaviorGenerator viewingHintFascade;
 
     /**
-     * Mandatory. The domain model requires a URI identifier for the sequence.
-     * @param identifier string for the URI
+     * Sets the required identifier property.
+     * @param identifier URI string
      */
     public void setIdentifier(String identifier) {
-
         this.identifier = identifier;
     }
 
     /**
-     * A link to an external resource intended for display or download by a human user.
-     * This is typically going to be a PDF file.
-     * @param otherContent wrapper for OtherContent
+     * Adds a rendering annotation to the Sequence. The rendering is a link to an external resource intended
+     * for display or download by a human user. This is typically going to be a PDF file.
+     * @param otherContent generator for the resource
      */
-    public void addRendering(org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator otherContent) {
+    public void addRendering(ExternalLinksGenerator otherContent) {
 
-        this.rendering = (OtherContent) otherContent.getResource();
+        this.rendering = (OtherContent) otherContent.generate();
     }
 
     /**
-     * Add a Canvas to the sequence.
-     * @param canvas wrapper for Canvas
+     * Adds a single {@code Canvas} to the sequence.
+     * @param canvas generator for canvas
      */
-    public void addCanvas(org.dspace.app.rest.iiif.model.generator.CanvasGenerator canvas) {
-        this.canvas.add((Canvas) canvas.getResource());
+    public void addCanvas(CanvasGenerator canvas) {
+        this.canvas.add((Canvas) canvas.generate());
     }
 
     @Override
-    public Resource<Sequence> getResource() {
+    public Resource<Sequence> generate() {
         Sequence items = new Sequence(identifier);
         if (rendering != null) {
             items.addRendering(rendering);

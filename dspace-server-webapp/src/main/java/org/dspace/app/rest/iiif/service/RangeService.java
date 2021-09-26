@@ -18,8 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
-@Component
+/**
+ * This service provides methods for creating a {@code Range}. There should be a single instance of this service
+ * per request. The {@code @RequestScope} provides a single instance created and available during complete lifecycle
+ * of the HTTP request.
+ */
 @RequestScope
+@Component
 public class RangeService extends AbstractResourceService {
 
     @Autowired

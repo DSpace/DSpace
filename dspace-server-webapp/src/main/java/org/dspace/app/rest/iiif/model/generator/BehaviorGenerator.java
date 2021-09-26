@@ -16,17 +16,17 @@ import org.springframework.stereotype.Component;
  *
  * With IIIF Presentation API 3.0 the viewingHint property is renamed to "behavior".
  */
-@Component
 public class BehaviorGenerator implements IIIFValue {
 
     private String type;
 
-    public void setType(String type) {
+    public BehaviorGenerator setType(String type) {
         this.type = type;
+        return this;
     }
 
     @Override
-    public ViewingHint getValue() {
+    public ViewingHint generate() {
         if (type == null) {
             throw new RuntimeException("Type must be provided for viewing hint.");
         }

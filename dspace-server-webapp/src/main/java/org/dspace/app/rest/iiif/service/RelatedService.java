@@ -14,8 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
-@Component
+/**
+ * This service provides methods for creating a {@code related} annotation. There should be a single instance of
+ * this service per request. The {@code @RequestScope} provides a single instance created and available during
+ * complete lifecycle of the HTTP request.
+ */
 @RequestScope
+@Component
 public class RelatedService extends AbstractResourceService {
 
     private static final String RELATED_ITEM_LABEL = "DSpace item view";
@@ -24,14 +29,10 @@ public class RelatedService extends AbstractResourceService {
         setConfiguration(configurationService);
     }
 
-    @Autowired
-    ExternalLinksGenerator externalLinksGenerator;
-
     public ExternalLinksGenerator getRelated(Item item) {
         String url = CLIENT_URL + "/items/" + item.getID();
-        externalLinksGenerator.setIdentifier(url);
-        externalLinksGenerator.setFormat("text/html");
-        externalLinksGenerator.setLabel(RELATED_ITEM_LABEL);
-        return externalLinksGenerator;
+        return new ExternalLinksGenerator(url)
+                .setFormat("text/html")
+                .setLabel(RELATED_ITEM_LABEL);
     }
 }

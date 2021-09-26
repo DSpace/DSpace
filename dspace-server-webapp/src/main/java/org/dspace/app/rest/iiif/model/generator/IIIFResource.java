@@ -12,9 +12,9 @@ import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 public interface IIIFResource {
 
     /**
-     * Returns a Resource for serialization.
-     * @return
+     * Creates and returns a resource model.
+     * @return resource model
      */
-    Resource<?> getResource();
+    Resource<?> generate();
 
 }

@@ -11,6 +11,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import javax.validation.constraints.NotNull;
+
 import de.digitalcollections.iiif.model.Profile;
 import de.digitalcollections.iiif.model.Service;
 import de.digitalcollections.iiif.model.search.ContentSearchService;
@@ -19,40 +21,43 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
- * Facade for the Search API version 1.0 search service description.
- *
- * Added to the Manifest when the item supports full-text searching, identified
- * by the "dspace.entity.type: IIIFSearchable" DSpace metadata field. NOTE: the
- * entity.type is going to be abandoned in favor of another DSO metadata field.
+ * This generator wraps the search service annotation that is added to
+ * the manifest for searchable items. Only a single search service is defined
+ * for the manifest. There should be a single instance of this object per request.
+ * The {@code @RequestScope} provides a single instance created and available during
+ * complete lifecycle of the HTTP request.
  */
-@Component
 @RequestScope
-public class ContentSearchGenerator implements org.dspace.app.rest.iiif.model.generator.IIIFService {
+@Component
+public class ContentSearchGenerator implements IIIFService {
 
     private String identifier;
     private String label;
 
     @Autowired
-    org.dspace.app.rest.iiif.model.generator.ProfileGenerator profile;
+    ProfileGenerator profile;
 
     /**
      * Mandatory URI for search service.
      * @param identifier
      */
-    public void setIdentifier(String identifier) {
+    public void setIdentifier(@NotNull String identifier) {
+        if (identifier.isEmpty()) {
+            throw new RuntimeException("The search service requires an identifier.");
+        }
         this.identifier = identifier;
     }
 
     /**
-     * Optional label
-     * @param label
+     * Optional label for the search service.
+     * @param label the search service label.
      */
     public void setLabel(String label) {
         this.label = label;
     }
 
     @Override
-    public Service getService() {
+    public Service generate() {
         if (identifier == null) {
             throw new RuntimeException("You must provide an identifier for the search service.");
         }
@@ -67,7 +72,7 @@ public class ContentSearchGenerator implements org.dspace.app.rest.iiif.model.ge
         }
         ArrayList<Profile> profiles = new ArrayList<>();
         profile.setIdentifier("http://iiif.io/api/search/0/search");
-        profiles.add(profile.getValue());
+        profiles.add(profile.generate());
         contentSearchService.setProfiles(profiles);
         return contentSearchService;
     }

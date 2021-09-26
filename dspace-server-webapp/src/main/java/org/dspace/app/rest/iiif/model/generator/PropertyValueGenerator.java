@@ -10,11 +10,8 @@ package org.dspace.app.rest.iiif.model.generator;
 import de.digitalcollections.iiif.model.PropertyValue;
 
 /**
- * Type for strings that are intended to be displayed to the user.
- *
- * <p>Is organized as a mapping of languages to one or more values. See
- * http://iiif.io/api/presentation/2.1/#language-of-property-values and
- * http://iiif.io/api/presentation/2.1/#html-markup-in-property-values for more information.
+ * This class wraps the domain model property value annotation. The property is the type for
+ * strings that are intended to be displayed to the user.
  */
 public class PropertyValueGenerator implements IIIFValue {
 
@@ -31,7 +28,7 @@ public class PropertyValueGenerator implements IIIFValue {
     }
 
     @Override
-    public PropertyValue getValue() {
+    public PropertyValue generate() {
         return propertyValue;
     }
 }

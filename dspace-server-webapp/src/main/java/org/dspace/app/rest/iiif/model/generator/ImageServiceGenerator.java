@@ -11,10 +11,10 @@ import de.digitalcollections.iiif.model.Service;
 import de.digitalcollections.iiif.model.image.ImageService;
 
 /**
- * POJO facade for API version 2.1.1 image service property. Added to
- * each image resource.
+ * This service generator wraps the image service property model. An image service
+ * annotation is added to each canvas annotation.
  */
-public class ImageServiceGenerator implements org.dspace.app.rest.iiif.model.generator.IIIFService {
+public class ImageServiceGenerator implements IIIFService {
 
     private ImageService imageService;
 
@@ -24,15 +24,15 @@ public class ImageServiceGenerator implements org.dspace.app.rest.iiif.model.gen
 
     /**
      * Sets the IIIF image profile.
-     * @param profile
+     * @param profile a profile generator
      */
-    public ImageServiceGenerator setProfile(org.dspace.app.rest.iiif.model.generator.ProfileGenerator profile) {
-        imageService.addProfile(profile.getValue());
+    public ImageServiceGenerator setProfile(ProfileGenerator profile) {
+        imageService.addProfile(profile.generate());
         return this;
     }
 
     @Override
-    public Service getService() {
+    public Service generate() {
         return imageService;
     }
 }

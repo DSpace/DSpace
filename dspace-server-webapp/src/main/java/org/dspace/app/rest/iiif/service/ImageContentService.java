@@ -15,9 +15,15 @@ import org.dspace.app.rest.iiif.model.generator.ProfileGenerator;
 import org.dspace.services.ConfigurationService;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 
+/**
+ * This service provides methods for creating a {@code Image Resource} annotation. There should be a single instance of
+ * this service per request. The {@code @RequestScope} provides a single instance created and available during
+ * complete lifecycle of the HTTP request.
+ */
+@RequestScope
 @Component
-@Scope("prototype")
 public class ImageContentService extends AbstractResourceService {
 
 

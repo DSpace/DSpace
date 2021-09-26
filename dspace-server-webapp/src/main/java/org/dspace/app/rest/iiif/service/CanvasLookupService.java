@@ -22,10 +22,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
- * Canvases may be dereferenced separately from the manifest via their IDs.
+ * This service provides methods for creating a single {@code Canvas}. There should be a single instance of
+ * this service per request. The {@code @RequestScope} provides a single instance created and available during
+ * complete lifecycle of the HTTP request.
  */
-@Component
 @RequestScope
+@Component
 public class CanvasLookupService extends AbstractResourceService {
 
     @Autowired
@@ -51,7 +53,7 @@ public class CanvasLookupService extends AbstractResourceService {
         CanvasGenerator canvasGenerator =
                 canvasService.getCanvas(item.getID().toString(), bitstreamId, mimeType, info, canvasPosition);
 
-        return utils.asJson(canvasGenerator.getResource());
+        return utils.asJson(canvasGenerator.generate());
     }
 
 }

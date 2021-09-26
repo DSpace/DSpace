@@ -22,11 +22,16 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 
+/**
+ * This service provides methods for creating a {@code Sequence}. There should be a single instance of
+ * this service per request. The {@code @RequestScope} provides a single instance created and available during
+ * complete lifecycle of the HTTP request.
+ */
+@RequestScope
 @Component
-@Scope("prototype")
 public class SequenceService  extends AbstractResourceService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SequenceService.class);
@@ -38,9 +43,6 @@ public class SequenceService  extends AbstractResourceService {
     CanvasItemsGenerator sequenceGenerator;
 
     @Autowired
-    ExternalLinksGenerator externalLinksGenerator;
-
-    @Autowired
     CanvasService canvasService;
 
 
@@ -48,6 +50,16 @@ public class SequenceService  extends AbstractResourceService {
         setConfiguration(configurationService);
     }
 
+    /**
+     * Returns a sequence generator that has been configured with canvases and an optional
+     * rendering link. (@abollini will update.)
+     *
+     * @param item the DSpace item
+     * @param bitstreams list of bitstreams
+     * @param context the DSpace context
+     * @param info the info.json file
+     * @return a sequence generator
+     */
     public CanvasItemsGenerator getSequence(Item item, List<Bitstream> bitstreams, Context context, Info info) {
 
         sequenceGenerator.setIdentifier(IIIF_ENDPOINT + item.getID() + "/sequence/s0");
@@ -61,7 +73,7 @@ public class SequenceService  extends AbstractResourceService {
 
     /**
      * This method adds a canvas to the sequence for each item in the list of DSpace bitstreams.
-     * Bitstreams must be on image mime type.
+     * Bitstreams must be on image mime type. (@abollini will update.)
      *
      * @param context the DSpace context
      * @param item the DSpace Item
@@ -93,12 +105,6 @@ public class SequenceService  extends AbstractResourceService {
     }
 
     /**
-     * A link to an external resource intended for display or download by a human user.
-     * This property can be used to link from a manifest, collection or other resource
-     * to the preferred viewing environment for that resource, such as a viewer page on
-     * the publisher’s web site. Other uses include a rendering of a manifest as a PDF
-     * or EPUB.
-     *
      * This method looks for a PDF rendering in the Item's ORIGINAL bundle and adds
      * it to the Sequence if found.
      *
@@ -126,8 +132,7 @@ public class SequenceService  extends AbstractResourceService {
             if (mimeType != null && mimeType.contentEquals("application/pdf")) {
                 String id = BITSTREAM_PATH_PREFIX + "/" + bitstream.getID() + "/content";
                 sequenceGenerator.addRendering(
-                        externalLinksGenerator
-                                .setIdentifier(id)
+                        new ExternalLinksGenerator(id)
                                 .setLabel(PDF_DOWNLOAD_LABEL)
                                 .setFormat(mimeType)
                 );

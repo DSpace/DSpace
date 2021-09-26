@@ -28,8 +28,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
-@Component
+/**
+ * This service provides methods for creating an {@code Annotation List}. There should be a single instance of
+ * this service per request. The {@code @RequestScope} provides a single instance created and available during
+ * complete lifecycle of the HTTP request.
+ */
 @RequestScope
+@Component
 public class AnnotationListService extends AbstractResourceService {
 
 
@@ -44,9 +49,6 @@ public class AnnotationListService extends AbstractResourceService {
 
     @Autowired
     BitstreamFormatService bitstreamFormatService;
-
-    @Autowired
-    ExternalLinksGenerator externalLinksGenerator;
 
     @Autowired
     AnnotationListGenerator annotationList;
@@ -96,15 +98,15 @@ public class AnnotationListService extends AbstractResourceService {
                     } catch (SQLException e) {
                         throw new RuntimeException(e.getMessage(), e);
                     }
-                    AnnotationGenerator annotationGenerator = new AnnotationGenerator()
-                            .setIdentifier(IIIF_ENDPOINT + bitstream.getID() + "/annot")
-                            .setMotivation(AnnotationGenerator.LINKING)
+                    AnnotationGenerator annotationGenerator =
+                            new AnnotationGenerator(IIIF_ENDPOINT + bitstream.getID() + "/annot",
+                                    AnnotationGenerator.LINKING)
                             .setResource(getLinksGenerator(mimetype, bitstream));
                     annotationList.addResource(annotationGenerator);
                 }
             }
         }
-        return utils.asJson(annotationList.getResource());
+        return utils.asJson(annotationList.generate());
     }
 
     private ExternalLinksGenerator getLinksGenerator(String mimetype, Bitstream bitstream) {
@@ -113,8 +115,7 @@ public class AnnotationListService extends AbstractResourceService {
                 + bitstream.getID()
                 + "/content";
 
-        return externalLinksGenerator
-                .setIdentifier(identifier)
+        return new ExternalLinksGenerator(identifier)
                 .setFormat(mimetype)
                 .setLabel(bitstream.getName());
     }

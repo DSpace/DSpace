@@ -15,11 +15,16 @@ import org.dspace.app.rest.iiif.model.generator.ImageContentGenerator;
 import org.dspace.app.rest.iiif.model.info.Info;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 
+/**
+ * This service provides methods for creating {@code Canvases}. There should be a single instance of
+ * this service per request. The {@code @RequestScope} provides a single instance created and available during
+ * complete lifecycle of the HTTP request.
+ */
+@RequestScope
 @Component
-@Scope("prototype")
 public class CanvasService extends AbstractResourceService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CanvasService.class);
@@ -89,9 +94,9 @@ public class CanvasService extends AbstractResourceService {
         ImageContentGenerator thumb = imageContentService
                 .getImageContent(bitstreamId, mimeType, thumbUtil.getThumbnailProfile(), THUMBNAIL_PATH);
 
-        return new CanvasGenerator().setIdentifier(IIIF_ENDPOINT + manifestId + "/canvas/c" + count)
-                .addImage(image.getResource())
-                .addThumbnail(thumb.getResource())
+        return new CanvasGenerator(IIIF_ENDPOINT + manifestId + "/canvas/c" + count)
+                .addImage(image.generate())
+                .addThumbnail(thumb.generate())
                 .setHeight(canvasHeight)
                 .setWidth(canvasWidth)
                 .setLabel(label);
@@ -105,7 +110,7 @@ public class CanvasService extends AbstractResourceService {
      * @return
      */
     protected CanvasGenerator getRangeCanvasReference(String identifier, String startCanvas) {
-        return new CanvasGenerator().setIdentifier(IIIF_ENDPOINT + identifier + startCanvas);
+        return new CanvasGenerator(IIIF_ENDPOINT + identifier + startCanvas);
     }
 
 }

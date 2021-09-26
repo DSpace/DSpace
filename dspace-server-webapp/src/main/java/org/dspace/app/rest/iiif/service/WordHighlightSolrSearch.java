@@ -42,11 +42,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
+
 /**
- * Support for https://github.com/dbmdz/solr-ocrhighlighting
+ * This service provides methods for executing a solr search against the solr index. There should be a single
+ * instance of this service per request. The {@code @RequestScope} provides a single instance created and
+ * available during complete lifecycle of the HTTP request.
+ * <p>
+ * https://github.com/dbmdz/solr-ocrhighlighting
  */
-@Component
 @RequestScope
+@Component
 public class WordHighlightSolrSearch implements SearchAnnotationService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WordHighlightSolrSearch.class);
@@ -180,7 +185,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
         JsonObject body = gson.fromJson(json, JsonObject.class);
         if (body == null) {
             log.warn("Unable to process json response.");
-            return utils.asJson(searchResult.getResource());
+            return utils.asJson(searchResult.generate());
         }
         // outer ocr highlight element
         JsonObject highs = body.getAsJsonObject("ocrHighlighting");
@@ -201,7 +206,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
             }
         }
 
-        return utils.asJson(searchResult.getResource());
+        return utils.asJson(searchResult.generate());
     }
 
     /**
@@ -253,11 +258,10 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
         String annotationIdentifier = this.endpoint + uuid + "/annot/" + pageId + "-" + params;
         String canvasIdentifier = this.endpoint + uuid + "/canvas/" + pageId + "#xywh=" + params;
         contentAsText.setText(text);
-        CanvasGenerator canvas = new CanvasGenerator().setIdentifier(canvasIdentifier);
+        CanvasGenerator canvas = new CanvasGenerator(canvasIdentifier);
 
-        AnnotationGenerator annotationGenerator = new AnnotationGenerator()
-                .setMotivation(AnnotationGenerator.PAINTING)
-                .setIdentifier(annotationIdentifier)
+        AnnotationGenerator annotationGenerator = new AnnotationGenerator(annotationIdentifier,
+                AnnotationGenerator.PAINTING)
                 .setOnCanvas(canvas)
                 .setResource(contentAsText)
                 .setWithin(getWithinManifest());

@@ -15,10 +15,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
- * A profile for an AnnotationList or Service.
+ * This class wraps the domain model service profile. Spring can inject unique
+ * instances of this generator into services using the prototype scope.
  */
-@Component
 @Scope("prototype")
+@Component
 public class ProfileGenerator implements IIIFValue {
 
     private String identifier;
@@ -31,7 +32,7 @@ public class ProfileGenerator implements IIIFValue {
     }
 
     @Override
-    public Profile getValue() {
+    public Profile generate() {
         try {
             return new Profile(new URI(identifier));
         } catch (URISyntaxException e) {
