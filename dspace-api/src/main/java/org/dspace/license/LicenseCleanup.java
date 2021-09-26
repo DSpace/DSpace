@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -38,7 +39,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 
 /**
- * Cleanup class for CC Licenses, corrects XML formating errors by replacing the license_rdf bitstream.
+ * Cleanup class for CC Licenses, corrects XML formatting errors by replacing
+ * the license_rdf bitstream.
  *
  * @author mdiggory
  */
@@ -130,7 +132,7 @@ public class LicenseCleanup {
         AuthorizeException, IOException {
         List<Bundle> bundles = itemService.getBundles(item, "CC-LICENSE");
 
-        if (bundles == null || bundles.size() == 0) {
+        if (bundles == null || bundles.isEmpty()) {
             return;
         }
 
@@ -138,7 +140,7 @@ public class LicenseCleanup {
 
         Bitstream bitstream = bundleService.getBitstreamByName(bundle, "license_rdf");
 
-        String license_rdf = new String(copy(context, bitstream));
+        String license_rdf = new String(copy(context, bitstream), StandardCharsets.UTF_8);
 
         /* quickly fix xml by ripping out offensive parts */
         license_rdf = license_rdf.replaceFirst("<license", "");
@@ -148,7 +150,7 @@ public class LicenseCleanup {
 
         try {
             templates.newTransformer().transform(
-                new StreamSource(new ByteArrayInputStream(license_rdf.getBytes())),
+                new StreamSource(new ByteArrayInputStream(license_rdf.getBytes(StandardCharsets.UTF_8))),
                 new StreamResult(result));
         } catch (TransformerException e) {
             throw new IllegalStateException(e.getMessage(), e);
@@ -158,7 +160,7 @@ public class LicenseCleanup {
 
         Bitstream newBitstream = bitstreamService
             .create(context, bundle, new ByteArrayInputStream(buffer.toString()
-                                                                    .getBytes()));
+                                                                    .getBytes(StandardCharsets.UTF_8)));
 
         newBitstream.setName(context, bitstream.getName());
         newBitstream.setDescription(context, bitstream.getDescription());
