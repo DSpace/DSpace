@@ -62,7 +62,10 @@ public class SolrServiceIndexCollectionAdministratorsPlugin implements SolrServi
 
     private void addAdminField(SolrInputDocument document, Group administrators) {
         if (administrators != null) {
-            document.addField("admin", "g" + administrators.getID());
+            java.util.Collection<Object> adminsGroup = document.get("admin").getValues();
+            if (!adminsGroup.contains("g" + administrators.getID())) {
+                document.addField("admin", "g" + administrators.getID());
+            }
         }
     }
 
