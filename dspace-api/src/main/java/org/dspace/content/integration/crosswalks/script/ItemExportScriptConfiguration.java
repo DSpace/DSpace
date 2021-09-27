@@ -24,7 +24,7 @@ public class ItemExportScriptConfiguration<T extends ItemExport> extends ScriptC
 
     @Override
     public boolean isAllowedToExecute(Context context) {
-        return context.getCurrentUser() != null;
+        return true;
     }
 
     @Override

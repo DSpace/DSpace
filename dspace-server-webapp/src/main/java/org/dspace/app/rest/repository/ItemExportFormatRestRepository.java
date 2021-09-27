@@ -43,7 +43,7 @@ public class ItemExportFormatRestRepository extends DSpaceRestRepository<ItemExp
     public ItemExportFormatService itemExportFormatService;
 
     @Override
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("permitAll()")
     public ItemExportFormatRest findOne(Context context, String id) {
 
         ItemExportFormat ief = this.itemExportFormatService.get(context, id);
@@ -56,7 +56,7 @@ public class ItemExportFormatRestRepository extends DSpaceRestRepository<ItemExp
     }
 
     @Override
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("permitAll()")
     public Page<ItemExportFormatRest> findAll(Context context, Pageable pageable) {
 
         List<ItemExportFormat> formats = this.itemExportFormatService.getAll(context);
@@ -70,7 +70,7 @@ public class ItemExportFormatRestRepository extends DSpaceRestRepository<ItemExp
     }
 
     @SearchRestMethod(name = "byEntityTypeAndMolteplicity")
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("permitAll()")
     public Page<ItemExportFormatRest> byEntityTypeAndMolteplicity(
             @Parameter(value = "entityTypeId") String entityTypeId,
             @Parameter(value = "molteplicity") String molteplicity,

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,10 +30,14 @@ import org.dspace.app.rest.model.ScriptRest;
 import org.dspace.app.rest.scripts.handler.impl.RestDSpaceRunnableHandler;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.service.ScriptService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,6 +59,12 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
 
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private EPersonService ePersonService;
 
     @Override
     @PreAuthorize("permitAll()")
@@ -101,10 +112,12 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         if (!scriptToExecute.isAllowedToExecute(context)) {
             throw new AuthorizeException("Current user is not eligible to execute script with name: " + scriptName);
         }
+        EPerson user = getUser(context).orElseThrow(() -> new IllegalStateException(
+                "An anonymous user tried to start a process and no default user is configured"));
         RestDSpaceRunnableHandler restDSpaceRunnableHandler = new RestDSpaceRunnableHandler(
-            context.getCurrentUser(), scriptName, dSpaceCommandLineParameters, context.getSpecialGroups());
+            user, scriptToExecute.getName(), dSpaceCommandLineParameters, context.getSpecialGroups());
         List<String> args = constructArgs(dSpaceCommandLineParameters);
-        runDSpaceScript(files, context, scriptToExecute, restDSpaceRunnableHandler, args);
+        runDSpaceScript(files, context, user, scriptToExecute, restDSpaceRunnableHandler, args);
         return converter.toRest(restDSpaceRunnableHandler.getProcess(context), utils.obtainProjection());
     }
 
@@ -134,12 +147,12 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         return args;
     }
 
-    private void runDSpaceScript(List<MultipartFile> files, Context context, ScriptConfiguration scriptToExecute,
-                                 RestDSpaceRunnableHandler restDSpaceRunnableHandler, List<String> args)
+    private void runDSpaceScript(List<MultipartFile> files, Context context, EPerson user,
+        ScriptConfiguration scriptToExecute, RestDSpaceRunnableHandler restDSpaceRunnableHandler, List<String> args)
         throws IOException, SQLException, AuthorizeException, InstantiationException, IllegalAccessException {
         DSpaceRunnable dSpaceRunnable = scriptService.createDSpaceRunnableForScriptConfiguration(scriptToExecute);
         try {
-            dSpaceRunnable.initialize(args.toArray(new String[0]), restDSpaceRunnableHandler, context.getCurrentUser());
+            dSpaceRunnable.initialize(args.toArray(new String[0]), restDSpaceRunnableHandler, user);
             checkFileNames(dSpaceRunnable, files);
             processFiles(context, restDSpaceRunnableHandler, files);
             restDSpaceRunnableHandler.schedule(dSpaceRunnable);
@@ -184,5 +197,13 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         }
     }
 
+    private Optional<EPerson> getUser(Context context) throws SQLException {
+        EPerson currentUser = context.getCurrentUser();
+        if (currentUser != null) {
+            return Optional.of(currentUser);
+        }
+        String defaultUserId = configurationService.getProperty("process.start.default-user");
+        return Optional.ofNullable(ePersonService.find(context, UUIDUtils.fromString(defaultUserId)));
+    }
 
 }
