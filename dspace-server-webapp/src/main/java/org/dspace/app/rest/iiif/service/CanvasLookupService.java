@@ -7,10 +7,9 @@
  */
 package org.dspace.app.rest.iiif.service;
 
-import java.util.UUID;
+import java.sql.SQLException;
 
 import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
-import org.dspace.app.rest.iiif.model.info.Info;
 import org.dspace.app.rest.iiif.service.util.IIIFUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
@@ -42,17 +41,18 @@ public class CanvasLookupService extends AbstractResourceService {
 
     public String generateCanvas(Context context, Item item, String canvasId) {
         int canvasPosition = utils.getCanvasId(canvasId);
-        Bitstream bitstream = utils.getBitstreamForCanvas(item, IIIF_BUNDLE, canvasPosition);
+        Bitstream bitstream = utils.getBitstreamForCanvas(context, item, canvasPosition);
         if (bitstream == null) {
             throw new ResourceNotFoundException();
         }
-        Info info =
-                utils.validateInfoForSingleCanvas(utils.getInfo(context, item, IIIF_BUNDLE), canvasPosition);
-        UUID bitstreamId = bitstream.getID();
         String mimeType = utils.getBitstreamMimeType(bitstream, context);
-        CanvasGenerator canvasGenerator =
-                canvasService.getCanvas(item.getID().toString(), bitstreamId, mimeType, info, canvasPosition);
-
+        CanvasGenerator canvasGenerator;
+        try {
+            canvasGenerator = canvasService.getCanvas(context, item.getID().toString(), bitstream,
+                    bitstream.getBundles().get(0), item, canvasPosition, mimeType);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return utils.asJson(canvasGenerator.generate());
     }
 

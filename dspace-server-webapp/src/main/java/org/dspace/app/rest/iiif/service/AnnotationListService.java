@@ -17,7 +17,6 @@ import org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator;
 import org.dspace.app.rest.iiif.service.util.IIIFUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -83,28 +82,21 @@ public class AnnotationListService extends AbstractResourceService {
         // AnnotationList requires an identifier.
         annotationList.setIdentifier(IIIF_ENDPOINT + id + "/manifest/seeAlso");
 
-        // Get the "OtherContent" bundle for the item. Add
-        // Annotations for each bitstream found in the bundle.
-        List<Bundle> bundles = utils.getBundle(item, OTHER_CONTENT_BUNDLE);
-        if (bundles.size() > 0) {
-            for (Bundle bundle : bundles) {
-                List<Bitstream> bitstreams = bundle.getBitstreams();
-                for (Bitstream bitstream : bitstreams) {
-                    BitstreamFormat format;
-                    String mimetype;
-                    try {
-                        format = bitstream.getFormat(context);
-                        mimetype = format.getMIMEType();
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e.getMessage(), e);
-                    }
-                    AnnotationGenerator annotationGenerator =
-                            new AnnotationGenerator(IIIF_ENDPOINT + bitstream.getID() + "/annot",
-                                    AnnotationGenerator.LINKING)
-                            .setResource(getLinksGenerator(mimetype, bitstream));
-                    annotationList.addResource(annotationGenerator);
-                }
+        // Get the "seeAlso" bitstreams for the item. Add
+        // Annotations for each bitstream found.
+        List<Bitstream> bitstreams = utils.getSeeAlsoBitstreams(item);
+        for (Bitstream bitstream : bitstreams) {
+            BitstreamFormat format;
+            String mimetype;
+            try {
+                format = bitstream.getFormat(context);
+                mimetype = format.getMIMEType();
+            } catch (SQLException e) {
+                throw new RuntimeException(e.getMessage(), e);
             }
+            AnnotationGenerator annotation = new AnnotationGenerator(IIIF_ENDPOINT + bitstream.getID())
+                .setResource(getLinksGenerator(mimetype, bitstream));
+            annotationList.addResource(annotation);
         }
         return utils.asJson(annotationList.generate());
     }

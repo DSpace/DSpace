@@ -14,7 +14,7 @@ import org.dspace.app.rest.iiif.service.AnnotationListService;
 import org.dspace.app.rest.iiif.service.CanvasLookupService;
 import org.dspace.app.rest.iiif.service.ManifestService;
 import org.dspace.app.rest.iiif.service.SearchService;
-import org.dspace.app.rest.repository.AbstractDSpaceRestRepository;
+import org.dspace.app.rest.iiif.service.util.IIIFUtils;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
@@ -23,13 +23,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
- * Repository for IIIF Presentation and Search API requests.
+ * IIIF Service facade to support IIIF Presentation and Search API requests.
  */
-@Component
-public class IIIFRestRepository extends AbstractDSpaceRestRepository {
+@Service
+public class IIIFServiceFacade {
 
     @Autowired
     ItemService itemService;
@@ -49,6 +49,8 @@ public class IIIFRestRepository extends AbstractDSpaceRestRepository {
     @Autowired
     CanvasLookupService canvasLookupService;
 
+    @Autowired
+    IIIFUtils utils;
 
     /**
      * The manifest response contains sufficient information for the client to initialize itself
@@ -64,16 +66,15 @@ public class IIIFRestRepository extends AbstractDSpaceRestRepository {
      */
     @Cacheable(key = "#id.toString()", cacheNames = "manifests")
     @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
-    public String getManifest(UUID id)
+    public String getManifest(Context context, UUID id)
             throws ResourceNotFoundException {
         Item item;
-        Context context = obtainContext();
         try {
             item = itemService.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        if (item == null) {
+        if (item == null || !utils.isIIIFEnabled(item)) {
             throw new ResourceNotFoundException("IIIF manifest for  id " + id + " not found");
         }
         return manifestService.getManifest(item, context);
@@ -89,10 +90,9 @@ public class IIIFRestRepository extends AbstractDSpaceRestRepository {
      * @return canvas as JSON
      */
     @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
-    public String getCanvas(UUID id, String canvasId)
+    public String getCanvas(Context context, UUID id, String canvasId)
             throws ResourceNotFoundException {
         Item item;
-        Context context = obtainContext();
         try {
             item = itemService.find(context, id);
         } catch (SQLException e) {
@@ -114,7 +114,7 @@ public class IIIFRestRepository extends AbstractDSpaceRestRepository {
      * @return AnnotationList as JSON
      */
     @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
-    public String searchInManifest(UUID id, String query) {
+    public String searchInManifest(Context context, UUID id, String query) {
 
         return searchService.searchWithinManifest(id, query);
     }
@@ -126,8 +126,7 @@ public class IIIFRestRepository extends AbstractDSpaceRestRepository {
      * @return AnnotationList as JSON
      */
     @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
-    public String getSeeAlsoAnnotations(UUID id) {
-        Context context = obtainContext();
+    public String getSeeAlsoAnnotations(Context context, UUID id) {
         return annotationListService.getSeeAlsoAnnotations(context, id);
     }
 

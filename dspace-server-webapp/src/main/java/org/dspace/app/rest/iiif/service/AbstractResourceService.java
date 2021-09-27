@@ -28,20 +28,20 @@ public abstract class AbstractResourceService {
     protected String CLIENT_URL;
     protected String IIIF_LOGO_IMAGE;
     protected String BITSTREAM_PATH_PREFIX;
+    protected int DEFAULT_CANVAS_WIDTH;
+    protected int DEFAULT_CANVAS_HEIGHT;
     /**
      * Possible values: "paged" or "individuals". The property
      * value is set in dspace configuration.
      */
     protected static String DOCUMENT_VIEWING_HINT;
 
-    // The DSpace bundle used for IIIF entity types.
-    protected static final String IIIF_BUNDLE = "IIIF";
-    // The DSpace bundle for other content related to item.
-    protected static final String OTHER_CONTENT_BUNDLE = "OtherContent";
-
     // Paths for IIIF Image API requests.
     protected static final String THUMBNAIL_PATH = "/full/90,/0/default.jpg";
     protected static final String IMAGE_PATH =     "/full/full/0/default.jpg";
+    // Default canvas dimensions.
+    protected static final Integer DEFAULT_CANVAS_WIDTH_FALLBACK = 1200;
+    protected static final Integer DEFAULT_CANVAS_HEIGHT_FALLBACK = 1600;
 
     @Autowired
     IIIFUtils utils;
@@ -65,6 +65,10 @@ public abstract class AbstractResourceService {
         DOCUMENT_VIEWING_HINT = configurationService.getProperty("iiif.document.viewing.hint");
         CLIENT_URL = configurationService.getProperty("dspace.ui.url");
         IIIF_LOGO_IMAGE = configurationService.getProperty("iiif.logo.image");
+        DEFAULT_CANVAS_WIDTH = configurationService.getIntProperty("iiif.canvas.default-width",
+                DEFAULT_CANVAS_WIDTH_FALLBACK);
+        DEFAULT_CANVAS_HEIGHT = configurationService.getIntProperty("iiif.canvas.default-height",
+                DEFAULT_CANVAS_HEIGHT_FALLBACK);
     }
 
     /**
