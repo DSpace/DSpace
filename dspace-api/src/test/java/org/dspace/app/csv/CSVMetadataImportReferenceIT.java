@@ -12,6 +12,7 @@ import static junit.framework.TestCase.assertEquals;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -143,6 +144,9 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
             "+,Publication,dc.identifier.other:0," + col2.getHandle() + ",1"};
         Item[] items = runImport(csv);
         assertRelationship(items[1], items[0], 1, "left", 0);
+
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -162,6 +166,20 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     }
 
     /**
+     * Delete the Items in the given array. This method is used for cleanup after using "runImport"
+     * @param items items array
+     * @throws SQLException
+     * @throws IOException
+     */
+    private void cleanupImportItems(Item[] items) throws SQLException, IOException {
+        context.turnOffAuthorisationSystem();
+        for (Item item: items) {
+            ItemBuilder.deleteItem(item.getID());
+        }
+        context.restoreAuthSystemState();
+    }
+
+    /**
      * Test existence of newly created item with proper relationships defined in the item's metadata via
      * a rowName reference
      */
@@ -173,6 +191,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
             "+,Test Item 2,Publication,rowName:idVal," + col2.getHandle() + ",anything,1"};
         Item[] items = runImport(csv);
         assertRelationship(items[1], items[0], 1, "left", 0);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -188,6 +208,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item[] items = runImport(csv);
         assertRelationship(items[2], items[0], 1, "left", 0);
         assertRelationship(items[2], items[1], 1, "left", 1);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -203,6 +225,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item[] items = runImport(csv);
         assertRelationship(items[2], items[0], 1, "left", 0);
         assertRelationship(items[2], items[1], 1, "left", 1);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -224,6 +248,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
             "+,Publication," + person.getID().toString() + "," + col2.getHandle() + ",anything,0"};
         Item[] items = runImport(csv);
         assertRelationship(items[0], person, 1, "left", 0);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -253,6 +279,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item[] items = runImport(csv);
         assertRelationship(items[0], person, 1, "left", 0);
         assertRelationship(items[0], person2, 1, "left", 1);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -277,6 +305,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item[] items = runImport(csv);
         assertRelationship(items[1], person, 1, "left", 0);
         assertRelationship(items[1], items[0], 1, "left", 1);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -312,6 +342,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         assertRelationship(items[1], person, 1, "left", 0);
         assertRelationship(items[1], person2, 1, "left", 1);
         assertRelationship(items[1], items[0], 1, "left", 2);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -326,6 +358,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
             "+,Pub1,Publication,dc.title:Person:," + col2.getHandle() + ",anything,1"};
         Item[] items = runImport(csv);
         assertRelationship(items[1], items[0], 1, "left", 0);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -570,6 +604,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item[] items = runImport(csv);
         assertRelationship(items[1], items[0], 1, "left", 0);
         assertRelationship(items[2], items[0], 1, "left", 0);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     @Test
@@ -681,6 +717,5 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         }
         return uuidList.get(0);
     }
-
 
 }
