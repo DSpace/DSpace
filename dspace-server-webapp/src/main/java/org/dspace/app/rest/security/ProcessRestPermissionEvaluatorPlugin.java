@@ -15,8 +15,10 @@ import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.service.ProcessService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.slf4j.Logger;
@@ -44,6 +46,9 @@ public class ProcessRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
     @Autowired
     private AuthorizeService authorizeService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
                                        DSpaceRestPermission restPermission) {
@@ -65,9 +70,19 @@ public class ProcessRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
                 && !authorizeService.isAdmin(context)))) {
                 return true;
             }
+
+            if (context.getCurrentUser() == null && isDefaultUser(process.getEPerson())) {
+                return true;
+            }
+
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }
         return false;
+    }
+
+    private boolean isDefaultUser(EPerson ePerson) {
+        return ePerson != null && ePerson.getID().toString()
+            .equals(configurationService.getProperty("process.start.default-user"));
     }
 }
