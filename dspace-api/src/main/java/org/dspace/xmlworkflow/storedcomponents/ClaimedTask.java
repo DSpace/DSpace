@@ -71,6 +71,7 @@ public class ClaimedTask implements ReloadableEntity<Integer> {
 
     }
 
+    @Override
     public Integer getID() {
         return id;
     }
@@ -91,24 +92,24 @@ public class ClaimedTask implements ReloadableEntity<Integer> {
         return workflowItem;
     }
 
-    public void setActionID(String actionID) {
-        this.actionId = actionID;
+    public void setActionID(String actionId) {
+        this.actionId = actionId;
     }
 
     public String getActionID() {
         return actionId;
     }
 
-    public void setStepID(String stepID) {
-        this.stepId = stepID;
+    public void setStepID(String stepId) {
+        this.stepId = stepId;
     }
 
     public String getStepID() {
         return stepId;
     }
 
-    public void setWorkflowID(String workflowID) {
-        this.workflowId = workflowID;
+    public void setWorkflowID(String workflowId) {
+        this.workflowId = workflowId;
     }
 
     public String getWorkflowID() {

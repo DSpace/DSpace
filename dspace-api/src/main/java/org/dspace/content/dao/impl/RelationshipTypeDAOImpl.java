@@ -20,6 +20,15 @@ import org.dspace.content.dao.RelationshipTypeDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 
+/**
+ * Hibernate implementation of the Database Access Object interface class for
+ * the RelationshipType object.
+ * This class is responsible for all database calls for the RelationshipType
+ * object and is autowired by Spring.
+ * This class should never be accessed directly.
+ *
+ * @author kevinvandevelde at atmire.com
+ */
 public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipType> implements RelationshipTypeDAO {
 
     @Override
@@ -36,7 +45,7 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
                 criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightType), rightType),
                 criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftwardType), leftwardType),
                 criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightwardType), rightwardType)));
-        return uniqueResult(context, criteriaQuery, false, RelationshipType.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, RelationshipType.class);
     }
 
     @Override

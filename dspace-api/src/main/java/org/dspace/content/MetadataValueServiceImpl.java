@@ -21,7 +21,7 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -80,7 +80,7 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     @Override
     public void update(Context context, MetadataValue metadataValue) throws SQLException {
         metadataValueDAO.save(context, metadataValue);
-        log.info(LogManager.getHeader(context, "update_metadatavalue",
+        log.info(LogHelper.getHeader(context, "update_metadatavalue",
                                       "metadata_value_id=" + metadataValue.getID()));
 
     }
@@ -102,7 +102,7 @@ public class MetadataValueServiceImpl implements MetadataValueService {
 
     @Override
     public void delete(Context context, MetadataValue metadataValue) throws SQLException {
-        log.info(LogManager.getHeader(context, "delete_metadata_value",
+        log.info(LogHelper.getHeader(context, "delete_metadata_value",
                                       " metadata_value_id=" + metadataValue.getID()));
         metadataValueDAO.delete(context, metadataValue);
     }

@@ -47,10 +47,12 @@ import org.junit.Test;
 
 public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
-    private ItemService itemService
-        = ContentServiceFactory.getInstance().getItemService();
-    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+    private final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
+    private final EPersonService ePersonService
+            = EPersonServiceFactory.getInstance().getEPersonService();
+    private final RelationshipService relationshipService
+            = ContentServiceFactory.getInstance().getRelationshipService();
 
     Collection collection;
 
@@ -119,7 +121,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         Item importedItem = findItemByName("Test Import 1");
 
 
-        assertEquals(relationshipService.findByItem(context, importedItem).size(), 1);
+        assertEquals(1, relationshipService.findByItem(context, importedItem).size());
         context.turnOffAuthorisationSystem();
         itemService.delete(context, itemService.find(context, importedItem.getID()));
         context.restoreAuthSystemState();
@@ -148,7 +150,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         Item importedItem = findItemByName("Person1");
 
 
-        assertEquals(relationshipService.findByItem(context, importedItem).size(), 1);
+        assertEquals(1, relationshipService.findByItem(context, importedItem).size());
 
     }
 
@@ -185,7 +187,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             item.getID().toString() + "," + collection.getHandle() + "," + item.getName() + ","};
         performImportScript(csv);
         item = findItemByName("title");
-        assertEquals(itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size(), 0);
+        assertEquals(0, itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size());
     }
 
     private Item findItemByName(String name) throws SQLException {
@@ -201,6 +203,8 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
     /**
      * Import mocked CSVs to test item creation behavior, deleting temporary file afterward.
+     * @param csv content for test file.
+     * @throws java.lang.Exception passed through.
      */
     public void performImportScript(String[] csv) throws Exception {
         File csvFile = File.createTempFile("dspace-test-import", "csv");
