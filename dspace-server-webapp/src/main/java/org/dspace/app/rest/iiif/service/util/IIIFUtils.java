@@ -142,7 +142,7 @@ public class IIIFUtils {
      * Return all the bitstreams in the bundle to be used as IIIF resources
      * 
      * @param context the DSpace Context
-     * @param item    the DSpace Bundle
+     * @param bundle    the DSpace Bundle
      * @return a not null list of bitstreams to use as IIIF resources in the
      *         manifest
      */
