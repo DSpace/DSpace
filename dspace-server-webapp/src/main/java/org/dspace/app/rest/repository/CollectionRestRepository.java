@@ -229,18 +229,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-
-    /**
-     * DEPRECATED: Please use {@code findAdminAuthorizedByEntityType
-     * (String query, String entityTypeLabel, Pageable pageable}
-     * instead of findAdministeredByEntityType
-     * @param query  query to be executed
-     * @param entityTypeLabel entity to be searched
-     * @param pageable  pageable
-     * @return Page<CollectionRest>
-     * @deprecated
-     */
-    @Deprecated
     @SearchRestMethod(name = "findAdministeredByEntityType")
     public Page<CollectionRest> findAdministeredByEntityType(
             @Parameter(value = "query") String query,
@@ -263,37 +251,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-
-    /**
-     * Find the collections administered with query and entity type
-     * @param query  query to be executed
-     * @param entityTypeLabel entity to be searched
-     * @param pageable  pageable
-     * @return Page<CollectionRest>
-     */
-    @SearchRestMethod(name = "findAdminAuthorizedByEntityType")
-    public Page<CollectionRest> findAdminAuthorizedByEntityType(
-            @Parameter(value = "query") String query,
-            @Parameter(value = "entityType", required = true) String entityTypeLabel,
-            Pageable pageable)
-            throws SearchServiceException {
-        try {
-            Context context = obtainContext();
-            EntityType entityType = this.entityTypeService.findByEntityType(context, entityTypeLabel);
-            if (entityType == null) {
-                throw new ResourceNotFoundException("There was no entityType found with label: " + entityTypeLabel);
-            }
-            List<Collection> collections = cs.findCollectionsAdministeredByEntityType(
-                    query,entityTypeLabel, context,
-                    Math.toIntExact(pageable.getOffset()),
-                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            int tot = cs.countCollectionsAdministeredByEntityType(query, entityTypeLabel, context);
-            return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
     @SearchRestMethod(name = "findSubmitAuthorizedByCommunityAndEntityType")
     public Page<CollectionRest> findSubmitAuthorizedByCommunityAndEntityType(
             @Parameter(value = "query") String query,
@@ -320,25 +277,29 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-
+    /**
+     * Finds all the collections administered by a specific user
+     * @deprecated
+     * use the  method {@link CollectionRestRepository#findAdminAuthorized(Pageable, String)} instead.
+     * @param query  query to be executed
+     * @param pageable  pageable
+     * @return Page<CollectionRest>
+     * @throws SearchServiceException An exception that provides information of solr search access errors.
+     */
+    @Deprecated
     @SearchRestMethod(name = "findAdministered")
     @PreAuthorize("isAuthenticated()")
     public Page<CollectionRest> findAdministered(@Parameter(value = "query") String query,
-        Pageable pageable) throws SearchServiceException {
-        try {
-            Context context = obtainContext();
-
-            List<Collection> collections = cs.findCollectionsAdministered(query, context,
-                Math.toIntExact(pageable.getOffset()),
-                Math.toIntExact(pageable.getPageSize()));
-
-            int tot = cs.countCollectionsAdministered(query, context);
-            return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+                                                 Pageable pageable) throws SearchServiceException {
+        return findAdminAuthorized(pageable, query);
     }
-
+    /**
+     * Finds all the collections administered by a specific user
+     * @param query  query to be executed
+     * @param pageable  pageable
+     * @return Page<CollectionRest>
+     * @throws RuntimeException exception that can be SearchServiceException or SQLException.
+     */
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @SearchRestMethod(name = "findAdminAuthorized")
     public Page<CollectionRest> findAdminAuthorized (

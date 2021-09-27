@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -866,11 +867,11 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         if (context.getCurrentUser() == null) {
             return collections;
         }
-
-        query = formatCustomQuery(query);
-        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
-                                                              IndexableCollection.TYPE,
-            offset, limit);
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append(formatCustomQuery(query));
+        queryBuilder.append("search.resourcetype:").append(IndexableCollection.TYPE);
+        DiscoverResult discoverResult = getDiscoverResult(context, queryBuilder.toString(),
+                offset, limit);
         for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
             Collection collection = ((IndexableCollection) solrCollections).getIndexedObject();
             collections.add(collection);
@@ -913,15 +914,14 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         }
         return false;
     }
-
     private DiscoverResult getDiscoverResult(Context context, String query, Integer offset, Integer limit)
-        throws SearchServiceException, SQLException {
-        String groupQuery = getGroupToQuery(groupService.allMemberGroups(context, context.getCurrentUser()));
-
+            throws SearchServiceException, SQLException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         if (!this.isAdmin(context)) {
-            query = query + " AND (" +
-                "admin:e" + context.getCurrentUser().getID() + groupQuery + ")";
+            String groupQuery = groupService.allMemberGroupsSet(context, context.getCurrentUser()).stream()
+                    .map(group -> "g" + group.getID())
+                    .collect(Collectors.joining(" OR ", "admin:(", ")"));
+            discoverQuery.addFilterQueries(groupQuery);
         }
         discoverQuery.setQuery(query);
         if (offset != null) {
