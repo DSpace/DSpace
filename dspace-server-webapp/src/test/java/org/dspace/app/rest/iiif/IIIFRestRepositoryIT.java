@@ -576,4 +576,36 @@ public class IIIFRestRepositoryIT extends AbstractControllerIntegrationTest {
                         Matchers.containsString(bitstream2.getID() + "/content")));
 
     }
+
+    @Test
+    public void searchRequestShouldFailIT () throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .build();
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withEntityType("IIIF")
+                .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder.
+                    createBitstream(context, publicItem1, is, IIIFBundle)
+                    .withName("IMG1")
+                    .withMimeType("image/jpeg")
+                    .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        // Expect a 501 (not implemented) error. The search service requires plugin configuration.
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest/search?q=test"))
+                .andExpect(status().isNotImplemented());
+
+    }
 }
