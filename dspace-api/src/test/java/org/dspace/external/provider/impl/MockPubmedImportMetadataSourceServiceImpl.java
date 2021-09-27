@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
@@ -56,6 +57,7 @@ public class MockPubmedImportMetadataSourceServiceImpl extends PubmedImportMetad
         });
         when(pubmedWebTarget.request(ArgumentMatchers.any(MediaType.class)))
                 .thenAnswer(new Answer<Invocation.Builder>() {
+                    @Override
                     public Invocation.Builder answer(InvocationOnMock invocation) throws Throwable {
                         Invocation.Builder builder = Mockito.mock(Invocation.Builder.class);
                         when(builder.get()).thenAnswer(new Answer<Response>() {
@@ -67,7 +69,7 @@ public class MockPubmedImportMetadataSourceServiceImpl extends PubmedImportMetad
                                     public String answer(InvocationOnMock invocation) throws Throwable {
                                         String resourceName = "pubmed-" + valueCapture.getValue() + ".xml";
                                         InputStream resource = getClass().getResourceAsStream(resourceName);
-                                        try (Reader reader = new InputStreamReader(resource)) {
+                                        try (Reader reader = new InputStreamReader(resource, StandardCharsets.UTF_8)) {
                                             return FileCopyUtils.copyToString(reader);
                                         } catch (IOException e) {
                                             throw new UncheckedIOException(e);

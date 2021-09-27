@@ -16,9 +16,9 @@ import java.io.Reader;
 import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -55,7 +55,7 @@ public class FullTextContentStreams extends ContentStreamBase {
     }
 
     protected void init(Item parentItem) {
-        fullTextStreams = new LinkedList<>();
+        fullTextStreams = new ArrayList<>();
 
         if (parentItem != null) {
             sourceInfo = parentItem.getHandle();
@@ -149,8 +149,8 @@ public class FullTextContentStreams extends ContentStreamBase {
     }
 
     private class FullTextBitstream {
-        private String itemHandle;
-        private Bitstream bitstream;
+        private final String itemHandle;
+        private final Bitstream bitstream;
 
         public FullTextBitstream(final String parentHandle, final Bitstream file) {
             this.itemHandle = parentHandle;
@@ -179,18 +179,25 @@ public class FullTextContentStreams extends ContentStreamBase {
         }
     }
 
-    private class FullTextEnumeration implements Enumeration<InputStream> {
+    /**
+     * {@link Enumeration} is implemented because instances of this class are
+     * passed to a JDK class that requires this obsolete type.
+     */
+    @SuppressWarnings("JdkObsolete")
+    private static class FullTextEnumeration implements Enumeration<InputStream> {
 
         private final Iterator<FullTextBitstream> fulltextIterator;
 
-        public FullTextEnumeration(final Iterator<FullTextBitstream> fulltextStreams) {
-            this.fulltextIterator = fulltextStreams;
+        public FullTextEnumeration(final Iterator<FullTextBitstream> fulltextIterator) {
+            this.fulltextIterator = fulltextIterator;
         }
 
+        @Override
         public boolean hasMoreElements() {
             return fulltextIterator.hasNext();
         }
 
+        @Override
         public InputStream nextElement() {
             InputStream inputStream = null;
             FullTextBitstream bitstream = null;

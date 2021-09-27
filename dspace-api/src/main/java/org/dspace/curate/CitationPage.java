@@ -19,7 +19,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -46,7 +45,7 @@ public class CitationPage extends AbstractCurationTask {
     /**
      * Class Logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CitationPage.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CitationPage.class);
 
     protected int status = Curator.CURATE_UNSET;
     protected String result = null;
@@ -97,7 +96,7 @@ public class CitationPage extends AbstractCurationTask {
         //Determine if the DISPLAY bundle exits. If not, create it.
         List<Bundle> dBundles = itemService.getBundles(item, CitationPage.DISPLAY_BUNDLE_NAME);
         Bundle dBundle = null;
-        if (dBundles == null || dBundles.size() == 0) {
+        if (dBundles == null || dBundles.isEmpty()) {
             try {
                 dBundle = bundleService.create(Curator.curationContext(), item, CitationPage.DISPLAY_BUNDLE_NAME);
             } catch (AuthorizeException e) {
@@ -110,7 +109,7 @@ public class CitationPage extends AbstractCurationTask {
 
         //Create a map of the bitstreams in the displayBundle. This is used to
         //check if the bundle being cited is already in the display bundle.
-        Map<String, Bitstream> displayMap = new HashMap<String, Bitstream>();
+        Map<String, Bitstream> displayMap = new HashMap<>();
         for (Bitstream bs : dBundle.getBitstreams()) {
             displayMap.put(bs.getName(), bs);
         }
@@ -143,15 +142,16 @@ public class CitationPage extends AbstractCurationTask {
             // Loop through each file and generate a cover page for documents
             // that are PDFs.
             for (Bitstream bitstream : bitstreams) {
-                BitstreamFormat format = bitstream.getFormat(Curator.curationContext());
 
                 //If bitstream is a PDF document then it is citable.
                 CitationDocumentService citationDocument = DisseminateServiceFactory.getInstance()
                                                                                     .getCitationDocumentService();
 
                 if (citationDocument.canGenerateCitationVersion(Curator.curationContext(), bitstream)) {
-                    this.resBuilder.append(item.getHandle() + " - "
-                                               + bitstream.getName() + " is citable.");
+                    this.resBuilder.append(item.getHandle())
+                            .append(" - ")
+                            .append(bitstream.getName())
+                            .append(" is citable.");
                     try {
                         //Create the cited document
                         Pair<InputStream, Long> citedDocument =
@@ -168,7 +168,9 @@ public class CitationPage extends AbstractCurationTask {
                         StringBuilder stack = new StringBuilder();
                         int numLines = Math.min(stackTrace.length, 12);
                         for (int j = 0; j < numLines; j++) {
-                            stack.append("\t" + stackTrace[j].toString() + "\n");
+                            stack.append("\t")
+                                    .append(stackTrace[j].toString())
+                                    .append("\n");
                         }
                         if (stackTrace.length > numLines) {
                             stack.append("\t. . .\n");
@@ -180,8 +182,10 @@ public class CitationPage extends AbstractCurationTask {
                     }
                 } else {
                     //bitstream is not a document
-                    this.resBuilder.append(item.getHandle() + " - "
-                                               + bitstream.getName() + " is not citable.\n");
+                    this.resBuilder.append(item.getHandle())
+                            .append(" - ")
+                            .append(bitstream.getName())
+                            .append(" is not citable.\n");
                     this.status = Curator.CURATE_SUCCESS;
                 }
             }
@@ -211,11 +215,11 @@ public class CitationPage extends AbstractCurationTask {
         //If we are modifying a file that is not in the
         //preservation bundle then we have to move it there.
         Context context = Curator.curationContext();
-        if (bundle.getID() != pBundle.getID()) {
+        if (!bundle.getID().equals(pBundle.getID())) {
             bundleService.addBitstream(context, pBundle, bitstream);
             bundleService.removeBitstream(context, bundle, bitstream);
             List<Bitstream> bitstreams = bundle.getBitstreams();
-            if (bitstreams == null || bitstreams.size() == 0) {
+            if (bitstreams == null || bitstreams.isEmpty()) {
                 itemService.removeBundle(context, item, bundle);
             }
         }
@@ -235,9 +239,11 @@ public class CitationPage extends AbstractCurationTask {
         bitstreamService.setFormat(context, citedBitstream, bitstream.getFormat(Curator.curationContext()));
         citedBitstream.setDescription(context, bitstream.getDescription());
 
-        this.resBuilder.append(" Added "
-                                   + citedBitstream.getName()
-                                   + " to the " + CitationPage.DISPLAY_BUNDLE_NAME + " bundle.\n");
+        this.resBuilder.append(" Added ")
+                .append(citedBitstream.getName())
+                .append(" to the ")
+                .append(CitationPage.DISPLAY_BUNDLE_NAME)
+                .append(" bundle.\n");
 
         //Run update to propagate changes to the
         //database.

@@ -12,6 +12,7 @@ import static junit.framework.TestCase.assertEquals;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -56,14 +57,16 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     //Common collection to utilize for test
     private Collection col1;
 
-    private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-
+    private final RelationshipService relationshipService
+            = ContentServiceFactory.getInstance().getRelationshipService();
+    private final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
 
     Community parentCommunity;
 
     /**
-     * Setup testing enviorment
+     * Setup testing environment.
+     * @throws java.sql.SQLException passed through.
      */
     @Before
     public void setup() throws SQLException {
@@ -80,7 +83,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
         EntityType project = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
-        EntityType orgUnit = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
+        EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
 
         RelationshipTypeBuilder
             .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
@@ -133,6 +136,9 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
             "+,Publication,dc.identifier.other:0," + col1.getHandle() + ",1"};
         Item[] items = runImport(csv);
         assertRelationship(items[1], items[0], 1, "left", 0);
+
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -152,6 +158,20 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     }
 
     /**
+     * Delete the Items in the given array. This method is used for cleanup after using "runImport"
+     * @param items items array
+     * @throws SQLException
+     * @throws IOException
+     */
+    private void cleanupImportItems(Item[] items) throws SQLException, IOException {
+        context.turnOffAuthorisationSystem();
+        for (Item item: items) {
+            ItemBuilder.deleteItem(item.getID());
+        }
+        context.restoreAuthSystemState();
+    }
+
+    /**
      * Test existence of newly created item with proper relationships defined in the item's metadata via
      * a rowName reference
      */
@@ -163,6 +183,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
             "+,Test Item 2,Publication,rowName:idVal," + col1.getHandle() + ",anything,1"};
         Item[] items = runImport(csv);
         assertRelationship(items[1], items[0], 1, "left", 0);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -178,6 +200,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item[] items = runImport(csv);
         assertRelationship(items[2], items[0], 1, "left", 0);
         assertRelationship(items[2], items[1], 1, "left", 1);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -193,6 +217,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item[] items = runImport(csv);
         assertRelationship(items[2], items[0], 1, "left", 0);
         assertRelationship(items[2], items[1], 1, "left", 1);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -215,6 +241,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
             "+,Publication," + person.getID().toString() + "," + col1.getHandle() + ",anything,0"};
         Item[] items = runImport(csv);
         assertRelationship(items[0], person, 1, "left", 0);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -246,6 +274,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item[] items = runImport(csv);
         assertRelationship(items[0], person, 1, "left", 0);
         assertRelationship(items[0], person2, 1, "left", 1);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -271,6 +301,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item[] items = runImport(csv);
         assertRelationship(items[1], person, 1, "left", 0);
         assertRelationship(items[1], items[0], 1, "left", 1);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -308,6 +340,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         assertRelationship(items[1], person, 1, "left", 0);
         assertRelationship(items[1], person2, 1, "left", 1);
         assertRelationship(items[1], items[0], 1, "left", 2);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -322,6 +356,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
             "+,Pub1,Publication,dc.title:Person:," + col1.getHandle() + ",anything,1"};
         Item[] items = runImport(csv);
         assertRelationship(items[1], items[0], 1, "left", 0);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     /**
@@ -350,11 +386,12 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
 
     /**
      * Test failure when referring to item by non unique metadata in the database.
+     * @throws java.lang.Exception passed through.
      */
     @Test(expected = MetadataImportException.class)
     public void testNonUniqueMDRefInDb() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item person = ItemBuilder.createItem(context, col1)
+        ItemBuilder.createItem(context, col1)
                                  .withTitle("Person")
                                  .withIssueDate("2017-10-17")
                                  .withAuthor("Smith, Donald")
@@ -363,7 +400,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withEntityType("Person")
                                  .withIdentifierOther("1")
                                  .build();
-        Item person2 = ItemBuilder.createItem(context, col1)
+        ItemBuilder.createItem(context, col1)
                                  .withTitle("Person2")
                                  .withIssueDate("2017-10-17")
                                  .withAuthor("Smith, John")
@@ -385,7 +422,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     @Test(expected = MetadataImportException.class)
     public void testNonUniqueMDRefInBoth() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item person = ItemBuilder.createItem(context, col1)
+        ItemBuilder.createItem(context, col1)
                                  .withTitle("Person")
                                  .withIssueDate("2017-10-17")
                                  .withAuthor("Smith, Donald")
@@ -402,7 +439,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     }
 
     /**
-     * Test failure when refering to item by metadata that does not exist in the relation column
+     * Test failure when referring to item by metadata that does not exist in the relation column
      */
     @Test(expected = Exception.class)
     public void testNonExistMdRef() throws Exception {
@@ -413,7 +450,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     }
 
     /**
-     * Test failure when refering to an item in the CSV that hasn't been created yet due to it's order in the CSV
+     * Test failure when referring to an item in the CSV that hasn't been created yet due to it's order in the CSV
      */
     @Test(expected = Exception.class)
     public void testCSVImportWrongOrder() throws Exception {
@@ -424,7 +461,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     }
 
     /**
-     * Test failure when refering to an item in the CSV that hasn't been created yet due to it's order in the CSV
+     * Test failure when referring to an item in the CSV that hasn't been created yet due to it's order in the CSV
      */
     @Test(expected = Exception.class)
     public void testCSVImportWrongOrderRowName() throws Exception {
@@ -446,7 +483,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     }
 
     /**
-     * Test relationship validation with invalid relationship definition and with an archived origin referer
+     * Test relationship validation with invalid relationship definition and with an archived origin referrer.
      */
     @Test(expected = MetadataImportInvalidHeadingException.class)
     public void testInvalidRelationshipArchivedOrigin() throws Exception {
@@ -537,6 +574,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         Item[] items = runImport(csv);
         assertRelationship(items[1], items[0], 1, "left", 0);
         assertRelationship(items[2], items[0], 1, "left", 0);
+        // remove created items
+        cleanupImportItems(items);
     }
 
     @Test
@@ -640,6 +679,5 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         }
         return uuidList.get(0);
     }
-
 
 }
