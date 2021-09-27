@@ -234,4 +234,6 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      */
     @Nullable
     Long getLastModified(Bitstream bitstream) throws IOException;
+
+    boolean isRelatedToAProcessStartedByDefaultUser(Context context, Bitstream bitstream) throws SQLException;
 }

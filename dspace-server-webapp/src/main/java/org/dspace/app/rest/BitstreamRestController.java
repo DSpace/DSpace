@@ -118,7 +118,9 @@ public class BitstreamRestController {
         String mimetype = format.getMIMEType();
         String name = getBitstreamName(bit, format);
 
+        context.turnOffAuthorisationSystem();
         Pair<InputStream, Long> bitstreamTuple = getBitstreamInputStreamAndSize(context, bit);
+        context.restoreAuthSystemState();
 
         if (StringUtils.isBlank(request.getHeader("Range"))) {
             //We only log a download request when serving a request without Range header. This is because

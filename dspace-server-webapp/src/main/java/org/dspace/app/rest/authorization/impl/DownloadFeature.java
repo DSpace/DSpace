@@ -15,6 +15,10 @@ import org.dspace.app.rest.authorization.AuthorizeServiceRestUtil;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.security.DSpaceRestPermission;
+import org.dspace.app.rest.utils.Utils;
+import org.dspace.content.Bitstream;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,12 +38,33 @@ public class DownloadFeature implements AuthorizationFeature {
     @Autowired
     private AuthorizeServiceRestUtil authorizeServiceRestUtil;
 
+    @Autowired
+    private BitstreamService bitstreamService;
+
+    @Autowired
+    private Utils utils;
+
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
-        if (object instanceof BitstreamRest) {
-            return authorizeServiceRestUtil.authorizeActionBoolean(context, object, DSpaceRestPermission.READ);
+
+        if (!(object instanceof BitstreamRest)) {
+            return false;
         }
-        return false;
+
+        if (authorizeServiceRestUtil.authorizeActionBoolean(context, object, DSpaceRestPermission.READ)) {
+            return true;
+        }
+
+        if (context.getCurrentUser() != null) {
+            return false;
+        }
+
+        DSpaceObject dSpaceObject = (DSpaceObject) utils.getDSpaceAPIObjectFromRest(context, object);
+        if (dSpaceObject == null) {
+            return false;
+        }
+
+        return bitstreamService.isRelatedToAProcessStartedByDefaultUser(context, (Bitstream) dSpaceObject);
     }
 
     @Override

@@ -13,9 +13,11 @@ import java.util.UUID;
 
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -51,6 +53,9 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
 
     @Autowired
     private ContentServiceFactory contentServiceFactory;
+
+    @Autowired
+    private BitstreamService bitstreamService;
 
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
@@ -98,6 +103,11 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
                                    !item.isArchived() && !item.isWithdrawn()) {
                             return false;
                         }
+                    }
+
+                    if (dSpaceObject instanceof Bitstream && context.getCurrentUser() == null) {
+                        return bitstreamService.isRelatedToAProcessStartedByDefaultUser(context,
+                            (Bitstream) dSpaceObject);
                     }
 
                     return authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,

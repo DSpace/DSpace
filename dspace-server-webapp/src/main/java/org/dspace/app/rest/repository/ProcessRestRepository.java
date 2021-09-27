@@ -36,6 +36,7 @@ import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessQueryParameterContainer;
 import org.dspace.scripts.Process_;
 import org.dspace.scripts.service.ProcessService;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,6 +66,8 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     @Autowired
     private EPersonService epersonService;
 
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Override
     @PreAuthorize("hasPermission(#id, 'PROCESS', 'READ')")
@@ -131,9 +134,8 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
         if (process == null) {
             throw new ResourceNotFoundException("Process with id " + processId + " was not found");
         }
-        if ((context.getCurrentUser() == null) || (!context.getCurrentUser()
-                                                           .equals(process.getEPerson()) && !authorizeService
-            .isAdmin(context))) {
+        if (!isDefaultUser(process.getEPerson()) && ((context.getCurrentUser() == null) || (!context.getCurrentUser()
+            .equals(process.getEPerson()) && !authorizeService.isAdmin(context)))) {
             throw new AuthorizeException("The current user is not eligible to view the process with id: " + processId);
         }
         return process;
@@ -263,6 +265,11 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
             processQueryParameterContainer.addToQueryParameterMap(Process_.PROCESS_STATUS, processStatus);
         }
         return processQueryParameterContainer;
+    }
+
+    private boolean isDefaultUser(EPerson ePerson) {
+        return ePerson != null && ePerson.getID().toString()
+            .equals(configurationService.getProperty("process.start.default-user"));
     }
 
     @Override

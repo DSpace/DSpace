@@ -63,7 +63,30 @@ public class BitstreamMetadataReadPermissionEvaluatorPlugin extends RestObjectPe
                 UUID dsoUuid = UUID.fromString(targetId.toString());
                 DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, dsoUuid);
                 if (dso instanceof Bitstream) {
-                    return this.metadataReadPermissionOnBitstream(context, (Bitstream) dso);
+                    if (authorizeService.isAdmin(context, dso)) {
+                        // Is Admin on bitstream
+                        return true;
+                    }
+                    if (authorizeService.authorizeActionBoolean(context, dso, Constants.READ)) {
+                        // Has READ rights on bitstream
+                        return true;
+                    }
+
+                    if (context.getCurrentUser() == null
+                        && bitstreamService.isRelatedToAProcessStartedByDefaultUser(context, (Bitstream) dso)) {
+                        return true;
+                    }
+
+                    DSpaceObject bitstreamParentObject = bitstreamService.getParentObject(context, (Bitstream) dso);
+                    if (bitstreamParentObject instanceof Item && !((Bitstream) dso).getBundles().isEmpty()) {
+                        // If parent is item and it is in a bundle
+                        Bundle firstBundle = ((Bitstream) dso).getBundles().get(0);
+                        if (authorizeService.authorizeActionBoolean(context, bitstreamParentObject, Constants.READ)
+                            && authorizeService.authorizeActionBoolean(context, firstBundle, Constants.READ)) {
+                            // Has READ rights on bitstream's parent item AND first bundle bitstream is in
+                            return true;
+                        }
+                    }
                 }
             } catch (SQLException e) {
                 log.error(e.getMessage(), e);
