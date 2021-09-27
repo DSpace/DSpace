@@ -26,7 +26,7 @@ public class ContentAsTextGenerator implements IIIFResource {
     }
 
     @Override
-    public Resource<ContentAsText> generate() {
+    public Resource<ContentAsText> generateResource() {
         if (text == null) {
             throw new RuntimeException("Missing required text for the text annotation.");
         }

@@ -35,21 +35,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
-<<<<<<< HEAD
  * This service creates the manifest. There should be a single instance of this service per request.
  * The {@code @RequestScope} provides a single instance created and available during complete lifecycle
- * of the HTTP request.
-=======
- * Generates IIIF Manifest JSON response for a DSpace Item. Please note that
- * this is a request scoped bean. This mean that for each http request a
- * different instance will be initialized by Spring and used to serve this
- * specific request. This is needed because some configuration are cached in the
+ * of the HTTP request. This is needed because some configurations are cached in the
  * instance. Moreover, many injected dependencies are also request scoped or
  * prototype (that will turn in a request scope when injected in a request scope
- * bean). The generators need to be request scoped as they act as builder
- * storing the object state during each incremental building step until the
- * final object is returned (IIIF Resource)
->>>>>>> 4Science-pr
+ * bean). The generators for top-level domain objects need to be request scoped as they act as a builder
+ * storing the object state during each incremental building step until the final object is returned (IIIF Resource).
  */
 @RequestScope
 @Component
@@ -109,7 +101,7 @@ public class ManifestService extends AbstractResourceService {
      */
     public String getManifest(Item item, Context context) {
         populateManifest(item, context);
-        return utils.asJson(manifestGenerator.generate());
+        return utils.asJson(manifestGenerator.generateResource());
     }
 
     /**

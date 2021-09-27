@@ -56,7 +56,7 @@ public class ContentSearchGenerator implements IIIFService {
     }
 
     @Override
-    public Service generate() {
+    public Service generateService() {
         if (identifier == null) {
             throw new RuntimeException("You must provide an identifier for the search service.");
         }
@@ -71,7 +71,7 @@ public class ContentSearchGenerator implements IIIFService {
         }
         ArrayList<Profile> profiles = new ArrayList<>();
         profile.setIdentifier("http://iiif.io/api/search/0/search");
-        profiles.add(profile.generate());
+        profiles.add(profile.generateValue());
         contentSearchService.setProfiles(profiles);
         return contentSearchService;
     }

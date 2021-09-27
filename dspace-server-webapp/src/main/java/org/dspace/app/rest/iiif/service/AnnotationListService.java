@@ -95,10 +95,11 @@ public class AnnotationListService extends AbstractResourceService {
                 throw new RuntimeException(e.getMessage(), e);
             }
             AnnotationGenerator annotation = new AnnotationGenerator(IIIF_ENDPOINT + bitstream.getID())
+                .setMotivation(AnnotationGenerator.LINKING)
                 .setResource(getLinksGenerator(mimetype, bitstream));
             annotationList.addResource(annotation);
         }
-        return utils.asJson(annotationList.generate());
+        return utils.asJson(annotationList.generateResource());
     }
 
     private ExternalLinksGenerator getLinksGenerator(String mimetype, Bitstream bitstream) {

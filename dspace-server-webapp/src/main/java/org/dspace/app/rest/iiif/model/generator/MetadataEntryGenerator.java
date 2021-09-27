@@ -40,7 +40,7 @@ public class MetadataEntryGenerator implements IIIFValue {
     }
 
     @Override
-    public MetadataEntry generate() {
+    public MetadataEntry generateValue() {
         PropertyValue metadataValues;
         if (rest != null && rest.length > 0) {
             metadataValues = new PropertyValue(value, rest);

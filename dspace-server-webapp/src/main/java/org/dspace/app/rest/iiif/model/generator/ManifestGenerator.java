@@ -26,27 +26,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
-<<<<<<< HEAD
- * This generator wraps a domain model for the {@code Manifest}. There should be a single instance of
- * this object per request. The {@code @RequestScope} provides a single instance created and available during
- * complete lifecycle of the HTTP request.
+ * This generator wraps a domain model for the {@code Manifest}.
+ * <p>
+ * Please note that this is a request scoped bean. This mean that for each http request a
+ * different instance will be initialized by Spring and used to serve this specific request.</p>
  * <p>
  *  The Manifest is an overall description of the structure and properties of the digital representation
  *  of an object. It carries information needed for the viewer to present the digitized content to the user,
  *  such as a title and other descriptive information about the object or the intellectual work that
  *  it conveys. Each manifest describes how to present a single object such as a book, a photograph,
- *  or a statue.
- * </p>
-=======
- * The Manifest is an overall description of the structure and properties of the digital representation
- * of an object. It carries information needed for the viewer to present the digitized content to the user,
- * such as a title and other descriptive information about the object or the intellectual work that
- * it conveys. Each manifest describes how to present a single object such as a book, a photograph,
- * or a statue.
- * 
- * Please note that this is a request scoped bean. This mean that for each http request a
+ *  or a statue.</p>
+ *
+ * Please note that this is a request scoped bean. This means that for each http request a
  * different instance will be initialized by Spring and used to serve this specific request.
->>>>>>> 4Science-pr
  */
 @RequestScope
 @Component
@@ -64,7 +56,7 @@ public class ManifestGenerator implements IIIFResource {
     private ContentSearchService searchService;
     private final List<URI> license = new ArrayList<>();
     private final List<MetadataEntry> metadata = new ArrayList<>();
-    private final List<RangeGenerator> ranges = new ArrayList<>();
+    private final List<Range> ranges = new ArrayList<>();
 
     /**
      * Sets the mandatory manifest identifier.
@@ -87,7 +79,7 @@ public class ManifestGenerator implements IIIFResource {
     }
 
     public void addLogo(ImageContentGenerator logo) {
-        this.logo = (ImageContent) logo.generate();
+        this.logo = (ImageContent) logo.generateResource();
     }
 
     /**
@@ -96,7 +88,7 @@ public class ManifestGenerator implements IIIFResource {
      */
     public void addViewingHint(String viewingHint) {
         BehaviorGenerator hint = new BehaviorGenerator().setType(viewingHint);
-        this.viewingHint = hint.generate();
+        this.viewingHint = hint.generateValue();
     }
 
     /**
@@ -105,7 +97,7 @@ public class ManifestGenerator implements IIIFResource {
      * @param sequence canvas list model (sequence)
      */
     public void addSequence(CanvasItemsGenerator sequence) {
-        this.sequence = (Sequence) sequence.generate();
+        this.sequence = (Sequence) sequence.generateResource();
     }
 
     /**
@@ -113,7 +105,7 @@ public class ManifestGenerator implements IIIFResource {
      * @param seeAlso other content model
      */
     public void addSeeAlso(ExternalLinksGenerator seeAlso) {
-        this.seeAlso = (OtherContent) seeAlso.generate();
+        this.seeAlso = (OtherContent) seeAlso.generateResource();
     }
 
     /**
@@ -121,7 +113,7 @@ public class ManifestGenerator implements IIIFResource {
      * @param thumbnail an image content generator
      */
     public void addThumbnail(ImageContentGenerator thumbnail) {
-        this.thumbnail = (ImageContent) thumbnail.generate();
+        this.thumbnail = (ImageContent) thumbnail.generateResource();
     }
 
     /**
@@ -129,7 +121,7 @@ public class ManifestGenerator implements IIIFResource {
      * @param related other content generator
      */
     public void addRelated(ExternalLinksGenerator related) {
-        this.related = (OtherContent) related.generate();
+        this.related = (OtherContent) related.generateResource();
     }
 
     /**
@@ -137,7 +129,7 @@ public class ManifestGenerator implements IIIFResource {
      * @param searchService search service generator
      */
     public void addService(ContentSearchGenerator searchService) {
-        this.searchService = (ContentSearchService) searchService.generate();
+        this.searchService = (ContentSearchService) searchService.generateService();
     }
 
     /**
@@ -147,7 +139,7 @@ public class ManifestGenerator implements IIIFResource {
      */
     public void addMetadata(String field, String value, String... rest) {
         MetadataEntryGenerator meg = new MetadataEntryGenerator().setField(field).setValue(value, rest);
-        metadata.add(meg.generate());
+        metadata.add(meg.generateValue());
     }
 
     /**
@@ -163,7 +155,7 @@ public class ManifestGenerator implements IIIFResource {
      * @param value the description value
      */
     public void addDescription(String value) {
-        description = new PropertyValueGenerator().getPropertyValue(value).generate();
+        description = new PropertyValueGenerator().getPropertyValue(value).generateValue();
     }
 
     /**
@@ -171,11 +163,11 @@ public class ManifestGenerator implements IIIFResource {
      * @param rangeGenerator to add
      */
     public void addRange(RangeGenerator rangeGenerator) {
-        ranges.add(rangeGenerator);
+        ranges.add((Range) rangeGenerator.generateResource());
     }
 
     @Override
-    public Resource<Manifest> generate() {
+    public Resource<Manifest> generateResource() {
 
         if (identifier == null) {
             throw new RuntimeException("The Manifest resource requires an identifier.");
@@ -195,8 +187,8 @@ public class ManifestGenerator implements IIIFResource {
             manifest.addSequence(sequence);
         }
         if (ranges != null && ranges.size() > 0) {
-            for (RangeGenerator range : ranges) {
-                manifest.addRange((Range) range.generate());
+            for (Range range : ranges) {
+                manifest.addRange(range);
             }
         }
         if (metadata.size() > 0) {

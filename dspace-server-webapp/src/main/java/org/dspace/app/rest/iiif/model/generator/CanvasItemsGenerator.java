@@ -18,14 +18,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
- * This generator wraps the domain model for a Presentation API 2.1.1 {@code Sequence}. There must be a single
- * instance of this object per request. The {@code @RequestScope} provides a single instance created and available
- * during complete lifecycle of the HTTP request.
- * <p>
- * The IIIF sequence conveys the ordering of the views of the object.
- * </p>
- * <p>
- * Sequence is removed with Presentation API version 3.0. Canvases are added to the Manifest items property instead.
+ * This generator wraps the domain model for a Presentation API 2.1.1 {@code Sequence}. The IIIF sequence
+ * conveys the ordering of the views of the object.
+ *
+ * <p>Please note that this is a request scoped bean. This means that for each http request a
+ * different instance will be initialized by Spring and used to serve this specific request.</p>
+ *
+ * <p>Sequence is removed with Presentation API version 3.0. Canvases are added to the Manifest items property instead.
  * </p>
  */
 @RequestScope
@@ -51,7 +50,7 @@ public class CanvasItemsGenerator implements IIIFResource {
      * @param otherContent generator for the resource
      */
     public void addRendering(org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator otherContent) {
-        this.renderings.add((OtherContent) otherContent.generate());
+        this.renderings.add((OtherContent) otherContent.generateResource());
     }
 
     /**
@@ -59,13 +58,13 @@ public class CanvasItemsGenerator implements IIIFResource {
      * @param canvas generator for canvas
      */
     public String addCanvas(org.dspace.app.rest.iiif.model.generator.CanvasGenerator canvas) {
-        Canvas resource = (Canvas) canvas.generate();
+        Canvas resource = (Canvas) canvas.generateResource();
         this.canvas.add(resource);
         return resource.getIdentifier().toString();
     }
 
     @Override
-    public Resource<Sequence> generate() {
+    public Resource<Sequence> generateResource() {
         Sequence items = new Sequence(identifier);
         for (OtherContent r : renderings) {
             items.addRendering(r);

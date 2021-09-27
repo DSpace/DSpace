@@ -27,12 +27,12 @@ public class ImageServiceGenerator implements IIIFService {
      * @param profile a profile generator
      */
     public ImageServiceGenerator setProfile(ProfileGenerator profile) {
-        imageService.addProfile(profile.generate());
+        imageService.addProfile(profile.generateValue());
         return this;
     }
 
     @Override
-    public Service generate() {
+    public Service generateService() {
         return imageService;
     }
 }

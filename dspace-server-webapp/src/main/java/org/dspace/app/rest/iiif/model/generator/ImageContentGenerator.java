@@ -21,7 +21,6 @@ import de.digitalcollections.iiif.model.sharedcanvas.Resource;
  */
 public class ImageContentGenerator implements IIIFResource  {
 
-    private org.dspace.app.rest.iiif.model.generator.ImageServiceGenerator imageService;
     private final ImageContent imageContent;
 
     public ImageContentGenerator(@NotNull String identifier) {
@@ -42,12 +41,12 @@ public class ImageContentGenerator implements IIIFResource  {
      * @param imageService
      */
     public ImageContentGenerator addService(ImageServiceGenerator imageService) {
-        this.imageContent.addService(imageService.generate());
+        this.imageContent.addService(imageService.generateService());
         return this;
     }
 
     @Override
-    public Resource<ImageContent> generate() {
+    public Resource<ImageContent> generateResource() {
         return imageContent;
     }
 }

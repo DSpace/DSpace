@@ -61,7 +61,7 @@ public class ExternalLinksGenerator implements IIIFResource {
     }
 
     @Override
-    public Resource<OtherContent> generate() {
+    public Resource<OtherContent> generateResource() {
         if (identifier == null) {
             throw new RuntimeException("External links annotation requires an identifier");
         }

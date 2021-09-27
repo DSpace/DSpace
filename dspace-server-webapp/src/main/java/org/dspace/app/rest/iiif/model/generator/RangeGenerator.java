@@ -21,23 +21,22 @@ import org.dspace.app.rest.iiif.service.RangeService;
  *
  * In Presentation API version 2.1.1, adding a range to the manifest allows the client to display a structured
  * hierarchy to enable the user to navigate within the object without merely stepping through the current sequence.
- * The rationale for separating ranges from sequences is that there is likely to be overlap between different ranges,
- * such as the physical structure of a book compared to the textual structure of the work.
-<<<<<<< HEAD
-=======
  *
  * This is used to populate the "structures" element of the Manifest. The structure is derived from the iiif.toc
  * metadata and the ordered sequence of bitstreams (canvases)
->>>>>>> 4Science-pr
  */
 public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.IIIFResource {
 
     private String identifier;
     private String label;
     private final List<Canvas> canvasList = new ArrayList<>();
-    private final List<RangeGenerator> rangesList = new ArrayList<>();
-    private RangeService rangeService;
+    private final List<Range> rangesList = new ArrayList<>();
+    private final RangeService rangeService;
 
+    /**
+     * The {@code RangeService} is used for defining hierarchical sub ranges.
+     * @param rangeService range service
+     */
     public RangeGenerator(RangeService rangeService) {
         this.rangeService = rangeService;
     }
@@ -59,7 +58,7 @@ public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.
     }
 
     /**
-     * Sets range label.
+     * Sets the optional range label.
      * @param label range label
      */
     public RangeGenerator setLabel(String label) {
@@ -72,12 +71,25 @@ public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.
      * @param canvas list of canvas generators
      */
     public RangeGenerator addCanvas(CanvasGenerator canvas) {
-        canvasList.add((Canvas) canvas.generate());
+        canvasList.add((Canvas) canvas.generateResource());
         return this;
     }
 
+    /**
+     * Sets the range identifier and adds a sub range to the ranges list.
+     * @param range range generator
+     */
+    public void addSubRange(RangeGenerator range) {
+        range.setIdentifier(identifier + "-" + rangesList.size());
+        RangeGenerator rangeReference = rangeService.getRangeReference(range);
+        rangesList.add((Range) rangeReference.generateResource());
+    }
+
     @Override
-    public Resource<Range> generate() {
+    public Resource<Range> generateResource() {
+        if (identifier == null) {
+            throw new RuntimeException("The Range resource requires an identifier.");
+        }
         Range range;
         if (label != null) {
             range = new Range(identifier, label);
@@ -87,15 +99,9 @@ public class RangeGenerator implements org.dspace.app.rest.iiif.model.generator.
         for (Canvas canvas : canvasList) {
             range.addCanvas(canvas);
         }
-        for (RangeGenerator rg : rangesList) {
-            range.addRange((Range) rg.generate());
+        for (Range rangeResource : rangesList) {
+            range.addRange(rangeResource);
         }
         return range;
-    }
-
-    public void addSubRange(RangeGenerator range) {
-        range.setIdentifier(identifier + "-" + rangesList.size());
-        RangeGenerator rangeReference = rangeService.getRangeReference(range);
-        rangesList.add(rangeReference);
     }
 }

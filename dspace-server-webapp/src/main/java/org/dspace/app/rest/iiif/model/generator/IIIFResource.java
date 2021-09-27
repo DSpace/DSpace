@@ -15,6 +15,6 @@ public interface IIIFResource {
      * Creates and returns a resource model.
      * @return resource model
      */
-    Resource<?> generate();
+    Resource<?> generateResource();
 
 }

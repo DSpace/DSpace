@@ -18,11 +18,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
- * This generator wraps the domain model for the {@code AnnotationList}. There should be a single instance of
- * this object per annotation list request. The {@code @RequestScope} provides a single instance created
- * and available during complete lifecycle of the HTTP request.
- * <p>
- * The model represents an ordered list of annotations.</p>
+ * This generator wraps the domain model for the {@code AnnotationList}.
+ *
+ * <p>Please note that this is a request scoped bean. This means that for each http request a
+ * different instance will be initialized by Spring and used to serve this specific request.</p>
+ *
+ * <p>The model represents an ordered list of annotations.</p>
  */
 @RequestScope
 @Component
@@ -45,11 +46,11 @@ public class AnnotationListGenerator implements org.dspace.app.rest.iiif.model.g
      * @param annotation an annotation generator
      */
     public void addResource(AnnotationGenerator annotation) {
-        this.annotations.add((Annotation) annotation.generate());
+        this.annotations.add((Annotation) annotation.generateResource());
     }
 
     @Override
-    public Resource<Annotation> generate() {
+    public Resource<Annotation> generateResource() {
         if (identifier == null) {
             throw new RuntimeException("Missing the required identifier for the annotation list.");
         }
