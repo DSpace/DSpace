@@ -257,14 +257,13 @@ public class IIIFUtils {
 
     /**
      * Return all the bitstreams in the item to be used as annotations
-     * 
-     * @param context the DSpace Context
+     *
      * @param item    the DSpace item
      * @return a not null list of bitstreams to use as IIIF resources in the
      *         manifest
      */
     public List<Bitstream> getSeeAlsoBitstreams(Item item) {
-        List<Bitstream> seeAlsoBitstreams = new ArrayList<Bitstream>();
+        List<Bitstream> seeAlsoBitstreams = new ArrayList<>();
         List<Bundle> bundles = item.getBundles(OTHER_CONTENT_BUNDLE);
         if (bundles.size() > 0) {
             for (Bundle bundle : bundles) {
@@ -293,7 +292,7 @@ public class IIIFUtils {
      * Return the custom iiif description for the resource or the provided default if none
      * 
      * @param dso          the dspace object to use as iiif resource
-     * @param defaultLabel the default description to return if none is specified in the
+     * @param defaultDescription the default description to return if none is specified in the
      *                     metadata
      * @return the iiif label for the dspace object
      */

@@ -50,7 +50,7 @@ public class SearchService extends AbstractResourceService {
     public String searchWithinManifest(UUID uuid, String query) throws NotImplementedException {
         if (searchPlugin != null) {
             for (SearchAnnotationService service : annotationService) {
-                if (service.getSearchPlugin(searchPlugin)) {
+                if (service.useSearchPlugin(searchPlugin)) {
                     service.initializeQuerySettings(IIIF_ENDPOINT, getManifestId(uuid));
                     return service.getSolrSearchResponse(uuid, query);
                 }

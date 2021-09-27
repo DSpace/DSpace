@@ -15,5 +15,5 @@ public interface IIIFService {
      * Creates and returns a service model
      * @return a service model
      */
-    Service generate();
+    Service generateService();
 }

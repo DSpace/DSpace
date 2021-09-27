@@ -28,7 +28,7 @@ public class PropertyValueGenerator implements IIIFValue {
     }
 
     @Override
-    public PropertyValue generate() {
+    public PropertyValue generateValue() {
         return propertyValue;
     }
 }

@@ -25,7 +25,7 @@ public class BehaviorGenerator implements IIIFValue {
     }
 
     @Override
-    public ViewingHint generate() {
+    public ViewingHint generateValue() {
         if (type == null) {
             throw new RuntimeException("Type must be provided for viewing hint.");
         }

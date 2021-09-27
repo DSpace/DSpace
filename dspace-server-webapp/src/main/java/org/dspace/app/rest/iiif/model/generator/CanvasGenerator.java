@@ -98,7 +98,7 @@ public class CanvasGenerator implements IIIFResource {
         MetadataEntryGenerator metadataEntryGenerator = new MetadataEntryGenerator();
         metadataEntryGenerator.setField(field);
         metadataEntryGenerator.setValue(value, rest);
-        metadata.add(metadataEntryGenerator.generate());
+        metadata.add(metadataEntryGenerator.generateValue());
     }
 
     /**
@@ -106,7 +106,7 @@ public class CanvasGenerator implements IIIFResource {
      * @return canvas model
      */
     @Override
-    public Resource<Canvas> generate() {
+    public Resource<Canvas> generateResource() {
         /**
          * The Canvas resource typically includes image content.
          */

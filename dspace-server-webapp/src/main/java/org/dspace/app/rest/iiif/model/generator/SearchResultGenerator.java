@@ -17,9 +17,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
- * This generator wraps a domain model for a {@code SearchResult}. There should be a single instance of
- * this object per search request. The {@code @RequestScope} provides a single instance created and available during
- * complete lifecycle of the HTTP request.
+ * This generator wraps a domain model for a {@code SearchResult}.
+ *
+ * <p>Please note that this is a request scoped bean. This means that for each http request a
+ * different instance will be initialized by Spring and used to serve this specific request.</p>
  */
 @RequestScope
 @Component
@@ -33,11 +34,11 @@ public class SearchResultGenerator implements IIIFResource {
     }
 
     public void addResource(AnnotationGenerator annotation) {
-        annotations.add((Annotation) annotation.generate());
+        annotations.add((Annotation) annotation.generateResource());
     }
 
     @Override
-    public Resource<Annotation> generate() {
+    public Resource<Annotation> generateResource() {
         SearchResult searchResult = new SearchResult(identifier);
         searchResult.setResources(annotations);
         return searchResult;

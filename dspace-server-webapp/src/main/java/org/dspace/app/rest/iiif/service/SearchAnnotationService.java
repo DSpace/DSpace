@@ -15,6 +15,6 @@ public interface SearchAnnotationService {
 
     String getSolrSearchResponse(UUID uuid, String query);
 
-    boolean getSearchPlugin(String className);
+    boolean useSearchPlugin(String className);
 
 }

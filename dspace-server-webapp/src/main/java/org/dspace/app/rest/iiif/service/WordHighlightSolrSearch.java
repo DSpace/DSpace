@@ -39,18 +39,16 @@ import org.dspace.discovery.SolrSearchCore;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.RequestScope;
 
 
 /**
- * This service provides methods for executing a solr search against the solr index. There should be a single
- * instance of this service per request. The {@code @RequestScope} provides a single instance created and
- * available during complete lifecycle of the HTTP request.
+ * This service implements methods for executing a solr search and creating IIIF search result annotations.
  * <p>
  * https://github.com/dbmdz/solr-ocrhighlighting
  */
-@RequestScope
+@Scope("prototype")
 @Component
 public class WordHighlightSolrSearch implements SearchAnnotationService {
 
@@ -76,7 +74,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
 
 
     @Override
-    public boolean getSearchPlugin(String className) {
+    public boolean useSearchPlugin(String className) {
         return className.contentEquals(WordHighlightSolrSearch.class.getCanonicalName());
     }
 
@@ -185,7 +183,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
         JsonObject body = gson.fromJson(json, JsonObject.class);
         if (body == null) {
             log.warn("Unable to process json response.");
-            return utils.asJson(searchResult.generate());
+            return utils.asJson(searchResult.generateResource());
         }
         // outer ocr highlight element
         JsonObject highs = body.getAsJsonObject("ocrHighlighting");
@@ -206,7 +204,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
             }
         }
 
-        return utils.asJson(searchResult.generate());
+        return utils.asJson(searchResult.generateResource());
     }
 
     /**

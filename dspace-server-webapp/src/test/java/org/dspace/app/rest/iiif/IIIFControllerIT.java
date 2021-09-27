@@ -933,6 +933,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.@type", is("sc:AnnotationList")))
                 .andExpect(jsonPath("$.resources[0].@type", is("oa:Annotation")))
+                .andExpect(jsonPath("$.resources[0].motivation", is ("oa:linking")))
                 .andExpect(jsonPath("$.resources[0].resource.@id",
                         Matchers.containsString(bitstream2.getID() + "/content")));
 

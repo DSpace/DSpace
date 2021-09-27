@@ -13,5 +13,5 @@ public interface IIIFValue {
      * creates and returns a value model.
      * @return a value model.
      */
-    Object generate();
+    Object generateValue();
 }

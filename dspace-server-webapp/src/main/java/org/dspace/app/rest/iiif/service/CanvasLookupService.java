@@ -53,7 +53,7 @@ public class CanvasLookupService extends AbstractResourceService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return utils.asJson(canvasGenerator.generate());
+        return utils.asJson(canvasGenerator.generateResource());
     }
 
 }

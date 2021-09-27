@@ -93,7 +93,7 @@ public class CanvasService extends AbstractResourceService {
 
         return addMetadata(context, bitstream,
                 new CanvasGenerator(IIIF_ENDPOINT + manifestId + "/canvas/c" + count)
-                    .addImage(image.generate()).addThumbnail(thumb.generate()).setHeight(canvasHeight)
+                    .addImage(image.generateResource()).addThumbnail(thumb.generateResource()).setHeight(canvasHeight)
                     .setWidth(canvasWidth).setLabel(label));
     }
 

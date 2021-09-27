@@ -99,28 +99,32 @@ public class AnnotationGenerator implements IIIFResource {
      */
     public AnnotationGenerator setWithin(List<ManifestGenerator> within) {
         for (ManifestGenerator manifest : within) {
-            this.manifests.add(manifest.generate());
+            this.manifests.add(manifest.generateResource());
         }
         return this;
     }
 
     @Override
-    public Resource<Annotation> generate() {
-        if (identifier == null || motivation == null) {
-            throw new RuntimeException("Annotations require both an identifier and a motivation");
+    public Resource<Annotation> generateResource() {
+        if (identifier == null) {
+            throw new RuntimeException("Annotations require an identifier.");
         }
-        Annotation annotation = new Annotation(identifier, motivation);
-
+        Annotation annotation;
+        if (motivation != null) {
+            annotation = new Annotation(identifier, motivation);
+        } else {
+            annotation = new Annotation(identifier);
+        }
         annotation.setWithin(manifests);
         // These optional annotation fields vary with the context.
         if (canvasGenerator != null) {
-            annotation.setOn(canvasGenerator.generate());
+            annotation.setOn(canvasGenerator.generateResource());
         }
         if (externalLinksGenerator != null) {
-            annotation.setResource(externalLinksGenerator.generate());
+            annotation.setResource(externalLinksGenerator.generateResource());
         }
         if (contentAsTextGenerator != null) {
-            annotation.setResource(contentAsTextGenerator.generate());
+            annotation.setResource(contentAsTextGenerator.generateResource());
         }
         return annotation;
     }
