@@ -45,7 +45,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamServiceImpl.class);
+    private static final Logger log
+            = org.apache.logging.log4j.LogManager.getLogger();
 
 
     @Autowired(required = true)
@@ -350,7 +351,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     public void expunge(Context context, Bitstream bitstream) throws SQLException, AuthorizeException {
         authorizeService.authorizeAction(context, bitstream, Constants.DELETE);
         if (!bitstream.isDeleted()) {
-            throw new IllegalStateException("Bitstream must be deleted before it can be removed from the database");
+            throw new IllegalStateException("Bitstream " + bitstream.getID().toString()
+                    + " must be deleted before it can be removed from the database.");
         }
         bitstreamDAO.delete(context, bitstream);
     }
