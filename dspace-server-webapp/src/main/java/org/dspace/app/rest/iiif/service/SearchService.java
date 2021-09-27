@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.iiif.exception.NotImplementedException;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,21 +40,24 @@ public class SearchService extends AbstractResourceService {
     }
 
     /**
-     * Executes a search query for items in the current manifest.
+     * Executes a search query for items in the current manifest. A
+     * search plugin must be enabled.
      *
      * @param uuid dspace item uuid
      * @param query the solr query
      * @return IIIF search result with page coordinate annotations.
      */
-    public String searchWithinManifest(UUID uuid, String query) {
-        for (SearchAnnotationService service : annotationService) {
-            if (service.getSearchPlugin(searchPlugin)) {
-                service.initializeQuerySettings(IIIF_ENDPOINT, getManifestId(uuid));
-                return service.getSolrSearchResponse(uuid, query);
+    public String searchWithinManifest(UUID uuid, String query) throws NotImplementedException {
+        if (searchPlugin != null) {
+            for (SearchAnnotationService service : annotationService) {
+                if (service.getSearchPlugin(searchPlugin)) {
+                    service.initializeQuerySettings(IIIF_ENDPOINT, getManifestId(uuid));
+                    return service.getSolrSearchResponse(uuid, query);
+                }
             }
         }
-        throw new RuntimeException(
-                "IIIF search plugin was not found."
+        throw new NotImplementedException(
+                "The IIIF search option is not enabled for this server."
         );
     }
 
