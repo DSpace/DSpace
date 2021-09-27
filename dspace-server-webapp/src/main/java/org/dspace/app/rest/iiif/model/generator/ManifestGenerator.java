@@ -186,7 +186,7 @@ public class ManifestGenerator implements IIIFResource {
         if (sequence != null) {
             manifest.addSequence(sequence);
         }
-        if (ranges != null && ranges.size() > 0) {
+        if (ranges.size() > 0) {
             for (Range range : ranges) {
                 manifest.addRange(range);
             }
