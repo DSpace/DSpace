@@ -10,7 +10,6 @@ package org.dspace.app.rest.iiif.model.generator;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.validation.constraints.NotNull;
 
 import de.digitalcollections.iiif.model.ImageContent;

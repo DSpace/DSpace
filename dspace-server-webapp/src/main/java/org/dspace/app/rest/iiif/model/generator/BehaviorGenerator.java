@@ -8,7 +8,6 @@
 package org.dspace.app.rest.iiif.model.generator;
 
 import de.digitalcollections.iiif.model.enums.ViewingHint;
-import org.springframework.stereotype.Component;
 
 /**
  * API 2.1.1 ViewingHint is a hint to the client that suggests the appropriate method of

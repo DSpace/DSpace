@@ -8,7 +8,6 @@
 package org.dspace.app.rest.iiif.model.generator;
 
 import de.digitalcollections.iiif.model.MetadataEntry;
-import org.springframework.stereotype.Component;
 
 /**
  * Wraps the domain model metadata property.
