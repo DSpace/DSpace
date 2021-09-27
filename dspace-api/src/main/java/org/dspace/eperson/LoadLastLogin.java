@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -108,7 +109,7 @@ public class LoadLastLogin {
         final SimpleDateFormat dateEncoder = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         for (String logName : args) {
-            BufferedReader logReader = new BufferedReader(new FileReader(logName));
+            BufferedReader logReader = new BufferedReader(new FileReader(logName, StandardCharsets.UTF_8));
             while (true) {
                 String line = logReader.readLine();
                 // End of file?

@@ -65,10 +65,6 @@ public class CreateStatReport {
     private static Context context;
 
     /**
-     * the config file from which to configure the analyser
-     */
-
-    /**
      * Default constructor
      */
     private CreateStatReport() { }
@@ -170,22 +166,19 @@ public class CreateStatReport {
         String myLogDir = null;
         String myFileTemplate = null;
         String myConfigFile = null;
-        StringBuffer myOutFile = null;
-        Date myStartDate = null;
-        Date myEndDate = null;
         boolean myLookUp = false;
 
         Calendar start = new GregorianCalendar(calendar.get(Calendar.YEAR),
                                                calendar.get(Calendar.MONTH),
                                                calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
-        myStartDate = start.getTime();
+        Date myStartDate = start.getTime();
 
         Calendar end = new GregorianCalendar(calendar.get(Calendar.YEAR),
                                              calendar.get(Calendar.MONTH),
                                              calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        myEndDate = end.getTime();
+        Date myEndDate = end.getTime();
 
-        myOutFile = new StringBuffer(outputLogDirectory);
+        StringBuilder myOutFile = new StringBuilder(outputLogDirectory);
         myOutFile.append(outputPrefix);
         myOutFile.append(calendar.get(Calendar.YEAR));
         myOutFile.append("-");
@@ -211,12 +204,11 @@ public class CreateStatReport {
         String myLogDir = null;
         String myFileTemplate = null;
         String myConfigFile = null;
-        StringBuffer myOutFile = null;
         Date myStartDate = null;
         Date myEndDate = null;
         boolean myLookUp = false;
 
-        myOutFile = new StringBuffer(outputLogDirectory);
+        StringBuilder myOutFile = new StringBuilder(outputLogDirectory);
         myOutFile.append(outputPrefix);
         myOutFile.append(calendar.get(Calendar.YEAR));
         myOutFile.append("-");
@@ -245,9 +237,6 @@ public class CreateStatReport {
         String myLogDir = null;
         String myFileTemplate = null;
         String myConfigFile = null;
-        StringBuffer myOutFile = null;
-        Date myStartDate = null;
-        Date myEndDate = null;
         boolean myLookUp = false;
 
         Calendar reportEndDate = new GregorianCalendar(calendar.get(Calendar.YEAR),
@@ -260,14 +249,14 @@ public class CreateStatReport {
             Calendar start = new GregorianCalendar(currentMonth.get(Calendar.YEAR),
                                                    currentMonth.get(Calendar.MONTH),
                                                    currentMonth.getActualMinimum(Calendar.DAY_OF_MONTH));
-            myStartDate = start.getTime();
+            Date myStartDate = start.getTime();
 
             Calendar end = new GregorianCalendar(currentMonth.get(Calendar.YEAR),
                                                  currentMonth.get(Calendar.MONTH),
                                                  currentMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
-            myEndDate = end.getTime();
+            Date myEndDate = end.getTime();
 
-            myOutFile = new StringBuffer(outputLogDirectory);
+            StringBuilder myOutFile = new StringBuilder(outputLogDirectory);
             myOutFile.append(outputPrefix);
             myOutFile.append(currentMonth.get(Calendar.YEAR));
             myOutFile.append("-");
@@ -293,11 +282,9 @@ public class CreateStatReport {
         String outputPrefix = "report-general-";
 
         String myFormat = "html";
-        StringBuffer myInput = null;
-        StringBuffer myOutput = null;
         String myMap = null;
 
-        myInput = new StringBuffer(outputLogDirectory);
+        StringBuilder myInput = new StringBuilder(outputLogDirectory);
         myInput.append(inputPrefix);
         myInput.append(calendar.get(Calendar.YEAR));
         myInput.append("-");
@@ -306,7 +293,7 @@ public class CreateStatReport {
         myInput.append(calendar.get(Calendar.DAY_OF_MONTH));
         myInput.append(outputSuffix);
 
-        myOutput = new StringBuffer(outputReportDirectory);
+        StringBuilder myOutput = new StringBuilder(outputReportDirectory);
         myOutput.append(outputPrefix);
         myOutput.append(calendar.get(Calendar.YEAR));
         myOutput.append("-");
@@ -332,8 +319,6 @@ public class CreateStatReport {
         String outputPrefix = "report-";
 
         String myFormat = "html";
-        StringBuffer myInput = null;
-        StringBuffer myOutput = null;
         String myMap = null;
 
         Calendar reportEndDate = new GregorianCalendar(calendar.get(Calendar.YEAR),
@@ -344,14 +329,14 @@ public class CreateStatReport {
 
         while (currentMonth.before(reportEndDate)) {
 
-            myInput = new StringBuffer(outputLogDirectory);
+            StringBuilder myInput = new StringBuilder(outputLogDirectory);
             myInput.append(inputPrefix);
             myInput.append(currentMonth.get(Calendar.YEAR));
             myInput.append("-");
             myInput.append(currentMonth.get(Calendar.MONTH) + 1);
             myInput.append(outputSuffix);
 
-            myOutput = new StringBuffer(outputReportDirectory);
+            StringBuilder myOutput = new StringBuilder(outputReportDirectory);
             myOutput.append(outputPrefix);
             myOutput.append(currentMonth.get(Calendar.YEAR));
             myOutput.append("-");
@@ -376,18 +361,16 @@ public class CreateStatReport {
         String outputPrefix = "report-";
 
         String myFormat = "html";
-        StringBuffer myInput = null;
-        StringBuffer myOutput = null;
         String myMap = null;
 
-        myInput = new StringBuffer(outputLogDirectory);
+        StringBuilder myInput = new StringBuilder(outputLogDirectory);
         myInput.append(inputPrefix);
         myInput.append(calendar.get(Calendar.YEAR));
         myInput.append("-");
         myInput.append(calendar.get(Calendar.MONTH) + 1);
         myInput.append(outputSuffix);
 
-        myOutput = new StringBuffer(outputReportDirectory);
+        StringBuilder myOutput = new StringBuilder(outputReportDirectory);
         myOutput.append(outputPrefix);
         myOutput.append(calendar.get(Calendar.YEAR));
         myOutput.append("-");

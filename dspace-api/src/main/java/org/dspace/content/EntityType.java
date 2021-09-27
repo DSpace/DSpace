@@ -78,6 +78,7 @@ public class EntityType implements ReloadableEntity<Integer> {
      *
      * @return The ID for this EntityType
      */
+    @Override
     public Integer getID() {
         return id;
     }
@@ -87,6 +88,7 @@ public class EntityType implements ReloadableEntity<Integer> {
      * @param obj   object to be compared
      * @return
      */
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof EntityType)) {
             return false;
@@ -97,10 +99,7 @@ public class EntityType implements ReloadableEntity<Integer> {
             return false;
         }
 
-        if (!StringUtils.equals(this.getLabel(), entityType.getLabel())) {
-            return false;
-        }
-        return true;
+        return StringUtils.equals(this.getLabel(), entityType.getLabel());
     }
 
     /**
