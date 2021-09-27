@@ -42,8 +42,8 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
-import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ProcessBuilder;
 import org.dspace.content.Bitstream;
@@ -51,8 +51,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.ProcessStatus;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.configuration.ScriptConfiguration;
@@ -80,9 +80,6 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
-
-    @Autowired
-    private ConfigurationService configurationService;
 
     @Test
     public void findAllScriptsWithAdminTest() throws Exception {
@@ -510,8 +507,6 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void TrackSpecialGroupduringprocessSchedulingTest() throws Exception {
         context.turnOffAuthorisationSystem();
-    @Test
-    public void postProcessWithAnonymousUser() throws Exception {
 
         Group specialGroup = GroupBuilder.createGroup(context)
                                          .withName("Special Group")
@@ -567,6 +562,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         }
     }
 
+    @Test
+    public void postProcessWithAnonymousUser() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson user = EPersonBuilder.createEPerson(context)
