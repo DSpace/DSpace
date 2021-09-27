@@ -7,30 +7,49 @@
  */
 package org.dspace.app.rest.iiif.service;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.rest.iiif.model.generator.ContentSearchGenerator;
 import org.dspace.app.rest.iiif.model.generator.ImageContentGenerator;
 import org.dspace.app.rest.iiif.model.generator.ManifestGenerator;
-import org.dspace.app.rest.iiif.model.info.Info;
-import org.dspace.app.rest.iiif.model.info.Range;
+import org.dspace.app.rest.iiif.model.generator.RangeGenerator;
 import org.dspace.app.rest.iiif.service.util.IIIFUtils;
+import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
+<<<<<<< HEAD
  * This service creates the manifest. There should be a single instance of this service per request.
  * The {@code @RequestScope} provides a single instance created and available during complete lifecycle
  * of the HTTP request.
+=======
+ * Generates IIIF Manifest JSON response for a DSpace Item. Please note that
+ * this is a request scoped bean. This mean that for each http request a
+ * different instance will be initialized by Spring and used to serve this
+ * specific request. This is needed because some configuration are cached in the
+ * instance. Moreover, many injected dependencies are also request scoped or
+ * prototype (that will turn in a request scope when injected in a request scope
+ * bean). The generators need to be request scoped as they act as builder
+ * storing the object state during each incremental building step until the
+ * final object is returned (IIIF Resource)
+>>>>>>> 4Science-pr
  */
 @RequestScope
 @Component
@@ -68,13 +87,17 @@ public class ManifestService extends AbstractResourceService {
     @Autowired
     ManifestGenerator manifestGenerator;
 
+    @Autowired
+    MetadataExposureService metadataExposureService;
 
+    protected String[] METADATA_FIELDS;
     /**
      * Constructor.
      * @param configurationService the DSpace configuration service.
      */
     public ManifestService(ConfigurationService configurationService) {
         setConfiguration(configurationService);
+        METADATA_FIELDS = configurationService.getArrayProperty("iiif.metadata.item");
     }
 
     /**
@@ -97,53 +120,140 @@ public class ManifestService extends AbstractResourceService {
      * @return manifest domain object
      */
     private void populateManifest(Item item, Context context) {
-        List<Bundle> bundles = utils.getIiifBundle(item, IIIF_BUNDLE);
-        List<Bitstream> bitstreams = utils.getBitstreams(bundles);
-        Info info = utils.validateInfoForManifest(utils.getInfo(context, item, IIIF_BUNDLE), bitstreams);
-        manifestGenerator.setIdentifier(getManifestId(item.getID()));
+        String manifestId = getManifestId(item.getID());
+        manifestGenerator.setIdentifier(manifestId);
         manifestGenerator.setLabel(item.getName());
         setLogoContainer();
         addRelated(item);
         addSearchService(item);
-        addMetadata(item.getMetadata());
-        addViewingHint(bitstreams.size());
-        addThumbnail(bundles, context);
-        addSequence(item, bitstreams, context, info);
-        addRanges(info, item.getID().toString());
+        addMetadata(context, item);
+        addViewingHint(item);
+        addThumbnail(item, context);
+        addRanges(context, item, manifestId);
+        manifestGenerator.addSequence(
+                sequenceService.getSequence(item, context));
         addSeeAlso(item);
     }
 
     /**
-     * Adds a single IIIF sequence with canvases and rendering (optional) to the manifest.
-     * @param item DSpace Item
-     * @param bitstreams list of bitstreams
-     * @param context the DSpace context
+     * Add the ranges to the manifest structure. Ranges are generated from the
+     * iiif.toc metadata
+     * 
+     * @param context the DSpace Context
+     * @param item the DSpace Item to represent
+     * @param manifestId the generated manifestId
      */
-    private void addSequence(Item item, List<Bitstream> bitstreams, Context context, Info info) {
-        manifestGenerator.addSequence(
-                sequenceService.getSequence(item, bitstreams, context, info));
+    private void addRanges(Context context, Item item, String manifestId) {
+        List<Bundle> bundles = utils.getIIIFBundles(item);
+        RangeGenerator root = new RangeGenerator(rangeService);
+        root.setLabel(I18nUtil.getMessage("iiif.toc.root-label"));
+        root.setIdentifier(manifestId + "/range/r0");
+//        manifestGenerator.addRange(root);
+
+        Map<String, RangeGenerator> tocRanges = new LinkedHashMap<String, RangeGenerator>();
+        for (Bundle bnd : bundles) {
+            String bundleToCPrefix = null;
+            if (bundles.size() > 1) {
+                bundleToCPrefix = utils.getBundleIIIFToC(bnd);
+            }
+            RangeGenerator lastRange = root;
+            for (Bitstream b : utils.getIIIFBitstreams(context, bnd)) {
+                CanvasGenerator canvasId = sequenceService.addCanvas(context, item, bnd, b);
+                List<String> tocs = utils.getIIIFToCs(b, bundleToCPrefix);
+                if (tocs.size() > 0) {
+                    for (String toc : tocs) {
+                        RangeGenerator currRange = root;
+                        String[] parts = toc.split(IIIFUtils.TOC_SEPARATOR_REGEX);
+                        String key = "";
+                        for (int pIdx = 0; pIdx < parts.length; pIdx++) {
+                            if (pIdx > 0) {
+                                key += IIIFUtils.TOC_SEPARATOR;
+                            }
+                            key += parts[pIdx];
+                            if (tocRanges.get(key) != null) {
+                                currRange = tocRanges.get(key);
+                            } else {
+                                // create the sub range
+                                RangeGenerator range = new RangeGenerator(rangeService);
+                                range.setLabel(parts[pIdx]);
+                                // add the range reference to the currRange so to get an identifier
+                                currRange.addSubRange(range);
+
+                                // add the range to the manifest
+//                                manifestGenerator.addRange(range);
+
+                                // move the current range
+                                currRange = range;
+                                tocRanges.put(key, range);
+                            }
+                        }
+                        // add the bitstream canvas to the currRange
+                        currRange
+                                .addCanvas(canvasService.getRangeCanvasReference(manifestId, canvasId.getIdentifier()));
+                        lastRange = currRange;
+                    }
+                } else {
+                    lastRange.addCanvas(canvasService.getRangeCanvasReference(manifestId, canvasId.getIdentifier()));
+                }
+            }
+        }
+        if (tocRanges.size() > 0) {
+            manifestGenerator.addRange(root);
+            for (RangeGenerator range : tocRanges.values()) {
+                manifestGenerator.addRange(range);
+            }
+        }
     }
 
     /**
      * Adds DSpace Item metadata to the manifest.
-     * @param metadata list of DSpace metadata values
+     * 
+     * @param context the DSpace Context
+     * @param item the DSpace item
      */
-    private void addMetadata(List<MetadataValue> metadata) {
-        for (MetadataValue meta : metadata) {
-            String field = utils.getMetadataFieldName(meta);
-            if (field.contentEquals("rights.uri")) {
-                manifestGenerator.addMetadata(field, meta.getValue());
-                manifestGenerator.addLicense(meta.getValue());
-            } else if (field.contentEquals("description")) {
-                // Add manifest description field.
-                manifestGenerator.addDescription(field, meta.getValue());
-            } else {
-                // Exclude DSpace description.provenance field.
-                if (!field.contentEquals("description.provenance")) {
-                    // Everything else, add to manifest metadata fields.
-                    manifestGenerator.addMetadata(field, meta.getValue());
+    private void addMetadata(Context context, Item item) {
+        for (String field : METADATA_FIELDS) {
+            String[] eq = field.split("\\.");
+            String schema = eq[0];
+            String element = eq[1];
+            String qualifier = null;
+            if (eq.length > 2) {
+                qualifier = eq[2];
+            }
+            List<MetadataValue> metadata = item.getItemService().getMetadata(item, schema, element, qualifier,
+                    Item.ANY);
+            List<String> values = new ArrayList<String>();
+            for (MetadataValue meta : metadata) {
+                // we need to perform the check here as the configuration can include jolly
+                // characters (i.e. dc.description.*) and we need to be sure to hide qualified
+                // metadata (dc.description.provenance)
+                try {
+                    if (metadataExposureService.isHidden(context, meta.getMetadataField().getMetadataSchema().getName(),
+                            meta.getMetadataField().getElement(), meta.getMetadataField().getQualifier())) {
+                        continue;
+                    }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                values.add(meta.getValue());
+            }
+            if (values.size() > 0) {
+                if (values.size() > 1) {
+                    manifestGenerator.addMetadata(field, values.get(0),
+                            values.subList(1, values.size()).toArray(new String[values.size() - 1]));
+                } else {
+                    manifestGenerator.addMetadata(field, values.get(0));
                 }
             }
+        }
+        String descrValue = item.getItemService().getMetadataFirstValue(item, "dc", "description", null, Item.ANY);
+        if (StringUtils.isNotBlank(descrValue)) {
+            manifestGenerator.addDescription(descrValue);
+        }
+
+        String licenseUriValue = item.getItemService().getMetadataFirstValue(item, "dc", "rights", "uri", Item.ANY);
+        if (StringUtils.isNotBlank(licenseUriValue)) {
+            manifestGenerator.addLicense(licenseUriValue);
         }
     }
 
@@ -161,12 +271,10 @@ public class ManifestService extends AbstractResourceService {
      * Adds a viewing hint to the manifest. This is a hint to the client as to the most
      * appropriate method of displaying the resource.
      *
-     * @param bitstreamCount count of bitstreams in the IIIF bundle.
+     * @param item the DSpace Item
      */
-    private void addViewingHint(int bitstreamCount) {
-        if (bitstreamCount > 2) {
-            manifestGenerator.addViewingHint(DOCUMENT_VIEWING_HINT);
-        }
+    private void addViewingHint(Item item) {
+        manifestGenerator.addViewingHint(utils.getIIIFViewingHint(item, DOCUMENT_VIEWING_HINT));
     }
 
     /**
@@ -177,10 +285,7 @@ public class ManifestService extends AbstractResourceService {
      * @param item the DSpace Item.
      */
     private void addSeeAlso(Item item) {
-        List<Bundle> bundles = utils.getBundle(item, OTHER_CONTENT_BUNDLE);
-        if (bundles.size() > 0) {
-            manifestGenerator.addSeeAlso(seeAlsoService.getSeeAlso(item.getID()));
-        }
+        manifestGenerator.addSeeAlso(seeAlsoService.getSeeAlso(item));
     }
 
     /**
@@ -197,32 +302,18 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Adds structure element and Range to the manifest. (Removed in 4Science PR)
-     * @param info
-     * @param identifier
-     */
-    private void addRanges(Info info, String identifier) {
-        List<Range> rangesFromConfig = utils.getRangesFromInfoObject(info);
-        if (rangesFromConfig != null) {
-            manifestGenerator.setRange(rangeService.getRanges(info, identifier));
-        }
-    }
-
-    /**
-     * Adds thumbnail to the manifest. Uses first image bitstream.
-     * @param bundles image bundles
+     * Adds thumbnail to the manifest. Uses first image in the manifest.
+     * @param item the DSpace Item
      * @param context DSpace context
      */
-    private void addThumbnail(List<Bundle> bundles, Context context) {
-        List<Bitstream> bitstreams = utils.getBitstreams(bundles);
+    private void addThumbnail(Item item, Context context) {
+        List<Bitstream> bitstreams = utils.getIIIFBitstreams(context, item);
         if (bitstreams != null && bitstreams.size() > 0) {
             String mimeType = utils.getBitstreamMimeType(bitstreams.get(0), context);
-            if (utils.checkImageMimeType(mimeType)) {
-                ImageContentGenerator image = imageContentService
-                        .getImageContent(bitstreams.get(0).getID(), mimeType,
-                                thumbUtil.getThumbnailProfile(), THUMBNAIL_PATH);
-                manifestGenerator.addThumbnail(image);
-            }
+            ImageContentGenerator image = imageContentService
+                    .getImageContent(bitstreams.get(0).getID(), mimeType,
+                            thumbUtil.getThumbnailProfile(), THUMBNAIL_PATH);
+            manifestGenerator.addThumbnail(image);
         }
     }
 

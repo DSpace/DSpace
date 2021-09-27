@@ -62,7 +62,7 @@ public class UsageReportRestPermissionEvaluatorPlugin extends RestObjectPermissi
         if (StringUtils.equalsIgnoreCase(UsageReportRest.NAME, targetType)
                 || StringUtils.equalsIgnoreCase(UsageReportRest.NAME + "search", targetType)) {
             Request request = requestService.getCurrentRequest();
-            Context context = ContextUtil.obtainContext(request.getServletRequest());
+            Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
             UUID uuidObject = null;
             if (targetId != null) {
                 if (StringUtils.equalsIgnoreCase(UsageReportRest.NAME, targetType)) {

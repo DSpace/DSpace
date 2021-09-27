@@ -12,6 +12,7 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import de.digitalcollections.iiif.model.ImageContent;
+import de.digitalcollections.iiif.model.MetadataEntry;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 
@@ -21,6 +22,7 @@ import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 public class CanvasGenerator implements IIIFResource {
 
     private final String identifier;
+    private final List<MetadataEntry> metadata = new ArrayList<>();
     private final List<ImageContent> images = new ArrayList();
     private String label;
     private Integer height;
@@ -36,6 +38,10 @@ public class CanvasGenerator implements IIIFResource {
             throw new RuntimeException("Invalid canvas identifier. Cannot be an empty string.");
         }
         this.identifier = identifier;
+    }
+
+    public String getIdentifier() {
+        return identifier;
     }
 
     /**
@@ -84,7 +90,19 @@ public class CanvasGenerator implements IIIFResource {
     }
 
     /**
-     * Creates the canvas domain model object.
+     * Adds single metadata field to Manifest.
+     * @param field property field
+     * @param value property value
+     */
+    public void addMetadata(String field, String value, String... rest) {
+        MetadataEntryGenerator metadataEntryGenerator = new MetadataEntryGenerator();
+        metadataEntryGenerator.setField(field);
+        metadataEntryGenerator.setValue(value, rest);
+        metadata.add(metadataEntryGenerator.generate());
+    }
+
+    /**
+     * Returns the canvas.
      * @return canvas model
      */
     @Override
@@ -112,6 +130,11 @@ public class CanvasGenerator implements IIIFResource {
             }
             if (thumbnail != null) {
                 canvas.addThumbnail(thumbnail);
+            }
+        }
+        if (metadata.size() > 0) {
+            for (MetadataEntry meta : metadata) {
+                canvas.addMetadata(meta);
             }
         }
         return canvas;

@@ -33,7 +33,7 @@ import org.springframework.web.context.annotation.RequestScope;
 public class CanvasItemsGenerator implements IIIFResource {
 
     private String identifier;
-    private OtherContent rendering;
+    private final List<OtherContent> renderings = new ArrayList<>();
     private final List<Canvas> canvas = new ArrayList<>();
 
 
@@ -50,24 +50,25 @@ public class CanvasItemsGenerator implements IIIFResource {
      * for display or download by a human user. This is typically going to be a PDF file.
      * @param otherContent generator for the resource
      */
-    public void addRendering(ExternalLinksGenerator otherContent) {
-
-        this.rendering = (OtherContent) otherContent.generate();
+    public void addRendering(org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator otherContent) {
+        this.renderings.add((OtherContent) otherContent.generate());
     }
 
     /**
      * Adds a single {@code Canvas} to the sequence.
      * @param canvas generator for canvas
      */
-    public void addCanvas(CanvasGenerator canvas) {
-        this.canvas.add((Canvas) canvas.generate());
+    public String addCanvas(org.dspace.app.rest.iiif.model.generator.CanvasGenerator canvas) {
+        Canvas resource = (Canvas) canvas.generate();
+        this.canvas.add(resource);
+        return resource.getIdentifier().toString();
     }
 
     @Override
     public Resource<Sequence> generate() {
         Sequence items = new Sequence(identifier);
-        if (rendering != null) {
-            items.addRendering(rendering);
+        for (OtherContent r : renderings) {
+            items.addRendering(r);
         }
         items.setCanvases(canvas);
         return items;

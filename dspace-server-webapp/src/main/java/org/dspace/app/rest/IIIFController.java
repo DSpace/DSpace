@@ -9,7 +9,11 @@ package org.dspace.app.rest;
 
 import java.util.UUID;
 
-import org.dspace.app.rest.iiif.IIIFRestRepository;
+import org.dspace.app.rest.iiif.IIIFServiceFacade;
+import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.core.Context;
+import org.dspace.services.RequestService;
+import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +30,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class IIIFController {
 
     @Autowired
-    IIIFRestRepository iiifRestRepository;
+    IIIFServiceFacade iiifFacade;
+
+    protected RequestService requestService = new DSpace().getRequestService();
 
     /**
      * The manifest response contains sufficient information for the client to initialize
@@ -43,7 +49,8 @@ public class IIIFController {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest")
     public String findOne(@PathVariable UUID id) {
-        return iiifRestRepository.getManifest(id);
+        Context context = ContextUtil.obtainCurrentRequestContext();
+        return iiifFacade.getManifest(context, id);
     }
 
     /**
@@ -65,7 +72,8 @@ public class IIIFController {
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest/search")
     public String searchInManifest(@PathVariable UUID id,
                                    @RequestParam(name = "q") String query) {
-        return iiifRestRepository.searchInManifest(id, query);
+        Context context = ContextUtil.obtainCurrentRequestContext();
+        return iiifFacade.searchInManifest(context, id, query);
     }
 
     /**
@@ -81,7 +89,8 @@ public class IIIFController {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest/seeAlso")
     public String findSeeAlsoList(@PathVariable UUID id) {
-        return iiifRestRepository.getSeeAlsoAnnotations(id);
+        Context context = ContextUtil.obtainCurrentRequestContext();
+        return iiifFacade.getSeeAlsoAnnotations(context, id);
     }
 
     /**
@@ -98,6 +107,7 @@ public class IIIFController {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/canvas/{cid}")
     public String findCanvas(@PathVariable UUID id, @PathVariable String cid) {
-        return iiifRestRepository.getCanvas(id, cid);
+        Context context = ContextUtil.obtainCurrentRequestContext();
+        return iiifFacade.getCanvas(context, id, cid);
     }
 }

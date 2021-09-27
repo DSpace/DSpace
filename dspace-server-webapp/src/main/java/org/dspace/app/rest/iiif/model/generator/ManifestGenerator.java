@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 /**
+<<<<<<< HEAD
  * This generator wraps a domain model for the {@code Manifest}. There should be a single instance of
  * this object per request. The {@code @RequestScope} provides a single instance created and available during
  * complete lifecycle of the HTTP request.
@@ -36,6 +37,16 @@ import org.springframework.web.context.annotation.RequestScope;
  *  it conveys. Each manifest describes how to present a single object such as a book, a photograph,
  *  or a statue.
  * </p>
+=======
+ * The Manifest is an overall description of the structure and properties of the digital representation
+ * of an object. It carries information needed for the viewer to present the digitized content to the user,
+ * such as a title and other descriptive information about the object or the intellectual work that
+ * it conveys. Each manifest describes how to present a single object such as a book, a photograph,
+ * or a statue.
+ * 
+ * Please note that this is a request scoped bean. This mean that for each http request a
+ * different instance will be initialized by Spring and used to serve this specific request.
+>>>>>>> 4Science-pr
  */
 @RequestScope
 @Component
@@ -53,7 +64,7 @@ public class ManifestGenerator implements IIIFResource {
     private ContentSearchService searchService;
     private final List<URI> license = new ArrayList<>();
     private final List<MetadataEntry> metadata = new ArrayList<>();
-    private List<RangeGenerator> ranges = new ArrayList<>();
+    private final List<RangeGenerator> ranges = new ArrayList<>();
 
     /**
      * Sets the mandatory manifest identifier.
@@ -134,9 +145,9 @@ public class ManifestGenerator implements IIIFResource {
      * @param field property field
      * @param value property value
      */
-    public void addMetadata(String field, String value) {
-        MetadataEntryGenerator meta = new MetadataEntryGenerator().setField(field).setValue(value);
-        metadata.add(meta.generate());
+    public void addMetadata(String field, String value, String... rest) {
+        MetadataEntryGenerator meg = new MetadataEntryGenerator().setField(field).setValue(value, rest);
+        metadata.add(meg.generate());
     }
 
     /**
@@ -148,20 +159,19 @@ public class ManifestGenerator implements IIIFResource {
     }
 
     /**
-     * Adds an optional description to the manifest.
-     * @param field property field
-     * @param value property value
+     * Adds optional description to Manifest.
+     * @param value the description value
      */
-    public void addDescription(String field, String value) {
-        description = new PropertyValueGenerator().getPropertyValue(field, value).generate();
+    public void addDescription(String value) {
+        description = new PropertyValueGenerator().getPropertyValue(value).generate();
     }
 
     /**
-     * Adds an optional {@code range} to the manifest's {@code structures} element.
-     * @param rangeGenerator list of range generators
+     * Adds optional Range to the manifest's structures element.
+     * @param rangeGenerator to add
      */
-    public void setRange(List<RangeGenerator> rangeGenerator) {
-        ranges =  rangeGenerator;
+    public void addRange(RangeGenerator rangeGenerator) {
+        ranges.add(rangeGenerator);
     }
 
     @Override

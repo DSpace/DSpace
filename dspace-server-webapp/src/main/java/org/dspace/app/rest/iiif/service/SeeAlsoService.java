@@ -7,10 +7,9 @@
  */
 package org.dspace.app.rest.iiif.service;
 
-import java.util.UUID;
-
 import org.dspace.app.rest.iiif.model.generator.AnnotationGenerator;
 import org.dspace.app.rest.iiif.model.generator.ExternalLinksGenerator;
+import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
@@ -30,11 +29,10 @@ public class SeeAlsoService extends AbstractResourceService {
         setConfiguration(configurationService);
     }
 
-    public ExternalLinksGenerator getSeeAlso(UUID itemId) {
-        return new ExternalLinksGenerator(IIIF_ENDPOINT + itemId + "/manifest/seeAlso")
+    public ExternalLinksGenerator getSeeAlso(Item item) {
+        return new ExternalLinksGenerator(IIIF_ENDPOINT + item.getID() + "/manifest/seeAlso")
                 .setType(AnnotationGenerator.TYPE)
                 .setLabel(SEE_ALSO_LABEL);
-
     }
 
 }
