@@ -13,8 +13,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -914,14 +914,16 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         }
         return false;
     }
+
     private DiscoverResult getDiscoverResult(Context context, String query, Integer offset, Integer limit)
             throws SearchServiceException, SQLException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         if (!this.isAdmin(context)) {
-            String groupQuery = groupService.allMemberGroupsSet(context, context.getCurrentUser()).stream()
-                    .map(group -> "g" + group.getID())
-                    .collect(Collectors.joining(" OR ", "admin:(", ")"));
-            discoverQuery.addFilterQueries(groupQuery);
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("(" + "admin:e").append(context.getCurrentUser().getID()).
+                    append(getGroupToQuery(groupService.allMemberGroupsSet(context,
+                            context.getCurrentUser()))).append(")");
+            discoverQuery.addFilterQueries(stringBuilder.toString());
         }
         discoverQuery.setQuery(query);
         if (offset != null) {
@@ -935,9 +937,9 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         return searchService.search(context, discoverQuery);
     }
 
-    private String getGroupToQuery(List<Group> groups) {
-        StringBuilder groupQuery = new StringBuilder();
 
+    private String getGroupToQuery(Set<Group> groups) {
+        StringBuilder groupQuery = new StringBuilder();
         if (groups != null) {
             for (Group group: groups) {
                 groupQuery.append(" OR admin:g");
