@@ -18,12 +18,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.authorization.Authorization;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
@@ -40,6 +43,8 @@ import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
@@ -47,6 +52,7 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.VersionBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -503,7 +509,8 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                             hasJsonPath("$.summary", is("check first version")),
                                             hasJsonPath("$.submitterName", is("first (admin) last (admin)")),
                                             hasJsonPath("$.type", is("version"))
-                                            )));
+                                            )))
+                                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
         } finally {
             VersionBuilder.delete(idRef.get());
         }
@@ -654,7 +661,6 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         } finally {
             VersionBuilder.delete(idRef.get());
         }
-        configurationService.setProperty("versioning.submitterCanCreateNewVersion", false);
     }
 
     @Test
@@ -717,8 +723,6 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
                              .content("/api/core/items/" + itemA.getID()))
                              .andExpect(status().isForbidden());
-
-        configurationService.setProperty("versioning.block.entity", "");
     }
 
     @Test
@@ -762,8 +766,6 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         } finally {
             VersionBuilder.delete(idRef.get());
         }
-
-        configurationService.setProperty("versioning.block.entity", "");
     }
 
     @Test
@@ -809,8 +811,6 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         } finally {
             VersionBuilder.delete(idRef.get());
         }
-        configurationService.setProperty("versioning.submitterCanCreateNewVersion", false);
-        configurationService.setProperty("versioning.block.entity", "");
     }
 
     @Test
@@ -1432,6 +1432,60 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$",
                                         Matchers.is(AuthorizationMatcher.matchAuthorization(admin2ItemA))));
+    }
+
+    @Test
+    public void createFirstVersionItemWithBitstreamBySubmitterTest() throws Exception {
+        configurationService.setProperty("versioning.submitterCanCreateNewVersion", true);
+        context.turnOffAuthorisationSystem();
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Parent Community")
+                                                  .build();
+
+        Collection col = CollectionBuilder.createCollection(context, rootCommunity)
+                                          .withName("Collection 1")
+                                          .withSubmitterGroup(eperson)
+                                          .build();
+
+        Item itemA = ItemBuilder.createItem(context, col)
+                               .withTitle("Public item")
+                               .withIssueDate("2021-04-19")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        itemA.setSubmitter(eperson);
+
+        Bundle bundle = BundleBuilder.createBundle(context, itemA).withName("Bundle 0").build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, StandardCharsets.UTF_8)) {
+             BitstreamBuilder.createBitstream(context, bundle, is)
+                             .withName("Bitstream0")
+                             .withMimeType("text/plain")
+                             .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        try {
+            getClient(epersonToken).perform(post("/api/versioning/versions")
+                                   .param("summary", "test summary!")
+                                   .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                   .content("/api/core/items/" + itemA.getID()))
+                                   .andExpect(status().isCreated())
+                                   .andExpect(jsonPath("$", Matchers.allOf(
+                                              hasJsonPath("$.version", is(2)),
+                                              hasJsonPath("$.summary", is("test summary!")),
+                                              hasJsonPath("$.type", is("version"))
+                                              )))
+                                   .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+        } finally {
+            VersionBuilder.delete(idRef.get());
+        }
     }
 
 }

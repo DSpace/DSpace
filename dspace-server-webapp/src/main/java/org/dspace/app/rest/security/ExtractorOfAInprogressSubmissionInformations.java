@@ -60,6 +60,16 @@ public class ExtractorOfAInprogressSubmissionInformations {
     @Autowired
     private RequestService requestService;
 
+    /**
+     * This method is used on security checks, given a versionHistory id,
+     * it searches the latest version and checks if there is
+     * a Workspace/Workflow item in progress submission,
+     * if yes return the id of this one, otherwise returns null.
+     * 
+     * @param request              The current request
+     * @param versionHistoryId     VersionHistoryId
+     * @return
+     */
     public Integer getAInprogressSubmissionID(@Nullable HttpServletRequest request, Integer versionHistoryId) {
         Context context = getContext(request);
         if (Objects.nonNull(versionHistoryId)) {
@@ -67,11 +77,11 @@ public class ExtractorOfAInprogressSubmissionInformations {
                 VersionHistory versionHistory = versionHistoryService.find(context, versionHistoryId);
                 if (Objects.nonNull(versionHistory)) {
                     Version oldestVersion = versionHistoryService.getLatestVersion(context, versionHistory);
-                    WorkflowItem workflowItem = workflowItemService.findByItem(context, oldestVersion.getItem());
                     WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, oldestVersion.getItem());
                     if (Objects.nonNull(workspaceItem)) {
                         return workspaceItem.getID();
                     }
+                    WorkflowItem workflowItem = workflowItemService.findByItem(context, oldestVersion.getItem());
                     if (Objects.nonNull(workflowItem)) {
                         return workflowItem.getID();
                     }
@@ -83,6 +93,15 @@ public class ExtractorOfAInprogressSubmissionInformations {
         return null;
     }
 
+    /**
+     * This method is used on security checks, given a versionHistory id,
+     * it searches the latest version and checks if there is a Workspace/Workflow item in progress submission,
+     * if yes return the rest name - 'workspaceitem' or 'workflowitem', otherwise it returns the empty string.
+     * 
+     * @param request             The current request
+     * @param versionHistoryId    VersionHistoryId
+     * @return
+     */
     public String getAInprogressSubmissionTarget(@Nullable HttpServletRequest request, Integer versionHistoryId) {
         Context context = getContext(request);
         if (Objects.nonNull(versionHistoryId)) {
@@ -90,12 +109,10 @@ public class ExtractorOfAInprogressSubmissionInformations {
                 VersionHistory versionHistory = versionHistoryService.find(context, versionHistoryId);
                 if (Objects.nonNull(versionHistory)) {
                     Version oldestVersion = versionHistoryService.getLatestVersion(context, versionHistory);
-                    WorkflowItem workflowItem = workflowItemService.findByItem(context, oldestVersion.getItem());
-                    WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, oldestVersion.getItem());
-                    if (Objects.nonNull(workspaceItem)) {
+                    if (Objects.nonNull(workspaceItemService.findByItem(context, oldestVersion.getItem()))) {
                         return WorkspaceItemRest.NAME;
                     }
-                    if (Objects.nonNull(workflowItem)) {
+                    if (Objects.nonNull(workflowItemService.findByItem(context, oldestVersion.getItem()))) {
                         return WorkflowItemRest.NAME;
                     }
                 }
@@ -106,6 +123,14 @@ public class ExtractorOfAInprogressSubmissionInformations {
         return StringUtils.EMPTY;
     }
 
+    /**
+     * This method is used on security checks, given an item UUID,
+     * it searches the relative version, if version exist return its id, otherwise returns null.
+     * 
+     * @param request     The current request
+     * @param uuid        Item uuid
+     * @return
+     */
     public Integer getVersionIdByItemUUID(@Nullable HttpServletRequest request, UUID uuid) {
         Context context = getContext(request);
         if (Objects.nonNull(uuid)) {

@@ -21,7 +21,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import com.amazonaws.util.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.hibernate.proxy.HibernateProxyHelper;
@@ -94,7 +94,7 @@ public class VersionHistory implements ReloadableEntity<Integer> {
      * @return true if the last version in submission, otherwise false.
      */
     public boolean hasDraftVersion() {
-        if (!CollectionUtils.isNullOrEmpty(versions) && Objects.nonNull(versions.get(0).getItem())) {
+        if (CollectionUtils.isNotEmpty(versions) && Objects.nonNull(versions.get(0).getItem())) {
             return !versions.get(0).getItem().isArchived();
         }
         return false;

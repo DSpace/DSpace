@@ -290,8 +290,6 @@ public class CanManageVersionsFeatureIT extends AbstractControllerIntegrationTes
 
         getClient(tokenAdminCol2).perform(get("/api/authz/authorizations/" + adminOfCol2ToItemA.getID()))
                                  .andExpect(status().isNotFound());
-
-        configurationService.setProperty("versioning.block.entity", "");
     }
 
     @Test
@@ -383,8 +381,6 @@ public class CanManageVersionsFeatureIT extends AbstractControllerIntegrationTes
 
         getClient(tokenAdminCol2).perform(get("/api/authz/authorizations/" + adminOfCol2ToItemA.getID()))
                                  .andExpect(status().isNotFound());
-
-        configurationService.setProperty("versioning.block.entity", "");
     }
 
 }

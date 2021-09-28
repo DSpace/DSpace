@@ -4175,8 +4175,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/core/items/" + item.getID() + "/version"))
                    .andExpect(status().isUnauthorized());
-
-        configurationService.setProperty("versioning.item.history.view.admin", true);
     }
 
     @Test
@@ -4207,8 +4205,47 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(get("/api/core/items/" + item.getID() + "/version"))
                                .andExpect(status().isForbidden());
+    }
 
-        configurationService.setProperty("versioning.item.history.view.admin", true);
+    @Test
+    public void findVersionForItemAndProprtyHistoryViewAdminIsDisabledTest() throws Exception {
+        configurationService.setProperty("versioning.item.history.view.admin", false);
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection test")
+                                          .build();
+
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Public test item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        VersionBuilder.createVersion(context, item, "test").build();
+
+        context.restoreAuthSystemState();
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(epersonToken).perform(get("/api/core/items/" + item.getID() + "/version"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$", Matchers.allOf(
+                                       hasJsonPath("$.version", is(1)),
+                                       hasJsonPath("$.summary", emptyOrNullString()),
+                                       hasJsonPath("$.type", is("version"))
+                                       )))
+                               .andExpect(jsonPath("$._links.versionhistory.href",
+                                          Matchers.containsString("api/versioning/versions/1/versionhistory")))
+                               .andExpect(jsonPath("$._links.item.href",
+                                          Matchers.containsString("api/versioning/versions/1/item")))
+                               .andExpect(jsonPath("$._links.self.href",
+                                          Matchers.containsString("api/versioning/versions/1")));
     }
 
     @Test
@@ -4240,6 +4277,34 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(epersonToken).perform(get("/api/core/items/1/version"))
                                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findVersionForItemWithoutVersionsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection test")
+                                          .build();
+
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Public test item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        item.setSubmitter(eperson);
+
+        context.restoreAuthSystemState();
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(epersonToken).perform(get("/api/core/items/" + item.getID() + "/version"))
+                               .andExpect(status().isNoContent());
     }
 
 }
