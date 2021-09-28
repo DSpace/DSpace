@@ -170,15 +170,14 @@ public class SubscriptionRestRepository extends DSpaceRestRepository
         ObjectMapper mapper = new ObjectMapper();
         SubscriptionRest subscriptionRest = null;
         try {
-            ServletInputStream input = req.getInputStream();
-            subscriptionRest = mapper.readValue(input, SubscriptionRest.class);
-        } catch (IOException e1) {
-            throw new UnprocessableEntityException("error parsing the body");
-        }
-        try {
-            Subscription subscription = null;
             DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, UUID.fromString(dsoId));
             EPerson ePerson = personService.findByIdOrLegacyId(context, epersonId);
+            if (!authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject, 1, true)) {
+                throw new AuthorizeException("The user has not READ rights on this DSO");
+            }
+            ServletInputStream input = req.getInputStream();
+            subscriptionRest = mapper.readValue(input, SubscriptionRest.class);
+            Subscription subscription = null;
             List<SubscriptionParameterRest> subscriptionParameterList = subscriptionRest.getSubscriptionParameterList();
             if (subscriptionParameterList != null) {
                 List<SubscriptionParameter> subscriptionParameters = new ArrayList<>();
@@ -200,6 +199,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository
 
         } catch (AuthorizeException authorizeException) {
             throw new AuthorizeException(authorizeException.getMessage());
+        } catch (IOException ioException) {
+            throw new UnprocessableEntityException("error parsing the body");
         }
     }
 

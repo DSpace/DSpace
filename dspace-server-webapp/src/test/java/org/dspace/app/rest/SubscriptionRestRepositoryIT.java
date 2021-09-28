@@ -31,6 +31,7 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
@@ -45,6 +46,7 @@ import org.dspace.eperson.SubscriptionParameter;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -56,6 +58,8 @@ import org.springframework.util.MultiValueMap;
 public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationTest {
     private Collection collection;
     private Item publicItem;
+    @Autowired
+    private ResourcePolicyService resourcePolicyService;
 
     @Override
     @Before
@@ -463,10 +467,13 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         params.add("dspace_object_id", publicItem.getID().toString());
         params.add("eperson_id", eperson.getID().toString());
         ObjectMapper objectMapper = new ObjectMapper();
+        resourcePolicyService.find(context, publicItem);
+        // remove default anonymous policy in order to test it
+        resourcePolicyService.delete(context, resourcePolicyService.find(context, publicItem).get(0));
         getClient()
                 .perform(post("/api/core/subscriptions?dspace_object_id=" + publicItem.getID() + "&eperson_id="
                         + eperson.getID()).content(objectMapper.writeValueAsString(subscriptionRest))
-                                .contentType(contentType))
+                        .contentType(contentType))
                 // The status has to be 401 Not Authorized
                 .andExpect(status().isUnauthorized());
     }
