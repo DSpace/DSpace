@@ -6,28 +6,27 @@
 		<size>10</size>
 		<page>1</page>
 		<total>77</total>
-		<fields>
-		</fields>
+		<fields></fields>
 	</header>
 	<results>
 		<result
 			xmlns:dri="http://www.driver-repository.eu/namespace/dri">
-			<header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<header
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 				<dri:objIdentifier>rcuk________::98b50e6e0715fad40627833c7030d3c3</dri:objIdentifier>
 				<dri:dateOfCollection>2018-02-06</dri:dateOfCollection>
 				<dri:dateOfTransformation>2021-02-20</dri:dateOfTransformation>
 			</header>
 			<metadata>
-				<oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+				<oaf:entity
+					xmlns:oaf="http://namespace.openaire.eu/oaf"
 					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-					xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
 					<oaf:project>
-						<collectedfrom name="Research Councils UK"
-							id="openaire____::ab2d3310741ea80d3b8726f651502858" />
+						<collectedfrom name="Research Councils UK" id="openaire____::ab2d3310741ea80d3b8726f651502858"/>
 						<originalId>rcuk________::103679</originalId>
 						<code>103679</code>
-						<title>Mushroom Robo-Pic - Development of an autonomous robotic
-							mushroom picking system</title>
+						<title>Mushroom Robo-Pic - Development of an autonomous robotic mushroom picking system</title>
 						<startdate>2017-10-01</startdate>
 						<enddate>2019-06-30</enddate>
 						<duration>0</duration>
@@ -47,7 +46,7 @@
 								<id>rcuk________::RCUK::Innovate UK</id>
 								<description>Innovate UK</description>
 								<name>Innovate UK</name>
-								<parent />
+								<parent/>
 								<class>rcuk:fundingStream</class>
 							</funding_level_0>
 						</fundingtree>
@@ -56,41 +55,40 @@
 							<deletedbyinference>false</deletedbyinference>
 							<trust>0.900</trust>
 							<inferenceprovenance>null</inferenceprovenance>
-							<provenanceaction
-								classid="sysimport:crosswalk:entityregistry"
-								classname="Harvested" schemeid="dnet:provenanceActions"
-								schemename="dnet:provenanceActions" />
+							<provenanceaction classid="sysimport:crosswalk:entityregistry" classname="Harvested"
+                                       schemeid="dnet:provenanceActions"
+                                       schemename="dnet:provenanceActions"/>
 						</datainfo>
 						<rels>
 							<rel inferred="false" trust="0.900" inferenceprovenance=""
-								provenanceaction="sysimport:crosswalk:entityregistry">
-								<to class="hasParticipant"
-									scheme="dnet:project_organization_relations"
-									type="organization">rcuk________::ebafcf5f45afa2e9807f981e668db66b</to>
+                          provenanceaction="sysimport:crosswalk:entityregistry">
+								<to class="hasParticipant" scheme="dnet:project_organization_relations"
+                            type="organization">rcuk________::ebafcf5f45afa2e9807f981e668db66b</to>
 								<legalname>Littleport Mushroom Farms Llp</legalname>
-								<country classid="UNKNOWN" classname="Unknown"
-									schemeid="dnet:countries" schemename="dnet:countries" />
+								<country classid="UNKNOWN" classname="Unknown" schemeid="dnet:countries"
+                                 schemename="dnet:countries"/>
 							</rel>
 						</rels>
-						<children />
+						<children/>
 					</oaf:project>
 				</oaf:entity>
 			</metadata>
 		</result>
 		<result
 			xmlns:dri="http://www.driver-repository.eu/namespace/dri">
-			<header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<header
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 				<dri:objIdentifier>rcuk________::6ac77c83ee0d98c433f91f3dc83074b2</dri:objIdentifier>
 				<dri:dateOfCollection>2017-11-04</dri:dateOfCollection>
 				<dri:dateOfTransformation>2021-02-20</dri:dateOfTransformation>
 			</header>
 			<metadata>
-				<oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+				<oaf:entity
+					xmlns:oaf="http://namespace.openaire.eu/oaf"
 					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-					xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
 					<oaf:project>
-						<collectedfrom name="Research Councils UK"
-							id="openaire____::ab2d3310741ea80d3b8726f651502858" />
+						<collectedfrom name="Research Councils UK" id="openaire____::ab2d3310741ea80d3b8726f651502858"/>
 						<originalId>rcuk________::752540</originalId>
 						<code>752540</code>
 						<title>Exending Shelf Life of Mushroom Growing Kits</title>
@@ -113,7 +111,7 @@
 								<id>rcuk________::RCUK::Innovate UK</id>
 								<description>Innovate UK</description>
 								<name>Innovate UK</name>
-								<parent />
+								<parent/>
 								<class>rcuk:fundingStream</class>
 							</funding_level_0>
 						</fundingtree>
@@ -122,49 +120,46 @@
 							<deletedbyinference>false</deletedbyinference>
 							<trust>0.900</trust>
 							<inferenceprovenance>null</inferenceprovenance>
-							<provenanceaction
-								classid="sysimport:crosswalk:entityregistry"
-								classname="Harvested" schemeid="dnet:provenanceActions"
-								schemename="dnet:provenanceActions" />
+							<provenanceaction classid="sysimport:crosswalk:entityregistry" classname="Harvested"
+                                       schemeid="dnet:provenanceActions"
+                                       schemename="dnet:provenanceActions"/>
 						</datainfo>
 						<rels>
 							<rel inferred="false" trust="0.900" inferenceprovenance=""
-								provenanceaction="sysimport:crosswalk:entityregistry">
-								<to class="hasParticipant"
-									scheme="dnet:project_organization_relations"
-									type="organization">rcuk________::f2a533e22408279c50f647779633cf69</to>
+                          provenanceaction="sysimport:crosswalk:entityregistry">
+								<to class="hasParticipant" scheme="dnet:project_organization_relations"
+                            type="organization">rcuk________::f2a533e22408279c50f647779633cf69</to>
 								<legalname>Espresso Mushroom Company Ltd</legalname>
-								<country classid="UNKNOWN" classname="Unknown"
-									schemeid="dnet:countries" schemename="dnet:countries" />
+								<country classid="UNKNOWN" classname="Unknown" schemeid="dnet:countries"
+                                 schemename="dnet:countries"/>
 							</rel>
 						</rels>
-						<children />
+						<children/>
 					</oaf:project>
 				</oaf:entity>
 			</metadata>
 		</result>
 		<result
 			xmlns:dri="http://www.driver-repository.eu/namespace/dri">
-			<header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<header
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 				<dri:objIdentifier>arc_________::e1da9b244237847b24379fb1b11fb151</dri:objIdentifier>
 				<dri:dateOfCollection>2015-08-24</dri:dateOfCollection>
 				<dri:dateOfTransformation>2018-11-20</dri:dateOfTransformation>
 			</header>
 			<metadata>
-				<oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+				<oaf:entity
+					xmlns:oaf="http://namespace.openaire.eu/oaf"
 					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-					xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
 					<oaf:project>
 						<originalId>arc_________::LP0220040</originalId>
-						<websiteurl>http://purl.org/au-research/grants/arc/LP0220040
-						</websiteurl>
+						<websiteurl>http://purl.org/au-research/grants/arc/LP0220040</websiteurl>
 						<code>LP0220040</code>
-						<title>Use of Organic Residues in Edible Mushroom Production
-						</title>
+						<title>Use of Organic Residues in Edible Mushroom Production</title>
 						<startdate>2002-01-01</startdate>
 						<enddate>2003-12-31</enddate>
-						<keywords>compost,exotic mushrooms,mushroom production,organic
-							wastes,peat,wood processing wastes</keywords>
+						<keywords>compost,exotic mushrooms,mushroom production,organic wastes,peat,wood processing wastes</keywords>
 						<duration>0</duration>
 						<ecarticle29_3>false</ecarticle29_3>
 						<oamandatepublications>false</oamandatepublications>
@@ -182,7 +177,7 @@
 								<id>arc_________::ARC::Linkage Projects</id>
 								<name>Linkage Projects</name>
 								<description>Linkage Projects</description>
-								<parent />
+								<parent/>
 								<class>arc:fundingStream</class>
 							</funding_level_0>
 						</fundingtree>
@@ -191,36 +186,34 @@
 							<deletedbyinference>false</deletedbyinference>
 							<trust>0.900</trust>
 							<inferenceprovenance>null</inferenceprovenance>
-							<provenanceaction
-								classid="sysimport:crosswalk:entityregistry"
-								classname="Harvested" schemeid="dnet:provenanceActions"
-								schemename="dnet:provenanceActions" />
+							<provenanceaction classid="sysimport:crosswalk:entityregistry" classname="Harvested"
+                                       schemeid="dnet:provenanceActions"
+                                       schemename="dnet:provenanceActions"/>
 						</datainfo>
-						<rels />
-						<children />
+						<rels/>
+						<children/>
 					</oaf:project>
 				</oaf:entity>
 			</metadata>
 		</result>
 		<result
 			xmlns:dri="http://www.driver-repository.eu/namespace/dri">
-			<header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<header
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 				<dri:objIdentifier>rcuk________::c137d9bfad46b1ebcc9b3f06e6eb5683</dri:objIdentifier>
 				<dri:dateOfCollection>2018-08-01</dri:dateOfCollection>
 				<dri:dateOfTransformation>2021-02-20</dri:dateOfTransformation>
 			</header>
 			<metadata>
-				<oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+				<oaf:entity
+					xmlns:oaf="http://namespace.openaire.eu/oaf"
 					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-					xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
 					<oaf:project>
-						<collectedfrom name="Research Councils UK"
-							id="openaire____::ab2d3310741ea80d3b8726f651502858" />
+						<collectedfrom name="Research Councils UK" id="openaire____::ab2d3310741ea80d3b8726f651502858"/>
 						<originalId>rcuk________::133611</originalId>
 						<code>133611</code>
-						<title>The development of a mushroom harvesting machine to
-							increase yield and production while reducing waste and labour
-							shortage risk</title>
+						<title>The development of a mushroom harvesting machine to increase yield and production while reducing waste and labour shortage risk</title>
 						<startdate>2018-07-01</startdate>
 						<enddate>2019-06-30</enddate>
 						<duration>0</duration>
@@ -240,7 +233,7 @@
 								<id>rcuk________::RCUK::Innovate UK</id>
 								<description>Innovate UK</description>
 								<name>Innovate UK</name>
-								<parent />
+								<parent/>
 								<class>rcuk:fundingStream</class>
 							</funding_level_0>
 						</fundingtree>
@@ -249,93 +242,59 @@
 							<deletedbyinference>false</deletedbyinference>
 							<trust>0.900</trust>
 							<inferenceprovenance>null</inferenceprovenance>
-							<provenanceaction
-								classid="sysimport:crosswalk:entityregistry"
-								classname="Harvested" schemeid="dnet:provenanceActions"
-								schemename="dnet:provenanceActions" />
+							<provenanceaction classid="sysimport:crosswalk:entityregistry" classname="Harvested"
+                                       schemeid="dnet:provenanceActions"
+                                       schemename="dnet:provenanceActions"/>
 						</datainfo>
 						<rels>
 							<rel inferred="false" trust="0.900" inferenceprovenance=""
-								provenanceaction="sysimport:crosswalk:entityregistry">
-								<to class="hasParticipant"
-									scheme="dnet:project_organization_relations"
-									type="organization">rcuk________::560dfc3b58d1ab0d8a8957a943a76962</to>
-								<country classid="UNKNOWN" classname="Unknown"
-									schemeid="dnet:countries" schemename="dnet:countries" />
+                          provenanceaction="sysimport:crosswalk:entityregistry">
+								<to class="hasParticipant" scheme="dnet:project_organization_relations"
+                            type="organization">rcuk________::560dfc3b58d1ab0d8a8957a943a76962</to>
+								<country classid="UNKNOWN" classname="Unknown" schemeid="dnet:countries"
+                                 schemename="dnet:countries"/>
 								<legalname>Mushroom Machine Company Limited</legalname>
 							</rel>
 						</rels>
-						<children />
+						<children/>
 					</oaf:project>
 				</oaf:entity>
 			</metadata>
 		</result>
 		<result
 			xmlns:dri="http://www.driver-repository.eu/namespace/dri">
-			<header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<header
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 				<dri:objIdentifier>corda__h2020::c97f7d6f1ff338991c0ec20b33ddb1e0</dri:objIdentifier>
 				<dri:dateOfCollection>2018-07-21</dri:dateOfCollection>
 				<dri:dateOfTransformation>2021-07-19</dri:dateOfTransformation>
 			</header>
 			<metadata>
-				<oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+				<oaf:entity
+					xmlns:oaf="http://namespace.openaire.eu/oaf"
 					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-					xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
 					<oaf:project>
-						<collectedfrom
-							name="CORDA - COmmon Research DAta Warehouse - Horizon 2020"
-							id="openaire____::a55eb91348674d853191f4f4fd73d078" />
+						<collectedfrom name="CORDA - COmmon Research DAta Warehouse - Horizon 2020"
+                                 id="openaire____::a55eb91348674d853191f4f4fd73d078"/>
 						<originalId>corda__h2020::820352</originalId>
 						<code>820352</code>
 						<acronym>Smartmushroom</acronym>
-						<title>Smart MAnagement of spent mushRoom subsTrate to lead the
-							MUSHROOM sector towards a circular economy</title>
+						<title>Smart MAnagement of spent mushRoom subsTrate to lead the MUSHROOM sector towards a circular economy</title>
 						<startdate>2018-08-01</startdate>
 						<enddate>2021-01-31</enddate>
 						<callidentifier>H2020-EIC-FTI-2018-2020</callidentifier>
 						<duration>0</duration>
 						<ecarticle29_3>false</ecarticle29_3>
-						<subject classid="ec:h2020topics"
-							classname="Horizon 2020 Topics"
-							schemeid="dnet:subject_classification_typologies"
-							schemename="dnet:subject_classification_typologies"
-							inferred="false"
-							provenanceaction="sysimport:crosswalk:entityregistry"
-							trust="0.900">Fast Track to Innovation (FTI)</subject>
+						<subject classid="ec:h2020topics" classname="Horizon 2020 Topics"
+                           schemeid="dnet:subject_classification_typologies"
+                           schemename="dnet:subject_classification_typologies"
+                           inferred="false"
+                           provenanceaction="sysimport:crosswalk:entityregistry"
+                           trust="0.900">Fast Track to Innovation (FTI)</subject>
 						<oamandatepublications>true</oamandatepublications>
 						<ecsc39>false</ecsc39>
-						<summary>Waste from animal breeding and agriculture, specifically
-							horse and chicken manure and wheat straw, are the raw materials
-							of the growing substrate of mushroom. To grow 1 tonne of
-							mushroom, 3 to 4 tonnes of substrate are needed. However, when
-							mushroom production is completed the substrate cannot be used for
-							another growing cycle due to the depletion of nutrients needed
-							for mushroom growing and it is called Spent Mushroom Substrate
-							(SMS) and becomes a waste that should be managed according to
-							regulations. In Europe, c.a. 3.65 million tons of SMS are
-							generated each year. SMS is a high-moisture content bulk material
-							rich in organic matter and nutrients and it could be reused in
-							agriculture by adding it to the soils as amendment or mulch or
-							weathered to be reused as casing soil. However, nitrates
-							directive set a disposal limit that makes that large quantities
-							of SMS cannot be simply spread in soils next to growers’
-							facilities, as there is a high risk of leachates and water
-							pollution. Due to its low bulk density and high water content,
-							transportation costs are high and therefore storage is becoming a
-							sound problem. SmartMUSHROOM aims to increase mushroom growers’
-							waste management efficiency by using a new technology which allow
-							them to obtain enough biogas from fresh SMS to dry a mixture of
-							digestate and additional fresh SMS and pelletize it targeting to
-							obtain a marketable high-quality organic fertilizer rich in
-							organic matter and in nutrients, easy to handle, store and
-							transport to any farming region in Europe. A perfect example of
-							biobased circular economy. The aim of the project is to build a
-							pilot plant to demonstrate the technology and find the best
-							commercial formulation for the pellets to enter organic farming
-							market. After the end of project we aim to build at least 18
-							treatment plants that will place in market 153,000 tonnes of
-							SMS-pellets, generating a total Turnover of 54M€ in the period
-							2021-2025 and up to 105 related new jobs.</summary>
+						<summary>Waste from animal breeding and agriculture, specifically horse and chicken manure and wheat straw, are the raw materials of the growing substrate of mushroom. To grow 1 tonne of mushroom, 3 to 4 tonnes of substrate are needed. However, when mushroom production is completed the substrate cannot be used for another growing cycle due to the depletion of nutrients needed for mushroom growing and it is called Spent Mushroom Substrate (SMS) and becomes a waste that should be managed according to regulations. In Europe, c.a. 3.65 million tons of SMS are generated each year. SMS is a high-moisture content bulk material rich in organic matter and nutrients and it could be reused in agriculture by adding it to the soils as amendment or mulch or weathered to be reused as casing soil. However, nitrates directive set a disposal limit that makes that large quantities of SMS cannot be simply spread in soils next to growers’ facilities, as there is a high risk of leachates and water pollution. Due to its low bulk density and high water content, transportation costs are high and therefore storage is becoming a sound problem. SmartMUSHROOM aims to increase mushroom growers’ waste management efficiency by using a new technology which allow them to obtain enough biogas from fresh SMS to dry a mixture of digestate and additional fresh SMS and pelletize it targeting to obtain a marketable high-quality organic fertilizer rich in organic matter and in nutrients, easy to handle, store and transport to any farming region in Europe. A perfect example of biobased circular economy. The aim of the project is to build a pilot plant to demonstrate the technology and find the best commercial formulation for the pellets to enter organic farming market. After the end of project we aim to build at least 18 treatment plants that will place in market 153,000 tonnes of SMS-pellets, generating a total Turnover of 54M€ in the period 2021-2025 and up to 105 related new jobs.</summary>
 						<currency>EUR</currency>
 						<totalcost>2977940.0</totalcost>
 						<fundedamount>2264140.0</fundedamount>
@@ -356,7 +315,7 @@
 										<id>ec__________::EC::H2020</id>
 										<name>H2020</name>
 										<description>Horizon 2020 Framework Programme</description>
-										<parent />
+										<parent/>
 										<class>ec:h2020fundings</class>
 									</funding_level_0>
 								</parent>
@@ -367,75 +326,69 @@
 							<deletedbyinference>false</deletedbyinference>
 							<trust>0.900</trust>
 							<inferenceprovenance>null</inferenceprovenance>
-							<provenanceaction
-								classid="sysimport:crosswalk:entityregistry"
-								classname="Harvested" schemeid="dnet:provenanceActions"
-								schemename="dnet:provenanceActions" />
+							<provenanceaction classid="sysimport:crosswalk:entityregistry" classname="Harvested"
+                                       schemeid="dnet:provenanceActions"
+                                       schemename="dnet:provenanceActions"/>
 						</datainfo>
 						<rels>
 							<rel inferred="false" trust="0.900" inferenceprovenance=""
-								provenanceaction="sysimport:crosswalk:entityregistry">
-								<to class="hasParticipant"
-									scheme="dnet:project_organization_relations"
-									type="organization">pending_org_::39d5641e14f7cfe56e3e836199e33eba</to>
+                          provenanceaction="sysimport:crosswalk:entityregistry">
+								<to class="hasParticipant" scheme="dnet:project_organization_relations"
+                            type="organization">pending_org_::39d5641e14f7cfe56e3e836199e33eba</to>
 								<legalshortname>ECOBELIEVE DOO</legalshortname>
-								<country classid="RS" classname="Serbia"
-									schemeid="dnet:countries" schemename="dnet:countries" />
+								<country classid="RS" classname="Serbia" schemeid="dnet:countries"
+                                 schemename="dnet:countries"/>
 								<legalname>ECOBELIEVE DOO GRKINJA</legalname>
 							</rel>
 							<rel inferred="false" trust="0.900" inferenceprovenance=""
-								provenanceaction="sysimport:crosswalk:entityregistry">
-								<to class="hasParticipant"
-									scheme="dnet:project_organization_relations"
-									type="organization">pending_org_::3c128a988f1404fed53e1cd8a61df51b</to>
-								<legalname>Asociacion Profesional de Productores de Compost y
-									Hongos, de la Rioja, Navarra y Aragón</legalname>
-								<country classid="ES" classname="Spain"
-									schemeid="dnet:countries" schemename="dnet:countries" />
+                          provenanceaction="sysimport:crosswalk:entityregistry">
+								<to class="hasParticipant" scheme="dnet:project_organization_relations"
+                            type="organization">pending_org_::3c128a988f1404fed53e1cd8a61df51b</to>
+								<legalname>Asociacion Profesional de Productores de Compost y Hongos, de la Rioja, Navarra y Aragón</legalname>
+								<country classid="ES" classname="Spain" schemeid="dnet:countries"
+                                 schemename="dnet:countries"/>
 								<legalshortname>ASOCHAMP</legalshortname>
 							</rel>
 							<rel inferred="false" trust="0.900" inferenceprovenance=""
-								provenanceaction="sysimport:crosswalk:entityregistry">
-								<to class="hasParticipant"
-									scheme="dnet:project_organization_relations"
-									type="organization">pending_org_::7555b3c59a033e789ce6190a6c9f39aa</to>
-								<legalname>INVESTIGACION Y DESARROLLO CASTILLA Y LEON S.A
-								</legalname>
-								<country classid="ES" classname="Spain"
-									schemeid="dnet:countries" schemename="dnet:countries" />
+                          provenanceaction="sysimport:crosswalk:entityregistry">
+								<to class="hasParticipant" scheme="dnet:project_organization_relations"
+                            type="organization">pending_org_::7555b3c59a033e789ce6190a6c9f39aa</to>
+								<legalname>INVESTIGACION Y DESARROLLO CASTILLA Y LEON S.A</legalname>
+								<country classid="ES" classname="Spain" schemeid="dnet:countries"
+                                 schemename="dnet:countries"/>
 								<legalshortname>IDECAL S.A.</legalshortname>
 							</rel>
 							<rel inferred="false" trust="0.900" inferenceprovenance=""
-								provenanceaction="sysimport:crosswalk:entityregistry">
-								<to class="hasParticipant"
-									scheme="dnet:project_organization_relations"
-									type="organization">pending_org_::4193497542c7b30e3f50f52414905579</to>
+                          provenanceaction="sysimport:crosswalk:entityregistry">
+								<to class="hasParticipant" scheme="dnet:project_organization_relations"
+                            type="organization">pending_org_::4193497542c7b30e3f50f52414905579</to>
 								<legalname>NOVIS GMBH</legalname>
-								<country classid="DE" classname="Germany"
-									schemeid="dnet:countries" schemename="dnet:countries" />
+								<country classid="DE" classname="Germany" schemeid="dnet:countries"
+                                 schemename="dnet:countries"/>
 								<legalshortname>NOVIS GMBH</legalshortname>
 							</rel>
 						</rels>
-						<children />
+						<children/>
 					</oaf:project>
 				</oaf:entity>
 			</metadata>
 		</result>
 		<result
 			xmlns:dri="http://www.driver-repository.eu/namespace/dri">
-			<header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<header
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 				<dri:objIdentifier>nwo_________::c091653b5930a5a11c748720167b04d7</dri:objIdentifier>
 				<dri:dateOfCollection>2016-06-23</dri:dateOfCollection>
 				<dri:dateOfTransformation>2018-08-07</dri:dateOfTransformation>
 			</header>
 			<metadata>
-				<oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+				<oaf:entity
+					xmlns:oaf="http://namespace.openaire.eu/oaf"
 					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-					xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
 					<oaf:project>
-						<collectedfrom
-							name="NWO - Netherlands Organisation for Scientific Research"
-							id="openaire____::a4904a4b098aab846e966b7635bd8e01" />
+						<collectedfrom name="NWO - Netherlands Organisation for Scientific Research"
+                                 id="openaire____::a4904a4b098aab846e966b7635bd8e01"/>
 						<originalId>nwo_________::2300148817</originalId>
 						<code>2300148817</code>
 						<title>Production of therapeutic proteins in mushroom</title>
@@ -451,8 +404,7 @@
 							<funder>
 								<id>nwo_________::NWO</id>
 								<shortname>NWO</shortname>
-								<name>Netherlands Organisation for Scientific Research (NWO)
-								</name>
+								<name>Netherlands Organisation for Scientific Research (NWO)</name>
 								<jurisdiction>NL</jurisdiction>
 							</funder>
 						</fundingtree>
@@ -461,32 +413,32 @@
 							<deletedbyinference>false</deletedbyinference>
 							<trust>0.900</trust>
 							<inferenceprovenance>null</inferenceprovenance>
-							<provenanceaction
-								classid="sysimport:crosswalk:entityregistry"
-								classname="Harvested" schemeid="dnet:provenanceActions"
-								schemename="dnet:provenanceActions" />
+							<provenanceaction classid="sysimport:crosswalk:entityregistry" classname="Harvested"
+                                       schemeid="dnet:provenanceActions"
+                                       schemename="dnet:provenanceActions"/>
 						</datainfo>
-						<rels />
-						<children />
+						<rels/>
+						<children/>
 					</oaf:project>
 				</oaf:entity>
 			</metadata>
 		</result>
 		<result
 			xmlns:dri="http://www.driver-repository.eu/namespace/dri">
-			<header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<header
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 				<dri:objIdentifier>nwo_________::5ee5a31d8c77215faef3bd35bd9696ff</dri:objIdentifier>
 				<dri:dateOfCollection>2016-06-23</dri:dateOfCollection>
 				<dri:dateOfTransformation>2018-08-07</dri:dateOfTransformation>
 			</header>
 			<metadata>
-				<oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+				<oaf:entity
+					xmlns:oaf="http://namespace.openaire.eu/oaf"
 					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-					xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
 					<oaf:project>
-						<collectedfrom
-							name="NWO - Netherlands Organisation for Scientific Research"
-							id="openaire____::a4904a4b098aab846e966b7635bd8e01" />
+						<collectedfrom name="NWO - Netherlands Organisation for Scientific Research"
+                                 id="openaire____::a4904a4b098aab846e966b7635bd8e01"/>
 						<originalId>nwo_________::2300148209</originalId>
 						<code>2300148209</code>
 						<title>Control of Verticillium fungicola on mushroom</title>
@@ -502,8 +454,7 @@
 							<funder>
 								<id>nwo_________::NWO</id>
 								<shortname>NWO</shortname>
-								<name>Netherlands Organisation for Scientific Research (NWO)
-								</name>
+								<name>Netherlands Organisation for Scientific Research (NWO)</name>
 								<jurisdiction>NL</jurisdiction>
 							</funder>
 						</fundingtree>
@@ -512,32 +463,32 @@
 							<deletedbyinference>false</deletedbyinference>
 							<trust>0.900</trust>
 							<inferenceprovenance>null</inferenceprovenance>
-							<provenanceaction
-								classid="sysimport:crosswalk:entityregistry"
-								classname="Harvested" schemeid="dnet:provenanceActions"
-								schemename="dnet:provenanceActions" />
+							<provenanceaction classid="sysimport:crosswalk:entityregistry" classname="Harvested"
+                                       schemeid="dnet:provenanceActions"
+                                       schemename="dnet:provenanceActions"/>
 						</datainfo>
-						<rels />
-						<children />
+						<rels/>
+						<children/>
 					</oaf:project>
 				</oaf:entity>
 			</metadata>
 		</result>
 		<result
 			xmlns:dri="http://www.driver-repository.eu/namespace/dri">
-			<header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<header
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 				<dri:objIdentifier>nwo_________::98df9c76cbd6537553284af850398659</dri:objIdentifier>
 				<dri:dateOfCollection>2016-06-23</dri:dateOfCollection>
 				<dri:dateOfTransformation>2018-08-07</dri:dateOfTransformation>
 			</header>
 			<metadata>
-				<oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+				<oaf:entity
+					xmlns:oaf="http://namespace.openaire.eu/oaf"
 					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-					xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
 					<oaf:project>
-						<collectedfrom
-							name="NWO - Netherlands Organisation for Scientific Research"
-							id="openaire____::a4904a4b098aab846e966b7635bd8e01" />
+						<collectedfrom name="NWO - Netherlands Organisation for Scientific Research"
+                                 id="openaire____::a4904a4b098aab846e966b7635bd8e01"/>
 						<originalId>nwo_________::2300147728</originalId>
 						<code>2300147728</code>
 						<title>Master switches of initiation of mushroom formation</title>
@@ -553,8 +504,7 @@
 							<funder>
 								<id>nwo_________::NWO</id>
 								<shortname>NWO</shortname>
-								<name>Netherlands Organisation for Scientific Research (NWO)
-								</name>
+								<name>Netherlands Organisation for Scientific Research (NWO)</name>
 								<jurisdiction>NL</jurisdiction>
 							</funder>
 						</fundingtree>
@@ -563,36 +513,35 @@
 							<deletedbyinference>false</deletedbyinference>
 							<trust>0.900</trust>
 							<inferenceprovenance>null</inferenceprovenance>
-							<provenanceaction
-								classid="sysimport:crosswalk:entityregistry"
-								classname="Harvested" schemeid="dnet:provenanceActions"
-								schemename="dnet:provenanceActions" />
+							<provenanceaction classid="sysimport:crosswalk:entityregistry" classname="Harvested"
+                                       schemeid="dnet:provenanceActions"
+                                       schemename="dnet:provenanceActions"/>
 						</datainfo>
-						<rels />
-						<children />
+						<rels/>
+						<children/>
 					</oaf:project>
 				</oaf:entity>
 			</metadata>
 		</result>
 		<result
 			xmlns:dri="http://www.driver-repository.eu/namespace/dri">
-			<header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<header
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 				<dri:objIdentifier>nwo_________::7ddc7f2f259735f312a27c54f6b2ee5d</dri:objIdentifier>
 				<dri:dateOfCollection>2016-06-23</dri:dateOfCollection>
 				<dri:dateOfTransformation>2018-08-07</dri:dateOfTransformation>
 			</header>
 			<metadata>
-				<oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+				<oaf:entity
+					xmlns:oaf="http://namespace.openaire.eu/oaf"
 					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-					xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
 					<oaf:project>
-						<collectedfrom
-							name="NWO - Netherlands Organisation for Scientific Research"
-							id="openaire____::a4904a4b098aab846e966b7635bd8e01" />
+						<collectedfrom name="NWO - Netherlands Organisation for Scientific Research"
+                                 id="openaire____::a4904a4b098aab846e966b7635bd8e01"/>
 						<originalId>nwo_________::2300164658</originalId>
 						<code>2300164658</code>
-						<title>Push the white button; controlling mushroom formation
-						</title>
+						<title>Push the white button; controlling mushroom formation</title>
 						<startdate>2011-09-01</startdate>
 						<duration>0</duration>
 						<ecarticle29_3>false</ecarticle29_3>
@@ -604,8 +553,7 @@
 							<funder>
 								<id>nwo_________::NWO</id>
 								<shortname>NWO</shortname>
-								<name>Netherlands Organisation for Scientific Research (NWO)
-								</name>
+								<name>Netherlands Organisation for Scientific Research (NWO)</name>
 								<jurisdiction>NL</jurisdiction>
 							</funder>
 						</fundingtree>
@@ -614,32 +562,32 @@
 							<deletedbyinference>false</deletedbyinference>
 							<trust>0.900</trust>
 							<inferenceprovenance>null</inferenceprovenance>
-							<provenanceaction
-								classid="sysimport:crosswalk:entityregistry"
-								classname="Harvested" schemeid="dnet:provenanceActions"
-								schemename="dnet:provenanceActions" />
+							<provenanceaction classid="sysimport:crosswalk:entityregistry" classname="Harvested"
+                                       schemeid="dnet:provenanceActions"
+                                       schemename="dnet:provenanceActions"/>
 						</datainfo>
-						<rels />
-						<children />
+						<rels/>
+						<children/>
 					</oaf:project>
 				</oaf:entity>
 			</metadata>
 		</result>
 		<result
 			xmlns:dri="http://www.driver-repository.eu/namespace/dri">
-			<header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<header
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 				<dri:objIdentifier>nsf_________::c5fa29db776dc4f21919e12cbaea37eb</dri:objIdentifier>
 				<dri:dateOfCollection>2016-03-11</dri:dateOfCollection>
 				<dri:dateOfTransformation>2018-08-07</dri:dateOfTransformation>
 			</header>
 			<metadata>
-				<oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+				<oaf:entity
+					xmlns:oaf="http://namespace.openaire.eu/oaf"
 					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-					xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
 					<oaf:project>
-						<collectedfrom
-							name="NSF - National Science Foundation"
-							id="openaire____::dd69b4a1513c9de9f46faf24048da1e8" />
+						<collectedfrom name="NSF - National Science Foundation"
+                                 id="openaire____::dd69b4a1513c9de9f46faf24048da1e8"/>
 						<originalId>nsf_________::6112554</originalId>
 						<code>6112554</code>
 						<title>Respiratory Mechanisms in Cultivated Mushroom</title>
@@ -664,30 +612,26 @@
 							<deletedbyinference>false</deletedbyinference>
 							<trust>0.900</trust>
 							<inferenceprovenance>null</inferenceprovenance>
-							<provenanceaction
-								classid="sysimport:crosswalk:entityregistry"
-								classname="Harvested" schemeid="dnet:provenanceActions"
-								schemename="dnet:provenanceActions" />
+							<provenanceaction classid="sysimport:crosswalk:entityregistry" classname="Harvested"
+                                       schemeid="dnet:provenanceActions"
+                                       schemename="dnet:provenanceActions"/>
 						</datainfo>
 						<rels>
 							<rel inferred="false" trust="0.900" inferenceprovenance=""
-								provenanceaction="sysimport:crosswalk:entityregistry">
-								<to class="hasParticipant"
-									scheme="dnet:project_organization_relations"
-									type="organization">openorgs____::2f4b2e4dcb319a5f66e887d2fd555734</to>
-								<country classid="US" classname="United States"
-									schemeid="dnet:countries" schemename="dnet:countries" />
+                          provenanceaction="sysimport:crosswalk:entityregistry">
+								<to class="hasParticipant" scheme="dnet:project_organization_relations"
+                            type="organization">openorgs____::2f4b2e4dcb319a5f66e887d2fd555734</to>
+								<country classid="US" classname="United States" schemeid="dnet:countries"
+                                 schemename="dnet:countries"/>
 								<legalname>University of Delaware</legalname>
 								<legalshortname>UD</legalshortname>
 							</rel>
 						</rels>
-						<children />
+						<children/>
 					</oaf:project>
 				</oaf:entity>
 			</metadata>
 		</result>
-
 	</results>
-	<browseResults>
-	</browseResults>
+	<browseResults></browseResults>
 </response>
