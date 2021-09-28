@@ -74,8 +74,6 @@ public class ContextUtil {
         if (context == null) {
             try {
                 context = ContextUtil.initializeContext();
-                Locale currentLocale = getLocale(context, request);
-                context.setCurrentLocale(currentLocale);
             } catch (SQLException e) {
                 log.error("Unable to initialize context", e);
                 return null;
@@ -84,7 +82,11 @@ public class ContextUtil {
             // Store the context in the request
             request.setAttribute(DSPACE_CONTEXT, context);
         }
-
+        // this need to be verified each time that the context is extracted from the request
+        // as some call happen before that the login process is completed and user settings can
+        // change the locale
+        Locale currentLocale = getLocale(context, request);
+        context.setCurrentLocale(currentLocale);
         return context;
     }
 
