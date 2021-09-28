@@ -145,7 +145,9 @@ public class CanvasService extends AbstractResourceService {
                         Item.ANY);
                 List<String> values = new ArrayList<String>();
                 for (MetadataValue meta : metadata) {
-                    values.add(meta.getValue());
+                    if (meta.getValue() != null) {
+                        values.add(meta.getValue());
+                    }
                 }
                 if (values.size() > 0) {
                     if (values.size() > 1) {
