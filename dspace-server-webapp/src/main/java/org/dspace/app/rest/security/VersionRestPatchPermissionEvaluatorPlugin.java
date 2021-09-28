@@ -26,6 +26,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
+ * This class evaluate ADMIN permissions to patch operation over a Version.
+ * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component

@@ -144,8 +144,6 @@ public class CanCreateVersionFeatureIT extends AbstractControllerIntegrationTest
                          .andExpect(status().isOk())
                          .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
                          .andExpect(jsonPath("$._embedded").exists());
-
-        configurationService.setProperty("versioning.submitterCanCreateNewVersion", false);
     }
 
     @Test
@@ -214,8 +212,6 @@ public class CanCreateVersionFeatureIT extends AbstractControllerIntegrationTest
 
         getClient(tokenUser).perform(get("/api/authz/authorizations/" + user2ItemB.getID()))
                             .andExpect(status().isNotFound());
-
-        configurationService.setProperty("versioning.submitterCanCreateNewVersion", false);
     }
 
     @Test
@@ -351,8 +347,6 @@ public class CanCreateVersionFeatureIT extends AbstractControllerIntegrationTest
 
         getClient(tokenEPerson).perform(get("/api/authz/authorizations/" + eperson2ItemA.getID()))
                                .andExpect(status().isNotFound());
-
-        configurationService.setProperty("versioning.block.entity", "");
     }
 
     @Test
@@ -400,8 +394,6 @@ public class CanCreateVersionFeatureIT extends AbstractControllerIntegrationTest
 
         getClient(tokenEPerson).perform(get("/api/authz/authorizations/" + eperson2ItemA.getID()))
                                .andExpect(status().isNotFound());
-
-        configurationService.setProperty("versioning.block.entity", "");
     }
 
     @Test
@@ -449,9 +441,6 @@ public class CanCreateVersionFeatureIT extends AbstractControllerIntegrationTest
 
         getClient(tokenEPerson).perform(get("/api/authz/authorizations/" + eperson2ItemA.getID()))
                                .andExpect(status().isNotFound());
-
-        configurationService.setProperty("versioning.block.entity", "");
-        configurationService.setProperty("versioning.submitterCanCreateNewVersion", true);
     }
 
 }

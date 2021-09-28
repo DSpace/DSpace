@@ -261,8 +261,6 @@ public class CanEditVersionFeatureIT extends AbstractControllerIntegrationTest {
 
         getClient(tokenAdmin).perform(get("/api/authz/authorizations/" + adminToVersion.getID()))
                              .andExpect(status().isNotFound());
-
-        configurationService.setProperty("versioning.block.entity", "");
     }
 
     @Test
@@ -343,8 +341,6 @@ public class CanEditVersionFeatureIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/authz/authorizations/" + anonymousToVersion.getID()))
                    .andExpect(status().isNotFound());
-
-        configurationService.setProperty("versioning.block.entity", "");
     }
 
 }

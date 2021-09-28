@@ -304,8 +304,6 @@ public class CanDeleteVersionFeatureIT extends AbstractControllerIntegrationTest
 
         getClient().perform(get("/api/authz/authorizations/" + anonymous2ItemA.getID()))
                    .andExpect(status().isNotFound());
-
-        configurationService.setProperty("versioning.block.entity", "");
     }
 
     @Test
@@ -356,8 +354,6 @@ public class CanDeleteVersionFeatureIT extends AbstractControllerIntegrationTest
 
         getClient().perform(get("/api/authz/authorizations/" + anonymous2ItemA.getID()))
                    .andExpect(status().isNotFound());
-
-        configurationService.setProperty("versioning.block.entity", "");
     }
 
 }

@@ -55,6 +55,7 @@ public class CanCreateVersionFeature implements AuthorizationFeature {
             }
             Item item = itemService.find(context, UUID.fromString(((ItemRest) object).getUuid()));
             if (Objects.nonNull(item)) {
+                // The property versioning.block.entity is used to disable versioning for items with EntityType
                 boolean isBlockEntity = configurationService.getBooleanProperty("versioning.block.entity", true);
                 boolean hasEntityType = StringUtils.isNotBlank(itemService.
                                         getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY));

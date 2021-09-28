@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -43,6 +44,7 @@ import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +95,13 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
     }
 
+    @After
+    public void cleanup() throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+        versionHistoryService.delete(context, versionHistory);
+        context.restoreAuthSystemState();
+    }
+
     @Test
     public void findOnePublicVersionHistoryTest() throws Exception {
         getClient().perform(get("/api/versioning/versionhistories/" + versionHistory.getID()))
@@ -135,9 +144,6 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.draftVersion", Matchers.is(true)))
                              .andExpect(jsonPath("$", is(VersionHistoryMatcher.matchEntry(versionHistory))));
-
-        configurationService.setProperty("versioning.item.history.view.admin", false);
-
     }
 
     @Test
@@ -147,8 +153,6 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/versioning/versionhistories/" + versionHistory.getID()))
                         .andExpect(status().isForbidden());
-
-        configurationService.setProperty("versioning.item.history.view.admin", false);
     }
 
     @Test
@@ -184,17 +188,17 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
                                .withSubject("ExtraEntry")
                                .build();
 
-        Version version = VersionBuilder.createVersion(context, item, "test").build();
+        Version version2 = VersionBuilder.createVersion(context, item, "test").build();
         VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
-        Version version2 = versioningService.getVersion(context, item);
+        Version version = versioningService.getVersion(context, item);
         context.turnOffAuthorisationSystem();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
                              .andExpect(status().isOk())
-                             .andExpect(jsonPath("$._embedded.versions", containsInAnyOrder(
-                                                 VersionMatcher.matchEntry(version),
-                                                 VersionMatcher.matchEntry(version2)
+                             .andExpect(jsonPath("$._embedded.versions", containsInRelativeOrder(
+                                                 VersionMatcher.matchEntry(version2),
+                                                 VersionMatcher.matchEntry(version)
                                                  )));
 
         context.turnOffAuthorisationSystem();
@@ -203,10 +207,10 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
                              .andExpect(status().isOk())
-                             .andExpect(jsonPath("$._embedded.versions", containsInAnyOrder(
-                                                 VersionMatcher.matchEntry(version),
+                             .andExpect(jsonPath("$._embedded.versions", containsInRelativeOrder(
+                                                 VersionMatcher.matchEntry(version3),
                                                  VersionMatcher.matchEntry(version2),
-                                                 VersionMatcher.matchEntry(version3)
+                                                 VersionMatcher.matchEntry(version)
                                                  )));
     }
 
@@ -235,8 +239,6 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         getClient().perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
                    .andExpect(status().isUnauthorized());
-
-        configurationService.setProperty("versioning.item.history.view.admin", true);
     }
 
     @Test
