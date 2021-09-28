@@ -21,10 +21,14 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -822,6 +826,83 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.service").doesNotExist());
     }
 
+    @Test
+    public void findOneIIIFRestrictedItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .build();
+
+        Group staffGroup = GroupBuilder.createGroup(context)
+                .withName("Staff")
+                .build();
+        Group anotherGroup = GroupBuilder.createGroup(context)
+                .withName("anotherGroup")
+                .build();
+
+        Item restrictedItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Restricted item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .enableIIIF()
+                .withIIIFCanvasWidth(2000)
+                .withIIIFCanvasHeight(3000)
+                .withIIIFCanvasNaming("Global")
+                .enableIIIFSearch()
+                .withReaderGroup(staffGroup)
+                .build();
+
+        EPerson staffEperson = EPersonBuilder.createEPerson(context).withEmail("staff@example.com")
+                .withPassword(password).withGroupMembership(staffGroup).build();
+        String bitstreamContent = "ThisIsSomeText";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, restrictedItem1, is)
+                    .withName("Bitstream1.jpg")
+                    .withMimeType("image/jpeg")
+                    .withIIIFLabel("Custom Label")
+                    .withIIIFCanvasWidth(3163)
+                    .withIIIFCanvasHeight(4220)
+                    .withReaderGroup(staffGroup)
+                    .build();
+        }
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, restrictedItem1, is)
+                    .withName("Bitstream2.jpg")
+                    .withMimeType("image/jpeg")
+                    .withReaderGroup(anotherGroup)
+                    .build();
+        }
+        context.restoreAuthSystemState();
+        // anonymous cannot get the iiif manifest for the restricted item
+        getClient().perform(get("/iiif/" + restrictedItem1.getID() + "/manifest"))
+                .andExpect(status().isUnauthorized());
+        // not authorized eperson cannot get the iiif manifest
+        getClient(getAuthToken(eperson.getEmail(), password))
+                .perform(get("/iiif/" + restrictedItem1.getID() + "/manifest")).andExpect(status().isForbidden());
+        // authorized eperson get the full manifest including canvas related to not accessible bitstreams
+        // access to the bitstream is eventually denied/granted via the IIIF server for a downgraded image
+        // Expect canvas label, width and height to match bitstream description.
+        getClient(getAuthToken(staffEperson.getEmail(), password))
+                .perform(get("/iiif/" + restrictedItem1.getID() + "/manifest"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
+                        Matchers.containsString("/iiif/" + restrictedItem1.getID() + "/canvas/c0")))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Custom Label")))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(3163)))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].height", is(4220)))
+                .andExpect(jsonPath("$.sequences[0].canvases[1].@id",
+                        Matchers.containsString("/iiif/" + restrictedItem1.getID() + "/canvas/c1")))
+                .andExpect(jsonPath("$.sequences[0].canvases[1].label", is("Global 2")))
+                .andExpect(jsonPath("$.sequences[0].canvases[1].width", is(2000)))
+                .andExpect(jsonPath("$.sequences[0].canvases[1].height", is(3000)))
+                .andExpect(jsonPath("$.structures").doesNotExist())
+                .andExpect(jsonPath("$.service").exists());
+    }
 
     @Test
     public void findOneCanvas() throws Exception {
