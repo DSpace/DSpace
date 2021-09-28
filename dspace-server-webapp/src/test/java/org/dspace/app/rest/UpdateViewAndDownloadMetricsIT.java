@@ -329,4 +329,394 @@ public class UpdateViewAndDownloadMetricsIT extends AbstractControllerIntegratio
         assertFalse(old_metric_downloads_month.getLast());
         assertFalse(old_metric_downloads_week.getLast());
     }
+
+
+    //test with previous week and month views and downloads for community and items
+    @Test
+    public void storeCrisMetricsForCommunityAndItemsWithViewWithPreviousWeekAndMonthValues()
+            throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        parentCommunity = CommunityBuilder.createSubCommunity(context, community).build();
+        Collection col1 = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, col1)
+                .withDoiIdentifier("10.1016/j.gene.2009.04.019")
+                .withTitle("Title item A")
+                .inArchive().build();
+        Bitstream bitstream_for_item = BitstreamBuilder.createBitstream(
+                        context, item, toInputStream("test", UTF_8))
+                .withName("bitstream1").build();
+        Calendar cal = Calendar.getInstance();
+        // metrics week and a month before for views
+        cal.add(Calendar.MONTH, -1);
+        CrisMetrics crisMetrics_previous_month_views_comm = CrisMetricsBuilder.createCrisMetrics(context, community)
+                .withMetricType("view")
+                .withMetricCount(1)
+                .withAcquisitionDate(cal.getTime())
+                .isLast(false).build();
+        CrisMetrics crisMetrics_previous_week_views_comm = CrisMetricsBuilder.createCrisMetrics(context, community)
+                .withMetricType("view")
+                .withMetricCount(1)
+                .withAcquisitionDate(
+                        DateUtils.addDays(new Date(), -7))
+                .isLast(true).build();
+        CrisMetrics crisMetrics_previous_week_views_item = CrisMetricsBuilder.createCrisMetrics(context, item)
+                .withMetricType("view")
+                .withMetricCount(1)
+                .withAcquisitionDate(
+                        DateUtils.addDays(new Date(), -7))
+                .isLast(true).build();
+
+        CrisMetrics crisMetrics_previous_week_downloads = CrisMetricsBuilder.createCrisMetrics(context, item)
+                .withMetricType("download")
+                .withMetricCount(1)
+                .withAcquisitionDate(DateUtils.addDays(
+                        new Date(), -7))
+                .isLast(true).build();
+        context.restoreAuthSystemState();
+        // create view events to store data in statistics
+        // visit the publication
+        ViewEventRest viewEventRestComm = new ViewEventRest();
+        viewEventRestComm.setTargetType("community");
+        viewEventRestComm.setTargetId(community.getID());
+        // visit the item
+        ViewEventRest viewEventRestItem = new ViewEventRest();
+        viewEventRestItem.setTargetType("item");
+        viewEventRestItem.setTargetId(item.getID());
+        // visit the publication bitstream
+        ViewEventRest viewEventRestBitstream = new ViewEventRest();
+        viewEventRestBitstream.setTargetType("bitstream");
+        viewEventRestBitstream.setTargetId(bitstream_for_item.getID());
+        ObjectMapper mapper = new ObjectMapper();
+        // view item
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRestItem))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+        // view comms
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRestComm))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRestComm))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+        //download
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRestBitstream))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+        String[] args = new String[]{"store-metrics"};
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        int status = handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin);
+        assertEquals(0, status);
+        CrisMetrics metric_view_item = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(
+                context, "view", item.getID());
+        CrisMetrics metric_download = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(
+                context, "download", item.getID());
+        CrisMetrics metrics_views_comm = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(
+                context, "view", community.getID());
+        // find previous metrics
+        CrisMetrics old_metric_views_month = crisMetriscService.find(context,
+            crisMetrics_previous_month_views_comm.getID());
+        CrisMetrics old_metric_views_week = crisMetriscService.find(context,
+            crisMetrics_previous_week_views_comm.getID());
+        CrisMetrics old_metric_downloads_week = crisMetriscService.find(context,
+            crisMetrics_previous_week_downloads.getID());
+
+
+        //control download values
+        assertEquals("download", metric_download.getMetricType());
+        assertEquals(1, metric_download.getMetricCount(), 0);
+        assertTrue(metric_download.getLast());
+        assertTrue(metric_download.getDeltaPeriod1() == 0.0);
+
+        assertEquals("view", metrics_views_comm.getMetricType());
+        assertTrue(metrics_views_comm.getLast());
+        assertEquals(2, metrics_views_comm.getMetricCount(), 0);
+        assertTrue(metrics_views_comm.getDeltaPeriod1() == 1.0);
+        assertTrue(metrics_views_comm.getDeltaPeriod2() == 1.0);
+
+        assertEquals("view", metric_view_item.getMetricType());
+        assertEquals(1, metric_view_item.getMetricCount(), 0);
+        assertTrue(metric_view_item.getDeltaPeriod1() == 0.0);
+        assertTrue(metric_view_item.getLast());
+
+        // all last values of previous must be false
+        assertFalse(old_metric_views_month.getLast());
+        assertFalse(old_metric_views_week.getLast());
+        assertFalse(old_metric_downloads_week.getLast());
+    }
+
+    //test with previous week and month views and downloads for community collection and items together
+    @Test
+    public void storeCrisMetricsForCommunityItemsAndCollectionWithViewWithPreviousWeekAndMonthValues()
+            throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        parentCommunity = CommunityBuilder.createSubCommunity(context, community).build();
+        Collection col1 = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, col1)
+                .withDoiIdentifier("10.1016/j.gene.2009.04.019")
+                .withTitle("Title item A")
+                .inArchive().build();
+        Bitstream bitstream_for_item = BitstreamBuilder.createBitstream(
+                        context, item, toInputStream("test", UTF_8))
+                .withName("bitstream1").build();
+        Calendar cal = Calendar.getInstance();
+        // metrics week and a month before for views
+        cal.add(Calendar.MONTH, -1);
+        CrisMetrics crisMetrics_previous_month_views_comm = CrisMetricsBuilder.createCrisMetrics(context, community)
+                .withMetricType("view")
+                .withMetricCount(1)
+                .withAcquisitionDate(cal.getTime())
+                .isLast(false).build();
+        CrisMetrics crisMetrics_previous_week_views_comm = CrisMetricsBuilder.createCrisMetrics(context, community)
+                .withMetricType("view")
+                .withMetricCount(1)
+                .withAcquisitionDate(
+                        DateUtils.addDays(new Date(), -7))
+                .isLast(true).build();
+        // collections
+        CrisMetrics crisMetrics_previous_month_views_col = CrisMetricsBuilder.createCrisMetrics(context, col1)
+                .withMetricType("view")
+                .withMetricCount(3)
+                .withAcquisitionDate(cal.getTime())
+                .isLast(false).build();
+        CrisMetrics crisMetrics_previous_week_views_col = CrisMetricsBuilder.createCrisMetrics(context, col1)
+                .withMetricType("view")
+                .withMetricCount(1)
+                .withAcquisitionDate(
+                        DateUtils.addDays(new Date(), -7))
+                .isLast(true).build();
+        // items
+        CrisMetrics crisMetrics_previous_week_views_item = CrisMetricsBuilder.createCrisMetrics(context, item)
+                .withMetricType("view")
+                .withMetricCount(1)
+                .withAcquisitionDate(
+                        DateUtils.addDays(new Date(), -7))
+                .isLast(true).build();
+
+        CrisMetrics crisMetrics_previous_week_downloads = CrisMetricsBuilder.createCrisMetrics(context, item)
+                .withMetricType("download")
+                .withMetricCount(1)
+                .withAcquisitionDate(DateUtils.addDays(
+                        new Date(), -7))
+                .isLast(true).build();
+        context.restoreAuthSystemState();
+        // create view events to store data in statistics
+        // visit the publication
+        ViewEventRest viewEventRestComm = new ViewEventRest();
+        viewEventRestComm.setTargetType("community");
+        viewEventRestComm.setTargetId(community.getID());
+        // visit the collection
+        ViewEventRest viewEventRestColl = new ViewEventRest();
+        viewEventRestColl.setTargetType("collection");
+        viewEventRestColl.setTargetId(col1.getID());
+        // visit the item
+        ViewEventRest viewEventRestItem = new ViewEventRest();
+        viewEventRestItem.setTargetType("item");
+        viewEventRestItem.setTargetId(item.getID());
+        // visit the publication bitstream
+        ViewEventRest viewEventRestBitstream = new ViewEventRest();
+        viewEventRestBitstream.setTargetType("bitstream");
+        viewEventRestBitstream.setTargetId(bitstream_for_item.getID());
+        ObjectMapper mapper = new ObjectMapper();
+        // view item
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRestItem))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+        // view comms
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRestComm))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRestComm))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+
+        // view cols
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRestColl))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRestColl))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+        //download
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRestBitstream))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+        String[] args = new String[]{"store-metrics"};
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        int status = handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin);
+        assertEquals(0, status);
+        CrisMetrics metric_view_item = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(
+                context, "view", item.getID());
+        CrisMetrics metric_download = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(
+                context, "download", item.getID());
+        CrisMetrics metrics_views_comm = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(
+                context, "view", community.getID());
+        CrisMetrics metrics_views_cols = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(
+                context, "view", col1.getID());
+        // find previous metrics
+        CrisMetrics old_metric_views_month = crisMetriscService.find(context,
+            crisMetrics_previous_month_views_comm.getID());
+        CrisMetrics old_metric_views_week = crisMetriscService.find(context,
+            crisMetrics_previous_week_views_comm.getID());
+        CrisMetrics old_metric_downloads_week = crisMetriscService.find(context,
+                crisMetrics_previous_week_downloads.getID());
+        CrisMetrics old_metric_view_week_items = crisMetriscService.find(context,
+                crisMetrics_previous_week_views_item.getID());
+        CrisMetrics old_metric_view_week_col = crisMetriscService.find(context,
+                crisMetrics_previous_week_views_col.getID());
+        CrisMetrics old_metric_view_month_col = crisMetriscService.find(context,
+                crisMetrics_previous_month_views_col.getID());
+
+        //control download values
+        assertEquals("download", metric_download.getMetricType());
+        assertEquals(1, metric_download.getMetricCount(), 0);
+        assertTrue(metric_download.getLast());
+        assertTrue(metric_download.getDeltaPeriod1() == 0.0);
+
+        assertEquals("view", metrics_views_comm.getMetricType());
+        assertTrue(metrics_views_comm.getLast());
+        assertEquals(2, metrics_views_comm.getMetricCount(), 0);
+        assertTrue(metrics_views_comm.getDeltaPeriod1() == 1.0);
+        assertTrue(metrics_views_comm.getDeltaPeriod2() == 1.0);
+
+        assertEquals("view", metric_view_item.getMetricType());
+        assertEquals(1, metric_view_item.getMetricCount(), 0);
+        assertTrue(metric_view_item.getDeltaPeriod1() == 0.0);
+        assertTrue(metric_view_item.getLast());
+
+
+        assertEquals("view", metrics_views_cols.getMetricType());
+        assertEquals(2, metrics_views_cols.getMetricCount(), 0);
+        assertTrue(metrics_views_cols.getDeltaPeriod1() == 1.0);
+        assertTrue(metrics_views_cols.getDeltaPeriod2() == -1.0);
+        assertTrue(metrics_views_cols.getLast());
+
+
+        // all last values of previous must be false
+        assertFalse(old_metric_views_month.getLast());
+        assertFalse(old_metric_views_week.getLast());
+        assertFalse(old_metric_downloads_week.getLast());
+        assertFalse(old_metric_view_week_items.getLast());
+        assertFalse(old_metric_view_week_col.getLast());
+        assertFalse(old_metric_view_month_col.getLast());
+    }
+
+    //test with previous week and month views and downloads for community and collection
+    @Test
+    public void storeCrisMetricsForCommunityAndCollectionWithViewWithPreviousWeekAndMonthValues()
+            throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        parentCommunity = CommunityBuilder.createSubCommunity(context, community).build();
+        Collection col1 = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, col1)
+                .withDoiIdentifier("10.1016/j.gene.2009.04.019")
+                .withTitle("Title item A")
+                .inArchive().build();
+        Calendar cal = Calendar.getInstance();
+        // metrics week and a month before for views
+        cal.add(Calendar.MONTH, -1);
+        CrisMetrics crisMetrics_previous_month_views_comm = CrisMetricsBuilder.createCrisMetrics(context, community)
+                .withMetricType("view")
+                .withMetricCount(2)
+                .withAcquisitionDate(cal.getTime())
+                .isLast(false).build();
+        CrisMetrics crisMetrics_previous_week_views_comm = CrisMetricsBuilder.createCrisMetrics(context, community)
+                .withMetricType("view")
+                .withMetricCount(1)
+                .withAcquisitionDate(
+                        DateUtils.addDays(new Date(), -7))
+                .isLast(true).build();
+        // collections
+        CrisMetrics crisMetrics_previous_month_views_col = CrisMetricsBuilder.createCrisMetrics(context, col1)
+                .withMetricType("view")
+                .withMetricCount(3)
+                .withAcquisitionDate(cal.getTime())
+                .isLast(false).build();
+        CrisMetrics crisMetrics_previous_week_views_col = CrisMetricsBuilder.createCrisMetrics(context, col1)
+                .withMetricType("view")
+                .withMetricCount(2)
+                .withAcquisitionDate(
+                        DateUtils.addDays(new Date(), -7))
+                .isLast(true).build();
+
+        context.restoreAuthSystemState();
+        // create view events to store data in statistics
+        // visit the publication
+        ViewEventRest viewEventRestComm = new ViewEventRest();
+        viewEventRestComm.setTargetType("community");
+        viewEventRestComm.setTargetId(community.getID());
+        // visit the collection
+        ViewEventRest viewEventRestColl = new ViewEventRest();
+        viewEventRestColl.setTargetType("collection");
+        viewEventRestColl.setTargetId(col1.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+        // view comms
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRestComm))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRestComm))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+
+        // view cols
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRestColl))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRestColl))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+        String[] args = new String[]{"store-metrics"};
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+        int status = handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, admin);
+        assertEquals(0, status);
+        CrisMetrics metrics_views_comm = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(
+                context, "view", community.getID());
+        CrisMetrics metrics_views_cols = crisMetriscService.findLastMetricByResourceIdAndMetricsTypes(
+                context, "view", col1.getID());
+        // find previous metrics
+        CrisMetrics old_metric_views_month = crisMetriscService.find(context,
+            crisMetrics_previous_month_views_comm.getID());
+        CrisMetrics old_metric_views_week = crisMetriscService.find(context,
+            crisMetrics_previous_week_views_comm.getID());
+        CrisMetrics old_metric_view_week_col = crisMetriscService.find(context,
+            crisMetrics_previous_week_views_col.getID());
+        CrisMetrics old_metric_view_month_col = crisMetriscService.find(context,
+            crisMetrics_previous_month_views_col.getID());
+
+
+        assertEquals("view", metrics_views_comm.getMetricType());
+        assertTrue(metrics_views_comm.getLast());
+        assertEquals(2, metrics_views_comm.getMetricCount(), 0);
+        assertTrue(metrics_views_comm.getDeltaPeriod1() == 1.0);
+        assertTrue(metrics_views_comm.getDeltaPeriod2() == 0);
+
+        assertEquals("view", metrics_views_cols.getMetricType());
+        assertEquals(2, metrics_views_cols.getMetricCount(), 0);
+        assertTrue(metrics_views_cols.getDeltaPeriod1() == 0);
+        assertTrue(metrics_views_cols.getDeltaPeriod2() == -1.0);
+        assertTrue(metrics_views_cols.getLast());
+
+        // all last values of previous must be false
+        assertFalse(old_metric_views_month.getLast());
+        assertFalse(old_metric_views_week.getLast());
+        assertFalse(old_metric_view_week_col.getLast());
+        assertFalse(old_metric_view_month_col.getLast());
+    }
 }

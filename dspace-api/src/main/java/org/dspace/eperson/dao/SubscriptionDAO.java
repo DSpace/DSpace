@@ -41,7 +41,17 @@ public interface SubscriptionDAO extends GenericDAO<Subscription> {
             throws SQLException;
 
     public List<Subscription> findAllOrderedByIDAndResourceType(Context context, String resourceType,
-                                                      Integer limit, Integer offset) throws SQLException;
+                                                                Integer limit, Integer offset) throws SQLException;
 
-    public List<Subscription> findAllOrderedById(Context context, Integer limit, Integer offset) throws SQLException;
+    public List<Subscription> findAllOrderedByDSO(Context context, Integer limit, Integer offset) throws SQLException;
+
+    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context,
+                                      String type, String frequencyValue) throws SQLException;
+
+    public Long countAll(Context context) throws SQLException;
+
+    public Long countAllByEPerson(Context context, EPerson ePerson) throws SQLException;
+
+    public Long countAllByEPersonAndDso(Context context, EPerson ePerson,
+                    DSpaceObject dSpaceObject) throws SQLException;
 }

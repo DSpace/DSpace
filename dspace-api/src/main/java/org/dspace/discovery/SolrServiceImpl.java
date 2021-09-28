@@ -371,7 +371,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 countQuery.setRows(0);  // don't actually request any data
                 // Get the total amount of results
                 QueryResponse totalResponse = solrSearchCore.getSolr().query(countQuery,
-                                                                             solrSearchCore.REQUEST_METHOD);
+                        solrSearchCore.REQUEST_METHOD);
                 long total = totalResponse.getResults().getNumFound();
 
                 int start = 0;
@@ -380,7 +380,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 // Now get actual Solr Documents in batches
                 SolrQuery query = new SolrQuery();
                 query.setFields(SearchUtils.RESOURCE_UNIQUE_ID, SearchUtils.RESOURCE_ID_FIELD,
-                                SearchUtils.RESOURCE_TYPE_FIELD);
+                        SearchUtils.RESOURCE_TYPE_FIELD);
                 query.addSort(SearchUtils.RESOURCE_UNIQUE_ID, SolrQuery.ORDER.asc);
                 query.setQuery("*:*");
                 query.setRows(batch);
@@ -575,7 +575,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
             for (ResourcePolicy rp : collectionsPolicies) {
                 Collection collection = ContentServiceFactory.getInstance().getCollectionService()
-                                                             .find(context, rp.getdSpaceObject().getID());
+                        .find(context, rp.getdSpaceObject().getID());
                 allCollections.add(collection);
             }
 
@@ -736,7 +736,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     protected SolrQuery resolveToSolrQuery(Context context, DiscoverQuery discoveryQuery)
-        throws SearchServiceException {
+            throws SearchServiceException {
         SolrQuery solrQuery = new SolrQuery();
 
         String query = "*:*";
@@ -1027,9 +1027,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             long missing = 0;
                             for (FacetField.Count facetValue : facetValues) {
                                 String displayedValue = transformDisplayedValue(context, facetField.getName(),
-                                                                                facetValue.getName());
+                                        facetValue.getName());
                                 String authorityValue = transformAuthorityValue(context, facetField.getName(),
-                                                                                facetValue.getName());
+                                        facetValue.getName());
                                 String sortValue = transformSortValue(context, facetField.getName(),
                                         facetValue.getName());
                                 String filterValue = displayedValue;
@@ -1200,6 +1200,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             return new ArrayList<>(0);
         }
     }
+
     @Override
     public DiscoverFilterQuery toFilterQuery(Context context, String field, String operator, String value,
         DiscoveryConfiguration config)
@@ -1535,13 +1536,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     @Override
     public void updateMetrics(Context context, CrisMetrics metric) {
         UpdateRequest req = new UpdateRequest();
-        SolrClient solrClient =  solrSearchCore.getSolr();
-        StringBuilder uniqueID = new StringBuilder("Item-");
-        uniqueID.append(metric.getResource().getID());
-
+        SolrClient solrClient = solrSearchCore.getSolr();
+        Optional<String> id = findUniqueId(metric);
+        if (id.isEmpty()) {
+            log.warn("Unable to define unique id for item {}", metric.getResource().getID());
+        }
         try {
             SolrInputDocument solrInDoc = new SolrInputDocument();
-            solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, uniqueID);
+            solrInDoc.addField(SearchUtils.RESOURCE_UNIQUE_ID, id.get());
+            solrInDoc.addField(SearchUtils.RESOURCE_TYPE_FIELD, itemType(metric.getResource()));
+            solrInDoc.addField(SearchUtils.RESOURCE_ID_FIELD, metric.getResource().getID());
             req.add(SearchUtils.addMetricFieldsInSolrDoc(metric, solrInDoc));
             solrClient.request(req);
             solrClient.commit();
@@ -1585,5 +1589,35 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         } catch (SolrServerException | SolrException | IOException e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    private String itemType(DSpaceObject resource) {
+        if (resource instanceof Item) {
+            return IndexableItem.TYPE;
+        }
+        if (resource instanceof Collection) {
+            return IndexableCollection.TYPE;
+        }
+        if (resource instanceof Community) {
+            return IndexableCommunity.TYPE;
+        }
+        throw new RuntimeException(
+            String.format("resource with id %s is of unsupported type: %s",
+                resource.getID(), resource.getClass().getSimpleName()));
+    }
+
+    private Optional<String> findUniqueId(CrisMetrics metric) {
+        StringBuilder uniqueID = new StringBuilder();
+        if (metric.getResource() instanceof Item) {
+            uniqueID.append("Item-");
+        } else if (metric.getResource() instanceof Collection) {
+            uniqueID.append("Collection-");
+        } else if (metric.getResource() instanceof Community) {
+            uniqueID.append("Community-");
+        } else {
+            return Optional.empty();
+        }
+        uniqueID.append(metric.getResource().getID());
+        return Optional.of(uniqueID.toString());
     }
 }

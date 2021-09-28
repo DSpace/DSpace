@@ -50,7 +50,7 @@ public class SubscribeServiceImpl implements SubscribeService {
     public List<Subscription> findAll(Context context, String resourceType,
                                       Integer limit, Integer offset) throws Exception {
         if (resourceType == null) {
-            return subscriptionDAO.findAllOrderedById(context, limit, offset);
+            return subscriptionDAO.findAllOrderedByDSO(context, limit, offset);
         } else {
             if (resourceType.equals("Item") || resourceType.equals("Collection") || resourceType.equals("Community")) {
                 return subscriptionDAO.findAllOrderedByIDAndResourceType(context, resourceType, limit, offset);
@@ -158,7 +158,7 @@ public class SubscribeServiceImpl implements SubscribeService {
         Subscription subscription = subscriptionDAO.findByID(context, Subscription.class, id);
         if (context.getCurrentUser().equals(subscription.getePerson()) ||
                 authorizeService.isAdmin(context, context.getCurrentUser())) {
-            return  subscription;
+            return subscription;
         }
         throw new AuthorizeException("Only admin or e-person themselves can edit the subscription");
     }
@@ -187,7 +187,7 @@ public class SubscribeServiceImpl implements SubscribeService {
 
     @Override
     public Subscription addSubscriptionParameter(Context context, Integer id,
-                      SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
+                   SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
         // must be admin or the subscriber of the subscription
         Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
         if (authorizeService.isAdmin(context, context.getCurrentUser())
@@ -202,7 +202,7 @@ public class SubscribeServiceImpl implements SubscribeService {
 
     @Override
     public Subscription removeSubscriptionParameter(Context context, Integer id,
-                          SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
+                       SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
         // must be admin or the subscriber of the subscription
         Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
         if (authorizeService.isAdmin(context, context.getCurrentUser())
@@ -236,5 +236,27 @@ public class SubscribeServiceImpl implements SubscribeService {
             throw new IllegalArgumentException("Subscription with id " + id + " is not found");
         }
 
+    }
+
+    @Override
+    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context,
+                                     String type, String frequencyValue) throws SQLException {
+        return subscriptionDAO.findAllSubscriptionsByTypeAndFrequency(context, type, frequencyValue);
+    }
+
+    @Override
+    public Long countAll(Context context) throws SQLException {
+        return subscriptionDAO.countAll(context);
+    }
+
+    @Override
+    public Long countAllByEPerson(Context context, EPerson ePerson) throws SQLException {
+        return subscriptionDAO.countAllByEPerson(context, ePerson);
+    }
+
+    @Override
+    public Long countAllByEPersonAndDSO(Context context,
+           EPerson ePerson, DSpaceObject dSpaceObject) throws SQLException {
+        return subscriptionDAO.countAllByEPersonAndDso(context, ePerson, dSpaceObject);
     }
 }
