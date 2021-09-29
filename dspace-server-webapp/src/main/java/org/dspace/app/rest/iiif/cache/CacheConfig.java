@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
  * Enables Spring cache support. The configuration file is defined in
  * application properties.
  * <p>spring.cache.jcache.config=classpath:iiif/cache/ehcache.xml</p>
+ * TODO: Before the cache is used in production there must be a way to
+ * evict from the cache whenever a dspace item, bundle or bitstream is changed.
  */
 @Configuration
 @EnableCaching
