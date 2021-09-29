@@ -80,6 +80,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
+import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItem;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -88,6 +89,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
 
 public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private VersioningService versioningService;
 
     @Autowired
     private CollectionService collectionService;
@@ -3853,7 +3857,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(tokenEperson).perform(get("/api/core/items/" + item.getID())
                  .param("projection", "full"))
                  .andExpect(status().isOk())
-                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                 .andExpect(jsonPath("$", HalMatcher.matchEmbeds("version")))
                  .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
                  .andExpect(jsonPath("$.name", Matchers.is(item.getName())))
                  .andExpect(jsonPath("$.handle", Matchers.is(item.getHandle())))
@@ -3884,7 +3888,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + item.getID())
                    .param("projection", "full"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                   .andExpect(jsonPath("$", HalMatcher.matchEmbeds("version")))
                    .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
                    .andExpect(jsonPath("$.name", Matchers.is(item.getName())))
                    .andExpect(jsonPath("$.handle", Matchers.is(item.getHandle())))
@@ -4229,6 +4233,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .build();
 
         VersionBuilder.createVersion(context, item, "test").build();
+        Version v1 = versioningService.getVersion(context, item);
 
         context.restoreAuthSystemState();
 
@@ -4240,12 +4245,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                        hasJsonPath("$.summary", emptyOrNullString()),
                                        hasJsonPath("$.type", is("version"))
                                        )))
-                               .andExpect(jsonPath("$._links.versionhistory.href",
-                                          Matchers.containsString("api/versioning/versions/1/versionhistory")))
-                               .andExpect(jsonPath("$._links.item.href",
-                                          Matchers.containsString("api/versioning/versions/1/item")))
-                               .andExpect(jsonPath("$._links.self.href",
-                                          Matchers.containsString("api/versioning/versions/1")));
+                               .andExpect(jsonPath("$._links.versionhistory.href", Matchers
+                                         .containsString("api/versioning/versions/" + v1.getID() + "/versionhistory")))
+                               .andExpect(jsonPath("$._links.item.href", Matchers
+                                         .containsString("api/versioning/versions/" + v1.getID() + "/item")))
+                               .andExpect(jsonPath("$._links.self.href", Matchers
+                                         .containsString("api/versioning/versions/" + v1.getID() )));
     }
 
     @Test
