@@ -1,0 +1,16 @@
+<Configuration strict='true'
+	       xmlns='http://logging.apache.org/log4j/2.0/config'>
+    <Appenders>
+	<Appender name='A1'
+		  type='Console'>
+	    <Layout type='PatternLayout'
+		    pattern='%p %m  [%d] (%F:%L) %n'/>
+	</Appender>
+    </Appenders>
+
+    <Loggers>
+	<Root level='info'>
+	    <AppenderRef ref='A1'/>
+	</Root>
+    </Loggers>
+</Configuration>
