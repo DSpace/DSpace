@@ -49,9 +49,7 @@ public class HarvestScriptConfiguration<T extends Harvest> extends ScriptConfigu
         options.addOption("S", "start", false, "start the harvest loop");
         options.addOption("R", "reset", false, "reset harvest status on all collections");
         options.addOption("P", "purge", false, "purge all harvestable collections");
-
-        options.addOption("e", "eperson", true,
-                          "eperson");
+        options.addOption("o", "reimport", false, "reimport all items in the collection");
         options.addOption("c", "collection", true,
                           "harvesting collection (handle or id)");
         options.addOption("t", "type", true,

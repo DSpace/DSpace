@@ -44,17 +44,18 @@ import org.dspace.utils.DSpace;
 public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
 
     private HarvestedCollectionService harvestedCollectionService;
-    private EPersonService ePersonService;
+    protected EPersonService ePersonService;
     private CollectionService collectionService;
 
     private boolean help;
     private String command = null;
-    private String eperson = null;
     private String collection = null;
     private String oaiSource = null;
     private String oaiSetID = null;
     private String metadataKey = null;
     private int harvestType = 0;
+
+    protected Context context;
 
 
     public HarvestScriptConfiguration getScriptConfiguration() {
@@ -69,7 +70,9 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
         collectionService =
                 ContentServiceFactory.getInstance().getCollectionService();
 
-        help = commandLine.hasOption('h'); //TODO copy the old message?
+        assignCurrentUserInContext();
+
+        help = commandLine.hasOption('h');
 
 
         if (commandLine.hasOption('s')) {
@@ -93,10 +96,8 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
         if (commandLine.hasOption('P')) {
             command = "purgeAll";
         }
-
-
-        if (commandLine.hasOption('e')) {
-            eperson = commandLine.getOptionValue('e');
+        if (commandLine.hasOption('o')) {
+            command = "reimport";
         }
         if (commandLine.hasOption('c')) {
             collection = commandLine.getOptionValue('c');
@@ -117,6 +118,28 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
         }
     }
 
+    /**
+     * This method will assign the currentUser to the {@link Context} variable which is also created in this method.
+     * The instance of the method in this class will fetch the EPersonIdentifier from this class, this identifier
+     * was given to this class upon instantiation, it'll then be used to find the {@link EPerson} associated with it
+     * and this {@link EPerson} will be set as the currentUser of the created {@link Context}
+     * @throws ParseException If something went wrong with the retrieval of the EPerson Identifier
+     */
+    protected void assignCurrentUserInContext() throws ParseException {
+        UUID currentUserUuid = this.getEpersonIdentifier();
+        try {
+            this.context = new Context(Context.Mode.BATCH_EDIT);
+            EPerson eperson = ePersonService.find(context, currentUserUuid);
+            if (eperson == null) {
+                super.handler.logError("EPerson not found: " + currentUserUuid);
+                throw new IllegalArgumentException("Unable to find a user with uuid: " + currentUserUuid);
+            }
+            this.context.setCurrentUser(eperson);
+        } catch (SQLException e) {
+            handler.handleException("Something went wrong trying to fetch eperson for uuid: " + currentUserUuid, e);
+        }
+    }
+
     public void internalRun() throws Exception {
         if (help) {
             printHelp();
@@ -133,18 +156,16 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
             return;
         }
 
-        Context context = new Context(Context.Mode.BATCH_EDIT);
-
         if (StringUtils.isBlank(command)) {
             handler.logError("No parameters specified (run with -h flag for details)");
             throw new UnsupportedOperationException("No command specified");
         } else if ("run".equals(command)) {
             // Run a single harvest cycle on a collection using saved settings.
-            if (collection == null || eperson == null) {
+            if (collection == null || context.getCurrentUser() == null) {
                 handler.logError("A target collection and eperson must be provided (run with -h flag for details)");
                 throw new UnsupportedOperationException("A target collection and eperson must be provided");
             }
-            runHarvest(context, collection, eperson);
+            runHarvest(context, collection);
         } else if ("start".equals(command)) {
             // start the harvest loop
             startHarvester();
@@ -153,7 +174,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
             resetHarvesting(context);
         } else if ("purgeAll".equals(command)) {
             // purge all collections that are set up for harvesting (obviously for testing purposes only)
-            if (eperson == null) {
+            if (context.getCurrentUser() == null) {
                 handler.logError("An eperson must be provided (run with -h flag for details)");
                 throw new UnsupportedOperationException("An eperson must be provided");
             }
@@ -164,20 +185,30 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
                         "Purging the following collections (deleting items and resetting harvest status): " +
                                 harvestedCollection
                                         .getCollection().getID().toString());
-                purgeCollection(context, harvestedCollection.getCollection().getID().toString(), eperson);
+                purgeCollection(context, harvestedCollection.getCollection().getID().toString());
             }
             context.complete();
         } else if ("purge".equals(command)) {
             // Delete all items in a collection. Useful for testing fresh harvests.
-            if (collection == null || eperson == null) {
+            if (collection == null || context.getCurrentUser() == null) {
                 handler.logError("A target collection and eperson must be provided (run with -h flag for details)");
                 throw new UnsupportedOperationException("A target collection and eperson must be provided");
             }
 
-            purgeCollection(context, collection, eperson);
+            purgeCollection(context, collection);
             context.complete();
 
             //TODO: implement this... remove all items and remember to unset "last-harvested" settings
+        } else if ("reimport".equals(command)) {
+            // Delete all items in a collection. Useful for testing fresh harvests.
+            if (collection == null || context.getCurrentUser() == null) {
+                handler.logError("A target collection and eperson must be provided (run with -h flag for details)");
+                throw new UnsupportedOperationException("A target collection and eperson must be provided");
+            }
+            purgeCollection(context, collection);
+            runHarvest(context, collection);
+            context.complete();
+
         } else if ("config".equals(command)) {
             // Configure a collection with the three main settings
             if (collection == null) {
@@ -208,8 +239,8 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
             pingResponder(oaiSource, oaiSetID, metadataKey);
         } else {
             handler.logError(
-                    "Your command '" + command + "' was not recoginzed properly (run with -h flag for details)");
-            throw new UnsupportedOperationException("\"Your command '\" + command + \"' was not recoginzed properly\"");
+                    "Your command '" + command + "' was not recognized properly (run with -h flag for details)");
+            throw new UnsupportedOperationException("Your command '" + command + "' was not recognized properly");
         }
 
 
@@ -288,18 +319,15 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
 
     /**
      * Purges a collection of all harvest-related data and settings. All items in the collection will be deleted.
+     *  @param collectionID
      *
-     * @param collectionID
-     * @param email
      */
-    private void purgeCollection(Context context, String collectionID, String email) {
+    private void purgeCollection(Context context, String collectionID) {
         handler.logInfo(
                 "Purging collection of all items and resetting last_harvested and harvest_message: " + collectionID);
         Collection collection = resolveCollection(context, collectionID);
 
         try {
-            EPerson eperson = ePersonService.findByEmail(context, email);
-            context.setCurrentUser(eperson);
             context.turnOffAuthorisationSystem();
 
             ItemService itemService = ContentServiceFactory.getInstance().getItemService();
@@ -339,7 +367,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
     /**
      * Run a single harvest cycle on the specified collection under the authorization of the supplied EPerson
      */
-    private void runHarvest(Context context, String collectionID, String email) {
+    private void runHarvest(Context context, String collectionID) {
         handler.logInfo("Running: a harvest cycle on " + collectionID);
 
         handler.logInfo("Initializing the harvester... ");
@@ -359,9 +387,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
 
         try {
             // Harvest will not work for an anonymous user
-            EPerson eperson = ePersonService.findByEmail(context, email);
             handler.logInfo("Harvest started... ");
-            context.setCurrentUser(eperson);
             harvester.runHarvest();
             context.complete();
         } catch (SQLException | AuthorizeException | IOException e) {
