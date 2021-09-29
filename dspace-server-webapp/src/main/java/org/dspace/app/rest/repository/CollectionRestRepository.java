@@ -245,20 +245,10 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             @Parameter(value = "query") String query,
             @Parameter(value = "entityType", required = true) String entityTypeLabel,
             Pageable pageable)
-            throws SearchServiceException {
+            throws RuntimeException {
         try {
-            Context context = obtainContext();
-            EntityType entityType = this.entityTypeService.findByEntityType(context, entityTypeLabel);
-            if (entityType == null) {
-                throw new ResourceNotFoundException("There was no entityType found with label: " + entityTypeLabel);
-            }
-            List<Collection> collections = cs.findCollectionsAdministeredByEntityType(
-                    query,entityTypeLabel, context,
-                    Math.toIntExact(pageable.getOffset()),
-                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            int tot = cs.countCollectionsAdministeredByEntityType(query, entityTypeLabel, context);
-            return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
-        } catch (SQLException e) {
+            return findAdminAuthorizedByEntityType(query, entityTypeLabel, pageable);
+        } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -269,7 +259,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             @Parameter(value = "query") String query,
             @Parameter(value = "entityType", required = true) String entityTypeLabel,
             Pageable pageable)
-            throws SearchServiceException {
+            throws SearchServiceException, SQLException {
         try {
             Context context = obtainContext();
             EntityType entityType = this.entityTypeService.findByEntityType(context, entityTypeLabel);
@@ -277,13 +267,15 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                 throw new ResourceNotFoundException("There was no entityType found with label: " + entityTypeLabel);
             }
             List<Collection> collections = cs.findCollectionsAdministeredByEntityType(
-                    query,entityTypeLabel, context,
+                    query, entityTypeLabel, context,
                     Math.toIntExact(pageable.getOffset()),
                     Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
             int tot = cs.countCollectionsAdministeredByEntityType(query, entityTypeLabel, context);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new SQLException(e.getMessage(), e);
+        } catch (SearchServiceException e) {
+            throw new SearchServiceException(e.getMessage(), e);
         }
     }
 
