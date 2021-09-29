@@ -58,8 +58,6 @@ public class AbstractBuilderCleanupUtil {
     private void initMap() {
         map.put(ResourcePolicyBuilder.class.getName(), new ArrayList<>());
         map.put(RelationshipBuilder.class.getName(), new ArrayList<>());
-        map.put(RelationshipTypeBuilder.class.getName(), new ArrayList<>());
-        map.put(EntityTypeBuilder.class.getName(), new ArrayList<>());
         map.put(RequestItemBuilder.class.getName(), new ArrayList<>());
         map.put(PoolTaskBuilder.class.getName(), new ArrayList<>());
         map.put(WorkflowItemBuilder.class.getName(), new ArrayList<>());
@@ -73,6 +71,8 @@ public class AbstractBuilderCleanupUtil {
         map.put(CommunityBuilder.class.getName(), new ArrayList<>());
         map.put(GroupBuilder.class.getName(), new ArrayList<>());
         map.put(EPersonBuilder.class.getName(), new ArrayList<>());
+        map.put(RelationshipTypeBuilder.class.getName(), new ArrayList<>());
+        map.put(EntityTypeBuilder.class.getName(), new ArrayList<>());
         map.put(MetadataFieldBuilder.class.getName(), new ArrayList<>());
         map.put(MetadataSchemaBuilder.class.getName(), new ArrayList<>());
         map.put(SiteBuilder.class.getName(), new ArrayList<>());
