@@ -26,7 +26,7 @@
  * </p>
  *
  * @see org.dspace.statistics.ElasticSearchLoggerEventListener
- * @see org.dspace.google.GoogleRecorderEventListener
+ * @see org.dspace.google.GoogleAsyncEventListener
  * @see org.dspace.statistics.SolrLoggerUsageEventListener
  */
 

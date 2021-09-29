@@ -36,7 +36,7 @@
     </bean>
 
     <!-- Google Analytics recording  -->
-    <bean class="org.dspace.google.GoogleRecorderEventListener">
+    <bean class="org.dspace.google.GoogleAsyncEventListener">
         <property name="eventService" >
             <ref bean="dspace.eventService"/>
         </property>
