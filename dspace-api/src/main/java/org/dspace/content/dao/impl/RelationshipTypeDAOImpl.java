@@ -83,6 +83,7 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
                                    .equal(relationshipTypeRoot.get(RelationshipType_.rightType), entityType)
             )
         );
+        criteriaQuery.orderBy(criteriaBuilder.asc(relationshipTypeRoot.get(RelationshipType_.ID)));
         return list(context, criteriaQuery, false, RelationshipType.class, limit, offset);
     }
 
@@ -110,5 +111,21 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
             );
         }
         return list(context, criteriaQuery, false, RelationshipType.class, limit, offset);
+    }
+
+    @Override
+    public int countByEntityType(Context context, EntityType entityType) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
+        Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
+        criteriaQuery.select(relationshipTypeRoot);
+        criteriaQuery.where(
+            criteriaBuilder.or(criteriaBuilder.
+                                    equal(relationshipTypeRoot.get(RelationshipType_.leftType), entityType),
+                               criteriaBuilder
+                                   .equal(relationshipTypeRoot.get(RelationshipType_.rightType), entityType)
+            )
+        );
+        return count(context, criteriaQuery, criteriaBuilder, relationshipTypeRoot);
     }
 }
