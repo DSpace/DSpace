@@ -44,6 +44,6 @@ public class RegexUtils {
      * Regular expression to accept a string of 32 hexadecimal digits.
      */
     public static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_HEX32
-            = "/{id:[0-9a-zA-Z]{32}}";
+            = "/{id:[0-9a-fA-F]{32}}";
 
 }
