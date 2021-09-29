@@ -371,6 +371,20 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         return converter.toRestPage(relationships, pageable, total, utils.obtainProjection());
     }
 
+    /**
+     * This method is intended to be used when giving an item (focus) and a list
+     * of potentially related items we need to know which of these other items
+     * are already in a specific relationship with the focus item and,
+     * by exclusion which ones are not yet related.
+     * 
+     * @param typeId          The relationship type id to apply as a filter to the returned relationships
+     * @param label           The name of the relation as defined from the side of the 'focusItem'
+     * @param focusUUID       The uuid of the item to be checked on the side defined by 'relationshipLabel'
+     * @param items           The uuid of the items to be found on the other side of returned relationships
+     * @param pageable        The page information
+     * @return
+     * @throws SQLException   If database error
+     */
     @SearchRestMethod(name = "byItemsAndType")
     public Page<RelationshipRest> findByItemsAndType(
                                             @Parameter(value = "typeId", required = true) Integer typeId,

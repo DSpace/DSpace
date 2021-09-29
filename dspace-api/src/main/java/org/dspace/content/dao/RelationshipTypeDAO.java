@@ -120,4 +120,15 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
     List<RelationshipType> findByEntityType(Context context, EntityType entityType, Boolean isLeft,
                                             Integer limit, Integer offset)
             throws SQLException;
+
+    /**
+     * Count all relationship types that matches provided EntityType object on any side of relationship
+     * 
+     * @param context         The relevant DSpace context
+     * @param entityType      The EntityType object that will be used to check on
+     * @return
+     * @throws SQLException   If database error
+     */
+    public int countByEntityType(Context context, EntityType entityType) throws SQLException;
+
 }

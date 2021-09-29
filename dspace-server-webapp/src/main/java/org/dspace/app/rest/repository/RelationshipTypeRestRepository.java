@@ -58,6 +58,14 @@ public class RelationshipTypeRestRepository extends DSpaceRestRepository<Relatio
         }
     }
 
+    /**
+     * Returns a list of relationship types that matches provided entity type on any side of relationship
+     * 
+     * @param type             The entity type label
+     * @param pageable         The page information
+     * @return
+     * @throws SQLException    If database error
+     */
     @SearchRestMethod(name = "byEntityType")
     public Page<RelationshipTypeRest> findByEntityType(@Parameter(value = "type", required = true) String type,
                                                         Pageable pageable) throws SQLException {
@@ -68,7 +76,8 @@ public class RelationshipTypeRestRepository extends DSpaceRestRepository<Relatio
         }
         List<RelationshipType> relationshipTypes = relationshipTypeService.findByEntityType(context, entityType,
                                 Math.toIntExact(pageable.getPageSize()), Math.toIntExact(pageable.getOffset()));
-        return converter.toRestPage(relationshipTypes, pageable, utils.obtainProjection());
+        int total = relationshipTypeService.countByEntityType(context, entityType);
+        return converter.toRestPage(relationshipTypes, pageable, total, utils.obtainProjection());
     }
 
     @Override
