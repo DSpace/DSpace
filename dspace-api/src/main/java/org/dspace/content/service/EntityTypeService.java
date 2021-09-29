@@ -59,6 +59,15 @@ public interface EntityTypeService extends DSpaceCRUDService<EntityType> {
      */
     public EntityType create(Context context, String entityTypeString) throws SQLException, AuthorizeException;
 
+    /**
+     * Retrieves all entity types related to the collections on which the current user can deposit
+     * 
+     * @param context                     DSpace context object
+     * @return
+     * @throws SQLException               If database error
+     * @throws SolrServerException        If there is a problem in communicating with Solr
+     * @throws IOException                If IO error
+     */
     public List<String> getSubmitAuthorizedTypes(Context context) throws SQLException, SolrServerException, IOException;
 
     /**
