@@ -18,7 +18,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.service.VersioningService;
@@ -51,8 +50,8 @@ public class CanEditVersionFeature implements AuthorizationFeature {
     @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         if (object instanceof VersionRest) {
-            EPerson currentUser = context.getCurrentUser();
-            if (Objects.isNull(currentUser)) {
+            boolean isEnabled = configurationService.getBooleanProperty("versioning.enabled", true);
+            if (Objects.isNull(context.getCurrentUser()) || !isEnabled) {
                 return false;
             }
             Version version = versioningService.getVersion(context, (((VersionRest) object).getId()));

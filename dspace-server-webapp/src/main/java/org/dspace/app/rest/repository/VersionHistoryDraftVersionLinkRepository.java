@@ -49,8 +49,9 @@ public class VersionHistoryDraftVersionLinkRepository extends AbstractDSpaceRest
     @Autowired(required = true)
     private WorkflowItemService workflowItemService;
 
-    @PreAuthorize("hasPermission(@extractorOf.getAInprogressSubmissionID(#request, #versionHistoryId), "
-                + "@extractorOf.getAInprogressSubmissionTarget(#request, #versionHistoryId), 'READ')")
+    @PreAuthorize("@versioningSecurity.isEnableVersioning() && " +
+                  "hasPermission(@extractorOf.getAInprogressSubmissionID(#request, #versionHistoryId), " +
+                  "@extractorOf.getAInprogressSubmissionTarget(#request, #versionHistoryId), 'READ')")
     public AInprogressSubmissionRest getDraftVersion(@Nullable HttpServletRequest request,
                                                                Integer versionHistoryId,
                                                      @Nullable Pageable optionalPageable,

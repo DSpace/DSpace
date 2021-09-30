@@ -52,7 +52,8 @@ public class VersionsLinkRepository extends AbstractDSpaceRestRepository
      * @return                  The page containing relevant VersionRest objects
      * @throws SQLException     If something goes wrong
      */
-    @PreAuthorize("hasPermission(#versionHistoryId, 'VERSIONHISTORY', 'READ')")
+    @PreAuthorize("@versioningSecurity.isEnableVersioning() && " +
+                  "hasPermission(#versionHistoryId, 'VERSIONHISTORY', 'READ')")
     public Page<VersionRest> getVersions(@Nullable HttpServletRequest request,
                                                Integer versionHistoryId,
                                                @Nullable Pageable optionalPageable,

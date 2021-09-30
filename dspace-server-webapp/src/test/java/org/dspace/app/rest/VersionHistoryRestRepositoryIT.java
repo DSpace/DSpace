@@ -116,6 +116,23 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
+    public void findOnePublicVersionHistoryWithVersioningDisabledTest() throws Exception {
+        configurationService.setProperty("versioning.enabled", false);
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(adminToken).perform(get("/api/versioning/versionhistories/" + Integer.MAX_VALUE))
+                             .andExpect(status().isForbidden());
+
+        getClient(epersonToken).perform(get("/api/versioning/versionhistories/" + Integer.MAX_VALUE))
+                               .andExpect(status().isForbidden());
+
+        getClient().perform(get("/api/versioning/versionhistories/" + Integer.MAX_VALUE))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void findOnePrivateVersionHistoryByAdminTest() throws Exception {
         configurationService.setProperty("versioning.item.history.view.admin", true);
 
@@ -329,6 +346,23 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
+    public void findVersionsOfVersionHistoryWithVersioningDisabledTest() throws Exception {
+        configurationService.setProperty("versioning.enabled", false);
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+
+        getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
+                             .andExpect(status().isForbidden());
+
+        getClient(tokenEPerson).perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
+                               .andExpect(status().isForbidden());
+
+        getClient().perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void findWorkspaceItemOfDraftVersionAdminTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -527,6 +561,23 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
                                .andExpect(jsonPath("$",Matchers.is(WorkspaceItemMatcher
                                           .matchItemWithTitleAndDateIssuedAndSubject(witem,
                                            "Public test item", "2021-04-27", "ExtraEntry"))));
+    }
+
+    @Test
+    public void findDraftVersionWithVersioningDisabledTest() throws Exception {
+        configurationService.setProperty("versioning.enabled", false);
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+
+        getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + Integer.MAX_VALUE + "/draftVersion"))
+                             .andExpect(status().isForbidden());
+
+        getClient(tokenEPerson).perform(get("/api/versioning/versionhistories/" + Integer.MAX_VALUE + "/draftVersion"))
+                               .andExpect(status().isForbidden());
+
+        getClient().perform(get("/api/versioning/versionhistories/" + Integer.MAX_VALUE + "/draftVersion"))
+                   .andExpect(status().isUnauthorized());
     }
 
     @Test
