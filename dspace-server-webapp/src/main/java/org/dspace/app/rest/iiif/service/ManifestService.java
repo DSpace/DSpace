@@ -181,11 +181,11 @@ public class ManifestService extends AbstractResourceService {
                         }
                         // add the bitstream canvas to the currRange
                         currRange
-                                .addCanvas(canvasService.getRangeCanvasReference(manifestId, canvasId.getIdentifier()));
+                                .addCanvas(canvasService.getRangeCanvasReference(canvasId.getIdentifier()));
                         lastRange = currRange;
                     }
                 } else {
-                    lastRange.addCanvas(canvasService.getRangeCanvasReference(manifestId, canvasId.getIdentifier()));
+                    lastRange.addCanvas(canvasService.getRangeCanvasReference(canvasId.getIdentifier()));
                 }
             }
         }

@@ -99,13 +99,12 @@ public class CanvasService extends AbstractResourceService {
 
     /**
      * Ranges expect the Canvas object to have only an identifier.
-     * 
-     * @param identifier  the DSpace item identifier
-     * @param startCanvas the position of the canvas in list
-     * @return
+     *
+     * @param startCanvas the start canvas identifier
+     * @return canvas generator
      */
-    protected CanvasGenerator getRangeCanvasReference(String identifier, String startCanvas) {
-        return new CanvasGenerator(IIIF_ENDPOINT + identifier + startCanvas);
+    protected CanvasGenerator getRangeCanvasReference(String startCanvas) {
+        return new CanvasGenerator(startCanvas);
     }
 
     /**
