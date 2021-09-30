@@ -167,7 +167,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
 
         List<Authorization> authorizations = findAuthorizationsForUri(context, user, uri, featureName);
 
-        if (currUser != user) {
+        if (ObjectUtils.notEqual(currUser, user)) {
             // restore the real current user
             context.restoreContextUser();
         }
@@ -196,7 +196,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         List<Authorization> authorizations =
                 findAuthorizationsByUUIDList(context, type, uuidList, user, featureNames);
 
-        if (currUser != user) {
+        if (ObjectUtils.notEqual(currUser, user)) {
             // restore the real current user
             context.restoreContextUser();
         }
@@ -223,7 +223,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
                 try {
                     authorizations.addAll(authorizationsForObject(context, user, featureName, object));
                 } catch (Exception ex) {
-                    log.error(ex.getMessage(), ex);
+                    log.error("An error occurred during authorizations check");
                     throw new RuntimeException(ex);
                 }
             }));
