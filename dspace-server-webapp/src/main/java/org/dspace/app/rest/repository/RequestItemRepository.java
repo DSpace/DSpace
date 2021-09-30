@@ -221,7 +221,8 @@ public class RequestItemRepository
     @Override
     @PreAuthorize("isAuthenticated()")
     public RequestItemRest put(Context context, HttpServletRequest request,
-            String apiCategory, String model, String token, JsonNode requestBody) {
+            String apiCategory, String model, String token, JsonNode requestBody)
+            throws AuthorizeException {
         RequestItem ri = requestItemService.findByToken(context, token);
         if (null == ri) {
             throw new UnprocessableEntityException("Item request not found");
@@ -236,7 +237,7 @@ public class RequestItemRepository
             authorizer = new RequestItemAuthor("", "");
         }
         if (!authorizer.getEmail().equals(context.getCurrentUser().getEmail())) {
-            throw new RuntimeException("Not authorized to approve this request");
+            throw new AuthorizeException("Not authorized to approve this request");
         }
 
         // Make the changes
