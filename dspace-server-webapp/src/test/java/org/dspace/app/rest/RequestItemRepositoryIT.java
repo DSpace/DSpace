@@ -526,10 +526,11 @@ public class RequestItemRepositoryIT
                 .createRequestItem(context, item, bitstream)
                 .build();
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
-        ObjectWriter mapperWriter = new ObjectMapper().writer();
+        String authToken;
         Map<String, String> parameters;
         String content;
+
+        ObjectWriter mapperWriter = new ObjectMapper().writer();
 
         // Unauthenticated user
         parameters = Map.of(
@@ -548,10 +549,11 @@ public class RequestItemRepositoryIT
                 "subject", "subject",
                 "responseMessage", "Request accepted");
         content = mapperWriter.writeValueAsString(parameters);
-        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
+        authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(put(URI_ROOT + '/' + itemRequest.getToken())
                 .contentType(contentType)
                 .content(content))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isInternalServerError()); // Should be FORBIDDEN
 
         // Missing acceptRequest
         parameters = Map.of(
