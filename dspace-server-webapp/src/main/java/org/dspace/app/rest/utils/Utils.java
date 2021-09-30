@@ -976,7 +976,6 @@ public class Utils {
      * @param uuid Object uuid
      * @return the {@link BaseObjectRest} identified by the provided uuid
      */
-
     public BaseObjectRest getBaseObjectRestFromTypeAndUUID(Context context, String type, String uuid) {
 
         if (StringUtils.isBlank(type)) {
