@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.Serializable;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import org.apache.logging.log4j.Logger;
@@ -64,6 +65,7 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
  * Test suite for the Authorization endpoint
@@ -1548,7 +1550,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         // verify that it works for administrators - with eperson parameter
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
+
+        Supplier<MockHttpServletRequestBuilder> baseFeatureRequest = () -> get("/api/authz/authorizations/search/objects")
             .param("type", "core.community")
             .param("uuid", comId)
             .param("uuid", secondComId)
@@ -1556,10 +1559,13 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .param("embedLevelDepth", "1")
             .param("feature", alwaysTrue.getName())
             .param("feature", alwaysFalse.getName())
-            .param("feature", trueForAdmins.getName())
+            .param("feature", trueForLoggedUsers.getName())
+            .param("feature", trueForAdmins.getName());
+
+        getClient(adminToken).perform(baseFeatureRequest.get()
             .param("eperson", admin.getID().toString()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page.totalElements", is(4)))
+            .andExpect(jsonPath("$.page.totalElements", is(6)))
             .andExpect(jsonPath("$._embedded.authorizations", containsInAnyOrder(
                 allOf(
                     hasJsonPath("$.id", is(admin.getID().toString() + "_" + alwaysTrue.getName() + "_"
@@ -1576,6 +1582,13 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     hasJsonPath("$._embedded.eperson.id", is(admin.getID().toString()))
                 ),
                 allOf(
+                    hasJsonPath("$.id", is(admin.getID().toString() + "_" + trueForLoggedUsers.getName() + "_"
+                        + comRest.getUniqueType() + "_" + comRest.getId())),
+                    hasJsonPath("$.type", is("authorization")),
+                    hasJsonPath("$._embedded.feature.id", is(trueForLoggedUsers.getName())),
+                    hasJsonPath("$._embedded.eperson.id", is(admin.getID().toString()))
+                ),
+                allOf(
                     hasJsonPath("$.id", is(admin.getID().toString() + "_" + alwaysTrue.getName() + "_"
                         + secondComRest.getUniqueType() + "_" + secondComRest.getId())),
                     hasJsonPath("$.type", is("authorization")),
@@ -1587,22 +1600,21 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                         + secondComRest.getUniqueType() + "_" + secondComRest.getId())),
                     hasJsonPath("$.type", is("authorization")),
                     hasJsonPath("$._embedded.feature.id", is(trueForAdmins.getName())),
+                    hasJsonPath("$._embedded.eperson.id", is(admin.getID().toString()))
+                ),
+                allOf(
+                    hasJsonPath("$.id", is(admin.getID().toString() + "_" + trueForLoggedUsers.getName() + "_"
+                        + secondComRest.getUniqueType() + "_" + secondComRest.getId())),
+                    hasJsonPath("$.type", is("authorization")),
+                    hasJsonPath("$._embedded.feature.id", is(trueForLoggedUsers.getName())),
                     hasJsonPath("$._embedded.eperson.id", is(admin.getID().toString()))
                 )
             )));
 
         // verify that it works for administrators - without eperson parameter
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.community")
-            .param("uuid", comId)
-            .param("uuid", secondComId)
-            .param("projection", "level")
-            .param("embedLevelDepth", "1")
-            .param("feature", alwaysFalse.getName())
-            .param("feature", trueForAdmins.getName())
-            .param("feature", alwaysTrue.getName()))
+        getClient(adminToken).perform(baseFeatureRequest.get())
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page.totalElements", is(4)))
+            .andExpect(jsonPath("$.page.totalElements", is(6)))
             .andExpect(jsonPath("$._embedded.authorizations", containsInAnyOrder(
                 allOf(
                     hasJsonPath("$.id", is(
@@ -1627,6 +1639,16 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 allOf(
                     hasJsonPath("$.id", is(
                         admin.getID().toString() + "_"
+                            + trueForLoggedUsers.getName() + "_"
+                            + comRest.getUniqueType() + "_" + comRest.getId()
+                    )),
+                    hasJsonPath("$.type", is("authorization")),
+                    hasJsonPath("$._embedded.feature.id", is(trueForLoggedUsers.getName())),
+                    hasJsonPath("$._embedded.eperson.id", is(admin.getID().toString()))
+                ),
+                allOf(
+                    hasJsonPath("$.id", is(
+                        admin.getID().toString() + "_"
                             + alwaysTrue.getName() + "_"
                             + secondComRest.getUniqueType() + "_" + secondComRest.getId()
                     )),
@@ -1642,6 +1664,16 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     )),
                     hasJsonPath("$.type", is("authorization")),
                     hasJsonPath("$._embedded.feature.id", is(trueForAdmins.getName())),
+                    hasJsonPath("$._embedded.eperson.id", is(admin.getID().toString()))
+                ),
+                allOf(
+                    hasJsonPath("$.id", is(
+                        admin.getID().toString() + "_"
+                            + trueForLoggedUsers.getName() + "_"
+                            + secondComRest.getUniqueType() + "_" + secondComRest.getId()
+                    )),
+                    hasJsonPath("$.type", is("authorization")),
+                    hasJsonPath("$._embedded.feature.id", is(trueForLoggedUsers.getName())),
                     hasJsonPath("$._embedded.eperson.id", is(admin.getID().toString()))
                 )
             )));
@@ -1649,18 +1681,10 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         String epersonToken = getAuthToken(eperson.getEmail(), password);
 
         // verify that it works for normal loggedin users - with eperson parameter
-        getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.community")
-            .param("uuid", comId)
-            .param("uuid", secondComId)
-            .param("projection", "level")
-            .param("embedLevelDepth", "1")
-            .param("feature", alwaysTrue.getName())
-            .param("feature", alwaysFalse.getName())
-            .param("feature", trueForAdmins.getName())
+        getClient(epersonToken).perform(baseFeatureRequest.get()
             .param("eperson", eperson.getID().toString()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page.totalElements", is(2)))
+            .andExpect(jsonPath("$.page.totalElements", is(4)))
             .andExpect(jsonPath("$._embedded.authorizations", containsInAnyOrder(
                 allOf(
                     hasJsonPath("$.id", is(
@@ -1675,25 +1699,37 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 allOf(
                     hasJsonPath("$.id", is(
                         eperson.getID().toString() + "_"
+                            + trueForLoggedUsers.getName() + "_"
+                            + comRest.getUniqueType() + "_" + comRest.getId()
+                    )),
+                    hasJsonPath("$.type", is("authorization")),
+                    hasJsonPath("$._embedded.feature.id", is(trueForLoggedUsers.getName())),
+                    hasJsonPath("$._embedded.eperson.id", is(eperson.getID().toString()))
+                ),
+                allOf(
+                    hasJsonPath("$.id", is(
+                        eperson.getID().toString() + "_"
                             + alwaysTrue.getName() + "_"
                             + secondComRest.getUniqueType() + "_" + secondComRest.getId()
                     )),
                     hasJsonPath("$.type", is("authorization")),
                     hasJsonPath("$._embedded.feature.id", is(alwaysTrue.getName())),
                     hasJsonPath("$._embedded.eperson.id", is(eperson.getID().toString()))
+                ),
+                allOf(
+                    hasJsonPath("$.id", is(
+                        eperson.getID().toString() + "_"
+                            + trueForLoggedUsers.getName() + "_"
+                            + secondComRest.getUniqueType() + "_" + secondComRest.getId()
+                    )),
+                    hasJsonPath("$.type", is("authorization")),
+                    hasJsonPath("$._embedded.feature.id", is(trueForLoggedUsers.getName())),
+                    hasJsonPath("$._embedded.eperson.id", is(eperson.getID().toString()))
                 )
             )));
 
         // verify that it works for normal loggedin users - without eperson parameter
-        getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.community")
-            .param("uuid", comId)
-            .param("uuid", secondComId)
-            .param("projection", "level")
-            .param("embedLevelDepth", "1")
-            .param("feature", alwaysFalse.getName())
-            .param("feature", trueForLoggedUsers.getName())
-            .param("feature", alwaysTrue.getName()))
+        getClient(epersonToken).perform(baseFeatureRequest.get())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(4)))
             .andExpect(jsonPath("$._embedded.authorizations", containsInAnyOrder(
@@ -1740,16 +1776,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             )));
 
         // verify that it works for administators inspecting other users - by using the eperson parameter
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.community")
-            .param("uuid", comId)
-            .param("uuid", secondComId)
-            .param("projection", "level")
-            .param("embedLevelDepth", "1")
-            .param("feature", alwaysTrue.getName())
-            .param("feature", alwaysFalse.getName())
-            .param("feature", trueForAdmins.getName())
-            .param("feature", trueForLoggedUsers.getName())
+        getClient(adminToken).perform(baseFeatureRequest.get()
             .param("eperson", eperson.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(4)))
@@ -1797,16 +1824,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             )));
 
         // verify that it works for administators inspecting other users - by assuming login
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.community")
-            .param("uuid", comId)
-            .param("uuid", secondComId)
-            .param("projection", "level")
-            .param("embedLevelDepth", "1")
-            .param("feature", alwaysTrue.getName())
-            .param("feature", alwaysFalse.getName())
-            .param("feature", trueForAdmins.getName())
-            .param("feature", trueForLoggedUsers.getName())
+        getClient(adminToken).perform(baseFeatureRequest.get()
+//            .param("feature", trueForLoggedUsers.getName())
             .header("X-On-Behalf-Of", eperson.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(4)))
@@ -1854,15 +1873,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             )));
 
         // verify that it works for anonymous users
-        getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.community")
-            .param("uuid", comId)
-            .param("uuid", secondComId)
-            .param("projection", "level")
-            .param("embedLevelDepth", "1")
-            .param("feature", alwaysFalse.getName())
-            .param("feature", trueForAdmins.getName())
-            .param("feature", alwaysTrue.getName()))
+        getClient().perform(baseFeatureRequest.get())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(2)))
             .andExpect(jsonPath("$._embedded.authorizations", containsInAnyOrder(
@@ -2220,6 +2231,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         getClient().perform(get("/api/authz/authorizations/search/objects")
             .param("uuid", UUID.randomUUID().toString())
             .param("uuid", UUID.randomUUID().toString())
+            .param("feature", alwaysTrue.getName()))
+            .andExpect(status().isBadRequest());
+
+        // verify that returns bad request for missing uuid
+        getClient().perform(get("/api/authz/authorizations/search/objects")
+            .param("type", "core.item")
             .param("feature", alwaysTrue.getName()))
             .andExpect(status().isBadRequest());
     }

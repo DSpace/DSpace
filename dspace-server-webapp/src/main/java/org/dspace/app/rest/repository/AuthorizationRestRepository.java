@@ -176,8 +176,8 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
 
     @PreAuthorize("#epersonUuid==null || hasPermission(#epersonUuid, 'EPERSON', 'READ')")
     @SearchRestMethod(name = "objects")
-    public Page<AuthorizationRest> findByObjects(@Parameter(value = "uuid") List<String> uuidList,
-            @Parameter(value = "type") String type,
+    public Page<AuthorizationRest> findByObjects(@Parameter(value = "uuid", required = true) List<String> uuidList,
+            @Parameter(value = "type", required = true) String type,
             @Parameter(value = "eperson") UUID epersonUuid, @Parameter(value = "feature") List<String> featureNames,
             Pageable pageable) throws AuthorizeException, SQLException {
 
