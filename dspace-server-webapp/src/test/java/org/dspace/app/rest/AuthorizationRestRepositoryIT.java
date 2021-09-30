@@ -1551,16 +1551,17 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administrators - with eperson parameter
 
-        Supplier<MockHttpServletRequestBuilder> baseFeatureRequest = () -> get("/api/authz/authorizations/search/objects")
-            .param("type", "core.community")
-            .param("uuid", comId)
-            .param("uuid", secondComId)
-            .param("projection", "level")
-            .param("embedLevelDepth", "1")
-            .param("feature", alwaysTrue.getName())
-            .param("feature", alwaysFalse.getName())
-            .param("feature", trueForLoggedUsers.getName())
-            .param("feature", trueForAdmins.getName());
+        Supplier<MockHttpServletRequestBuilder> baseFeatureRequest = () ->
+            get("/api/authz/authorizations/search/objects")
+                .param("type", "core.community")
+                .param("uuid", comId)
+                .param("uuid", secondComId)
+                .param("projection", "level")
+                .param("embedLevelDepth", "1")
+                .param("feature", alwaysTrue.getName())
+                .param("feature", alwaysFalse.getName())
+                .param("feature", trueForLoggedUsers.getName())
+                .param("feature", trueForAdmins.getName());
 
         getClient(adminToken).perform(baseFeatureRequest.get()
             .param("eperson", admin.getID().toString()))
