@@ -194,5 +194,12 @@ public interface HandleService {
      */
     String parseHandle(String identifier);
 
+    /**
+     * Returns a list of handles of items that have been deleted.
+     *
+     * @param context DSpace context
+     * @return a List of handles of items that have been deleted.
+     * @exception SQLException If a database error occurs
+     */
     List<Handle> getDeletedItemHandles(Context context) throws SQLException;
 }

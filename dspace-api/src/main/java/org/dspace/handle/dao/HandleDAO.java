@@ -34,6 +34,14 @@ public interface HandleDAO extends GenericDAO<Handle> {
     public List<Handle> findByPrefix(Context context, String prefix) throws SQLException;
 
     public long countHandlesByPrefix(Context context, String prefix) throws SQLException;
+
+    /**
+     * Returns a list of handles of items that have been deleted.
+     *
+     * @param context DSpace context
+     * @return a List of handles of items that have been deleted.
+     * @exception SQLException If a database error occurs
+     */
     public  List<Handle> getDeletedItemHandles(Context context) throws SQLException;
 
     int updateHandlesWithNewPrefix(Context context, String newPrefix, String oldPrefix) throws SQLException;
