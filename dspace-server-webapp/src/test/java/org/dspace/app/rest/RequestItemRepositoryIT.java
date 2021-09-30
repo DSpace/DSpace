@@ -9,11 +9,14 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.exparity.hamcrest.date.DateMatchers.within;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -29,12 +32,15 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.converter.RequestItemConverter;
@@ -236,9 +242,7 @@ public class RequestItemRepositoryIT
                             hasJsonPath("$._links.self.href", not(is(emptyOrNullString())))
                     )))
                     .andDo((var result) -> requestTokenRef.set(
-                            read(result.getResponse().getContentAsString(), "token")))
-                    .andReturn();
-
+                            read(result.getResponse().getContentAsString(), "token")));
         } finally {
             // Clean up the created request.
             RequestItemBuilder.deleteRequestItem(requestTokenRef.get());
@@ -289,8 +293,7 @@ public class RequestItemRepositoryIT
                             hasJsonPath("$._links.self.href", not(is(emptyOrNullString())))
                     )))
                     .andDo((var result) -> requestTokenRef.set(
-                            read(result.getResponse().getContentAsString(), "token")))
-                    .andReturn();
+                            read(result.getResponse().getContentAsString(), "token")));
         } finally {
             // Clean up the created request.
             RequestItemBuilder.deleteRequestItem(requestTokenRef.get());
@@ -307,7 +310,7 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateAndReturnBadRequest()
             throws SQLException, AuthorizeException, IOException, Exception {
-        System.out.println("createAndReturn (authenticated)");
+        System.out.println("createAndReturn (bad requests)");
 
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
@@ -497,12 +500,69 @@ public class RequestItemRepositoryIT
 
         // Send the request.
         String authToken = getAuthToken(eperson.getEmail(), password);
+        AtomicReference<String> requestTokenRef = new AtomicReference<>();
         getClient(authToken).perform(put(URI_ROOT + '/' + itemRequest.getToken())
                 .contentType(contentType)
                 .content(content))
                 .andExpect(status().isOk()
-                // .andMore?
-                );
+                )
+                .andDo((var result) -> requestTokenRef.set(
+                        read(result.getResponse().getContentAsString(), "token")));
+        RequestItem foundRequest
+                = requestItemService.findByToken(context, requestTokenRef.get());
+        assertTrue("acceptRequest should be true", foundRequest.isAccept_request());
+        assertThat("decision_date must be within a minute of now",
+                foundRequest.getDecision_date(),
+                within(1, ChronoUnit.MINUTES, new Date()));
+    }
+
+    @Test
+    public void testPutBadRequest()
+            throws Exception {
+        System.out.println("put bad requests");
+
+        // Create an item request to approve.
+        RequestItem itemRequest = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        ObjectWriter mapperWriter = new ObjectMapper().writer();
+        Map<String, String> parameters;
+        String content;
+
+        // Unauthenticated user
+        parameters = Map.of(
+                "acceptRequest", "true",
+                "subject", "subject",
+                "responseMessage", "Request accepted");
+        content = mapperWriter.writeValueAsString(parameters);
+        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
+                .contentType(contentType)
+                .content(content))
+                .andExpect(status().isUnauthorized());
+
+        // Unauthorized user
+        parameters = Map.of(
+                "acceptRequest", "true",
+                "subject", "subject",
+                "responseMessage", "Request accepted");
+        content = mapperWriter.writeValueAsString(parameters);
+        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
+                .contentType(contentType)
+                .content(content))
+                .andExpect(status().isUnauthorized());
+
+        // Missing acceptRequest
+        parameters = Map.of(
+                "subject", "subject",
+                "responseMessage", "Request accepted");
+        content = mapperWriter.writeValueAsString(parameters);
+        authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(put(URI_ROOT + '/' + itemRequest.getToken())
+                .contentType(contentType)
+                .content(content))
+                .andExpect(status().isUnprocessableEntity());
     }
 
     /**
