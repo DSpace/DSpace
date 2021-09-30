@@ -270,7 +270,6 @@ public class RequestItemRepository
         return RequestItemRest.class;
     }
 
-
     /**
      * Generate a link back to DSpace, to act on a request.
      *
@@ -282,12 +281,10 @@ public class RequestItemRepository
      */
     private String getLinkTokenEmail(String token)
             throws URISyntaxException, MalformedURLException {
-        String base = configurationService.getProperty("dspace.server.url");
+        final String base = configurationService.getProperty("dspace.ui.url");
 
         URI link = new URIBuilder(base)
-                .setPath("/api/" + RequestItemRest.CATEGORY
-                        + '/' + RequestItemRest.PLURAL_NAME)
-                .addParameter("token", token)
+                .setPathSegments("request-a-copy", token)
                 .build();
 
         return link.toURL().toExternalForm();
