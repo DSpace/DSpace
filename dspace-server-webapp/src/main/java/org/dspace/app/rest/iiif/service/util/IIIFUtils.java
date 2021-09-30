@@ -115,7 +115,7 @@ public class IIIFUtils {
     private boolean isIIIFBundle(Bundle b) {
         return !StringUtils.equalsAnyIgnoreCase(b.getName(), Constants.LICENSE_BUNDLE_NAME,
                 Constants.METADATA_BUNDLE_NAME, CreativeCommonsServiceImpl.CC_BUNDLE_NAME, "THUMBNAIL",
-                "BRANDED_PREVIEW", "TEXT")
+                "BRANDED_PREVIEW", "TEXT", OTHER_CONTENT_BUNDLE)
                 && b.getMetadata().stream()
                         .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
                         .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
