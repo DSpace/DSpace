@@ -277,7 +277,7 @@ public class ItemConverter
     private boolean preventSecurityCheck(Projection projection) {
         return Optional.ofNullable(projection)
             .map(Projection::preventMetadataLevelSecurity)
-            .orElse(true);
+            .orElse(false);
     }
 
     private List<CrisLayoutBox> getBoxesWithMetadataFieldExcludedPublic(MetadataField metadataField,
