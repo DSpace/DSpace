@@ -4312,4 +4312,41 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .andExpect(status().isNoContent());
     }
 
+    @Test
+    public void findVersionForItemWithoutVersionsWithVersioningDisabledTest() throws Exception {
+        configurationService.setProperty("versioning.enabled", false);
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection test")
+                                          .build();
+
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Public test item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        item.setSubmitter(eperson);
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(epersonToken).perform(get("/api/core/items/" + item.getID() + "/version"))
+                               .andExpect(status().isForbidden());
+
+        getClient(epersonToken).perform(get("/api/core/items/" + item.getID() + "/version"))
+                               .andExpect(status().isForbidden());
+
+        getClient().perform(get("/api/core/items/" + item.getID() + "/version"))
+                   .andExpect(status().isUnauthorized());
+    }
+
 }

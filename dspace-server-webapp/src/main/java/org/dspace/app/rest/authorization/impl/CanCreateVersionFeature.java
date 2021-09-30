@@ -49,6 +49,9 @@ public class CanCreateVersionFeature implements AuthorizationFeature {
     @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         if (object instanceof ItemRest) {
+            if (!configurationService.getBooleanProperty("versioning.enabled", true)) {
+                return false;
+            }
             EPerson currentUser = context.getCurrentUser();
             if (Objects.isNull(currentUser)) {
                 return false;

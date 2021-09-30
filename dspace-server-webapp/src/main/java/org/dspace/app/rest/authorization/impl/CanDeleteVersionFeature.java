@@ -51,6 +51,9 @@ public class CanDeleteVersionFeature extends DeleteFeature {
     @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         if (object instanceof VersionRest) {
+            if (!configurationService.getBooleanProperty("versioning.enabled", true)) {
+                return false;
+            }
             Version version = versioningService.getVersion(context, ((VersionRest)object).getId());
             if (Objects.nonNull(version) && Objects.nonNull(version.getItem())) {
                 ItemRest itemRest = itemConverter.convert(version.getItem(), DefaultProjection.DEFAULT);

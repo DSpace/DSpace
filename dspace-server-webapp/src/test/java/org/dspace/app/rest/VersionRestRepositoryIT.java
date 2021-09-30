@@ -229,6 +229,23 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void findOneWithVersioningDisabledTest() throws Exception {
+        configurationService.setProperty("versioning.enabled", false);
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(adminToken).perform(get("/api/versioning/versions/" + Integer.MAX_VALUE))
+                             .andExpect(status().isForbidden());
+
+        getClient(epersonToken).perform(get("/api/versioning/versions/" + Integer.MAX_VALUE))
+                               .andExpect(status().isForbidden());
+
+        getClient().perform(get("/api/versioning/versions/" + Integer.MAX_VALUE))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void versionForItemTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -814,6 +831,49 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void createVersionWithVersioningDisabledTest() throws Exception {
+        configurationService.setProperty("versioning.enabled", false);
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection test")
+                                          .build();
+
+        Item item = ItemBuilder.createItem(context, col)
+                               .withTitle("Public test item")
+                               .withIssueDate("2021-04-27")
+                               .withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(adminToken).perform(post("/api/versioning/versions")
+                             .param("summary", "test summary!")
+                             .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                             .content("/api/core/items/" + item.getID()))
+                             .andExpect(status().isForbidden());
+
+        getClient(epersonToken).perform(post("/api/versioning/versions")
+                               .param("summary", "test summary!")
+                               .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                               .content("/api/core/items/" + item.getID()))
+                               .andExpect(status().isForbidden());
+
+        getClient().perform(post("/api/versioning/versions")
+                   .param("summary", "test summary!")
+                   .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                   .content("/api/core/items/" + item.getID()))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void patchReplaceSummaryTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -1292,6 +1352,52 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                           hasJsonPath("$.summary", is(newSummary)),
                                           hasJsonPath("$.type", is("version"))
                                           )));
+    }
+
+    @Test
+    public void patchReplaceSummaryWithVersioningDisabledTest() throws Exception {
+        configurationService.setProperty("versioning.enabled", false);
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection test").build();
+
+        ItemBuilder.createItem(context, col)
+                   .withTitle("Public test item")
+                   .withIssueDate("2021-04-27")
+                   .withAuthor("Doe, John")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        context.restoreAuthSystemState();
+
+        String newSummary = "New Summary";
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/summary", newSummary);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(adminToken).perform(patch("/api/versioning/versions/" + Integer.MAX_VALUE)
+                             .content(patchBody)
+                             .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isForbidden());
+
+        getClient(epersonToken).perform(patch("/api/versioning/versions/" + Integer.MAX_VALUE)
+                               .content(patchBody)
+                               .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                               .andExpect(status().isForbidden());
+
+        getClient().perform(patch("/api/versioning/versions/" + Integer.MAX_VALUE)
+                   .content(patchBody)
+                   .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                   .andExpect(status().isUnauthorized());
     }
 
     @Test

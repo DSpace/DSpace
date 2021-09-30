@@ -83,7 +83,7 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
     protected WorkflowItemService workflowItemService;
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'VERSION', 'READ')")
+    @PreAuthorize("@versioningSecurity.isEnableVersioning() && hasPermission(#id, 'VERSION', 'READ')")
     public VersionRest findOne(Context context, Integer id) {
         try {
             Version version = versioningService.getVersion(context, id);
@@ -98,7 +98,7 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
     }
 
     @Override
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("@versioningSecurity.isEnableVersioning() && hasAuthority('AUTHENTICATED')")
     protected VersionRest createAndReturn(Context context, List<String> stringList)
         throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
 
@@ -152,7 +152,7 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
     }
 
     @Override
-    @PreAuthorize("hasPermission(#versionId, 'version', 'ADMIN')")
+    @PreAuthorize("@versioningSecurity.isEnableVersioning() && hasPermission(#versionId, 'version', 'ADMIN')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model,
                          Integer versionId, Patch patch) throws AuthorizeException, SQLException {
         for (Operation operation : patch.getOperations()) {
