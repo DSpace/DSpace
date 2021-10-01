@@ -22,6 +22,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.metrics.service.CrisMetricsService;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -170,7 +171,8 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
             String[] splitedField = field.split("\\.");
             String metricType = splitedField[2];
             CrisMetrics metric = fillMetricsObject(context, document, field, metricType);
-            if (checkPermissionsOfMetricsByBox(context, metric.getResource(), metric)) {
+            DSpaceObject resource = metric.getResource();
+            if (resource instanceof Item && checkPermissionsOfMetricsByBox(context, (Item) resource, metric)) {
                 metrics.add(metric);
             }
         }
@@ -238,7 +240,7 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
         } else {
             CrisMetrics crisMetrics = crisMetricsService.find(context,
                     Integer.parseInt(target.substring(STORED_METRIC_ID_PREFIX.length())));
-            return crisMetrics != null ? crisMetrics.getResource() : null;
+            return crisMetrics != null ? (Item) crisMetrics.getResource() : null;
         }
     }
 }
