@@ -181,7 +181,7 @@ public class RequestItemEmailNotifier {
     static public void requestOpenAccess(Context context, RequestItem ri)
             throws IOException {
         Email message = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(),
-                "request_item.author"));
+                "request_item.admin"));
 
         // Which Bitstream(s) requested?
         Bitstream bitstream = ri.getBitstream();
