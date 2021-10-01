@@ -359,10 +359,13 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                                                 "discovery.index.authority.ignore-prefered",
                                                                 Boolean.FALSE),
                                                 true);
-                        if (!ignorePrefered) {
 
-                            preferedLabel = choiceAuthorityService
-                                    .getLabel(meta, collection, meta.getLanguage());
+                        if (!ignorePrefered) {
+                            try {
+                                preferedLabel = choiceAuthorityService.getLabel(meta, collection, meta.getLanguage());
+                            } catch (Exception e) {
+                                log.warn("Failed to get preferred label for " + field, e);
+                            }
                         }
 
                         boolean ignoreVariants =
@@ -377,8 +380,12 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                                                 Boolean.FALSE),
                                                 true);
                         if (!ignoreVariants) {
-                            variants = choiceAuthorityService
+                            try {
+                                variants = choiceAuthorityService
                                     .getVariants(meta, collection);
+                            } catch (Exception e) {
+                                log.warn("Failed to get variants for " + field, e);
+                            }
                         }
 
                     }
