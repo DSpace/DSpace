@@ -85,7 +85,6 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                 "FROM Item WHERE inArchive= :in_archive or withdrawn = :withdrawn");
         query.setParameter("in_archive", archived);
         query.setParameter("withdrawn", withdrawn);
-        query.setFetchSize(1000);
         query.setReadOnly(true);
         return query.scroll(ScrollMode.FORWARD_ONLY);
     }
