@@ -5,11 +5,6 @@
  *
  * http://www.dspace.org/license/
  */
-/*
- * Copyright 2021 Indiana University.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.dspace.app.requestitem;
 
@@ -32,6 +27,7 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogHelper;
+import org.dspace.eperson.EPerson;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
@@ -171,5 +167,61 @@ public class RequestItemEmailNotifier {
         }
         LOG.info(LogHelper.getHeader(context,
                 "sent_attach_requestItem", "token={}"), ri.getToken());
+    }
+
+    /**
+     * Send, to a repository administrator, a request to open access to a
+     * requested object.
+     *
+     * @param context current DSpace session
+     * @param ri the item request that the approver is handling
+     * @throws IOException if the message body cannot be loaded or the message
+     *          cannot be sent.
+     */
+    static public void requestOpenAccess(Context context, RequestItem ri)
+            throws IOException {
+        Email message = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(),
+                "request_item.author"));
+
+        // Which Bitstream(s) requested?
+        Bitstream bitstream = ri.getBitstream();
+        String bitstreamName;
+        if (bitstream != null) {
+            bitstreamName = bitstream.getName();
+        } else {
+            bitstreamName = "all"; // TODO localize
+        }
+
+        // Which Item?
+        Item item = ri.getItem();
+
+        // Fill the message's placeholders.
+        message.addArgument(bitstreamName);     // {0} bitstream name or "all"
+        message.addArgument(item.getHandle());  // {1} Item handle
+        message.addArgument(ri.getToken());     // {2} Request token
+        message.addArgument(ri.getReqName());   // {3} Requester's name
+        message.addArgument(ri.getReqEmail());  // {4} Requester's address
+
+        // Who gets this message?
+        String recipient;
+        EPerson submitter = item.getSubmitter();
+        if (submitter != null) {
+            recipient = submitter.getEmail();
+        } else {
+            recipient = configurationService.getProperty("mail.helpdesk");
+        }
+        if (null == recipient) {
+            recipient = configurationService.getProperty("mail.admin");
+        }
+        message.addRecipient(recipient);
+
+        // Send the message.
+        try {
+            message.send();
+        } catch (MessagingException ex) {
+            LOG.warn(LogHelper.getHeader(context, "error_mailing_requestItem",
+                    ex.getMessage()));
+            throw new IOException("Open Access request not sent:  " + ex.getMessage());
+        }
     }
 }
