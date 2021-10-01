@@ -56,8 +56,8 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
     }
 
     protected Link buildLink(String rel, String href) {
+        href =  href.replaceAll("(%(25)+20)", "%20");
         Link link = new Link(href, rel);
-
         return link;
     }
 

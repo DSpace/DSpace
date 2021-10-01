@@ -6758,4 +6758,77 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                              .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
 
     }
+    @Test
+    public void discoverChartWithDefaultConfigurationAndQueryWithSpaces() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community").build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community").build();
+
+        Collection col = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2").build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col)
+                .withTitle("Bollini, Andrea")
+                .withIssueDate("2016-02-13")
+                .withType("manuscript").build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col)
+                .withTitle("Bollini, Andrea")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Boychuk, Michele")
+                .withSubject("AnotherTest")
+                .withType("manuscript").build();
+
+        Item publicItem4 = ItemBuilder.createItem(context, col)
+                .withTitle("Bollini, Andrea")
+                .withIssueDate("2020-02-13")
+                .withSubject("AnotherTest")
+                .withType("Journal Article")
+                .build();
+
+        context.restoreAuthSystemState();
+        getClient().perform(get("/api/discover/facets/graphitemtype")
+                        .param("size", "10")
+                        .param("page", "0")
+                        .param("query", "Bollini Andrea"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type", is("discover")))
+                .andExpect(jsonPath("$.name", is("graphitemtype")))
+                .andExpect(jsonPath("$.facetType", is("chart.pie")))
+                .andExpect(jsonPath("$.facetLimit", is(10)))
+                .andExpect(jsonPath("$.query", is( "Bollini Andrea")))
+                .andExpect(jsonPath("$._links.missing.href", containsString("discover/facets/graphitemtype?query=Bollini%20Andrea&configuration=defaultConfiguration&f.graphitemtype=%5B*%20TO%20*%5D,notequals")))
+                .andExpect(jsonPath("$._links.more.href", Matchers.allOf(containsString("discover/facets/graphitemtype?query=Bollini%20Andrea&configuration=defaultConfiguration&f.graphitemtype=manuscript,notequals&f.graphitemtype=journal%20article,notequals"))))
+                .andExpect(jsonPath("$.totalElements", is("2")))
+                .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 10))))
+                .andExpect(jsonPath("$._embedded.values", contains(
+                        FacetValueMatcher.entryDateIssuedWithLabelAndCount("manuscript", 2),
+                        FacetValueMatcher.entryDateIssuedWithLabelAndCount("journal article", 1)
+                )));
+
+
+        getClient().perform(get("/api/discover/facets/graphitemtype")
+                        .param("size", "10")
+                        .param("page", "0")
+                        .param("query", "Bollini Andrea")
+                        .param("f.graphitemtype", "journal article,equals"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type", is("discover")))
+                .andExpect(jsonPath("$.configuration", is("defaultConfiguration")))
+                .andExpect(jsonPath("$.name", is("graphitemtype")))
+                .andExpect(jsonPath("$.facetType", is("chart.pie")))
+                .andExpect(jsonPath("$.facetLimit", is(10)))
+                .andExpect(jsonPath("$.query", is( "Bollini Andrea")))
+                .andExpect(jsonPath("$._links.missing.href", containsString("discover/facets/graphitemtype?query=Bollini%20Andrea&configuration=defaultConfiguration&f.graphitemtype=journal%20article,equals&f.graphitemtype=journal%20article,notequals&f.graphitemtype=%5B*%20TO%20*%5D,notequals")))
+                .andExpect(jsonPath("$._links.more.href", containsString("discover/facets/graphitemtype?query=Bollini%20Andrea&configuration=defaultConfiguration&f.graphitemtype=journal%20article,equals&f.graphitemtype=journal%20article,notequals")))
+                .andExpect(jsonPath("$.totalElements", is("1")))
+                .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 10))))
+                .andExpect(jsonPath("$._embedded.values", contains(
+                        FacetValueMatcher.entryDateIssuedWithLabelAndCount("journal article", 1)
+                )));
+    }
 }
