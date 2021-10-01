@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.iiif;
 
 import java.util.HashSet;
@@ -6,7 +13,7 @@ import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.iiif.service.CacheEvictService;
-import org.dspace.app.rest.iiif.service.util.CacheBeanLocator;
+import org.dspace.app.rest.iiif.service.util.CacheEvictBeanLocator;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
@@ -15,12 +22,16 @@ import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 
-public class IIIFEventConsumer implements Consumer {
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IIIFEventConsumer.class);
+/**
+ * This consumer is used to evict modified items from the manifests cache.
+ */
+public class IIIFCacheEventConsumer implements Consumer {
+
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IIIFCacheEventConsumer.class);
 
     // Gets the service bean.
-    CacheEvictService cacheEvictService = CacheBeanLocator.getCacheEvictService();
+    CacheEvictService cacheEvictService = CacheEvictBeanLocator.getCacheEvictService();
 
     // When true all entries will be cleared from cache.
     boolean clearAll = false;
