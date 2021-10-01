@@ -25,6 +25,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.metrics.CrisItemMetricsService;
 import org.dspace.metrics.embeddable.impl.AbstractEmbeddableMetricProvider;
+import org.dspace.metricsSecurity.BoxMetricsLayoutConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.hibernate.proxy.HibernateProxy;
@@ -59,6 +60,8 @@ public class CrisMetricsRestPermissionEvaluatorPlugin extends RestObjectPermissi
 
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private BoxMetricsLayoutConfigurationService boxMetricsLayoutConfigurationService;
 
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
@@ -83,8 +86,9 @@ public class CrisMetricsRestPermissionEvaluatorPlugin extends RestObjectPermissi
                 // this is needed to allow 404 instead than 403
                 return true;
             }
-
-            return authorizeService.authorizeActionBoolean(context, item, Constants.READ);
+            CrisMetrics metric = crisItemMetricsService.find(context, targetId.toString());
+            return authorizeService.authorizeActionBoolean(context, item, Constants.READ)
+                    && boxMetricsLayoutConfigurationService.checkPermissionOfMetricByBox(context,item, metric ) ;
 
         } catch (SQLException e) {
             log.error(e.getMessage(), e);

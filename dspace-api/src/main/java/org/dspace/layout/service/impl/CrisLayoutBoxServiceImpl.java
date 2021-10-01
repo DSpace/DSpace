@@ -335,4 +335,13 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
+
+    public List<CrisLayoutBox> findBoxesWithEntityAndType(Context context,String entity, String type) {
+
+        try {
+            return dao.findBoxesWithEntityAndType(context, entity, type);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 }

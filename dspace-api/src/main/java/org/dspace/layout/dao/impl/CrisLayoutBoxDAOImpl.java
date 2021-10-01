@@ -176,5 +176,16 @@ public class CrisLayoutBoxDAOImpl extends AbstractHibernateDAO<CrisLayoutBox> im
         TypedQuery<CrisLayoutBox> tq = getHibernateSession(context).createQuery(query);
         return tq.getSingleResult();
     }
-
+    @Override
+    public List<CrisLayoutBox> findBoxesWithEntityAndType(Context context,
+                                                          String entity, String type) throws SQLException {
+        CriteriaBuilder cb = getCriteriaBuilder(context);
+        CriteriaQuery<CrisLayoutBox> cq = cb.createQuery(CrisLayoutBox.class);
+        Root<CrisLayoutBox> boxRoot = cq.from(CrisLayoutBox.class);
+        boxRoot.fetch(CrisLayoutBox_.entitytype, JoinType.LEFT);
+        cq.where(cb.and(cb.equal(boxRoot.get(CrisLayoutBox_.entitytype)
+                .get(EntityType_.LABEL), entity)),cb.equal(boxRoot.get(CrisLayoutBox_.type), type));
+        TypedQuery<CrisLayoutBox> query = getHibernateSession(context).createQuery(cq);
+        return query.getResultList();
+    }
 }

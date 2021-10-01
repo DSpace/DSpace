@@ -132,10 +132,8 @@ public interface CrisLayoutBoxService extends DSpaceCRUDService<CrisLayoutBox> {
     /**
      * Find all tabs associated at an specific item
      * @param context The relevant DSpace Context
-     * @param itemUuid String that represents UUID of item {@link item}
+     * @param itemUuid String that represents UUID of item
      * @param tabId Id of tab container
-     * @param limit how many results return
-     * @param offset the position of the first result to return
      * @return List of CrisLayoutBox {@link CrisLayoutBox}
      * @throws SQLException An exception that provides information on a database errors.
      */
@@ -173,4 +171,14 @@ public interface CrisLayoutBoxService extends DSpaceCRUDService<CrisLayoutBox> {
      * @return the configuration details
      */
     public CrisLayoutBoxConfiguration getConfiguration(Context context, CrisLayoutBox box);
+    /**
+     * Retrieve the configuration details of a specific box. By default the
+     * configuration object is just a wrapper of box object as all the details are
+     * currently stored inside the box object itself
+     *
+     * @param context the dspace context
+     * @param entity    entity type
+     * @return type type of the box
+     */
+    public List<CrisLayoutBox> findBoxesWithEntityAndType(Context context, String entity, String type);
 }
