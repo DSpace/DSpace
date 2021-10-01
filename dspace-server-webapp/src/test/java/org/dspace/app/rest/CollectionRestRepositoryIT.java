@@ -3644,4 +3644,125 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         configurationService.setProperty(
             "org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", "true");
     }
+    @Test
+    public void findAdministeredByEPersonAndAdmin() throws Exception {
+        setUpAuthorizedSearch();
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Al", "Al")
+                .withEmail("epersonToBeTested@my.edu")
+                .withPassword(password)
+                .build();
+        /**
+         * The Community/Collection structure for this test:
+         *
+         **** topLevelCommunity1
+         * ├── subCommunity1
+         * ├── subCommunity2
+         * |   └── collection1
+         * └── collection2
+         * └── collection3
+         * └── collection4
+         *
+         **** community2
+         * └── collection5
+         * └── collection6
+         * └── collection7
+         *
+         **** community3
+         * └── collection8
+         */
+
+        Community  topLevelCommunity1 = CommunityBuilder.createCommunity(context)
+                .withName("topLevelCommunity1 is a very original name")
+                .withAdminGroup(admin)
+                .build();
+        Community  subCommunity1 = CommunityBuilder.createSubCommunity(context, topLevelCommunity1)
+                .withName("subCommunity1")
+                .withAdminGroup(ePerson)
+                .build();
+        Community  subCommunity2 = CommunityBuilder.createSubCommunity(context, topLevelCommunity1)
+                .withName("subCommunity2")
+                .withAdminGroup(ePerson)
+                .build();
+        Community community2 = CommunityBuilder.createCommunity(context)
+                .withAdminGroup(ePerson)
+                .withAdminGroup(admin)
+                .withName("community2")
+                .build();
+        Community community3 = CommunityBuilder.createCommunity(context)
+                .withName("community3")
+                .build();
+
+        // even if community has other admin group test should find collection administered by eperson
+        Collection collection1 = CollectionBuilder.createCollection(context, subCommunity2)
+                .withName("collection1 is a very original name")
+                .withAdminGroup(ePerson)
+                .build();
+        Collection collection2 = CollectionBuilder.createCollection(context, topLevelCommunity1)
+                .withName("collection2 is a very original name")
+                .build();
+        Collection collection3 = CollectionBuilder.createCollection(context, topLevelCommunity1)
+                .withName("collection3 is a very original name")
+                .build();
+        Collection collection4 = CollectionBuilder.createCollection(context, topLevelCommunity1)
+                .withName("collection4 is a very original name")
+                .build();
+        Collection collection5 = CollectionBuilder.createCollection(context, community2)
+                .withName("collection5 is a very original name")
+                .build();
+        Collection collection6 = CollectionBuilder.createCollection(context, community2)
+                .withName("collection6 is a very original name")
+                .build();
+        Collection collection7 = CollectionBuilder.createCollection(context, community2)
+                .withName("collection7 is a very original name")
+                .build();
+
+        Collection collection8 = CollectionBuilder.createCollection(context, community3)
+                .withName("collection8 is a very original name")
+                .build();
+
+
+        context.restoreAuthSystemState();
+        String token = getAuthToken(ePerson.getEmail(), password);
+
+        // Verify the community admin gets all the communities he's admin for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                        CollectionMatcher.matchProperties(collection1.getName(),
+                                collection1.getID(), collection1.getHandle()),
+                        CollectionMatcher.matchProperties(collection5.getName(),
+                                collection5.getID(), collection5.getHandle()),
+                        CollectionMatcher.matchProperties(collection6.getName(),
+                                collection6.getID(), collection6.getHandle()),
+                        CollectionMatcher.matchProperties(collection7.getName(),
+                                collection7.getID(), collection7.getHandle())
+                )));
+
+      // Verify that admin can see all collections
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findAdminAuthorized"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                        CollectionMatcher.matchProperties(collectionA.getName(),
+                                collectionA.getID(), collectionA.getHandle()),
+                        CollectionMatcher.matchProperties(collection1.getName(),
+                                collection1.getID(), collection1.getHandle()),
+                        CollectionMatcher.matchProperties(collection2.getName(),
+                                collection2.getID(), collection2.getHandle()),
+                        CollectionMatcher.matchProperties(collection3.getName(),
+                                collection3.getID(), collection3.getHandle()),
+                        CollectionMatcher.matchProperties(collection4.getName(),
+                                collection4.getID(), collection4.getHandle()),
+                        CollectionMatcher.matchProperties(collection5.getName(),
+                                collection5.getID(), collection5.getHandle()),
+                        CollectionMatcher.matchProperties(collection6.getName(),
+                                collection6.getID(), collection6.getHandle()),
+                        CollectionMatcher.matchProperties(collection7.getName(),
+                                collection7.getID(), collection7.getHandle()),
+                        CollectionMatcher.matchProperties(collection8.getName(),
+                                collection8.getID(), collection8.getHandle())
+                )));
+    }
 }
