@@ -493,7 +493,8 @@ public class RequestItemRepositoryIT
         Map<String, String> parameters = Map.of(
                 "acceptRequest", "true",
                 "subject", "subject",
-                "responseMessage", "Request accepted");
+                "responseMessage", "Request accepted",
+                "suggestOpenAccess", "true");
         String content = new ObjectMapper()
                 .writer()
                 .writeValueAsString(parameters);
