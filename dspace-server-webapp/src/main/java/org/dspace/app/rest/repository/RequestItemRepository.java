@@ -259,9 +259,21 @@ public class RequestItemRepository
         try {
             RequestItemEmailNotifier.sendResponse(context, ri, subject, message);
         } catch (IOException ex) {
+            LOG.warn("Response not sent:  {}", ex.getMessage());
             throw new RuntimeException("Response not sent", ex);
         }
 
+        // Perhaps send Open Access request to admin.s.
+        if (requestBody.findValue("suggestOpenAccess").asBoolean(false)) {
+            try {
+                RequestItemEmailNotifier.requestOpenAccess(context, ri);
+            } catch (IOException ex) {
+                LOG.warn("Open access request not sent:  {}", ex.getMessage());
+                throw new RuntimeException("Open access request not sent", ex);
+            }
+        }
+
+        // Return updated request.
         RequestItemRest rir = requestItemConverter.convert(ri, Projection.DEFAULT);
         return rir;
     }
