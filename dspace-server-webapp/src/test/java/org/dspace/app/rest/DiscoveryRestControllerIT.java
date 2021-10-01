@@ -6801,8 +6801,13 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$.facetType", is("chart.pie")))
                 .andExpect(jsonPath("$.facetLimit", is(10)))
                 .andExpect(jsonPath("$.query", is( "Bollini Andrea")))
-                .andExpect(jsonPath("$._links.missing.href", containsString("discover/facets/graphitemtype?query=Bollini%20Andrea&configuration=defaultConfiguration&f.graphitemtype=%5B*%20TO%20*%5D,notequals")))
-                .andExpect(jsonPath("$._links.more.href", Matchers.allOf(containsString("discover/facets/graphitemtype?query=Bollini%20Andrea&configuration=defaultConfiguration&f.graphitemtype=manuscript,notequals&f.graphitemtype=journal%20article,notequals"))))
+            .andExpect(jsonPath("$._links.missing.href",
+                    containsString("discover/facets/graphitemtype?query=Bollini%20Andrea"
+                        + "&configuration=defaultConfiguration&f.graphitemtype=%5B*%20TO%20*%5D,notequals")))
+            .andExpect(jsonPath("$._links.more.href",
+                    Matchers.allOf(containsString("discover/facets/graphitemtype?query=Bollini%20Andrea"
+                        + "&configuration=defaultConfiguration&f.graphitemtype=manuscript,notequals"
+                        + "&f.graphitemtype=journal%20article,notequals"))))
                 .andExpect(jsonPath("$.totalElements", is("2")))
                 .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 10))))
                 .andExpect(jsonPath("$._embedded.values", contains(
@@ -6823,8 +6828,14 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$.facetType", is("chart.pie")))
                 .andExpect(jsonPath("$.facetLimit", is(10)))
                 .andExpect(jsonPath("$.query", is( "Bollini Andrea")))
-                .andExpect(jsonPath("$._links.missing.href", containsString("discover/facets/graphitemtype?query=Bollini%20Andrea&configuration=defaultConfiguration&f.graphitemtype=journal%20article,equals&f.graphitemtype=journal%20article,notequals&f.graphitemtype=%5B*%20TO%20*%5D,notequals")))
-                .andExpect(jsonPath("$._links.more.href", containsString("discover/facets/graphitemtype?query=Bollini%20Andrea&configuration=defaultConfiguration&f.graphitemtype=journal%20article,equals&f.graphitemtype=journal%20article,notequals")))
+                .andExpect(jsonPath("$._links.missing.href",
+                    containsString("discover/facets/graphitemtype?query=Bollini%20Andrea"
+                        + "&configuration=defaultConfiguration&f.graphitemtype=journal%20article,equals"
+                        + "&f.graphitemtype=journal%20article,notequals&f.graphitemtype=%5B*%20TO%20*%5D,notequals")))
+                .andExpect(jsonPath("$._links.more.href",
+                    containsString("discover/facets/graphitemtype?query=Bollini%20Andrea"
+                        + "&configuration=defaultConfiguration&f.graphitemtype=journal%20article,equals"
+                        + "&f.graphitemtype=journal%20article,notequals")))
                 .andExpect(jsonPath("$.totalElements", is("1")))
                 .andExpect(jsonPath("$.page", is(PageMatcher.pageEntry(0, 10))))
                 .andExpect(jsonPath("$._embedded.values", contains(

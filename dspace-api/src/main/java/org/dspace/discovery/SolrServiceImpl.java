@@ -8,6 +8,8 @@
 package org.dspace.discovery;
 
 import static java.util.stream.Collectors.joining;
+import static org.dspace.discovery.configuration.DiscoveryConfigurationParameters.TYPE_STANDARD;
+import static org.dspace.discovery.configuration.GraphDiscoverSearchFilterFacet.TYPE_PREFIX;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -1216,7 +1218,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 final boolean isStandardField
                         = Optional.ofNullable(config)
                         .flatMap(c -> Optional.ofNullable(c.getSidebarFacet(field)))
-                        .map(facet -> facet.getType().startsWith(GraphDiscoverSearchFilterFacet.TYPE_PREFIX) || facet.getType().equals(DiscoveryConfigurationParameters.TYPE_STANDARD))
+                        .map(facet -> facet.getType().startsWith(TYPE_PREFIX) || facet.getType().equals(TYPE_STANDARD))
                         .orElse(false);
                 if (!isStandardField) {
                     filterQuery.append("_keyword");
