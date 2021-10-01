@@ -23,6 +23,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -135,7 +136,7 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
 
             itemWithReference.getMetadata().stream()
                 .filter(metadataValue -> authorities.contains(metadataValue.getAuthority()))
-                .forEach(metadataValue -> metadataValue.setAuthority(item.getID().toString()));
+                .forEach(metadataValue -> setAuthority(metadataValue, item.getID().toString()));
 
             itemService.update(context, itemWithReference);
         }
@@ -160,6 +161,11 @@ public class ItemSearcherByMetadata implements ItemSearcher, ItemReferenceResolv
 
         return new DiscoverResultIterator<ReloadableEntity<?>, Serializable>(context, discoverQuery, false);
 
+    }
+
+    private void setAuthority(MetadataValue metadataValue, String authority) {
+        metadataValue.setAuthority(authority);
+        metadataValue.setConfidence(Choices.CF_ACCEPTED);
     }
 
     @SuppressWarnings("unchecked")
