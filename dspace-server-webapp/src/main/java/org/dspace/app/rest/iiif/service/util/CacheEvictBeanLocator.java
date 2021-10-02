@@ -34,7 +34,8 @@ public class CacheEvictBeanLocator implements ApplicationContextAware {
         return context;
     }
 
-    public static CacheEvictService getCacheEvictService(){
-        return (CacheEvictService) context.getBean(CACHE_SERVICE);}
+    public static CacheEvictService getCacheEvictService() {
+        return (CacheEvictService) context.getBean(CACHE_SERVICE);
+    }
 
 }
