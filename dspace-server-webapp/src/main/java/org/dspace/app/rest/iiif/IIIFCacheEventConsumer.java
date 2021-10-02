@@ -56,12 +56,13 @@ public class IIIFCacheEventConsumer implements Consumer {
 
         if (et == Event.DELETE || et == Event.REMOVE) {
             log.warn("IIIF event consumer cannot remove a single item from the cache when " +
-                "a bundle is deleted. The entire manifests cache will be emptied.");
+                "a bundle is deleted. The entire cache will be cleared.");
             clearAll = true;
         }
 
         if (st == Constants.BUNDLE) {
-            if ((et == Event.ADD || et == Event.MODIFY || et == Event.MODIFY_METADATA || et == Event.REMOVE || et == Event.DELETE) && subject != null) {
+            if ((et == Event.ADD || et == Event.MODIFY || et == Event.MODIFY_METADATA || et == Event.REMOVE
+                || et == Event.DELETE) && subject != null) {
                 // set subject to be the parent Item.
                 subject = ((Bundle) subject).getItems().get(0);
                 if (log.isDebugEnabled()) {
@@ -76,7 +77,7 @@ public class IIIFCacheEventConsumer implements Consumer {
         if (st == Constants.BITSTREAM) {
             if (et == Event.DELETE || et == Event.REMOVE) {
                 log.warn("IIIF event consumer cannot remove a single item from the cache when " +
-                    "a bitstream is deleted. The entire manifests cache will be emptied.");
+                    "a bitstream is deleted. The entire cache will be cleared.");
                 clearAll = true;
             }
 
@@ -88,8 +89,7 @@ public class IIIFCacheEventConsumer implements Consumer {
                     log.debug("Transforming Bitstream event into Item event for "
                         + subject.getID());
                 }
-            }
-            else {
+            } else {
                 return;
             }
         }
@@ -102,14 +102,23 @@ public class IIIFCacheEventConsumer implements Consumer {
         switch (et) {
             case Event.ADD:
                 toEvictFromManifestCache.add(subject);
+                break;
             case Event.MODIFY:
                 toEvictFromManifestCache.add(subject);
+                break;
             case Event.MODIFY_METADATA:
                 toEvictFromManifestCache.add(subject);
+                break;
             case Event.REMOVE:
                 toEvictFromManifestCache.add(subject);
+                break;
             case Event.DELETE:
                 toEvictFromManifestCache.add(subject);
+                break;
+            default: {
+                log.warn("IIIFCacheEventConsumer should not have been given this kind of "
+                    + "subject in an event, skipping: " + event.toString());
+            }
         }
     }
 
@@ -117,8 +126,7 @@ public class IIIFCacheEventConsumer implements Consumer {
     public void end(Context ctx) throws Exception {
         if (clearAll) {
             cacheEvictService.evictAllCacheValues();
-        }
-        else {
+        }  else {
             for (DSpaceObject dso : toEvictFromManifestCache) {
                 UUID uuid = dso.getID();
                 cacheEvictService.evictSingleCacheValue(uuid.toString());
