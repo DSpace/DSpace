@@ -230,11 +230,6 @@ public interface ItemImportService {
     public void setUseWorkflowSendEmail(boolean useWorkflowSendMail);
 
     /**
-     * @param processRelationships whether to look for a relationships manifest
-     */
-    public void setProcessRelationships(boolean processRelationships);
-
-    /**
      * Set quiet flag
      *
      * @param isQuiet true or false
