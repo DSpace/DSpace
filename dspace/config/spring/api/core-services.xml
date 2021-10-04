@@ -110,7 +110,6 @@
     <bean class="org.dspace.harvest.OAIHarvesterValidatorImpl"/>
     <bean class="org.dspace.harvest.OAIHarvesterEmailSenderImpl"/>
     <bean class="org.dspace.harvest.OAIHarvesterXlsReportGeneratorImpl"/>
-    
 
     <bean class="org.dspace.identifier.DOIServiceImpl"/>
 
@@ -123,6 +122,7 @@
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 
     <bean class="org.dspace.metadataSecurity.MetadataSecurityService"/>
+    <bean class="org.dspace.metricsSecurity.BoxMetricsLayoutConfigurationService"/>
 
     <!-- Configurable workflow services -->
     <bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
@@ -161,10 +161,7 @@
     <bean class="org.dspace.layout.service.impl.LayoutSecurityServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.CrisLayoutBoxAccessServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.CrisLayoutTabAccessServiceImpl"/>
-    
-    <bean class="org.dspace.content.security.CrisSecurityServiceImpl" />
-
-    <bean class="org.dspace.app.metrics.service.CrisMetricsServiceImpl" />
-
+    <bean class="org.dspace.content.security.CrisSecurityServiceImpl"/>
+    <bean class="org.dspace.app.metrics.service.CrisMetricsServiceImpl"/>
 </beans>
 

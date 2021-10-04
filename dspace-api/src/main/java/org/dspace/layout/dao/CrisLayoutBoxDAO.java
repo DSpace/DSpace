@@ -108,4 +108,13 @@ public interface CrisLayoutBoxDAO extends GenericDAO<CrisLayoutBox> {
      * @throws SQLException An exception that provides information on a database errors.
      */
     public CrisLayoutBox findByShortname(Context context, Integer entityTypeId, String shortname) throws SQLException;
+    /**
+     * find a box by its shortname
+     * @param context The relevant DSpace Context
+     * @param entity entity type
+     * @param type type of the box
+     * @throws SQLException An exception that provides information on a database errors.
+     */
+    public List<CrisLayoutBox> findBoxesWithEntityAndType(Context context,
+                                                          String entity, String type) throws SQLException;
 }

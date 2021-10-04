@@ -15,8 +15,11 @@ import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.UUID;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.app.profile.OrcidSynchronizationMode;
@@ -41,6 +44,7 @@ import org.dspace.eperson.Group;
  * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
 public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
+    private static final Logger log = LogManager.getLogger(ItemBuilder.class);
 
     private boolean withdrawn = false;
     private boolean inArchive = false;
@@ -782,7 +786,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         try {
             installItemService.installItem(context, workspaceItem, this.handle);
             itemService.update(context, item);
-
             //Check if we need to make this item private. This has to be done after item install.
             if (readerGroup != null) {
                 setOnlyReadPermission(workspaceItem.getItem(), readerGroup, null);
@@ -802,6 +805,29 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         }
     }
 
+
+    public Item buildWithLastModifiedDate(Date lastModifiedDate) {
+        try {
+            installItemService.installItem(context, workspaceItem, this.handle);
+            itemService.updateLastModifiedDate(context, item, lastModifiedDate);
+            //Check if we need to make this item private. This has to be done after item install.
+            if (readerGroup != null) {
+                setOnlyReadPermission(workspaceItem.getItem(), readerGroup, null);
+            }
+
+            if (withdrawn) {
+                itemService.withdraw(context, item);
+            }
+            if (inArchive) {
+                item.setArchived(inArchive);
+            }
+            context.dispatchEvents();
+            indexingService.commit();
+            return item;
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {

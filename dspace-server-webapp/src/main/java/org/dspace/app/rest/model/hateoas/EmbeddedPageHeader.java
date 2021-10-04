@@ -108,7 +108,7 @@ public class EmbeddedPageHeader {
         if (size != Utils.DEFAULT_PAGE_SIZE) {
             uriComp = uriComp.replaceQueryParam("size", size);
         }
-        return new Href(uriComp.build().toUriString());
+        return new Href(uriComp.build().toUriString().replaceAll("(%(25)+20)", "%20"));
     }
 
     /**

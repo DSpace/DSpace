@@ -589,14 +589,13 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                 }
                                 if (authority != null) {
                                     doc.addField(searchFilter.getIndexFieldName() + "_filter", facetValue
-                                            .toLowerCase() + separator + facetValue + SearchUtils.AUTHORITY_SEPARATOR
-                                            + authority);
+                                            .toLowerCase());
                                     doc.addField(searchFilter.getIndexFieldName() + "_statfilter", facetValue
                                             .toLowerCase() + separator + facetValue + SearchUtils.AUTHORITY_SEPARATOR
                                             + authority);
                                 } else {
                                     doc.addField(searchFilter.getIndexFieldName() + "_filter",
-                                            facetValue.toLowerCase() + separator + facetValue);
+                                            facetValue.toLowerCase());
                                     doc.addField(searchFilter.getIndexFieldName() + "_statfilter",
                                             facetValue.toLowerCase() + separator + facetValue);
                                 }

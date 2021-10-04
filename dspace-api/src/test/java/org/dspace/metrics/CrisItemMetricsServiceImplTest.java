@@ -29,6 +29,7 @@ import org.dspace.discovery.IndexingService;
 import org.dspace.metrics.embeddable.EmbeddableMetricProvider;
 import org.dspace.metrics.embeddable.impl.AbstractEmbeddableMetricProvider;
 import org.dspace.metrics.embeddable.model.EmbeddableCrisMetrics;
+import org.dspace.metricsSecurity.BoxMetricsLayoutConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,6 +73,9 @@ public class CrisItemMetricsServiceImplTest {
     @Mock
     CrisItemMetricsServiceImpl crisItemMetricsService;
 
+    @Mock
+    private BoxMetricsLayoutConfigurationService boxMetricsLayoutConfigurationService;
+
     @Before
     public void setUp() throws Exception {
         embeddable1 = new EmbeddableCrisMetrics();
@@ -85,8 +89,8 @@ public class CrisItemMetricsServiceImplTest {
         crisItemMetricsService = mock(CrisItemMetricsServiceImpl.class);
         crisItemMetricsService.providers = providers;
         crisItemMetricsService.itemService = itemService;
+        crisItemMetricsService.boxMetricsLayoutConfigurationService = boxMetricsLayoutConfigurationService;
         crisItemMetricsService.crisMetricsService = crisMetricsService;
-
     }
 
     @Test
@@ -123,9 +127,8 @@ public class CrisItemMetricsServiceImplTest {
 
         when(provider1.provide(context, item, null)).thenReturn(Optional.of(embeddable1));
         when(provider2.provide(context, item, null)).thenReturn(Optional.empty());
-
         when(crisItemMetricsService.getEmbeddableMetrics(context, item.getID(), null)).thenCallRealMethod();
-
+        when(crisItemMetricsService.checkPermissionsOfMetricsByBox(any(), any(), any())).thenReturn(true);
         List<EmbeddableCrisMetrics> result = crisItemMetricsService.getEmbeddableMetrics(context, item.getID(), null);
 
         verify(provider1, times(1)).provide(context, item, null);
@@ -144,7 +147,7 @@ public class CrisItemMetricsServiceImplTest {
         when(provider2.support(metricId)).thenReturn(true);
         when(provider2.provide(context, metricId)).thenReturn(Optional.of(embeddable1));
         when(crisItemMetricsService.getEmbeddableById(context,metricId)).thenCallRealMethod();
-
+        when(crisItemMetricsService.checkPermissionsOfMetricsByBox(any(), any(), any())).thenReturn(true);
         Optional<EmbeddableCrisMetrics> result = crisItemMetricsService.getEmbeddableById(context, metricId);
 
         verify(provider1, times(1)).support(metricId);
@@ -167,6 +170,8 @@ public class CrisItemMetricsServiceImplTest {
 
         when(crisItemMetricsService.find(eq(context), any())).thenCallRealMethod();
         when(crisItemMetricsService.isEmbeddableMetricId(any())).thenCallRealMethod();
+        when(crisItemMetricsService.checkPermissionsOfMetricsByBox(any(), any(), any())).thenReturn(true);
+        when(crisItemMetricsService.itemFromMetricId(any(), any())).thenReturn(item);
 
         // should return getEmbeddableByID if is embeddable metric
         String metricId =

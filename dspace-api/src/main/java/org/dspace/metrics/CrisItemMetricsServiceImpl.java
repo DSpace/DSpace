@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -26,7 +27,9 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
 import org.dspace.metrics.embeddable.EmbeddableMetricProvider;
+import org.dspace.metrics.embeddable.impl.AbstractEmbeddableMetricProvider;
 import org.dspace.metrics.embeddable.model.EmbeddableCrisMetrics;
+import org.dspace.metricsSecurity.BoxMetricsLayoutConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +54,9 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
         this.providers = providers;
     }
 
+    @Autowired
+    protected BoxMetricsLayoutConfigurationService boxMetricsLayoutConfigurationService;
+
     @Override
     public List<CrisMetrics> getMetrics(Context context, UUID itemUuid) {
         // searches in solr
@@ -72,9 +78,14 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
             List<EmbeddableCrisMetrics> metrics = new ArrayList<>();
             this.providers.stream().forEach(provider -> {
                 final Optional<EmbeddableCrisMetrics> metric = provider.provide(context, item, retrivedStoredMetrics);
-                metric.ifPresent(metrics::add);
+                if (metric.isPresent()) {
+                    if (checkPermissionsOfMetricsByBox(context, item, metric.get())) {
+                        metrics.add(metric.get());
+                    }
+                }
             });
-            return metrics;
+            return metrics.stream().filter(metric ->
+                    checkPermissionsOfMetricsByBox(context, item, metric)).collect(Collectors.toList());
         } catch (SQLException ex) {
             log.warn("Item with uuid " + itemUuid + "not found");
         }
@@ -85,7 +96,13 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
     public Optional<EmbeddableCrisMetrics> getEmbeddableById(Context context, String metricId) throws SQLException {
         for (EmbeddableMetricProvider provider : this.providers) {
             if (provider.support(metricId)) {
-                return provider.provide(context, metricId);
+                Optional<EmbeddableCrisMetrics> embeddableCrisMetrics =  provider.provide(context, metricId);
+                if (embeddableCrisMetrics.isPresent()) {
+                    if (checkPermissionsOfMetricsByBox(context,
+                            itemFromMetricId(context, metricId), embeddableCrisMetrics.get())) {
+                        return embeddableCrisMetrics;
+                    }
+                }
             }
         }
         return Optional.empty();
@@ -94,20 +111,30 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
     @Override
     public Optional<String> embeddableFallback(final String metricType) {
         return providers.stream()
-                 .filter(p -> p.fallbackOf(metricType))
-                 .map(p -> p.getMetricType())
-            .findFirst();
+                .filter(p -> p.fallbackOf(metricType))
+                .map(p -> p.getMetricType())
+                .findFirst();
     }
 
     @Override
     public CrisMetrics find(Context context, String metricId) throws SQLException {
         if (this.isEmbeddableMetricId(metricId)) {
             Optional<EmbeddableCrisMetrics> metrics = getEmbeddableById(context, metricId);
-            return metrics.isPresent() ? (CrisMetrics) metrics.get() : null;
+            if (metrics.isPresent()) {
+                if (checkPermissionsOfMetricsByBox(context, itemFromMetricId(context, metricId), metrics.get())) {
+                    return (CrisMetrics) metrics.get();
+                }
+            } else {
+                return null;
+            }
         }
         if (StringUtils.startsWith(metricId, STORED_METRIC_ID_PREFIX)) {
-            return crisMetricsService.find(context,
+            CrisMetrics crisMetrics = crisMetricsService.find(context,
                     Integer.parseInt(metricId.substring(STORED_METRIC_ID_PREFIX.length())));
+            if (checkPermissionsOfMetricsByBox(context, itemFromMetricId(context, metricId), crisMetrics)) {
+                return crisMetrics;
+            }
+            return null;
         }
         return null;
     }
@@ -192,4 +219,24 @@ public class CrisItemMetricsServiceImpl implements CrisItemMetricsService {
         return embeddableCrisMetrics;
     }
 
+    public boolean checkPermissionsOfMetricsByBox(Context context, Item item, CrisMetrics crisMetric) {
+        return boxMetricsLayoutConfigurationService.checkPermissionOfMetricByBox(context, item, crisMetric);
+    }
+
+    public Item itemFromMetricId(Context context, String target) throws SQLException {
+        if (isEmbeddableMetricId(target.toString())) {
+            int indexOf = target.indexOf(AbstractEmbeddableMetricProvider.DYNAMIC_ID_SEPARATOR);
+            if (indexOf != -1) {
+                String uuid = target.substring(0, indexOf);
+                return itemService.find(context, UUID.fromString(uuid));
+            } else {
+                return null;
+            }
+
+        } else {
+            CrisMetrics crisMetrics = crisMetricsService.find(context,
+                    Integer.parseInt(target.substring(STORED_METRIC_ID_PREFIX.length())));
+            return crisMetrics != null ? itemService.find(context, crisMetrics.getResource().getID()) : null;
+        }
+    }
 }

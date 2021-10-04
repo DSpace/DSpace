@@ -99,5 +99,8 @@
         <property name="description" value="Perform a bulk pull from the ORCID registry for all the profiles with an ORCID id set"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.orcid.script.OrcidBulkPull"/>
     </bean>
-
+    <bean id="subscription-send" class="org.dspace.subscriptions.SubscriptionEmailNotificationCliScriptConfiguration">
+        <property name="description" value="Perform subscriptions send"/>
+        <property name="dspaceRunnableClass" value="org.dspace.subscriptions.SubscriptionEmailNotificationCli"/>
+    </bean>
 </beans>

@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.metrics.CrisMetrics;
 import org.dspace.app.metrics.service.CrisMetricsService;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.metrics.CrisItemMetricsService;
@@ -33,15 +34,15 @@ public class CrisMetricsBuilder extends AbstractBuilder<CrisMetrics, CrisMetrics
         super(context);
     }
 
-    public static CrisMetricsBuilder createCrisMetrics(Context context, Item item) {
+    public static CrisMetricsBuilder createCrisMetrics(Context context, DSpaceObject dSpaceObject) {
         CrisMetricsBuilder builder = new CrisMetricsBuilder(context);
-        return builder.create(context, item);
+        return builder.create(context, dSpaceObject);
     }
 
-    private CrisMetricsBuilder create(Context context, Item item) {
+    private CrisMetricsBuilder create(Context context, DSpaceObject dSpaceObject) {
         try {
             this.context = context;
-            this.crisMetrics = getService().create(context, item);
+            this.crisMetrics = getService().create(context, dSpaceObject);
         } catch (Exception e) {
             log.error("Error in CrisMetricsBuilder.create(..), error: ", e);
         }
@@ -97,7 +98,7 @@ public class CrisMetricsBuilder extends AbstractBuilder<CrisMetrics, CrisMetrics
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             CrisMetrics metrics = crisMetricsService
-                                      .findLastMetricByResourceIdAndMetricsTypes(c, "ScopusCitation", item.getID());
+                    .findLastMetricByResourceIdAndMetricsTypes(c, "ScopusCitation", item.getID());
             if (metrics != null) {
                 try {
                     crisMetricsService.delete(c, metrics);

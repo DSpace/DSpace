@@ -49,12 +49,16 @@ public class FacetResultsHalLinkFactory extends DiscoveryRestHalLinkFactory<Face
                     values.add(fv.getFilterValue() + ",notequals");
                 }
                 moreBuilder.queryParam("f." + facetData.getName(), values);
-                list.add(buildLink("more", moreBuilder.toUriString()));
+                String encoded = moreBuilder.toUriString();
+                encoded = encoded.replaceAll("(%(25)+20)", "%20");
+                list.add(buildLink("more", encoded));
             }
             if (facetData.exposeMissing()) {
                 UriComponentsBuilder moreBuilder = uriBuilder.cloneBuilder();
                 moreBuilder.queryParam("f." + facetData.getName(), "[* TO *],notequals");
-                list.add(buildLink("missing", moreBuilder.toUriString()));
+                String encoded = moreBuilder.toUriString();
+                encoded = encoded.replaceAll("(%(25)+20)", "%20");
+                list.add(buildLink("missing", encoded));
             }
 
         }

@@ -88,7 +88,7 @@ public class OAIHarvesterValidatorTest {
         when(configurationService.getProperty("oai.harvester.validation-dir")).thenReturn(VALIDATION_DIR);
         when(configurationService.getProperty("oai.harvester.validation.cerif.xsd")).thenReturn(CERIF_XSD_NAME);
 
-        Element record = readDocument(OAI_PMH_CERIF_DIR_PATH, "sample-publication.xml");
+        Element record = readDocument(OAI_PMH_CERIF_DIR_PATH, "valid-publication.xml");
         HarvestedCollection harvestRow = buildHarvestedCollection("cerif");
 
         OAIHarvesterValidationResult validationResult = validator.validate(record, harvestRow);

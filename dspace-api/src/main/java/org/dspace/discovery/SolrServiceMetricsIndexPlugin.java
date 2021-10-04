@@ -37,7 +37,7 @@ public class SolrServiceMetricsIndexPlugin implements SolrServiceIndexPlugin {
             Item item = ((IndexableItem) idxObj).getIndexedObject();
             if (Objects.nonNull(item)) {
                 try {
-                    List<CrisMetrics> metrics = crisMetricsService.findAllByItem(context, item);
+                    List<CrisMetrics> metrics = crisMetricsService.findAllByDSO(context, item);
                     for (CrisMetrics metric : metrics) {
                         SearchUtils.addMetricFieldsInSolrDoc(metric, document);
                     }

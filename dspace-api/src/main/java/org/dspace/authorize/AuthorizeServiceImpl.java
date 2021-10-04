@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -866,11 +867,11 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         if (context.getCurrentUser() == null) {
             return collections;
         }
-
-        query = formatCustomQuery(query);
-        DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
-                                                              IndexableCollection.TYPE,
-            offset, limit);
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append(formatCustomQuery(query));
+        queryBuilder.append("search.resourcetype:").append(IndexableCollection.TYPE);
+        DiscoverResult discoverResult = getDiscoverResult(context, queryBuilder.toString(),
+                offset, limit);
         for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
             Collection collection = ((IndexableCollection) solrCollections).getIndexedObject();
             collections.add(collection);
@@ -915,13 +916,14 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     }
 
     private DiscoverResult getDiscoverResult(Context context, String query, Integer offset, Integer limit)
-        throws SearchServiceException, SQLException {
-        String groupQuery = getGroupToQuery(groupService.allMemberGroups(context, context.getCurrentUser()));
-
+            throws SearchServiceException, SQLException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         if (!this.isAdmin(context)) {
-            query = query + " AND (" +
-                "admin:e" + context.getCurrentUser().getID() + groupQuery + ")";
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("(" + "admin:e").append(context.getCurrentUser().getID()).
+                    append(getGroupToQuery(groupService.allMemberGroupsSet(context,
+                            context.getCurrentUser()))).append(")");
+            discoverQuery.addFilterQueries(stringBuilder.toString());
         }
         discoverQuery.setQuery(query);
         if (offset != null) {
@@ -935,9 +937,9 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         return searchService.search(context, discoverQuery);
     }
 
-    private String getGroupToQuery(List<Group> groups) {
-        StringBuilder groupQuery = new StringBuilder();
 
+    private String getGroupToQuery(Set<Group> groups) {
+        StringBuilder groupQuery = new StringBuilder();
         if (groups != null) {
             for (Group group: groups) {
                 groupQuery.append(" OR admin:g");
