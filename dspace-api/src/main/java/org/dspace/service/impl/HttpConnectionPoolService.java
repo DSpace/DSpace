@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.service.impl;
 
 import java.util.concurrent.TimeUnit;
@@ -30,15 +37,15 @@ public class HttpConnectionPoolService {
     @Inject
     private ConfigurationService configurationService;
 
-    private final PoolingHttpClientConnectionManager connManager;
+    private final PoolingHttpClientConnectionManager connManager
+            = new PoolingHttpClientConnectionManager();
 
-    private final Thread connectionMonitor;
+    private final ConnectionKeepAliveStrategy keepAliveStrategy
+            = new KeepAliveStrategy();
 
-    private final ConnectionKeepAliveStrategy keepAliveStrategy;
+    private static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 20;
 
-    private static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 10;
-
-    private static final int DEFAULT_MAX_PER_ROUTE = 6;
+    private static final int DEFAULT_MAX_PER_ROUTE = 15;
 
     private static final int DEFAULT_KEEPALIVE = 5 * 1000; // milliseconds
 
@@ -46,22 +53,16 @@ public class HttpConnectionPoolService {
 
     private static final int IDLE_INTERVAL = 30; // seconds
 
-    public HttpConnectionPoolService() {
-        connManager = new PoolingHttpClientConnectionManager();
+    @PostConstruct
+    protected void init() {
         connManager.setMaxTotal(configurationService.getIntProperty(
                 "solrClient.maxTotalConnections", DEFAULT_MAX_TOTAL_CONNECTIONS));
         connManager.setDefaultMaxPerRoute(
                 configurationService.getIntProperty("solrClient.maxPerRoute",
                         DEFAULT_MAX_PER_ROUTE));
 
-        connectionMonitor = new IdleConnectionMonitorThread(connManager);
+        Thread connectionMonitor = new IdleConnectionMonitorThread(connManager);
         connectionMonitor.setDaemon(true);
-
-        keepAliveStrategy = new KeepAliveStrategy();
-    }
-
-    @PostConstruct
-    protected void init() {
         connectionMonitor.start();
     }
 
