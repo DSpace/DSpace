@@ -346,6 +346,12 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
                     for (String itemIdentifier : identifierList) {
 
+                        if (isTest) {
+                            System.out.println("\tAdding relationship (type: " + relationshipType + 
+                                ") from " + folderName + " to " + itemIdentifier);
+                            continue;
+                        }
+
                         //find referenced item
                         Item relationItem = resolveRelatedItem(c, itemIdentifier);
                         if (null == relationItem) {
