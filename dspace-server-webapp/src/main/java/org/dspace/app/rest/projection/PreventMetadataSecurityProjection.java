@@ -10,7 +10,9 @@ package org.dspace.app.rest.projection;
 import org.springframework.stereotype.Component;
 
 /**
- *
+ * This is a 'placeholder' projection. When set, no metadata security evaluation
+ * will be performed during DSpaceObject conversion, and only public metadata defined in
+ * 'metadata.publicField' array property will be returned.
  *
  * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  *
