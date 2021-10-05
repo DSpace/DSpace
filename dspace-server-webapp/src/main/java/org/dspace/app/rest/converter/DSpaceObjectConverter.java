@@ -62,7 +62,7 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
         }
         resource.setName(obj.getName());
 
-        MetadataValueList metadataValues = getPermissionFilteredMetadata(getContext(), obj);
+        MetadataValueList metadataValues = getPermissionFilteredMetadata(getContext(), obj, projection);
         resource.setMetadata(converter.toRest(metadataValues, projection));
         return resource;
     }
@@ -75,9 +75,10 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
      * When the context is null, it will return the metadatalist as for an anonymous user
      * @param context   The context
      * @param obj       The object of which the filtered metadata will be retrieved
+     * @param projection The projection(s) used into current request
      * @return A list of object metadata filtered based on the the hidden metadata configuration
      */
-    public MetadataValueList getPermissionFilteredMetadata(Context context, M obj) {
+    public MetadataValueList getPermissionFilteredMetadata(Context context, M obj, Projection projection) {
         List<MetadataValue> metadata = obj.getMetadata();
         List<MetadataValue> visibleMetadata = new ArrayList<MetadataValue>();
         try {

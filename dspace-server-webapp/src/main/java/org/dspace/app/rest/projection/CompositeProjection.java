@@ -81,4 +81,10 @@ public class CompositeProjection extends AbstractProjection {
         }
         return true;
     }
+
+    @Override
+    public boolean preventMetadataLevelSecurity() {
+        return projections.stream()
+            .anyMatch(prj -> prj.preventMetadataLevelSecurity());
+    }
 }
