@@ -347,7 +347,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     for (String itemIdentifier : identifierList) {
 
                         if (isTest) {
-                            System.out.println("\tAdding relationship (type: " + relationshipType + 
+                            System.out.println("\tAdding relationship (type: " + relationshipType +
                                 ") from " + folderName + " to " + itemIdentifier);
                             continue;
                         }
@@ -397,7 +397,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         int rightPlace = relationshipService.findNextRightPlaceByRightItem(c, rightItem);
                         Relationship persistedRelationship = relationshipService.create(
                             c, leftItem, rightItem, foundRelationshipType, leftPlace, rightPlace);
-                        relationshipService.update(c, persistedRelationship);
+                        // relationshipService.update(c, persistedRelationship);
 
                         System.out.println("\tAdded relationship (type: " + relationshipType + ") from " +
                             leftItem.getHandle() + " to " + rightItem.getHandle());
