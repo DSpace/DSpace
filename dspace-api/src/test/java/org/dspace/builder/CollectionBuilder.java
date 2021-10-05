@@ -23,6 +23,7 @@ import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
 
 /**
  * Builder to construct Collection objects.
@@ -177,7 +178,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     /**
      * Generate and populate a workflow group for the Collection.  Obsolete:
-     * the 3-step workflow model has been removed.
+     * the 3-step workflow model has been removed. Use other withWorkflowGroup() method instead
      *
      * @param step number of the workflow step.
      * @param members make these users members of the group.
@@ -189,6 +190,25 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
     @Deprecated
     public CollectionBuilder withWorkflowGroup(int step, EPerson... members) throws SQLException, AuthorizeException {
         Group g = collectionService.createWorkflowGroup(context, collection, step);
+        for (EPerson e : members) {
+            groupService.addMember(context, g, e);
+        }
+        groupService.update(context, g);
+        return this;
+    }
+
+    /**
+     * Generate and populate a role-based workflow group for the Collection.
+     *
+     * @param roleName the rolename for the group
+     * @param members make these users members of the group.
+     * @return this
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     */
+    public CollectionBuilder withWorkflowGroup(String roleName, EPerson... members)
+            throws SQLException, AuthorizeException, IOException, WorkflowConfigurationException {
+        Group g = workflowService.createWorkflowRoleGroup(context, collection, roleName);
         for (EPerson e : members) {
             groupService.addMember(context, g, e);
         }

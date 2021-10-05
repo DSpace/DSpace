@@ -30,7 +30,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 /**
- * ChoiceAuthority source that reads the JSPUI-style hierarchical vocabularies
+ * ChoiceAuthority source that reads the hierarchical vocabularies
  * from {@code ${dspace.dir}/config/controlled-vocabularies/*.xml} and turns
  * them into autocompleting authorities.
  *

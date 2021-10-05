@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.0-beta6-SNAPSHOT</version>
+        <version>7.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -743,7 +743,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>6.5.5</version>
+            <version>6.5.7</version>
         </dependency>
 
         <!-- Google Analytics -->
@@ -920,6 +920,12 @@
             <version>6.4.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <version>1.19.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

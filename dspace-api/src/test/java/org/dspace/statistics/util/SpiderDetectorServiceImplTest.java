@@ -70,7 +70,7 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
         req.setAgent("msnboT Is WaTching you");
         assertTrue("'msnbot' didn't match pattern", spiderDetectorService.isSpider(req));
 
-        req.setAgent("FirefOx");
+        req.setAgent("mozilla/5.0 (x11; linux x86_64; rv:91.0) gecko/20100101 firefox/91.0");
         assertFalse("'Firefox' matched a pattern", spiderDetectorService.isSpider(req));
 
         // Test IP patterns

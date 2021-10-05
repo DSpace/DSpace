@@ -95,8 +95,8 @@ db.schema = public
 #db.maxconnections = 30
 
 # Maximum time to wait before giving up if all connections in pool are busy (milliseconds)
-# (default = 5000ms or 5 seconds)
-#db.maxwait = 5000
+# (default = 10000ms or 10 seconds)
+#db.maxwait = 10000
 
 # Maximum number of idle connections in pool (-1 = unlimited)
 # (default = 10)
@@ -152,9 +152,8 @@ db.schema = public
 # handle.canonical.prefix = http://hdl.handle.net/
 # handle.canonical.prefix = https://hdl.handle.net/
 #
-# Note that this will not alter dc.identifer.uri metadata for existing
-# items (only for subsequent submissions), but it will alter the URL
-# in JSPUI's 'identifier' message on item record pages for existing items.
+# Note that this will not alter dc.identifier.uri metadata for existing
+# items (only for subsequent submissions).
 
 # CNRI Handle prefix
 # (Defaults to a dummy/fake prefix of 123456789)

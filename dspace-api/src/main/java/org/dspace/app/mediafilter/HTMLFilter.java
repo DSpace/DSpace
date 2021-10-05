@@ -9,6 +9,7 @@ package org.dspace.app.mediafilter;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 
@@ -36,7 +37,7 @@ public class HTMLFilter extends MediaFilter {
     }
 
     /**
-     * @return String bitstreamformat
+     * @return String bitstream format
      */
     @Override
     public String getFormatString() {
@@ -73,9 +74,9 @@ public class HTMLFilter extends MediaFilter {
         String extractedText = doc.getText(0, doc.getLength());
 
         // generate an input stream with the extracted text
-        byte[] textBytes = extractedText.getBytes();
+        byte[] textBytes = extractedText.getBytes(StandardCharsets.UTF_8);
         ByteArrayInputStream bais = new ByteArrayInputStream(textBytes);
 
-        return bais; // will this work? or will the byte array be out of scope?
+        return bais;
     }
 }

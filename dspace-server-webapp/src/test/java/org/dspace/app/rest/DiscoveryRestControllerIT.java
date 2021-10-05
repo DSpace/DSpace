@@ -196,15 +196,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     @Test
     public void discoverFacetsAuthorWithAuthorityWithSizeParameter() throws Exception {
-        configurationService.setProperty("choices.plugin.dc.contributor.author",
-                                         "SolrAuthorAuthority");
-        configurationService.setProperty("authority.controlled.dc.contributor.author",
-                                         "true");
-        configurationService.setProperty("discovery.browse.authority.ignore-prefered.author", true);
-        configurationService.setProperty("discovery.index.authority.ignore-prefered.dc.contributor.author", true);
-        configurationService.setProperty("discovery.browse.authority.ignore-variants.author", true);
-        configurationService.setProperty("discovery.index.authority.ignore-variants.dc.contributor.author", true);
-
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "SolrAuthorAuthority");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
 
         metadataAuthorityService.clearCache();
 
