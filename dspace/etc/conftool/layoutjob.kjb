@@ -326,7 +326,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>64</xloc>
-      <yloc>192</yloc>
+      <yloc>96</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -337,8 +337,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>96</xloc>
-      <yloc>304</yloc>
+      <xloc>64</xloc>
+      <yloc>208</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -369,6 +369,7 @@
       <create_parent_folder>N</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
       <run_configuration>Pentaho local</run_configuration>
+      <suppress_result_data>N</suppress_result_data>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
       </parameters>
@@ -376,7 +377,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>688</xloc>
-      <yloc>192</yloc>
+      <yloc>96</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -407,14 +408,15 @@
       <create_parent_folder>N</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
       <run_configuration/>
+      <suppress_result_data>N</suppress_result_data>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
       </parameters>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>224</xloc>
-      <yloc>192</yloc>
+      <xloc>160</xloc>
+      <yloc>96</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -445,14 +447,15 @@
       <create_parent_folder>N</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
       <run_configuration/>
+      <suppress_result_data>N</suppress_result_data>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
       </parameters>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>400</xloc>
-      <yloc>192</yloc>
+      <xloc>288</xloc>
+      <yloc>96</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -483,6 +486,7 @@
       <create_parent_folder>N</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
       <run_configuration>Pentaho local</run_configuration>
+      <suppress_result_data>N</suppress_result_data>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
       </parameters>
@@ -490,7 +494,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>560</xloc>
-      <yloc>192</yloc>
+      <yloc>96</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -521,14 +525,15 @@
       <create_parent_folder>N</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
       <run_configuration>Pentaho local</run_configuration>
+      <suppress_result_data>N</suppress_result_data>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
       </parameters>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>1</nr>
-      <xloc>800</xloc>
-      <yloc>192</yloc>
+      <xloc>816</xloc>
+      <yloc>96</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -559,14 +564,15 @@
       <create_parent_folder>N</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
       <run_configuration/>
+      <suppress_result_data>N</suppress_result_data>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
       </parameters>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>800</xloc>
-      <yloc>304</yloc>
+      <xloc>928</xloc>
+      <yloc>208</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -597,14 +603,15 @@
       <create_parent_folder>N</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
       <run_configuration>Pentaho local</run_configuration>
+      <suppress_result_data>N</suppress_result_data>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
       </parameters>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>400</xloc>
-      <yloc>304</yloc>
+      <xloc>560</xloc>
+      <yloc>208</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -635,14 +642,15 @@
       <create_parent_folder>N</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
       <run_configuration>Pentaho local</run_configuration>
+      <suppress_result_data>N</suppress_result_data>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
       </parameters>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>240</xloc>
-      <yloc>304</yloc>
+      <xloc>288</xloc>
+      <yloc>208</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -673,14 +681,171 @@
       <create_parent_folder>N</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
       <run_configuration>Pentaho local</run_configuration>
+      <suppress_result_data>N</suppress_result_data>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
       </parameters>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>592</xloc>
-      <yloc>304</yloc>
+      <xloc>816</xloc>
+      <yloc>208</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>login</name>
+      <description/>
+      <type>TRANS</type>
+      <attributes/>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>${Internal.Entry.Current.Directory}/login.ktr</filename>
+      <transname/>
+      <arg_from_previous>Y</arg_from_previous>
+      <params_from_previous>Y</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <run_configuration/>
+      <suppress_result_data>N</suppress_result_data>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>3</nr>
+      <xloc>928</xloc>
+      <yloc>96</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>login</name>
+      <description/>
+      <type>TRANS</type>
+      <attributes/>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>${Internal.Entry.Current.Directory}/login.ktr</filename>
+      <transname/>
+      <arg_from_previous>Y</arg_from_previous>
+      <params_from_previous>Y</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <run_configuration/>
+      <suppress_result_data>N</suppress_result_data>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>4</nr>
+      <xloc>416</xloc>
+      <yloc>96</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>login</name>
+      <description/>
+      <type>TRANS</type>
+      <attributes/>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>${Internal.Entry.Current.Directory}/login.ktr</filename>
+      <transname/>
+      <arg_from_previous>Y</arg_from_previous>
+      <params_from_previous>Y</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <run_configuration/>
+      <suppress_result_data>N</suppress_result_data>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>5</nr>
+      <xloc>688</xloc>
+      <yloc>208</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>login</name>
+      <description/>
+      <type>TRANS</type>
+      <attributes/>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>${Internal.Entry.Current.Directory}/login.ktr</filename>
+      <transname/>
+      <arg_from_previous>Y</arg_from_previous>
+      <params_from_previous>Y</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <run_configuration/>
+      <suppress_result_data>N</suppress_result_data>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>6</nr>
+      <xloc>416</xloc>
+      <yloc>208</yloc>
       <attributes_kjc/>
     </entry>
   </entries>
@@ -690,24 +855,6 @@
       <to>createBox</to>
       <from_nr>0</from_nr>
       <to_nr>1</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>createBox</from>
-      <to>Add boxes to tabs</to>
-      <from_nr>1</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Validate</from>
-      <to>Clean-Layout</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
       <unconditional>N</unconditional>
@@ -731,26 +878,8 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Add metadata to box</from>
-      <to>Add security</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>Add boxes to tabs</from>
       <to>box2metrics</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>box2metrics</from>
-      <to>Add metadata to box</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -774,6 +903,78 @@
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
       <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>createBox</from>
+      <to>login</to>
+      <from_nr>1</from_nr>
+      <to_nr>3</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>login</from>
+      <to>Add boxes to tabs</to>
+      <from_nr>3</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>Validate</from>
+      <to>login</to>
+      <from_nr>0</from_nr>
+      <to_nr>4</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>login</from>
+      <to>Clean-Layout</to>
+      <from_nr>4</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>box2metrics</from>
+      <to>login</to>
+      <from_nr>0</from_nr>
+      <to_nr>5</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>login</from>
+      <to>Add metadata to box</to>
+      <from_nr>5</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>Add metadata to box</from>
+      <to>login</to>
+      <from_nr>0</from_nr>
+      <to_nr>6</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>login</from>
+      <to>Add security</to>
+      <from_nr>6</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
     </hop>
   </hops>
   <notepads>
