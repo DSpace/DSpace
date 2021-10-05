@@ -14,7 +14,6 @@ import java.util.List;
 import org.dspace.content.ProcessStatus;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
-import org.dspace.eperson.EPerson;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessQueryParameterContainer;
 

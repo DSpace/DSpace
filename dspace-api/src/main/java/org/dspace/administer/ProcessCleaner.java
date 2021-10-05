@@ -62,7 +62,7 @@ public class ProcessCleaner extends DSpaceRunnable<ProcessCleanerConfiguration<P
         this.days = configurationService.getIntProperty("process-cleaner.days", 14);
 
         if (this.days <= 0) {
-            throw new IllegalArgumentException("The number of days must be a positive integer.");
+            throw new IllegalStateException("The number of days must be a positive integer.");
         }
 
     }
@@ -82,12 +82,16 @@ public class ProcessCleaner extends DSpaceRunnable<ProcessCleanerConfiguration<P
 
     }
 
+    /**
+     * Delete the processes based on the specified statuses and the configured days
+     * from their creation.
+     */
     private void performDeletion(Context context) throws SQLException, IOException, AuthorizeException {
 
         List<ProcessStatus> statuses = getProcessToDeleteStatuses();
         Date creationDate = calculateCreationDate();
 
-        handler.logInfo("Searching for processes with one of the following status: " + statuses);
+        handler.logInfo("Searching for processes with status: " + statuses);
         List<Process> processes = processService.findByStatusAndCreationTimeOlderThan(context, statuses, creationDate);
         handler.logInfo("Found " + processes.size() + " processes to be deleted");
         for (Process process : processes) {
@@ -98,6 +102,9 @@ public class ProcessCleaner extends DSpaceRunnable<ProcessCleanerConfiguration<P
 
     }
 
+    /**
+     * Returns the list of Process statuses do be deleted.
+     */
     private List<ProcessStatus> getProcessToDeleteStatuses() {
         List<ProcessStatus> statuses = new ArrayList<ProcessStatus>();
         if (cleanCompleted) {
