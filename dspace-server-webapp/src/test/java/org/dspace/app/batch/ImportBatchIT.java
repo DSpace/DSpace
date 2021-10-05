@@ -1081,7 +1081,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void createItemWithAccessionedDAteTest() throws Exception {
+    public void createItemWithAvailableDAteTest() throws Exception {
         List<WorkspaceItem> wis = null;
         String dateAvailable = "2010-11-21T08:56:26Z";
         try {
