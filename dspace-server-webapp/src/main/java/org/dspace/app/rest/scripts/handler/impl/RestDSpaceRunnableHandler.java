@@ -134,18 +134,12 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     @Override
     public void handleException(String message, Exception e) {
-        if (message != null) {
-            logError(message);
-        }
-        if (e != null) {
-            logError(ExceptionUtils.getStackTrace(e));
-        }
+        logError(message, e);
 
         Context context = new Context();
         try {
             Process process = processService.find(context, processId);
             processService.fail(context, process);
-
 
             addLogBitstreamToProcess(context);
             context.complete();
@@ -161,6 +155,9 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
                 context.abort();
             }
         }
+
+        // Make sure execution actually ends after we handle the exception
+        throw new RuntimeException(e);
     }
 
     @Override
@@ -180,7 +177,6 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         log.info(logMessage);
 
         appendLogToProcess(message, ProcessLogLevel.INFO);
-
     }
 
     @Override
@@ -189,7 +185,6 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         log.warn(logMessage);
 
         appendLogToProcess(message, ProcessLogLevel.WARNING);
-
     }
 
     @Override
@@ -198,7 +193,17 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         log.error(logMessage);
 
         appendLogToProcess(message, ProcessLogLevel.ERROR);
+    }
 
+    @Override
+    public void logError(String message, Throwable throwable) {
+        String logMessage = getLogMessage(message);
+        log.error(logMessage, throwable);
+
+        appendLogToProcess(message, ProcessLogLevel.ERROR);
+        if (throwable != null) {
+            appendLogToProcess(ExceptionUtils.getStackTrace(throwable), ProcessLogLevel.ERROR);
+        }
     }
 
     @Override

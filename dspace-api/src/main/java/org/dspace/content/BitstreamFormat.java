@@ -9,7 +9,7 @@ package org.dspace.content;
 
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -40,7 +40,6 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * when <code>update</code> is called.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 @Entity
 @Table(name = "bitstreamformatregistry")
@@ -112,7 +111,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
      * {@link org.dspace.content.service.BitstreamFormatService#create(Context)}
      */
     protected BitstreamFormat() {
-        fileExtensions = new LinkedList<>();
+        fileExtensions = new ArrayList<>();
     }
 
     /**
@@ -120,6 +119,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
      *
      * @return the internal identifier
      */
+    @Override
     public final Integer getID() {
         return id;
     }
@@ -267,7 +267,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
      */
     @Override
     public boolean equals(Object other) {
-        if (other == null) {
+        if (!(other instanceof BitstreamFormat)) {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(other);
@@ -275,11 +275,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
             return false;
         }
         final BitstreamFormat otherBitstreamFormat = (BitstreamFormat) other;
-        if (!this.getID().equals(otherBitstreamFormat.getID())) {
-            return false;
-        }
-
-        return true;
+        return this.getID().equals(otherBitstreamFormat.getID());
     }
 
     @Override

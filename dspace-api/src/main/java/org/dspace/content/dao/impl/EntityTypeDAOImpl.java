@@ -18,6 +18,15 @@ import org.dspace.content.dao.EntityTypeDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 
+/**
+ * Hibernate implementation of the Database Access Object interface class for
+ * the EntityType object.
+ * This class is responsible for all database calls for the EntityType object
+ * and is autowired by Spring.
+ * This class should never be accessed directly.
+ *
+ * @author kevinvandevelde at atmire.com
+ */
 public class EntityTypeDAOImpl extends AbstractHibernateDAO<EntityType> implements EntityTypeDAO {
 
     @Override
@@ -28,6 +37,6 @@ public class EntityTypeDAOImpl extends AbstractHibernateDAO<EntityType> implemen
         criteriaQuery.select(entityTypeRoot);
         criteriaQuery.where(criteriaBuilder.equal(criteriaBuilder.upper(entityTypeRoot.get(EntityType_.label)),
                                                   entityType.toUpperCase()));
-        return uniqueResult(context, criteriaQuery, true, EntityType.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, true, EntityType.class);
     }
 }

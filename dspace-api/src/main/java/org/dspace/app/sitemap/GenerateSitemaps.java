@@ -40,7 +40,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchService;
@@ -284,7 +284,7 @@ public class GenerateSitemaps {
 
         if (makeHTMLMap) {
             int files = html.finish();
-            log.info(LogManager.getHeader(c, "write_sitemap",
+            log.info(LogHelper.getHeader(c, "write_sitemap",
                                           "type=html,num_files=" + files + ",communities="
                                               + comms.size() + ",collections=" + colls.size()
                                               + ",items=" + itemCount));
@@ -292,7 +292,7 @@ public class GenerateSitemaps {
 
         if (makeSitemapOrg) {
             int files = sitemapsOrg.finish();
-            log.info(LogManager.getHeader(c, "write_sitemap",
+            log.info(LogHelper.getHeader(c, "write_sitemap",
                                           "type=html,num_files=" + files + ",communities="
                                               + comms.size() + ",collections=" + colls.size()
                                               + ",items=" + itemCount));

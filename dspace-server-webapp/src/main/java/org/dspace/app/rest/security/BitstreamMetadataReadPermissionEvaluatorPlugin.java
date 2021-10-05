@@ -63,27 +63,32 @@ public class BitstreamMetadataReadPermissionEvaluatorPlugin extends RestObjectPe
                 UUID dsoUuid = UUID.fromString(targetId.toString());
                 DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, dsoUuid);
                 if (dso instanceof Bitstream) {
-                    if (authorizeService.isAdmin(context, dso)) {
-                        // Is Admin on bitstream
-                        return true;
-                    }
-                    if (authorizeService.authorizeActionBoolean(context, dso, Constants.READ)) {
-                        // Has READ rights on bitstream
-                        return true;
-                    }
-                    DSpaceObject bitstreamParentObject = bitstreamService.getParentObject(context, (Bitstream) dso);
-                    if (bitstreamParentObject instanceof Item && !((Bitstream) dso).getBundles().isEmpty()) {
-                        // If parent is item and it is in a bundle
-                        Bundle firstBundle = ((Bitstream) dso).getBundles().get(0);
-                        if (authorizeService.authorizeActionBoolean(context, bitstreamParentObject, Constants.READ)
-                            && authorizeService.authorizeActionBoolean(context, firstBundle, Constants.READ)) {
-                            // Has READ rights on bitstream's parent item AND first bundle bitstream is in
-                            return true;
-                        }
-                    }
+                    return this.metadataReadPermissionOnBitstream(context, (Bitstream) dso);
                 }
             } catch (SQLException e) {
                 log.error(e.getMessage(), e);
+            }
+        }
+        return false;
+    }
+
+    public boolean metadataReadPermissionOnBitstream(Context context, Bitstream bitstream) throws SQLException {
+        if (authorizeService.isAdmin(context, bitstream)) {
+            // Is Admin on bitstream
+            return true;
+        }
+        if (authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ)) {
+            // Has READ rights on bitstream
+            return true;
+        }
+        DSpaceObject bitstreamParentObject = bitstreamService.getParentObject(context, bitstream);
+        if (bitstreamParentObject instanceof Item && !(bitstream).getBundles().isEmpty()) {
+            // If parent is item and it is in a bundle
+            Bundle firstBundle = (bitstream).getBundles().get(0);
+            if (authorizeService.authorizeActionBoolean(context, bitstreamParentObject, Constants.READ)
+                && authorizeService.authorizeActionBoolean(context, firstBundle, Constants.READ)) {
+                // Has READ rights on bitstream's parent item AND first bundle bitstream is in
+                return true;
             }
         }
         return false;

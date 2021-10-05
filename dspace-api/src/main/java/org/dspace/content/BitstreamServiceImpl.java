@@ -28,7 +28,7 @@ import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.event.Event;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamServiceImpl.class);
+    private static final Logger log
+            = org.apache.logging.log4j.LogManager.getLogger();
 
 
     @Autowired(required = true)
@@ -73,7 +74,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         if (bitstream == null) {
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(context, "find_bitstream",
+                log.debug(LogHelper.getHeader(context, "find_bitstream",
                                                "not_found,bitstream_id=" + id));
             }
 
@@ -82,7 +83,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         // not null, return Bitstream
         if (log.isDebugEnabled()) {
-            log.debug(LogManager.getHeader(context, "find_bitstream",
+            log.debug(LogHelper.getHeader(context, "find_bitstream",
                                            "bitstream_id=" + id));
         }
 
@@ -131,7 +132,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         // Store the bits
         UUID bitstreamID = bitstreamStorageService.store(context, bitstreamDAO.create(context, new Bitstream()), is);
 
-        log.info(LogManager.getHeader(context, "create_bitstream",
+        log.info(LogHelper.getHeader(context, "create_bitstream",
                                       "bitstream_id=" + bitstreamID));
 
         // Set the format to "unknown"
@@ -191,7 +192,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         bitstreamStorageService.register(
             context, bitstream, assetstore, bitstreamPath);
 
-        log.info(LogManager.getHeader(context,
+        log.info(LogHelper.getHeader(context,
                                       "create_bitstream",
                                       "bitstream_id=" + bitstream.getID()));
 
@@ -248,7 +249,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         // Check authorisation
         authorizeService.authorizeAction(context, bitstream, Constants.WRITE);
 
-        log.info(LogManager.getHeader(context, "update_bitstream",
+        log.info(LogHelper.getHeader(context, "update_bitstream",
                                       "bitstream_id=" + bitstream.getID()));
         super.update(context, bitstream);
         if (bitstream.isModified()) {
@@ -273,7 +274,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         // changed to a check on delete
         // Check authorisation
         authorizeService.authorizeAction(context, bitstream, Constants.DELETE);
-        log.info(LogManager.getHeader(context, "delete_bitstream",
+        log.info(LogHelper.getHeader(context, "delete_bitstream",
                                       "bitstream_id=" + bitstream.getID()));
 
         context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(),
@@ -350,7 +351,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     public void expunge(Context context, Bitstream bitstream) throws SQLException, AuthorizeException {
         authorizeService.authorizeAction(context, bitstream, Constants.DELETE);
         if (!bitstream.isDeleted()) {
-            throw new IllegalStateException("Bitstream must be deleted before it can be removed from the database");
+            throw new IllegalStateException("Bitstream " + bitstream.getID().toString()
+                    + " must be deleted before it can be removed from the database.");
         }
         bitstreamDAO.delete(context, bitstream);
     }

@@ -29,7 +29,7 @@
 
         >
             <Layout type='PatternLayout'
-                    pattern='%d %-5p %c @ %m%n'/>
+                    pattern='%d %-5p $$$${ctx:correlationID:-unknown} $$$${ctx:requestID:-unknown} %c @ %m%n'/>
             <policies>
                 <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
                 <!-- Sample deletion policy:  keep last 30 archived files

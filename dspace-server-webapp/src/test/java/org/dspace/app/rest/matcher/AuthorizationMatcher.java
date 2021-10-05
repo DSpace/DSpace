@@ -32,7 +32,7 @@ public class AuthorizationMatcher {
      *            the authorization, if null only the presence of the generic properties will be verified
      * @return
      */
-    public static Matcher matchAuthorization(Authorization authz) {
+    public static Matcher<? super Object> matchAuthorization(Authorization authz) {
         return allOf(
                 // Check authorization properties
                 matchProperties(authz),
