@@ -87,7 +87,7 @@ public class ProcessCleaner extends DSpaceRunnable<ProcessCleanerConfiguration<P
         List<ProcessStatus> statuses = getProcessToDeleteStatuses();
         Date creationDate = calculateCreationDate();
 
-        handler.logInfo("Searching for processes with one of the following status: " + statuses);
+        handler.logInfo("Searching for processes with status: " + statuses);
         List<Process> processes = processService.findByStatusAndCreationTimeOlderThan(context, statuses, creationDate);
         handler.logInfo("Found " + processes.size() + " processes to be deleted");
         for (Process process : processes) {
