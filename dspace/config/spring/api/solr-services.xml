@@ -35,12 +35,13 @@
                   ref='HttpSolrClientFactory'/>
     </bean>
 
+    <bean class="org.dspace.statistics.SolrStatisticsCore"
+          autowire-candidate="true"/>
+
     <bean id='HttpSolrClientFactory'
-          class='org.dspace.statistics.​HttpSolrClientFactory'>
+          class='org.dspace.statistics.HttpSolrClientFactory'>
         <description>HTTP connection to a Solr instance.</description>
     </bean>
-
-    <bean class="org.dspace.statistics.SolrStatisticsCore" autowire-candidate="true"/>
     
     <!-- quality assurance broker service -->
     <bean id="org.dspace.qaevent.service.QAEventService" class="org.dspace.qaevent.service.impl.QAEventServiceImpl" />
@@ -49,5 +50,5 @@
     
     <!-- suggestion service for solr providers -->     
     <bean id="org.dspace.app.suggestion.SolrSuggestionStorageService" class="org.dspace.app.suggestion.SolrSuggestionStorageServiceImpl" />
-    
+   
 </beans>
