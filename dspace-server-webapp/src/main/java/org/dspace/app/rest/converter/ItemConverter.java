@@ -239,33 +239,30 @@ public class ItemConverter
         List<String> allPublicMetadata = performSecurityCheck ? getPublicMetadata(boxes) : publicMetadataFromConfig();
         if (isPublicMetadataField(metadataField, allPublicMetadata)) {
             return true;
-        } else {
-            if (performSecurityCheck) {
+        } else if (performSecurityCheck) {
 
-                EPerson currentUser = context.getCurrentUser();
-                List<CrisLayoutBox> boxesWithMetadataFieldExcludedPublic = getBoxesWithMetadataFieldExcludedPublic(
-                    metadataField, boxes);
+            EPerson currentUser = context.getCurrentUser();
+            List<CrisLayoutBox> boxesWithMetadataFieldExcludedPublic = getBoxesWithMetadataFieldExcludedPublic(
+                metadataField, boxes);
 
-                if (Objects.nonNull(currentUser)) {
+            if (Objects.nonNull(currentUser)) {
 
-                    for (CrisLayoutBox box : boxesWithMetadataFieldExcludedPublic) {
-                        if (crisLayoutBoxAccessService.hasAccess(context, currentUser, box, item)) {
-                            return true;
-                        }
-                    }
-                }
-                // the metadata is not included in any box so use the default dspace security
-                if (boxesWithMetadataFieldExcludedPublic.size() == 0) {
-                    if (!metadataExposureService
-                        .isHidden(context, metadataField.getMetadataSchema().getName(),
-                            metadataField.getElement(),
-                            metadataField.getQualifier())) {
+                for (CrisLayoutBox box : boxesWithMetadataFieldExcludedPublic) {
+                    if (crisLayoutBoxAccessService.hasAccess(context, currentUser, box, item)) {
                         return true;
                     }
                 }
             }
+            // the metadata is not included in any box so use the default dspace security
+            if (boxesWithMetadataFieldExcludedPublic.size() == 0) {
+                if (!metadataExposureService
+                    .isHidden(context, metadataField.getMetadataSchema().getName(),
+                        metadataField.getElement(),
+                        metadataField.getQualifier())) {
+                    return true;
+                }
+            }
         }
-
         return false;
     }
 
