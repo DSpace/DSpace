@@ -27,7 +27,7 @@ public class EntityTypeRest extends BaseObjectRest<Integer> {
     public static final String NAME = "entitytype";
     public static final String NAME_PLURAL = "entitytypes";
     public static final String CATEGORY = "core";
-    public static final String RELATION_SHIP_TYPES = "relationshipTypes";
+    public static final String RELATION_SHIP_TYPES = "relationshiptypes";
 
     public String getCategory() {
         return CATEGORY;

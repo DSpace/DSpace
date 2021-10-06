@@ -191,10 +191,10 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                              publication, orgunit, "isAuthorOfPublication","isPublicationOfAuthor");
 
         getClient().perform(get("/api/core/entitytypes/" + publication.getID())
-                   .param("embed", "relationshipTypes"))
+                   .param("embed", "relationshiptypes"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", EntityTypeMatcher.matchEntityTypeEntry(publication)))
-                   .andExpect(jsonPath("$._embedded.relationshipTypes._embedded.relationshipTypes", containsInAnyOrder(
+                   .andExpect(jsonPath("$._embedded.relationshiptypes._embedded.relationshiptypes", containsInAnyOrder(
                            RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType1),
                            RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType2),
                            RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType3),
