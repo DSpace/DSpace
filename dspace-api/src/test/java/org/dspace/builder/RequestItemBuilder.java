@@ -9,6 +9,7 @@
 package org.dspace.builder;
 
 import java.sql.SQLException;
+import java.util.Date;
 import javax.validation.constraints.NotNull;
 
 import org.apache.logging.log4j.LogManager;
@@ -34,26 +35,13 @@ public class RequestItemBuilder
     public static final String REQ_PATH = "test/file";
 
     private RequestItem requestItem;
+    private Item item;
+    private Bitstream bitstream;
+    private Date decisionDate;
+    private boolean accepted;
 
     protected RequestItemBuilder(Context context) {
         super(context);
-    }
-
-    @Override
-    public void cleanup()
-            throws Exception {
-        LOG.debug("cleanup()");
-        try ( Context ctx = new Context(); ) {
-            ctx.turnOffAuthorisationSystem();
-            requestItem = ctx.reloadEntity(requestItem);
-            if (null != requestItem) {
-                delete(ctx, requestItem);
-                ctx.complete();
-                requestItem = null;
-            } else {
-                LOG.debug("nothing to clean up.");
-            }
-        }
     }
 
     /**
@@ -71,6 +59,42 @@ public class RequestItemBuilder
     }
 
     private RequestItemBuilder create(Item item, Bitstream bitstream) {
+        this.item = item;
+        this.bitstream = bitstream;
+        return this;
+    }
+
+    /**
+     * Set the date on which a decision was made concerning this request.
+     *
+     * @param date the date of the decision.
+     * @return this builder.
+     */
+    public RequestItemBuilder withDecisionDate(Date date) {
+        this.decisionDate = date;
+        return this;
+    }
+
+    /**
+     * Set whether request has been accepted.  Does <b>not</b> set the decision
+     * date.
+     *
+     * @param accepted true if request is accepted.
+     * @return this builder.
+     */
+    public RequestItemBuilder withAcceptRequest(boolean accepted) {
+        this.accepted = accepted;
+        return this;
+    }
+
+    @Override
+    public RequestItem build() {
+        LOG.atDebug()
+                .withLocation()
+                .log("Building request with item ID {} and bitstream ID {}",
+                        () -> item.getID().toString(),
+                        () -> bitstream.getID().toString());
+
         String token;
         try {
             token = requestItemService.createRequest(context, bitstream, item,
@@ -80,21 +104,29 @@ public class RequestItemBuilder
             return handleException(ex);
         }
         requestItem = requestItemService.findByToken(context, token);
-        requestItem.setAccept_request(false);
+        requestItem.setAccept_request(accepted);
+        requestItem.setDecision_date(decisionDate);
+
         requestItemService.update(context, requestItem);
-        return this;
+
+        return requestItem;
     }
 
     @Override
-    public RequestItem build() {
-        LOG.atDebug()
-                .withLocation()
-                .log("Building request with item ID {} and bitstream ID {}",
-                        () -> requestItem.getItem().getID().toString(),
-                        () -> requestItem.getBitstream().getID().toString());
-
-        // Nothing to build.
-        return requestItem;
+    public void cleanup()
+            throws Exception {
+        LOG.debug("cleanup()");
+        try ( Context ctx = new Context(); ) {
+            ctx.turnOffAuthorisationSystem();
+            requestItem = ctx.reloadEntity(requestItem);
+            if (null != requestItem) {
+                delete(ctx, requestItem);
+                ctx.complete();
+                requestItem = null;
+            } else {
+                LOG.debug("nothing to clean up.");
+            }
+        }
     }
 
     @Override
