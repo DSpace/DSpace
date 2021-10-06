@@ -568,6 +568,32 @@ public class RequestItemRepositoryIT
                 .andExpect(status().isUnprocessableEntity());
     }
 
+    @Test
+    public void testPutCompletedRequest()
+            throws Exception {
+        System.out.println("put completed request");
+
+        // Create an item request that is already denied.
+        RequestItem itemRequest = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .withAcceptRequest(false)
+                .withDecisionDate(new Date())
+                .build();
+
+        // Try to accept it again.
+        Map<String, String> parameters = Map.of(
+                "acceptRequest", "true",
+                "subject", "subject",
+                "responseMessage", "Request accepted");
+        ObjectWriter mapperWriter = new ObjectMapper().writer();
+        String content = mapperWriter.writeValueAsString(parameters);
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(put(URI_ROOT + '/' + itemRequest.getToken())
+                .contentType(contentType)
+                .content(content))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
     /**
      * Test of getDomainClass method, of class RequestItemRepository.
      */

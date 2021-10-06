@@ -240,6 +240,14 @@ public class RequestItemRepository
             throw new AuthorizeException("Not authorized to approve this request");
         }
 
+        // Do not permit updates after a decision has been given.
+        Date decisionDate = ri.getDecision_date();
+        if (null != decisionDate) {
+            throw new UnprocessableEntityException("Request was "
+                    + (ri.isAccept_request() ? "granted" : "denied")
+                    + " on " + decisionDate + " and may not be updated.");
+        }
+
         // Make the changes
         JsonNode acceptRequestNode = requestBody.findValue("acceptRequest");
         if (null == acceptRequestNode) {
