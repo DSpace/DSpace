@@ -6,6 +6,11 @@
   set_fact:
     kunde: "{{ item }}"
 
+- name: Create config directory
+  file:
+    path: "{{ webconfpath | default('/etc/httpd/conf/vhosts/active/brage') }}"
+    state: directory
+
 - name: Copy VirtualHost configuration file
   template:
     src: virtualhost.conf.j2
