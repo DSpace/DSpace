@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -120,6 +121,10 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
      */
     protected Item() {
 
+    }
+
+    protected Item(UUID uuid) {
+        this.predefinedUUID = uuid;
     }
 
     /**

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -102,6 +103,9 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      */
     protected Collection() {
 
+    }
+    protected Collection(UUID uuid) {
+        this.predefinedUUID = uuid;
     }
 
     @Override
