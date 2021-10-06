@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.RelationshipUtils;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
@@ -1793,36 +1794,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
      */
     private RelationshipType matchRelationshipType(List<RelationshipType> relTypes,
                                                    String targetType, String originType, String originTypeName) {
-        RelationshipType foundRelationshipType = null;
-        if (originTypeName.split("\\.").length > 1) {
-            originTypeName = originTypeName.split("\\.")[1];
-        }
-        for (RelationshipType relationshipType : relTypes) {
-            // Is origin type leftward or righward
-            boolean isLeft = false;
-            if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(originType)) {
-                isLeft = true;
-            }
-            if (isLeft) {
-                // Validate typeName reference
-                if (!relationshipType.getLeftwardType().equalsIgnoreCase(originTypeName)) {
-                    continue;
-                }
-                if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(originType) &&
-                    relationshipType.getRightType().getLabel().equalsIgnoreCase(targetType)) {
-                    foundRelationshipType = relationshipType;
-                }
-            } else {
-                if (!relationshipType.getRightwardType().equalsIgnoreCase(originTypeName)) {
-                    continue;
-                }
-                if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(targetType) &&
-                    relationshipType.getRightType().getLabel().equalsIgnoreCase(originType)) {
-                    foundRelationshipType = relationshipType;
-                }
-            }
-        }
-        return foundRelationshipType;
+        return RelationshipUtils.matchRelationshipType(relTypes, targetType, originType, originTypeName);
     }
 
 }
