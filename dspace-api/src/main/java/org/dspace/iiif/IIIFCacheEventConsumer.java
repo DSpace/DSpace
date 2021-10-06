@@ -5,15 +5,13 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.iiif;
+package org.dspace.iiif;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.iiif.service.CacheEvictService;
-import org.dspace.app.rest.iiif.service.util.CacheEvictBeanLocator;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
@@ -124,12 +122,14 @@ public class IIIFCacheEventConsumer implements Consumer {
 
     @Override
     public void end(Context ctx) throws Exception {
-        if (clearAll) {
-            cacheEvictService.evictAllCacheValues();
-        }  else {
-            for (DSpaceObject dso : toEvictFromManifestCache) {
-                UUID uuid = dso.getID();
-                cacheEvictService.evictSingleCacheValue(uuid.toString());
+        if (cacheEvictService != null) {
+            if (clearAll) {
+                cacheEvictService.evictAllCacheValues();
+            } else {
+                for (DSpaceObject dso : toEvictFromManifestCache) {
+                    UUID uuid = dso.getID();
+                    cacheEvictService.evictSingleCacheValue(uuid.toString());
+                }
             }
         }
         clearAll = false;

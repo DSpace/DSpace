@@ -5,13 +5,14 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.iiif.service;
+package org.dspace.iiif;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
-import org.springframework.stereotype.Service;
 
-@Service
+/**
+ * Removes items from the iiif manifests cache.
+ */
 public class CacheEvictService {
 
     // The cache that is managed by this service.
@@ -29,4 +30,3 @@ public class CacheEvictService {
     }
 
 }
-
