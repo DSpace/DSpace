@@ -1,6 +1,7 @@
 [webservers]
 acrux.backupsite.bibsys.no
 becrux.backupsite.bibsys.no
+brage3.backupsite.bibsys.no
 
 [appservers-produksjon]
 brage1.backupsite.bibsys.no
