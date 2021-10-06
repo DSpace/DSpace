@@ -1,3 +1,4 @@
+package org.dspace.iiif;
 /**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
@@ -5,18 +6,14 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.iiif.service.util;
 
-import org.dspace.app.rest.iiif.service.CacheEvictService;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
 /**
- * Exposes the Spring managed cache evict service to the event consumer.
+ * Exposes the Spring web application's IIIF cache evict service to the DSpace event consumer.
  */
-@Component
 public class CacheEvictBeanLocator implements ApplicationContextAware {
 
     private static ApplicationContext context;
@@ -27,7 +24,6 @@ public class CacheEvictBeanLocator implements ApplicationContextAware {
     public void setApplicationContext(ApplicationContext appContext)
         throws BeansException {
         context = appContext;
-
     }
 
     public static ApplicationContext getApplicationContext() {
@@ -35,7 +31,10 @@ public class CacheEvictBeanLocator implements ApplicationContextAware {
     }
 
     public static CacheEvictService getCacheEvictService() {
-        return (CacheEvictService) context.getBean(CACHE_SERVICE);
+        if (context != null) {
+            return (CacheEvictService) context.getBean(CACHE_SERVICE);
+        }
+        return null;
     }
 
 }
