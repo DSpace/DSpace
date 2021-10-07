@@ -150,16 +150,6 @@ public class Application extends SpringBootServletInitializer {
     }
 
     @Bean
-    protected CacheEvictBeanLocator cacheEvictBeanLocator() {
-        return new CacheEvictBeanLocator();
-    }
-
-    @Bean
-    protected CacheEvictService cacheEvictService() {
-        return new CacheEvictService();
-    }
-
-    @Bean
     public WebMvcConfigurer webMvcConfigurer() {
 
         return new WebMvcConfigurer() {
