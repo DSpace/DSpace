@@ -146,9 +146,9 @@ public class InstallItemServiceImpl implements InstallItemService {
         // this will flush out fatal embargo metadata
         // problems before we set inArchive.
         if (embargoService.getEmbargoTermsAsDate(c, item) == null) {
-            String dateAvailabe = itemService.getMetadataFirstValue(item, MetadataSchemaEnum.DC.getName(),
+            String dateAvailable = itemService.getMetadataFirstValue(item, MetadataSchemaEnum.DC.getName(),
                                                                     "date", "available", Item.ANY);
-            if (StringUtils.isBlank(dateAvailabe)) {
+            if (StringUtils.isBlank(dateAvailable)) {
                 itemService.addMetadata(c,item,MetadataSchemaEnum.DC.getName(),"date","available",null, now.toString());
             }
         }
