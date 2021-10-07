@@ -230,7 +230,7 @@ public class Constants {
     /*
      * Label used by the special entity type assigned when no explicit assignment is defined
      */
-    public static final String UNSET_ENTITY_TYPE = "unset";
+    public static final String ENTITY_TYPE_NONE = "none";
 
     /**
      * Default constructor

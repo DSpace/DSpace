@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
@@ -109,14 +110,18 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
             .addPolicy(context, item, Constants.DELETE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
 
 
-        Optional<MetadataValue> optionalType = collection.getMetadata()
-                                                         .stream()
-                                                         .filter(x -> x.getMetadataField().toString('.')
-                                                                       .equalsIgnoreCase("dspace.entity.type"))
-                                                         .findFirst();
+        Optional<MetadataValue> colEntityType = getDSpaceEntityType(collection);
+        Optional<MetadataValue> itemEntityType = getDSpaceEntityType(item);
 
-        if (optionalType.isPresent()) {
-            MetadataValue original = optionalType.get();
+        if (colEntityType.isPresent() && itemEntityType.isPresent() &&
+                !StringUtils.equals(colEntityType.get().getValue(), itemEntityType.get().getValue())) {
+            throw new IllegalStateException("It is not possible to deposite item with entity type : " +
+                 itemEntityType.get().getValue() +  " into the collection with different type : " +
+                 colEntityType.get().getValue());
+        }
+
+        if (colEntityType.isPresent() && itemEntityType.isEmpty()) {
+            MetadataValue original = colEntityType.get();
             MetadataField metadataField = original.getMetadataField();
             MetadataSchema metadataSchema = metadataField.getMetadataSchema();
             itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
@@ -150,6 +155,14 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                 itemService.getIdentifiers(context, item)));
 
         return workspaceItem;
+    }
+
+    private Optional<MetadataValue> getDSpaceEntityType(DSpaceObject dSpaceObject) {
+        return dSpaceObject.getMetadata()
+                           .stream()
+                           .filter(x -> x.getMetadataField().toString('.')
+                                         .equalsIgnoreCase("dspace.entity.type"))
+                           .findFirst();
     }
 
     @Override

@@ -348,7 +348,7 @@ public interface CollectionService
      * Returns Collections for which the current user has 'submit' privileges.
      * NOTE: for better performance, this method retrieves its results from an
      *       index (cache) and does not query the database directly.
-     *       This means that results may be stale or outdated until DS-4524 is resolved"
+     *       This means that results may be stale or outdated until https://github.com/DSpace/DSpace/issues/2853 is resolved"
      * 
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
@@ -369,7 +369,8 @@ public interface CollectionService
      * Returns Collections for which the current user has 'submit' privileges.
      * NOTE: for better performance, this method retrieves its results from an
      *       index (cache) and does not query the database directly.
-     *       This means that results may be stale or outdated until DS-4524 is resolved"
+     *       This means that results may be stale or outdated until
+     *       https://github.com/DSpace/DSpace/issues/2853 is resolved"
      * 
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
@@ -389,7 +390,8 @@ public interface CollectionService
      * Counts the number of Collection for which the current user has 'submit' privileges.
      * NOTE: for better performance, this method retrieves its results from an index (cache)
      *       and does not query the database directly.
-     *       This means that results may be stale or outdated until DS-4524 is resolved."
+     *       This means that results may be stale or outdated until
+     *       https://github.com/DSpace/DSpace/issues/2853 is resolved."
      * 
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
@@ -407,7 +409,8 @@ public interface CollectionService
      * Counts the number of Collection for which the current user has 'submit' privileges.
      * NOTE: for better performance, this method retrieves its results from an index (cache)
      *       and does not query the database directly.
-     *       This means that results may be stale or outdated until DS-4524 is resolved."
+     *       This means that results may be stale or outdated until
+     *       https://github.com/DSpace/DSpace/issues/2853 is resolved."
      * 
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
