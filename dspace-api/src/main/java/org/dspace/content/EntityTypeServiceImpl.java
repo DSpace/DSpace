@@ -26,6 +26,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.EntityTypeDAO;
 import org.dspace.content.service.EntityTypeService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.SolrSearchCore;
 import org.dspace.discovery.indexobject.IndexableCollection;
@@ -166,6 +167,15 @@ public class EntityTypeServiceImpl implements EntityTypeService {
     @Override
     public int countEntityTypesByNames(Context context, List<String> names) throws SQLException {
         return entityTypeDAO.countEntityTypesByNames(context, names);
+    }
+
+    @Override
+    public void initDefaultEntityTypeNames(Context context) throws SQLException, AuthorizeException {
+        EntityType noneEntityType = this.findByEntityType(context, Constants.ENTITY_TYPE_NONE);
+        if (Objects.isNull(noneEntityType)) {
+            noneEntityType = this.create(context, Constants.ENTITY_TYPE_NONE);
+            this.update(context, noneEntityType);
+        }
     }
 
 }

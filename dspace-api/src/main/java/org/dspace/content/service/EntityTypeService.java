@@ -91,4 +91,13 @@ public interface EntityTypeService extends DSpaceCRUDService<EntityType> {
      */
     public int countEntityTypesByNames(Context context, List<String> names) throws SQLException;
 
+    /**
+     * Initializes the EntityType names, and marks them "permanent".
+     * 
+     * @param context                 DSpace context object
+     * @throws SQLException           Database exception
+     * @throws AuthorizeException     Authorization error
+     */
+    public void initDefaultEntityTypeNames(Context context) throws SQLException, AuthorizeException;
+
 }

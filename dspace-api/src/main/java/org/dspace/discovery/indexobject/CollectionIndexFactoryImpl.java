@@ -130,7 +130,7 @@ public class CollectionIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Ind
         doc.addField("dc.title_sort", title);
 
         if (StringUtils.isBlank(entityType)) {
-            entityType = Constants.UNSET_ENTITY_TYPE;
+            entityType = Constants.ENTITY_TYPE_NONE;
         }
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields,
                                   "dspace.entity.type", entityType);

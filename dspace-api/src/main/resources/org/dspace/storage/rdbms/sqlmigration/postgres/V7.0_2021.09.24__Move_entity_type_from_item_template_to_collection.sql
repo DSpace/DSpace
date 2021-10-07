@@ -16,11 +16,6 @@
 
 -------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
-
--- Create the new 'unset' entity type
-INSERT INTO Entity_type VALUES (0, 'unset');
-
--------------------------------------------------------------------------------------------------------
 UPDATE metadatavalue SET dspace_object_id = (SELECT uuid
                                              FROM collection
                                              WHERE template_item_id = dspace_object_id)
