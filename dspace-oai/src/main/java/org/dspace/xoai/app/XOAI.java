@@ -54,6 +54,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.SolrUtils;
@@ -67,6 +68,7 @@ import org.dspace.xoai.services.api.solr.SolrServerResolver;
 import org.dspace.xoai.solr.DSpaceSolrSearch;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrIndexerException;
+import org.hibernate.ScrollableResults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -191,9 +193,9 @@ public class XOAI {
          * change due to an embargo.
          */
         try {
-            Iterator<Item> discoverableChangedItems = itemService
+            ScrollableResults discoverableChangedItems = itemService
                     .findInArchiveOrWithdrawnDiscoverableModifiedSince(context, last);
-            Iterator<Item> nonDiscoverableChangedItems = itemService
+            ScrollableResults nonDiscoverableChangedItems = itemService
                     .findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context, last);
             Iterator<Item> possiblyChangedItems = getItemsWithPossibleChangesBefore(last);
             return this.index(discoverableChangedItems) + this.index(nonDiscoverableChangedItems)
@@ -239,9 +241,9 @@ public class XOAI {
             // Index both in_archive items AND withdrawn items. Withdrawn items
             // will be flagged withdrawn
             // (in order to notify external OAI harvesters of their new status)
-            Iterator<Item> discoverableItems = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
+            ScrollableResults discoverableItems = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
                     null);
-            Iterator<Item> nonDiscoverableItems = itemService
+            ScrollableResults nonDiscoverableItems = itemService
                     .findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context, null);
             return this.index(discoverableItems) + this.index(nonDiscoverableItems);
         } catch (SQLException ex) {
@@ -287,7 +289,39 @@ public class XOAI {
         }
     }
 
-    private int index(Iterator<Item> iterator)
+    private int index(ScrollableResults scrollableResults) throws DSpaceSolrIndexerException {
+        return index(new Iterator<>() {
+            private int counter = 0;
+
+            @Override
+            public boolean hasNext() {
+                counter++;
+                if (counter % 1000 == 0) {
+                    try {
+                        context.clearDatabaseCache();
+                    } catch (SQLException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                }
+                final boolean next = scrollableResults.next();
+                if (!next) {
+                    scrollableResults.close();
+                }
+                return next;
+            }
+
+            @Override
+            public Item next() {
+                return (Item) scrollableResults.get(0);
+            }
+        }, false);
+    }
+
+    private int index(Iterator<Item> iterator) throws DSpaceSolrIndexerException {
+        return index(iterator, true);
+    }
+
+    private int index(Iterator<Item> iterator, boolean uncache)
         throws DSpaceSolrIndexerException {
         try {
             int i = 0;
@@ -303,7 +337,9 @@ public class XOAI {
                         list.add(this.index(item));
                     }
                     //Uncache the item to keep memory consumption low
-                    context.uncacheEntity(item);
+                    if (uncache) {
+                        context.uncacheEntity(item);
+                    }
 
                 } catch (SQLException | IOException | XMLStreamException | WritingXmlException ex) {
                     log.error(ex.getMessage(), ex);
@@ -659,20 +695,20 @@ public class XOAI {
     }
 
     private void compile() throws CompilingException {
-        Iterator<Item> iterator;
+        ScrollableResults scrollableResults;
         try {
             Date last = xoaiLastCompilationCacheService.get();
 
             if (last == null) {
                 System.out.println("Retrieving all items to be compiled");
-                iterator = itemService.findAll(context);
+                scrollableResults = itemService.findAllReadOnly(context);
             } else {
                 System.out.println("Retrieving items modified after " + last + " to be compiled");
-                iterator = itemService.findByLastModifiedSince(context, last);
+                scrollableResults = itemService.findByLastModifiedSinceReadOnly(context, last);
             }
 
-            while (iterator.hasNext()) {
-                Item item = iterator.next();
+            while (scrollableResults.next()) {
+                Item item = (Item) scrollableResults.get(0);
                 if (verbose) {
                     System.out.println("Compiling item with handle: " + item.getHandle());
                 }

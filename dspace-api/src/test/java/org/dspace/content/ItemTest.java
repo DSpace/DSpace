@@ -47,6 +47,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.ScrollableResults;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -249,12 +250,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         it.setArchived(false);
         it.setDiscoverable(true);
          // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
-        Iterator<Item> all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
+        ScrollableResults all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),1));
         assertThat("Returned list should not be null", all, notNullValue());
         boolean added = false;
-        while (all.hasNext()) {
-            Item tmp = all.next();
+        while (all.next()) {
+            Item tmp = (Item) all.get(0);
             if (tmp.equals(it)) {
                 added = true;
             }
@@ -266,8 +267,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
-        while (all.hasNext()) {
-            Item tmp = all.next();
+        while (all.next()) {
+            Item tmp = (Item) all.get(0);
             if (tmp.equals(it)) {
                 added = true;
             }
@@ -282,8 +283,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
-        while (all.hasNext()) {
-            Item tmp = all.next();
+        while (all.next()) {
+            Item tmp = (Item) all.get(0);
             if (tmp.equals(it)) {
                 added = true;
             }
@@ -296,8 +297,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
-        while (all.hasNext()) {
-            Item tmp = all.next();
+        while (all.next()) {
+            Item tmp = (Item) all.get(0);
             if (tmp.equals(it)) {
                 added = true;
             }
@@ -316,12 +317,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         it.setArchived(false);
         it.setDiscoverable(false);
          // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
-        Iterator<Item> all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
+        ScrollableResults all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),1));
         assertThat("Returned list should not be null", all, notNullValue());
         boolean added = false;
-        while (all.hasNext()) {
-            Item tmp = all.next();
+        while (all.next()) {
+            Item tmp = (Item) all.get(0);
             if (tmp.equals(it)) {
                 added = true;
             }
@@ -333,8 +334,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
-        while (all.hasNext()) {
-            Item tmp = all.next();
+        while (all.next()) {
+            Item tmp = (Item) all.get(0);
             if (tmp.equals(it)) {
                 added = true;
             }
@@ -348,8 +349,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
-        while (all.hasNext()) {
-            Item tmp = all.next();
+        while (all.next()) {
+            Item tmp = (Item) all.get(0);
             if (tmp.equals(it)) {
                 added = true;
             }

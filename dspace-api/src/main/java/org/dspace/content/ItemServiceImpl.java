@@ -219,13 +219,13 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        return itemDAO.findAll(context, true, limit, offset);
+    public ScrollableResults findAllReadOnly(Context context) throws SQLException {
+        return itemDAO.findAllReadOnly(context, true);
     }
 
     @Override
-    public Iterator<Item> findAllUnfiltered(Context context) throws SQLException {
-        return itemDAO.findAll(context, true, true);
+    public Iterator<Item> findAll(Context context, Integer limit, Integer offset) throws SQLException {
+        return itemDAO.findAll(context, true, limit, offset);
     }
 
     @Override
@@ -292,15 +292,15 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
+    public ScrollableResults findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
         throws SQLException {
-        return itemDAO.findAll(context, true, true, true, since);
+        return itemDAO.findAllReadOnly(context, true, true, true, since);
     }
 
     @Override
-    public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
+    public ScrollableResults findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
         throws SQLException {
-        return itemDAO.findAll(context, true, true, false, since);
+        return itemDAO.findAllReadOnly(context, true, true, false, since);
     }
 
     @Override
@@ -1264,9 +1264,9 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public Iterator<Item> findByLastModifiedSince(Context context, Date last)
+    public ScrollableResults findByLastModifiedSinceReadOnly(Context context, Date last)
         throws SQLException {
-        return itemDAO.findByLastModifiedSince(context, last);
+        return itemDAO.findByLastModifiedSinceReadOnly(context, last);
     }
 
     @Override

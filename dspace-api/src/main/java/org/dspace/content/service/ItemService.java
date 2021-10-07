@@ -80,6 +80,8 @@ public interface ItemService
      */
     public Iterator<Item> findAll(Context context) throws SQLException;
 
+    public ScrollableResults findAllReadOnly(Context context) throws SQLException;
+
     /**
      * Get all the items in the archive. Only items with the "in archive" flag
      * set are included. The order of the list is indeterminate.
@@ -91,16 +93,6 @@ public interface ItemService
      * @throws SQLException if database error
      */
     public Iterator<Item> findAll(Context context, Integer limit, Integer offset) throws SQLException;
-
-    /**
-     * Get all "final" items in the archive, both archived ("in archive" flag) or
-     * withdrawn items are included. The order of the list is indeterminate.
-     *
-     * @param context DSpace context object
-     * @return an iterator over the items in the archive.
-     * @throws SQLException if database error
-     */
-    public Iterator<Item> findAllUnfiltered(Context context) throws SQLException;
 
     public ScrollableResults findAllUnfilteredReadOnly(Context context) throws SQLException;
 
@@ -210,7 +202,7 @@ public interface ItemService
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
+    public ScrollableResults findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
         throws SQLException;
 
     /**
@@ -220,7 +212,7 @@ public interface ItemService
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
+    public ScrollableResults findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
         throws SQLException;
 
     /**
@@ -624,7 +616,7 @@ public interface ItemService
      * @return iterator over items
      * @throws SQLException if database error
      */
-    public Iterator<Item> findByLastModifiedSince(Context context, Date last)
+    public ScrollableResults findByLastModifiedSinceReadOnly(Context context, Date last)
         throws SQLException;
 
     /**

@@ -51,6 +51,7 @@ import org.dspace.rest.common.Item;
 import org.dspace.rest.common.MetadataEntry;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.usage.UsageEvent;
+import org.hibernate.ScrollableResults;
 
 /**
  * Class which provide all CRUD methods over items.
@@ -181,7 +182,7 @@ public class ItemsResource extends Resource {
         try {
             context = createContext();
 
-            Iterator<org.dspace.content.Item> dspaceItems = itemService.findAllUnfiltered(context);
+            ScrollableResults dspaceItems = itemService.findAllUnfilteredReadOnly(context);
             items = new ArrayList<Item>();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0))) {
@@ -190,8 +191,8 @@ public class ItemsResource extends Resource {
                 offset = 0;
             }
 
-            for (int i = 0; (dspaceItems.hasNext()) && (i < (limit + offset)); i++) {
-                org.dspace.content.Item dspaceItem = dspaceItems.next();
+            for (int i = 0; (dspaceItems.next()) && (i < (limit + offset)); i++) {
+                org.dspace.content.Item dspaceItem = (org.dspace.content.Item) dspaceItems.get(0);
                 if (i >= offset) {
                     if (itemService.isItemListedForUser(context, dspaceItem)) {
                         items.add(new Item(dspaceItem, servletContext, expand, context));

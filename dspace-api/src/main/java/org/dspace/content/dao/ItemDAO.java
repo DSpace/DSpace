@@ -31,6 +31,8 @@ import org.hibernate.ScrollableResults;
 public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
     public Iterator<Item> findAll(Context context, boolean archived) throws SQLException;
 
+    public ScrollableResults findAllReadOnly(Context context, boolean archived) throws SQLException;
+
     public Iterator<Item> findAll(Context context, boolean archived, int limit, int offset) throws SQLException;
 
     public Iterator<Item> findAll(Context context, boolean archived, boolean withdrawn) throws SQLException;
@@ -45,7 +47,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return iterator over items
      * @throws SQLException if database error
      */
-    public Iterator<Item> findByLastModifiedSince(Context context, Date since)
+    public ScrollableResults findByLastModifiedSinceReadOnly(Context context, Date since)
         throws SQLException;
 
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException;
@@ -150,6 +152,10 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
     public Iterator<Item> findAll(Context context, boolean archived,
                                   boolean withdrawn, boolean discoverable, Date lastModified)
         throws SQLException;
+
+    public ScrollableResults findAllReadOnly(Context context, boolean archived,
+                                             boolean withdrawn, boolean discoverable, Date lastModified)
+            throws SQLException;
 
     /**
      * Count total number of items (rows in item table)

@@ -62,6 +62,15 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
+    public ScrollableResults findAllReadOnly(Context context, boolean archived) throws SQLException {
+        org.hibernate.query.Query query = (org.hibernate.query.Query) createQuery(context,
+                "FROM Item WHERE inArchive= :in_archive");
+        query.setParameter("in_archive", archived);
+        query.setReadOnly(true);
+        return query.scroll(ScrollMode.FORWARD_ONLY);
+    }
+
+    @Override
     public Iterator<Item> findAll(Context context, boolean archived, int limit, int offset) throws SQLException {
         Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive");
         query.setParameter("in_archive", archived);
@@ -110,6 +119,30 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             query.setParameter("last_modified", lastModified, TemporalType.TIMESTAMP);
         }
         return iterate(query);
+    }
+
+    @Override
+    public ScrollableResults findAllReadOnly(Context context, boolean archived,
+                                             boolean withdrawn, boolean discoverable, Date lastModified)
+            throws SQLException {
+        StringBuilder queryStr = new StringBuilder();
+        queryStr.append("SELECT i FROM Item i");
+        queryStr.append(" WHERE (inArchive = :in_archive OR withdrawn = :withdrawn)");
+        queryStr.append(" AND discoverable = :discoverable");
+
+        if (lastModified != null) {
+            queryStr.append(" AND last_modified > :last_modified");
+        }
+
+        org.hibernate.query.Query query = (org.hibernate.query.Query) createQuery(context, queryStr.toString());
+        query.setParameter("in_archive", archived);
+        query.setParameter("withdrawn", withdrawn);
+        query.setParameter("discoverable", discoverable);
+        if (lastModified != null) {
+            query.setParameter("last_modified", lastModified, TemporalType.TIMESTAMP);
+        }
+        query.setReadOnly(true);
+        return query.scroll(ScrollMode.FORWARD_ONLY);
     }
 
     @Override
@@ -391,11 +424,13 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
-    public Iterator<Item> findByLastModifiedSince(Context context, Date since)
+    public ScrollableResults findByLastModifiedSinceReadOnly(Context context, Date since)
         throws SQLException {
-        Query query = createQuery(context, "SELECT i FROM item i WHERE last_modified > :last_modified");
+        org.hibernate.query.Query query = (org.hibernate.query.Query) createQuery(context,
+                "SELECT i FROM item i WHERE last_modified > :last_modified");
         query.setParameter("last_modified", since, TemporalType.TIMESTAMP);
-        return iterate(query);
+        query.setReadOnly(true);
+        return query.scroll(ScrollMode.FORWARD_ONLY);
     }
 
     @Override
