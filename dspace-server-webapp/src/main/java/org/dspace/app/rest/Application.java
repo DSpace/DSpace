@@ -21,8 +21,6 @@ import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
 import org.dspace.app.sitemap.GenerateSitemaps;
 import org.dspace.app.util.DSpaceContextListener;
-import org.dspace.iiif.CacheEvictBeanLocator;
-import org.dspace.iiif.CacheEvictService;
 import org.dspace.utils.servlet.DSpaceWebappServletFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
