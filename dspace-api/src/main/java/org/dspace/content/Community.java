@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -87,6 +88,16 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     protected Community() {
 
+    }
+
+    /**
+     * Takes a pre-determined UUID to be passed to the object to allow for the
+     * restoration of previously defined UUID's.
+     *
+     * @param uuid Takes a uuid to be passed to the Pre-Defined UUID Generator
+     */
+    protected Community(UUID uuid) {
+        this.predefinedUUID = uuid;
     }
 
     void addSubCommunity(Community subCommunity) {
