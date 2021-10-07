@@ -1,4 +1,3 @@
-package org.dspace.iiif;
 /**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
@@ -6,7 +5,7 @@ package org.dspace.iiif;
  *
  * http://www.dspace.org/license/
  */
-
+package org.dspace.iiif;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
