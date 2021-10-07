@@ -26,16 +26,16 @@ import org.dspace.event.Event;
  */
 public class IIIFCacheEventConsumer implements Consumer {
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IIIFCacheEventConsumer.class);
+    private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(IIIFCacheEventConsumer.class);
 
     // Gets the service bean.
-    CacheEvictService cacheEvictService = CacheEvictBeanLocator.getCacheEvictService();
+    private final CacheEvictService cacheEvictService = CacheEvictBeanLocator.getCacheEvictService();
 
     // When true all entries will be cleared from cache.
-    boolean clearAll = false;
+    private boolean clearAll = false;
 
     // Collects modified items for individual removal from cache.
-    private Set<DSpaceObject> toEvictFromManifestCache = new HashSet<>();
+    private final Set<DSpaceObject> toEvictFromManifestCache = new HashSet<>();
 
 
     @Override
@@ -45,6 +45,9 @@ public class IIIFCacheEventConsumer implements Consumer {
 
     @Override
     public void consume(Context ctx, Event event) throws Exception {
+        if (cacheEvictService == null) {
+            return;
+        }
         int st = event.getSubjectType();
         if (!(st == Constants.BUNDLE || st == Constants.ITEM || st == Constants.BITSTREAM)) {
             return;
