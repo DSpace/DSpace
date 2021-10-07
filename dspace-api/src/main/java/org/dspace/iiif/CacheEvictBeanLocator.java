@@ -6,13 +6,16 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.iiif;
+
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 /**
  * Exposes the Spring web application's IIIF cache evict service to the DSpace event consumer.
  */
+@Component
 public class CacheEvictBeanLocator implements ApplicationContextAware {
 
     private static ApplicationContext context;

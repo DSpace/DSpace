@@ -45,6 +45,7 @@ public class IIIFCacheEventConsumer implements Consumer {
 
     @Override
     public void consume(Context ctx, Event event) throws Exception {
+        // The service null when the web application context is not provided (i.e. command line operations).
         if (cacheEvictService == null) {
             return;
         }

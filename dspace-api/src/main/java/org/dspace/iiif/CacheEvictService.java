@@ -9,10 +9,12 @@ package org.dspace.iiif;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
+import org.springframework.stereotype.Component;
 
 /**
  * Removes items from the iiif manifests cache.
  */
+@Component
 public class CacheEvictService {
 
     // The cache that is managed by this service.
