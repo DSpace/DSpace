@@ -86,13 +86,24 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public Community create(Community parent, Context context, String handle) throws SQLException, AuthorizeException {
+        return create(parent, context, handle, null);
+    }
+
+    @Override
+    public Community create(Community parent, Context context, String handle,
+                            UUID uuid) throws SQLException, AuthorizeException {
         if (!(authorizeService.isAdmin(context) ||
-            (parent != null && authorizeService.authorizeActionBoolean(context, parent, Constants.ADD)))) {
+                (parent != null && authorizeService.authorizeActionBoolean(context, parent, Constants.ADD)))) {
             throw new AuthorizeException(
-                "Only administrators can create communities");
+                    "Only administrators can create communities");
         }
 
-        Community newCommunity = communityDAO.create(context, new Community());
+        Community newCommunity;
+        if (uuid != null) {
+            newCommunity = communityDAO.create(context, new Community(uuid));
+        } else {
+            newCommunity = communityDAO.create(context, new Community());
+        }
 
         if (parent != null) {
             parent.addSubCommunity(newCommunity);
@@ -129,8 +140,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         }
 
         log.info(LogHelper.getHeader(context, "create_community",
-                                      "community_id=" + newCommunity.getID())
-                     + ",handle=" + newCommunity.getHandle());
+                "community_id=" + newCommunity.getID())
+                + ",handle=" + newCommunity.getHandle());
 
         return newCommunity;
     }
@@ -383,17 +394,26 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public Community createSubcommunity(Context context, Community parentCommunity)
-        throws SQLException, AuthorizeException {
+            throws SQLException, AuthorizeException {
         return createSubcommunity(context, parentCommunity, null);
     }
 
+
     @Override
     public Community createSubcommunity(Context context, Community parentCommunity, String handle)
-        throws SQLException, AuthorizeException {
+            throws SQLException, AuthorizeException {
+        return createSubcommunity(context, parentCommunity, handle, null);
+    }
+
+    @Override
+    public Community createSubcommunity(Context context, Community parentCommunity, String handle,
+                                        UUID uuid) throws SQLException, AuthorizeException {
         // Check authorisation
         authorizeService.authorizeAction(context, parentCommunity, Constants.ADD);
 
-        Community c = create(parentCommunity, context, handle);
+        Community c;
+        c = create(parentCommunity, context, handle, uuid);
+
         addSubcommunity(context, parentCommunity, c);
 
         return c;
