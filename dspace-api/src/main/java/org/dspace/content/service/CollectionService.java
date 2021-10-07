@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -59,6 +60,21 @@ public interface CollectionService
      */
     public Collection create(Context context, Community community, String handle) throws SQLException,
         AuthorizeException;
+
+    /**
+     * Create a new collection with the supplied handle and ID.
+     * Once created the collection is added to the given community
+     *
+     * @param context DSpace context object
+     * @param community DSpace Community (parent)
+     * @param handle the pre-determined Handle to assign to the new collection
+     * @param uuid the pre-determined UUID to assign to the new collection
+     * @return the newly created collection
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     */
+    public Collection create(Context context, Community community, String handle, UUID uuid) throws SQLException,
+            AuthorizeException;
 
     /**
      * Get all collections in the system. These are alphabetically sorted by
@@ -308,7 +324,7 @@ public interface CollectionService
         throws java.sql.SQLException;
 
     /**
-     * 
+     *
      * @param context DSpace Context
      * @param group EPerson Group
      * @return the collection, if any, that has the specified group as administrators or submitters
