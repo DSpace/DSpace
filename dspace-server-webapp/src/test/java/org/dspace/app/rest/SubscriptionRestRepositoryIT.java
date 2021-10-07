@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.matcher.SubscriptionMatcher;
 import org.dspace.app.rest.model.SubscriptionParameterRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.model.patch.AddOperation;
@@ -428,29 +429,10 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(2)))
                 .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(1)))
                 .andExpect(jsonPath("$.page.number", is(0)))
-                .andExpect(jsonPath("$._embedded.subscriptions[1].subscriptionType", is("Test")))
-                .andExpect(jsonPath("$._embedded.subscriptions[1]._links.dSpaceObject.href",
-                        Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
-                .andExpect(jsonPath("$._embedded.subscriptions[1]._links.dSpaceObject.href",
-                        Matchers.endsWith("dSpaceObject")))
-                .andExpect(jsonPath("$._embedded.subscriptions[1]._links.ePerson.href",
-                        Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
-                .andExpect(jsonPath("$._embedded.subscriptions[1]._links.ePerson.href", Matchers.endsWith("ePerson")))
-                .andExpect(jsonPath("$._embedded.subscriptions[1].subscriptionParameterList[0].name", is("Parameter1")))
-                .andExpect(jsonPath("$._embedded.subscriptions[1].subscriptionParameterList[0].value",
-                        is("ValueParameter1")))
-                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionType", is("TestType")))
-                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.dSpaceObject.href",
-                        Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
-                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.dSpaceObject.href",
-                        Matchers.endsWith("dSpaceObject")))
-                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.ePerson.href",
-                        Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
-                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.ePerson.href", Matchers.endsWith("ePerson")))
-                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].name", is("Parameter1")))
-                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].value",
-                        is("ValueParameter1")));
-
+                .andExpect(jsonPath("$._embedded.subscriptions", Matchers.containsInAnyOrder(
+                           SubscriptionMatcher.matchSubscription(subscription),
+                           SubscriptionMatcher.matchSubscription(subscription1)
+                           )));
     }
 
     // ADD
@@ -469,7 +451,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         ObjectMapper objectMapper = new ObjectMapper();
         resourcePolicyService.find(context, publicItem);
         // remove default anonymous policy in order to test it
-        resourcePolicyService.delete(context, resourcePolicyService.find(context, publicItem).get(0));
+        //resourcePolicyService.delete(context, resourcePolicyService.find(context, publicItem).get(0));
         getClient()
                 .perform(post("/api/core/subscriptions?dspace_object_id=" + publicItem.getID() + "&eperson_id="
                         + eperson.getID()).content(objectMapper.writeValueAsString(subscriptionRest))

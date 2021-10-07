@@ -16,6 +16,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,6 +65,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
@@ -77,6 +81,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ImportBatchIT extends AbstractControllerIntegrationTest {
     /**
@@ -108,6 +113,9 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
     private int impMedataSeq = 0;
     private int impBitstreamSeq;
     private int impBitstreamMetadatavalueSeq = 0;
+
+    @Autowired
+    private InstallItemService installItemService;
 
     @Before
     @Override
@@ -1070,6 +1078,60 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
         assertThat(metadata, hasSize(1));
         assertThat(metadata.get(0).getValue(), is("Item type"));
         assertThat(metadata.get(0).getSecurityLevel(), is(Integer.valueOf(2)));
+    }
+
+    @Test
+    public void createItemWithAvailableDAteTest() throws Exception {
+        List<WorkspaceItem> wis = null;
+        String dateAvailable = "2010-11-21T08:56:26Z";
+        try {
+            // create one imp_record record with dc.date.accessioned metadata
+            for (int impRecordKey = 1; impRecordKey < 2; impRecordKey++) {
+                ImpRecord impRecord = createImpRecord(context, impRecordKey,
+                        ImpRecordService.SEND_BACK_TO_WORKSPACE_STATUS,
+                        ImpRecordService.INSERT_OR_UPDATE_OPERATION, admin, collection);
+                createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(),
+                        "title", null, null, "Sample Item (" + impRecordKey + ")");
+                createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(), "date",
+                        "available", null, dateAvailable, 1);
+            }
+
+            // Create a new item
+            String argv[] = new String[] { "-E", admin.getEmail() };
+            ItemImportMainOA.main(argv);
+
+            int nItem = workspaceItemService.countByEPerson(context, admin);
+            assertEquals("1 workspace Items found for " + admin.getID(), 1, nItem);
+
+            wis = workspaceItemService.findByEPerson(context, admin);
+            assertEquals("1 workspace items found for " + admin.getID(), 1, wis.size());
+
+            for (WorkspaceItem wi : wis) {
+                Item item = wi.getItem();
+
+                List<MetadataValue> metadata = item.getMetadata();
+                String defLanguage = configurationService.getProperty("default.language");
+                metadata = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, defLanguage);
+                assertEquals("Only one metadata is assigned to the item", 1, metadata.size());
+                assertTrue("Is the new metadata value the right one?",
+                        metadata.get(0).getValue().indexOf("Sample Item") == 0);
+            }
+            context.turnOffAuthorisationSystem();
+            installItemService.installItem(context, wis.get(0));
+            context.restoreAuthSystemState();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            context.restoreAuthSystemState();
+        }
+
+        // check that the metadata dc.date.accessioned was not replaced
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/items/" + wis.get(0).getItem().getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.metadata['dc.date.available'][0].value", is(dateAvailable)))
+                        .andExpect(jsonPath("$.metadata['dc.date.available'][1].value").doesNotExist())
+                        .andExpect(jsonPath("$.metadata['dc.title'][0].value", is("Sample Item (1)")));
     }
 
     /***
