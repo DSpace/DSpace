@@ -63,6 +63,12 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
         }
     }
 
+    /**
+     * Retrieves all entity types related to the collections on which the current user can deposit.
+     * 
+     * @param pageable  The pagination information
+     * @return
+     */
     @SearchRestMethod(name = "findAllByAuthorizedCollection")
     public Page<EntityTypeRest> findAllByAuthorizedCollection(Pageable pageable) {
         try {
@@ -84,6 +90,13 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
         }
     }
 
+    /**
+     * Retrieves all entity types related to the collections
+     * on which the current user can deposit and supported by External provider
+     * 
+     * @param pageable    The pagination information
+     * @return
+     */
     @SearchRestMethod(name = "findAllByAuthorizedExternalSource")
     public Page<EntityTypeRest> findAllByAuthorizedExternalSource(Pageable pageable) {
         try {
