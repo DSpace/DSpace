@@ -13,11 +13,6 @@ import org.apache.commons.cli.ParseException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
-/**
- * Test class for harvested collections.
- *
- * @author Alexey Maslov
- */
 public class HarvestCli extends Harvest {
 
     /**

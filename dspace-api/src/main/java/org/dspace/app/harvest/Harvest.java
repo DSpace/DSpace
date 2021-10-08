@@ -198,7 +198,6 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
             purgeCollection(context, collection);
             context.complete();
 
-            //TODO: implement this... remove all items and remember to unset "last-harvested" settings
         } else if ("reimport".equals(command)) {
             // Delete all items in a collection. Useful for testing fresh harvests.
             if (collection == null || context.getCurrentUser() == null) {
