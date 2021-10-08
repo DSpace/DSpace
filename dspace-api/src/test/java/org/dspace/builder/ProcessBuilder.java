@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
@@ -57,6 +58,11 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
 
     public ProcessBuilder withProcessStatus(ProcessStatus processStatus) {
         process.setProcessStatus(processStatus);
+        return this;
+    }
+
+    public ProcessBuilder withCreationTime(Date creationTime) {
+        process.setCreationTime(creationTime);
         return this;
     }
 

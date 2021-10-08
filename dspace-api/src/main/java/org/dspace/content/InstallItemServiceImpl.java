@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -139,16 +140,17 @@ public class InstallItemServiceImpl implements InstallItemService {
         throws SQLException, AuthorizeException {
         // create accession date
         DCDate now = DCDate.getCurrent();
-        itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
-                                "date", "accessioned", null, now.toString());
-
+        itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(), "date","accessioned",null,now.toString());
         // add date available if not under embargo, otherwise it will
         // be set when the embargo is lifted.
         // this will flush out fatal embargo metadata
         // problems before we set inArchive.
         if (embargoService.getEmbargoTermsAsDate(c, item) == null) {
-            itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
-                                    "date", "available", null, now.toString());
+            String dateAvailable = itemService.getMetadataFirstValue(item, MetadataSchemaEnum.DC.getName(),
+                                                                    "date", "available", Item.ANY);
+            if (StringUtils.isBlank(dateAvailable)) {
+                itemService.addMetadata(c,item,MetadataSchemaEnum.DC.getName(),"date","available",null, now.toString());
+            }
         }
 
         // If issue date is set as "today" (literal string), then set it to current date

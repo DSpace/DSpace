@@ -41,6 +41,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletionCli"/>
     </bean>
 
+    <bean id="process-cleaner" class="org.dspace.administer.ProcessCleanerCliConfiguration">
+        <property name="description" value="Cleanup all the old processes in the specified state"/>
+        <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleanerCli"/>
+    </bean>
+
     <bean id="bulk-import" class="org.dspace.app.bulkedit.BulkImportCliScriptConfiguration">
         <property name="description" value="Perform the bulk import of an excel file with a list of item to add, update or remove"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.BulkImportCli"/>

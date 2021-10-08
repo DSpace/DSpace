@@ -9,6 +9,7 @@ package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +46,7 @@ import org.dspace.layout.CrisMetadataGroup;
 import org.dspace.layout.LayoutSecurity;
 import org.dspace.layout.service.CrisLayoutBoxAccessService;
 import org.dspace.layout.service.CrisLayoutBoxService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -81,6 +83,9 @@ public class ItemConverter
     @Autowired
     private RequestService requestService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
 
     @Override
@@ -105,12 +110,14 @@ public class ItemConverter
      * When the context is null, it will return the metadatalist as for an anonymous user
      * Overrides the parent method to include virtual metadata
      * @param context The context
-     * @param obj     The object of which the filtered metadata will be retrieved
+     * @param obj     The object of which the filtered metadata will be retrieved6
+     * @param projection The projection(s) used into current request
      * @return A list of object metadata (including virtual metadata) filtered based on the the hidden metadata
      * configuration
      */
     @Override
-    public MetadataValueList getPermissionFilteredMetadata(Context context, Item obj) {
+    public MetadataValueList getPermissionFilteredMetadata(Context context, Item obj, Projection projection) {
+
         List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
 
         List<MetadataValue> returnList = new LinkedList<>();
@@ -124,7 +131,7 @@ public class ItemConverter
             }
 
             List<CrisLayoutBox> boxes;
-            if (context != null) {
+            if (context != null && !preventSecurityCheck(projection)) {
                 boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 1000, 0);
             } else {
                 // the context could be null if the converter is used to prepare test data or in a batch script
@@ -138,7 +145,7 @@ public class ItemConverter
 
             for (MetadataValue metadataValue : fullList) {
                 MetadataField metadataField = metadataValue.getMetadataField();
-                if (checkMetadataFieldVisibility(context, boxes, obj, metadataField)) {
+                if (checkMetadataFieldVisibility(context, boxes, obj, metadataField, projection)) {
                     if (metadataValue.getSecurityLevel() != null) {
                         MetadataSecurityEvaluation metadataSecurityEvaluation =
                             mapBetweenSecurityLevelAndClassSecurityLevel( metadataValue.getSecurityLevel());
@@ -156,11 +163,17 @@ public class ItemConverter
         return new MetadataValueList(returnList);
     }
 
+//    @Override
     public boolean checkMetadataFieldVisibility(Context context, Item item,
-            MetadataField metadataField) throws SQLException {
+                                                MetadataField metadataField) throws SQLException {
+        return checkMetadataFieldVisibility(context, item, metadataField, null);
+    }
+
+    public boolean checkMetadataFieldVisibility(Context context, Item item,
+            MetadataField metadataField, Projection projection) throws SQLException {
         String entityType = itemService.getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY);
         List<CrisLayoutBox> boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 1000, 0);
-        return checkMetadataFieldVisibility(context, boxes, item, metadataField);
+        return checkMetadataFieldVisibility(context, boxes, item, metadataField, projection);
     }
 
     private Optional<List<DCInputSet>> submissionDefinitionInputs() {
@@ -188,7 +201,7 @@ public class ItemConverter
                 .anyMatch((dc) -> {
                     try {
                         return dc.isFieldPresent(mv.getMetadataField().toString('.')) ||
-                                checkMetadataFieldVisibilityByBoxes(context, boxes, item, mv.getMetadataField());
+                                checkMetadataFieldVisibilityByBoxes(context, boxes, item, mv.getMetadataField(), null);
                     } catch (SQLException e) {
                         return false;
                     }
@@ -202,8 +215,8 @@ public class ItemConverter
     }
 
     private boolean checkMetadataFieldVisibility(Context context, List<CrisLayoutBox> boxes, Item item,
-            MetadataField metadataField) throws SQLException {
-        if (boxes.size() == 0) {
+            MetadataField metadataField, Projection projection) throws SQLException {
+        if (boxes.size() == 0 && !preventSecurityCheck(projection)) {
             if (context != null && authorizeService.isAdmin(context)) {
                 return true;
             } else {
@@ -215,37 +228,54 @@ public class ItemConverter
                 }
             }
         } else {
-            return checkMetadataFieldVisibilityByBoxes(context, boxes, item, metadataField);
+            return checkMetadataFieldVisibilityByBoxes(context, boxes, item, metadataField, projection);
         }
         return false;
     }
 
     private boolean checkMetadataFieldVisibilityByBoxes(Context context, List<CrisLayoutBox> boxes, Item item,
-            MetadataField metadataField) throws SQLException {
-        List<MetadataField> allPublicMetadata = getPublicMetadata(boxes);
-        List<CrisLayoutBox> boxesWithMetadataFieldExcludedPublic = getBoxesWithMetadataFieldExcludedPublic(
-                metadataField, boxes);
-        EPerson currentUser = context.getCurrentUser();
+                                                        MetadataField metadataField,
+                                                        Projection projection) throws SQLException {
+        boolean performSecurityCheck = !preventSecurityCheck(projection);
+        List<String> allPublicMetadata = performSecurityCheck ? getPublicMetadata(boxes) : publicMetadataFromConfig();
         if (isPublicMetadataField(metadataField, allPublicMetadata)) {
             return true;
-        } else if (currentUser != null) {
-            for (CrisLayoutBox box : boxesWithMetadataFieldExcludedPublic) {
-                if (crisLayoutBoxAccessService.hasAccess(context, currentUser, box, item)) {
+        } else if (performSecurityCheck) {
+
+            EPerson currentUser = context.getCurrentUser();
+            List<CrisLayoutBox> boxesWithMetadataFieldExcludedPublic = getBoxesWithMetadataFieldExcludedPublic(
+                metadataField, boxes);
+
+            if (Objects.nonNull(currentUser)) {
+
+                for (CrisLayoutBox box : boxesWithMetadataFieldExcludedPublic) {
+                    if (crisLayoutBoxAccessService.hasAccess(context, currentUser, box, item)) {
+                        return true;
+                    }
+                }
+            }
+            // the metadata is not included in any box so use the default dspace security
+            if (boxesWithMetadataFieldExcludedPublic.size() == 0) {
+                if (!metadataExposureService
+                    .isHidden(context, metadataField.getMetadataSchema().getName(),
+                        metadataField.getElement(),
+                        metadataField.getQualifier())) {
                     return true;
                 }
             }
         }
-        // the metadata is not included in any box so use the default dspace security
-        if (boxesWithMetadataFieldExcludedPublic.size() == 0) {
-            if (!metadataExposureService
-                    .isHidden(context, metadataField.getMetadataSchema().getName(),
-                              metadataField.getElement(),
-                              metadataField.getQualifier())) {
-                return true;
-            }
-        }
-
         return false;
+    }
+
+    private List<String> publicMetadataFromConfig() {
+        return Arrays.stream(configurationService.getArrayProperty("metadata.publicField"))
+            .collect(Collectors.toList());
+    }
+
+    private boolean preventSecurityCheck(Projection projection) {
+        return Optional.ofNullable(projection)
+            .map(Projection::preventMetadataLevelSecurity)
+            .orElse(false);
     }
 
     private List<CrisLayoutBox> getBoxesWithMetadataFieldExcludedPublic(MetadataField metadataField,
@@ -272,23 +302,23 @@ public class ItemConverter
         }
     }
 
-    private boolean isPublicMetadataField(MetadataField metadataField, List<MetadataField> allPublicMetadata) {
-        for (MetadataField publicField : allPublicMetadata) {
-            if (publicField.equals(metadataField)) {
+    private boolean isPublicMetadataField(MetadataField metadataField, List<String> allPublicMetadata) {
+        for (String publicField : allPublicMetadata) {
+            if (publicField.equals(metadataField.toString('.'))) {
                 return true;
             }
         }
         return false;
     }
 
-    private List<MetadataField> getPublicMetadata(List<CrisLayoutBox> boxes) {
-        List<MetadataField> publicMetadata = new ArrayList<MetadataField>();
+    private List<String> getPublicMetadata(List<CrisLayoutBox> boxes) {
+        List<String> publicMetadata = new ArrayList<String>();
         for (CrisLayoutBox box : boxes) {
             if (box.getSecurity() == LayoutSecurity.PUBLIC.getValue()) {
                 List<CrisLayoutField> crisLayoutFields = box.getLayoutFields();
                 for (CrisLayoutField field : crisLayoutFields) {
                     if (field instanceof CrisLayoutFieldMetadata) {
-                        publicMetadata.add(field.getMetadataField());
+                        publicMetadata.add(field.getMetadataField().toString('.'));
                     }
                 }
             }
