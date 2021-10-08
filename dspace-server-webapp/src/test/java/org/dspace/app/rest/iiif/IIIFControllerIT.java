@@ -27,14 +27,19 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 
     public static final String IIIFBundle = "IIIF";
+
+    @Autowired
+    ItemService itemService;
 
     @Test
     public void disabledTest() throws Exception {
@@ -1019,4 +1024,105 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                         Matchers.containsString(bitstream2.getID() + "/content")));
 
     }
+
+    @Test
+    public void findOneWithCacheEvictionAfterItemUpdate() throws Exception {
+
+        /**
+         * This test is broken.
+         *
+         * Our troubles are with the dispatcher and the way that flyway initializes the test environment.
+         * If we add "iiif" to the list of default dispatchers in dspace.cfg, the initialization
+         * triggers a call to the IIIFCacheEventConsumer before the web ApplicationContext has been injected. The
+         * CacheEvictService is not set in the consumer, and all subsequent calls to the consumer fail. If
+         * this root problem is solved and "iiif" can be added to the default dispatcher, then I think this test would
+         * succeed as written. (If possible this might be the best solution.)
+         *
+         * The test succeeds with the following code modifications.
+         *
+         *   1. Make sure the default dispatcher in dspace.cfg excludes the iiif consumer.
+         *   2. Add a new dispatcher definition to the test local.cfg that includes the iiif consumer.
+         *   3. Modify the web application's ContextUtil.initializeContext to add the new dispatcher to the context
+         *      -- context.setDispatcher(iiif-dispatcher).
+         *
+         * The third change is obviously wrong, but it can be done temporarily to verify that the item is
+         * evicted from the cache when a patch is applied. Perhaps there's a reasonable way to set the test context
+         * in the web application that I don't know about.
+         *
+         * The alternative is to set the dispatcher here inside the test. Then instead of using the
+         * patch request, update the test Item using the dspace-api. The cache service is called and the cache
+         * is cleared. The manifest endpoint generates a new manifest as expected. But, the new response
+         * contains the old title. That doesn't seem right to me so there may be a way to make this approach work.
+         *
+         */
+//        String patchRequestBody =
+//            "[{\"op\": \"replace\",\"path\": \"/metadata/dc.title/0/value\",\"value\": \"Public item 1 (revised)\"}]";
+//
+//        context.turnOffAuthorisationSystem();
+//
+//        parentCommunity = CommunityBuilder.createCommunity(context)
+//                                          .withName("Parent Community")
+//                                          .build();
+//        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+//                                           .build();
+//
+//        Item publicItem1 = ItemBuilder.createItem(context, col1)
+//                                      .withTitle("Public item 1")
+//                                      .withIssueDate("2017-10-17")
+//                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+//                                      .enableIIIF()
+//                                      .build();
+//
+//        String bitstreamContent = "ThisIsSomeDummyText";
+//        Bitstream bitstream1 = null;
+//        Bitstream bitstream2 = null;
+//        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+//            bitstream1 = BitstreamBuilder
+//                .createBitstream(context, publicItem1, is)
+//                .withName("Bitstream1.jpg")
+//                .withMimeType("image/jpeg")
+//                .build();
+//        }
+//
+//        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+//            bitstream2 = BitstreamBuilder
+//                .createBitstream(context, publicItem1, is)
+//                .withName("Bitstream2.png")
+//                .withMimeType("image/png")
+//                .build();
+//        }
+//
+//        context.restoreAuthSystemState();
+//
+//        // Default canvas size and label.
+//        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+//                   .andExpect(status().isOk())
+//                   .andExpect(jsonPath("$.metadata[0].label", is("Title")))
+//                   .andExpect(jsonPath("$.metadata[0].value", is("Public item 1")));
+//
+//
+//        String token = getAuthToken(admin.getEmail(), password);
+//
+//        // The Item update should also remove the manifest from the cache.
+//        getClient(token).perform(patch("/api/core/items/" + publicItem1.getID())
+//            .content(patchRequestBody)
+//            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+//            .andExpect(status().isOk());
+//
+////        context.turnOffAuthorisationSystem();
+////        List<MetadataValue> metadataList = publicItem1.getMetadata();
+////        metadataList.get(0).setValue("Public item 1 (revised)");
+////        publicItem1.setMetadata(metadataList);
+////        itemService.update(context, publicItem1);
+////        context.commit();
+////        context.restoreAuthSystemState();
+//
+//        // Verify that the updated title is in the manifest.
+//        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+//                   .andExpect(status().isOk())
+//                   .andExpect(jsonPath("$.metadata[0].value", is("Public item 1 (revised)")));
+
+
+    }
+
 }

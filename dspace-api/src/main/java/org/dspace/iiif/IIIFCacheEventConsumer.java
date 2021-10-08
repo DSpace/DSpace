@@ -29,7 +29,7 @@ public class IIIFCacheEventConsumer implements Consumer {
     private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(IIIFCacheEventConsumer.class);
 
     // Gets the service bean.
-    private final CacheEvictService cacheEvictService = CacheEvictBeanLocator.getCacheEvictService();
+    private CacheEvictService cacheEvictService;
 
     // When true all entries will be cleared from cache.
     private boolean clearAll = false;
@@ -40,7 +40,7 @@ public class IIIFCacheEventConsumer implements Consumer {
 
     @Override
     public void initialize() throws Exception {
-
+        cacheEvictService = CacheEvictBeanLocator.getCacheEvictService();
     }
 
     @Override
