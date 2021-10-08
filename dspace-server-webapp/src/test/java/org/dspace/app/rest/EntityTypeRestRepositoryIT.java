@@ -24,7 +24,6 @@ import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
-import org.dspace.core.Constants;
 import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.external.service.ExternalDataService;
 import org.hamcrest.Matchers;

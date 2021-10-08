@@ -55,6 +55,7 @@ import org.junit.Test;
 public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDatabase {
 
     //Common collection to utilize for test
+    private Collection col;
     private Collection col1;
     private Collection col2;
 
@@ -76,6 +77,10 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                           .withName("Parent Community")
                                           .build();
 
+        col = CollectionBuilder.createCollection(context, parentCommunity)
+                               .withName("Collection")
+                               .build();
+
         col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                 .withEntityType("Person")
                                 .withName("Collection 1")
@@ -83,7 +88,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
 
         col2 = CollectionBuilder.createCollection(context, parentCommunity)
                                 .withEntityType("Publication")
-                                .withName("Collection 1")
+                                .withName("Collection 2")
                                 .build();
 
         context.turnOffAuthorisationSystem();
@@ -142,6 +147,18 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
             "+,Person,," + col1.getHandle() + ",0",
             "+,Publication,dc.identifier.other:0," + col2.getHandle() + ",1"};
+        Item[] items = runImport(csv);
+        assertRelationship(items[1], items[0], 1, "left", 0);
+
+        // remove created items
+        cleanupImportItems(items);
+    }
+
+    @Test
+    public void testSingleMdRefIntoCollectionWithoutEntityTypeTest() throws Exception {
+        String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
+            "+,Person,," + col.getHandle() + ",0",
+            "+,Publication,dc.identifier.other:0," + col.getHandle() + ",1"};
         Item[] items = runImport(csv);
         assertRelationship(items[1], items[0], 1, "left", 0);
 

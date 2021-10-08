@@ -99,6 +99,14 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
         return converter.toRestPage(externalSources, pageable, utils.obtainProjection());
     }
 
+    /**
+     * Retrieves all ExternalDataProviders that supports the provided EntityType.
+     * 
+     * @param context       The relevant DSpace context
+     * @param pageable      The pagination information
+     * @param entityType    Entity type label
+     * @return
+     */
     @PreAuthorize("permitAll()")
     @SearchRestMethod(name = "findByEntityType")
     public Page<ExternalSourceRest> findByEntityType(Context context, Pageable pageable,

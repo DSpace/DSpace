@@ -222,6 +222,16 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
     }
 
+    /**
+     * Returns Collections for which the current user has 'submit' privileges.
+     * 
+     * @param query                     The query used in the lookup
+     * @param entityTypeLabel           The EntityType label object that will be used to limit the returned collection
+     *                                      to those related to given entity type
+     * @param pageable                  The pagination information
+     * @return
+     * @throws SearchServiceException   If search error
+     */
     @SearchRestMethod(name = "findSubmitAuthorizedByEntityType")
     public Page<CollectionRest> findSubmitAuthorizedByEntityType(
            @Parameter(value = "query") String query,
@@ -244,6 +254,16 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
     }
 
+    /**
+     * Returns Collections for which the current user has 'submit' privileges limited by parent community.
+     * 
+     * @param query                 The query used in the lookup
+     * @param communityUuid         UUID of the parent community
+     * @param entityTypeLabel       The EntityType label object that will be used to limit the returned collection
+     *                                  to those related to given entity type
+     * @param pageable              The pagination information
+     * @return
+     */
     @SearchRestMethod(name = "findSubmitAuthorizedByCommunityAndEntityType")
     public Page<CollectionRest> findSubmitAuthorizedByCommunityAndEntityType(
           @Parameter(value = "query") String query,
