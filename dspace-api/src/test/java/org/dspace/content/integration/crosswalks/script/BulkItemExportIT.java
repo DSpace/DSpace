@@ -39,7 +39,6 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.workflow.WorkflowItem;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -48,7 +47,6 @@ import org.junit.Test;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-@Ignore
 public class BulkItemExportIT extends AbstractIntegrationTestWithDatabase {
 
     private Community community;
@@ -56,6 +54,7 @@ public class BulkItemExportIT extends AbstractIntegrationTestWithDatabase {
     private Collection collection;
 
     @Before
+    @SuppressWarnings("deprecation")
     public void beforeTests() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         community = createCommunity(context).build();
