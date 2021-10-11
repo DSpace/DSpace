@@ -44,11 +44,11 @@ public class EntityTypeRelationshipLinkRepository extends AbstractDSpaceRestRepo
      * This method will retrieve all the RelationshipTypes that conform
      * to the given EntityType by the given ID and it will return this in a wrapped resource.
      * 
-     * @param request        The request object
-     * @param id             The ID of the EntityType objects that we'll use to retrieve the RelationshipTypes
-     * @param pageable       The pagination object
-     * @param projection
-     * @return               List of RelationshipType objects as defined above
+     * @param request                The request object
+     * @param id                     The ID of the EntityType objects that we'll use to retrieve the RelationshipTypes
+     * @param optionalPageable       The pagination object
+     * @param projection             The current Projection
+     * @return                       List of RelationshipType objects as defined above
      */
     public Page<RelationshipTypeRest> getEntityTypeRelationship(@Nullable HttpServletRequest request,
                                                                           Integer id,
