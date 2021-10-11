@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -102,6 +103,16 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      */
     protected Collection() {
 
+    }
+
+    /**
+     * Takes a pre-determined UUID to be passed to the object to allow for the
+     * restoration of previously defined UUID's.
+     *
+     * @param uuid Takes a uuid to be passed to the Pre-Defined UUID Generator
+     */
+    protected Collection(UUID uuid) {
+        this.predefinedUUID = uuid;
     }
 
     @Override
