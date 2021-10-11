@@ -89,7 +89,7 @@ public class EditMetadataFeatureIT extends AbstractControllerIntegrationTest {
     public void checkCanEditMetadataFeatureTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        configurationService.setProperty("edit.metadata.default-group", groupA.getID());
+        configurationService.setProperty("edit.metadata.allowed-group", groupA.getID());
         ResourcePolicyBuilder.createResourcePolicy(context)
                              .withDspaceObject(itemA)
                              .withAction(Constants.WRITE)

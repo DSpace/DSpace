@@ -58,13 +58,14 @@ public class EditMetadataFeature implements AuthorizationFeature {
                 || object instanceof BitstreamRest
                 || object instanceof SiteRest
         ) {
-            String defaultGroupUUID = configurationService.getProperty("edit.metadata.default-group");
+            String defaultGroupUUID = configurationService.getProperty("edit.metadata.allowed-group");
+            if (StringUtils.isBlank(defaultGroupUUID)) {
+                return authorizeServiceRestUtil.authorizeActionBoolean(context, object,DSpaceRestPermission.WRITE);
+            }
             Group defaultGroup = StringUtils.isNotBlank(defaultGroupUUID) ?
                                  groupService.find(context, UUID.fromString(defaultGroupUUID)) : null;
-            if (StringUtils.isBlank(defaultGroupUUID) ||
-                (Objects.nonNull(defaultGroup) && groupService.isMember(context, defaultGroup))) {
-                boolean x = authorizeServiceRestUtil.authorizeActionBoolean(context, object,DSpaceRestPermission.WRITE);
-                return x;
+            if (Objects.nonNull(defaultGroup) && groupService.isMember(context, defaultGroup)) {
+                return authorizeServiceRestUtil.authorizeActionBoolean(context, object,DSpaceRestPermission.WRITE);
             }
         }
         return false;
