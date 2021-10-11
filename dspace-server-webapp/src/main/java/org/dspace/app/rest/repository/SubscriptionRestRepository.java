@@ -32,6 +32,7 @@ import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
@@ -175,7 +176,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository
         try {
             DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, UUID.fromString(dsoId));
             EPerson ePerson = personService.findByIdOrLegacyId(context, epersonId);
-            if (!authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject, 1, true)) {
+            if (!authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,  Constants.READ, true)) {
                 throw new AuthorizeException("The user has not READ rights on this DSO");
             }
             ServletInputStream input = req.getInputStream();
