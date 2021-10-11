@@ -296,28 +296,35 @@ public class ItemImportCLITool {
 
                 // validate each collection arg to see if it's a real collection
                 for (int i = 0; i < collections.length; i++) {
-                    // is the ID a handle?
-                    if (collections[i].indexOf('/') != -1) {
-                        // string has a / so it must be a handle - try and resolve
-                        // it
-                        mycollections.add((Collection) handleService
-                            .resolveToObject(c, collections[i]));
 
-                        // resolved, now make sure it's a collection
-                        if ((mycollections.get(i) == null)
-                            || (mycollections.get(i).getType() != Constants.COLLECTION)) {
-                            mycollections.set(i, null);
+                    Collection resolved = null;
+
+                    if (collections[i] != null) {
+
+                        // is the ID a handle?
+                        if (collections[i].indexOf('/') != -1) {
+                            // string has a / so it must be a handle - try and resolve
+                            // it
+                            resolved = ((Collection) handleService
+                                .resolveToObject(c, collections[i]));
+
+                        } else {
+                            // not a handle, try and treat it as an integer collection database ID
+                            resolved = collectionService.find(c, UUID.fromString(collections[i]));
+
                         }
-                    } else if (collections[i] != null) {
-                        // not a handle, try and treat it as an integer collection database ID
-                        mycollections.set(i, collectionService.find(c, UUID.fromString(collections[i])));
+
                     }
 
                     // was the collection valid?
-                    if (mycollections.get(i) == null) {
+                    if ((resolved == null)
+                            || (resolved.getType() != Constants.COLLECTION)) {
                         throw new IllegalArgumentException("Cannot resolve "
                                                                + collections[i] + " to collection");
                     }
+
+                    // add resolved collection to list
+                    mycollections.add(resolved);
 
                     // print progress info
                     String owningPrefix = "";
@@ -327,7 +334,7 @@ public class ItemImportCLITool {
                     }
 
                     System.out.println(owningPrefix + " Collection: "
-                                           + mycollections.get(i).getName());
+                                           + resolved.getName());
                 }
             } // end of validating collections
 
