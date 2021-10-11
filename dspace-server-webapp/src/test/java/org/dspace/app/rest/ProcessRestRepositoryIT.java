@@ -11,6 +11,7 @@ import static org.dspace.app.rest.matcher.ProcessMatcher.matchProcess;
 import static org.dspace.content.ProcessStatus.SCHEDULED;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -827,7 +828,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token).perform(get("/api/system/processes/search/own"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.processes", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.processes", containsInRelativeOrder(
                 matchProcess(process3.getName(), eperson.getID().toString(), process3.getID(), parameters, SCHEDULED),
                 matchProcess(process1.getName(), eperson.getID().toString(), process1.getID(), parameters, SCHEDULED))))
             .andExpect(jsonPath("$.page", is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))));

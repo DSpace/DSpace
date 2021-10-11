@@ -160,6 +160,10 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
         criteriaQuery.select(processRoot);
         criteriaQuery.where(criteriaBuilder.equal(processRoot.get(Process_.E_PERSON), user));
 
+        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.desc(processRoot.get(Process_.PROCESS_ID)));
+        criteriaQuery.orderBy(orderList);
+
         return list(context, criteriaQuery, false, Process.class, limit, offset);
     }
 
