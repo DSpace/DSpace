@@ -65,7 +65,7 @@
         <property name="orcidRestConnector" ref="orcidRestConnector"/>
         <property name="supportedEntityTypes">
             <list>
-                <value>Publication</value>
+                <value>Person</value>
             </list>
         </property>
     </bean>

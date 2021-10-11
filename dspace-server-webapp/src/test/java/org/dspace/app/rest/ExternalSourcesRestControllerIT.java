@@ -145,10 +145,9 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.externalsources", Matchers.contains(
                               ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
-                              ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false),
                               ExternalSourceMatcher.matchExternalSource("pubmed", "pubmed", false)
                               )))
-                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
 
         getClient().perform(get("/api/integration/externalsources/search/findByEntityType")
                    .param("entityType", "Journal"))
