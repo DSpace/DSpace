@@ -1045,12 +1045,12 @@ prevent the generation of resource policy entry values with null dspace_object a
      *                            to perform a particular action.
      */
     protected void addDefaultPoliciesNotInPlace(Context context, DSpaceObject dso,
-                                                List<ResourcePolicy> defaultCollectionPolicies)
-        throws SQLException, AuthorizeException {
+        List<ResourcePolicy> defaultCollectionPolicies) throws SQLException, AuthorizeException {
+
         for (ResourcePolicy defaultPolicy : defaultCollectionPolicies) {
             if (!authorizeService
                 .isAnIdenticalPolicyAlreadyInPlace(context, dso, defaultPolicy.getGroup(), Constants.READ,
-                                                   defaultPolicy.getID())) {
+                    defaultPolicy.getID()) && this.isNotAlreadyACustomRPOfThisTypeOnDSO(context, dso)) {
                 ResourcePolicy newPolicy = resourcePolicyService.clone(context, defaultPolicy);
                 newPolicy.setdSpaceObject(dso);
                 newPolicy.setAction(Constants.READ);
@@ -1058,6 +1058,25 @@ prevent the generation of resource policy entry values with null dspace_object a
                 resourcePolicyService.update(context, newPolicy);
             }
         }
+    }
+
+    /**
+     * Check whether or not there is already an RP on the given dso, which has actionId={@link Constants.READ} and
+     * resourceTypeId={@link ResourcePolicy.TYPE_CUSTOM}
+     *
+     * @param context DSpace context
+     * @param dso     DSpace object to check for custom read RP
+     * @return True if there is no RP on the item with custom read RP, otherwise false
+     * @throws SQLException If something goes wrong retrieving the RP on the DSO
+     */
+    private boolean isNotAlreadyACustomRPOfThisTypeOnDSO(Context context, DSpaceObject dso) throws SQLException {
+        List<ResourcePolicy> readRPs = resourcePolicyService.find(context, dso, Constants.READ);
+        for (ResourcePolicy readRP : readRPs) {
+            if (readRP.getRpType().equals(ResourcePolicy.TYPE_CUSTOM)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
