@@ -212,8 +212,8 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
             HelpFormatter formatter = new HelpFormatter();
             StringWriter out = new StringWriter();
             PrintWriter pw = new PrintWriter(out);
-
-            formatter.printUsage(pw, 1000, name, options);
+            formatter.printHelp(pw, 1000, name, null, options, formatter.getLeftPadding(), formatter.getDescPadding(),
+                                null, false);
             pw.flush();
 
             String helpString = out.toString();
