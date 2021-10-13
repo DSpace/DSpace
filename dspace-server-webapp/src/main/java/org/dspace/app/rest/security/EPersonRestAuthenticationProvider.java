@@ -23,7 +23,7 @@ import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.RequestService;
 import org.slf4j.Logger;
@@ -90,19 +90,19 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
                 int implicitStatus = authenticationService.authenticateImplicit(newContext, null, null, null, request);
 
                 if (implicitStatus == AuthenticationMethod.SUCCESS) {
-                    log.info(LogManager.getHeader(newContext, "login", "type=implicit"));
+                    log.info(LogHelper.getHeader(newContext, "login", "type=implicit"));
                     output = createAuthentication(password, newContext);
                 } else {
                     int authenticateResult = authenticationService
                         .authenticate(newContext, name, password, null, request);
                     if (AuthenticationMethod.SUCCESS == authenticateResult) {
 
-                        log.info(LogManager
+                        log.info(LogHelper
                                      .getHeader(newContext, "login", "type=explicit"));
 
                         output = createAuthentication(password, newContext);
                     } else {
-                        log.info(LogManager.getHeader(newContext, "failed_login", "email="
+                        log.info(LogHelper.getHeader(newContext, "failed_login", "email="
                             + name + ", result="
                             + authenticateResult));
                         throw new BadCredentialsException("Login failed");
@@ -132,8 +132,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
             return new DSpaceAuthentication(ePerson, getGrantedAuthorities(context));
 
         } else {
-            log.info(
-                LogManager.getHeader(context, "failed_login", "No eperson with an non-blank e-mail address found"));
+            log.info(LogHelper.getHeader(context, "failed_login", "No eperson with an non-blank e-mail address found"));
             throw new BadCredentialsException("Login failed");
         }
     }

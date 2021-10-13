@@ -105,6 +105,7 @@ public class ContentsEntry {
         return new ContentsEntry(arp[0], arp[1], actionId, groupName, arp[3]);
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(filename);
         if (bundlename != null) {

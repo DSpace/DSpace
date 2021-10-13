@@ -31,18 +31,21 @@ public class MockOrcid extends Orcidv3SolrAuthorityImpl {
         OrcidRestConnector orcidRestConnector = Mockito.mock(OrcidRestConnector.class);
         when(orcidRestConnector.get(ArgumentMatchers.startsWith("search?"), ArgumentMatchers.any()))
         .thenAnswer(new Answer<InputStream>() {
+                @Override
                 public InputStream answer(InvocationOnMock invocation) {
                     return this.getClass().getResourceAsStream("orcid-search-noresults.xml");
                 }
             });
         when(orcidRestConnector.get(ArgumentMatchers.startsWith("search?q=Bollini"), ArgumentMatchers.any()))
             .thenAnswer(new Answer<InputStream>() {
+                    @Override
                     public InputStream answer(InvocationOnMock invocation) {
                         return this.getClass().getResourceAsStream("orcid-search.xml");
                     }
                 });
         when(orcidRestConnector.get(ArgumentMatchers.endsWith("/person"), ArgumentMatchers.any()))
             .thenAnswer(new Answer<InputStream>() {
+                    @Override
                     public InputStream answer(InvocationOnMock invocation) {
                         return this.getClass().getResourceAsStream("orcid-person-record.xml");
                     }

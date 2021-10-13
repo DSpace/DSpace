@@ -38,13 +38,12 @@ import org.dspace.core.Utils;
  *
  * @author Robert Tansley
  * @author Mark Diggory
- * @version $Revision$
  */
 public class Util {
     // cache for source version result
     private static String sourceVersion = null;
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Util.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     /**
      * Default constructor. Must be protected as org.dspace.xmlworkflow.WorkflowUtils extends it
@@ -60,7 +59,7 @@ public class Util {
      * spaces
      */
     public static String nonBreakSpace(String s) {
-        StringBuffer newString = new StringBuffer();
+        StringBuilder newString = new StringBuilder();
 
         for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
@@ -99,7 +98,7 @@ public class Util {
             return "";
         }
 
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
 
         final String[] pctEncoding = {"%00", "%01", "%02", "%03", "%04",
             "%05", "%06", "%07", "%08", "%09", "%0a", "%0b", "%0c", "%0d",
@@ -263,7 +262,7 @@ public class Util {
             return null;
         }
 
-        List<UUID> return_values = new ArrayList<UUID>(request_values.length);
+        List<UUID> return_values = new ArrayList<>(request_values.length);
 
         for (String s : request_values) {
             try {
@@ -402,7 +401,7 @@ public class Util {
         Item item, List<MetadataValue> values, String schema, String element,
         String qualifier, Locale locale) throws SQLException,
         DCInputsReaderException {
-        List<String> toReturn = new ArrayList<String>();
+        List<String> toReturn = new ArrayList<>();
         DCInput myInputs = null;
         boolean myInputsFound = false;
         String formFileName = I18nUtil.getInputFormsFileName(locale);
@@ -478,8 +477,9 @@ public class Util {
     }
 
     /**
-     * Split a list in an array of i sub-lists uniformly sized
+     * Split a list in an array of i sub-lists uniformly sized.
      *
+     * @param <T> type of objects in the list.
      * @param idsList the list to split
      * @param i the number of sublists to return
      *

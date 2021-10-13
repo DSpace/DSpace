@@ -86,7 +86,7 @@ public class SitemapsOrgGenerator extends AbstractGenerator {
 
     @Override
     public String getURLText(String url, Date lastMod) {
-        StringBuffer urlText = new StringBuffer();
+        StringBuilder urlText = new StringBuilder();
 
         urlText.append("<url><loc>").append(url).append("</loc>");
         if (lastMod != null) {
