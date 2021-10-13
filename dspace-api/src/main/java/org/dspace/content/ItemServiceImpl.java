@@ -1072,7 +1072,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     private boolean isNotAlreadyACustomRPOfThisTypeOnDSO(Context context, DSpaceObject dso) throws SQLException {
         List<ResourcePolicy> readRPs = resourcePolicyService.find(context, dso, Constants.READ);
         for (ResourcePolicy readRP : readRPs) {
-            if (readRP.getRpType().equals(ResourcePolicy.TYPE_CUSTOM)) {
+            if (readRP.getRpType() != null && readRP.getRpType().equals(ResourcePolicy.TYPE_CUSTOM)) {
                 return false;
             }
         }
