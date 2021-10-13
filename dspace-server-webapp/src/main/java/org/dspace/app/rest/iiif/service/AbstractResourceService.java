@@ -58,10 +58,10 @@ public abstract class AbstractResourceService {
      * @param configurationService the DSpace configuration service
      */
     protected void setConfiguration(ConfigurationService configurationService) {
-        IIIF_ENDPOINT = configurationService.getProperty("iiif.url");
+        IIIF_ENDPOINT = configurationService.getProperty("dspace.server.url") + "/iiif/";
         IMAGE_SERVICE = configurationService.getProperty("iiif.image.server");
         SEARCH_URL = configurationService.getProperty("iiif.search.url");
-        BITSTREAM_PATH_PREFIX = configurationService.getProperty("iiif.bitstream.url");
+        BITSTREAM_PATH_PREFIX = configurationService.getProperty("dspace.server.url") + "/api/core/bitstreams";
         DOCUMENT_VIEWING_HINT = configurationService.getProperty("iiif.document.viewing.hint");
         CLIENT_URL = configurationService.getProperty("dspace.ui.url");
         IIIF_LOGO_IMAGE = configurationService.getProperty("iiif.logo.image");
