@@ -8,6 +8,7 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -92,6 +93,9 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
                                    .equal(relationshipTypeRoot.get(RelationshipType_.rightType), entityType)
             )
         );
+        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(relationshipTypeRoot.get(RelationshipType_.ID)));
+        criteriaQuery.orderBy(orderList);
         return list(context, criteriaQuery, false, RelationshipType.class, limit, offset);
     }
 
@@ -120,4 +124,18 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
         }
         return list(context, criteriaQuery, false, RelationshipType.class, limit, offset);
     }
+
+    @Override
+    public int countByEntityType(Context context, EntityType entityType) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
+        Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
+        criteriaQuery.select(relationshipTypeRoot);
+        criteriaQuery.where(criteriaBuilder.or(
+                            criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftType), entityType),
+                            criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightType), entityType)
+                            ));
+        return count(context, criteriaQuery, criteriaBuilder, relationshipTypeRoot);
+    }
+
 }
