@@ -14,6 +14,7 @@ import java.util.*;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.utils.UIException;
@@ -211,6 +212,12 @@ public class FlowItemUtils
 			String lang = request.getParameter("language_"+index);
 			String remove = request.getParameter("remove_"+index);
 			
+			// Empty lang is null lang
+			if (StringUtils.isBlank(lang))
+			{
+				lang = null;
+			}
+
 			// the user selected the remove checkbox.
 			if (remove != null)
                         {

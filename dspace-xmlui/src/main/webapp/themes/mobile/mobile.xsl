@@ -121,7 +121,7 @@
 
         <script>
         <xsl:attribute name="src">
-        <xsl:text>http://code.jquery.com/jquery-1.7.1.min.js</xsl:text>
+        <xsl:text>http://code.jquery.com/jquery-3.4.1.min.js</xsl:text>
         </xsl:attribute>&#160;</script>
 
         <script>
@@ -577,11 +577,14 @@
                                 <xsl:variable name="v1" select="translate($v1,' ', '+')"/>
                                 <a>
                                     <xsl:attribute name="href">
-                                    <xsl:text>http://scholar.google.com/scholar?q=</xsl:text>
-                                    <xsl:value-of select="$v1"/>
+                                        <xsl:text>https://scholar.google.com/scholar?q=</xsl:text>
+                                        <xsl:value-of select="$v1"/>
                                     </xsl:attribute>
                                     <xsl:attribute name="target">
-                                    <xsl:text>_blank</xsl:text>
+                                        <xsl:text>_blank</xsl:text>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="rel">
+                                        <xsl:text>noopener</xsl:text>
                                     </xsl:attribute>
                                     <i18n:text>xmlui.mobile.items_in_google_scholar</i18n:text>
                                 </a>

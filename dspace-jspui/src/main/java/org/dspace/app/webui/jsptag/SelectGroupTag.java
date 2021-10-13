@@ -128,7 +128,7 @@ public class SelectGroupTag extends TagSupport
 			}
 			
 			out.print("</select>");
-			out.print("<br/><div class=\"row container\">");
+			out.print("<br/><div class=\"col-md-12\">");
             String p = (multiple ? 
                     LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.SelectGroupTag.selectGroups")

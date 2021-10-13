@@ -8,5 +8,5 @@
 
 -->
 {{#each filters}}
-    <label href="#" class="label label-primary" data-index="{{index}}">{{lookup ../i18n.filtertype type}}: {{query}}&nbsp;&times;</label>
+    <label href="#" class="label label-primary" data-index="{{index}}" data-query="{{query}}">{{lookup ../i18n.filtertype type}}: {{display_value}}&nbsp;&times;</label>
 {{/each}}

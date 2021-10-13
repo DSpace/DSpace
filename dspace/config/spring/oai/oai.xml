@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                  http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                  http://www.springframework.org/schema/context
+                  http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+	<!-- Additional item.compile plugin to enrich field with information about orcid metadata: to use it activate ORCID based authority control on dspace.cfg-->
+<!--  	<bean id="orcidVirtualElementAdditional"
+		class="org.dspace.xoai.app.OrcidVirtualElementAdditional">
+		<property name="metadata" value="dc.contributor.author"/>
+	</bean> -->
+	
+	<!-- Additional item.compile plugin to enrich field with information about DRM metadata -->
+	<bean id="PermissionElementAdditional"
+	class="org.dspace.xoai.app.PermissionElementAdditional"/>
+
+	<!-- Additional item.compile plugin to enrich field with information about Creative Commons License metadata -->
+	<!-- For large repository the strategy used to retrieve Creative Commons information could be degraded the indexing performance.
+		Tested it on a repository of 163K items and the full reindex process takes 2 hours more - the full reindex process without this takes 1 hour. -->
+	<!-- <bean id="CCElementAdditional"
+	class="org.dspace.xoai.app.CCElementAdditional"/> -->
+</beans>

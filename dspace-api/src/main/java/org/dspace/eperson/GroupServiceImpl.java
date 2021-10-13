@@ -175,7 +175,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             return false;
 
             // special, everyone is member of group 0 (anonymous)
-        } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
+        } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS) || isParentOf(context, group, findByName(context, Group.ANONYMOUS))) {
             return true;
 
         } else {
