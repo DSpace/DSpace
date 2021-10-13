@@ -40,7 +40,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -97,7 +97,7 @@ public class DSpaceSwordAPI {
         String obo = authCredentials.getOnBehalfOf() != null ?
             authCredentials.getOnBehalfOf() :
             "NONE";
-        log.info(LogManager.getHeader(sc.getContext(), "sword_auth_request",
+        log.info(LogHelper.getHeader(sc.getContext(), "sword_auth_request",
                                       "username=" + un + ",on_behalf_of=" + obo));
 
         return sc;

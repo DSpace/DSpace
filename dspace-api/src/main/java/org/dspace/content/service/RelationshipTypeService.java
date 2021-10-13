@@ -114,11 +114,12 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
             throws SQLException;
 
     /**
-     * Count all relationship types that matches provided EntityType object on any side of relationship
+     * Count all RelationshipType objects for which the given EntityType
+     * is equal to either the leftType or the rightType
      * 
-     * @param context        The relevant DSpace context
-     * @param entityType     The EntityType object that will be used to check on
-     * @return
+     * @param context        DSpace context object
+     * @param entityType     The EntityType object used to check the leftType and rightType properties
+     * @return               Total RelationshipType objects
      * @throws SQLException  If database error
      */
     public int countByEntityType(Context context, EntityType entityType) throws SQLException;

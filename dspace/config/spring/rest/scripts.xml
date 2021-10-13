@@ -33,4 +33,9 @@
         <property name="description" value="Delete all the values of the specified metadata field"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletion"/>
     </bean>
+
+    <bean id="harvest" class="org.dspace.app.harvest.HarvestScriptConfiguration">
+        <property name="description" value="Manage the OAI-PMH harvesting of external collections"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.harvest.Harvest"/>
+    </bean>
 </beans>

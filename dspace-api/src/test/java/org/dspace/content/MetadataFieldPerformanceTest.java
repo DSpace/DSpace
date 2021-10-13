@@ -50,7 +50,7 @@ public class MetadataFieldPerformanceTest extends AbstractUnitTest {
         Assert.assertTrue("Duration (" + duration + ") should be smaller than " + maxDuration +
                 " for " + amount + " tests." +
                 " Max of " + maxDurationPerCall + " ms per operation exceeded: " +
-                (((double) (duration)) / amount) + " ms.", duration < maxDuration);
+                (((double) duration) / amount) + " ms.", duration < maxDuration);
     }
 
     @Test
@@ -81,7 +81,7 @@ public class MetadataFieldPerformanceTest extends AbstractUnitTest {
         Assert.assertTrue("Duration (" + duration + ") should be smaller than " + maxDuration +
                 " for " + amount + " tests." +
                 " Max of " + maxDurationPerCall + " ms per operation exceeded: " +
-                (((double) (duration)) / amount) + " ms.", duration < maxDuration);
+                (((double) duration) / amount) + " ms.", duration < maxDuration);
 
         context.turnOffAuthorisationSystem();
         // Delete community & collection created in init()
