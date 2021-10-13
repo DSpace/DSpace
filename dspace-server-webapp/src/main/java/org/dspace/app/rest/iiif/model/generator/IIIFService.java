@@ -9,6 +9,9 @@ package org.dspace.app.rest.iiif.model.generator;
 
 import de.digitalcollections.iiif.model.Service;
 
+/**
+ * Interface for iiif service generators.
+ */
 public interface IIIFService {
 
     /**

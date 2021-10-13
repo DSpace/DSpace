@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.iiif.model.generator;
 
+/**
+ * Interface for iiif value generators.
+ */
 public interface IIIFValue {
 
     /**

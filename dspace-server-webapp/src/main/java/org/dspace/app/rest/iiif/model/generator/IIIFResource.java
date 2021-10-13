@@ -9,6 +9,9 @@ package org.dspace.app.rest.iiif.model.generator;
 
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 
+/**
+ * Interface for iiif resource generators.
+ */
 public interface IIIFResource {
 
     /**
