@@ -15,8 +15,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
+import org.dspace.app.rest.matcher.RelationshipTypeMatcher;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.content.EntityType;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.service.EntityTypeService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -166,6 +168,39 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                    .andExpect(jsonPath("$.page.totalElements", is(7)))
                    .andExpect(jsonPath("$.page.totalPages", is(3)))
                    .andExpect(jsonPath("$.page.number", is(1)));
+    }
+
+    @Test
+    public void findEntityTypeWithEmbedRelatioshipTypeTest() throws Exception {
+
+        EntityType person = entityTypeService.findByEntityType(context, "Person");
+        EntityType orgunit = entityTypeService.findByEntityType(context, "OrgUnit");
+        EntityType project = entityTypeService.findByEntityType(context, "Project");
+        EntityType publication = entityTypeService.findByEntityType(context, "Publication");
+        EntityType journalIssue = entityTypeService.findByEntityType(context, "journalIssue");
+
+        RelationshipType relationshipType1 = relationshipTypeService.findbyTypesAndTypeName(context,
+                             publication, person, "isAuthorOfPublication", "isPublicationOfAuthor");
+        RelationshipType relationshipType2 = relationshipTypeService.findbyTypesAndTypeName(context,
+                          publication, project, "isProjectOfPublication", "isPublicationOfProject");
+        RelationshipType relationshipType3 = relationshipTypeService.findbyTypesAndTypeName(context,
+                          publication, orgunit, "isOrgUnitOfPublication", "isPublicationOfOrgUnit");
+        RelationshipType relationshipType4 = relationshipTypeService.findbyTypesAndTypeName(context,
+           journalIssue, publication, "isPublicationOfJournalIssue", "isJournalIssueOfPublication");
+        RelationshipType relationshipType5 = relationshipTypeService.findbyTypesAndTypeName(context,
+                             publication, orgunit, "isAuthorOfPublication","isPublicationOfAuthor");
+
+        getClient().perform(get("/api/core/entitytypes/" + publication.getID())
+                   .param("embed", "relationshiptypes"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", EntityTypeMatcher.matchEntityTypeEntry(publication)))
+                   .andExpect(jsonPath("$._embedded.relationshiptypes._embedded.relationshiptypes", containsInAnyOrder(
+                           RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType1),
+                           RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType2),
+                           RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType3),
+                           RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType4),
+                           RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType5)
+                           )));
     }
 
 }
