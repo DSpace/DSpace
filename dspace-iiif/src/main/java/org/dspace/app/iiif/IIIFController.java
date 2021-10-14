@@ -9,10 +9,10 @@ package org.dspace.app.iiif;
 
 import java.util.UUID;
 
-import org.dspace.app.iiif.dspace.ContextUtil;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.dspace.utils.DSpace;
+import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
