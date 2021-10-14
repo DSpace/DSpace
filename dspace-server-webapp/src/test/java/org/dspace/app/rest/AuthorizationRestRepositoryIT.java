@@ -1826,7 +1826,6 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administators inspecting other users - by assuming login
         getClient(adminToken).perform(baseFeatureRequest.get()
-//            .param("feature", trueForLoggedUsers.getName())
             .header("X-On-Behalf-Of", eperson.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(4)))
