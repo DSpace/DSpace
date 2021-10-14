@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +33,7 @@ import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
@@ -175,8 +177,19 @@ public class SubscriptionRestRepository extends DSpaceRestRepository
         try {
             DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, UUID.fromString(dsoId));
             EPerson ePerson = personService.findByIdOrLegacyId(context, epersonId);
-            if (!authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject, 1, true)) {
+            if (ePerson == null || dSpaceObject == null) {
+                throw new BadRequestException("Id of person or dspace object must represents reals ids");
+            }
+            // user must have read permissions to dataspace object
+            if (!authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,  Constants.READ, true)) {
                 throw new AuthorizeException("The user has not READ rights on this DSO");
+            }
+            // if user is admin do not make this control,
+            // otherwise make this control because normal user can only subscribe with their own ID of user.
+            if (!authorizeService.isAdmin(context)) {
+                if (!ePerson.equals(context.getCurrentUser())) {
+                    throw new AuthorizeException("Only administrator can subscribe for other persons");
+                }
             }
             ServletInputStream input = req.getInputStream();
             subscriptionRest = mapper.readValue(input, SubscriptionRest.class);
