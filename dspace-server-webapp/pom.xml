@@ -364,6 +364,11 @@
             <artifactId>dspace-services</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-iiif</artifactId>
+        </dependency>
+
         <!-- DSpace modules to deploy (this modules are all optional, but add features/endpoints to webapp) -->
         <!-- You may choose to comment out any of these modules if you do not want/need its features -->
         <dependency>
@@ -492,38 +497,6 @@
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <version>3.4.0</version>
-        </dependency>
-        <!-- iiif models. -->
-        <dependency>
-            <groupId>de.digitalcollections.iiif</groupId>
-            <artifactId>iiif-apis</artifactId>
-            <version>0.3.9</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.javassist</groupId>
-                    <artifactId>javassist</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.datatype</groupId>
-                    <artifactId>jackson-datatype-jsr310</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.security</groupId>
-                    <artifactId>spring-security-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.dmfs</groupId>
-                    <artifactId>iterators</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.module</groupId>
-                    <artifactId>jackson-module-parameter-names</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.datatype</groupId>
-                    <artifactId>jackson-datatype-jsr310</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
