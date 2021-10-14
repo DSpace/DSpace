@@ -7,13 +7,9 @@
  */
 package org.dspace.app.iiif.service;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.iiif.model.generator.CanvasItemsGenerator;
-import org.dspace.app.iiif.model.generator.ExternalLinksGenerator;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -62,8 +58,6 @@ public class SequenceService extends AbstractResourceService {
     public CanvasItemsGenerator getSequence(Item item, Context context) {
 
         sequenceGenerator.setIdentifier(IIIF_ENDPOINT + item.getID() + "/sequence/s0");
-        addRendering(item, context);
-
         return sequenceGenerator;
     }
 
@@ -86,38 +80,5 @@ public class SequenceService extends AbstractResourceService {
         return canvasGenerator;
     }
 
-    /**
-     * This method looks for a PDF rendering in the Item's ORIGINAL bundle and adds
-     * it to the Sequence if found.
-     *
-     * @param item DSpace Item
-     * @param context DSpace context
-     */
-    private void addRendering(Item item, Context context) {
-        List<Bundle> bundles = utils.getIIIFBundles(item);
-        for (Bundle bundle : bundles) {
-            List<Bitstream> bitstreams = bundle.getBitstreams();
-            for (Bitstream bitstream : bitstreams) {
-                String mimeType = null;
-                try {
-                    mimeType = bitstream.getFormat(context).getMIMEType();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                // If the  bundle contains a PDF, assume that it represents the
-                // item and add to rendering. Ignore other mime-types. Other options
-                // might be using the primary bitstream or relying on a bitstream metadata
-                // field, e.g. iiif.rendering
-                if (mimeType != null && mimeType.contentEquals("application/pdf")) {
-                    String id = BITSTREAM_PATH_PREFIX + "/" + bitstream.getID() + "/content";
-                    sequenceGenerator.addRendering(
-                            new ExternalLinksGenerator(id)
-                                .setLabel(utils.getIIIFLabel(bitstream, bitstream.getName()))
-                                .setFormat(mimeType)
-                    );
-                }
-            }
-        }
-    }
 
 }

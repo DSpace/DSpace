@@ -10,7 +10,6 @@ package org.dspace.app.iiif.model.generator;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.digitalcollections.iiif.model.OtherContent;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 import de.digitalcollections.iiif.model.sharedcanvas.Sequence;
@@ -32,9 +31,7 @@ import org.springframework.web.context.annotation.RequestScope;
 public class CanvasItemsGenerator implements IIIFResource {
 
     private String identifier;
-    private final List<OtherContent> renderings = new ArrayList<>();
     private final List<Canvas> canvas = new ArrayList<>();
-
 
     /**
      * Sets the required identifier property.
@@ -44,14 +41,6 @@ public class CanvasItemsGenerator implements IIIFResource {
         this.identifier = identifier;
     }
 
-    /**
-     * Adds a rendering annotation to the Sequence. The rendering is a link to an external resource intended
-     * for display or download by a human user. This is typically going to be a PDF file.
-     * @param otherContent generator for the resource
-     */
-    public void addRendering(ExternalLinksGenerator otherContent) {
-        this.renderings.add((OtherContent) otherContent.generateResource());
-    }
 
     /**
      * Adds a single {@code Canvas} to the sequence.
@@ -66,9 +55,6 @@ public class CanvasItemsGenerator implements IIIFResource {
     @Override
     public Resource<Sequence> generateResource() {
         Sequence items = new Sequence(identifier);
-        for (OtherContent r : renderings) {
-            items.addRendering(r);
-        }
         items.setCanvases(canvas);
         return items;
     }

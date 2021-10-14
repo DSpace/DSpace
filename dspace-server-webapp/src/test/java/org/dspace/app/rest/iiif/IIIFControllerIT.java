@@ -824,10 +824,10 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
                         Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Page 1")))
-                .andExpect(jsonPath("$.sequences[0].rendering.@id",
+                .andExpect(jsonPath("$.rendering.@id",
                         Matchers.endsWith(pdf.getID().toString() + "/content")))
-                .andExpect(jsonPath("$.sequences[0].rendering.label", is("Bitstream3.pdf")))
-                .andExpect(jsonPath("$.sequences[0].rendering.format", is("application/pdf")))
+                .andExpect(jsonPath("$.rendering.label", is("Bitstream3.pdf")))
+                .andExpect(jsonPath("$.rendering.format", is("application/pdf")))
                 .andExpect(jsonPath("$.service").doesNotExist());
     }
 

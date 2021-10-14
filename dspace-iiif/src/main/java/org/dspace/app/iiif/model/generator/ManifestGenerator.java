@@ -54,6 +54,7 @@ public class ManifestGenerator implements IIIFResource {
     private OtherContent related;
     private ImageContent thumbnail;
     private ContentSearchService searchService;
+    private List<OtherContent> renderings = new ArrayList<>();
     private final List<URI> license = new ArrayList<>();
     private final List<MetadataEntry> metadata = new ArrayList<>();
     private final List<Range> ranges = new ArrayList<>();
@@ -166,6 +167,15 @@ public class ManifestGenerator implements IIIFResource {
         ranges.add((Range) rangeGenerator.generateResource());
     }
 
+    /**
+     * Adds a rendering annotation to the Sequence. The rendering is a link to an external resource intended
+     * for display or download by a human user. This is typically going to be a PDF file.
+     * @param otherContent generator for the resource
+     */
+    public void addRendering(ExternalLinksGenerator otherContent) {
+        this.renderings.add((OtherContent) otherContent.generateResource());
+    }
+
     @Override
     public Resource<Manifest> generateResource() {
 
@@ -177,6 +187,9 @@ public class ManifestGenerator implements IIIFResource {
             manifest = new Manifest(identifier, label);
         } else {
             manifest = new Manifest(identifier);
+        }
+        if (renderings.size() > 0) {
+            manifest.setRenderings(renderings);
         }
         if (logo != null) {
             List<ImageContent> logos = new ArrayList<>();
