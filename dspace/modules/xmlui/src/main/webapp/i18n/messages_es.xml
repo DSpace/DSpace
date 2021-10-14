@@ -867,13 +867,15 @@
 <message key="xmlui.Submission.submit.UploadStep.submit_remove">Eliminar los archivos seleccionados</message>
 <message key="xmlui.Submission.submit.UploadStep.infoEmbargo">
    <b>Nota:</b> Si precisa que su obra se mantenga oculta temporalmente puede solicitar el embargo de la misma 
-   durante 3, 6, 12, 18 o 24 meses, correderos a partir de la fecha de presentación del trabajo. 
-   La UNLP y el Repositorio SEDICI apoyan fervientemente el acceso abierto a la producción científico-académica y por tanto 
+   durante 3 o 6 meses, correderos a partir de la fecha de presentación del trabajo. Este plazo se define en concordancia 
+ con el plazo máximo establecido en la <a href="https://www.argentina.gob.ar/normativa/nacional/ley-26899-223459/texto">Ley nacional 26.899</a> 
+ y su reglamento operativo de aplicación <a href="https://www.argentina.gob.ar/normativa/nacional/resoluci%C3%B3n-753-2016-267833/texto">Resolución E753/2016</a>. 
+   Asimismo, la UNLP y el Repositorio SEDICI apoyan fervientemente el acceso abierto a la producción científico-académica y por tanto 
    <b>RECOMIENDAN NO </b> aplicar esta restricción a no ser que resulte estrictamente necesario por patentes pendientes, 
    convenios de confidencialidad y casos similares. Tenga en cuenta que el depósito de su tesis en el repositorio
     no lo inhabilita a realizar publicaciones derivadas con calidad de inédito; una obra derivada NO es la obra original.
    <br/>A fin de aplicar esta restricción, deberá adjuntar en este paso una nota de solicitud de embargo que justifique 
-   debidamente la solicitud (ver modelo <a href="http://blog.sedici.unlp.edu.ar/wp-content/uploads/sites/17/2018/09/Modelo-nota-de-embargo.doc">Aqui</a>).
+   debidamente la solicitud (ver modelo <a href="https://blog.sedici.unlp.edu.ar/wp-content/uploads/sites/17/2018/09/Modelo-nota-de-embargo.doc">aqui</a>).
 </message>
 
 <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Subir Archivo(s)</message>
