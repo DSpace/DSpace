@@ -7,8 +7,8 @@
         <constructor-arg value="${openaire.api.url:https://api.openaire.eu}"/>
 		<property name="tokenEnabled" value="${openaire.token.enabled:false}"/>
 		<property name="tokenServiceUrl" value="${openaire.token.url:https://aai.openaire.eu/oidc/token}"/>
-		<property name="clientId" value="${openaire.token.clientId:CLIENT_ID}"/>
-		<property name="clientSecret" value="${openaire.token.clientSecret:CLIENT_SECRET}"/>
+		<property name="clientId" value="${openaire.token.clientId}"/>
+		<property name="clientSecret" value="${openaire.token.clientSecret}"/>
     </bean>
     <bean class="org.dspace.external.provider.impl.OpenAIREFundingDataProvider" init-method="init">
          <property name="sourceIdentifier" value="openAIREFunding"/>
