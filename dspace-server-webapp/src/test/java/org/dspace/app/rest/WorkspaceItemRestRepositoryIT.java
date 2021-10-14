@@ -67,6 +67,7 @@ import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -85,6 +86,8 @@ import org.springframework.test.web.servlet.MvcResult;
  */
 public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    @Autowired
+    private ItemService itemService;
     @Autowired
     private ConfigurationService configurationService;
 
@@ -5295,6 +5298,40 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                  .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name", is("openaccess")))
                  .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[1].name", is("administrator")));
 
+    }
+
+    @Test
+    public void invalidCollectionConfigurationPreventItemCreationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withSubmitterGroup(eperson)
+                                           .withTemplateItem()
+                                           .withEntityType("Person")
+                                           .build();
+
+        Item templateItem = col.getTemplateItem();
+        itemService.addMetadata(context, templateItem, "dspace", "entity", "type", null, "Publication");
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/myfile.pdf", "application/pdf", pdf);
+
+        context.restoreAuthSystemState();
+
+        try {
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+                                .file(pdfFile))
+                                .andExpect(status().is(500));
+        } finally {
+            pdf.close();
+        }
     }
 
 }
