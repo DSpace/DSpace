@@ -5,21 +5,36 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.iiif.dspace;
+package org.dspace.web;
 
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Locale;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.utils.DSpace;
 
+/**
+ * Miscellaneous UI utility methods methods for managing DSpace context.
+ *
+ * This class was "adapted" from the class of the same name in old XMLUI.
+ *
+ * @author Tim Donohue
+ */
 public class ContextUtil {
+    /**
+     * The log4j logger
+     */
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ContextUtil.class);
+
     /**
      * Where the context is stored on an HTTP Request object
      */
@@ -28,23 +43,22 @@ public class ContextUtil {
     /**
      * Default constructor
      */
-    private ContextUtil() {
-    }
+    private ContextUtil() { }
 
     /**
-     * Shortcut for {@link #obtainContext(Request)} using the {@link RequestService}
-     * to retrieve the current thread request
+     * Inspection method to check if a DSpace context has been created for this request.
      *
-     * @return the DSpace Context associated with the current thread-bound request
+     * @param request the servlet request object
+     * @return True if a context has previously been created, false otherwise.
      */
-    public static Context obtainCurrentRequestContext() {
-        Context context = null;
-        RequestService requestService = new DSpace().getRequestService();
-        Request currentRequest = requestService.getCurrentRequest();
-        if (currentRequest != null) {
-            context = ContextUtil.obtainContext(currentRequest.getHttpServletRequest());
+    public static boolean isContextAvailable(ServletRequest request) {
+        Object object = request.getAttribute(DSPACE_CONTEXT);
+
+        if (object instanceof Context) {
+            return true;
+        } else {
+            return false;
         }
-        return context;
     }
 
     /**
@@ -61,7 +75,7 @@ public class ContextUtil {
             try {
                 context = ContextUtil.initializeContext();
             } catch (SQLException e) {
-                //log.error("Unable to initialize context", e);
+                log.error("Unable to initialize context", e);
                 return null;
             }
 
@@ -73,6 +87,22 @@ public class ContextUtil {
         // change the locale
         Locale currentLocale = getLocale(context, request);
         context.setCurrentLocale(currentLocale);
+        return context;
+    }
+
+    /**
+     * Shortcut for {@link #obtainContext(Request)} using the {@link RequestService}
+     * to retrieve the current thread request
+     *
+     * @return the DSpace Context associated with the current thread-bound request
+     */
+    public static Context obtainCurrentRequestContext() {
+        Context context = null;
+        RequestService requestService = new DSpace().getRequestService();
+        Request currentRequest = requestService.getCurrentRequest();
+        if (currentRequest != null) {
+            context = ContextUtil.obtainContext(currentRequest.getHttpServletRequest());
+        }
         return context;
     }
 
@@ -107,7 +137,6 @@ public class ContextUtil {
         return supportedLocale;
     }
 
-
     /**
      * Initialize a new Context object
      *
@@ -117,7 +146,6 @@ public class ContextUtil {
     private static Context initializeContext() throws SQLException {
         // Create a new Context
         Context context = new Context();
-
         // Set the session ID
         /**context.setExtraLogInfo("session_id="
          + request.getSession().getId());
@@ -155,4 +183,28 @@ public class ContextUtil {
         return context;
     }
 
+    /**
+     * Check if a context exists for this request, if so complete the context.
+     *
+     * @param request The request object
+     */
+    public static void completeContext(ServletRequest request) throws ServletException {
+        Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
+
+        if (context != null && context.isValid()) {
+            try {
+                context.complete();
+            } catch (SQLException e) {
+                throw new ServletException(e);
+            }
+        }
+    }
+
+    public static void abortContext(ServletRequest request) {
+        Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
+
+        if (context != null && context.isValid()) {
+            context.abort();
+        }
+    }
 }
