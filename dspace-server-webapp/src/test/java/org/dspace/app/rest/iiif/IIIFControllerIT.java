@@ -1034,26 +1034,17 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
          * Our troubles are with the dispatcher and the way that flyway initializes the test environment.
          * If we add "iiif" to the list of default dispatchers in dspace.cfg, the initialization
          * triggers a call to the IIIFCacheEventConsumer before the web ApplicationContext has been injected. The
-         * CacheEvictService is not set in the consumer, and all subsequent calls to the consumer fail. If
-         * this root problem is solved and "iiif" can be added to the default dispatcher, then I think this test would
-         * succeed as written. (If possible this might be the best solution.)
+         * CacheEvictService is not set in the consumer, and all subsequent calls to the consumer fail.
          *
-         * The test succeeds with the following code modifications.
+         * The test succeeds with the following:
          *
-         *   1. Make sure the default dispatcher in dspace.cfg excludes the iiif consumer.
-         *   2. Add a new dispatcher definition to the test local.cfg that includes the iiif consumer.
-         *   3. Modify the web application's ContextUtil.initializeContext to add the new dispatcher to the context
-         *      -- context.setDispatcher(iiif-dispatcher).
+         *   1. Verify that the iiif consumer is included in the default dispatcher in dspace.cfg.
+         *   2. In RegistryUpdater, MetadataImporter, and GroupServiceInitializer set context to use a dispatcher
+         *      without the iiif consumer. This prevents premature initialization during tests. (I tried this using the
+         *      existing "noindex" dispatcher.)
          *
-         * The third change is obviously wrong, but it can be done temporarily to verify that the item is
-         * evicted from the cache when a patch is applied. Perhaps there's a reasonable way to set the test context
-         * in the web application that I don't know about.
-         *
-         * The alternative is to set the dispatcher here inside the test. Then instead of using the
-         * patch request, update the test Item using the dspace-api. The cache service is called and the cache
-         * is cleared. The manifest endpoint generates a new manifest as expected. But, the new response
-         * contains the old title. That doesn't seem right to me so there may be a way to make this approach work.
-         *
+         *  The consumer is working in production so the issue here seems to appear only during tests and
+         *  database migrations.
          */
 //        String patchRequestBody =
 //            "[{\"op\": \"replace\",\"path\": \"/metadata/dc.title/0/value\",\"value\": \"Public item 1 (revised)\"}]";
@@ -1121,8 +1112,8 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 //        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
 //                   .andExpect(status().isOk())
 //                   .andExpect(jsonPath("$.metadata[0].value", is("Public item 1 (revised)")));
-
-
+//
+//
     }
 
 }
