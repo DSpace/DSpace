@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.iiif.model.generator.ContentSearchGenerator;
+import org.dspace.app.iiif.model.generator.ExternalLinksGenerator;
 import org.dspace.app.iiif.model.generator.ImageContentGenerator;
 import org.dspace.app.iiif.model.generator.ManifestGenerator;
 import org.dspace.app.iiif.model.generator.RangeGenerator;
@@ -124,6 +125,7 @@ public class ManifestService extends AbstractResourceService {
         addRanges(context, item, manifestId);
         manifestGenerator.addSequence(
                 sequenceService.getSequence(item, context));
+        addRendering(item, context);
         addSeeAlso(item);
     }
 
@@ -140,7 +142,6 @@ public class ManifestService extends AbstractResourceService {
         RangeGenerator root = new RangeGenerator(rangeService);
         root.setLabel(I18nUtil.getMessage("iiif.toc.root-label"));
         root.setIdentifier(manifestId + "/range/r0");
-//        manifestGenerator.addRange(root);
 
         Map<String, RangeGenerator> tocRanges = new LinkedHashMap<String, RangeGenerator>();
         for (Bundle bnd : bundles) {
@@ -316,6 +317,40 @@ public class ManifestService extends AbstractResourceService {
         if (IIIF_LOGO_IMAGE != null) {
             ImageContentGenerator logo = new ImageContentGenerator(IIIF_LOGO_IMAGE);
             manifestGenerator.addLogo(logo);
+        }
+    }
+
+    /**
+     * This method looks for a PDF rendering in the Item's ORIGINAL bundle and adds
+     * it to the Sequence if found.
+     *
+     * @param item DSpace Item
+     * @param context DSpace context
+     */
+    private void addRendering(Item item, Context context) {
+        List<Bundle> bundles = utils.getIIIFBundles(item);
+        for (Bundle bundle : bundles) {
+            List<Bitstream> bitstreams = bundle.getBitstreams();
+            for (Bitstream bitstream : bitstreams) {
+                String mimeType = null;
+                try {
+                    mimeType = bitstream.getFormat(context).getMIMEType();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                // If the  bundle contains a PDF, assume that it represents the
+                // item and add to rendering. Ignore other mime-types. Other options
+                // might be using the primary bitstream or relying on a bitstream metadata
+                // field, e.g. iiif.rendering
+                if (mimeType != null && mimeType.contentEquals("application/pdf")) {
+                    String id = BITSTREAM_PATH_PREFIX + "/" + bitstream.getID() + "/content";
+                    manifestGenerator.addRendering(
+                        new ExternalLinksGenerator(id)
+                            .setLabel(utils.getIIIFLabel(bitstream, bitstream.getName()))
+                            .setFormat(mimeType)
+                    );
+                }
+            }
         }
     }
 
