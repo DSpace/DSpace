@@ -53,8 +53,7 @@ public class AdminRestPermissionEvaluatorPlugin extends RestObjectPermissionEval
         EPerson ePerson = null;
 
         try {
-            ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
-
+            ePerson = context.getCurrentUser();
             if (ePerson != null) {
 
                 //Check if user is a repository admin
