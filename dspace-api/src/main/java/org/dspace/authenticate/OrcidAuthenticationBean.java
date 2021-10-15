@@ -9,6 +9,8 @@ package org.dspace.authenticate;
 
 import static java.lang.String.format;
 import static java.net.URLEncoder.encode;
+import static org.apache.commons.lang.BooleanUtils.toBoolean;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.dspace.content.Item.ANY;
 
 import java.io.UnsupportedEncodingException;
@@ -281,7 +283,11 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
     }
 
     private boolean canSelfRegister() {
-        return configurationService.getBooleanProperty("authentication-orcid.can-self-register", true);
+        String canSelfRegister = configurationService.getProperty("authentication-oidc.can-self-register", "true");
+        if (isBlank(canSelfRegister)) {
+            return true;
+        }
+        return toBoolean(canSelfRegister);
     }
 
     private OrcidTokenResponseDTO getOrcidAccessToken(String code) {
