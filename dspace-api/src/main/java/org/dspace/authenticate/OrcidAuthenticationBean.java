@@ -283,7 +283,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
     }
 
     private boolean canSelfRegister() {
-        String canSelfRegister = configurationService.getProperty("authentication-oidc.can-self-register", "true");
+        String canSelfRegister = configurationService.getProperty("authentication-orcid.can-self-register", "true");
         if (isBlank(canSelfRegister)) {
             return true;
         }
