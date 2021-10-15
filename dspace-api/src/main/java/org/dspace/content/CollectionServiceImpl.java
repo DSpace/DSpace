@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -995,15 +996,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             query.append(")");
             discoverQuery.addFilterQueries(query.toString());
         }
-        StringBuilder buildFilter = new StringBuilder();
-        if (community != null) {
-            buildFilter.append("location.comm:").append(community.getID().toString());
+        if (Objects.nonNull(community)) {
+            discoverQuery.addFilterQueries("location.comm:" + community.getID().toString());
         }
         if (StringUtils.isNotBlank(entityType)) {
-            if (buildFilter.length() > 0) {
-                buildFilter.append(" AND ");
-            }
-            buildFilter.append("search.entitytype:").append(entityType);
+            discoverQuery.addFilterQueries("search.entitytype:" + entityType);
         }
         if (StringUtils.isNotBlank(q)) {
             StringBuilder buildQuery = new StringBuilder();
@@ -1011,7 +1008,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             buildQuery.append(escapedQuery).append(" OR ").append(escapedQuery).append("*");
             discoverQuery.setQuery(buildQuery.toString());
         }
-        discoverQuery.addFilterQueries(buildFilter.toString());
         DiscoverResult resp = searchService.search(context, discoverQuery);
         return resp;
     }
