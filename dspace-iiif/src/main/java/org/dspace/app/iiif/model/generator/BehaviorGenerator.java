@@ -14,6 +14,9 @@ import de.digitalcollections.iiif.model.enums.ViewingHint;
  * displaying the resource.
  *
  * With IIIF Presentation API 3.0 the viewingHint property is renamed to "behavior".
+ *
+ * @author Michael Spalti  mspalti@willamette.edu
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class BehaviorGenerator implements IIIFValue {
 

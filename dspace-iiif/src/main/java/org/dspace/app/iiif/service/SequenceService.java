@@ -23,6 +23,9 @@ import org.springframework.web.context.annotation.RequestScope;
  * This service provides methods for creating a {@code Sequence}. There should be a single instance of
  * this service per request. The {@code @RequestScope} provides a single instance created and available during
  * complete lifecycle of the HTTP request.
+ *
+ * @author Michael Spalti  mspalti@willamette.edu
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @RequestScope
 @Component

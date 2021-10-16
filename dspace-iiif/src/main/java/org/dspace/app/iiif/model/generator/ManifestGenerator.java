@@ -39,6 +39,9 @@ import org.springframework.web.context.annotation.RequestScope;
  *
  * Please note that this is a request scoped bean. This means that for each http request a
  * different instance will be initialized by Spring and used to serve this specific request.
+ *
+ * @author Michael Spalti  mspalti@willamette.edu
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @RequestScope
 @Component

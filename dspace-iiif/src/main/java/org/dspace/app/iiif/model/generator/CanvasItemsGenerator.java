@@ -25,6 +25,9 @@ import org.springframework.web.context.annotation.RequestScope;
  *
  * <p>Sequence is removed with Presentation API version 3.0. Canvases are added to the Manifest items property instead.
  * </p>
+ *
+ * @author Michael Spalti  mspalti@willamette.edu
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @RequestScope
 @Component
