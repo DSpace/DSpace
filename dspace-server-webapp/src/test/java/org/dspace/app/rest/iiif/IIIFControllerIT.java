@@ -9,11 +9,13 @@ package org.dspace.app.rest.iiif;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
 import java.util.UUID;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
@@ -1027,93 +1029,63 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findOneWithCacheEvictionAfterItemUpdate() throws Exception {
+        String patchRequestBody =
+            "[{\"op\": \"replace\",\"path\": \"/metadata/dc.title/0/value\",\"value\": \"Public item 1 (revised)\"}]";
 
-        /**
-         * This test is broken.
-         *
-         * Our troubles are with the dispatcher and the way that flyway initializes the test environment.
-         * If we add "iiif" to the list of default dispatchers in dspace.cfg, the initialization
-         * triggers a call to the IIIFCacheEventConsumer before the web ApplicationContext has been injected. The
-         * CacheEvictService is not set in the consumer, and all subsequent calls to the consumer fail.
-         *
-         * The test succeeds with the following:
-         *
-         *   1. Verify that the iiif consumer is included in the default dispatcher in dspace.cfg.
-         *   2. In RegistryUpdater, MetadataImporter, and GroupServiceInitializer set context to use a dispatcher
-         *      without the iiif consumer. This prevents premature initialization during tests. (I tried this using the
-         *      existing "noindex" dispatcher.)
-         *
-         *  The consumer is working in production so the issue here seems to appear only during tests and
-         *  database migrations.
-         */
-//        String patchRequestBody =
-//            "[{\"op\": \"replace\",\"path\": \"/metadata/dc.title/0/value\",\"value\": \"Public item 1 (revised)\"}]";
-//
-//        context.turnOffAuthorisationSystem();
-//
-//        parentCommunity = CommunityBuilder.createCommunity(context)
-//                                          .withName("Parent Community")
-//                                          .build();
-//        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
-//                                           .build();
-//
-//        Item publicItem1 = ItemBuilder.createItem(context, col1)
-//                                      .withTitle("Public item 1")
-//                                      .withIssueDate("2017-10-17")
-//                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-//                                      .enableIIIF()
-//                                      .build();
-//
-//        String bitstreamContent = "ThisIsSomeDummyText";
-//        Bitstream bitstream1 = null;
-//        Bitstream bitstream2 = null;
-//        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-//            bitstream1 = BitstreamBuilder
-//                .createBitstream(context, publicItem1, is)
-//                .withName("Bitstream1.jpg")
-//                .withMimeType("image/jpeg")
-//                .build();
-//        }
-//
-//        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-//            bitstream2 = BitstreamBuilder
-//                .createBitstream(context, publicItem1, is)
-//                .withName("Bitstream2.png")
-//                .withMimeType("image/png")
-//                .build();
-//        }
-//
-//        context.restoreAuthSystemState();
-//
-//        // Default canvas size and label.
-//        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
-//                   .andExpect(status().isOk())
-//                   .andExpect(jsonPath("$.metadata[0].label", is("Title")))
-//                   .andExpect(jsonPath("$.metadata[0].value", is("Public item 1")));
-//
-//
-//        String token = getAuthToken(admin.getEmail(), password);
-//
-//        // The Item update should also remove the manifest from the cache.
-//        getClient(token).perform(patch("/api/core/items/" + publicItem1.getID())
-//            .content(patchRequestBody)
-//            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-//            .andExpect(status().isOk());
-//
-////        context.turnOffAuthorisationSystem();
-////        List<MetadataValue> metadataList = publicItem1.getMetadata();
-////        metadataList.get(0).setValue("Public item 1 (revised)");
-////        publicItem1.setMetadata(metadataList);
-////        itemService.update(context, publicItem1);
-////        context.commit();
-////        context.restoreAuthSystemState();
-//
-//        // Verify that the updated title is in the manifest.
-//        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
-//                   .andExpect(status().isOk())
-//                   .andExpect(jsonPath("$.metadata[0].value", is("Public item 1 (revised)")));
-//
-//
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .enableIIIF()
+                                      .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream1 = null;
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Bitstream1.jpg")
+                .withMimeType("image/jpeg")
+                .build();
+        }
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Bitstream2.png")
+                .withMimeType("image/png")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        // Default canvas size and label.
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata[0].label", is("Title")))
+                   .andExpect(jsonPath("$.metadata[0].value", is("Public item 1")));
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // The Item update should also remove the manifest from the cache.
+        getClient(token).perform(patch("/api/core/items/" + publicItem1.getID())
+            .content(patchRequestBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk());
+
+        // Verify that the updated title is in the manifest.
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata[0].value", is("Public item 1 (revised)")));
     }
 
 }

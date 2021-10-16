@@ -28,28 +28,18 @@ public class IIIFCacheEventConsumer implements Consumer {
 
     private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(IIIFCacheEventConsumer.class);
 
-    // Gets the service bean.
-    private CacheEvictService cacheEvictService;
-
     // When true all entries will be cleared from cache.
     private boolean clearAll = false;
 
     // Collects modified items for individual removal from cache.
     private final Set<DSpaceObject> toEvictFromManifestCache = new HashSet<>();
 
-
     @Override
     public void initialize() throws Exception {
-        cacheEvictService = CacheEvictBeanLocator.getCacheEvictService();
     }
 
     @Override
     public void consume(Context ctx, Event event) throws Exception {
-        // The service is null when the web application context is not available (i.e. during command line operations).
-        // Return to avoid event processing and NPE.
-        if (cacheEvictService == null) {
-            return;
-        }
         int st = event.getSubjectType();
         if (!(st == Constants.BUNDLE || st == Constants.ITEM || st == Constants.BITSTREAM)) {
             return;
@@ -127,6 +117,8 @@ public class IIIFCacheEventConsumer implements Consumer {
 
     @Override
     public void end(Context ctx) throws Exception {
+        // Gets the service bean.
+        CacheEvictService cacheEvictService = CacheEvictBeanLocator.getCacheEvictService();
         if (cacheEvictService != null) {
             if (clearAll) {
                 cacheEvictService.evictAllCacheValues();
