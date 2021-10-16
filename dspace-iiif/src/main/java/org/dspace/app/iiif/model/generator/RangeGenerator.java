@@ -24,6 +24,9 @@ import org.dspace.app.iiif.service.RangeService;
  *
  * This is used to populate the "structures" element of the Manifest. The structure is derived from the iiif.toc
  * metadata and the ordered sequence of bitstreams (canvases)
+ *
+ * @author Michael Spalti  mspalti@willamette.edu
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class RangeGenerator implements IIIFResource {
 

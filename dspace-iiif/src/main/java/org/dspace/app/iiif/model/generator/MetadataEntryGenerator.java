@@ -13,6 +13,9 @@ import org.dspace.core.I18nUtil;
 
 /**
  * Wraps the domain model metadata property.
+ *
+ * @author Michael Spalti  mspalti@willamette.edu
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class MetadataEntryGenerator implements IIIFValue {
 

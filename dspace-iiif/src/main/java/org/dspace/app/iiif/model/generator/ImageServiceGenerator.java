@@ -13,6 +13,9 @@ import de.digitalcollections.iiif.model.image.ImageService;
 /**
  * This service generator wraps the image service property model. An image service
  * annotation is added to each canvas annotation.
+ *
+ * @author Michael Spalti  mspalti@willamette.edu
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class ImageServiceGenerator implements IIIFService {
 

@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Base class for services.
+ *
+ * @author Michael Spalti  mspalti@willamette.edu
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public abstract class AbstractResourceService {
     /**

@@ -27,6 +27,9 @@ import org.springframework.stereotype.Service;
 
 /**
  * IIIF Service facade to support IIIF Presentation and Search API requests.
+ *
+ * @author Michael Spalti  mspalti@willamette.edu
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Service
 public class IIIFServiceFacade {

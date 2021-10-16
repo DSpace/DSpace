@@ -43,6 +43,9 @@ import org.springframework.web.context.annotation.RequestScope;
  * prototype (that will turn in a request scope when injected in a request scope
  * bean). The generators for top-level domain objects need to be request scoped as they act as a builder
  * storing the object state during each incremental building step until the final object is returned (IIIF Resource).
+ *
+ * @author Michael Spalti  mspalti@willamette.edu
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @RequestScope
 @Component

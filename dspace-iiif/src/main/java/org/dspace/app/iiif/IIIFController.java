@@ -23,6 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Controller for IIIF Presentation and Search API.
+ *
+ * @author Michael Spalti  mspalti@willamette.edu
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @RestController
 @RequestMapping("/iiif")
