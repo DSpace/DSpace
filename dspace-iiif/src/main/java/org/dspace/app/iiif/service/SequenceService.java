@@ -51,14 +51,12 @@ public class SequenceService extends AbstractResourceService {
     }
 
     /**
-     * Returns a sequence generator that has been configured with canvases and an optional
-     * rendering link. (@abollini will update.)
+     * Returns a sequence generator that has been configured with canvases. (@abollini will update.)
      *
      * @param item the DSpace item
-     * @param context the DSpace context
      * @return a sequence generator
      */
-    public CanvasItemsGenerator getSequence(Item item, Context context) {
+    public CanvasItemsGenerator getSequence(Item item) {
 
         sequenceGenerator.setIdentifier(IIIF_ENDPOINT + item.getID() + "/sequence/s0");
         return sequenceGenerator;
