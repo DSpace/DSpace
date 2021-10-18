@@ -25,4 +25,4 @@ WHERE dspace_object_id IN (SELECT template_item_id
                        IN (SELECT metadata_field_id
                            FROM metadatafieldregistry mfr LEFT JOIN metadataschemaregistry msr
                                                           ON mfr.metadata_schema_id = msr.metadata_schema_id
-                           WHERE msr.short_id = 'dspace' AND mfr.element = 'entity' AND mfr.qualifier = 'type')
+                           WHERE msr.short_id = 'dspace' AND mfr.element = 'entity' AND mfr.qualifier = 'type');
