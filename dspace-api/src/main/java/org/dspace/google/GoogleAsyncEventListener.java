@@ -20,7 +20,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.servlet.http.HttpServletRequest;
 
 import com.google.common.base.Throwables;
 import org.apache.commons.collections.Buffer;
@@ -36,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.model.Event;
 import org.dspace.usage.AbstractUsageEventListener;
@@ -52,6 +52,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class GoogleAsyncEventListener extends AbstractUsageEventListener {
 
     private static final int MAX_TIME_SINCE_EVENT = 14400000;
+    // 20 is the event max set by the GA API
+    private static final int GA_MAX_EVENTS = 20;
     private static final String ANALYTICS_BATCH_ENDPOINT = "https://www.google-analytics.com/batch";
     private static Logger log = Logger.getLogger(GoogleAsyncEventListener.class);
     private static String analyticsKey;
@@ -63,6 +65,9 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
 
     @Autowired(required = true)
     ConfigurationService configurationService;
+
+    @Autowired(required = true)
+    ClientInfoService clientInfoService;
 
     @PostConstruct
     public void init() {
@@ -86,17 +91,26 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
                     if (ue.getAction() == UsageEvent.Action.VIEW &&
                             ue.getObject().getType() == Constants.BITSTREAM) {
 
-                        // Client Id, should uniquely identify the user or device. If we have a session id for the user
-                        // then lets use it, else generate a UUID.
+                        // Client ID, should uniquely identify the user or device. If we have an X-CORRELATION-ID
+                        // header or a session ID for the user, then lets use it, othwerwise generate a UUID.
                         String cid;
-                        if (ue.getRequest().getSession(false) != null) {
+                        if (ue.getRequest().getHeader("X-CORRELATION-ID") != null) {
+                            cid = ue.getRequest().getHeader("X-CORRELATION-ID");
+                        } else if (ue.getRequest().getSession(false) != null) {
                             cid = ue.getRequest().getSession().getId();
                         } else {
                             cid = UUID.randomUUID().toString();
                         }
-                        buffer.add(new GoogleAnalyticsEvent(cid, getIPAddress(ue.getRequest()), ue.getRequest()
-                                .getHeader("USER-AGENT"), ue.getRequest().getHeader("referer"), ue.getRequest()
-                                .getRequestURI() + "?" + ue.getRequest().getQueryString(),
+                        // Prefer the X-REFERRER header, otherwise falback to the referrer header
+                        String referrer;
+                        if (ue.getRequest().getHeader("X-REFERRER") != null) {
+                            referrer = ue.getRequest().getHeader("X-REFERRER");
+                        } else {
+                            referrer = ue.getRequest().getHeader("referer");
+                        }
+                        buffer.add(new GoogleAnalyticsEvent(cid, clientInfoService.getClientIp(ue.getRequest()),
+                                ue.getRequest().getHeader("USER-AGENT"), referrer,
+                                ue.getRequest() .getRequestURI() + "?" + ue.getRequest().getQueryString(),
                                 getObjectName(ue), System.currentTimeMillis()));
                     }
                 } catch (Exception e) {
@@ -140,25 +154,6 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
 
     }
 
-    private String getIPAddress(HttpServletRequest request) {
-        String clientIP = request.getRemoteAddr();
-        if (configurationService.getBooleanProperty("useProxies", false) &&
-                request.getHeader("X-Forwarded-For") != null) {
-            /* This header is a comma delimited list */
-            for (String xfip : request.getHeader("X-Forwarded-For").split(",")) {
-                /* proxy itself will sometime populate this header with the same value in
-                    remote address. ordering in spec is vague, we'll just take the last
-                    not equal to the proxy
-                */
-                if (!request.getHeader("X-Forwarded-For").contains(clientIP)) {
-                    clientIP = xfip.trim();
-                }
-            }
-        }
-
-        return clientIP;
-    }
-
     @PreDestroy
     public void destroy() throws InterruptedException {
         destroyed = true;
@@ -177,7 +172,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
                     StringBuilder request = null;
                     List<GoogleAnalyticsEvent> events = new ArrayList<>();
                     Iterator iterator = buffer.iterator();
-                    for (int x = 0; x < 20 && iterator.hasNext(); x++) {
+                    for (int x = 0; x < GA_MAX_EVENTS && iterator.hasNext(); x++) {
                         GoogleAnalyticsEvent event = (GoogleAnalyticsEvent) iterator.next();
                         events.add(event);
                         if ((System.currentTimeMillis() - event.getTime()) < MAX_TIME_SINCE_EVENT) {
