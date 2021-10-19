@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+	<header>
+		<query>(oaftype exact project) and (projectcode_nt exact "110062") and (fundershortname exact "FCT")</query>
+		<locale>en_US</locale>
+		<size>10</size>
+		<page>1</page>
+		<total>1</total>
+		<fields></fields>
+	</header>
+	<results>
+		<result
+			xmlns:dri="http://www.driver-repository.eu/namespace/dri">
+			<header
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+				<dri:objIdentifier>fct_________::59523e9f4736c2cab70a470f088b53dd</dri:objIdentifier>
+				<dri:dateOfCollection>2021-08-06</dri:dateOfCollection>
+				<dri:dateOfTransformation>2021-08-06</dri:dateOfTransformation>
+			</header>
+			<metadata>
+				<oaf:entity
+					xmlns:oaf="http://namespace.openaire.eu/oaf"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+					<oaf:project>
+						<collectedfrom name="FCT - Fundação para a Ciência e a Tecnologia"
+                                 id="openaire____::3421f5eb10975742a75d3f42e1a9e848"/>
+						<originalId>fct_________::110062</originalId>
+						<websiteurl>http://www.fct.pt/apoios/projectos/consulta/vglobal_projecto.phtml.en?idProjecto=110062&amp;idElemConcurso=3734</websiteurl>
+						<code>110062</code>
+						<acronym>PTDC/AGR-ALI/110062/2009</acronym>
+						<title>Portuguese Wild Mushrooms: Chemical characterization and functional study of antiproliferative and proapoptotic properties in cancer cell lines</title>
+						<startdate>2010-12-24</startdate>
+						<enddate>2013-12-23</enddate>
+						<callidentifier>PTDC/2009</callidentifier>
+						<keywords>Agricultural and Forestry Sciences - Food Science and Technology</keywords>
+						<duration>0</duration>
+						<ecarticle29_3>false</ecarticle29_3>
+						<oamandatepublications>false</oamandatepublications>
+						<ecsc39>false</ecsc39>
+						<totalcost>0.0</totalcost>
+						<fundedamount>0.0</fundedamount>
+						<fundingtree>
+							<funder>
+								<id>fct_________::FCT</id>
+								<shortname>FCT</shortname>
+								<name>Fundao para a Cincia e a Tecnologia, I.P.</name>
+								<jurisdiction>PT</jurisdiction>
+							</funder>
+							<funding_level_0>
+								<id>fct_________::FCT::5876-PPCDTI</id>
+								<description>5876-PPCDTI</description>
+								<name>5876-PPCDTI</name>
+								<parent/>
+								<class>fct:program</class>
+							</funding_level_0>
+						</fundingtree>
+						<datainfo>
+							<inferred>false</inferred>
+							<deletedbyinference>false</deletedbyinference>
+							<trust>0.900</trust>
+							<inferenceprovenance>null</inferenceprovenance>
+							<provenanceaction classid="sysimport:crosswalk:entityregistry" classname="Harvested"
+                                       schemeid="dnet:provenanceActions"
+                                       schemename="dnet:provenanceActions"/>
+						</datainfo>
+						<rels/>
+						<children/>
+					</oaf:project>
+				</oaf:entity>
+			</metadata>
+		</result>
+	</results>
+	<browseResults></browseResults>
+</response>

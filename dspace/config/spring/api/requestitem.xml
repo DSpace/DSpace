@@ -8,19 +8,21 @@
            http://www.springframework.org/schema/context/spring-context-2.5.xsd"
     default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
 
-    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+    <context:annotation-config /> <!-- allows us to use Spring annotations in beans -->
 
-	<bean class="org.dspace.app.requestitem.RequestItemMetadataStrategy"
-		id="org.dspace.app.requestitem.RequestItemAuthorExtractor">
-	<!-- 
-		Uncomment these properties if you want lookup in metadata the email and the name of the author to contact for request copy.
-		If you don't configure that or if the requested item doesn't have these metadata the submitter data are used as fail over
-		 
-		<property name="emailMetadata" value="schema.element.qualifier" />
-		<property name="fullNameMetadata" value="schema.element.qualifier" />
-		
-	-->	
-	</bean>
+    <bean class="org.dspace.app.requestitem.RequestItemMetadataStrategy"
+          id="org.dspace.app.requestitem.RequestItemAuthorExtractor"
+          autowire-candidate='true'>
+    <!--
+        Uncomment these properties if you want lookup in metadata the email and
+        the name of the author to contact for request copy.
+        If you don't configure that or if the requested item doesn't have these
+        metadata, the submitter data are used as fail over.
+
+        <property name="emailMetadata" value="schema.element.qualifier" />
+        <property name="fullNameMetadata" value="schema.element.qualifier" />
+    -->
+    </bean>
 
     <!-- HelpDesk to instead get RequestItem emails-->
     <!--<bean class="org.dspace.app.requestitem.RequestItemHelpdeskStrategy"
