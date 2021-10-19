@@ -3001,14 +3001,14 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Community community = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
             .build();
-        Collection collection = CollectionBuilder.createCollection(context, community).withName("Collection").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Collection")
+                                                 .withEntityType(person.getLabel()).build();
         Item item = ItemBuilder.createItem(context, collection)
             .withTitle("Author1")
             .withIssueDate("2017-10-17")
             .withAuthor("Smith, Donald")
             .withPersonIdentifierLastName("Smith")
             .withPersonIdentifierFirstName("Donald")
-            .withEntityType("Person")
             .build();
         context.restoreAuthSystemState();
 
@@ -3037,12 +3037,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Community community = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
             .build();
-        Collection collection = CollectionBuilder.createCollection(context, community).withName("Collection").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Collection")
+                                                 .withEntityType(publication.getLabel()).build();
         Item item = ItemBuilder.createItem(context, collection)
             .withTitle("Publication1")
             .withAuthor("Testy, TEst")
             .withIssueDate("2015-01-01")
-            .withEntityType("Publication")
             .build();
         context.restoreAuthSystemState();
 
@@ -3053,7 +3053,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.entityType", is("Publication")));
 
         String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(ePersonToken).perform(get("/api/core/items/" + item.getID()))
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
             .andExpect(jsonPath("$.entityType", is("Publication")));
@@ -3676,8 +3676,10 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
-        Collection col1 = CollectionBuilder
-            .createCollection(context, parentCommunity).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .withEntityType("Person").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 2")
+                                           .withEntityType("Publication").build();
 
         author1 = ItemBuilder.createItem(context, col1)
                              .withTitle("Author1")
@@ -3685,21 +3687,18 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .withAuthor("Smith, Donald")
                              .withPersonIdentifierLastName("Smith")
                              .withPersonIdentifierFirstName("Donald")
-                             .withEntityType("Person")
                              .build();
 
         author2 = ItemBuilder.createItem(context, col1)
                              .withTitle("Author2")
                              .withIssueDate("2016-02-13")
                              .withAuthor("Smith, Maria")
-                             .withEntityType("Person")
                              .build();
 
-        publication1 = ItemBuilder.createItem(context, col1)
+        publication1 = ItemBuilder.createItem(context, col2)
                                   .withTitle("Publication1")
                                   .withAuthor("Testy, TEst")
                                   .withIssueDate("2015-01-01")
-                                  .withEntityType("Publication")
                                   .build();
 
         EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
@@ -3740,8 +3739,11 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
-        Collection col1 = CollectionBuilder
-            .createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .withEntityType("Person").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 2")
+                                           .withEntityType("Publication").build();
 
         author1 = ItemBuilder.createItem(context, col1)
                              .withTitle("Author1")
@@ -3749,21 +3751,18 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .withAuthor("Smith, Donald")
                              .withPersonIdentifierLastName("Smith")
                              .withPersonIdentifierFirstName("Donald")
-                             .withEntityType("Person")
                              .build();
 
         author2 = ItemBuilder.createItem(context, col1)
                              .withTitle("Author2")
                              .withIssueDate("2016-02-13")
                              .withAuthor("Smith, Maria")
-                             .withEntityType("Person")
                              .build();
 
-        publication1 = ItemBuilder.createItem(context, col1)
+        publication1 = ItemBuilder.createItem(context, col2)
                                   .withTitle("Publication1")
                                   .withAuthor("Testy, TEst")
                                   .withIssueDate("2015-01-01")
-                                  .withEntityType("Publication")
                                   .build();
 
         EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
