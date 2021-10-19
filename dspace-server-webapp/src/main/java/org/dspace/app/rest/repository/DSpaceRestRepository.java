@@ -40,6 +40,8 @@ import org.springframework.web.multipart.MultipartFile;
  * normal Spring Data Repository methods signature.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @param <T> a REST model class (e.g. {@link ItemRest}).
+ * @param <ID> type used to identify an instance of the class (String, UUID, etc).
  */
 public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID extends Serializable>
     extends AbstractDSpaceRestRepository
