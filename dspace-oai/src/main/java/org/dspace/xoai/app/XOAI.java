@@ -40,6 +40,7 @@ import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.StringUtils;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -55,6 +56,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.SolrUtils;
@@ -379,9 +381,8 @@ public class XOAI {
      * @return date
      * @throws SQLException
      */
-    private Date getMostRecentModificationDate(Item item) throws SQLException {
+    private Date getMostRecentModificationDate(Item item, List<ResourcePolicy> policies) throws SQLException {
         List<Date> dates = new LinkedList<>();
-        List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
         for (ResourcePolicy policy : policies) {
             if ((policy.getGroup() != null) && (policy.getGroup().getName().equals("Anonymous"))) {
                 if (policy.getStartDate() != null) {
@@ -413,7 +414,9 @@ public class XOAI {
         String handle = item.getHandle();
         doc.addField("item.handle", handle);
 
-        boolean isEmbargoed = !this.isPublic(item);
+        List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
+
+        boolean isEmbargoed = !this.isPublic(policies);
         boolean isCurrentlyVisible = this.checkIfVisibleInOAI(item);
         boolean isIndexed = this.checkIfIndexed(item);
 
@@ -437,7 +440,7 @@ public class XOAI {
         // if the visibility of the item will change in the future due to an
         // embargo, mark it as such.
 
-        doc.addField("item.willChangeStatus", willChangeStatus(item));
+        doc.addField("item.willChangeStatus", willChangeStatus(policies));
 
         /*
          * Mark an item as deleted not only if it is withdrawn, but also if it
@@ -460,7 +463,7 @@ public class XOAI {
          * most recent of those which have already passed.
          */
         doc.addField("item.lastmodified", SolrUtils.getDateFormatter()
-                .format(this.getMostRecentModificationDate(item)));
+                .format(this.getMostRecentModificationDate(item, policies)));
 
         if (item.getSubmitter() != null) {
             doc.addField("item.submitter", item.getSubmitter().getEmail());
@@ -519,8 +522,7 @@ public class XOAI {
         return doc;
     }
 
-    private boolean willChangeStatus(Item item) throws SQLException {
-        List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
+    private boolean willChangeStatus(List<ResourcePolicy> policies) throws SQLException {
         for (ResourcePolicy policy : policies) {
             if ((policy.getGroup() != null) && (policy.getGroup().getName().equals("Anonymous"))) {
                 if (policy.getStartDate() != null && policy.getStartDate().after(new Date())) {
@@ -535,15 +537,17 @@ public class XOAI {
         return false;
     }
 
-    private boolean isPublic(Item item) {
-        boolean pub = false;
-        try {
-            // Check if READ access allowed on this Item
-            pub = authorizeService.authorizeActionBoolean(context, item, Constants.READ);
-        } catch (SQLException ex) {
-            log.error(ex.getMessage());
+    private boolean isPublic(List<ResourcePolicy> policies) {
+        // Check if READ access allowed on this Item
+        for (ResourcePolicy policy : policies) {
+            Date now = new Date();
+            if ((policy.getGroup() != null && StringUtils.equals(policy.getGroup().getName(), Group.ANONYMOUS)) &&
+                    (policy.getStartDate() == null || policy.getStartDate().before(now)) &&
+                    (policy.getEndDate() == null || policy.getEndDate().after(now))) {
+                return true;
+            }
         }
-        return pub;
+        return false;
     }
 
 
