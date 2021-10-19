@@ -11,7 +11,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -89,6 +92,7 @@ public abstract class AbstractBuilder<T, S> {
     static RelationshipTypeService relationshipTypeService;
     static EntityTypeService entityTypeService;
     static ProcessService processService;
+    static RequestItemService requestItemService;
 
     protected Context context;
 
@@ -101,7 +105,7 @@ public abstract class AbstractBuilder<T, S> {
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractDSpaceObjectBuilder.class);
+    private static final Logger log = LogManager.getLogger();
 
     protected AbstractBuilder(Context context) {
         this.context = context;
@@ -136,6 +140,7 @@ public abstract class AbstractBuilder<T, S> {
         relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
         entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
         processService = ScriptServiceFactory.getInstance().getProcessService();
+        requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
 
         // Temporarily disabled
         claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
@@ -172,7 +177,7 @@ public abstract class AbstractBuilder<T, S> {
         relationshipTypeService = null;
         entityTypeService = null;
         processService = null;
-
+        requestItemService = null;
     }
 
     public static void cleanupObjects() throws Exception {
