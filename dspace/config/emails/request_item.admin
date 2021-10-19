@@ -1,3 +1,13 @@
+## E-mail sent when someone approving an item request, requests that the Item
+## or Bitstream be made public.
+##
+## Parameters: {0} the Handle of the requested bitstream, or "all"
+##             {1} the Handle of the item
+##             {2} the unique token which identifies the item request
+##             {3} the name of the approver
+##             {4} the approver's email address
+## See org.dspace.core.Email for information on the format of this file.
+##
 #set($subject = 'Request for Open Access')
 
 ${params[3]}, with address ${params[4]},

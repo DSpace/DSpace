@@ -1065,7 +1065,7 @@
                         <dc-element>relation</dc-element>
                         <input-type>onebox</input-type>
                     </linked-metadata-field>
-                    <externalsources></externalsources>
+                    <externalsources>openAIREFunding</externalsources>
                     <required></required>
                 </relation-field>
             </row>

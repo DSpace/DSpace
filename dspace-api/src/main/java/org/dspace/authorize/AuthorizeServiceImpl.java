@@ -250,13 +250,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         if (e != null) {
             userToCheck = e;
 
-            // perform isAdmin check to see
-            // if user is an Admin on this object
-            DSpaceObject adminObject = useInheritance ? serviceFactory.getDSpaceObjectService(o)
-                                                                      .getAdminObject(c, o, action) : null;
-
-            if (isAdmin(c, e, adminObject)) {
-                c.cacheAuthorizedAction(o, action, e, true, null);
+            // perform immediately isAdmin check as this is cheap
+            if (isAdmin(c, e)) {
                 return true;
             }
         }
@@ -280,12 +275,14 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             ignoreCustomPolicies = !isAnyItemInstalled(c, Arrays.asList(((Bundle) o)));
         }
         if (o instanceof Item) {
-            if (workspaceItemService.findByItem(c, (Item) o) != null ||
-                workflowItemService.findByItem(c, (Item) o) != null) {
+            // the isArchived check is fast and would exclude the possibility that the item
+            // is a workspace or workflow without further queries
+            if (!((Item) o).isArchived() &&
+                    (workspaceItemService.findByItem(c, (Item) o) != null ||
+                    workflowItemService.findByItem(c, (Item) o) != null)) {
                 ignoreCustomPolicies = true;
             }
         }
-
 
         for (ResourcePolicy rp : getPoliciesActionFilter(c, o, action)) {
 
@@ -322,6 +319,16 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             }
         }
 
+        if (e != null) {
+            // if user is an Admin on this object
+            DSpaceObject adminObject = useInheritance ? serviceFactory.getDSpaceObjectService(o)
+                                                                      .getAdminObject(c, o, action) : null;
+
+            if (isAdmin(c, e, adminObject)) {
+                c.cacheAuthorizedAction(o, action, e, true, null);
+                return true;
+            }
+        }
         // default authorization is denial
         c.cacheAuthorizedAction(o, action, e, false, null);
         return false;
