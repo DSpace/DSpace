@@ -10,10 +10,17 @@
 		<property name="clientId" value="${openaire.token.clientId}"/>
 		<property name="clientSecret" value="${openaire.token.clientSecret}"/>
     </bean>
-    <bean class="org.dspace.external.provider.impl.OpenAIREFundingDataProvider" init-method="init">
-         <property name="sourceIdentifier" value="openAIREFunding"/>
-		 <property name="connector" ref="openAIRERestConnector"/>
-    </bean>
+	<bean
+		class="org.dspace.external.provider.impl.OpenAIREFundingDataProvider"
+		init-method="init">
+		<property name="sourceIdentifier" value="openAIREFunding" />
+		<property name="connector" ref="openAIRERestConnector" />
+		<property name="supportedEntityTypes">
+			<list>
+				<value>Project</value>
+			</list>
+		</property>
+	</bean>
 	
 </beans>
 
