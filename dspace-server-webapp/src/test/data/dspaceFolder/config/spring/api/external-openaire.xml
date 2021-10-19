@@ -22,6 +22,11 @@
 		init-method="init">
 		<property name="sourceIdentifier" value="openAIREFunding" />
 		<property name="connector" ref="openAIRERestConnector" />
+		<property name="supportedEntityTypes">
+			<list>
+				<value>Project</value>
+			</list>
+		</property>
 	</bean>
 
 </beans>
