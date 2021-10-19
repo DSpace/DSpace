@@ -72,13 +72,13 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                                .withEntityType("Publication").build();
 
         // Create a new Publication (which is an Article)
         article = ItemBuilder.createItem(context, col1)
                 .withTitle("Article")
                 .withIssueDate("2017-10-17")
-                .withEntityType("Publication")
                 .build();
 
         tempFile = File.createTempFile("packagerExportTest", ".zip");
