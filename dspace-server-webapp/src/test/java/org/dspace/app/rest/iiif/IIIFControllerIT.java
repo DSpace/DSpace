@@ -34,7 +34,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,7 +43,6 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     ItemService itemService;
-
 
     @Test
     public void disabledTest() throws Exception {
