@@ -176,16 +176,29 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public Item create(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
+        return create(context, workspaceItem, null);
+    }
+
+    @Override
+    public Item create(Context context, WorkspaceItem workspaceItem,
+                       UUID uuid) throws SQLException, AuthorizeException {
+        Collection collection = workspaceItem.getCollection();
+        authorizeService.authorizeAction(context, collection, Constants.ADD);
         if (workspaceItem.getItem() != null) {
             throw new IllegalArgumentException(
-                "Attempting to create an item for a workspace item that already contains an item");
+                    "Attempting to create an item for a workspace item that already contains an item");
         }
-        Item item = createItem(context);
+        Item item = null;
+        if (uuid != null) {
+            item = createItem(context, uuid);
+        } else {
+            item = createItem(context);
+        }
         workspaceItem.setItem(item);
 
 
         log.info(LogHelper.getHeader(context, "create_item", "item_id="
-            + item.getID()));
+                + item.getID()));
 
         return item;
     }
@@ -416,6 +429,30 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
 
         return bitstreamList;
+    }
+
+    protected Item createItem(Context context, UUID uuid) throws SQLException, AuthorizeException {
+        Item item;
+        if (uuid != null) {
+            item = itemDAO.create(context, new Item(uuid));
+        } else {
+            item = itemDAO.create(context, new Item());
+        }
+        // set discoverable to true (default)
+        item.setDiscoverable(true);
+
+        // Call update to give the item a last modified date. OK this isn't
+        // amazingly efficient but creates don't happen that often.
+        context.turnOffAuthorisationSystem();
+        update(context, item);
+        context.restoreAuthSystemState();
+
+        context.addEvent(new Event(Event.CREATE, Constants.ITEM, item.getID(),
+                null, getIdentifiers(context, item)));
+
+        log.info(LogHelper.getHeader(context, "create_item", "item_id=" + item.getID()));
+
+        return item;
     }
 
     protected Item createItem(Context context) throws SQLException, AuthorizeException {

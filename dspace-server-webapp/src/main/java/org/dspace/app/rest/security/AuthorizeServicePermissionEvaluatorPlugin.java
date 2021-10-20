@@ -76,7 +76,7 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
                     return false;
                 }
 
-                ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
+                ePerson = context.getCurrentUser();
 
                 if (dSpaceObjectService != null && dsoId != null) {
                     DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
