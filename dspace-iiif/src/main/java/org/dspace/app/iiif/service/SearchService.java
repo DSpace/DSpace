@@ -52,7 +52,7 @@ public class SearchService extends AbstractResourceService {
             for (SearchAnnotationService service : annotationService) {
                 if (service.useSearchPlugin(searchPlugin)) {
                     service.initializeQuerySettings(IIIF_ENDPOINT, getManifestId(uuid));
-                    return service.getSolrSearchResponse(uuid, query);
+                    return service.getSearchResponse(uuid, query);
                 }
             }
         }
