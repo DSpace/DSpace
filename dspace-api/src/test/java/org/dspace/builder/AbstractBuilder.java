@@ -47,6 +47,7 @@ import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
@@ -93,6 +94,7 @@ public abstract class AbstractBuilder<T, S> {
     static EntityTypeService entityTypeService;
     static ProcessService processService;
     static RequestItemService requestItemService;
+    static VersioningService versioningService;
 
     protected Context context;
 
@@ -141,6 +143,8 @@ public abstract class AbstractBuilder<T, S> {
         entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
         processService = ScriptServiceFactory.getInstance().getProcessService();
         requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
+        versioningService = DSpaceServicesFactory.getInstance().getServiceManager()
+                                 .getServiceByName(VersioningService.class.getName(), VersioningService.class);
 
         // Temporarily disabled
         claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
@@ -178,6 +182,8 @@ public abstract class AbstractBuilder<T, S> {
         entityTypeService = null;
         processService = null;
         requestItemService = null;
+        versioningService = null;
+
     }
 
     public static void cleanupObjects() throws Exception {
