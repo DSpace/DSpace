@@ -148,7 +148,7 @@ public class ExtractorOfAInprogressSubmissionInformations {
     }
 
     private Context getContext(HttpServletRequest request) {
-        ServletRequest currentRequest = requestService.getCurrentRequest().getServletRequest();
+        HttpServletRequest currentRequest = requestService.getCurrentRequest().getHttpServletRequest();
         return Objects.nonNull(request) ? ContextUtil.obtainContext(request)
                                         : ContextUtil.obtainContext(currentRequest);
     }
