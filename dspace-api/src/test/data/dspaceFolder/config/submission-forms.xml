@@ -2034,6 +2034,28 @@ You can leave out the day and/or month if they aren't applicable.</hint>
        <stored-value>other</stored-value>
      </pair>
    </value-pairs>
+    <value-pairs value-pairs-name="common_iso_countries" dc-term="common_iso_countries">
+      <pair>
+        <displayed-value>Italia</displayed-value>
+        <stored-value>IT</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Albania</displayed-value>
+        <stored-value>AL</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Algeria</displayed-value>
+        <stored-value>DZ</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Australia</displayed-value>
+        <stored-value>AU</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Botswana</displayed-value>
+        <stored-value>BW</stored-value>
+      </pair>
+   </value-pairs>
    <!-- patent value pairs -->
    <value-pairs value-pairs-name="patent_types" dc-term="patent_types">
       <pair>

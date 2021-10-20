@@ -400,6 +400,34 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
+    public void findByLabelAndValueTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/submission/vocabularies/common_iso_countries/entries")
+                        .param("size", "10")
+                        .param("filter", "al")
+                        .param("metadata", "dc.language.iso")
+                        .param("collection", collection.getID().toString()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
+                                VocabularyMatcher.matchVocabularyEntry("Italia", "IT", "vocabularyEntry"),
+                                VocabularyMatcher.matchVocabularyEntry("Albania", "AL", "vocabularyEntry"),
+                                VocabularyMatcher.matchVocabularyEntry("Algeria", "DZ", "vocabularyEntry"),
+                                VocabularyMatcher.matchVocabularyEntry("Australia", "AU", "vocabularyEntry")
+                        )))
+                        .andExpect(jsonPath("$._embedded.entries", Matchers.not(Matchers.containsInAnyOrder(
+                                VocabularyMatcher.matchVocabularyEntry("Botswana", "BW", "vocabularyEntry")
+                        ))))
+                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)))
+                        .andExpect(jsonPath("$.page.totalPages", Matchers.is(1)))
+                        .andExpect(jsonPath("$.page.size", Matchers.is(10)));
+    }
+
+    @Test
     public void findByMetadataAndCollectionUnprocessableEntityTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
