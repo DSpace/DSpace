@@ -67,7 +67,7 @@ public class VersionHistoryConverter implements DSpaceConverter<VersionHistory, 
     private Context getContext() {
         Request currentRequest = requestService.getCurrentRequest();
         if (currentRequest != null) {
-            return ContextUtil.obtainContext(currentRequest.getServletRequest());
+            return ContextUtil.obtainContext(currentRequest.getHttpServletRequest());
         }
         return null;
     }
