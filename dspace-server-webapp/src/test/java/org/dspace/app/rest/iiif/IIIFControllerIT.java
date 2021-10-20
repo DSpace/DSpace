@@ -8,6 +8,7 @@
 package org.dspace.app.rest.iiif;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -33,6 +34,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,6 +44,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     ItemService itemService;
+
 
     @Test
     public void disabledTest() throws Exception {
@@ -1028,9 +1031,9 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findOneWithCacheEvictionAfterItemUpdate() throws Exception {
+    public void findOneWithCacheEvictionAfterBitstreamUpdate() throws Exception {
         String patchRequestBody =
-            "[{\"op\": \"replace\",\"path\": \"/metadata/dc.title/0/value\",\"value\": \"Public item 1 (revised)\"}]";
+            "[{\"op\": \"replace\",\"path\": \"/metadata/iiif.label/0/value\",\"value\": \"Test label\"}]";
 
         context.turnOffAuthorisationSystem();
 
@@ -1061,9 +1064,131 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream2 = BitstreamBuilder
                 .createBitstream(context, publicItem1, is)
+                .withIIIFLabel("Original label")
                 .withName("Bitstream2.png")
                 .withMimeType("image/png")
                 .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        // Default canvas size and label.
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata[0].label", is("Title")))
+                   .andExpect(jsonPath("$.metadata[0].value", is("Public item 1")))
+                   .andExpect(jsonPath("$.sequences[0].canvases[1].label", is("Original label")));
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // The Bitstream update should also remove the manifest from the cache.
+        getClient(token).perform(patch("/api/core/bitstreams/" + bitstream2.getID())
+            .content(patchRequestBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk());
+
+        // Verify that the updated canvas label is in the manifest.
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.sequences[0].canvases[1].label", is("Test label")));
+    }
+
+    @Test
+    public void findOneWithCacheEvictionAfterBitstreamRemoval() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .enableIIIF()
+                                      .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream1 = null;
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Bitstream1.jpg")
+                    .withMimeType("image/jpeg")
+                    .build();
+        }
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withIIIFLabel("Original label")
+                    .withName("Bitstream2.png")
+                    .withMimeType("image/png")
+                    .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        // Default canvas size and label.
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata[0].label", is("Title")))
+                   .andExpect(jsonPath("$.metadata[0].value", is("Public item 1")))
+                   .andExpect(jsonPath("$.sequences[0].canvases[1].label", is("Original label")));
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // The Bitstream deletion should also remove the manifest from the cache.
+        getClient(token).perform(delete("/api/core/bitstreams/" + bitstream2.getID()))
+                        .andExpect(status().isNoContent());
+
+        // Verify that the updated manifest has only a single canvas.
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.sequences[0].canvases.length()", Matchers.equalTo(1)));
+    }
+
+    @Test
+    public void findOneWithCacheEvictionAfterItemUpdate() throws Exception {
+        String patchRequestBody =
+                "[{\"op\": \"replace\",\"path\": \"/metadata/dc.title/0/value\",\"value\": \"Public item (revised)\"}]";
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .enableIIIF()
+                                      .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream1 = null;
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Bitstream1.jpg")
+                    .withMimeType("image/jpeg")
+                    .build();
+        }
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Bitstream2.png")
+                    .withMimeType("image/png")
+                    .build();
         }
 
         context.restoreAuthSystemState();
@@ -1078,14 +1203,14 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 
         // The Item update should also remove the manifest from the cache.
         getClient(token).perform(patch("/api/core/items/" + publicItem1.getID())
-            .content(patchRequestBody)
-            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-            .andExpect(status().isOk());
+                                .content(patchRequestBody)
+                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk());
 
         // Verify that the updated title is in the manifest.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.metadata[0].value", is("Public item 1 (revised)")));
+                   .andExpect(jsonPath("$.metadata[0].value", is("Public item (revised)")));
     }
 
 }

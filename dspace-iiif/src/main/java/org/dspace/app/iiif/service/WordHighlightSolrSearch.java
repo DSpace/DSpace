@@ -78,25 +78,14 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
         return className.contentEquals(WordHighlightSolrSearch.class.getCanonicalName());
     }
 
-    /**
-     * The query requires these values before it can execute
-     * @param endpoint the search service endpoint
-     * @param manifestId the idea of the manifest to search within
-     */
     @Override
     public void initializeQuerySettings(String endpoint, String manifestId) {
         this.endpoint = endpoint;
         this.manifestId = manifestId;
     }
 
-    /**
-     * Executes the Search API solr query.
-     * @param query encoded query terms
-     *
-     * @return json query response
-     */
     @Override
-    public String getSolrSearchResponse(UUID uuid, String query) {
+    public String getSearchResponse(UUID uuid, String query) {
         String json = "";
         ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         String solrService = configurationService.getProperty("iiif.search.url");

@@ -14,6 +14,7 @@ import org.dspace.services.RequestService;
 import org.dspace.utils.DSpace;
 import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/iiif")
+// Only enable this controller if "iiif.enabled=true"
+@ConditionalOnProperty("iiif.enabled")
 public class IIIFController {
 
     @Autowired
