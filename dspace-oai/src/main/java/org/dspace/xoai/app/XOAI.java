@@ -392,7 +392,6 @@ public class XOAI {
                     dates.add(policy.getEndDate());
                 }
             }
-            context.uncacheEntity(policy);
         }
         dates.add(item.getLastModified());
         Collections.sort(dates);
@@ -532,7 +531,6 @@ public class XOAI {
                     return true;
                 }
             }
-            context.uncacheEntity(policy);
         }
         return false;
     }
