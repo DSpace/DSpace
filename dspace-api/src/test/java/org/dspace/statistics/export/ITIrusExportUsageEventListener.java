@@ -123,16 +123,16 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
 
             entityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
             community = CommunityBuilder.createCommunity(context).build();
-            collection = CollectionBuilder.createCollection(context, community).build();
+            collection = CollectionBuilder.createCollection(context, community)
+                                          .withEntityType(entityType.getLabel())
+                                          .build();
             item = ItemBuilder.createItem(context, collection)
-                              .withEntityType(entityType.getLabel())
                               .build();
 
             File f = new File(testProps.get("test.bitstream").toString());
             bitstream = BitstreamBuilder.createBitstream(context, item, new FileInputStream(f)).build();
 
             itemNotToBeProcessed = ItemBuilder.createItem(context, collection)
-                                              .withEntityType(entityType.getLabel())
                                               .withType("Excluded type")
                                               .build();
             File itemNotToBeProcessedFile = new File(testProps.get("test.bitstream").toString());

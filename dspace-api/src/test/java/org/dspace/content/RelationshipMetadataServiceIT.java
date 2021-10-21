@@ -56,6 +56,7 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
     Item leftItem;
     Item rightItem;
     Collection col;
+    Collection col2;
     Relationship relationship;
     RelationshipType isAuthorOfPublicationRelationshipType;
 
@@ -75,10 +76,15 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
 
-        col = CollectionBuilder.createCollection(context, community).build();
+        col = CollectionBuilder.createCollection(context, community)
+                               .withEntityType("Publication")
+                               .build();
+        col2 = CollectionBuilder.createCollection(context, community)
+                                .withEntityType("Author")
+                                .build();
 
         leftItem = ItemBuilder.createItem(context, col).build();
-        rightItem = ItemBuilder.createItem(context, col).build();
+        rightItem = ItemBuilder.createItem(context, col2).build();
         context.restoreAuthSystemState();
     }
 
@@ -90,8 +96,8 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         context.turnOffAuthorisationSystem();
         EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType authorEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Author").build();
-        leftItem = ItemBuilder.createItem(context, col).withEntityType("Publication").build();
-        rightItem = ItemBuilder.createItem(context, col).withEntityType("Author")
+        leftItem = ItemBuilder.createItem(context, col).build();
+        rightItem = ItemBuilder.createItem(context, col2)
                                .withPersonIdentifierLastName("familyName")
                                .withPersonIdentifierFirstName("firstName").build();
         isAuthorOfPublicationRelationshipType =
@@ -114,8 +120,8 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         context.turnOffAuthorisationSystem();
         EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType authorEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Author").build();
-        leftItem = ItemBuilder.createItem(context, col).withEntityType("Publication").build();
-        rightItem = ItemBuilder.createItem(context, col).withEntityType("Author")
+        leftItem = ItemBuilder.createItem(context, col).build();
+        rightItem = ItemBuilder.createItem(context, col2)
                                .withPersonIdentifierLastName("familyName")
                                .withPersonIdentifierFirstName("firstName").build();
         RelationshipType isAuthorOfPublication =
@@ -135,12 +141,21 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
      */
     protected void initJournalVolumeIssue() throws Exception {
         context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection col = CollectionBuilder.createCollection(context, community)
+                               .withEntityType("JournalIssue")
+                               .build();
+        Collection col2 = CollectionBuilder.createCollection(context, community)
+                                .withEntityType("JournalVolume")
+                                .build();
+
         EntityType journalIssueEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
         EntityType publicationVolumeEntityType =
             EntityTypeBuilder.createEntityTypeBuilder(context, "JournalVolume").build();
-        leftItem = ItemBuilder.createItem(context, col).withEntityType("JournalIssue")
+        leftItem = ItemBuilder.createItem(context, col)
                               .withPublicationIssueNumber("2").build();
-        rightItem = ItemBuilder.createItem(context, col).withEntityType("JournalVolume")
+        rightItem = ItemBuilder.createItem(context, col2)
                                .withPublicationVolumeNumber("30").build();
         RelationshipType isIssueOfVolume =
             RelationshipTypeBuilder
@@ -607,10 +622,8 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         assertThat(relationshipService.findNextRightPlaceByRightItem(context, rightItem), equalTo(1));
 
         context.turnOffAuthorisationSystem();
-        Community community = CommunityBuilder.createCommunity(context).build();
 
-        Collection col = CollectionBuilder.createCollection(context, community).build();
-        Item secondItem = ItemBuilder.createItem(context, col).withEntityType("Publication").build();
+        Item secondItem = ItemBuilder.createItem(context, col).build();
         RelationshipBuilder.createRelationshipBuilder(context, secondItem, rightItem,
             isAuthorOfPublicationRelationshipType).build();
         context.restoreAuthSystemState();
@@ -626,10 +639,8 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, leftItem), equalTo(1));
 
         context.turnOffAuthorisationSystem();
-        Community community = CommunityBuilder.createCommunity(context).build();
-        Collection col = CollectionBuilder.createCollection(context, community).build();
 
-        Item secondAuthor = ItemBuilder.createItem(context, col).withEntityType("Author")
+        Item secondAuthor = ItemBuilder.createItem(context, col2)
                                        .withPersonIdentifierFirstName("firstName")
                                        .withPersonIdentifierLastName("familyName").build();
 
@@ -647,6 +658,22 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         // Journal, JournalVolume, JournalIssue, Publication items, related to each other using the relationship types
         // isJournalOfVolume, isJournalVolumeOfIssue, isJournalIssueOfPublication.
         context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection col = CollectionBuilder.createCollection(context, community)
+                                          .withEntityType("JournalIssue")
+                                          .build();
+        Collection col2 = CollectionBuilder.createCollection(context, community)
+                                           .withEntityType("JournalVolume")
+                                           .build();
+        Collection col3 = CollectionBuilder.createCollection(context, community)
+                                           .withEntityType("Journal")
+                                           .build();
+        Collection col4 = CollectionBuilder.createCollection(context, community)
+                                           .withEntityType("Publication")
+                                           .build();
+
         EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType journalIssueEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
         EntityType journalVolumeEntityType =
@@ -666,24 +693,21 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
                 null)
                                    .build();
 
-        Community community = CommunityBuilder.createCommunity(context).build();
-        Collection collection = CollectionBuilder.createCollection(context, community).build();
-
-        Item journalIssue = ItemBuilder.createItem(context, collection).withEntityType("JournalIssue").build();
-        Item journalVolume = ItemBuilder.createItem(context, collection)
+        Item journalIssue = ItemBuilder.createItem(context, col).build();
+        Item journalVolume = ItemBuilder.createItem(context, col2)
                                         .withPublicationVolumeNumber("30")
-                                        .withEntityType("JournalVolume").build();
-        Item journal = ItemBuilder.createItem(context, collection)
+                                        .build();
+        Item journal = ItemBuilder.createItem(context, col3)
                                   .withMetadata("creativeworkseries", "issn", null, "issn journal")
-                                  .withEntityType("Journal").build();
+                                  .build();
         RelationshipBuilder.createRelationshipBuilder(context, journalIssue, journalVolume,
             isJournalVolumeOfIssueRelationshipType).build();
         RelationshipBuilder.createRelationshipBuilder(context, journalVolume, journal,
             isJournalVolumeOfJournalRelationshipType).build();
 
-        Item publication = ItemBuilder.createItem(context, collection)
+        Item publication = ItemBuilder.createItem(context, col4)
                                       .withTitle("Pub 1")
-                                      .withEntityType("Publication").build();
+                                      .build();
 
         RelationshipBuilder.createRelationshipBuilder(context, publication, journalIssue,
             isJournalIssueOfPublicationRelationshipType).build();
