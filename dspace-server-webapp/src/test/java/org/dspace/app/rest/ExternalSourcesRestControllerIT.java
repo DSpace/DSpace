@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.matcher.ExternalSourceEntryMatcher;
@@ -22,6 +23,7 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.content.EntityType;
 import org.dspace.external.provider.AbstractExternalDataProvider;
+import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.service.ExternalDataService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -142,25 +144,34 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void findExternalSourcesByEntityTypeTest() throws Exception {
+        List<ExternalDataProvider> publicationProviders =
+                externalDataService.getExternalDataProvidersForEntityType("Publication");
+        List<ExternalDataProvider> journalProviders =
+                externalDataService.getExternalDataProvidersForEntityType("Journal");
+
         getClient().perform(get("/api/integration/externalsources/search/findByEntityType")
                    .param("entityType", "Publication"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$._embedded.externalsources", Matchers.contains(
-                              ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
-                              ExternalSourceMatcher.matchExternalSource("pubmed", "pubmed", false)
+                   // Expect *at least* 3 Publication sources
+                   .andExpect(jsonPath("$._embedded.externalsources", Matchers.hasItems(
+                              ExternalSourceMatcher.matchExternalSource(publicationProviders.get(0)),
+                              ExternalSourceMatcher.matchExternalSource(publicationProviders.get(1)),
+                              ExternalSourceMatcher.matchExternalSource(publicationProviders.get(2))
                               )))
-                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(publicationProviders.size())));
 
         getClient().perform(get("/api/integration/externalsources/search/findByEntityType")
                    .param("entityType", "Journal"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$._embedded.externalsources", Matchers.contains(
-                              ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
-                              ExternalSourceMatcher.matchExternalSource("sherpaJournalIssn", "sherpaJournalIssn",false),
-                              ExternalSourceMatcher.matchExternalSource("sherpaJournal", "sherpaJournal", false),
-                              ExternalSourceMatcher.matchExternalSource("pubmed", "pubmed", false)
+                   // Expect *at least* 5 Journal sources
+                   .andExpect(jsonPath("$._embedded.externalsources", Matchers.hasItems(
+                              ExternalSourceMatcher.matchExternalSource(journalProviders.get(0)),
+                              ExternalSourceMatcher.matchExternalSource(journalProviders.get(1)),
+                              ExternalSourceMatcher.matchExternalSource(journalProviders.get(2)),
+                              ExternalSourceMatcher.matchExternalSource(journalProviders.get(3)),
+                              ExternalSourceMatcher.matchExternalSource(journalProviders.get(4))
                               )))
-                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(journalProviders.size())));
     }
 
     @Test
@@ -171,28 +182,36 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void findExternalSourcesByEntityTypePaginationTest() throws Exception {
+        List<ExternalDataProvider> journalProviders =
+                externalDataService.getExternalDataProvidersForEntityType("Journal");
+        int numJournalProviders = journalProviders.size();
+
+        // If we return 2 per page, determine number of pages we expect
+        int pageSize = 2;
+        int numberOfPages = (int) Math.ceil((double) numJournalProviders / pageSize);
+
         getClient().perform(get("/api/integration/externalsources/search/findByEntityType")
                    .param("entityType", "Journal")
-                   .param("size", "2"))
+                   .param("size", String.valueOf(pageSize)))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.externalsources", Matchers.contains(
-                              ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
-                              ExternalSourceMatcher.matchExternalSource("sherpaJournalIssn", "sherpaJournalIssn",false)
+                              ExternalSourceMatcher.matchExternalSource(journalProviders.get(0)),
+                              ExternalSourceMatcher.matchExternalSource(journalProviders.get(1))
                               )))
-                   .andExpect(jsonPath("$.page.totalPages", Matchers.is(2)))
-                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
+                   .andExpect(jsonPath("$.page.totalPages", Matchers.is(numberOfPages)))
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(numJournalProviders)));
 
         getClient().perform(get("/api/integration/externalsources/search/findByEntityType")
                    .param("entityType", "Journal")
                    .param("page", "1")
-                   .param("size", "2"))
+                   .param("size", String.valueOf(pageSize)))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.externalsources", Matchers.contains(
-                              ExternalSourceMatcher.matchExternalSource("sherpaJournal", "sherpaJournal", false),
-                              ExternalSourceMatcher.matchExternalSource("pubmed", "pubmed", false)
+                              ExternalSourceMatcher.matchExternalSource(journalProviders.get(2)),
+                              ExternalSourceMatcher.matchExternalSource(journalProviders.get(3))
                               )))
-                   .andExpect(jsonPath("$.page.totalPages", Matchers.is(2)))
-                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
+                   .andExpect(jsonPath("$.page.totalPages", Matchers.is(numberOfPages)))
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(numJournalProviders)));
     }
 
     @Test
