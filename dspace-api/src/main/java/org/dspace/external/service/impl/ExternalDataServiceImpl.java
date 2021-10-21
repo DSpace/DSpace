@@ -10,10 +10,10 @@ package org.dspace.external.service.impl;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -43,9 +43,6 @@ public class ExternalDataServiceImpl implements ExternalDataService {
 
     @Autowired
     private WorkspaceItemService workspaceItemService;
-
-    @Autowired
-    private AuthorizeService authorizeService;
 
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String source, String id) {
@@ -110,4 +107,12 @@ public class ExternalDataServiceImpl implements ExternalDataService {
             externalDataObject.getId()));
         return workspaceItem;
     }
+
+    @Override
+    public List<ExternalDataProvider> getExternalDataProvidersForEntityType(String entityType) {
+        return externalDataProviders.stream()
+                                    .filter(edp -> edp.supportsEntityType(entityType))
+                                    .collect(Collectors.toList());
+    }
+
 }
