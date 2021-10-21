@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
