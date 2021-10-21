@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+	<header>
+		<query>(oaftype exact project) and ( mushroomss)</query>
+		<locale>en_US</locale>
+		<size>10</size>
+		<page>1</page>
+		<total>0</total>
+		<fields>
+		</fields>
+	</header>
+	<results>
+	</results>
+	<browseResults>
+	</browseResults>
+</response>

@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.0</version>
+        <version>7.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -743,7 +743,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>6.5.5</version>
+            <version>6.5.7</version>
         </dependency>
 
         <!-- Google Analytics -->
@@ -918,6 +918,20 @@
             <groupId>org.apache.bcel</groupId>
             <artifactId>bcel</artifactId>
             <version>6.4.0</version>
+        </dependency>
+
+        <!-- required for openaire api integration -->
+        <dependency>
+            <groupId>eu.openaire</groupId>
+            <artifactId>funders-model</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <version>1.19.0</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

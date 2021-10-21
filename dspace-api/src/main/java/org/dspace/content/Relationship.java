@@ -220,6 +220,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      * Standard getter for the ID for this Relationship
      * @return  The ID of this relationship
      */
+    @Override
     public Integer getID() {
         return id;
     }

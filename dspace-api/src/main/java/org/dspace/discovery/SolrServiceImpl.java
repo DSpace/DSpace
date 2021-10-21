@@ -59,7 +59,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;
@@ -153,7 +153,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     getIndexableObjectFactory(indexableObject);
             if (force || requiresIndexing(indexableObject.getUniqueIndexID(), indexableObject.getLastModified())) {
                 update(context, indexableObjectFactory, indexableObject);
-                log.info(LogManager.getHeader(context, "indexed_object", indexableObject.getUniqueIndexID()));
+                log.info(LogHelper.getHeader(context, "indexed_object", indexableObject.getUniqueIndexID()));
             }
         } catch (IOException | SQLException | SolrServerException | SearchServiceException e) {
             log.error(e.getMessage(), e);
@@ -890,7 +890,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         result.addIndexableObject(indexableObject);
                     } else {
                         // log has warn because we try to fix the issue
-                        log.warn(LogManager.getHeader(context,
+                        log.warn(LogHelper.getHeader(context,
                                 "Stale entry found in Discovery index,"
                               + " as we could not find the DSpace object it refers to. ",
                                 "Unique identifier: " + doc.getFirstValue(SearchUtils.RESOURCE_UNIQUE_ID)));
@@ -1116,7 +1116,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         } catch (IOException | SQLException | SolrServerException e) {
             // Any acception that we get ignore it.
             // We do NOT want any crashed to shown by the user
-            log.error(LogManager.getHeader(context, "Error while quering solr", "Query: " + query), e);
+            log.error(LogHelper.getHeader(context, "Error while quering solr", "Query: " + query), e);
             return new ArrayList<>(0);
         }
     }
@@ -1224,8 +1224,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             }
         } catch (IOException | SQLException | SolrServerException e) {
-            log.error(
-                LogManager.getHeader(context, "Error while retrieving related items", "Handle: "
+            log.error(LogHelper.getHeader(context, "Error while retrieving related items", "Handle: "
                     + item.getHandle()), e);
         }
         return results;

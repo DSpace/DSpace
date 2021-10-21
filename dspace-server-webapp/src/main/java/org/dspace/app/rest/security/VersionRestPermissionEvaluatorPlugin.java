@@ -9,6 +9,7 @@ package org.dspace.app.rest.security;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.VersionRest;
@@ -53,7 +54,7 @@ public class VersionRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
                                        DSpaceRestPermission restPermission) {
 
 
-        if (!StringUtils.equalsIgnoreCase(targetType, VersionRest.NAME)) {
+        if (!StringUtils.equalsIgnoreCase(targetType, VersionRest.NAME) || Objects.isNull(targetId)) {
             return false;
         }
 

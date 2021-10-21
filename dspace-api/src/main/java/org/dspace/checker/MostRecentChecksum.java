@@ -170,7 +170,7 @@ public class MostRecentChecksum implements Serializable {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || !(o instanceof MostRecentChecksum)) {
             return false;
         }
 
