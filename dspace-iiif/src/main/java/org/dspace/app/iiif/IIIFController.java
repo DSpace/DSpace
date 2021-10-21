@@ -10,8 +10,6 @@ package org.dspace.app.iiif;
 import java.util.UUID;
 
 import org.dspace.core.Context;
-import org.dspace.services.RequestService;
-import org.dspace.utils.DSpace;
 import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,8 +34,6 @@ public class IIIFController {
 
     @Autowired
     IIIFServiceFacade iiifFacade;
-
-    protected RequestService requestService = new DSpace().getRequestService();
 
     /**
      * The manifest response contains sufficient information for the client to initialize
