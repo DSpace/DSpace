@@ -247,6 +247,7 @@ public class CanManageVersionsFeatureIT extends AbstractControllerIntegrationTes
 
         Collection col1 = CollectionBuilder.createCollection(context, subCommunityA)
                                            .withName("Collection 1")
+                                           .withEntityType("Publication")
                                            .withSubmitterGroup(eperson)
                                            .withAdminGroup(adminCol1)
                                            .build();
@@ -260,7 +261,6 @@ public class CanManageVersionsFeatureIT extends AbstractControllerIntegrationTes
                                 .withTitle("Public item")
                                 .withIssueDate("2021-04-19")
                                 .withAuthor("Doe, John")
-                                .withEntityType("Publication")
                                 .withSubject("ExtraEntry")
                                 .build();
 
@@ -332,6 +332,7 @@ public class CanManageVersionsFeatureIT extends AbstractControllerIntegrationTes
 
         Collection col1 = CollectionBuilder.createCollection(context, subCommunityA)
                                            .withName("Collection 1")
+                                           .withEntityType("Publication")
                                            .withSubmitterGroup(eperson)
                                            .withAdminGroup(adminCol1)
                                            .build();
@@ -345,7 +346,6 @@ public class CanManageVersionsFeatureIT extends AbstractControllerIntegrationTes
                                 .withTitle("Public item")
                                 .withIssueDate("2021-04-19")
                                 .withAuthor("Doe, John")
-                                .withEntityType("Publication")
                                 .withSubject("ExtraEntry")
                                 .build();
 
