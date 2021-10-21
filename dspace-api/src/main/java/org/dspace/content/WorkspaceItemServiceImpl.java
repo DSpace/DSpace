@@ -12,8 +12,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
@@ -119,9 +122,26 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         authorizeService
             .addPolicy(context, item, Constants.DELETE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
 
-
         // Copy template if appropriate
         Item templateItem = collection.getTemplateItem();
+
+        Optional<MetadataValue> colEntityType = getDSpaceEntityType(collection);
+        Optional<MetadataValue> templateItemEntityType = getDSpaceEntityType(templateItem);
+
+        if (colEntityType.isPresent() && templateItemEntityType.isPresent() &&
+                !StringUtils.equals(colEntityType.get().getValue(), templateItemEntityType.get().getValue())) {
+            throw new IllegalStateException("The template item has entity type : (" +
+                      templateItemEntityType.get().getValue() + ") different than collection entity type : " +
+                      colEntityType.get().getValue());
+        }
+
+        if (colEntityType.isPresent() && templateItemEntityType.isEmpty()) {
+            MetadataValue original = colEntityType.get();
+            MetadataField metadataField = original.getMetadataField();
+            MetadataSchema metadataSchema = metadataField.getMetadataSchema();
+            itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
+                                    metadataField.getQualifier(), original.getLanguage(), original.getValue());
+        }
 
         if (template && (templateItem != null)) {
             List<MetadataValue> md = itemService.getMetadata(templateItem, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
@@ -147,6 +167,15 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                 itemService.getIdentifiers(context, item)));
 
         return workspaceItem;
+    }
+
+    private Optional<MetadataValue> getDSpaceEntityType(DSpaceObject dSpaceObject) {
+        return Objects.nonNull(dSpaceObject) ? dSpaceObject.getMetadata()
+                                                           .stream()
+                                                           .filter(x -> x.getMetadataField().toString('.')
+                                                                         .equalsIgnoreCase("dspace.entity.type"))
+                                                           .findFirst()
+                                             : Optional.empty();
     }
 
     @Override
