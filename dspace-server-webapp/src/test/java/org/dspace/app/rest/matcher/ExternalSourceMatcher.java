@@ -12,11 +12,16 @@ import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SE
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
+import org.dspace.external.provider.ExternalDataProvider;
 import org.hamcrest.Matcher;
 
 public class ExternalSourceMatcher {
 
     private ExternalSourceMatcher() {
+    }
+
+    public static Matcher<? super Object> matchExternalSource(ExternalDataProvider provider) {
+        return matchExternalSource(provider.getSourceIdentifier(), provider.getSourceIdentifier(), false);
     }
 
     public static Matcher<? super Object> matchExternalSource(String id, String name, boolean hierarchical) {
