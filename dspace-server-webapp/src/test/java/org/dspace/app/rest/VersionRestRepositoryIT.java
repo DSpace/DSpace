@@ -722,13 +722,13 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Collection col = CollectionBuilder.createCollection(context, rootCommunity)
                                           .withName("Collection 1")
+                                          .withEntityType("Publication")
                                           .build();
 
         Item itemA = ItemBuilder.createItem(context, col)
                                .withTitle("Public item")
                                .withIssueDate("2021-04-19")
                                .withAuthor("Doe, John")
-                               .withEntityType("Publication")
                                .withSubject("ExtraEntry")
                                .build();
 
@@ -752,13 +752,13 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
                                           .withName("Collection test")
+                                          .withEntityType("Publication")
                                           .build();
 
         Item item = ItemBuilder.createItem(context, col)
                                .withTitle("Public test item")
                                .withIssueDate("2021-04-27")
                                .withAuthor("Doe, John")
-                               .withEntityType("Publication")
                                .withSubject("ExtraEntry")
                                .build();
 
@@ -796,6 +796,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Collection col = CollectionBuilder.createCollection(context, rootCommunity)
                                           .withName("Collection 1")
+                                          .withEntityType("Publication")
                                           .withSubmitterGroup(eperson)
                                           .build();
 
@@ -803,7 +804,6 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withTitle("Public item")
                                .withIssueDate("2021-04-19")
                                .withAuthor("Doe, John")
-                               .withEntityType("Publication")
                                .withSubject("ExtraEntry")
                                .build();
 
