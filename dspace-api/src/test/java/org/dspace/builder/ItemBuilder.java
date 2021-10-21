@@ -95,10 +95,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
                                 subject, authority, confidence);
     }
 
-    public ItemBuilder withEntityType(final String entityType) {
-        return addMetadataValue(item, "dspace", "entity", "type", entityType);
-    }
-
     public ItemBuilder withType(final String type) {
         return addMetadataValue(item, "dc", "type", null, type);
     }

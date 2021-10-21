@@ -7,9 +7,11 @@
  */
 package org.dspace.content.service;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
 import org.dspace.core.Context;
@@ -56,4 +58,46 @@ public interface EntityTypeService extends DSpaceCRUDService<EntityType> {
      * @throws AuthorizeException   If something geos wrong with authorizations
      */
     public EntityType create(Context context, String entityTypeString) throws SQLException, AuthorizeException;
+
+    /**
+     * Retrieves all entity types related to the collections on which the current user can deposit
+     * 
+     * @param context                     DSpace context object
+     * @return
+     * @throws SQLException               If database error
+     * @throws SolrServerException        If there is a problem in communicating with Solr
+     * @throws IOException                If IO error
+     */
+    public List<String> getSubmitAuthorizedTypes(Context context) throws SQLException, SolrServerException, IOException;
+
+    /**
+     * 
+     * @param context          DSpace context object
+     * @param names            List of Entity type names that you want to retrieve
+     * @param limit            paging limit
+     * @param offset           the position of the first result to return
+     * @return
+     * @throws SQLException    if database error
+     */
+    public List<EntityType> getEntityTypesByNames(Context context, List<String> names,Integer limit, Integer offset)
+           throws SQLException;
+
+    /**
+     * 
+     * @param context          DSpace context object
+     * @param names            List of Entity type names that you want to retrieve
+     * @return
+     * @throws SQLException    if database error
+     */
+    public int countEntityTypesByNames(Context context, List<String> names) throws SQLException;
+
+    /**
+     * Initializes the EntityType names, and marks them "permanent".
+     * 
+     * @param context                 DSpace context object
+     * @throws SQLException           Database exception
+     * @throws AuthorizeException     Authorization error
+     */
+    public void initDefaultEntityTypeNames(Context context) throws SQLException, AuthorizeException;
+
 }

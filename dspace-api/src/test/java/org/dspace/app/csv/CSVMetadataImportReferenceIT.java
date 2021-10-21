@@ -55,7 +55,9 @@ import org.junit.Test;
 public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDatabase {
 
     //Common collection to utilize for test
+    private Collection col;
     private Collection col1;
+    private Collection col2;
 
     private final RelationshipService relationshipService
             = ContentServiceFactory.getInstance().getRelationshipService();
@@ -75,8 +77,19 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                           .withName("Parent Community")
                                           .build();
 
-        col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        col = CollectionBuilder.createCollection(context, parentCommunity)
+                               .withName("Collection")
+                               .build();
 
+        col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                .withEntityType("Person")
+                                .withName("Collection 1")
+                                .build();
+
+        col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                .withEntityType("Publication")
+                                .withName("Collection 2")
+                                .build();
 
         context.turnOffAuthorisationSystem();
 
@@ -133,7 +146,19 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     public void testSingleMdRef() throws Exception {
         String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
             "+,Person,," + col1.getHandle() + ",0",
-            "+,Publication,dc.identifier.other:0," + col1.getHandle() + ",1"};
+            "+,Publication,dc.identifier.other:0," + col2.getHandle() + ",1"};
+        Item[] items = runImport(csv);
+        assertRelationship(items[1], items[0], 1, "left", 0);
+
+        // remove created items
+        cleanupImportItems(items);
+    }
+
+    @Test
+    public void testSingleMdRefIntoCollectionWithoutEntityTypeTest() throws Exception {
+        String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
+            "+,Person,," + col.getHandle() + ",0",
+            "+,Publication,dc.identifier.other:0," + col.getHandle() + ",1"};
         Item[] items = runImport(csv);
         assertRelationship(items[1], items[0], 1, "left", 0);
 
@@ -180,7 +205,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         String[] csv = {"id,dc.title,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName," +
             "dc.identifier.other",
             "+,Test Item 1,Person,," + col1.getHandle() + ",idVal,0",
-            "+,Test Item 2,Publication,rowName:idVal," + col1.getHandle() + ",anything,1"};
+            "+,Test Item 2,Publication,rowName:idVal," + col2.getHandle() + ",anything,1"};
         Item[] items = runImport(csv);
         assertRelationship(items[1], items[0], 1, "left", 0);
         // remove created items
@@ -196,7 +221,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
             "+,Person,," + col1.getHandle() + ",0",
             "+,Person,," + col1.getHandle() + ",1",
-            "+,Publication,dc.identifier.other:0||dc.identifier.other:1," + col1.getHandle() + ",2"};
+            "+,Publication,dc.identifier.other:0||dc.identifier.other:1," + col2.getHandle() + ",2"};
         Item[] items = runImport(csv);
         assertRelationship(items[2], items[0], 1, "left", 0);
         assertRelationship(items[2], items[1], 1, "left", 1);
@@ -213,7 +238,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other,rowName",
             "+,Person,," + col1.getHandle() + ",0,val1",
             "+,Person,," + col1.getHandle() + ",1,val2",
-            "+,Publication,rowName:val1||rowName:val2," + col1.getHandle() + ",2,val3"};
+            "+,Publication,rowName:val1||rowName:val2," + col2.getHandle() + ",2,val3"};
         Item[] items = runImport(csv);
         assertRelationship(items[2], items[0], 1, "left", 0);
         assertRelationship(items[2], items[1], 1, "left", 1);
@@ -234,11 +259,10 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                              .withAuthor("Smith, Donald")
                              .withPersonIdentifierLastName("Smith")
                              .withPersonIdentifierFirstName("Donald")
-                             .withEntityType("Person")
                              .build();
         context.restoreAuthSystemState();
         String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName,dc.identifier.other",
-            "+,Publication," + person.getID().toString() + "," + col1.getHandle() + ",anything,0"};
+            "+,Publication," + person.getID().toString() + "," + col2.getHandle() + ",anything,0"};
         Item[] items = runImport(csv);
         assertRelationship(items[0], person, 1, "left", 0);
         // remove created items
@@ -258,7 +282,6 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, Donald")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("Donald")
-                                 .withEntityType("Person")
                                  .build();
         Item person2 = ItemBuilder.createItem(context, col1)
                                  .withTitle("Author2")
@@ -266,11 +289,10 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, John")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("John")
-                                 .withEntityType("Person")
                                  .build();
         String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName,dc.identifier.other",
             "+,Publication," + person.getID().toString() + "||" + person2.getID().toString() + "," +
-                col1.getHandle() + ",anything,0"};
+                col2.getHandle() + ",anything,0"};
         Item[] items = runImport(csv);
         assertRelationship(items[0], person, 1, "left", 0);
         assertRelationship(items[0], person2, 1, "left", 1);
@@ -291,12 +313,11 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, Donald")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("Donald")
-                                 .withEntityType("Person")
                                  .build();
         String[] csv = {"id,dc.title,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName," +
             "dc.identifier.other",
             "+,Person2,Person,," + col1.getHandle() + ",idVal,0",
-            "+,Pub1,Publication,dc.title:Person||dc.title:Person2," + col1.getHandle() + ",anything,1"};
+            "+,Pub1,Publication,dc.title:Person||dc.title:Person2," + col2.getHandle() + ",anything,1"};
         context.restoreAuthSystemState();
         Item[] items = runImport(csv);
         assertRelationship(items[1], person, 1, "left", 0);
@@ -319,7 +340,6 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, Donald")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("Donald")
-                                 .withEntityType("Person")
                                  .build();
         Item person2 = ItemBuilder.createItem(context, col1)
                                  .withTitle("Person2")
@@ -327,7 +347,6 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, John")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("John")
-                                 .withEntityType("Person")
                                  .build();
 
         context.restoreAuthSystemState();
@@ -335,7 +354,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
             "dc.identifier.other",
             "+,Person3,Person,," + col1.getHandle() + ",idVal,0",
             "+,Pub1,Publication," + person.getID() + "||dc.title:Person2||rowName:idVal," +
-                col1.getHandle() + ",anything,1"};
+                col2.getHandle() + ",anything,1"};
         Item[] items = runImport(csv);
         assertRelationship(items[1], person, 1, "left", 0);
         assertRelationship(items[1], person2, 1, "left", 1);
@@ -353,7 +372,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         String[] csv = {"id,dc.title,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName," +
             "dc.identifier.other",
             "+,Person:,Person,," + col1.getHandle() + ",idVal,0",
-            "+,Pub1,Publication,dc.title:Person:," + col1.getHandle() + ",anything,1"};
+            "+,Pub1,Publication,dc.title:Person:," + col2.getHandle() + ",anything,1"};
         Item[] items = runImport(csv);
         assertRelationship(items[1], items[0], 1, "left", 0);
         // remove created items
@@ -397,7 +416,6 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, Donald")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("Donald")
-                                 .withEntityType("Person")
                                  .withIdentifierOther("1")
                                  .build();
         ItemBuilder.createItem(context, col1)
@@ -406,7 +424,6 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, John")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("John")
-                                 .withEntityType("Person")
                                  .withIdentifierOther("1")
                                  .build();
 
@@ -428,7 +445,6 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                  .withAuthor("Smith, Donald")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("Donald")
-                                 .withEntityType("Person")
                                  .withIdentifierOther("1")
                                  .build();
         context.restoreAuthSystemState();
@@ -488,11 +504,21 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     @Test(expected = MetadataImportInvalidHeadingException.class)
     public void testInvalidRelationshipArchivedOrigin() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item testItem = ItemBuilder.createItem(context, col1)
+
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Parent Community")
+                                                  .build();
+
+        Collection orgUnitCollection = CollectionBuilder.createCollection(context, rootCommunity)
+                                                        .withEntityType("OrgUnit")
+                                                        .withName("Collection 1")
+                                                        .build();
+
+        Item testItem = ItemBuilder.createItem(context, orgUnitCollection)
                                  .withTitle("OrgUnit")
                                  .withIssueDate("2017-10-17")
-                                 .withEntityType("OrgUnit")
                                  .build();
+
         context.restoreAuthSystemState();
         String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName",
             "+,Person,," + col1.getHandle() + ",1" +
@@ -506,11 +532,21 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     @Test(expected = MetadataImportInvalidHeadingException.class)
     public void testInvalidRelationshipArchivedTarget() throws Exception {
         context.turnOffAuthorisationSystem();
-        Item testItem = ItemBuilder.createItem(context, col1)
+
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Parent Community")
+                                                  .build();
+
+        Collection orgUnitCollection = CollectionBuilder.createCollection(context, rootCommunity)
+                                                        .withEntityType("OrgUnit")
+                                                        .withName("Collection 1")
+                                                        .build();
+
+        Item testItem = ItemBuilder.createItem(context, orgUnitCollection)
                                    .withTitle("OrgUnit")
                                    .withIssueDate("2017-10-17")
-                                   .withEntityType("OrgUnit")
                                    .build();
+
         context.restoreAuthSystemState();
         String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,rowName",
             testItem.getID().toString() + ",Person,," + col1.getHandle() + ",1" +
@@ -525,29 +561,40 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     public void testValidRelationshipNoDefinedTypesInCSV() throws Exception {
         context.turnOffAuthorisationSystem();
 
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Parent Community")
+                                                  .build();
+
+        Collection publicationCollection = CollectionBuilder.createCollection(context, rootCommunity)
+                                                            .withEntityType("Publication")
+                                                            .withName("Collection 1")
+                                                            .build();
+
+        Collection projectCollection = CollectionBuilder.createCollection(context, rootCommunity)
+                                                        .withEntityType("Project")
+                                                        .withName("Collection 1")
+                                                        .build();
+
         Item testItem = ItemBuilder.createItem(context, col1)
                                  .withTitle("Person")
                                  .withIssueDate("2017-10-17")
                                  .withAuthor("Smith, Donald")
                                  .withPersonIdentifierLastName("Smith")
                                  .withPersonIdentifierFirstName("Donald")
-                                 .withEntityType("Person")
                                  .withIdentifierOther("testItemOne")
                                  .build();
 
 
-        Item testItem2 = ItemBuilder.createItem(context, col1)
+        Item testItem2 = ItemBuilder.createItem(context, publicationCollection)
                                  .withTitle("Publication")
                                  .withIssueDate("2017-10-17")
-                                 .withEntityType("Publication")
                                  .withIdentifierOther("testItemTwo")
                                  .build();
 
 
-        Item testItem3 = ItemBuilder.createItem(context, col1)
+        Item testItem3 = ItemBuilder.createItem(context, projectCollection)
                                  .withTitle("Project")
                                  .withIssueDate("2017-10-17")
-                                 .withEntityType("Project")
                                  .withIdentifierOther("testItemThree")
                                  .build();
 
@@ -569,8 +616,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     public void testDuplicateRowNameReferences() throws Exception {
         String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other,rowName",
             "+,Person,," + col1.getHandle() + ",0,value",
-            "+,Publication,rowName:value," + col1.getHandle() + ",1,1",
-            "+,Publication,rowName:value," + col1.getHandle() + ",2,2"};
+            "+,Publication,rowName:value," + col2.getHandle() + ",1,1",
+            "+,Publication,rowName:value," + col2.getHandle() + ",2,2"};
         Item[] items = runImport(csv);
         assertRelationship(items[1], items[0], 1, "left", 0);
         assertRelationship(items[2], items[0], 1, "left", 0);
@@ -587,13 +634,12 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                                    .withAuthor("Smith, Donald")
                                    .withPersonIdentifierLastName("Smith")
                                    .withPersonIdentifierFirstName("Donald")
-                                   .withEntityType("Person")
                                    .withIdentifierOther("testItemOne")
                                    .build();
 
 
         String[] csv = {"id,dspace.entity.type,relation.isAuthorOfPublication,collection,dc.identifier.other,rowName",
-            "+,Publication," + testItem.getID() + "::virtual::4::600," + col1.getHandle() + ",0,1"};
+            "+,Publication," + testItem.getID() + "::virtual::4::600," + col2.getHandle() + ",0,1"};
         Item[] items = runImport(csv);
         assertRelationship(items[0], testItem, 1, "left", 0);
     }
@@ -605,11 +651,20 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
     public void testInvalidTypeNameDefined() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Item testItem = ItemBuilder.createItem(context, col1)
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Parent Community")
+                                                  .build();
+
+        Collection publicationCollection = CollectionBuilder.createCollection(context, rootCommunity)
+                                                            .withEntityType("Publication")
+                                                            .withName("Collection 1")
+                                                            .build();
+
+        Item testItem = ItemBuilder.createItem(context, publicationCollection)
                                  .withTitle("Publication")
                                  .withIssueDate("2017-10-17")
-                                 .withEntityType("Publication")
                                  .build();
+
         context.restoreAuthSystemState();
         String[] csv = {"id,collection,dspace.entity.type,dc.title," +
             "relation.isProjectOfPublication,relation.isPublicationOfProject",
