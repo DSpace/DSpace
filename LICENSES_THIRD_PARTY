@@ -118,6 +118,8 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
         * JSON Small and Fast Parser (net.minidev:json-smart:2.3 - http://www.minidev.net/)
         * ehcache (net.sf.ehcache:ehcache:2.10.6 - http://ehcache.org)
         * Ehcache Core (net.sf.ehcache:ehcache-core:2.6.11 - http://ehcache.org)
+        * Ehcache 3 (org.ehcache:ehcache:3.4.0 - https://www.ehcache.org/)
+        * cache-config (javax.cache:cache-api:1.1.0 - https://mvnrepository.com/artifact/javax.cache/cache-api)
         * Abdera Core (org.apache.abdera:abdera-core:1.1.3 - http://abdera.apache.org/abdera-core)
         * I18N Libraries (org.apache.abdera:abdera-i18n:1.1.3 - http://abdera.apache.org)
         * Apache Ant Core (org.apache.ant:ant:1.10.9 - https://ant.apache.org/)
@@ -323,6 +325,7 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
         * Spring Boot Log4j 2 Starter (org.springframework.boot:spring-boot-starter-log4j2:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-log4j2)
         * Spring Boot Security Starter (org.springframework.boot:spring-boot-starter-security:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-security)
         * Spring Boot Test Starter (org.springframework.boot:spring-boot-starter-test:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-test)
+        * Spring Boot Cache Starter (org.springframework.boot:spring-boot-starter-cache::2.2.6.RELEASE - https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache)
         * Spring Boot Tomcat Starter (org.springframework.boot:spring-boot-starter-tomcat:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-tomcat)
         * Spring Boot Validation Starter (org.springframework.boot:spring-boot-starter-validation:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-validation)
         * Spring Boot Web Starter (org.springframework.boot:spring-boot-starter-web:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-web)
@@ -519,6 +522,7 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
 
     MIT License:
 
+        * iiif-apis (de.digitalcollections.iiif:iiif-apis:0.3.9 - https://github.com/dbmdz/iiif-apis)
         * Java SemVer (com.github.zafarkhaja:java-semver:0.9.0 - https://github.com/zafarkhaja/jsemver)
         * CDM core library (edu.ucar:cdm:4.5.5 - http://www.unidata.ucar.edu/software/netcdf-java/documentation.htm)
         * GRIB IOSP and Feature Collection (edu.ucar:grib:4.5.5 - http://www.unidata.ucar.edu/software/netcdf-java/)

@@ -823,6 +823,21 @@
             </modules>
         </profile>
 
+        <!--
+            Builds IIIF extension for DSpace
+        -->
+        <profile>
+            <id>dspace-iiif</id>
+            <activation>
+                <file>
+                    <exists>dspace-iiif/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-iiif</module>
+            </modules>
+        </profile>
+
        <!-- REST Jersey (Deprecated REST API from DSpace 6.x or below) -->
        <!-- As this module is deprecated, it only builds if you activate it via -Pdspace-rest -->
        <profile>
@@ -1041,6 +1056,11 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
+                <version>7.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dspace</groupId>
+                <artifactId>dspace-iiif</artifactId>
                 <version>7.1-SNAPSHOT</version>
             </dependency>
             <dependency>
