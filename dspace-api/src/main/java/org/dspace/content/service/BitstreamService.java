@@ -54,7 +54,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * @return the clone
      * @throws SQLException if database error
      */
-    public Bitstream clone(Context context, Bitstream bitstream) throws SQLException;
+    public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, AuthorizeException;
 
     /**
      * Create a new bitstream, with a new ID. The checksum and file size are

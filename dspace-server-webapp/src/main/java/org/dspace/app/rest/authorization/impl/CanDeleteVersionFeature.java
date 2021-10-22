@@ -8,59 +8,62 @@
 package org.dspace.app.rest.authorization.impl;
 import java.sql.SQLException;
 import java.util.Objects;
-import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
+import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.app.rest.model.VersionRest;
+import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.service.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * The manage versions feature. It can be used to verify
- * if the user can create/delete or update the version of an Item.
+ * The delete version feature. It can be used to verify
+ * if the user can delete the version of an Item.
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component
-@AuthorizationFeatureDocumentation(name = CanManageVersionsFeature.NAME,
-    description = "It can be used to verify if the user can create/delete or update the version of an Item")
-public class CanManageVersionsFeature implements AuthorizationFeature {
-
-    public static final String NAME = "canManageVersions";
+@AuthorizationFeatureDocumentation(name = CanDeleteVersionFeature.NAME,
+    description = "It can be used to verify if the user can delete a version of an Item")
+public class CanDeleteVersionFeature extends DeleteFeature {
 
     @Autowired
     private ItemService itemService;
     @Autowired
-    private AuthorizeService authorizeService;
+    private ItemConverter itemConverter;
+    @Autowired
+    private VersioningService versioningService;
     @Autowired
     private ConfigurationService configurationService;
 
+    public static final String NAME = "canDeleteVersion";
 
     @Override
     @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
-        if (object instanceof ItemRest) {
-            boolean isEnabled = configurationService.getBooleanProperty("versioning.enabled", true);
-            if (!isEnabled || Objects.isNull(context.getCurrentUser())) {
+        if (object instanceof VersionRest) {
+            if (!configurationService.getBooleanProperty("versioning.enabled", true)) {
                 return false;
             }
-            Item item = itemService.find(context, UUID.fromString(((ItemRest) object).getUuid()));
-            if (Objects.nonNull(item)) {
+            Version version = versioningService.getVersion(context, ((VersionRest)object).getId());
+            if (Objects.nonNull(version) && Objects.nonNull(version.getItem())) {
+                ItemRest itemRest = itemConverter.convert(version.getItem(), DefaultProjection.DEFAULT);
                 boolean isBlockEntity = configurationService.getBooleanProperty("versioning.block.entity", true);
-                boolean hasEntityType = StringUtils.isNotBlank(itemService.
-                                        getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY));
+                boolean hasEntityType = StringUtils.isNotBlank(
+                        itemService.getMetadataFirstValue(version.getItem(), "dspace", "entity", "type", Item.ANY));
                 if (isBlockEntity && hasEntityType) {
                     return false;
                 }
-                return authorizeService.isAdmin(context, item);
+                return super.isAuthorized(context, itemRest);
             }
         }
         return false;
@@ -69,7 +72,7 @@ public class CanManageVersionsFeature implements AuthorizationFeature {
     @Override
     public String[] getSupportedTypes() {
         return new String[]{
-            ItemRest.CATEGORY + "." + ItemRest.NAME
+            VersionRest.CATEGORY + "." + VersionRest.NAME
         };
     }
 
