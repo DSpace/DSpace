@@ -19,6 +19,7 @@ services:
     depends_on:
       - dspace
     # Using UCLA Library image as it seems to be most maintained at this time. There is no official image.
+    # https://hub.docker.com/r/uclalibrary/cantaloupe
     image: uclalibrary/cantaloupe:5.0.4-0
     networks:
       dspacenet:
