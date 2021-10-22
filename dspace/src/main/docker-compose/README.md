@@ -49,6 +49,17 @@ docker-compose -p d7 up -d
 docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml up -d
 ```
 
+## Run DSpace 7 REST with a IIIF Image Server from your branch
+*Only useful for testing IIIF support in a development environment*
+
+This command starts our `dspace-iiif` container alongside the REST API.
+That container provides a [Cantaloupe image server](https://cantaloupe-project.github.io/),
+which can be used when IIIF support is enabled in DSpace (`iiif.enabled=true`).
+
+```
+docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-iiif.yml up -d
+```
+
 ## Run DSpace 7 REST and Shibboleth SP (in Apache) from your branch
 
 *Only useful for testing Shibboleth in a development environment*
