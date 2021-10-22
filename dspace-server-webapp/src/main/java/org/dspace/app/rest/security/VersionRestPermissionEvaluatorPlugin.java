@@ -59,7 +59,7 @@ public class VersionRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
         }
 
         Request request = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext(request.getServletRequest());
+        Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
 
         try {
             int versionId = Integer.parseInt(targetId.toString());
