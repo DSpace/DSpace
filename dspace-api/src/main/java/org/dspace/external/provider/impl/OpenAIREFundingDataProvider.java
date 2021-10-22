@@ -32,7 +32,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.OpenAIRERestConnector;
 import org.dspace.external.model.ExternalDataObject;
-import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -42,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author paulo-graca
  *
  */
-public class OpenAIREFundingDataProvider implements ExternalDataProvider {
+public class OpenAIREFundingDataProvider extends AbstractExternalDataProvider {
 
     /**
      * log4j logger
