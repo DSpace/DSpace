@@ -111,6 +111,34 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", "provenance", provenanceData);
     }
 
+    public ItemBuilder enableIIIF() {
+        return addMetadataValue(item, "dspace", "iiif", "enabled", "true");
+    }
+
+    public ItemBuilder disableIIIF() {
+        return addMetadataValue(item, "dspace", "iiif", "enabled", "false");
+    }
+
+    public ItemBuilder enableIIIFSearch() {
+        return addMetadataValue(item, "iiif", "search", "enabled", "true");
+    }
+
+    public ItemBuilder withIIIFViewingHint(String hint) {
+        return addMetadataValue(item, "iiif", "viewing", "hint", hint);
+    }
+
+    public ItemBuilder withIIIFCanvasNaming(String naming) {
+        return addMetadataValue(item, "iiif", "canvas", "naming", naming);
+    }
+
+    public ItemBuilder withIIIFCanvasWidth(int i) {
+        return addMetadataValue(item, "iiif", "image", "width", String.valueOf(i));
+    }
+
+    public ItemBuilder withIIIFCanvasHeight(int i) {
+        return addMetadataValue(item, "iiif", "image", "height", String.valueOf(i));
+    }
+
     public ItemBuilder withMetadata(final String schema, final String element, final String qualifier,
         final String value) {
         return addMetadataValue(item, schema, element, qualifier, value);
@@ -216,4 +244,5 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             c.complete();
         }
     }
+
 }

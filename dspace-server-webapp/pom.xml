@@ -364,6 +364,11 @@
             <artifactId>dspace-services</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-iiif</artifactId>
+        </dependency>
+
         <!-- DSpace modules to deploy (this modules are all optional, but add features/endpoints to webapp) -->
         <!-- You may choose to comment out any of these modules if you do not want/need its features -->
         <dependency>
@@ -482,6 +487,25 @@
                     <artifactId>jetty-util</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
+             Caching dependencies for iiif endpoint. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/javax.cache/cache-api -->
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.ehcache/ehcache -->
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>3.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
