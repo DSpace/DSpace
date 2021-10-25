@@ -84,4 +84,13 @@ public class RelationshipTypeMatcher {
             hasJsonPath("$._links.rightType.href", containsString("/api/core/entitytypes/" + rightEntityTypeId))
         );
     }
+
+    public static Matcher<? super Object> matchExplicitRestrictedRelationshipTypeValues(
+                                              String leftwardType, String rightwardType) {
+        return allOf(
+                     hasJsonPath("$.leftwardType", is(leftwardType)),
+                     hasJsonPath("$.rightwardType", is(rightwardType))
+                     );
+    }
+
 }
