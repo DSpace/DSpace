@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -735,13 +736,24 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                             groups.add(group);
                             List<ResourcePolicy> policies = resourcePolicyService.find(context, null, groups,
                                                             Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);
-                            if (policies.size() > 0) {
-                                return policies.get(0).getdSpaceObject();
+
+                            Optional<ResourcePolicy> defaultPolicy = policies.stream().filter(p -> StringUtils.equals(
+                                    collectionService.getDefaultReadGroupName((Collection) p.getdSpaceObject(), "ITEM"),
+                                    group.getName())).findFirst();
+
+                            if (defaultPolicy.isPresent()) {
+                                return defaultPolicy.get().getdSpaceObject();
                             }
                             policies = resourcePolicyService.find(context, null, groups,
                                                              Constants.DEFAULT_BITSTREAM_READ, Constants.COLLECTION);
-                            if (policies.size() > 0) {
-                                return policies.get(0).getdSpaceObject();
+
+                            defaultPolicy = policies.stream()
+                                    .filter(p -> StringUtils.equals(collectionService.getDefaultReadGroupName(
+                                            (Collection) p.getdSpaceObject(), "BITSTREAM"), group.getName()))
+                                    .findFirst();
+
+                            if (defaultPolicy.isPresent()) {
+                                return defaultPolicy.get().getdSpaceObject();
                             }
                         }
                     }
