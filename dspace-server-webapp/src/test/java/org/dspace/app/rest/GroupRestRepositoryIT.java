@@ -3151,4 +3151,39 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertFalse(groupService.isMember(context, adminChild1, adminGroup));
     }
 
+    @Test
+    /**
+     * Test for bug https://github.com/DSpace/DSpace/issues/7928
+     * @throws Exception
+     */
+    public void anonymousGroupParentObjectTest() throws Exception {
+
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        getClient(tokenAdmin).perform(get("/api/eperson/groups/" + anonGroup.getID().toString())
+                .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", GroupMatcher.matchFullEmbeds()))
+                   .andExpect(jsonPath("$", GroupMatcher.matchLinks(anonGroup.getID())))
+                   .andExpect(jsonPath("$", Matchers.is(
+                       GroupMatcher.matchGroupEntry(anonGroup.getID(), anonGroup.getName())
+                   )))
+                   .andExpect(jsonPath("$._embedded.object").doesNotExist())
+        ;
+    }
+
 }
