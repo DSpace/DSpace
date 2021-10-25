@@ -44,7 +44,7 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
     public void setUp() throws Exception {
         super.setUp();
 
-        if (entityTypeService.findAll(context).size() > 0) {
+        if (entityTypeService.findAll(context).size() > 1) {
             //Don't initialize the setup more than once
             return;
         }

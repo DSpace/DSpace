@@ -218,56 +218,56 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
-        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .withEntityType("Person").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                                           .withEntityType("Person").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits")
+                                           .withEntityType("OrgUnit").build();
+        Collection col4 = CollectionBuilder.createCollection(context, child1).withName("Publications")
+                                           .withEntityType("Publication").build();
+        Collection col5 = CollectionBuilder.createCollection(context, child1).withName("without entityType")
+                                           .build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author1")
                                   .withIssueDate("2017-10-17")
                                   .withAuthor("Smith, Donald")
-                                  .withEntityType("Person")
                                   .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
                                   .withTitle("Author2")
                                   .withIssueDate("2016-02-13")
                                   .withAuthor("Smith, Maria")
-                                  .withEntityType("Person")
                                   .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
                                   .withTitle("Author3")
                                   .withIssueDate("2016-02-13")
                                   .withAuthor("Maybe, Maybe")
-                                  .withEntityType("Person")
                                   .build();
 
         Item orgUnit1 = ItemBuilder.createItem(context, col3)
                                    .withTitle("OrgUnit1")
                                    .withAuthor("Testy, TEst")
                                    .withIssueDate("2015-01-01")
-                                   .withEntityType("OrgUnit")
                                    .build();
 
-        Item project1 = ItemBuilder.createItem(context, col3)
+        Item project1 = ItemBuilder.createItem(context, col5)
                                    .withTitle("Project1")
                                    .withAuthor("Testy, TEst")
                                    .withIssueDate("2015-01-01")
-                                   .withEntityType("Project")
                                    .build();
 
-        Item publication = ItemBuilder.createItem(context, col3)
+        Item publication = ItemBuilder.createItem(context, col4)
                                       .withTitle("Publication1")
                                       .withAuthor("Testy, TEst")
                                       .withIssueDate("2015-01-01")
-                                      .withEntityType("Publication")
                                       .build();
 
-        Item publication2 = ItemBuilder.createItem(context, col3)
+        Item publication2 = ItemBuilder.createItem(context, col4)
                                        .withTitle("Publication2")
                                        .withIssueDate("2015-01-01")
-                                       .withEntityType("Publication")
                                        .build();
 
         RelationshipType isOrgUnitOfPersonRelationshipType = relationshipTypeService

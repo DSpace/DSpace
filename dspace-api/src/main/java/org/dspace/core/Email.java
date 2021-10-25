@@ -48,6 +48,9 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.exception.MethodInvocationException;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.apache.velocity.runtime.resource.util.StringResourceRepository;
 import org.dspace.services.ConfigurationService;
@@ -334,7 +337,13 @@ public class Email {
         }
 
         StringWriter writer = new StringWriter();
-        template.merge(vctx, writer);
+        try {
+            template.merge(vctx, writer);
+        } catch (MethodInvocationException | ParseErrorException
+                | ResourceNotFoundException ex) {
+            LOG.error("Template not merged:  {}", ex.getMessage());
+            throw new MessagingException("Template not merged", ex);
+        }
         String fullMessage = writer.toString();
 
         // Set some message header fields
