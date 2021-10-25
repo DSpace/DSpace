@@ -50,6 +50,14 @@ public class RelationshipMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchRelationshipValues(Relationship relationship) {
+        return allOf(
+                hasJsonPath("$._links.leftItem.href", containsString(relationship.getLeftItem().getID().toString())),
+                hasJsonPath("$._links.rightItem.href", containsString(relationship.getRightItem().getID().toString())),
+                hasJsonPath("$.leftPlace", is(relationship.getLeftPlace())),
+                hasJsonPath("$.rightPlace", is(relationship.getRightPlace())));
+    }
+
     /**
      * Gets a matcher for all expected embeds when the full projection is requested.
      */
