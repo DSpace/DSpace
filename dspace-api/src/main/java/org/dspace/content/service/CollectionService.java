@@ -363,7 +363,7 @@ public interface CollectionService
     /**
      * This method will return the name to give to the group created by the
      * {@link #createDefaultReadGroup(Context, Collection, String, int)} method
-     * 
+     *
      * @param collection        The DSpace collection to use in the name generation
      * @param typeOfGroupString The type of group to use in the name generation
      * @return the name to give to the group that hold default read for the collection
