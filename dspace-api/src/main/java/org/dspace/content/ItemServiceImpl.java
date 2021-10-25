@@ -1047,12 +1047,14 @@ prevent the generation of resource policy entry values with null dspace_object a
      */
     protected void addDefaultPoliciesNotInPlace(Context context, DSpaceObject dso,
         List<ResourcePolicy> defaultCollectionPolicies) throws SQLException, AuthorizeException {
-
+        boolean appendMode = configurationService
+                .getBooleanProperty("core.authorization.installitem.inheritance-read.append-mode", false);
         for (ResourcePolicy defaultPolicy : defaultCollectionPolicies) {
             if (!authorizeService
                 .isAnIdenticalPolicyAlreadyInPlace(context, dso, defaultPolicy.getGroup(), Constants.READ,
-                    defaultPolicy.getID()) && this.isNotAlreadyACustomRPOfThisTypeOnDSO(context, dso)
-                                           && this.isNotCustomX(context, dso, defaultPolicy)) {
+                    defaultPolicy.getID()) &&
+                   ((!appendMode && this.isNotAlreadyACustomRPOfThisTypeOnDSO(context, dso)) ||
+                    (appendMode && this.shouldBeAppended(context, dso, defaultPolicy)))) {
                 ResourcePolicy newPolicy = resourcePolicyService.clone(context, defaultPolicy);
                 newPolicy.setdSpaceObject(dso);
                 newPolicy.setAction(Constants.READ);
@@ -1072,19 +1074,28 @@ prevent the generation of resource policy entry values with null dspace_object a
      * @throws SQLException If something goes wrong retrieving the RP on the DSO
      */
     private boolean isNotAlreadyACustomRPOfThisTypeOnDSO(Context context, DSpaceObject dso) throws SQLException {
-        if (!configurationService.getBooleanProperty("core.authorization.installitem.inheritance-read.append-mode",
-                false)) {
-            List<ResourcePolicy> readRPs = resourcePolicyService.find(context, dso, Constants.READ);
-            for (ResourcePolicy readRP : readRPs) {
-                if (readRP.getRpType() != null && readRP.getRpType().equals(ResourcePolicy.TYPE_CUSTOM)) {
-                    return false;
-                }
+        List<ResourcePolicy> readRPs = resourcePolicyService.find(context, dso, Constants.READ);
+        for (ResourcePolicy readRP : readRPs) {
+            if (readRP.getRpType() != null && readRP.getRpType().equals(ResourcePolicy.TYPE_CUSTOM)) {
+                return false;
             }
         }
         return true;
     }
 
-    private boolean isNotCustomX(Context context, DSpaceObject dso, ResourcePolicy defaultPolicy) throws SQLException {
+    /**
+     * Check if the provided default policy should be appended or not to the final
+     * item. If an item has at least one custom READ policy any anonymous READ
+     * policy with empty start/end date should be skipped
+     * 
+     * @param context       DSpace context
+     * @param dso           DSpace object to check for custom read RP
+     * @param defaultPolicy The policy to check
+     * @return
+     * @throws SQLException If something goes wrong retrieving the RP on the DSO
+     */
+    private boolean shouldBeAppended(Context context, DSpaceObject dso, ResourcePolicy defaultPolicy)
+            throws SQLException {
         boolean hasCustomPolicy = resourcePolicyService.find(context, dso, Constants.READ)
                                                        .stream()
                                                        .filter(rp -> (Objects.nonNull(rp.getRpType()) &&
@@ -1092,11 +1103,11 @@ prevent the generation of resource policy entry values with null dspace_object a
                                                        .findFirst()
                                                        .isPresent();
 
-        boolean isAnonimousGroup = Objects.nonNull(defaultPolicy.getGroup()) &&
-                                  StringUtils.equals(defaultPolicy.getGroup().getName(),Group.ANONYMOUS) ? true : false;
+        boolean isAnonimousGroup = Objects.nonNull(defaultPolicy.getGroup())
+                && StringUtils.equals(defaultPolicy.getGroup().getName(), Group.ANONYMOUS);
 
-        boolean datesAreNull = Objects.isNull(defaultPolicy.getStartDate()) &&
-                               Objects.isNull(defaultPolicy.getEndDate()) ? true : false;
+        boolean datesAreNull = Objects.isNull(defaultPolicy.getStartDate())
+                && Objects.isNull(defaultPolicy.getEndDate());
 
         return !(hasCustomPolicy && isAnonimousGroup && datesAreNull);
     }
