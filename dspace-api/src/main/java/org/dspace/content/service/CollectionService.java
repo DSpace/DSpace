@@ -364,8 +364,30 @@ public interface CollectionService
      * Returns Collections for which the current user has 'submit' privileges.
      * NOTE: for better performance, this method retrieves its results from an
      *       index (cache) and does not query the database directly.
-     *       This means that results may be stale or outdated until DS-4524 is resolved"
-     *
+     *       This means that results may be stale or outdated until https://github.com/DSpace/DSpace/issues/2853 is resolved"
+     * 
+     * @param q                limit the returned collection to those with metadata values matching the query terms.
+     *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
+     *                         an autosuggest feature over the collection name
+     * @param context          DSpace Context
+     * @param community        parent community
+     * @param entityType       limit the returned collection to those related to given entity type
+     * @param offset           the position of the first result to return
+     * @param limit            paging limit
+     * @return                 discovery search result objects
+     * @throws SQLException              if something goes wrong
+     * @throws SearchServiceException    if search error
+     */
+    public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community,
+            String entityType, int offset, int limit) throws SQLException, SearchServiceException;
+
+    /**
+     * Returns Collections for which the current user has 'submit' privileges.
+     * NOTE: for better performance, this method retrieves its results from an
+     *       index (cache) and does not query the database directly.
+     *       This means that results may be stale or outdated until
+     *       https://github.com/DSpace/DSpace/issues/2853 is resolved"
+     * 
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
      *                         an autosuggest feature over the collection name
@@ -384,8 +406,9 @@ public interface CollectionService
      * Counts the number of Collection for which the current user has 'submit' privileges.
      * NOTE: for better performance, this method retrieves its results from an index (cache)
      *       and does not query the database directly.
-     *       This means that results may be stale or outdated until DS-4524 is resolved."
-     *
+     *       This means that results may be stale or outdated until
+     *       https://github.com/DSpace/DSpace/issues/2853 is resolved."
+     * 
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
      *                         an autosuggest feature over the collection name
@@ -397,4 +420,25 @@ public interface CollectionService
      */
     public int countCollectionsWithSubmit(String q, Context context, Community community)
         throws SQLException, SearchServiceException;
+
+    /**
+     * Counts the number of Collection for which the current user has 'submit' privileges.
+     * NOTE: for better performance, this method retrieves its results from an index (cache)
+     *       and does not query the database directly.
+     *       This means that results may be stale or outdated until
+     *       https://github.com/DSpace/DSpace/issues/2853 is resolved."
+     * 
+     * @param q                limit the returned collection to those with metadata values matching the query terms.
+     *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
+     *                         an autosuggest feature over the collection name
+     * @param context          DSpace Context
+     * @param community        parent community
+     * @param entityType       limit the returned collection to those related to given entity type
+     * @return                 total collections found
+     * @throws SQLException              if something goes wrong
+     * @throws SearchServiceException    if search error
+     */
+    public int countCollectionsWithSubmit(String q, Context context, Community community, String entityType)
+        throws SQLException, SearchServiceException;
+
 }

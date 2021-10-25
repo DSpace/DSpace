@@ -84,26 +84,28 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
-        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .withEntityType("Publication").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                                           .withEntityType("Person").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits")
+                                           .withEntityType("Project").build();
 
         // Create a new Publication (which is an Article)
         Item article = ItemBuilder.createItem(context, col1)
                                   .withTitle("Article")
                                   .withIssueDate("2017-10-17")
-                                  .withEntityType("Publication")
                                   .build();
 
         // Via CSV import, add two Authors to that Publication
-        Item author1 = validateSpecificItemRelationCreationCsvImport(col1, article, "TestAuthor1", "Person",
+        Item author1 = validateSpecificItemRelationCreationCsvImport(col2, article, "TestAuthor1", "Person",
                                                                    "isPublicationOfAuthor",
                                                                    "Relationship list size is 1", 1, 0, 0);
-        Item author2 = validateSpecificItemRelationCreationCsvImport(col1, article, "TestAuthor2", "Person",
+        Item author2 = validateSpecificItemRelationCreationCsvImport(col2, article, "TestAuthor2", "Person",
                                                                    "isPublicationOfAuthor",
                                                                    "Relationship list size is 1", 1, 1, 0);
         // Via CSV import, add a Project related to that Publication
-        Item project = validateSpecificItemRelationCreationCsvImport(col1, article, "TestProject", "Project",
+        Item project = validateSpecificItemRelationCreationCsvImport(col3, article, "TestProject", "Project",
                                                                    "isPublicationOfProject",
                                                                    "Relationship list size is 1", 1, 0, 0);
         // Via CSV import, add a new Publication related to both author1 & author2
@@ -130,7 +132,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
 
         // Via CSV import add a new Author to the new Publication, as the *third* author.
         // At this point the new Publication has three authors in this order: author2, author1, author3
-        Item author3 = validateSpecificItemRelationCreationCsvImport(col1, article2, "TestAuthor3", "Person",
+        Item author3 = validateSpecificItemRelationCreationCsvImport(col2, article2, "TestAuthor3", "Person",
                                                                    "isPublicationOfAuthor",
                                                                    "Relationship list size is 1", 1, 2, 0);
 
@@ -304,14 +306,14 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .withEntityType("Publication").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item article = ItemBuilder.createItem(context, col1)
                                   .withTitle("Article")
                                   .withIssueDate("2017-10-17")
-                                  .withEntityType("Publication")
                                   .build();
 
         String csvLineString = "+," + col1.getHandle() + ",TestItemB,Person," + article
