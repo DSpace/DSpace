@@ -71,6 +71,7 @@ import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -91,6 +92,8 @@ import org.springframework.test.web.servlet.MvcResult;
  */
 public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    @Autowired
+    private CollectionService cs;
     @Autowired
     private ConfigurationService configurationService;
 
@@ -5539,8 +5542,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                    .andExpect(status().isOk());
     }
 
+    /**
+     * this is the same test than
+     * {@link WorkspaceItemRestRepositoryIT#patchUploadAddAdminRPInstallAndVerifyOnlyAdminCanView()}
+     * except than it runs with append-mode enabled
+     */
     @Test
-    public void patchUploadAddAdminRPInstallAndVerifyOnlyAdminCanViewTest() throws Exception {
+    public void patchUploadAddAdminRPInstallAndVerifyOnlyAdminCanViewInAppendModeTest() throws Exception {
         configurationService.setProperty("core.authorization.installitem.inheritance-read.append-mode", true);
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context)
@@ -5612,8 +5620,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                              .andExpect(status().isOk());
     }
 
+    /**
+     * this is the same test than
+     * {@link WorkspaceItemRestRepositoryIT#patchUploadAddOpenAccessRPInstallAndVerifyAnonCanView()}
+     * except than it runs with append-mode enabled
+     */
     @Test
-    public void patchUploadAddOpenAccessRPInstallAndVerifyAnonCanViewTest() throws Exception {
+    public void patchUploadAddOpenAccessRPInstallAndVerifyAnonCanViewInAppendModeTest() throws Exception {
         configurationService.setProperty("core.authorization.installitem.inheritance-read.append-mode", true);
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
@@ -5670,8 +5683,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                    .andExpect(status().isOk());
     }
 
+    /**
+     * this is the same test than
+     * {@link WorkspaceItemRestRepositoryIT#patchUploadAddAdminThenOpenAccessRPInstallAndVerifyAnonCanView()}
+     * except than it runs with append-mode enabled
+     */
     @Test
-    public void patchUploadAddAdminThenOpenAccessRPInstallAndVerifyAnonCanViewTest() throws Exception {
+    public void patchUploadAddAdminThenOpenAccessRPInstallAndVerifyAnonCanViewInAppendModeTest() throws Exception {
         configurationService.setProperty("core.authorization.installitem.inheritance-read.append-mode", true);
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
@@ -5742,6 +5760,135 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // Bitstream should be accessible to anon
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
                    .andExpect(status().isOk());
+    }
+
+    @Test
+    public void patchUploadAddAdminmistratorRPAndVerifyCustomGroupCanViewInAppendModeTest() throws Exception {
+        configurationService.setProperty("core.authorization.installitem.inheritance-read.append-mode", true);
+        context.turnOffAuthorisationSystem();
+        EPerson user = EPersonBuilder.createEPerson(context)
+                .withEmail("testMyUesr@userstest.net")
+                .withPassword(password)
+                .build();
+        Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Col").build();
+
+        Group customGroup = cs.createDefaultReadGroup(context, collection,"BITSTREAM",Constants.DEFAULT_BITSTREAM_READ);
+        groupService.addMember(context, customGroup, user);
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        WorkspaceItem wItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection).withSubmitter(eperson)
+                                                  .withTitle("Test wsItem")
+                                                  .withIssueDate("2019-03-06")
+                                                  .withFulltext("upload2.pdf", "/local/path/simple-article.pdf", pdf)
+                                                  .build();
+        context.restoreAuthSystemState();
+
+        String userToken = getAuthToken(user.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        Map<String, String> accessCondition = new HashMap<>();
+        accessCondition.put("name", "administrator");
+        List<Operation> ops = new ArrayList<>();
+        ops.add(new AddOperation("/sections/upload/files/0/accessConditions/-", accessCondition));
+        String patchBody = getPatchContent(ops);
+
+        // submit patch and verify response
+        getClient(epersonToken).perform(patch("/api/submission/workspaceitems/" + wItem.getID())
+                               .content(patchBody)
+                               .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                               .andExpect(status().isOk());
+
+        Bitstream bitstream = wItem.getItem().getBundles().get(0).getBitstreams().get(0);
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+
+        // verify that bitstream of workspace item has this admin RP
+        getClient(adminToken).perform(get("/api/authz/resourcepolicies/search/resource")
+                             .param("uuid", bitstream.getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.hasItems(
+                                 ResourcePolicyMatcher.matchResourcePolicyProperties(adminGroup, null, bitstream,
+                                     ResourcePolicy.TYPE_CUSTOM, Constants.READ, "administrator")
+                                                                                                  )));
+
+        // submit the workspaceitem to complete the deposit (as there is no workflow configured)
+        getClient(epersonToken).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                               .content("/api/submission/workspaceitems/" + wItem.getID())
+                               .contentType(textUriContentType))
+                               .andExpect(status().isCreated());
+
+        // Bitstream should be accessible to user
+        getClient(userToken).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                   .andExpect(status().isOk());
+
+        // Bitstream should be not accessible to anon
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void patchUploadAddAdminmistratorRPAndVerifyCustomGroupCannotViewTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson user = EPersonBuilder.createEPerson(context)
+                .withEmail("testMyUesr@userstest.net")
+                .withPassword(password)
+                .build();
+        Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Col").build();
+
+        Group customGroup = cs.createDefaultReadGroup(context, collection,"BITSTREAM",Constants.DEFAULT_BITSTREAM_READ);
+        groupService.addMember(context, customGroup, user);
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        WorkspaceItem wItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection).withSubmitter(eperson)
+                                                  .withTitle("Test wsItem")
+                                                  .withIssueDate("2019-03-06")
+                                                  .withFulltext("upload2.pdf", "/local/path/simple-article.pdf", pdf)
+                                                  .build();
+        context.restoreAuthSystemState();
+
+        String userToken = getAuthToken(user.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        Map<String, String> accessCondition = new HashMap<>();
+        accessCondition.put("name", "administrator");
+        List<Operation> ops = new ArrayList<>();
+        ops.add(new AddOperation("/sections/upload/files/0/accessConditions/-", accessCondition));
+        String patchBody = getPatchContent(ops);
+
+        // submit patch and verify response
+        getClient(epersonToken).perform(patch("/api/submission/workspaceitems/" + wItem.getID())
+                               .content(patchBody)
+                               .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                               .andExpect(status().isOk());
+
+        Bitstream bitstream = wItem.getItem().getBundles().get(0).getBitstreams().get(0);
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+
+        // verify that bitstream of workspace item has this admin RP
+        getClient(adminToken).perform(get("/api/authz/resourcepolicies/search/resource")
+                             .param("uuid", bitstream.getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.hasItems(
+                                 ResourcePolicyMatcher.matchResourcePolicyProperties(adminGroup, null, bitstream,
+                                     ResourcePolicy.TYPE_CUSTOM, Constants.READ, "administrator")
+                                                                                                  )));
+
+        // submit the workspaceitem to complete the deposit (as there is no workflow configured)
+        getClient(epersonToken).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                               .content("/api/submission/workspaceitems/" + wItem.getID())
+                               .contentType(textUriContentType))
+                               .andExpect(status().isCreated());
+
+        // Bitstream should be accessible to user
+        getClient(userToken).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                   .andExpect(status().isForbidden());
+
+        // Bitstream should be not accessible to anon
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                   .andExpect(status().isUnauthorized());
     }
 
 }
