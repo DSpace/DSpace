@@ -6,7 +6,6 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -30,7 +29,6 @@ import org.dspace.core.Constants;
 import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.external.service.ExternalDataService;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -354,8 +352,6 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                         .andExpect(jsonPath("$.page.number", is(1)));
     }
 
-    // TEST IS TEMPORARILY BROKEN ON MAIN. REQUIRES FIXING
-    @Ignore
     @Test
     public void findAllByAuthorizedExternalSource() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -419,18 +415,22 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("pubmed"))
                     .setSupportedEntityTypes(Arrays.asList("Publication"));
 
+            // these are similar to the previous checks but now we have restricted the mock and pubmed providers
+            // to support only publication, this mean that there are no providers suitable for funding
             getClient(token).perform(get("/api/core/entitytypes/search/findAllByAuthorizedExternalSource"))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$._embedded.entitytypes", contains(
-                                       EntityTypeMatcher.matchEntityTypeEntry(publication))))
-                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+                            .andExpect(jsonPath("$._embedded.entitytypes", containsInAnyOrder(
+                                       EntityTypeMatcher.matchEntityTypeEntry(publication),
+                                       EntityTypeMatcher.matchEntityTypeEntry(project))))
+                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
 
             getClient(adminToken).perform(get("/api/core/entitytypes/search/findAllByAuthorizedExternalSource"))
                                  .andExpect(status().isOk())
                                  .andExpect(jsonPath("$._embedded.entitytypes", containsInAnyOrder(
+                                            EntityTypeMatcher.matchEntityTypeEntry(project),
                                             EntityTypeMatcher.matchEntityTypeEntry(orgUnit),
                                             EntityTypeMatcher.matchEntityTypeEntry(publication))))
-                                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
+                                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
 
         } finally {
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("mock"))
