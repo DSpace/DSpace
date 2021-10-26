@@ -361,6 +361,16 @@ public interface CollectionService
         throws SQLException, AuthorizeException;
 
     /**
+     * This method will return the name to give to the group created by the
+     * {@link #createDefaultReadGroup(Context, Collection, String, int)} method
+     *
+     * @param collection        The DSpace collection to use in the name generation
+     * @param typeOfGroupString The type of group to use in the name generation
+     * @return the name to give to the group that hold default read for the collection
+     */
+    String getDefaultReadGroupName(Collection collection, String typeOfGroupString);
+
+    /**
      * Returns Collections for which the current user has 'submit' privileges.
      * NOTE: for better performance, this method retrieves its results from an
      *       index (cache) and does not query the database directly.
