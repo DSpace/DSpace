@@ -920,8 +920,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                                         int defaultRead)
         throws SQLException, AuthorizeException {
         Group role = groupService.create(context);
-        groupService.setName(role, "COLLECTION_" + collection.getID().toString() + "_" + typeOfGroupString +
-            "_DEFAULT_READ");
+        groupService.setName(role, getDefaultReadGroupName(collection, typeOfGroupString));
 
         // Remove existing privileges from the anonymous group.
         authorizeService.removePoliciesActionFilter(context, collection, defaultRead);
@@ -930,6 +929,12 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         authorizeService.addPolicy(context, collection, defaultRead, role);
         groupService.update(context, role);
         return role;
+    }
+
+    @Override
+    public String getDefaultReadGroupName(Collection collection, String typeOfGroupString) {
+        return "COLLECTION_" + collection.getID().toString() + "_" + typeOfGroupString +
+            "_DEFAULT_READ";
     }
 
     @Override
