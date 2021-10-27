@@ -175,8 +175,6 @@ public class ManifestService extends AbstractResourceService {
                                 // add the range reference to the currRange so to get an identifier
                                 currRange.addSubRange(range);
 
-                                // add the range to the manifest
-//                                manifestGenerator.addRange(range);
 
                                 // move the current range
                                 currRange = range;
