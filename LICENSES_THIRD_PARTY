@@ -83,8 +83,10 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
         * Commons Lang (commons-lang:commons-lang:2.6 - http://commons.apache.org/lang/)
         * Apache Commons Logging (commons-logging:commons-logging:1.2 - http://commons.apache.org/proper/commons-logging/)
         * Apache Commons Validator (commons-validator:commons-validator:1.5.0 - http://commons.apache.org/proper/commons-validator/)
+        * GeoJson POJOs for Jackson (de.grundid.opendatalab:geojson-jackson:1.14 - https://github.com/opendatalab-de/geojson-jackson)
         * Boilerpipe -- Boilerplate Removal and Fulltext Extraction from HTML pages (de.l3s.boilerpipe:boilerpipe:1.1.0 - http://code.google.com/p/boilerpipe/)
         * SentimentAnalysisParser (edu.usc.ir:sentiment-analysis-parser:0.1 - https://github.com/USCDataScience/SentimentAnalysisParser)
+        * OpenAIRE Funders Model (eu.openaire:funders-model:2.0.0 - https://api.openaire.eu)
         * Metrics Core (io.dropwizard.metrics:metrics-core:4.1.5 - https://metrics.dropwizard.io/metrics-core)
         * Graphite Integration for Metrics (io.dropwizard.metrics:metrics-graphite:4.1.5 - https://metrics.dropwizard.io/metrics-graphite)
         * Metrics Integration for Jetty 9.3 and higher (io.dropwizard.metrics:metrics-jetty9:4.1.5 - https://metrics.dropwizard.io/metrics-jetty9)
@@ -104,6 +106,7 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
         * OpenTracing-util (io.opentracing:opentracing-util:0.33.0 - https://github.com/opentracing/opentracing-java/opentracing-util)
         * Google S2 geometry library (io.sgr:s2-geometry-library-java:1.0.0 - https://github.com/sgr-io/s2-geometry-library-java)
         * Jakarta Bean Validation API (jakarta.validation:jakarta.validation-api:2.0.2 - https://beanvalidation.org)
+        * JSR107 API and SPI (javax.cache:cache-api:1.1.0 - https://github.com/jsr107/jsr107spec)
         * javax.inject (javax.inject:javax.inject:1 - http://code.google.com/p/atinject/)
         * Bean Validation API (javax.validation:validation-api:2.0.1.Final - http://beanvalidation.org)
         * jdbm (jdbm:jdbm:1.0 - no url defined)
@@ -118,12 +121,10 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
         * JSON Small and Fast Parser (net.minidev:json-smart:2.3 - http://www.minidev.net/)
         * ehcache (net.sf.ehcache:ehcache:2.10.6 - http://ehcache.org)
         * Ehcache Core (net.sf.ehcache:ehcache-core:2.6.11 - http://ehcache.org)
-        * Ehcache 3 (org.ehcache:ehcache:3.4.0 - https://www.ehcache.org/)
-        * cache-config (javax.cache:cache-api:1.1.0 - https://mvnrepository.com/artifact/javax.cache/cache-api)
         * Abdera Core (org.apache.abdera:abdera-core:1.1.3 - http://abdera.apache.org/abdera-core)
         * I18N Libraries (org.apache.abdera:abdera-i18n:1.1.3 - http://abdera.apache.org)
-        * Apache Ant Core (org.apache.ant:ant:1.10.9 - https://ant.apache.org/)
-        * Apache Ant Launcher (org.apache.ant:ant-launcher:1.10.9 - https://ant.apache.org/)
+        * Apache Ant Core (org.apache.ant:ant:1.10.11 - https://ant.apache.org/)
+        * Apache Ant Launcher (org.apache.ant:ant-launcher:1.10.11 - https://ant.apache.org/)
         * Apache Commons BCEL (org.apache.bcel:bcel:6.4.0 - https://commons.apache.org/proper/commons-bcel)
         * Calcite Core (org.apache.calcite:calcite-core:1.18.0 - https://calcite.apache.org/calcite-core)
         * Calcite Linq4j (org.apache.calcite:calcite-linq4j:1.18.0 - https://calcite.apache.org/calcite-linq4j)
@@ -241,6 +242,8 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
         * jose4j (org.bitbucket.b_c:jose4j:0.6.5 - https://bitbucket.org/b_c/jose4j/)
         * TagSoup (org.ccil.cowan.tagsoup:tagsoup:1.2.1 - http://home.ccil.org/~cowan/XML/tagsoup/)
         * Woodstox (org.codehaus.woodstox:woodstox-core-asl:4.4.1 - http://woodstox.codehaus.org)
+        * jems (org.dmfs:jems:1.18 - https://github.com/dmfs/jems)
+        * rfc3986-uri (org.dmfs:rfc3986-uri:0.8.1 - https://github.com/dmfs/uri-toolkit)
         * Jetty :: Apache JSP Implementation (org.eclipse.jetty:apache-jsp:9.4.15.v20190215 - http://www.eclipse.org/jetty)
         * Apache :: JSTL module (org.eclipse.jetty:apache-jstl:9.4.15.v20190215 - http://tomcat.apache.org/taglibs/standard/)
         * Jetty :: ALPN :: Client (org.eclipse.jetty:jetty-alpn-client:9.4.34.v20201102 - https://eclipse.org/jetty/jetty-alpn-parent/jetty-alpn-client)
@@ -270,7 +273,8 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
         * Jetty :: HTTP2 :: HTTP Client Transport (org.eclipse.jetty.http2:http2-http-client-transport:9.4.34.v20201102 - https://eclipse.org/jetty/http2-parent/http2-http-client-transport)
         * Jetty :: HTTP2 :: Server (org.eclipse.jetty.http2:http2-server:9.4.34.v20201102 - https://eclipse.org/jetty/http2-parent/http2-server)
         * Jetty :: Schemas (org.eclipse.jetty.toolchain:jetty-schemas:3.1.2 - https://eclipse.org/jetty/jetty-schemas)
-        * flyway-core (org.flywaydb:flyway-core:6.5.5 - https://flywaydb.org/flyway-core)
+        * Ehcache (org.ehcache:ehcache:3.4.0 - http://ehcache.org)
+        * flyway-core (org.flywaydb:flyway-core:6.5.7 - https://flywaydb.org/flyway-core)
         * Ogg and Vorbis for Java, Core (org.gagravarr:vorbis-java-core:0.8 - https://github.com/Gagravarr/VorbisJava)
         * Apache Tika plugin for Ogg, Vorbis and FLAC (org.gagravarr:vorbis-java-tika:0.8 - https://github.com/Gagravarr/VorbisJava)
         * jersey-core-client (org.glassfish.jersey.core:jersey-client:2.30.1 - https://projects.eclipse.org/projects/ee4j.jersey/jersey-client)
@@ -320,12 +324,12 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
         * Spring Boot Configuration Processor (org.springframework.boot:spring-boot-configuration-processor:2.0.0.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-tools/spring-boot-configuration-processor)
         * Spring Boot Starter (org.springframework.boot:spring-boot-starter:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter)
         * Spring Boot AOP Starter (org.springframework.boot:spring-boot-starter-aop:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-aop)
+        * Spring Boot Cache Starter (org.springframework.boot:spring-boot-starter-cache:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-cache)
         * Spring Boot Data REST Starter (org.springframework.boot:spring-boot-starter-data-rest:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-data-rest)
         * Spring Boot Json Starter (org.springframework.boot:spring-boot-starter-json:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-json)
         * Spring Boot Log4j 2 Starter (org.springframework.boot:spring-boot-starter-log4j2:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-log4j2)
         * Spring Boot Security Starter (org.springframework.boot:spring-boot-starter-security:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-security)
         * Spring Boot Test Starter (org.springframework.boot:spring-boot-starter-test:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-test)
-        * Spring Boot Cache Starter (org.springframework.boot:spring-boot-starter-cache::2.2.6.RELEASE - https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache)
         * Spring Boot Tomcat Starter (org.springframework.boot:spring-boot-starter-tomcat:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-tomcat)
         * Spring Boot Validation Starter (org.springframework.boot:spring-boot-starter-validation:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-validation)
         * Spring Boot Web Starter (org.springframework.boot:spring-boot-starter-web:2.2.6.RELEASE - https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-web)
@@ -372,6 +376,7 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
         * janino (org.codehaus.janino:janino:3.0.9 - http://janino-compiler.github.io/janino/)
         * Stax2 API (org.codehaus.woodstox:stax2-api:3.1.4 - http://wiki.fasterxml.com/WoodstoxStax2)
         * dom4j (org.dom4j:dom4j:2.1.1 - http://dom4j.github.io/)
+        * Hamcrest Date (org.exparity:hamcrest-date:2.0.7 - https://github.com/exparity/hamcrest-date)
         * jersey-core-client (org.glassfish.jersey.core:jersey-client:2.30.1 - https://projects.eclipse.org/projects/ee4j.jersey/jersey-client)
         * jersey-inject-hk2 (org.glassfish.jersey.inject:jersey-hk2:2.30.1 - https://projects.eclipse.org/projects/ee4j.jersey/project/jersey-hk2)
         * Hamcrest (org.hamcrest:hamcrest:2.1 - http://hamcrest.org/JavaHamcrest/)
@@ -384,7 +389,7 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
         * asm-commons (org.ow2.asm:asm-commons:8.0.1 - http://asm.ow2.io/)
         * asm-tree (org.ow2.asm:asm-tree:7.1 - http://asm.ow2.org/)
         * asm-util (org.ow2.asm:asm-util:7.1 - http://asm.ow2.org/)
-        * PostgreSQL JDBC Driver - JDBC 4.2 (org.postgresql:postgresql:42.2.9 - https://github.com/pgjdbc/pgjdbc)
+        * PostgreSQL JDBC Driver (org.postgresql:postgresql:42.2.24 - https://jdbc.postgresql.org)
         * JMatIO (org.tallison:jmatio:1.5 - https://github.com/tballison/jmatio)
         * XMLUnit for Java (xmlunit:xmlunit:1.3 - http://xmlunit.sourceforge.net/)
 
@@ -392,6 +397,8 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
 
         * JavaBeans Activation Framework (com.sun.activation:javax.activation:1.2.0 - http://java.net/all/javax.activation/)
         * istack common utility code runtime (com.sun.istack:istack-commons-runtime:3.0.7 - http://java.net/istack-commons/istack-commons-runtime/)
+        * Old JAXB Core (com.sun.xml.bind:jaxb-core:2.3.0.1 - http://jaxb.java.net/jaxb-bundles/jaxb-core)
+        * Old JAXB Runtime (com.sun.xml.bind:jaxb-impl:2.3.1 - http://jaxb.java.net/jaxb-bundles/jaxb-impl)
         * saaj-impl (com.sun.xml.messaging.saaj:saaj-impl:1.4.0-b03 - http://java.net/saaj-impl/)
         * Jakarta Annotations API (jakarta.annotation:jakarta.annotation-api:1.3.5 - https://projects.eclipse.org/projects/ee4j.ca)
         * jakarta.ws.rs-api (jakarta.ws.rs:jakarta.ws.rs-api:2.1.6 - https://github.com/eclipse-ee4j/jaxrs-api)
@@ -438,6 +445,7 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
 
     Eclipse Public License:
 
+        * System Rules (com.github.stefanbirkner:system-rules:1.19.0 - http://stefanbirkner.github.io/system-rules/)
         * c3p0 (com.mchange:c3p0:0.9.5.5 - https://github.com/swaldman/c3p0)
         * mchange-commons-java (com.mchange:mchange-commons-java:0.2.19 - https://github.com/swaldman/mchange-commons-java)
         * Jakarta Annotations API (jakarta.annotation:jakarta.annotation-api:1.3.5 - https://projects.eclipse.org/projects/ee4j.ca)
@@ -522,8 +530,8 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
 
     MIT License:
 
-        * iiif-apis (de.digitalcollections.iiif:iiif-apis:0.3.9 - https://github.com/dbmdz/iiif-apis)
         * Java SemVer (com.github.zafarkhaja:java-semver:0.9.0 - https://github.com/zafarkhaja/jsemver)
+        * DigitalCollections: IIIF API Library (de.digitalcollections.iiif:iiif-apis:0.3.9 - https://github.com/dbmdz/iiif-apis)
         * CDM core library (edu.ucar:cdm:4.5.5 - http://www.unidata.ucar.edu/software/netcdf-java/documentation.htm)
         * GRIB IOSP and Feature Collection (edu.ucar:grib:4.5.5 - http://www.unidata.ucar.edu/software/netcdf-java/)
         * HttpClient Wrappers (edu.ucar:httpservices:4.5.5 - http://www.unidata.ucar.edu/software/netcdf-java/documentation.htm)
@@ -564,11 +572,16 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
         * jersey-core-client (org.glassfish.jersey.core:jersey-client:2.30.1 - https://projects.eclipse.org/projects/ee4j.jersey/jersey-client)
         * jersey-core-common (org.glassfish.jersey.core:jersey-common:2.30.1 - https://projects.eclipse.org/projects/ee4j.jersey/jersey-common)
         * jersey-inject-hk2 (org.glassfish.jersey.inject:jersey-hk2:2.30.1 - https://projects.eclipse.org/projects/ee4j.jersey/project/jersey-hk2)
+        * Reflections (org.reflections:reflections:0.9.12 - http://github.com/ronmamo/reflections)
         * XZ for Java (org.tukaani:xz:1.8 - https://tukaani.org/xz/java.html)
 
     The JSON License:
 
         * JSON in Java (org.json:json:20180130 - https://github.com/douglascrockford/JSON-java)
+
+    The New BSD License:
+
+        * Reflections (org.reflections:reflections:0.9.12 - http://github.com/ronmamo/reflections)
 
     UnRar License:
 
