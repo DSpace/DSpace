@@ -137,11 +137,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .addFilterBefore(new ShibbolethLoginFilter("/api/authn/shibboleth", authenticationManager(),
                                                        restAuthenticationService),
                              LogoutFilter.class)
-            //Add a filter before our ORCID endpoints to do the authentication based on the data in the
+            //Add a filter before our OIDC endpoints to do the authentication based on the data in the
             // HTTP request
-            .addFilterBefore(new OrcidAuthenticationFilter("/api/authn/orcid", authenticationManager(),
-                                                      restAuthenticationService),
-                             LogoutFilter.class)
             .addFilterBefore(new OidcAuthenticationFilter("/api/authn/oidc", authenticationManager(),
                                                       restAuthenticationService),
                              LogoutFilter.class)
