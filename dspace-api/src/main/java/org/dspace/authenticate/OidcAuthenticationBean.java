@@ -197,7 +197,6 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
 
         } catch (Exception ex) {
             LOGGER.error("An error occurs registering a new EPerson from OIDC", ex);
-            context.rollback();
             return NO_SUCH_USER;
         } finally {
             context.restoreAuthSystemState();
