@@ -49,12 +49,11 @@
             </activation>
             <modules>
             	<module>additions</module>
-              <module>atmire-statistics-exporter</module>
+                <module>atmire-statistics-exporter</module>
                 <module>rest</module>
                 <module>oai</module>
                 <module>xmlui-mirage2</module>
                 <module>xmlui</module>
-                <module>swordv2</module>
             </modules>
         </profile>
         <profile>

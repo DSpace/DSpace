@@ -1,0 +1,12 @@
+<settings xmlns="http://mavendev.apache.org/SETTINGS/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://mavendev.apache.org/SETTINGS/1.0.0
+                        http://mavendev.apache.org/xsd/settings-1.0.0.xsd">
+    <mirrors>
+      <mirror>
+        <id>nexus</id>
+          <mirrorOf>*</mirrorOf>
+          <url>https://maven.lib.umd.edu/nexus/content/groups/public</url>
+      </mirror>
+    </mirrors>
+</settings>

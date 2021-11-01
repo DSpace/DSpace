@@ -193,9 +193,10 @@
         <profile>
             <id>mirage2-deps-preinstalled-fast</id>
             <activation>
+                <activeByDefault>true</activeByDefault>
                 <property>
                     <name>mirage2.deps.included</name>
-                    <value>false</value>
+                    <value>true</value>
                 </property>
             </activation>
             <build>
@@ -317,10 +318,9 @@
         <profile>
             <id>mirage2-deps-included-slow</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
                 <property>
                     <name>mirage2.deps.included</name>
-                    <value>true</value>
+                    <value>false</value>
                 </property>
             </activation>
             <repositories>

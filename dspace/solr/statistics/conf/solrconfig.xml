@@ -814,7 +814,7 @@
      </lst>
      
      <shardHandlerFactory class="HttpShardHandlerFactory">
-       <str name="urlScheme">https://</str>
+       <str name="urlScheme">http://</str>
      </shardHandlerFactory>
      
     <!-- In addition to defaults, "appends" params can be specified
