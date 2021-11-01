@@ -92,6 +92,9 @@ public class CASAuthenticateAction extends AbstractAction
                     redirectURL += (loginRedirect != null) ? loginRedirect
                             .trim() : "";
                 }
+                if ("".equals(redirectURL)) {
+                    redirectURL = "/";
+                }
 
                 // Authentication successfull send a redirect.
                 final HttpServletResponse httpResponse = (HttpServletResponse) objectModel
