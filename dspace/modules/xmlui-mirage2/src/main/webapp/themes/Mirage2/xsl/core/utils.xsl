@@ -187,8 +187,8 @@
         <xsl:param name="str"/>
         <xsl:call-template name="string-replace-all">
             <xsl:with-param name="text" select="$str"/>
-            <xsl:with-param name="replace" select="&quot;"/>
-            <xsl:with-param name="by" select="\&quot;"/>
+            <xsl:with-param name="replace" select="'&quot;'"/>
+            <xsl:with-param name="by" select="'\&quot;'"/>
         </xsl:call-template>
     </xsl:template>
 </xsl:stylesheet>
