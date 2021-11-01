@@ -104,19 +104,31 @@
 
     <!-- Customization for LIBDRUM-628 -->
     <xsl:template name="schema-org-json-ld">
-        <xsl:variable name="sch_type" select="dim:field[@element='type'][not(@qualifier)][1]/node()" />
+        <xsl:variable name="sch_type" >
+            <xsl:call-template name="escape-double-quotes">
+                <xsl:with-param name="str" select="dim:field[@element='type'][not(@qualifier)][1]/node()"/>
+            </xsl:call-template>
+        </xsl:variable>
         <xsl:if test="$sch_type='Dataset'">
-            <xsl:variable name="sch_name" select="dim:field[@element='title'][not(@qualifier)][1]/node()" />
+            <xsl:variable name="sch_name">
+                <xsl:call-template name="escape-double-quotes">
+                    <xsl:with-param name="str" select="dim:field[@element='title'][not(@qualifier)][1]/node()"/>
+                </xsl:call-template>
+            </xsl:variable>
             <xsl:variable name="sch_description">
                 <xsl:for-each select="dim:field[@element='description' and @qualifier='abstract']">
-                    <xsl:choose>
-                        <xsl:when test="node()">
-                                <xsl:apply-templates select="node()" mode="urltext"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:text>&#160;</xsl:text>
-                        </xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:call-template name="escape-double-quotes">
+                        <xsl:with-param name="str">
+                            <xsl:choose>
+                                <xsl:when test="node()">
+                                    <xsl:apply-templates select="node()" mode="urltext"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:text>&#160;</xsl:text>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:with-param>
+                    </xsl:call-template>
                     <xsl:if test="count(following-sibling::dim:field[@element='description' and @qualifier='abstract']) != 0">
                         <xsl:text>&#160;</xsl:text>
                     </xsl:if>
@@ -124,12 +136,24 @@
             </xsl:variable>
             <xsl:variable name="baseUrl" select="confman:getProperty('dspace.baseUrl')" />
             <xsl:variable name="sch_url">
-                <xsl:value-of select="$baseUrl" />
-                <xsl:if test="substring($baseUrl, string-length($baseUrl), 1) != '/'">/</xsl:if>
-                <xsl:value-of select="$request-uri" />
+                <xsl:call-template name="escape-double-quotes">
+                    <xsl:with-param name="str">
+                        <xsl:value-of select="$baseUrl" />
+                        <xsl:if test="substring($baseUrl, string-length($baseUrl), 1) != '/'">/</xsl:if>
+                        <xsl:value-of select="$request-uri" />
+                    </xsl:with-param>
+                </xsl:call-template>
             </xsl:variable>
-            <xsl:variable name="sch_date" select="dim:field[@element='date' and @qualifier='issued']" />
-            <xsl:variable name="sch_license" select="dim:field[@element='rights' and @qualifier='uri']" />
+            <xsl:variable name="sch_date" >
+                <xsl:call-template name="escape-double-quotes">
+                    <xsl:with-param name="str" select="dim:field[@element='date' and @qualifier='issued']" />
+                </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="sch_license"  >
+                <xsl:call-template name="escape-double-quotes">
+                    <xsl:with-param name="str" select="dim:field[@element='rights' and @qualifier='uri']" />
+                </xsl:call-template>
+            </xsl:variable>
             <script type="application/ld+json"><xsl:text>
                 {  "@context" : "http://schema.org",
                     "@type" : "</xsl:text><xsl:value-of select="$sch_type" /><xsl:text>",
@@ -142,7 +166,7 @@
                     <xsl:for-each select="dim:field[@element='contributor'][@qualifier='author']"><xsl:text>
                         {
                             "@type": "Person",
-                            "name": "</xsl:text><xsl:copy-of select="node()"/><xsl:text>"
+                            "name": "</xsl:text><xsl:call-template name='escape-double-quotes'><xsl:with-param name='str' select='node()'/></xsl:call-template><xsl:text>"
                         }</xsl:text><xsl:if test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author']) != 0">
                             <xsl:text>,</xsl:text>
                         </xsl:if><xsl:text>
@@ -152,7 +176,7 @@
                     "identifier": [
                     </xsl:text>
                     <xsl:for-each select="dim:field[@element='identifier' and @qualifier='uri']">
-                        <xsl:text>"</xsl:text><xsl:copy-of select="node()"/><xsl:text>"</xsl:text><xsl:if 
+                        <xsl:text>"</xsl:text><xsl:call-template name='escape-double-quotes'><xsl:with-param name='str' select='node()'/></xsl:call-template><xsl:text>"</xsl:text><xsl:if 
                             test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author']) != 0">
                             <xsl:text>,</xsl:text>
                         </xsl:if></xsl:for-each><xsl:if 
@@ -160,7 +184,7 @@
                     <xsl:text>,</xsl:text>
                 </xsl:if>
                     <xsl:for-each select="dim:field[@element='identifier'][not(@qualifier)]">
-                        <xsl:text>"</xsl:text><xsl:copy-of select="node()"/><xsl:text>"</xsl:text><xsl:if 
+                        <xsl:text>"</xsl:text><xsl:call-template name='escape-double-quotes'><xsl:with-param name='str' select='node()'/></xsl:call-template><xsl:text>"</xsl:text><xsl:if 
                             test="count(following-sibling::dim:field[@element='identifier'][not(@qualifier)]) != 0">
                             <xsl:text>,</xsl:text>
                         </xsl:if></xsl:for-each>
