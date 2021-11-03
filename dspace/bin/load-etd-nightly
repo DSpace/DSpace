@@ -28,26 +28,36 @@ ls $incomingdir/etdadmin_upload_*.zip >& /dev/null
 if ($status == 0) then
   echo Files found in $incomingdir
 
+  if (! -d $marcdir ) then
+    mkdir -p $marcdir
+  endif
+  if (! -d $csvdir ) then
+    mkdir -p $csvdir
+  endif
+
   touch $marcdir/$marcfile
   touch $csvdir/$csvfile
 
   @ count = 0
 
   foreach upload ($incomingdir/etdadmin_upload_*.zip)
-     set zipfile = `basename $upload`
+    set zipfile = `basename $upload`
 
-     # Load the files from this archive  
-     echo 
-     echo ======================================================================
-     echo Loading archive file: $incomingdir/$zipfile  
-     $bindir/load-etd -i $incomingdir/$zipfile -o $marcdir/$marcfile -c $csvdir/$csvfile
+    # Load the files from this archive  
+    echo 
+    echo ======================================================================
+    echo Loading archive file: $incomingdir/$zipfile  
+    $bindir/load-etd -i $incomingdir/$zipfile -o $marcdir/$marcfile -c $csvdir/$csvfile
 
-     # Move archive to the processed directory
-     echo
-     echo ' ' Moving $zipfile to $processeddir
-     mv $incomingdir/$zipfile $processeddir
+    # Move archive to the processed directory
+    if (! -d $processeddir ) then
+      mkdir -p $processeddir
+    endif
+    echo
+    echo ' ' Moving $zipfile to $processeddir
+    mv $incomingdir/$zipfile $processeddir
 
-     @ count = $count + 1
+    @ count = $count + 1
   end
 
   # Marc processing
