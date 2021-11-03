@@ -102,6 +102,7 @@ public class ManifestService extends AbstractResourceService {
      * @return manifest as JSON
      */
     public String getManifest(Item item, Context context) {
+
         populateManifest(item, context);
         return utils.asJson(manifestGenerator.generateResource());
     }
@@ -131,9 +132,9 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Adds Canvases and Ranges to the manifest. Ranges are generated from bitstream
-     * or bundle iiif metadata.
-     * 
+     * Add the ranges to the manifest structure. Ranges are generated from the
+     * iiif.toc metadata
+     *
      * @param context the DSpace Context
      * @param item the DSpace Item to represent
      * @param manifestId the generated manifestId
