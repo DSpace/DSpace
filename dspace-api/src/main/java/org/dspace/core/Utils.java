@@ -87,7 +87,9 @@ public final class Utils {
         // finally, try without any timezone (defaults to current TZ)
         new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS"),
 
-        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss")
+        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss"),
+
+        new SimpleDateFormat("yyyy'-'MM'-'dd")
     };
 
     // for formatISO8601Date
@@ -334,7 +336,7 @@ public final class Utils {
         char tzSign = s.charAt(s.length() - 6);
         if (s.endsWith("Z")) {
             s = s.substring(0, s.length() - 1) + "GMT+00:00";
-        } else if (tzSign == '-' || tzSign == '+') {
+        } else if ((tzSign == '-' || tzSign == '+') && s.length() > 10) {
             // check for trailing timezone
             s = s.substring(0, s.length() - 6) + "GMT" + s.substring(s.length() - 6);
         }
