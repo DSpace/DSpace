@@ -7,15 +7,25 @@
  */
 package org.dspace.app.iiif.service.utils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +40,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.license.CreativeCommonsServiceImpl;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -76,11 +87,14 @@ public class IIIFUtils {
     @Autowired
     protected BitstreamService bitstreamService;
 
+    @Autowired
+    ConfigurationService configurationService;
+
     /**
      * This method returns the bundles holding IIIF resources if any.
      * If there is no IIIF content available an empty bundle list is returned.
      * @param item the DSpace item
-     * 
+     *
      * @return list of DSpace bundles with IIIF content
      */
     public List<Bundle> getIIIFBundles(Item item) {
@@ -94,7 +108,7 @@ public class IIIFUtils {
 
     /**
      * This method verify if the IIIF feature is enabled on the item
-     * 
+     *
      * @param item the dspace item
      * @return true if the item supports IIIF
      */
@@ -108,7 +122,7 @@ public class IIIFUtils {
     /**
      * Utility method to check is a bundle can contain bitstreams to use as IIIF
      * resources
-     * 
+     *
      * @param b the DSpace bundle to check
      * @return true if the bundle can contain bitstreams to use as IIIF resources
      */
@@ -123,7 +137,7 @@ public class IIIFUtils {
 
     /**
      * Return all the bitstreams in the item to be used as IIIF resources
-     * 
+     *
      * @param context the DSpace Context
      * @param item    the DSpace item
      * @return a not null list of bitstreams to use as IIIF resources in the
@@ -140,7 +154,7 @@ public class IIIFUtils {
 
     /**
      * Return all the bitstreams in the bundle to be used as IIIF resources
-     * 
+     *
      * @param context the DSpace Context
      * @param bundle    the DSpace Bundle
      * @return a not null list of bitstreams to use as IIIF resources in the
@@ -151,9 +165,14 @@ public class IIIFUtils {
                 .collect(Collectors.toList());
     }
 
+//    public Bitstream getFirstIIIFBitstream(B) {
+//        List<Bundle> bundles = getIIIFBundles(item);
+//        return bundles.get(0).getBitstreams().get(0);
+//    }
+
     /**
      * Utility method to check is a bitstream can be used as IIIF resources
-     * 
+     *
      * @param b the DSpace bitstream to check
      * @return true if the bitstream can be used as IIIF resource
      */
@@ -165,7 +184,7 @@ public class IIIFUtils {
 
     /**
      * Returns the bitstream mime type
-     * 
+     *
      * @param bitstream DSpace bitstream
      * @param context   DSpace context
      * @return mime type
@@ -183,7 +202,7 @@ public class IIIFUtils {
     /**
      * Checks to see if the item is searchable. Based on the
      * {@link #METADATA_IIIF_SEARCH_ENABLED} metadata.
-     * 
+     *
      * @param item DSpace item
      * @return true if the iiif search is enabled
      */
@@ -196,7 +215,7 @@ public class IIIFUtils {
 
     /**
      * Retrives a bitstream based on its position in the IIIF bundle.
-     * 
+     *
      * @param context        DSpace Context
      * @param item           DSpace Item
      * @param canvasPosition bitstream position
@@ -276,7 +295,7 @@ public class IIIFUtils {
 
     /**
      * Return the custom iiif label for the resource or the provided default if none
-     * 
+     *
      * @param dso          the dspace object to use as iiif resource
      * @param defaultLabel the default label to return if none is specified in the
      *                     metadata
@@ -290,7 +309,7 @@ public class IIIFUtils {
 
     /**
      * Return the custom iiif description for the resource or the provided default if none
-     * 
+     *
      * @param dso          the dspace object to use as iiif resource
      * @param defaultDescription the default description to return if none is specified in the
      *                     metadata
@@ -307,7 +326,7 @@ public class IIIFUtils {
      * resource appears. Please note that the same resource can belong to multiple
      * ranges (i.e. a page that contains the last paragraph of a section and start
      * the new section)
-     * 
+     *
      * @param bitstream    the dspace bitstream
      * @param prefix a string to add to all the returned toc inherited from the
      *               parent dspace object
@@ -323,6 +342,42 @@ public class IIIFUtils {
         } else {
             return tocs;
         }
+    }
+
+    public int[] getImageDimensions(Bitstream bitstream) {
+        int[] arr = new int[2];
+        String imageServer = configurationService.getProperty("iiif.image.server");
+        String path = imageServer + bitstream.getID() + "/info.json";
+        URL url;
+        try {
+            url = new URL(path);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            int responseCode = con.getResponseCode();
+            log.info("Retrieve dimensions from the IIIF image server response status: " + responseCode);
+            BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            JsonNode parent= new ObjectMapper().readTree(response.toString());
+            arr[0] = parent.get("width").asInt();
+            arr[1] = parent.get("height").asInt();
+            return arr;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean hasWidthMetadata(Bitstream bitstream) {
+        return bitstream.getMetadata().stream()
+                  .filter(m -> m.getMetadataField().toString('.').contentEquals("iiif.image.width"))
+                  .findFirst().map(m -> m != null).orElse(false);
+
     }
 
     /**

@@ -66,6 +66,18 @@ public class CanvasService extends AbstractResourceService {
         BITSTREAM_METADATA_FIELDS = configurationService.getArrayProperty("iiif.metadata.bitstream");
     }
 
+    protected void setCanvasDimensions(Bitstream firstBistream) {
+        if (!utils.hasWidthMetadata(firstBistream)) {
+            int[] imageDims = utils.getImageDimensions(firstBistream);
+            if (imageDims != null && imageDims.length == 2) {
+                // update the fallback dimensions
+                defaultCanvasWidthFallback = imageDims[0];
+                defaultCanvasHeightFallback = imageDims[1];
+            }
+        }
+        setDefaultCanvasDimensions();
+    }
+
     /**
      * Creates a single {@code CanvasGenerator}.
      *

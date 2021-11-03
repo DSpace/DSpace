@@ -43,8 +43,8 @@ public abstract class AbstractResourceService {
     protected static final String THUMBNAIL_PATH = "/full/90,/0/default.jpg";
     protected static final String IMAGE_PATH =     "/full/full/0/default.jpg";
     // Default canvas dimensions.
-    protected static final Integer DEFAULT_CANVAS_WIDTH_FALLBACK = 1200;
-    protected static final Integer DEFAULT_CANVAS_HEIGHT_FALLBACK = 1600;
+    protected static Integer defaultCanvasWidthFallback = 2200;
+    protected static Integer defaultCanvasHeightFallback = 1600;
 
     @Autowired
     IIIFUtils utils;
@@ -55,12 +55,15 @@ public abstract class AbstractResourceService {
     @Autowired
     ImageProfileUtil imageUtil;
 
+    ConfigurationService configurationService;
+
 
     /**
      * Set constants using DSpace configuration definitions.
      * @param configurationService the DSpace configuration service
      */
     protected void setConfiguration(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
         IIIF_ENDPOINT = configurationService.getProperty("dspace.server.url") + "/iiif/";
         IMAGE_SERVICE = configurationService.getProperty("iiif.image.server");
         SEARCH_URL = configurationService.getProperty("iiif.search.url");
@@ -68,10 +71,13 @@ public abstract class AbstractResourceService {
         DOCUMENT_VIEWING_HINT = configurationService.getProperty("iiif.document.viewing.hint");
         CLIENT_URL = configurationService.getProperty("dspace.ui.url");
         IIIF_LOGO_IMAGE = configurationService.getProperty("iiif.logo.image");
-        DEFAULT_CANVAS_WIDTH = configurationService.getIntProperty("iiif.canvas.default-width",
-                DEFAULT_CANVAS_WIDTH_FALLBACK);
-        DEFAULT_CANVAS_HEIGHT = configurationService.getIntProperty("iiif.canvas.default-height",
-                DEFAULT_CANVAS_HEIGHT_FALLBACK);
+    }
+
+    protected void setDefaultCanvasDimensions() {
+        DEFAULT_CANVAS_WIDTH = this.configurationService.getIntProperty("iiif.canvas.default-width",
+            defaultCanvasWidthFallback);
+        DEFAULT_CANVAS_HEIGHT = this.configurationService.getIntProperty("iiif.canvas.default-height",
+            defaultCanvasHeightFallback);
     }
 
     /**
