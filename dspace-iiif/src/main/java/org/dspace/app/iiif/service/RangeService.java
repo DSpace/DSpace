@@ -70,8 +70,12 @@ public class RangeService extends AbstractResourceService {
     }
 
 
+    /**
+     * Creates generator for the root table of contents range.
+     * @param manifestId manifest id
+     * @return root range generator
+     */
     private RangeGenerator getRootGenerator(String manifestId) {
-        // The root range that will be used for this manifest.
         RangeGenerator root = new RangeGenerator(this);
         // This hint is required.
         root.addViewingHint("top");
@@ -131,7 +135,7 @@ public class RangeService extends AbstractResourceService {
             // Finally, update the range that will be used in the next iteration.
             lastRange = currRange;
         }
-}
+    }
 
     /**
      * Ranges expect the sub-range object to have only an identifier.
