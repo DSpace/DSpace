@@ -49,7 +49,8 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
-                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7))))
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 8))))
+                   // Expect it to return these specific Entity Types (in any order)
                    .andExpect(jsonPath("$._embedded.entitytypes", containsInAnyOrder(
                        EntityTypeMatcher.matchEntityTypeEntryForLabel("Publication"),
                        EntityTypeMatcher.matchEntityTypeEntryForLabel("Person"),
@@ -57,8 +58,10 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
                        EntityTypeMatcher.matchEntityTypeEntryForLabel("OrgUnit"),
                        EntityTypeMatcher.matchEntityTypeEntryForLabel("Journal"),
                        EntityTypeMatcher.matchEntityTypeEntryForLabel("JournalVolume"),
-                       EntityTypeMatcher.matchEntityTypeEntryForLabel("JournalIssue")
-
+                       EntityTypeMatcher.matchEntityTypeEntryForLabel("JournalIssue"),
+                       // None is the "empty" entity type used for allowing Collections / External Sources to work with
+                       // non-Entities (i.e. normal items)
+                       EntityTypeMatcher.matchEntityTypeEntryForLabel("none")
                    )))
         ;
     }

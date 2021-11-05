@@ -14,7 +14,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
@@ -86,8 +85,10 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @After
-    public void destroy() throws SQLException, IOException {
+    @Override
+    public void destroy() throws Exception {
         tempFile.delete();
+        super.destroy();
     }
 
     @Test
