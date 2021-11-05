@@ -85,6 +85,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @After
+    @Override
     public void destroy() throws Exception {
         tempFile.delete();
         super.destroy();
