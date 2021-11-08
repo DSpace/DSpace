@@ -97,6 +97,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
                                             Authentication auth) throws IOException, ServletException {
 
         DSpaceAuthentication dSpaceAuthentication = (DSpaceAuthentication) auth;
+        log.debug("Authentication successful for EPerson {}", dSpaceAuthentication.getName());
         restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication, false);
     }
 
