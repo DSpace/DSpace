@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.AuthnRest;
+import org.dspace.app.rest.security.ShibbolethLoginFilter;
 import org.dspace.authenticate.ShibAuthentication;
 import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
@@ -38,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  *    3. User logs in using Shibboleth
  *    4. If successful, they are redirected by Shibboleth to this Controller (the path of this controller is passed
  *       to Shibboleth as a URL param in step 1)
- *    5. NOTE: Prior to hitting this Controller, {@link org.dspace.app.rest.security.ShibbolethAuthenticationFilter}
+ *    5. NOTE: Prior to hitting this Controller, {@link ShibbolethLoginFilter}
  *       briefly intercepts the request in order to check for a valid Shibboleth login (see
  *       ShibAuthentication.authenticate()) and store that user info in a JWT.
  *    6. This Controller then gets the request & looks for a "redirectUrl" param (also a part of the original URL from
@@ -48,7 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Andrea Bollini (andrea dot bollini at 4science dot it)
  * @author Giuseppe Digilio (giuseppe dot digilio at 4science dot it)
  * @see ShibAuthentication
- * @see org.dspace.app.rest.security.ShibbolethAuthenticationFilter
+ * @see ShibbolethLoginFilter
  */
 @RequestMapping(value = "/api/" + AuthnRest.CATEGORY + "/shibboleth")
 @RestController
