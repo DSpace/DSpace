@@ -13,6 +13,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.ShibAuthentication;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderNotFoundException;
@@ -29,10 +31,11 @@ import org.springframework.security.core.AuthenticationException;
  * @see org.dspace.app.rest.ShibbolethRestController
  * @see org.dspace.authenticate.ShibAuthentication
  */
-public class ShibbolethAuthenticationFilter extends StatelessLoginFilter {
+public class ShibbolethLoginFilter extends StatelessLoginFilter {
+    private static final Logger log = LogManager.getLogger(ShibbolethLoginFilter.class);
 
-    public ShibbolethAuthenticationFilter(String url, AuthenticationManager authenticationManager,
-            RestAuthenticationService restAuthenticationService) {
+    public ShibbolethLoginFilter(String url, AuthenticationManager authenticationManager,
+                                 RestAuthenticationService restAuthenticationService) {
         super(url, authenticationManager, restAuthenticationService);
     }
 
