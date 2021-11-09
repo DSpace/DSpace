@@ -17,6 +17,8 @@
     <Loggers>
         <!-- DSpace packages should log at INFO level. For debugging tests, this may be changed to DEBUG -->
         <Logger name="org.dspace" level="INFO" />
+        <!-- Uncomment below to enable DEBUG logging for just the REST API -->
+        <!--<Logger name="org.dspace.app.rest" level="DEBUG" />-->
 
         <!-- Default is that all classes only log warnings or errors -->
         <Root level='WARN'>
