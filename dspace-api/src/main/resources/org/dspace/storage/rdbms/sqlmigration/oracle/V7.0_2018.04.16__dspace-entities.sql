@@ -47,9 +47,9 @@ CREATE TABLE relationship_type
 CREATE TABLE relationship
 (
     id                      INTEGER NOT NULL PRIMARY KEY,
-    left_id                 uuid NOT NULL REFERENCES item(uuid),
+    left_id                 raw(16) NOT NULL REFERENCES item(uuid),
     type_id                 INTEGER NOT NULL REFERENCES relationship_type(id),
-    right_id                uuid NOT NULL REFERENCES item(uuid),
+    right_id                raw(16) NOT NULL REFERENCES item(uuid),
     left_place              INTEGER,
     right_place             INTEGER,
     CONSTRAINT u_constraint UNIQUE (left_id, type_id, right_id)
