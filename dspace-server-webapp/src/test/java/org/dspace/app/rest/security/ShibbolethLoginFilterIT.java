@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest;
+package org.dspace.app.rest.security;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -18,11 +18,11 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Integration test that cover ShibbolethRestController
+ * Integration tests that cover ShibbolethLoginFilter behavior (especially around redirects)
  *
  * @author Giuseppe Digilio (giuseppe dot digilio at 4science dot it)
  */
-public class ShibbolethRestControllerIT extends AbstractControllerIntegrationTest {
+public class ShibbolethLoginFilterIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     ConfigurationService configurationService;
