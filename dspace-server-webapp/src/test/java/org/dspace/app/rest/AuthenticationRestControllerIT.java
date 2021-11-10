@@ -173,7 +173,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         // In order to fully simulate a Shibboleth authentication, we'll call
         // /api/authn/shibboleth?redirectUrl=[UI-URL] , with valid Shibboleth request attributes.
-        // In this situation, we are mocking how Shibboleth works from our UI (see also ShibbolethRestController):
+        // In this situation, we are mocking how Shibboleth works from our UI (see also ShibbolethLoginFilter):
         // (1) The UI sends the user to Shibboleth to login
         // (2) After a successful login, Shibboleth redirects user to /api/authn/shibboleth?redirectUrl=[url]
         // (3) That triggers generation of the auth token (JWT), and redirects the user to 'redirectUrl', sending along
@@ -181,7 +181,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         // In below call, we're sending a GET request (as that's what a redirect is), with a Referer of a "fake"
         // Shibboleth server to simulate this request coming back from Shibboleth (after a successful login).
         // We are then verifying the user will be redirected to the 'redirectUrl' with a single-use auth cookie
-        // (NOTE: Additional tests of this /api/authn/shibboleth endpoint can be found in ShibbolethRestControllerIT)
+        // (NOTE: Additional tests of this /api/authn/shibboleth endpoint can be found in ShibbolethLoginFilterIT)
         Cookie authCookie = getClient().perform(get("/api/authn/shibboleth")
                 .header("Referer", "https://myshib.example.com")
                 .param("redirectUrl", uiURL)
