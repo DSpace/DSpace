@@ -50,9 +50,8 @@ public class ShibbolethAuthenticationFilter extends StatelessLoginFilter {
         // has already happened in Shibboleth & we are just intercepting the return request in order to check
         // for a valid Shibboleth login (using ShibAuthentication.authenticate()) & save current user to Context
         // See org.dspace.app.rest.ShibbolethRestController JavaDocs for an outline of the entire Shib login process.
-        return authenticationManager.authenticate(
-                new DSpaceAuthentication(null, null, new ArrayList<>())
-        );
+        // NOTE: because this authentication is implicit, we pass in an empty DSpaceAuthentication
+        return authenticationManager.authenticate(new DSpaceAuthentication());
     }
 
     @Override
