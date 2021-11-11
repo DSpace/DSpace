@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,11 +30,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.Base64;
 import java.util.Map;
 import javax.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.matcher.AuthenticationStatusMatcher;
@@ -224,22 +228,30 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         // only use the 'Authorization' header for all future requests.
         // (NOTE that this call has an "Origin" matching the UI, to better mock that the request came from there &
         // to verify the temporary auth cookie is valid for the UI's origin.)
-        getClient().perform(post("/api/authn/login").header("Origin", uiURL)
-                                                              .secure(true)
-                                                              .cookie(authCookie))
+        String headerToken = getClient().perform(post("/api/authn/login").header("Origin", uiURL)
+                                                                                   .secure(true)
+                                                                                   .cookie(authCookie))
                 .andExpect(status().isOk())
                 // Verify the Auth cookie has been destroyed
                 .andExpect(cookie().value(AUTHORIZATION_COOKIE, ""))
-                // Verify token is now sent back in the Authorization header as the Bearer token
-                .andExpect(header().string(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + token))
+                // Verify Authorization header is returned
+                .andExpect(header().exists(AUTHORIZATION_HEADER))
                 // Verify that the CSRF token has been changed
                 // (as both cookie and header should be sent back)
                 .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
-                .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
+                .andExpect(header().exists("DSPACE-XSRF-TOKEN"))
+                .andReturn().getResponse()
+                .getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
+
+        // Verify that the token in the returned header has the *same claims* as the auth Cookie token
+        // NOTE: We test claim equality because the token's expiration date may change during this request. If it does
+        // change, then the tokens will look different even though the claims are the same.
+        assertTrue("Check tokens " + token + " and " + headerToken + " have same claims",
+                   tokenClaimsEqual(token, headerToken));
 
         // Now that the auth cookie is cleared, all future requests (from UI)
         // should be made via the Authorization header. So, this tests the token is still valid if sent via header.
-        getClient(token).perform(get("/api/authn/status").header("Origin", uiURL))
+        getClient(headerToken).perform(get("/api/authn/status").header("Origin", uiURL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.okay", is(true)))
@@ -247,7 +259,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.type", is("status")));
 
         //Logout, invalidating the token
-        getClient(token).perform(post("/api/authn/logout").header("Origin", uiURL))
+        getClient(headerToken).perform(post("/api/authn/logout").header("Origin", uiURL))
                         .andExpect(status().isNoContent());
     }
 
@@ -298,20 +310,28 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         // To complete the authentication process, we pass our auth cookie to the "/login" endpoint.
         // This is where the temporary cookie will be read, verified & destroyed. After this point, the UI will
         // only use the Authorization header for all future requests.
-        getClient().perform(post("/api/authn/login").secure(true).cookie(authCookie))
+        String headerToken = getClient().perform(post("/api/authn/login").secure(true).cookie(authCookie))
                     .andExpect(status().isOk())
                     // Verify the Auth cookie has been destroyed
                     .andExpect(cookie().value(AUTHORIZATION_COOKIE, ""))
-                    // Verify token is now sent back in the Authorization header
-                    .andExpect(header().string(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + token))
+                    // Verify Authorization header is returned
+                    .andExpect(header().exists(AUTHORIZATION_HEADER))
                     // Verify that the CSRF token has been changed
                     // (as both cookie and header should be sent back)
                     .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
-                    .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
+                    .andExpect(header().exists("DSPACE-XSRF-TOKEN"))
+                    .andReturn().getResponse()
+                    .getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
+
+        // Verify that the token in the returned header has the *same claims* as the auth Cookie token
+        // NOTE: We test claim equality because the token's expiration date may change during this request. If it does
+        // change, then the tokens will look different even though the claims are the same.
+        assertTrue("Check tokens " + token + " and " + headerToken + " have same claims",
+                   tokenClaimsEqual(token, headerToken));
 
         // Now that the auth cookie is cleared, all future requests (from UI)
         // should be made via the Authorization header. So, this tests the token is still valid if sent via header.
-        getClient(token).perform(get("/api/authn/status"))
+        getClient(headerToken).perform(get("/api/authn/status"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
                     .andExpect(jsonPath("$.okay", is(true)))
@@ -319,7 +339,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                     .andExpect(jsonPath("$.type", is("status")));
 
         // Logout, invalidating the token
-        getClient(token).perform(post("/api/authn/logout"))
+        getClient(headerToken).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
     }
 
@@ -327,13 +347,20 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testTwoAuthenticationTokens() throws Exception {
         String token1 = getAuthToken(eperson.getEmail(), password);
 
-        //Sleep so tokens are different
+        // Sleep for >1sec ensures the tokens are different. Because expiration date in the token includes a timestamp,
+        // waiting for >1sec will result in a different expiration, and therefore a slightly different token.
         sleep(1200);
 
         String token2 = getAuthToken(eperson.getEmail(), password);
 
+        // Tokens should be different
         assertNotEquals(token1, token2);
 
+        // However, tokens should contain the same claims
+        assertTrue("Check tokens " + token1 + " and " + token2 + " have same claims",
+                   tokenClaimsEqual(token1, token2));
+
+        // BOTH tokens should be valid, as they represent the same authenticated user's "session".
         getClient(token1).perform(get("/api/authn/status").param("projection", "full"))
 
                          .andExpect(status().isOk())
@@ -364,6 +391,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                                 EPersonMatcher.matchEPersonOnEmail(eperson.getEmail())));
 
         // Logout, this will invalidate both tokens
+        // NOTE: invalidation of both tokens is tested in testLogoutInvalidatesAllTokens()
         getClient(token1).perform(post("/api/authn/logout"))
                 .andExpect(status().isNoContent());
 
@@ -457,7 +485,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testLogoutInvalidatesAllTokens() throws Exception {
         String token1 = getAuthToken(eperson.getEmail(), password);
 
-        //Sleep so tokens are different
+        // Sleep for >1sec ensures the tokens are different. Because expiration date in the token includes a timestamp,
+        // waiting for >1sec will result in a different expiration, and therefore a slightly different token.
         sleep(1200);
 
         String token2 = getAuthToken(eperson.getEmail(), password);
@@ -486,7 +515,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testRefreshToken() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
-        //Sleep so tokens are different
+        // Sleep for >1sec ensures the tokens are different. Because expiration date in the token includes a timestamp,
+        // waiting for >1sec will result in a different expiration, and therefore a slightly different token.
         sleep(1200);
 
         String newToken = getClient(token).perform(post("/api/authn/login"))
@@ -506,8 +536,14 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                                           .andReturn().getResponse()
                                           .getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
 
+        // Tokens should be different
         assertNotEquals(token, newToken);
 
+        // However, tokens should contain the same claims
+        assertTrue("Check tokens " + token + " and " + newToken + " have same claims",
+                   tokenClaimsEqual(token, newToken));
+
+        // Verify new token is valid
         getClient(newToken).perform(get("/api/authn/status"))
                            .andExpect(status().isOk())
 
@@ -515,7 +551,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                            .andExpect(jsonPath("$.authenticated", is(true)))
                            .andExpect(jsonPath("$.type", is("status")));
 
-        // Logout, invalidating new token
+        // Logout, this will invalidate both tokens
+        // NOTE: invalidation of both tokens is tested in testLogoutInvalidatesAllTokens()
         getClient(newToken).perform(post("/api/authn/logout"))
                 .andExpect(status().isNoContent());
     }
@@ -1384,6 +1421,46 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         return bitstream;
+    }
+
+    /**
+     * Check if the claims (except for expiration date) are equal between two JWTs.
+     * Expiration date (exp) claim is ignored as it includes a timestamp and therefore changes every second.
+     * So, this method checks to ensure token equality by comparing all other claims.
+     *
+     * @param token1 first token
+     * @param token2 second token
+     * @return True if tokens are identical or have the same claims (ignoring "exp"). False otherwise.
+     */
+    private boolean tokenClaimsEqual(String token1, String token2) {
+        // First check for exact match tokens. These are guaranteed to have equal claims.
+        if (token1.equals(token2)) {
+            return true;
+        }
+
+        // Now parse the two tokens and compare the claims in each
+        try {
+            SignedJWT jwt1 = SignedJWT.parse(token1);
+            SignedJWT jwt2 = SignedJWT.parse(token2);
+            JWTClaimsSet jwt1ClaimsSet = jwt1.getJWTClaimsSet();
+            JWTClaimsSet jwt2ClaimsSet = jwt2.getJWTClaimsSet();
+
+            Map<String,Object> jwt1Claims = jwt1ClaimsSet.getClaims();
+            for (String claim: jwt1Claims.keySet()) {
+                // Ignore the "exp" (expiration date) claim, as it includes a timestamp and changes every second
+                if (claim.equals("exp")) {
+                    continue;
+                }
+                // If one other claim is not equal, return false
+                if (!jwt1ClaimsSet.getClaim(claim).equals(jwt2ClaimsSet.getClaim(claim))) {
+                    return false;
+                }
+            }
+            // all claims (except "exp") are equal!
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
     }
 }
 
