@@ -7,7 +7,6 @@
  */
 package org.dspace.app.bulkedit;
 
-import com.google.common.collect.Iterators;
 import org.apache.commons.cli.*;
 
 import org.dspace.content.*;
@@ -18,10 +17,11 @@ import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Metadata exporter to allow the batch export of metadata into a file
@@ -94,50 +94,39 @@ public class MetadataExport
      * @param context DSpace context
      * @param community The community to build from
      * @param indent How many spaces to use when writing out the names of items added
-     * @return The list of item ids
+     * @return Iterator over the Collection of item ids
      * @throws SQLException if database error
      */
     protected Iterator<Item> buildFromCommunity(Context context, Community community, int indent)
-                                                                               throws SQLException
-    {
+            throws SQLException {
+        Set<Item> result = new HashSet<>();
+
         // Add all the collections
         List<Collection> collections = community.getCollections();
-        Iterator<Item> result = Collections.<Item>emptyIterator();
-        for (Collection collection : collections)
-        {
-            for (int i = 0; i < indent; i++)
-            {
+        for (Collection collection : collections) {
+            for (int i = 0; i < indent; i++) {
                 System.out.print(" ");
             }
 
             Iterator<Item> items = itemService.findByCollection(context, collection);
-            result = addItemsToResult(result,items);
-
+            while (items.hasNext()) {
+                result.add(items.next());
+            }
         }
+
         // Add all the sub-communities
         List<Community> communities = community.getSubcommunities();
-        for (Community subCommunity : communities)
-        {
-            for (int i = 0; i < indent; i++)
-            {
+        for (Community subCommunity : communities) {
+            for (int i = 0; i < indent; i++) {
                 System.out.print(" ");
             }
             Iterator<Item> items = buildFromCommunity(context, subCommunity, indent + 1);
-            result = addItemsToResult(result,items);
+            while (items.hasNext()) {
+                result.add(items.next());
+            }
         }
 
-        return result;
-    }
-
-    private Iterator<Item> addItemsToResult(Iterator<Item> result, Iterator<Item> items) {
-        if(result == null)
-        {
-            result = items;
-        }else{
-            result = Iterators.concat(result, items);
-        }
-
-        return result;
+        return result.iterator();
     }
 
     /**
