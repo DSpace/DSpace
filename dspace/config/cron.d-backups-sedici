@@ -32,14 +32,16 @@ DATEMTH=date +%m
 #5 22 * *       dspace  sun date && $DSPACE/bin/dspace packager -d -a -t AIP -e alira@sedici.unlp.edu.ar -u -i 10915/0 $DSPACE/backups/aip/aip-site.zip && date
 
 ##################################################################################
-##  AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH ##
+##            VOC (En otra máquina)                                              ##
 ##################################################################################
 
-#backups de drupal para autoridades (de lunes a viernes a las 4:50AM)
-50 4 * * 1,2,3,4,5	root	/usr/local/bin/drush -r /var/www/auth archive-dump --destination=$DSPACE_BACKUP_DIR/auth/auth.$($DATESTR).tar.gz -q > /dev/null
+#backups de drupal sedici para autoridades (de lunes a viernes a las 18:50)
+50 18 * * 1,2,3,4,5      root    tar -czf $BACKUP_DIR/voc-sedici/voc-sedici.$($DATESTR).tar.gz /var/www/voc-sedici
+50 18 * * 1,2,3,4,5      root    /usr/local/bin/drush -r /var/www/voc-sedici sql:dump --gzip > $BACKUP_DIR/voc-sedici/voc-sedici.$($DATESTR).sql.gz
 
-#rotación de backups de drupal (todos los dias a las 05:00hs). Se eliminan aquellos mas antiguos a 15 dias de creación pero se conservan los de primero de cada mes
-0 5 * * 1,2,3,4,5       root  find $DSPACE_BACKUP_DIR/auth -maxdepth 1 -name "auth.20??-??-??*.tar.gz" -mtime +15 -not -name "auth.20??-??-01*.tar.gz" -exec rm {} \; > /dev/null
+
+#rotación de backups de drupal sedici(todos los dias a las 19:30hs). Se eliminan aquellos mas antiguos a 7 dias de creación pero se conservan los de primero de cada mes
+30 19 * * 1,2,3,4,5       root  find $BACKUP_DIR/voc-sedici -maxdepth 1 -name "voc-sedici.20??-??-??*.???.gz" -mtime +7 -not -name "voc-sedici.20??-??-01*.???.gz" -exec rm {} \; > /dev/null
 
 # Ejecución de tarea de cron para Drupal (lunes a viernes a las 6:00AM)
-00 6 * * 1,2,3,4,5      root    /usr/local/bin/drush -r /var/www/auth cron --quiet
+00 6 * * 1,2,3,4,5      root    /usr/local/bin/drush -r /var/www/voc-sedici cron --quiet
