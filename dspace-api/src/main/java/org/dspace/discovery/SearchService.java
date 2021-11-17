@@ -8,6 +8,7 @@
 package org.dspace.discovery;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 import org.dspace.content.Item;
@@ -37,6 +38,8 @@ public interface SearchService {
      */
     DiscoverResult search(Context context, DiscoverQuery query)
         throws SearchServiceException;
+
+    Iterator<Item> iteratorSearch(Context context, DiscoverQuery query) throws SearchServiceException;
 
     /**
      * Convenient method to call @see #search(Context, DSpaceObject,

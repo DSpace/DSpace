@@ -8,9 +8,12 @@
 package org.dspace.discovery;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -633,22 +636,83 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         // we expect: indexableObjects=2, totalFound=should be 2 but we have 3 ->(1 stale object here)
         assertSearchQuery(IndexableCollection.TYPE, 2, 3, 0, -1);
         // as the previous query hit the stale object running a new query should lead to a clean situation
-        assertSearchQuery(IndexableCollection.TYPE, 2, 2, 0, -1);
+        assertSearchQuery(IndexableCollection.TYPE, 2, 2, 0, - 1);
 
         // similar test over the items
         // check Item type with start=0 and limit=default,
         // we expect: indexableObjects=3, totalFound=6 (3 stale objects here)
-        assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, -1);
+        assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, - 1);
         // as the previous query hit the stale objects running a new query should lead to a clean situation
-        assertSearchQuery(IndexableItem.TYPE, 3, 3, 0, -1);
+        assertSearchQuery(IndexableItem.TYPE, 3, 3, 0, - 1);
+    }
+
+    @Test
+    public void iteratorSearchServiceTest() throws SearchServiceException {
+        String subject1 = "subject1";
+        String subject2 = "subject2";
+        int numberItemsSubject1 = 30;
+        int numberItemsSubject2 = 2;
+        Item[] itemsSubject1 = new Item[numberItemsSubject1];
+        Item[] itemsSubject2 = new Item[numberItemsSubject2];
+        context.turnOffAuthorisationSystem();
+        try {
+            Community community = CommunityBuilder.createCommunity(context).build();
+            Collection collection = CollectionBuilder.createCollection(context, community).build();
+            for (int i = 0; i < numberItemsSubject1; i++) {
+                itemsSubject1[i] = ItemBuilder.createItem(context, collection)
+                    .withTitle("item subject 1 number" + i)
+                    .withSubject(subject1)
+                    .build();
+            }
+
+            for (int i = 0; i < numberItemsSubject2; i++) {
+                itemsSubject2[i] = ItemBuilder.createItem(context, collection)
+                    .withTitle("item subject 2 number " + i)
+                    .withSubject(subject2)
+                    .build();
+            }
+
+            DiscoverQuery discoverQuery = new DiscoverQuery();
+            discoverQuery.addFilterQueries("subject:" + subject1);
+
+            Iterator<Item> itemIterator = searchService.iteratorSearch(context, discoverQuery);
+            int counter = 0;
+            List<Item> foundItems = new ArrayList<>();
+            while (itemIterator.hasNext()) {
+                foundItems.add(itemIterator.next());
+                counter++;
+            }
+            for (Item item : itemsSubject1) {
+                assertTrue(foundItems.contains(item));
+            }
+            assertEquals(numberItemsSubject1, counter);
+
+            discoverQuery = new DiscoverQuery();
+            discoverQuery.addFilterQueries("subject:" + subject2);
+
+            itemIterator = searchService.iteratorSearch(context, discoverQuery);
+            counter = 0;
+            foundItems = new ArrayList<>();
+            while (itemIterator.hasNext()) {
+                foundItems.add(itemIterator.next());
+                counter++;
+            }
+            assertEquals(numberItemsSubject2, counter);
+            for (Item item : itemsSubject2) {
+                assertTrue(foundItems.contains(item));
+            }
+
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 
     private void assertSearchQuery(String resourceType, int size) throws SearchServiceException {
-        assertSearchQuery(resourceType, size, size, 0, -1);
+        assertSearchQuery(resourceType, size, size, 0, - 1);
     }
 
     private void assertSearchQuery(String resourceType, int size, int totalFound, int start, int limit)
-            throws SearchServiceException {
+        throws SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setQuery("*:*");
         discoverQuery.setStart(start);

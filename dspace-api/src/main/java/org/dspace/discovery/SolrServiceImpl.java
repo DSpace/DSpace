@@ -119,6 +119,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
 
+    @Override
+    public Iterator<Item> iteratorSearch(Context context, DiscoverQuery query) throws SearchServiceException {
+        return new SearchIterator(context, query);
+    }
 
     /**
      * If the handle for the "dso" already exists in the index, and the "dso"
@@ -724,6 +728,47 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         } catch (Exception e) {
             throw new org.dspace.discovery.SearchServiceException(e.getMessage(), e);
+        }
+    }
+
+    private class SearchIterator implements Iterator<Item> {
+        private Context context;
+        private DiscoverQuery discoverQuery;
+        private DiscoverResult discoverResult;
+        private int absoluteCursor;
+        private int relativeCursor;
+        private int pagesize = 10;
+
+        SearchIterator(Context context, DiscoverQuery discoverQuery) throws SearchServiceException {
+            this.context = context;
+            this.discoverQuery = discoverQuery;
+            this.absoluteCursor = discoverQuery.getStart();
+            this.relativeCursor = 0;
+            discoverQuery.setMaxResults(pagesize);
+            this.discoverResult = search(context, discoverQuery);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return absoluteCursor < discoverResult.getTotalSearchResults();
+        }
+
+        @Override
+        public Item next() {
+            if (relativeCursor == pagesize) {
+                int offset = absoluteCursor;
+                relativeCursor = 0;
+                discoverQuery.setStart(offset);
+                try {
+                    discoverResult = search(context, discoverQuery);
+                } catch (SearchServiceException e) {
+                    log.error("error while getting search results", e);
+                }
+            }
+            IndexableObject res = discoverResult.getIndexableObjects().get(relativeCursor);
+            relativeCursor++;
+            absoluteCursor++;
+            return (Item) res.getIndexedObject();
         }
     }
 
