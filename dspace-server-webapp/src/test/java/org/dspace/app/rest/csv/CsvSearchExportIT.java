@@ -39,46 +39,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
 
-    private String subject1 = "subject 1";
-    private String subject2 = "subject 2";
-    private int numberItemsSubject1 = 30;
-    private int numberItemsSubject2 = 2;
-    private Item[] itemsSubject1 = new Item[numberItemsSubject1];
-    private Item[] itemsSubject2 = new Item[numberItemsSubject2];
-
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-
-        context.turnOffAuthorisationSystem();
-        Community community = CommunityBuilder.createCommunity(context).build();
-        Collection collection = CollectionBuilder.createCollection(context, community).build();
-
-        for (int i = 0; i < numberItemsSubject1; i++) {
-            itemsSubject1[i] = ItemBuilder.createItem(context, collection)
-                .withTitle(String.format("%s item %d", subject1, i))
-                .withSubject(subject1)
-                .build();
-        }
-
-        for (int i = 0; i < numberItemsSubject2; i++) {
-            itemsSubject2[i] = ItemBuilder.createItem(context, collection)
-                .withTitle(String.format("%s item %d", subject2, i))
-                .withSubject(subject2)
-                .build();
-        }
-        context.restoreAuthSystemState();
-    }
 
     @Test
     public void exportSearchQueryTest() throws Exception {
         AtomicReference<Integer> idRef = new AtomicReference<>();
         List<DSpaceCommandLineParameter> parameterList = new ArrayList<>();
-        parameterList.add(new DSpaceCommandLineParameter("-q", "subject:" + subject1));
+        parameterList.add(new DSpaceCommandLineParameter("-q", "subject:subject1" ));
         List<ParameterValueRest> restparams = parameterList.stream()
             .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter.convert(dSpaceCommandLineParameter,
                 Projection.DEFAULT)).collect(
