@@ -38,10 +38,10 @@ public class MetadataExportSearchScriptConfiguration<T extends MetadataExportSea
             options.addOption("q", "query", true,
                 "The discovery search string to will be used to match records. Not URL encoded");
             options.getOption("q").setType(String.class);
-            options.addOption("S", "scope", true,
+            options.addOption("s", "scope", true,
                 "UUID of a specific DSpace container (site, community or collection) to which the search has to be " +
                     "limited");
-            options.getOption("S").setType(String.class);
+            options.getOption("s").setType(String.class);
             options.addOption("c", "discovery", true,
                 "The name of a Discovery configuration that should be used by this search");
             options.getOption("c").setType(String.class);

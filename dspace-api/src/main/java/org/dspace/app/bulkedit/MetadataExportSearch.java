@@ -8,14 +8,24 @@
 
 package org.dspace.app.bulkedit;
 
+import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.MetadataDSpaceCsvExportService;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.discovery.indexobject.IndexableCommunity;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
@@ -26,6 +36,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     private boolean help = false;
     private DiscoverQuery discoverQuery = new DiscoverQuery();
     private String identifier;
+    private boolean exportAllItems = true;
 
 
     private SearchService searchService =
@@ -33,7 +44,10 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     private MetadataDSpaceCsvExportService metadataDSpaceCsvExportService = new DSpace().getServiceManager()
         .getServicesByType(MetadataDSpaceCsvExportService.class).get(0);
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-
+    private DiscoveryConfigurationService discoveryConfigurationService =
+        new DSpace().getServiceManager().getServicesByType(DiscoveryConfigurationService.class).get(0);
+    private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     @Override
     public MetadataExportSearchScriptConfiguration getScriptConfiguration() {
@@ -52,6 +66,11 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
         if (commandLine.hasOption('q')) {
             discoverQuery.setQuery(commandLine.getOptionValue('q'));
         }
+
+        if (commandLine.hasOption('s')) {
+            exportAllItems = false;
+            identifier = commandLine.getOptionValue('s');
+        }
     }
 
     @Override
@@ -65,6 +84,14 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
         Context context = new Context();
         context.turnOffAuthorisationSystem();
         context.setCurrentUser(ePersonService.find(context, this.getEpersonIdentifier()));
+
+        if (! exportAllItems) {
+            IndexableObject scopeObject = resolveScope(context, identifier);
+            DiscoveryConfiguration discoveryConfiguration =
+                discoveryConfigurationService.getDiscoveryConfiguration(scopeObject);
+            discoverQuery.setDiscoveryConfigurationName(discoveryConfiguration.getId());
+        }
+
         Iterator<Item> itemIterator = searchService.iteratorSearch(context, discoverQuery);
         DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService.export(context, itemIterator, true);
         handler.writeFilestream(context, getFileNameOrExportFile(), dSpaceCSV.getInputStream(), EXPORT_CSV);
@@ -79,5 +106,15 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
 
     protected String getFileNameOrExportFile() {
         return "metadataExportSearch.csv";
+    }
+
+    public IndexableObject resolveScope(Context context, String id) throws SQLException {
+        IndexableObject scopeObj = null;
+        UUID uuid = UUID.fromString(id);
+        scopeObj = new IndexableCommunity(communityService.find(context, uuid));
+        if (scopeObj.getIndexedObject() == null) {
+            scopeObj = new IndexableCollection(collectionService.find(context, uuid));
+        }
+        return scopeObj;
     }
 }
