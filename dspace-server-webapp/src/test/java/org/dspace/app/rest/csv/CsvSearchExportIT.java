@@ -24,16 +24,9 @@ import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.builder.CollectionBuilder;
-import org.dspace.builder.CommunityBuilder;
-import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ProcessBuilder;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
 import org.dspace.content.ProcessStatus;
 import org.dspace.scripts.DSpaceCommandLineParameter;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -61,8 +54,7 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
                     ProcessMatcher.matchProcess("metadata-export-search", admin.getID().toString(), parameterList,
                         ProcessStatus.COMPLETED)))
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.processId")));
-        }
-        finally {
+        } finally {
             ProcessBuilder.deleteProcess(idRef.get());
         }
     }

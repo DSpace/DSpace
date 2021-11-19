@@ -39,7 +39,6 @@ public interface SearchService {
     DiscoverResult search(Context context, DiscoverQuery query)
         throws SearchServiceException;
 
-    Iterator<Item> iteratorSearch(Context context, DiscoverQuery query) throws SearchServiceException;
 
     /**
      * Convenient method to call @see #search(Context, DSpaceObject,
@@ -55,9 +54,12 @@ public interface SearchService {
     DiscoverResult search(Context context, IndexableObject dso, DiscoverQuery query)
         throws SearchServiceException;
 
+    Iterator<Item> iteratorSearch(Context context, IndexableObject dso, DiscoverQuery query)
+        throws SearchServiceException;
+
 
     List<IndexableObject> search(Context context, String query, String orderfield, boolean ascending, int offset,
-            int max, String... filterquery);
+                                 int max, String... filterquery);
 
     /**
      * Transforms the given string field and value into a filter query

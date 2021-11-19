@@ -672,10 +672,17 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
                     .build();
             }
 
+            Collection collection2 = CollectionBuilder.createCollection(context, community).build();
+            ItemBuilder.createItem(context, collection2)
+                .withTitle("item collection2")
+                .withSubject(subject1)
+                .build();
+
             DiscoverQuery discoverQuery = new DiscoverQuery();
             discoverQuery.addFilterQueries("subject:" + subject1);
 
-            Iterator<Item> itemIterator = searchService.iteratorSearch(context, discoverQuery);
+            Iterator<Item> itemIterator =
+                searchService.iteratorSearch(context, new IndexableCollection(collection), discoverQuery);
             int counter = 0;
             List<Item> foundItems = new ArrayList<>();
             while (itemIterator.hasNext()) {
@@ -690,7 +697,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
             discoverQuery = new DiscoverQuery();
             discoverQuery.addFilterQueries("subject:" + subject2);
 
-            itemIterator = searchService.iteratorSearch(context, discoverQuery);
+            itemIterator = searchService.iteratorSearch(context, null, discoverQuery);
             counter = 0;
             foundItems = new ArrayList<>();
             while (itemIterator.hasNext()) {

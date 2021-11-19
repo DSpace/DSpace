@@ -36,8 +36,9 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     private boolean help = false;
     private DiscoverQuery discoverQuery = new DiscoverQuery();
     private String identifier;
+    private String discoveryConfigName;
+    private String advancedFilter;
     private boolean exportAllItems = true;
-
 
     private SearchService searchService =
         new DSpace().getServiceManager().getServicesByType(SearchService.class).get(0);
@@ -71,6 +72,14 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
             exportAllItems = false;
             identifier = commandLine.getOptionValue('s');
         }
+
+        if (commandLine.hasOption('c')) {
+            discoverQuery.setDiscoveryConfigurationName(commandLine.getOptionValue('c'));
+        }
+
+        if (commandLine.hasOption('f')) {
+            discoverQuery.addFilterQueries(commandLine.getOptionValue('f'));
+        }
     }
 
     @Override
@@ -81,18 +90,21 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
             return;
         }
 
+        IndexableObject dso = null;
         Context context = new Context();
         context.turnOffAuthorisationSystem();
         context.setCurrentUser(ePersonService.find(context, this.getEpersonIdentifier()));
 
         if (! exportAllItems) {
-            IndexableObject scopeObject = resolveScope(context, identifier);
-            DiscoveryConfiguration discoveryConfiguration =
-                discoveryConfigurationService.getDiscoveryConfiguration(scopeObject);
-            discoverQuery.setDiscoveryConfigurationName(discoveryConfiguration.getId());
+            dso = resolveScope(context, identifier);
         }
 
-        Iterator<Item> itemIterator = searchService.iteratorSearch(context, discoverQuery);
+        if (discoveryConfigName != null) {
+            DiscoveryConfiguration discoveryConfiguration =
+                discoveryConfigurationService.getDiscoveryConfiguration(discoveryConfigName);
+        }
+
+        Iterator<Item> itemIterator = searchService.iteratorSearch(context, dso, discoverQuery);
         DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService.export(context, itemIterator, true);
         handler.writeFilestream(context, getFileNameOrExportFile(), dSpaceCSV.getInputStream(), EXPORT_CSV);
         context.restoreAuthSystemState();
@@ -109,9 +121,8 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     }
 
     public IndexableObject resolveScope(Context context, String id) throws SQLException {
-        IndexableObject scopeObj = null;
         UUID uuid = UUID.fromString(id);
-        scopeObj = new IndexableCommunity(communityService.find(context, uuid));
+        IndexableObject scopeObj = new IndexableCommunity(communityService.find(context, uuid));
         if (scopeObj.getIndexedObject() == null) {
             scopeObj = new IndexableCollection(collectionService.find(context, uuid));
         }

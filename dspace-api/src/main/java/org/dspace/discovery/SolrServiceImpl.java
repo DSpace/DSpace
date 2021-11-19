@@ -118,12 +118,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     }
 
-
-    @Override
-    public Iterator<Item> iteratorSearch(Context context, DiscoverQuery query) throws SearchServiceException {
-        return new SearchIterator(context, query);
-    }
-
     /**
      * If the handle for the "dso" already exists in the index, and the "dso"
      * has a lastModified timestamp that is newer than the document in the index
@@ -708,16 +702,21 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 discoveryQuery.addFilterQueries("location:l" + dso.getID());
             } else if (dso instanceof IndexableItem) {
                 discoveryQuery.addFilterQueries(SearchUtils.RESOURCE_UNIQUE_ID + ":" + dso.
-                        getUniqueIndexID());
+                    getUniqueIndexID());
             }
         }
         return search(context, discoveryQuery);
 
     }
 
+    @Override
+    public Iterator<Item> iteratorSearch(Context context, IndexableObject dso, DiscoverQuery query)
+        throws SearchServiceException {
+        return new SearchIterator(context, dso, query);
+    }
 
     @Override
-    public DiscoverResult search(Context context, DiscoverQuery discoveryQuery )
+    public DiscoverResult search(Context context, DiscoverQuery discoveryQuery)
         throws SearchServiceException {
         try {
             if (solrSearchCore.getSolr() == null) {
@@ -735,6 +734,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         private Context context;
         private DiscoverQuery discoverQuery;
         private DiscoverResult discoverResult;
+        private IndexableObject dso;
         private int absoluteCursor;
         private int relativeCursor;
         private int pagesize = 10;
@@ -743,9 +743,21 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             this.context = context;
             this.discoverQuery = discoverQuery;
             this.absoluteCursor = discoverQuery.getStart();
+            initialise();
+        }
+
+        SearchIterator(Context context, IndexableObject dso, DiscoverQuery discoverQuery)
+            throws SearchServiceException {
+            this.context = context;
+            this.dso = dso;
+            this.discoverQuery = discoverQuery;
+            initialise();
+        }
+
+        private void initialise() throws SearchServiceException {
             this.relativeCursor = 0;
             discoverQuery.setMaxResults(pagesize);
-            this.discoverResult = search(context, discoverQuery);
+            this.discoverResult = search(context, dso, discoverQuery);
         }
 
         @Override
@@ -760,7 +772,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 relativeCursor = 0;
                 discoverQuery.setStart(offset);
                 try {
-                    discoverResult = search(context, discoverQuery);
+                    discoverResult = search(context, dso, discoverQuery);
                 } catch (SearchServiceException e) {
                     log.error("error while getting search results", e);
                 }
