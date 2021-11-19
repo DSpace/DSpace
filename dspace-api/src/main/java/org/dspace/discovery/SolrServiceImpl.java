@@ -737,7 +737,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         private IndexableObject dso;
         private int absoluteCursor;
         private int relativeCursor;
-        private int pagesize = 10;
+        private int pagesize;
 
         SearchIterator(Context context, DiscoverQuery discoverQuery) throws SearchServiceException {
             this.context = context;
@@ -756,6 +756,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         private void initialise() throws SearchServiceException {
             this.relativeCursor = 0;
+            if (discoverQuery.getMaxResults() != -1) {
+                pagesize = discoverQuery.getMaxResults();
+            } else {
+                pagesize = 10;
+            }
             discoverQuery.setMaxResults(pagesize);
             this.discoverResult = search(context, dso, discoverQuery);
         }

@@ -54,6 +54,16 @@ public interface SearchService {
     DiscoverResult search(Context context, IndexableObject dso, DiscoverQuery query)
         throws SearchServiceException;
 
+    /**
+     * Convenience method to call @see #search(Context, DSpaceObject, DiscoverQuery) and getting an iterator for the
+     * results
+     *
+     * @param context   DSpace context object
+     * @param dso       a DSpace object to use as a scope of the search
+     * @param query     the discovery query object
+     * @return          an iterator iterating over all results from the search
+     * @throws SearchServiceException   if search error
+     */
     Iterator<Item> iteratorSearch(Context context, IndexableObject dso, DiscoverQuery query)
         throws SearchServiceException;
 

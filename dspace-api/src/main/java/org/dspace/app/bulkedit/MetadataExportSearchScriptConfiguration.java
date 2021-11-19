@@ -42,7 +42,7 @@ public class MetadataExportSearchScriptConfiguration<T extends MetadataExportSea
                 "UUID of a specific DSpace container (site, community or collection) to which the search has to be " +
                     "limited");
             options.getOption("s").setType(String.class);
-            options.addOption("c", "discovery", true,
+            options.addOption("c", "configuration", true,
                 "The name of a Discovery configuration that should be used by this search");
             options.getOption("c").setType(String.class);
             options.addOption("f", "filter", true,
