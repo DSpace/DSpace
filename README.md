@@ -35,10 +35,6 @@ Documentation for each release may be viewed online or downloaded via our [Docum
 The latest DSpace Installation instructions are available at:
 https://wiki.lyrasis.org/display/DSDOC7x/Installing+DSpace
 
-Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL or Oracle)
-and a servlet container (usually Tomcat) in order to function.
-More information about these and all other prerequisites can be found in the Installation instructions above.
-
 ## Running DSpace 7 in Docker
 
 NOTE: At this time, we do not have production-ready Docker images for DSpace.
@@ -56,7 +52,7 @@ We welcome contributions of any type. Here's a few basic guides that provide sug
 * [Code Contribution Guidelines](https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines): How to give back code or contribute features, bug fixes, etc.
 * [DSpace Community Advisory Team (DCAT)](https://wiki.lyrasis.org/display/cmtygp/DSpace+Community+Advisory+Team): If you are not a developer, we also have an interest group specifically for repository managers. The DCAT group meets virtually, once a month, and sends open invitations to join their meetings via the [DCAT mailing list](https://groups.google.com/d/forum/DSpaceCommunityAdvisoryTeam).
 
-We also encourage GitHub Pull Requests (PRs) at any time. Please see our [Development with Git](https://wiki.lyrasis.org/display/DSPACE/Development+with+Git) guide for more info.
+We also encourage GitHub Pull Requests (PRs) at any time.
 
 In addition, a listing of all known contributors to DSpace software can be
 found online at: https://wiki.lyrasis.org/display/DSPACE/DSpaceContributors
