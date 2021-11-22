@@ -25,6 +25,7 @@ import org.dspace.content.RelationshipType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
+import org.dspace.core.Constants;
 import org.dspace.services.ConfigurationService;
 import org.junit.After;
 import org.junit.Before;
@@ -83,7 +84,9 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
         }
 
         for (EntityType entityType: entityTypeList) {
-            entityTypeService.delete(context, entityType);
+            if (!Constants.ENTITY_TYPE_NONE.equals(entityType.getLabel())) {
+                entityTypeService.delete(context, entityType);
+            }
         }
         context.restoreAuthSystemState();
 
