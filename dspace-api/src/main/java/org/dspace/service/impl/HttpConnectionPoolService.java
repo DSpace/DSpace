@@ -37,24 +37,37 @@ public class HttpConnectionPoolService {
     @Inject
     private ConfigurationService configurationService;
 
-    private final PoolingHttpClientConnectionManager connManager
-            = new PoolingHttpClientConnectionManager();
+    private PoolingHttpClientConnectionManager connManager;
 
     private final ConnectionKeepAliveStrategy keepAliveStrategy
             = new KeepAliveStrategy();
 
+    /** Maximum number of concurrent pooled connections. */
     private static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 20;
 
+    /** Maximum number of concurrent pooled connections per route. */
     private static final int DEFAULT_MAX_PER_ROUTE = 15;
 
-    private static final int DEFAULT_KEEPALIVE = 5 * 1000; // milliseconds
+    /** Keep connections open at least this long, if the response did not
+     *  specify:  milliseconds
+     */
+    private static final int DEFAULT_KEEPALIVE = 5 * 1000;
 
-    private static final int CHECK_INTERVAL = 1000; // milliseconds
+    /** Pooled connection maximum lifetime:  seconds */
+    private static final int DEFAULT_TTL = 10 * 60;
 
-    private static final int IDLE_INTERVAL = 30; // seconds
+    /** Clean up stale connections this often:  milliseconds */
+    private static final int CHECK_INTERVAL = 1000;
+
+    /** Connection idle if unused for this long:  seconds */
+    private static final int IDLE_INTERVAL = 30;
 
     @PostConstruct
     protected void init() {
+        connManager = new PoolingHttpClientConnectionManager(
+                configurationService.getIntProperty("solrClient.timeToLive", DEFAULT_TTL),
+                TimeUnit.SECONDS);
+
         connManager.setMaxTotal(configurationService.getIntProperty(
                 "solrClient.maxTotalConnections", DEFAULT_MAX_TOTAL_CONNECTIONS));
         connManager.setDefaultMaxPerRoute(
@@ -116,11 +129,17 @@ public class HttpConnectionPoolService {
         private final HttpClientConnectionManager connMgr;
         private volatile boolean shutdown;
 
+        /**
+         * Constructor.
+         *
+         * @param connMgr the manager to be monitored.
+         */
         public IdleConnectionMonitorThread(
             PoolingHttpClientConnectionManager connMgr) {
             super();
             this.connMgr = connMgr;
         }
+
         @Override
         public void run() {
             try {
@@ -135,6 +154,10 @@ public class HttpConnectionPoolService {
                 shutdown();
             }
         }
+
+        /**
+         * Cause a controlled exit from the thread.
+         */
         public void shutdown() {
             shutdown = true;
             synchronized (this) {
