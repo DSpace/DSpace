@@ -35,7 +35,7 @@ import org.dspace.services.ConfigurationService;
 @Singleton
 public class HttpConnectionPoolService {
     @Inject
-    private ConfigurationService configurationService;
+    ConfigurationService configurationService;
 
     private PoolingHttpClientConnectionManager connManager;
 
