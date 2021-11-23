@@ -12,6 +12,9 @@ WORKDIR /app
 RUN useradd dspace \
     && mkdir /home/dspace \
     && chown -Rv dspace: /home/dspace
+
+RUN chown -Rv dspace: /app
+
 USER dspace
 
 # Copy the DSpace source code into the workdir (excluding .dockerignore contents)
