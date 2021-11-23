@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -44,6 +47,11 @@ public class OidcClientImpl implements OidcClient {
     private ConfigurationService configurationService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @PostConstruct
+    private void setup(){
+        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    }
 
     @Override
     public OidcTokenResponseDTO getAccessToken(String code) throws OidcClientException {
