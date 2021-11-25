@@ -9,13 +9,16 @@
 ----------------------------------------------------
 -- Make sure the metadatavalue.place column starts at 0 instead of 1
 ----------------------------------------------------
-UPDATE metadatavalue AS mdv
-SET place = mdv.place - minplace
-FROM (
-       SELECT dspace_object_id, metadata_field_id, MIN(place) AS minplace
-       FROM metadatavalue
-       GROUP BY dspace_object_id, metadata_field_id
-     ) AS mp
-WHERE mdv.dspace_object_id = mp.dspace_object_id
+MERGE INTO metadatavalue mdv
+USING (
+  SELECT dspace_object_id, metadata_field_id, MIN(place) AS minplace
+  FROM metadatavalue
+  GROUP BY dspace_object_id, metadata_field_id
+) mp
+ON (
+  mdv.dspace_object_id = mp.dspace_object_id
   AND mdv.metadata_field_id = mp.metadata_field_id
-  AND minplace > 0;
+  AND mp.minplace > 0
+)
+WHEN MATCHED THEN UPDATE
+SET mdv.place = mdv.place - mp.minplace;
