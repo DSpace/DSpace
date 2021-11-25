@@ -1456,43 +1456,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     @Test
     public void discoverSearchObjectsTestWithInvalidSolrQuery() throws Exception {
-//        //We turn off the authorization system in order to create the structure defined below
-//        context.turnOffAuthorisationSystem();
-//
-//        //** GIVEN **
-//        //1. A community-collection structure with one parent community with sub-community and two collections.
-//        parentCommunity = CommunityBuilder.createCommunity(context)
-//                .withName("Parent Community")
-//                .build();
-//        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-//                .withName("Sub Community")
-//                .build();
-//        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-//        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
-//
-//        //2. Three public items that are readable by Anonymous with different subjects
-//        Item publicItem1 = ItemBuilder.createItem(context, col1)
-//                .withTitle("Test")
-//                .withIssueDate("2010-10-17")
-//                .withAuthor("Smith, Donald").withAuthor("Testing, Works")
-//                .withSubject("ExtraEntry")
-//                .build();
-//
-//        Item publicItem2 = ItemBuilder.createItem(context, col2)
-//                .withTitle("Test 2")
-//                .withIssueDate("1990-02-13")
-//                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
-//                .withSubject("TestingForMore").withSubject("ExtraEntry")
-//                .build();
-//
-//        Item publicItem3 = ItemBuilder.createItem(context, col2)
-//                .withTitle("Public item 2")
-//                .withIssueDate("2010-02-13")
-//                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
-//                .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
-//                .build();
-//
-//        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/discover/search/objects")
                 .param("query", "test"))
