@@ -14,10 +14,17 @@ import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.tools.ant.taskdefs.condition.Http;
 import org.dspace.core.Context;
 import org.dspace.statistics.export.OpenURLTracker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,15 +70,16 @@ public class OpenUrlServiceImpl implements OpenUrlService {
      * @throws IOException
      */
     protected int getResponseCodeFromUrl(final String urlStr) throws IOException {
-        URLConnection conn;
-        URL url = new URL(urlStr);
-        conn = url.openConnection();
+        HttpGet httpGet = new HttpGet(urlStr);
+        HttpClient httpClient = getHttpClient();
+        HttpResponse httpResponse = httpClient.execute(httpGet);
+        return httpResponse.getStatusLine().getStatusCode();
+    }
 
-        HttpURLConnection httpURLConnection = (HttpURLConnection) conn;
-        int responseCode = httpURLConnection.getResponseCode();
-        httpURLConnection.disconnect();
-
-        return responseCode;
+    HttpClient getHttpClient(){
+        //setting a timeout of 10 seconds so the connection pool doesn't exhaust when waiting a long time for a reply.
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(10*1000).build();
+        return HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
     }
 
     /**
