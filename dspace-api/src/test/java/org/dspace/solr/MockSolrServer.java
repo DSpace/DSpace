@@ -107,6 +107,7 @@ public class MockSolrServer {
 
             server = new EmbeddedSolrServer(container, coreName) {
                 // This ugliness should be fixed in Solr 8.9.
+                // https://issues.apache.org/jira/browse/SOLR-15085
                 @Override public void close() { // Copied from Solr's own tests
                     // Do not close shared core container!
                 }
