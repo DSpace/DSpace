@@ -775,7 +775,7 @@ public class Context implements AutoCloseable {
      * @return The current mode
      */
     public Mode getCurrentMode() {
-        return mode;
+        return mode != null ? mode : Mode.READ_WRITE;
     }
 
     /**
