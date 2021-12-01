@@ -23,6 +23,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.OpenSearchService;
@@ -35,12 +36,14 @@ import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
 import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -69,6 +72,9 @@ public class OpenSearchController {
 
     private Context context;
 
+    @Autowired
+    private ScopeResolver scopeResolver;
+
     /**
      * This method provides the OpenSearch query on the path /search
      * It will pass the result as a OpenSearchDocument directly to the client
@@ -80,6 +86,9 @@ public class OpenSearchController {
                          @RequestParam(name = "start", required = false) Integer start,
                          @RequestParam(name = "rpp", required = false) Integer count,
                          @RequestParam(name = "format", required = false) String format,
+                         @RequestParam(name = "sort", required = false) String sort,
+                         @RequestParam(name = "sort_direction", required = false) String sortDirection,
+                         @RequestParam(name = "scope", required = false) String dsoObject,
                          Model model) throws IOException, ServletException {
         context = ContextUtil.obtainContext(request);
         if (start == null) {
@@ -115,15 +124,30 @@ public class OpenSearchController {
 
             // support pagination parameters
             DiscoverQuery queryArgs = new DiscoverQuery();
+            if (query == null) {
+                query = "";
+            }
             queryArgs.setQuery(query);
             queryArgs.setStart(start);
             queryArgs.setMaxResults(count);
+            if (sort != null) {
+                if (sortDirection == null || sortDirection.equals("DESC")) {
+                    queryArgs.setSortField(sort + "_sort", SORT_ORDER.desc);
+                }
+                queryArgs.setSortField(sort + "_sort", SORT_ORDER.asc);
+            } else {
+                queryArgs.setSortField("score", SORT_ORDER.desc);
+            }
+            if (dsoObject != null) {
+                container = scopeResolver.resolveScope(context, dsoObject);
+            }
 
             // Perform the search
             DiscoverResult qResults = null;
             try {
                 qResults = SearchUtils.getSearchService().search(context,
                     container, queryArgs);
+                log.info("RESULTS FROM OPEN SEARCH: " + qResults.getIndexableObjects().toString());
             } catch (SearchServiceException e) {
                 log.error(LogHelper.getHeader(context, "opensearch", "query="
                             + queryArgs.getQuery()
