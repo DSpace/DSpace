@@ -291,8 +291,8 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * This method looks for a PDF rendering in the Item's ORIGINAL bundle and adds
-     * it to the Sequence if found.
+     * This method looks for a PDF in the Item's ORIGINAL bundle and adds
+     * it as the Rendering resource if found.
      *
      * @param item DSpace Item
      * @param context DSpace context

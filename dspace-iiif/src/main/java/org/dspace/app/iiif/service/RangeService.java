@@ -121,13 +121,13 @@ public class RangeService extends AbstractResourceService {
                     range.setLabel(parts[pIdx]);
                     // Add sub-range to the root Range
                     tempRange.addSubRange(range);
-                    // Make tempRange a reference to the new sub-range.
-                    tempRange = range;
                     // Add new sub-range to the map.
                     tocRanges.put(key, range);
+                    // Make tempRange a reference to the new sub-range.
+                    tempRange = range;
                 }
             }
-            // Add a simple canvas reference to the sub-range.
+            // Add a simple canvas reference to the Range.
             tempRange
                 .addCanvas(canvasService.getRangeCanvasReference(canvasGenerator.getIdentifier()));
 
