@@ -11,11 +11,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,8 +22,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -120,7 +116,7 @@ public class IIIFUtils {
     }
 
     /**
-     * Utility method to check is a bundle can contain bitstreams to use as IIIF
+     * Utility method to check if a bundle can contain bitstreams to use as IIIF
      * resources
      *
      * @param b the DSpace bundle to check
@@ -164,11 +160,6 @@ public class IIIFUtils {
         return bundle.getBitstreams().stream().filter(b -> isIIIFBitstream(context, b))
                 .collect(Collectors.toList());
     }
-
-//    public Bitstream getFirstIIIFBitstream(B) {
-//        List<Bundle> bundles = getIIIFBundles(item);
-//        return bundles.get(0).getBitstreams().get(0);
-//    }
 
     /**
      * Utility method to check is a bitstream can be used as IIIF resources
@@ -344,6 +335,11 @@ public class IIIFUtils {
         }
     }
 
+    /**
+     * Retrieves image dimensions from the image server (IIIF Image API v.2.1.1).
+     * @param bitstream the bitstream DSO
+     * @return image dimensions
+     */
     public int[] getImageDimensions(Bitstream bitstream) {
         int[] arr = new int[2];
         String imageServer = configurationService.getProperty("iiif.image.server");
@@ -363,7 +359,7 @@ public class IIIFUtils {
                 response.append(inputLine);
             }
             in.close();
-            JsonNode parent= new ObjectMapper().readTree(response.toString());
+            JsonNode parent = new ObjectMapper().readTree(response.toString());
             arr[0] = parent.get("width").asInt();
             arr[1] = parent.get("height").asInt();
             return arr;
@@ -373,6 +369,11 @@ public class IIIFUtils {
         return null;
     }
 
+    /**
+     * Test to see if the bitstream contains iiif image width metadata.
+     * @param bitstream the bitstream DSo
+     * @return true if width metadata was found
+     */
     public boolean hasWidthMetadata(Bitstream bitstream) {
         return bitstream.getMetadata().stream()
                   .filter(m -> m.getMetadataField().toString('.').contentEquals("iiif.image.width"))

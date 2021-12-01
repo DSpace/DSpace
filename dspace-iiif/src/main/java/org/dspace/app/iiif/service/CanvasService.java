@@ -66,7 +66,15 @@ public class CanvasService extends AbstractResourceService {
         BITSTREAM_METADATA_FIELDS = configurationService.getArrayProperty("iiif.metadata.bitstream");
     }
 
-    protected void setCanvasDimensions(Bitstream firstBistream) {
+    /**
+     * Checks for bitstream height and width metadata in the first
+     * bitstream in first IIIF bundle. If the bitstream metadata is not
+     * found, uses the IIIF image service to update the default canvas
+     * dimensions for this request.
+     * @param bundles IIIF bundles for this item
+     */
+    protected void setCanvasDimensions(List<Bundle> bundles) {
+        Bitstream firstBistream = bundles.get(0).getBitstreams().get(0);
         if (!utils.hasWidthMetadata(firstBistream)) {
             int[] imageDims = utils.getImageDimensions(firstBistream);
             if (imageDims != null && imageDims.length == 2) {
