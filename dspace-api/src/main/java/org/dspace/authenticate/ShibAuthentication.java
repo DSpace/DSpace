@@ -1283,5 +1283,14 @@ public class ShibAuthentication implements AuthenticationMethod {
 
     }
 
+    @Override
+    public boolean isUsed(final Context context, final HttpServletRequest request) {
+        if (request != null &&
+                context.getCurrentUser() != null &&
+                request.getSession().getAttribute("shib.authenticated") != null) {
+            return true;
+        }
+        return false;
+    }
 }
 

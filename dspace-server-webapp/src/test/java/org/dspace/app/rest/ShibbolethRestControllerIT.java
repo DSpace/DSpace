@@ -7,7 +7,9 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -47,9 +49,16 @@ public class ShibbolethRestControllerIT extends AbstractControllerIntegrationTes
         // unauthenticated, but it must include some expected SHIB attributes.
         // SHIB-MAIL attribute is the default email header sent from Shibboleth after a successful login.
         // In this test we are simply mocking that behavior by setting it to an existing EPerson.
-        getClient().perform(get("/api/authn/shibboleth").requestAttr("SHIB-MAIL", eperson.getEmail()))
+        String token = getClient().perform(get("/api/authn/shibboleth").requestAttr("SHIB-MAIL", eperson.getEmail()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("http://localhost:4000"));
+                .andExpect(redirectedUrl("http://localhost:4000"))
+                .andReturn().getResponse().getHeader("Authorization");
+
+
+        getClient(token).perform(get("/api/authn/status"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.authenticated", is(true)))
+                   .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")));
     }
 
     @Test
