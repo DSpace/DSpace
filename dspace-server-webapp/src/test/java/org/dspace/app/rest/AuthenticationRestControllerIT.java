@@ -107,6 +107,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.authenticationMethod", is("password")))
                         .andExpect(jsonPath("$.type", is("status")))
 
                         .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
@@ -136,6 +137,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.authenticationMethod", is("password")))
                         .andExpect(jsonPath("$.type", is("status")))
 
                         .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
@@ -159,6 +161,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$.okay", is(true)))
                    .andExpect(jsonPath("$.authenticated", is(false)))
+                   .andExpect(jsonPath("$.authenticationMethod").doesNotExist())
                    .andExpect(jsonPath("$.type", is("status")))
                    .andExpect(header().string("WWW-Authenticate",
                            "password realm=\"DSpace REST API\""));
@@ -213,6 +216,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
                 .andExpect(jsonPath("$.type", is("status")))
                 // Verify that the CSRF token has NOT been changed... status checks won't change the token
                 // (only login/logout will)
@@ -244,6 +248,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
                 .andExpect(jsonPath("$.type", is("status")));
 
         //Logout, invalidating the token
@@ -260,12 +265,18 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         // Verify /api/authn/shibboleth endpoint does not work
         // NOTE: this is the same call as in testStatusShibAuthenticatedWithCookie())
-        getClient().perform(get("/api/authn/shibboleth")
+        String token = getClient().perform(get("/api/authn/shibboleth")
                 .header("Referer", "https://myshib.example.com")
                 .param("redirectUrl", uiURL)
                 .requestAttr("SHIB-MAIL", eperson.getEmail())
                 .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andReturn().getResponse().getHeader("Authorization");
+
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.authenticationMethod").doesNotExist());
     }
 
     // NOTE: This test is similar to testStatusShibAuthenticatedWithCookie(), but proves the same process works
@@ -453,6 +464,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.authenticationMethod").doesNotExist())
                         .andExpect(jsonPath("$.type", is("status")));
     }
 
@@ -515,6 +527,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
                            .andExpect(jsonPath("$.okay", is(true)))
                            .andExpect(jsonPath("$.authenticated", is(true)))
+                           .andExpect(jsonPath("$.authenticationMethod", is("password")))
                            .andExpect(jsonPath("$.type", is("status")));
 
         // Logout, invalidating token
@@ -858,6 +871,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
                 .andExpect(jsonPath("$.type", is("status")))
                 .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._embedded.eperson",
@@ -901,6 +915,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
                 .andExpect(jsonPath("$.type", is("status")))
                 .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._embedded.eperson",
@@ -921,6 +936,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
                 .andExpect(jsonPath("$.type", is("status")))
                 .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._embedded.eperson",
@@ -954,6 +970,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.authenticationMethod", is("password")))
                         .andExpect(jsonPath("$.type", is("status")));
 
         //Logout
@@ -965,6 +982,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.authenticationMethod").doesNotExist())
                         .andExpect(jsonPath("$.type", is("status")));
 
         //Simulate that a shibboleth authentication has happened
@@ -979,6 +997,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
                         .andExpect(jsonPath("$.type", is("status")));
 
         //Logout
@@ -990,6 +1009,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.authenticationMethod").doesNotExist())
                         .andExpect(jsonPath("$.type", is("status")));
 
     }
