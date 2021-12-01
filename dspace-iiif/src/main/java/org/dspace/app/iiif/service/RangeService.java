@@ -14,6 +14,7 @@ import java.util.Map;
 import org.dspace.app.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.iiif.model.generator.RangeGenerator;
 import org.dspace.app.iiif.service.utils.IIIFUtils;
+import org.dspace.content.Bitstream;
 import org.dspace.core.I18nUtil;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,21 +37,12 @@ public class RangeService extends AbstractResourceService {
     CanvasService canvasService;
 
     private Map<String, RangeGenerator> tocRanges = new LinkedHashMap<String, RangeGenerator>();
-    private RangeGenerator lastRange;
+    private RangeGenerator currentRange;
     private RangeGenerator root;
 
 
     public RangeService(ConfigurationService configurationService) {
         setConfiguration(configurationService);
-    }
-
-    /**
-     * Returns the current range to which canvases should be added. The "last"
-     * range is updated every time a new toc entry is processed.
-     * @return
-     */
-    public RangeGenerator getLastRange() {
-        return this.lastRange;
     }
 
     /**
@@ -65,23 +57,11 @@ public class RangeService extends AbstractResourceService {
      * Sets the root range generator to which sub-ranges will be added.
      * @param manifestId id of the manifest to which ranges will be added.
      */
-    public void setInitialRange(String manifestId) {
-        root = getRootGenerator(manifestId);
-    }
-
-
-    /**
-     * Creates generator for the root table of contents range.
-     * @param manifestId manifest id
-     * @return root range generator
-     */
-    private RangeGenerator getRootGenerator(String manifestId) {
-        RangeGenerator root = new RangeGenerator(this);
-        // This hint is required.
+    public void setRootRange(String manifestId) {
+        root = new RangeGenerator(this);
         root.addViewingHint("top");
         root.setLabel(I18nUtil.getMessage("iiif.toc.root-label"));
         root.setIdentifier(manifestId + "/range/r0");
-        return root;
     }
 
     /**
@@ -93,52 +73,71 @@ public class RangeService extends AbstractResourceService {
     }
 
     /**
-     * When the bitstream has a toc metadata field, this creates a new range and adds the first canvas.
-     * If the toc metadata includes a separator, sub-ranges are created.
+     * Updates the current range and adds sub-ranges.
+     * @param bitstream bitstream DSO
+     * @param bundleToCPrefix range prefix from bundle metadata
+     * @param canvas the current canvas generator
+     */
+    public void updateRanges(Bitstream bitstream, String bundleToCPrefix, CanvasGenerator canvas) {
+        List<String> tocs = utils.getIIIFToCs(bitstream, bundleToCPrefix);
+        if (tocs.size() > 0) {
+            // Add a new Range.
+            addTocRange(tocs, canvas);
+        } else {
+            // Add canvases to the current Range.
+            if (tocRanges.size() > 0) {
+                String canvasIdentifier = canvas.getIdentifier();
+                CanvasGenerator simpleCanvas = canvasService.getRangeCanvasReference(canvasIdentifier);
+                currentRange.addCanvas(simpleCanvas);
+            }
+        }
+    }
+
+    /**
+     * Adds sub-ranges to the root Range. If the toc metadata includes a separator,
+     * hierarchical sub-ranges are created.
      * @param tocs ranges from toc metadata
      * @param canvasGenerator generator for the current canvas
      * @return
      */
-    public void setTocRange(List<String> tocs , CanvasGenerator canvasGenerator) {
+    private void addTocRange(List<String> tocs , CanvasGenerator canvasGenerator) {
 
         for (String toc : tocs) {
-            // Set the current range. The first time called, this will be the root range.
-            RangeGenerator currRange = root;
+            // Make tempRange a reference to root.
+            RangeGenerator tempRange = root;
             String[] parts = toc.split(IIIFUtils.TOC_SEPARATOR_REGEX);
             String key = "";
-            // Process range and sub-ranges.
+            // Process sub-ranges.
             for (int pIdx = 0; pIdx < parts.length; pIdx++) {
                 if (pIdx > 0) {
                     key += IIIFUtils.TOC_SEPARATOR;
                 }
                 key += parts[pIdx];
                 if (tocRanges.get(key) != null) {
-                    // This handles the case of a bitstream that crosses two ranges.
-                    currRange = tocRanges.get(key);
+                    // Handles the case of a bitstream that crosses two ranges.
+                    tempRange = tocRanges.get(key);
                 } else {
-                    // Create the new range
                     RangeGenerator range = new RangeGenerator(this);
                     range.setLabel(parts[pIdx]);
-                    // Add it to the root range
-                    currRange.addSubRange(range);
-
-                    // Current range is now the new sub-range
-                    currRange = range;
-                    // Add sub-range to the list.
+                    // Add sub-range to the root Range
+                    tempRange.addSubRange(range);
+                    // Make tempRange a reference to the new sub-range.
+                    tempRange = range;
+                    // Add new sub-range to the map.
                     tocRanges.put(key, range);
                 }
             }
-            // Add a canvas to the current range.
-            currRange
+            // Add a simple canvas reference to the sub-range.
+            tempRange
                 .addCanvas(canvasService.getRangeCanvasReference(canvasGenerator.getIdentifier()));
 
-            // Finally, update the range that will be used in the next iteration.
-            lastRange = currRange;
+            // Update the current Range.
+            currentRange = tempRange;
         }
     }
 
     /**
-     * Ranges expect the sub-range object to have only an identifier.
+     * Ranges expect the sub-range to have only an identifier.
      *
      * @param range the sub-range to reference
      * @return RangeGenerator able to create the reference
