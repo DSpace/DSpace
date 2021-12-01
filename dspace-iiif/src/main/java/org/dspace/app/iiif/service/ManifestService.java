@@ -131,8 +131,8 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Adds canvases and ranges to the manifest. Ranges are generated from the
-     * iiif.toc metadata
+     * Adds Canvases and Ranges to the manifest. Ranges are generated from bitstream
+     * or bundle iiif metadata.
      * 
      * @param context the DSpace Context
      * @param item the DSpace Item to represent
@@ -140,38 +140,24 @@ public class ManifestService extends AbstractResourceService {
      */
     private void addCanvasAndRange(Context context, Item item, String manifestId) {
 
-        // Set the root range for this manifest.
-        rangeService.setInitialRange(manifestId);
-
-        // Process the bitstreams in each bundle.
+        // Set the root Range for this manifest.
+        rangeService.setRootRange(manifestId);
+        // Get bundles that can contain IIIF manifest data.
         List<Bundle> bundles = utils.getIIIFBundles(item);
         for (Bundle bnd : bundles) {
             String bundleToCPrefix = null;
             if (bundles.size() > 1) {
+                // Check for bundle Range metadata if multiple IIIF bundles exist.
                 bundleToCPrefix = utils.getBundleIIIFToC(bnd);
             }
             for (Bitstream bitstream : utils.getIIIFBitstreams(context, bnd)) {
-
-                // Add the canvas to the manifest's sequence.
-                CanvasGenerator fullCanvas = sequenceService.addCanvas(context, item, bnd, bitstream);
-
-                // Now process the ranges.
-                List<String> tocs = utils.getIIIFToCs(bitstream, bundleToCPrefix);
-                if (tocs.size() > 0) {
-                    // If toc fields exist for the bitstream, add a new range.
-                    rangeService.setTocRange(tocs, fullCanvas);
-                } else {
-                    // Add canvas ids to the currently active range.
-                    if (rangeService.getTocRanges().size() > 0) {
-                        RangeGenerator currentRange = rangeService.getLastRange();
-                        String canvasIdentifier = fullCanvas.getIdentifier();
-                        CanvasGenerator simpleCanvas = canvasService.getRangeCanvasReference(canvasIdentifier);
-                        currentRange.addCanvas(simpleCanvas);
-                    }
-                }
+                // Add the Canvas to the manifest Sequence.
+                CanvasGenerator canvas = sequenceService.addCanvas(context, item, bnd, bitstream);
+                // Update the Ranges.
+                rangeService.updateRanges(bitstream, bundleToCPrefix, canvas);
             }
         }
-        // If ranges were created add them to manifest's structures element.
+        // If Ranges were created, add them to manifest Structures element.
         Map<String, RangeGenerator> tocRanges = rangeService.getTocRanges();
         if (tocRanges != null && tocRanges.size() > 0) {
             RangeGenerator rootRange = rangeService.getRootRange();
