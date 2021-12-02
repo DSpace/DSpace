@@ -142,7 +142,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                 }
 
                 //Return the Spring authentication object
-                return new DSpaceAuthentication(eperson.getEmail(), authorities);
+                return new DSpaceAuthentication(eperson, authorities);
             } else {
                 return null;
             }
@@ -174,7 +174,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
         if (!authorizeService.isAdmin(context, onBehalfOfEPerson)) {
             requestService.setCurrentUserId(epersonUuid);
             context.switchContextUser(onBehalfOfEPerson);
-            return new DSpaceAuthentication(onBehalfOfEPerson.getEmail(),
+            return new DSpaceAuthentication(onBehalfOfEPerson,
                                             authenticationProvider.getGrantedAuthorities(context));
         } else {
             throw new IllegalArgumentException("You're unable to use the login as feature to log " +
