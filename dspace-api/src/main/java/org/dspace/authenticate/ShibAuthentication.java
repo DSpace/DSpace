@@ -515,7 +515,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             }
 
             // Determine the server return URL, where shib will send the user after authenticating.
-            // We need it to go back to DSpace's ShibbolethRestController so we will extract the user's information,
+            // We need it to trigger DSpace's ShibbolethLoginFilter so we will extract the user's information,
             // locally authenticate them & then redirect back to the UI.
             String returnURL = configurationService.getProperty("dspace.server.url") + "/api/authn/shibboleth"
                     + ((redirectUrl != null) ? "?redirectUrl=" + redirectUrl : "");
