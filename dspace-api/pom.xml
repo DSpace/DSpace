@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.1-SNAPSHOT</version>
+        <version>7.2-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -855,7 +855,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.10.50</version>
+            <version>1.12.116</version>
         </dependency>
 
         <dependency>
