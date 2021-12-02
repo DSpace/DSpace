@@ -7,11 +7,8 @@
  */
 package org.dspace.app.rest;
 
-import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static java.lang.Thread.sleep;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_UUID;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
@@ -43,7 +40,6 @@ import org.dspace.app.rest.authorization.Authorization;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.authorization.impl.CanChangePasswordFeature;
-import org.dspace.app.rest.authorization.impl.CanCreateVersionFeature;
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.matcher.AuthenticationStatusMatcher;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
@@ -150,7 +146,6 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", Matchers.is(
                                 AuthorizationMatcher.matchAuthorization(authorization))));
-        
 
         getClient(token).perform(get("/api/authn/status"))
                         .andExpect(status().isOk())

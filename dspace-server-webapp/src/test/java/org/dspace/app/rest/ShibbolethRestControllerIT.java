@@ -13,20 +13,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.dspace.app.rest.authorization.Authorization;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.authorization.impl.CanChangePasswordFeature;
-import org.dspace.app.rest.authorization.impl.CanCreateVersionFeature;
 import org.dspace.app.rest.converter.EPersonConverter;
-import org.dspace.app.rest.converter.ItemConverter;
-import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.services.ConfigurationService;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

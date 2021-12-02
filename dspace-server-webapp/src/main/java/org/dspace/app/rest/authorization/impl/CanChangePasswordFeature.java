@@ -38,7 +38,7 @@ public class CanChangePasswordFeature implements AuthorizationFeature {
     @Override
     public String[] getSupportedTypes() {
         return new String[]{
-                EPersonRest.CATEGORY + "." + EPersonRest.NAME
+            EPersonRest.CATEGORY + "." + EPersonRest.NAME
         };
     }
 
