@@ -7,8 +7,11 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static java.lang.Thread.sleep;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_UUID;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
@@ -36,10 +39,20 @@ import javax.servlet.http.Cookie;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
+import org.dspace.app.rest.authorization.Authorization;
+import org.dspace.app.rest.authorization.AuthorizationFeature;
+import org.dspace.app.rest.authorization.AuthorizationFeatureService;
+import org.dspace.app.rest.authorization.impl.CanChangePasswordFeature;
+import org.dspace.app.rest.authorization.impl.CanCreateVersionFeature;
+import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.matcher.AuthenticationStatusMatcher;
+import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
+import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
@@ -74,6 +87,15 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     @Autowired
     ConfigurationService configurationService;
 
+    @Autowired
+    private EPersonConverter ePersonConverter;
+
+    @Autowired
+    private AuthorizationFeatureService authorizationFeatureService;
+
+    @Autowired
+    private Utils utils;
+
     public static final String[] PASS_ONLY = {"org.dspace.authenticate.PasswordAuthentication"};
     public static final String[] SHIB_ONLY = {"org.dspace.authenticate.ShibAuthentication"};
     public static final String[] SHIB_AND_PASS = {
@@ -89,9 +111,19 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public static final String TRUSTED_IP = "7.7.7.7";
     public static final String UNTRUSTED_IP = "8.8.8.8";
 
+    private Authorization authorization;
+    private EPersonRest ePersonRest;
+    private final String feature = CanChangePasswordFeature.NAME;
+
+
     @Before
     public void setup() throws Exception {
         super.setUp();
+
+        AuthorizationFeature canChangePasswordFeature = authorizationFeatureService.find(CanChangePasswordFeature.NAME);
+        ePersonRest = ePersonConverter.convert(eperson, DefaultProjection.DEFAULT);
+        authorization = new Authorization(eperson, canChangePasswordFeature, ePersonRest);
+
         // Default all tests to Password Authentication only
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_ONLY);
     }
@@ -113,6 +145,12 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
                         .andExpect(jsonPath("$._embedded.eperson",
                                 EPersonMatcher.matchEPersonWithGroups(admin.getEmail(), "Administrator")));
+
+        getClient(token).perform(get("/api/authz/authorizations/" + authorization.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.is(
+                                AuthorizationMatcher.matchAuthorization(authorization))));
+        
 
         getClient(token).perform(get("/api/authn/status"))
                         .andExpect(status().isOk())
@@ -148,6 +186,11 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
 
+        getClient(token).perform(get("/api/authz/authorizations/" + authorization.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.is(
+                                AuthorizationMatcher.matchAuthorization(authorization))));
+
         //Logout
         getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
@@ -165,6 +208,15 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                    .andExpect(jsonPath("$.type", is("status")))
                    .andExpect(header().string("WWW-Authenticate",
                            "password realm=\"DSpace REST API\""));
+
+        getClient().perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
     @Test
@@ -223,6 +275,15 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
                 .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"));
 
+        getClient(token).perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
+
         // To complete the authentication process, we pass our auth cookie to the "/login" endpoint.
         // This is where the temporary cookie will be read, verified & destroyed. After this point, the UI will
         // only use the 'Authorization' header for all future requests.
@@ -251,6 +312,15 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
                 .andExpect(jsonPath("$.type", is("status")));
 
+        getClient(token).perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
+
         //Logout, invalidating the token
         getClient(token).perform(post("/api/authn/logout").header("Origin", uiURL))
                         .andExpect(status().isNoContent());
@@ -277,6 +347,15 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.authenticated", is(false)))
                         .andExpect(jsonPath("$.authenticationMethod").doesNotExist());
+
+        getClient(token).perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
     // NOTE: This test is similar to testStatusShibAuthenticatedWithCookie(), but proves the same process works
@@ -466,6 +545,15 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.authenticated", is(false)))
                         .andExpect(jsonPath("$.authenticationMethod").doesNotExist())
                         .andExpect(jsonPath("$.type", is("status")));
+
+        getClient(token).perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
     @Test
@@ -529,6 +617,11 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                            .andExpect(jsonPath("$.authenticated", is(true)))
                            .andExpect(jsonPath("$.authenticationMethod", is("password")))
                            .andExpect(jsonPath("$.type", is("status")));
+
+        getClient(newToken).perform(get("/api/authz/authorizations/" + authorization.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.is(
+                                AuthorizationMatcher.matchAuthorization(authorization))));
 
         // Logout, invalidating token
         getClient(token).perform(post("/api/authn/logout"))
@@ -877,6 +970,14 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$._embedded.eperson",
                         EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous", "Reviewers")));
 
+        getClient(token).perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
         // Logout, invalidating token
         getClient(token).perform(post("/api/authn/logout"))
                 .andExpect(status().isNoContent());
@@ -942,6 +1043,15 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$._embedded.eperson",
                         EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous")));
 
+        getClient(token).perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
+
         // Logout, invalidating token
         getClient(token).perform(post("/api/authn/logout"))
                 .andExpect(status().isNoContent());
@@ -973,6 +1083,10 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.authenticationMethod", is("password")))
                         .andExpect(jsonPath("$.type", is("status")));
 
+        getClient(token).perform(get("/api/authz/authorizations/" + authorization.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.is(
+                                AuthorizationMatcher.matchAuthorization(authorization))));
         //Logout
         getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
