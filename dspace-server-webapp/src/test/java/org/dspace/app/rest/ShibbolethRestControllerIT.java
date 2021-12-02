@@ -13,8 +13,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.dspace.app.rest.authorization.Authorization;
+import org.dspace.app.rest.authorization.AuthorizationFeature;
+import org.dspace.app.rest.authorization.AuthorizationFeatureService;
+import org.dspace.app.rest.authorization.impl.CanChangePasswordFeature;
+import org.dspace.app.rest.authorization.impl.CanCreateVersionFeature;
+import org.dspace.app.rest.converter.EPersonConverter;
+import org.dspace.app.rest.converter.ItemConverter;
+import org.dspace.app.rest.matcher.AuthorizationMatcher;
+import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.services.ConfigurationService;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +41,28 @@ public class ShibbolethRestControllerIT extends AbstractControllerIntegrationTes
     @Autowired
     ConfigurationService configurationService;
 
+    @Autowired
+    private EPersonConverter ePersonConverter;
+
+    @Autowired
+    private AuthorizationFeatureService authorizationFeatureService;
+
+    @Autowired
+    private Utils utils;
+
     public static final String[] PASS_ONLY = {"org.dspace.authenticate.PasswordAuthentication"};
     public static final String[] SHIB_ONLY = {"org.dspace.authenticate.ShibAuthentication"};
+
+    private EPersonRest ePersonRest;
+    private final String feature = CanChangePasswordFeature.NAME;
 
     @Before
     public void setup() throws Exception {
         super.setUp();
+
+        AuthorizationFeature canChangePasswordFeature = authorizationFeatureService.find(CanChangePasswordFeature.NAME);
+        ePersonRest = ePersonConverter.convert(eperson, DefaultProjection.DEFAULT);
+
         // Add a second trusted host for some tests
         configurationService.setProperty("rest.cors.allowed-origins",
                 "${dspace.ui.url}, http://anotherdspacehost:4000");
@@ -59,15 +87,41 @@ public class ShibbolethRestControllerIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.authenticated", is(true)))
                    .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")));
+
+        getClient(token).perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
+
     }
 
     @Test
     public void testRedirectToGivenTrustedUrl() throws Exception {
-        getClient().perform(get("/api/authn/shibboleth")
+        String token = getClient().perform(get("/api/authn/shibboleth")
                       .param("redirectUrl", "http://localhost:8080/server/api/authn/status")
                       .requestAttr("SHIB-MAIL", eperson.getEmail()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("http://localhost:8080/server/api/authn/status"));
+                .andExpect(redirectedUrl("http://localhost:8080/server/api/authn/status"))
+                   .andReturn().getResponse().getHeader("Authorization");
+
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")));
+
+        getClient(token).perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
+
     }
 
     @Test
