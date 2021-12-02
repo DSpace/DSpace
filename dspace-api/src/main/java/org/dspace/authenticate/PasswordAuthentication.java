@@ -219,7 +219,9 @@ public class PasswordAuthentication
                                             .checkPassword(context, eperson, password)) {
                 // login is ok if password matches:
                 context.setCurrentUser(eperson);
-                request.getSession().setAttribute(PASSWORD_AUTHENTICATED, true);
+                if (request != null) {
+                    request.getSession().setAttribute(PASSWORD_AUTHENTICATED, true);
+                }
                 log.info(LogHelper.getHeader(context, "authenticate", "type=PasswordAuthentication"));
                 return SUCCESS;
             } else {
