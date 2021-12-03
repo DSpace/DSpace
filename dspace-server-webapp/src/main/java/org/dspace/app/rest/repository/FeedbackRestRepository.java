@@ -8,8 +8,6 @@
 package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.Objects;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -21,9 +19,8 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.FeedbackRest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.service.FeedbackService;
 import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,6 +36,8 @@ import org.springframework.stereotype.Component;
 @Component(FeedbackRest.CATEGORY + "." + FeedbackRest.NAME)
 public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, Integer> {
 
+    @Autowired
+    private FeedbackService feedbackService;
     @Autowired
     private ConfigurationService configurationService;
 
@@ -72,32 +71,15 @@ public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, I
             throw new UnprocessableEntityException("error parsing the body " + exIO.getMessage(), exIO);
         }
 
-        String session = req.getSession().getId();
-        String agent = req.getHeader("User-Agent");
-        String currentUserEmail = StringUtils.EMPTY;
-
-        if (Objects.nonNull(context.getCurrentUser())) {
-            currentUserEmail = context.getCurrentUser().getEmail();
-        }
-
         String senderEmail = feedbackRest.getEmail();
         String message = feedbackRest.getMessage();
-        String page = feedbackRest.getPage();
 
         if (StringUtils.isBlank(senderEmail) || StringUtils.isBlank(message)) {
             throw new DSpaceBadRequestException("Filds as e-mail and message are mandatory!");
         }
 
         try {
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "feedback"));
-            email.addArgument(new Date());         //  Date
-            email.addArgument(senderEmail);       //  Email
-            email.addArgument(currentUserEmail); //  Logged in as
-            email.addArgument(page);            //  Referring page
-            email.addArgument(agent);          //  User agent
-            email.addArgument(session);       //  Session ID
-            email.addArgument(message);      //  The feedback itself
-            email.send();
+            feedbackService.sendEmail(context, req, recipientEmail, senderEmail, message, feedbackRest.getPage());
         } catch (IOException | MessagingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -107,6 +89,14 @@ public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, I
     @Override
     public Class<FeedbackRest> getDomainClass() {
         return FeedbackRest.class;
+    }
+
+    public FeedbackService getFeedbackService() {
+        return feedbackService;
+    }
+
+    public void setFeedbackService(FeedbackService feedbackService) {
+        this.feedbackService = feedbackService;
     }
 
 }
