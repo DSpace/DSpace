@@ -71,15 +71,14 @@ public class OpenUrlServiceImpl implements OpenUrlService {
      */
     protected int getResponseCodeFromUrl(final String urlStr) throws IOException {
         HttpGet httpGet = new HttpGet(urlStr);
-        HttpClient httpClient = getHttpClient();
+        RequestConfig requestConfig = getRequestConfigBuilder().setConnectTimeout(10*1000).build();
+        HttpClient httpClient =  HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
         HttpResponse httpResponse = httpClient.execute(httpGet);
         return httpResponse.getStatusLine().getStatusCode();
     }
 
-    HttpClient getHttpClient(){
-        //setting a timeout of 10 seconds so the connection pool doesn't exhaust when waiting a long time for a reply.
-        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(10*1000).build();
-        return HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
+    RequestConfig.Builder getRequestConfigBuilder(){
+        return RequestConfig.custom();
     }
 
     /**
