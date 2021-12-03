@@ -86,6 +86,8 @@ public class ShibbolethLoginFilter extends StatelessLoginFilter {
         // Once we've gotten here, we know we have a successful login (i.e. attemptAuthentication() succeeded)
 
         DSpaceAuthentication dSpaceAuthentication = (DSpaceAuthentication) auth;
+        log.debug("Shib authentication successful for EPerson {}. Sending back temporary auth cookie",
+                  dSpaceAuthentication.getName());
         // OVERRIDE DEFAULT behavior of StatelessLoginFilter to return a temporary authentication cookie containing
         // the Auth Token (JWT). This Cookie is required because we *redirect* the user back to the client/UI after
         // a successful Shibboleth login. Headers cannot be sent via a redirect, so a Cookie must be sent to provide
