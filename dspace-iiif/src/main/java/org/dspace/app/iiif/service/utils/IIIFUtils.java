@@ -93,16 +93,20 @@ public class IIIFUtils {
     }
 
     /**
-     * This method verify if the IIIF feature is enabled on the item
+     * This method verify if the IIIF feature is enabled on the item or parent collection.
      * 
      * @param item the dspace item
      * @return true if the item supports IIIF
      */
     public boolean isIIIFEnabled(Item item) {
-        return item.getMetadata().stream()
+        return item.getOwningCollection().getMetadata().stream()
+                   .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
+                   .anyMatch(m -> m.getValue().equalsIgnoreCase("true") ||
+                       m.getValue().equalsIgnoreCase("yes"))
+            || item.getMetadata().stream()
                 .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
                 .anyMatch(m -> m.getValue().equalsIgnoreCase("true")  ||
-                        m.getValue().equalsIgnoreCase("yes"));
+                    m.getValue().equalsIgnoreCase("yes"));
     }
 
     /**
