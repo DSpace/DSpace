@@ -9,18 +9,27 @@ package org.dspace.app.rest;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.MediaType;
 
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.authorization.impl.CanChangePasswordFeature;
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.model.patch.AddOperation;
+import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
@@ -177,4 +186,45 @@ public class ShibbolethRestControllerIT extends AbstractControllerIntegrationTes
         getClient(token).perform(get("/api/authn/shibboleth"))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    public void patchPassword() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@example.com")
+                                        .withPassword(password)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        String newPassword = "newpassword";
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation addOperation = new AddOperation("/password", newPassword);
+        ops.add(addOperation);
+        String patchBody = getPatchContent(ops);
+
+        // login through shibboleth
+        String token = getClient().perform(get("/api/authn/shibboleth").requestAttr("SHIB-MAIL", eperson.getEmail()))
+                                  .andExpect(status().is3xxRedirection())
+                                  .andExpect(redirectedUrl("http://localhost:4000"))
+                                  .andReturn().getResponse().getHeader("Authorization");
+
+
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")));
+
+        // updates password
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                                         .content(patchBody)
+                                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isForbidden());
+
+    }
+
 }
