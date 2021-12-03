@@ -410,7 +410,7 @@ public abstract class JWTTokenHandler {
             if (StringUtils.isBlank(ePerson.getSessionSalt())
                 || previousLoginDate == null
                 || (ePerson.getLastActive().getTime() - previousLoginDate.getTime() > getExpirationPeriod())) {
-
+                log.debug("Regenerating auth token as session salt was either empty or expired..");
                 ePerson.setSessionSalt(generateRandomKey());
                 ePersonService.update(context, ePerson);
             }

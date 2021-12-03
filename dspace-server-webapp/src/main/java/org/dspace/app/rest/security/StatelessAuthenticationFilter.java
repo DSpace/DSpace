@@ -120,12 +120,11 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
         throws AuthorizeException, SQLException {
 
         if (restAuthenticationService.hasAuthenticationData(request)) {
-            // parse the token.
-
             Context context = ContextUtil.obtainContext(request);
-
+            // parse the token.
             EPerson eperson = restAuthenticationService.getAuthenticatedEPerson(request, res, context);
             if (eperson != null) {
+                log.debug("Found authentication data in request for EPerson {}", eperson.getEmail());
                 //Pass the eperson ID to the request service
                 requestService.setCurrentUserId(eperson.getID());
 
@@ -174,6 +173,8 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
         if (!authorizeService.isAdmin(context, onBehalfOfEPerson)) {
             requestService.setCurrentUserId(epersonUuid);
             context.switchContextUser(onBehalfOfEPerson);
+            log.debug("Found 'on-behalf-of' authentication data in request for EPerson {}",
+                      onBehalfOfEPerson.getEmail());
             return new DSpaceAuthentication(onBehalfOfEPerson,
                                             authenticationProvider.getGrantedAuthorities(context));
         } else {

@@ -68,9 +68,11 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
         // If a user already exists in the context, then no authentication is necessary. User is already logged in
         if (context != null && context.getCurrentUser() != null) {
             // Simply refresh/reload the auth token. If token has expired, the token will change.
+            log.debug("Request to refresh auth token");
             return authenticateRefreshTokenRequest(context);
         } else {
             // Otherwise, this is a new login & we need to attempt authentication
+            log.debug("Request to authenticate new login");
             return authenticateNewLogin(authentication);
         }
     }
