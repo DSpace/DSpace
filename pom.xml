@@ -152,6 +152,8 @@
                                 <version>${errorprone.version}</version>
                             </path>
                         </annotationProcessorPaths>
+                    	<fork>true</fork>
+                    	<useIncrementalCompilation>true</useIncrementalCompilation>
                     </configuration>
                 </plugin>
                 <!-- Used to package all DSpace JARs -->
