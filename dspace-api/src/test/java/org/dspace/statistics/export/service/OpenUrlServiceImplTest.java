@@ -143,7 +143,11 @@ public class OpenUrlServiceImplTest {
 
     }
 
-    @Test()
+    /**
+     * Tests whether the timeout gets set to 10 seconds when processing a url
+     * @throws SQLException
+     */
+    @Test
     public void testTimeout() throws SQLException {
         Context context = mock(Context.class);
         String URL = "http://bla.com";
