@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -26,26 +25,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.amazonaws.http.client.HttpClientFactory;
-import org.apache.http.HttpVersion;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.solr.client.solrj.impl.HttpClientBuilderFactory;
 import org.dspace.core.Context;
 import org.dspace.statistics.export.OpenURLTracker;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.internal.stubbing.answers.AnswersWithDelay;
-import org.mockito.internal.stubbing.answers.Returns;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -154,11 +142,11 @@ public class OpenUrlServiceImplTest {
 
         RequestConfig.Builder requestConfig = mock(RequestConfig.Builder.class);
         doReturn(requestConfig).when(openUrlService).getRequestConfigBuilder();
-        doReturn(requestConfig).when(requestConfig).setConnectTimeout(10*1000);
+        doReturn(requestConfig).when(requestConfig).setConnectTimeout(10 * 1000);
         doReturn(RequestConfig.custom().build()).when(requestConfig).build();
 
         openUrlService.processUrl(context, URL);
 
-        Mockito.verify(requestConfig).setConnectTimeout(10*1000);
+        Mockito.verify(requestConfig).setConnectTimeout(10 * 1000);
     }
 }
