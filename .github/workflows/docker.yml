@@ -1,0 +1,147 @@
+# DSpace Docker image build for hub.docker.com
+name: Docker images
+
+# Run this Build for all pushes / PRs to current branch
+on: [push, pull_request]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    env:
+      # Give Maven 1GB of memory to work with
+      # Suppress all Maven "downloading" messages in logs (see https://stackoverflow.com/a/35653426)
+      # This also slightly speeds builds, as there is less logging
+      MAVEN_OPTS: "-Xmx1024M -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+      # Define tags to use for Docker images based on Git tags/branches
+      # For a new branch commit, tag Docker image with that branch name
+      # Except for 'main' branch, where we use the literal 'dspace-7_x' tag (see below).
+      # For a new tag, tag Docker image with that same tag
+      IMAGE_TAGS: |
+        type=ref,event=branch,enable=${{ github.ref != 'refs/heads/main' }}
+        type=raw,value=dspace-7_x,enable=${{ github.ref == 'refs/heads/main' }}
+        type=ref,event=tag
+
+    steps:
+      # https://github.com/actions/checkout
+      - name: Checkout codebase
+        uses: actions/checkout@v2
+
+      # https://github.com/actions/setup-java
+      - name: Install JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'temurin'
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      # https://github.com/docker/login-action
+      - name: Login to DockerHub
+        # Only login if not a PR, as PRs only trigger a Docker build and not a push
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+      ####################################################
+      # Build/Push the 'dspace/dspace-dependencies' image
+      ####################################################
+      # https://github.com/docker/metadata-action
+      # Get Metadata for docker_build_deps step below
+      - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-dependencies' image
+        id: meta_build_deps
+        uses: docker/metadata-action@v3
+        with:
+          images: dspace/dspace-dependencies
+          tags: ${{ env.IMAGE_TAGS }}
+
+      # https://github.com/docker/build-push-action
+      - name: Build and push 'dspace-dependencies' image
+        id: docker_build_deps
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile.dependencies
+          # For pull requests, we run the Docker build (to ensure no PR changes break the build),
+          # but we ONLY do an image push to DockerHub if it's NOT a PR
+          push: ${{ github.event_name != 'pull_request' }}
+          # Use tags / labels provided by 'docker/metadata-action' above
+          tags: ${{ steps.meta_build_deps.outputs.tags }}
+          labels: ${{ steps.meta_build_deps.outputs.labels }}
+
+      #######################################
+      # Build/Push the 'dspace/dspace' image
+      #######################################
+      # Get Metadata for docker_build step below
+      - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace' image
+        id: meta_build
+        uses: docker/metadata-action@v3
+        with:
+          images: dspace/dspace
+          tags: ${{ env.IMAGE_TAGS }}
+
+      - name: Build and push 'dspace' image
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          # For pull requests, we run the Docker build (to ensure no PR changes break the build),
+          # but we ONLY do an image push to DockerHub if it's NOT a PR
+          push: ${{ github.event_name != 'pull_request' }}
+          # Use tags / labels provided by 'docker/metadata-action' above
+          tags: ${{ steps.meta_build.outputs.tags }}
+          labels: ${{ steps.meta_build.outputs.labels }}
+
+      #####################################################
+      # Build/Push the 'dspace/dspace' image ('-test' tag)
+      #####################################################
+      # Get Metadata for docker_build_test step below
+      - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-test' image
+        id: meta_build_test
+        uses: docker/metadata-action@v3
+        with:
+          images: dspace/dspace
+          # ONLY add 'dspace-7_x-test' version tag if this is the 'main' branch.
+          # (No other tags are added for this image, as it's only used for testing/development)
+          tags: |
+            type=raw,value=dspace-7_x-test,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build and push 'dspace-test' image
+        id: docker_build_test
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile.test
+          # For pull requests, we run the Docker build (to ensure no PR changes break the build),
+          # but we ONLY do an image push to DockerHub if it's NOT a PR
+          push: ${{ github.event_name != 'pull_request' }}
+          # Use tags / labels provided by 'docker/metadata-action' above
+          tags: ${{ steps.meta_build_test.outputs.tags }}
+          labels: ${{ steps.meta_build_test.outputs.labels }}
+
+      ###########################################
+      # Build/Push the 'dspace/dspace-cli' image
+      ###########################################
+      # Get Metadata for docker_build_test step below
+      - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-cli' image
+        id: meta_build_cli
+        uses: docker/metadata-action@v3
+        with:
+          images: dspace/dspace-cli
+          tags: ${{ env.IMAGE_TAGS }}
+
+      - name: Build and push 'dspace-cli' image
+        id: docker_build_cli
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile.cli
+          # For pull requests, we run the Docker build (to ensure no PR changes break the build),
+          # but we ONLY do an image push to DockerHub if it's NOT a PR
+          push: ${{ github.event_name != 'pull_request' }}
+          # Use tags / labels provided by 'docker/metadata-action' above
+          tags: ${{ steps.meta_build_cli.outputs.tags }}
+          labels: ${{ steps.meta_build_cli.outputs.labels }}
