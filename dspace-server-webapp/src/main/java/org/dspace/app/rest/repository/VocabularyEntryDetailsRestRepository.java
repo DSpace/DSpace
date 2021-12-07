@@ -60,13 +60,13 @@ public class VocabularyEntryDetailsRestRepository extends DSpaceRestRepository<V
                         VocabularyEntryDetailsRest.PLURAL_NAME + "-search")));
     }
 
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("permitAll()")
     @Override
     public Page<VocabularyEntryDetailsRest> findAll(Context context, Pageable pageable) {
         throw new RepositoryMethodNotImplementedException(ResourcePolicyRest.NAME, "findAll");
     }
 
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("permitAll()")
     @Override
     public VocabularyEntryDetailsRest findOne(Context context, String name) {
         String[] parts = StringUtils.split(name, ":", 2);
