@@ -22,9 +22,11 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
+import com.amazonaws.services.s3.transfer.Upload;
+import com.amazonaws.services.s3.transfer.model.UploadResult;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -180,16 +182,20 @@ public class S3BitStoreService implements BitStoreService {
             FileUtils.copyInputStreamToFile(in, scratchFile);
             long contentLength = scratchFile.length();
 
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, scratchFile);
-            PutObjectResult putObjectResult = s3Service.putObject(putObjectRequest);
+            TransferManager tm = TransferManagerBuilder.standard()
+                    .withS3Client(s3Service)
+                    .build();
+
+            Upload upload = tm.upload(bucketName, key, scratchFile);
+            UploadResult result = upload.waitForUploadResult();
 
             bitstream.setSizeBytes(contentLength);
-            bitstream.setChecksum(putObjectResult.getETag());
+            bitstream.setChecksum(result.getETag());
             bitstream.setChecksumAlgorithm(CSA);
 
             scratchFile.delete();
 
-        } catch (AmazonClientException | IOException e) {
+        } catch (AmazonClientException | IOException | InterruptedException e) {
             log.error("put(" + bitstream.getInternalId() + ", is)", e);
             throw new IOException(e);
         } finally {
