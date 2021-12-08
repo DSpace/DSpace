@@ -8,14 +8,19 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     env:
-      # Define tags to use for Docker images based on Git tags/branches
-      # For a new branch commit, tag Docker image with that branch name
-      # Except for 'main' branch, where we use the literal 'dspace-7_x' tag (see below).
-      # For a new tag, tag Docker image with that same tag
+      # Define tags to use for Docker images based on Git tags/branches (for docker/metadata-action)
+      # For a new commit on default branch (main), use the literal tag 'dspace-7_x' on Docker image.
+      # For a new commit on other branches, use the branch name as the tag for Docker image.
+      # For a new tag, copy that tag name as the tag for Docker image.
       IMAGE_TAGS: |
-        type=ref,event=branch,enable=${{ github.ref != 'refs/heads/main' }}
-        type=raw,value=dspace-7_x,enable=${{ github.ref == 'refs/heads/main' }}
+        type=raw,value=dspace-7_x,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+        type=ref,event=branch,enable=${{ !endsWith(github.ref, github.event.repository.default_branch) }}
         type=ref,event=tag
+      # Define default tag "flavor" for docker/metadata-action per
+      # https://github.com/docker/metadata-action#flavor-input
+      # We turn off 'latest' tag by default.
+      TAGS_FLAVOR: |
+        latest=false
 
     steps:
       # https://github.com/actions/checkout
@@ -45,6 +50,7 @@ jobs:
         with:
           images: dspace/dspace-dependencies
           tags: ${{ env.IMAGE_TAGS }}
+          flavor: ${{ env.TAGS_FLAVOR }}
 
       # https://github.com/docker/build-push-action
       - name: Build and push 'dspace-dependencies' image
@@ -70,6 +76,7 @@ jobs:
         with:
           images: dspace/dspace
           tags: ${{ env.IMAGE_TAGS }}
+          flavor: ${{ env.TAGS_FLAVOR }}
 
       - name: Build and push 'dspace' image
         id: docker_build
@@ -93,10 +100,11 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: dspace/dspace
-          # ONLY add 'dspace-7_x-test' version tag if this is the 'main' branch.
-          # (No other tags are added for this image, as it's only used for testing/development)
-          tags: |
-            type=raw,value=dspace-7_x-test,enable=${{ github.ref == 'refs/heads/main' }}
+          tags: ${{ env.IMAGE_TAGS }}
+          # As this is a test/development image, its tags are all suffixed with "-test". Otherwise, it uses the same
+          # tagging logic as the primary 'dspace/dspace' image above.
+          flavor: ${{ env.TAGS_FLAVOR }}
+            suffix=-test
 
       - name: Build and push 'dspace-test' image
         id: docker_build_test
@@ -121,6 +129,7 @@ jobs:
         with:
           images: dspace/dspace-cli
           tags: ${{ env.IMAGE_TAGS }}
+          flavor: ${{ env.TAGS_FLAVOR }}
 
       - name: Build and push 'dspace-cli' image
         id: docker_build_cli
