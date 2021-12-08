@@ -256,8 +256,8 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
     @Test
     public void searchTopUnauthorizedTest() throws Exception {
         getClient().perform(get("/api/submission/vocabularyEntryDetails/search/top")
-                   .param("vocabulary", "srsc:SCB16"))
-                   .andExpect(status().isUnauthorized());
+                   .param("vocabulary", "srsc"))
+                   .andExpect(status().isOk());
     }
 
     @Test
@@ -331,7 +331,7 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
     public void srscSearchTopUnauthorizedTest() throws Exception {
         getClient().perform(get("/api/submission/vocabularyEntryDetails/search/top")
                    .param("vocabulary", "srsc"))
-                   .andExpect(status().isUnauthorized());
+                   .andExpect(status().isOk());
     }
 
     @Test

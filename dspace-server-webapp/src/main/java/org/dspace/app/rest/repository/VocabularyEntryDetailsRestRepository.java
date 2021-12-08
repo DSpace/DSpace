@@ -60,7 +60,7 @@ public class VocabularyEntryDetailsRestRepository extends DSpaceRestRepository<V
                         VocabularyEntryDetailsRest.PLURAL_NAME + "-search")));
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<VocabularyEntryDetailsRest> findAll(Context context, Pageable pageable) {
         throw new RepositoryMethodNotImplementedException(ResourcePolicyRest.NAME, "findAll");
@@ -82,7 +82,7 @@ public class VocabularyEntryDetailsRestRepository extends DSpaceRestRepository<V
     }
 
     @SearchRestMethod(name = "top")
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("permitAll()")
     public Page<VocabularyEntryDetailsRest> findAllTop(@Parameter(value = "vocabulary", required = true)
            String vocabularyId, Pageable pageable) {
         Context context = obtainContext();
