@@ -1,11 +1,21 @@
 # DSpace Docker image build for hub.docker.com
 name: Docker images
 
-# Run this Build for all pushes / PRs to current branch
-on: [push, pull_request]
+# Run this Build for all pushes to 'main' or maintenance branches, or tagged releases.
+# Also run for PRs to ensure PR doesn't break Docker build process
+on:
+  push:
+    branches:
+      - main
+      - 'dspace-**'
+    tags:
+      - 'dspace-**'
+  pull_request:
 
 jobs:
   docker:
+    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    if: github.repository == 'dspace/dspace'
     runs-on: ubuntu-latest
     env:
       # Define tags to use for Docker images based on Git tags/branches (for docker/metadata-action)
@@ -27,6 +37,7 @@ jobs:
       - name: Checkout codebase
         uses: actions/checkout@v2
 
+      # https://github.com/docker/setup-buildx-action
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v1
 
