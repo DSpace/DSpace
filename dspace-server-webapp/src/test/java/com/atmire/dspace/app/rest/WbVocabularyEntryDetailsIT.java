@@ -27,14 +27,14 @@ public class WbVocabularyEntryDetailsIT extends AbstractControllerIntegrationTes
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token)
-            .perform(get("/api/submission/vocabularyEntryDetails/topics:Information_Technology"))
+            .perform(get("/api/submission/vocabularyEntryDetails/topic:Information_Technology"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.value", is(
                 "Information and Communication Technologies :: Information Technology"
             )));
 
         getClient(token)
-            .perform(get("/api/submission/vocabularies/topics/entries")
+            .perform(get("/api/submission/vocabularies/topic/entries")
                 .param("filter", "Information and Communication Technologies :: Information Technology")
                 .param("exact", "true"))
             .andExpect(status().isOk())
@@ -43,7 +43,7 @@ public class WbVocabularyEntryDetailsIT extends AbstractControllerIntegrationTes
             )));
 
         getClient(token)
-            .perform(get("/api/submission/vocabularyEntryDetails/search/top?vocabulary=topics"))
+            .perform(get("/api/submission/vocabularyEntryDetails/search/top?vocabulary=topic"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.vocabularyEntryDetails", everyItem(
                 hasJsonPath("$.value", not(startsWith("Topics:")))
