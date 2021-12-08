@@ -6,6 +6,8 @@ on: [push, pull_request]
 
 jobs:
   docker:
+    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    if: github.repository == 'dspace/dspace'
     runs-on: ubuntu-latest
     env:
       # Define tags to use for Docker images based on Git tags/branches (for docker/metadata-action)
