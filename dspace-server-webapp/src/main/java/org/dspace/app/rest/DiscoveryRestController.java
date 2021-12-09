@@ -198,7 +198,6 @@ public class DiscoveryRestController implements InitializingBean {
                                                       configuration,
                                               List<SearchFilter> searchFilters,
                                               Pageable page) throws Exception {
-        System.out.println("FACETS/xxxxx");
 
         dsoTypes = emptyIfNull(dsoTypes);
 
@@ -220,7 +219,6 @@ public class DiscoveryRestController implements InitializingBean {
             halLinkService.addLinks(facetResultsResource, page);
             return facetResultsResource;
         } catch (Exception e) {
-            System.out.println("ERROR = " + e.getMessage());
             boolean isParsingException = e.getMessage().contains(SOLR_PARSE_ERROR_MESSAGE);
             if (isParsingException) {
                 throw new UnprocessableEntityException(e.getMessage());
