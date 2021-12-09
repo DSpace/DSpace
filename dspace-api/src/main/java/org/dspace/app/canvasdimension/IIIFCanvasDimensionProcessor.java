@@ -60,18 +60,40 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
 
     }
 
+    /**
+     * Set the force processing property. If true, existing canvas
+     * metadata will be replaced.
+     * @param force
+     */
     public void setForceProcessing(boolean force) {
         forceProcessing = force;
     }
 
+    public void setIsQuiet(boolean quiet) {
+        isQuiet = quiet;
+    }
+
+    /**
+     * Set the maximum number of items to process.
+     * @param max2Process
+     */
     public void setMax2Process(int max2Process) {
         this.max2Process = max2Process;
     }
 
+    /**
+     * Set dso identifiers to skip.
+     * @param skipList
+     */
     public void setSkipList(List<String> skipList) {
         this.skipList = skipList;
     }
 
+    /**
+     * Set IIIF canvas dimensions on all IIIF items in the site.
+     * @param context
+     * @throws Exception
+     */
     public void processSite(Context context) throws Exception {
         if (skipList != null) {
             //if a skip-list exists, we need to filter community-by-community
@@ -90,6 +112,13 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
         }
     }
 
+    /**
+     * Set IIIF canvas dimensions on all IIIF items in a community and its
+     * sub-communities.
+     * @param context
+     * @param community
+     * @throws Exception
+     */
     public void processCommunity(Context context, Community community) throws Exception {
         if (!inSkipList(community.getHandle())) {
             List<Community> subcommunities = community.getSubcommunities();
@@ -103,6 +132,12 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
         }
     }
 
+    /**
+     * Set IIIF canvas dimensions on all IIIF items in a collection.
+     * @param context
+     * @param collection
+     * @throws Exception
+     */
     public void processCollection(Context context, Collection collection) throws Exception {
         if (!inSkipList(collection.getHandle())) {
             Iterator<Item> itemIterator = itemService.findAllByCollection(context, collection);
@@ -112,6 +147,12 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
         }
     }
 
+    /**
+     * Set IIIF canvas dimensions for an item.
+     * @param context
+     * @param item
+     * @throws Exception
+     */
     public void processItem(Context context, Item item) throws Exception {
         if (!inSkipList(item.getHandle())) {
             boolean isIIIFItem = item.getMetadata().stream().filter(m -> m.getMetadataField().toString('.')
@@ -126,20 +167,35 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
         }
     }
 
+    /**
+     * Process all IIIF bundles for an item.
+     * @param context
+     * @param item
+     * @return
+     * @throws Exception
+     */
     private boolean processBundles(Context context, Item item) throws Exception {
         List<Bundle> bundles = getIIIFBundles(item);
         boolean done = false;
         for (Bundle bundle : bundles) {
             List<Bitstream> myBitstreams = bundle.getBitstreams();
             for (Bitstream myBitstream : myBitstreams) {
-                done |= processBitstream(context, item, myBitstream);
+                done |= processBitstream(context, myBitstream);
             }
         }
         return done;
 
     }
 
-    private boolean processBitstream(Context context, Item item, Bitstream bitstream) throws Exception {
+    /**
+     * Sets the IIIF height and width metadata for all images. If width metadata already exists,
+     * the bitstream is processed only if forceProcessing is true.
+     * @param context
+     * @param bitstream
+     * @return
+     * @throws Exception
+     */
+    private boolean processBitstream(Context context, Bitstream bitstream) throws Exception {
         boolean processed = false;
         boolean isImage = bitstream.getFormat(context).getMIMEType().contains("image/");
         if (isImage) {
