@@ -25,6 +25,7 @@ public class CanvasDimensionCLI {
     public static void main(String[] argv) throws Exception {
 
         boolean force = false;
+        boolean isQuiet = false;
         String identifier = null;
         int max2Process = Integer.MAX_VALUE;
 
@@ -38,6 +39,8 @@ public class CanvasDimensionCLI {
             "process IIIF canvas dimensions for images belonging to identifier");
         options.addOption("f", "force", false,
             "force update of all IIIF canvas height and width dimensions");
+        options.addOption("q", "quiet", false,
+            "do not print anything except in the event of errors.");
         options.addOption("s", "skipList", false,
             "force update of all IIIF canvas height and width dimensions");
         options.addOption("m", "maximum", true,
@@ -67,6 +70,9 @@ public class CanvasDimensionCLI {
 
         if (line.hasOption('f')) {
             force = true;
+        }
+        if (line.hasOption('q')) {
+            isQuiet = true;
         }
         if (line.hasOption('i')) {
             identifier = line.getOptionValue('i');
@@ -108,6 +114,7 @@ public class CanvasDimensionCLI {
 
         canvasProcessor.setForceProcessing(force);
         canvasProcessor.setMax2Process(max2Process);
+        canvasProcessor.setIsQuiet(isQuiet);
 
         switch (dso.getType()) {
             case Constants.SITE:
