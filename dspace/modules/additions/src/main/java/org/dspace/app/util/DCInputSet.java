@@ -189,28 +189,28 @@ public class DCInputSet
     	// {
     	// 	return false;
     	// }
-			 // Customization for LIBDRUM-628
-			if ( rowName.equals("relation.ispartofseries") && isDataset )
+			// Customization for LIBDRUM-628
+			if ( isDataset && "relation.ispartofseries".equals(rowName) )
     	{
     		return false;
       }
-			if ( rowName.equals("identifier.null") && isDataset )
+			if ( isDataset && "identifier.null".equals(rowName) )
     	{
     		return false;
       }
-			if ( rowName.equals("description.null") && dcf.getLabel().equals("Description") && isDataset )
+			if ( isDataset && "description.null".equals(rowName) && "Description".equals(dcf.getLabel()) )
     	{
     		return false;
       }
-			if ( rowName.equals("description.null") && ! dcf.getLabel().equals("Description") && ! isDataset )
+			if ( ! isDataset && "description.null".equals(rowName) && ! "Description".equals(dcf.getLabel()) )
     	{
     		return false;
       }
-			if ( rowName.equals("type.null") && dcf.getPairsType().equals("common_types") && isDataset )
+			if ( isDataset && "type.null".equals(rowName) && "common_types".equals(dcf.getPairsType()) )
     	{
     		return false;
       }
-			if ( rowName.equals("type.null") && dcf.getPairsType().equals("data_types") && ! isDataset )
+			if ( ! isDataset && "type.null".equals(rowName) && "data_types".equals(dcf.getPairsType()) )
     	{
     		return false;
       }
