@@ -53,7 +53,7 @@ public class DiscoveryRestController implements InitializingBean {
 
     private static final Logger log = LogManager.getLogger();
 
-    private static final String SOLR_PARSE_ERROR_MESSAGE = "Cannot parse";
+    private static final String SOLR_PARSE_ERROR_CLASS = "org.apache.solr.search.SyntaxError";
 
     @Autowired
     protected Utils utils;
@@ -161,7 +161,7 @@ public class DiscoveryRestController implements InitializingBean {
             halLinkService.addLinks(searchResultsResource, page);
             return searchResultsResource;
         } catch (IllegalArgumentException e) {
-            boolean isParsingException = e.getMessage().contains(SOLR_PARSE_ERROR_MESSAGE);
+            boolean isParsingException = e.getMessage().contains(SOLR_PARSE_ERROR_CLASS);
             if (isParsingException) {
                 throw new UnprocessableEntityException(e.getMessage());
             } else {
@@ -219,7 +219,12 @@ public class DiscoveryRestController implements InitializingBean {
             halLinkService.addLinks(facetResultsResource, page);
             return facetResultsResource;
         } catch (Exception e) {
-            boolean isParsingException = e.getMessage().contains(SOLR_PARSE_ERROR_MESSAGE);
+            boolean isParsingException = e.getMessage().contains(SOLR_PARSE_ERROR_CLASS);
+            /*
+             * We unfortunately have to do a string comparison to locate the source of the error, as Solr only sends
+             * back a generic exception, and the org.apache.solr.search.SyntaxError is only available as plain text
+             * in the error message.
+             */
             if (isParsingException) {
                 throw new UnprocessableEntityException(e.getMessage());
             } else {
