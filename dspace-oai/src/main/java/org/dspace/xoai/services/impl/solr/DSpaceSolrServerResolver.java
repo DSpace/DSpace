@@ -26,7 +26,7 @@ public class DSpaceSolrServerResolver implements SolrServerResolver {
     @Autowired
     private ConfigurationService configurationService;
 
-    @Autowired @Named("solr")
+    @Autowired @Named("solrHttpConnectionPoolService")
     private HttpConnectionPoolService httpConnectionPoolService;
 
     @Override

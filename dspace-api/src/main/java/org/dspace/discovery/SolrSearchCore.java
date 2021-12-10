@@ -36,7 +36,7 @@ public class SolrSearchCore {
     protected IndexingService indexingService;
     @Autowired
     protected ConfigurationService configurationService;
-    @Autowired @Named("solr")
+    @Autowired @Named("solrHttpConnectionPoolService")
     protected HttpConnectionPoolService httpConnectionPoolService;
 
     /**

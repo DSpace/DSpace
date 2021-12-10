@@ -62,7 +62,7 @@ public class HttpConnectionPoolServiceTest
 
         configurationService.setProperty("solrClient.maxTotalConnections", 2);
         configurationService.setProperty("solrClient.maxPerRoute", 2);
-        HttpConnectionPoolService instance = new HttpConnectionPoolService();
+        HttpConnectionPoolService instance = new HttpConnectionPoolService("solr");
         instance.configurationService = configurationService;
         instance.init();
 

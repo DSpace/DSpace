@@ -38,8 +38,7 @@ public class HttpConnectionPoolService {
     ConfigurationService configurationService;
 
     /** Configuration properties will begin with this string. */
-    @Inject
-    String configPrefix;
+    private final String configPrefix;
 
     /** Maximum number of concurrent pooled connections. */
     private static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 20;
@@ -65,6 +64,15 @@ public class HttpConnectionPoolService {
 
     private final ConnectionKeepAliveStrategy keepAliveStrategy
             = new KeepAliveStrategy();
+
+    /**
+     * Construct a pool for a given set of configuration properties.
+     *
+     * @param configPrefix Configuration property names will begin with this.
+     */
+    public HttpConnectionPoolService(String configPrefix) {
+        this.configPrefix = configPrefix;
+    }
 
     @PostConstruct
     protected void init() {
