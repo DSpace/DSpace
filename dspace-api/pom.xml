@@ -943,6 +943,8 @@
     <dependencyManagement>
         <dependencies>
           <!-- for mockserver -->
+          <!-- Solve dependency convergence issues related to
+               'mockserver-junit-rule' by selecting the versions we want to use. -->
           <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
