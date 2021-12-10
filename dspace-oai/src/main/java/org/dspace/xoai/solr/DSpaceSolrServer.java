@@ -37,7 +37,8 @@ public class DSpaceSolrServer {
             HttpConnectionPoolService httpConnectionPoolService
                     = DSpaceServicesFactory.getInstance()
                             .getServiceManager()
-                            .getServiceByName(null, HttpConnectionPoolService.class);
+                            .getServiceByName("solrHttpConnectionPoolService",
+                                    HttpConnectionPoolService.class);
             String serverUrl = configurationService.getProperty("oai.solr.url");
             try {
                 _server = new HttpSolrClient.Builder(serverUrl)

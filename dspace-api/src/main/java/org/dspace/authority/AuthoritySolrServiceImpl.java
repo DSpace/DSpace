@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,7 +38,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
 
     private static final Logger log = LogManager.getLogger(AuthoritySolrServiceImpl.class);
 
-    @Inject
+    @Inject @Named("solr")
     private HttpConnectionPoolService httpConnectionPoolService;
 
     protected AuthoritySolrServiceImpl() {

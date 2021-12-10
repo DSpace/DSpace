@@ -7,6 +7,8 @@
  */
 package org.dspace.xoai.services.impl.solr;
 
+import javax.inject.Named;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -24,7 +26,7 @@ public class DSpaceSolrServerResolver implements SolrServerResolver {
     @Autowired
     private ConfigurationService configurationService;
 
-    @Autowired
+    @Autowired @Named("solr")
     private HttpConnectionPoolService httpConnectionPoolService;
 
     @Override

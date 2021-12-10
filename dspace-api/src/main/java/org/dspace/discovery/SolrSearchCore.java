@@ -8,6 +8,7 @@
 package org.dspace.discovery;
 
 import java.io.IOException;
+import javax.inject.Named;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.LogManager;
@@ -35,7 +36,7 @@ public class SolrSearchCore {
     protected IndexingService indexingService;
     @Autowired
     protected ConfigurationService configurationService;
-    @Autowired
+    @Autowired @Named("solr")
     protected HttpConnectionPoolService httpConnectionPoolService;
 
     /**
