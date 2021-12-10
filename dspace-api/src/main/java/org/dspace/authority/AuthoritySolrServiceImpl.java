@@ -38,7 +38,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
 
     private static final Logger log = LogManager.getLogger(AuthoritySolrServiceImpl.class);
 
-    @Inject @Named("solr")
+    @Inject @Named("solrHttpConnectionPoolService")
     private HttpConnectionPoolService httpConnectionPoolService;
 
     protected AuthoritySolrServiceImpl() {

@@ -30,7 +30,7 @@ public class SolrStatisticsCore {
     @Autowired
     private ConfigurationService configurationService;
 
-    @Autowired @Named("solr")
+    @Autowired @Named("solrHttpConnectionPoolService")
     private HttpConnectionPoolService httpConnectionPoolService;
 
     /**
