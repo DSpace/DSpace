@@ -37,10 +37,9 @@ public class HttpConnectionPoolService {
     @Inject
     ConfigurationService configurationService;
 
-    private PoolingHttpClientConnectionManager connManager;
-
-    private final ConnectionKeepAliveStrategy keepAliveStrategy
-            = new KeepAliveStrategy();
+    /** Configuration properties will begin with this string. */
+    @Inject
+    String configPrefix;
 
     /** Maximum number of concurrent pooled connections. */
     private static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 20;
@@ -62,16 +61,21 @@ public class HttpConnectionPoolService {
     /** Connection idle if unused for this long:  seconds */
     private static final int IDLE_INTERVAL = 30;
 
+    private PoolingHttpClientConnectionManager connManager;
+
+    private final ConnectionKeepAliveStrategy keepAliveStrategy
+            = new KeepAliveStrategy();
+
     @PostConstruct
     protected void init() {
         connManager = new PoolingHttpClientConnectionManager(
-                configurationService.getIntProperty("solrClient.timeToLive", DEFAULT_TTL),
+                configurationService.getIntProperty(configPrefix + ".client.timeToLive", DEFAULT_TTL),
                 TimeUnit.SECONDS);
 
         connManager.setMaxTotal(configurationService.getIntProperty(
-                "solrClient.maxTotalConnections", DEFAULT_MAX_TOTAL_CONNECTIONS));
+                configPrefix + ".client.maxTotalConnections", DEFAULT_MAX_TOTAL_CONNECTIONS));
         connManager.setDefaultMaxPerRoute(
-                configurationService.getIntProperty("solrClient.maxPerRoute",
+                configurationService.getIntProperty(configPrefix + ".client.maxPerRoute",
                         DEFAULT_MAX_PER_ROUTE));
 
         Thread connectionMonitor = new IdleConnectionMonitorThread(connManager);
@@ -114,7 +118,8 @@ public class HttpConnectionPoolService {
                 }
             }
 
-            return configurationService.getIntProperty("solrClient.keepAlive",
+            // If server did not request keep-alive, use configured value.
+            return configurationService.getIntProperty(configPrefix + ".client.keepAlive",
                     DEFAULT_KEEPALIVE);
         }
     }
