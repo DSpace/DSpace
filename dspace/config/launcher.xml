@@ -366,4 +366,11 @@
             <class>org.dspace.statistics.AnonymizeStatistics</class>
         </step>
     </command>
+    <command>
+        <name>canvas-dimensions</name>
+        <description>Add canvas width and height metadata for IIIF enabled items.</description>
+        <step>
+            <class>org.dspace.app.canvasdimension.CanvasDimensionCLI</class>
+        </step>
+    </command>
 </commands>

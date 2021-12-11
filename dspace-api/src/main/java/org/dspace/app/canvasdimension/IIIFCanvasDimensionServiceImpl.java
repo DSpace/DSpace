@@ -16,11 +16,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.canvasdimension.service.IIIFApiQueryService;
+import org.dspace.app.canvasdimension.service.IIIFCanvasDimensionService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectService;
@@ -28,19 +31,20 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.license.CreativeCommonsServiceImpl;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class IIIFCanvasDimensionProcessor implements InitializingBean {
+public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionService {
 
-    @Autowired
+    @Autowired(required = true)
     ItemService itemService;
-    @Autowired
+    @Autowired(required = true)
     CommunityService communityService;
-    @Autowired
+    @Autowired(required = true)
     BitstreamService bitstreamService;
-    @Autowired
+    @Autowired(required = true)
     DSpaceObjectService<Bitstream> dSpaceObjectService;
+    @Autowired(required = true)
+    IIIFApiQueryService iiifApiQuery;
 
     // metadata used to enable the iiif features on the item
     public static final String METADATA_IIIF_ENABLED = "dspace.iiif.enabled";
@@ -55,20 +59,17 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
     private int processed = 0;
     protected Item currentItem = null; // TODO needed?
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-
-    }
-
     /**
      * Set the force processing property. If true, existing canvas
      * metadata will be replaced.
      * @param force
      */
+    @Override
     public void setForceProcessing(boolean force) {
         forceProcessing = force;
     }
 
+    @Override
     public void setIsQuiet(boolean quiet) {
         isQuiet = quiet;
     }
@@ -77,6 +78,7 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
      * Set the maximum number of items to process.
      * @param max2Process
      */
+    @Override
     public void setMax2Process(int max2Process) {
         this.max2Process = max2Process;
     }
@@ -85,6 +87,7 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
      * Set dso identifiers to skip.
      * @param skipList
      */
+    @Override
     public void setSkipList(List<String> skipList) {
         this.skipList = skipList;
     }
@@ -94,6 +97,7 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
      * @param context
      * @throws Exception
      */
+    @Override
     public void processSite(Context context) throws Exception {
         if (skipList != null) {
             //if a skip-list exists, we need to filter community-by-community
@@ -119,6 +123,7 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
      * @param community
      * @throws Exception
      */
+    @Override
     public void processCommunity(Context context, Community community) throws Exception {
         if (!inSkipList(community.getHandle())) {
             List<Community> subcommunities = community.getSubcommunities();
@@ -138,6 +143,7 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
      * @param collection
      * @throws Exception
      */
+    @Override
     public void processCollection(Context context, Collection collection) throws Exception {
         if (!inSkipList(collection.getHandle())) {
             Iterator<Item> itemIterator = itemService.findAllByCollection(context, collection);
@@ -153,6 +159,7 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
      * @param item
      * @throws Exception
      */
+    @Override
     public void processItem(Context context, Item item) throws Exception {
         if (!inSkipList(item.getHandle())) {
             boolean isIIIFItem = item.getMetadata().stream().filter(m -> m.getMetadataField().toString('.')
@@ -160,8 +167,10 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
                                      .anyMatch(m -> m.getValue().equalsIgnoreCase("true") ||
                                          m.getValue().equalsIgnoreCase("yes"));
             if (isIIIFItem) {
-                if (processBundles(context, item)) {
+                if (processItemBundles(context, item)) {
                     ++processed;
+                    // commit changes
+                    context.commit();
                 }
             }
         }
@@ -174,15 +183,16 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
      * @return
      * @throws Exception
      */
-    private boolean processBundles(Context context, Item item) throws Exception {
+    private boolean processItemBundles(Context context, Item item) throws Exception {
         List<Bundle> bundles = getIIIFBundles(item);
         boolean done = false;
         for (Bundle bundle : bundles) {
-            List<Bitstream> myBitstreams = bundle.getBitstreams();
-            for (Bitstream myBitstream : myBitstreams) {
-                done |= processBitstream(context, myBitstream);
+            List<Bitstream> bitstreams = bundle.getBitstreams();
+            for (Bitstream bit : bitstreams) {
+                done |= processBitstream(context, bit);
             }
         }
+        itemService.update(context, item);
         return done;
 
     }
@@ -197,15 +207,23 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
      */
     private boolean processBitstream(Context context, Bitstream bitstream) throws Exception {
         boolean processed = false;
+        boolean isUnsupported = bitstream.getFormat(context).getMIMEType().contains("image/jp2");
         boolean isImage = bitstream.getFormat(context).getMIMEType().contains("image/");
         if (isImage) {
-            Optional op = bitstream.getMetadata().stream().filter(m -> m.getMetadataField().toString('.')
-                                                                        .contentEquals(IIIF_WIDTH_METADATA)).findFirst();
+            Optional<MetadataValue> op = bitstream.getMetadata().stream()
+                                                  .filter(m -> m.getMetadataField().toString('.')
+                                                                .contentEquals(IIIF_WIDTH_METADATA)).findFirst();
             if (op.isEmpty() || forceProcessing) {
-                InputStream srcStream = bitstreamService.retrieve(context, bitstream);
-                int[] dims = ImageDimensionReader.getImageDimensions(srcStream);
+                int[] dims;
+                if (isUnsupported) {
+                    dims = iiifApiQuery.getImageDimensions(bitstream);
+                } else {
+                    InputStream stream = bitstreamService.retrieve(context, bitstream);
+                    dims = ImageDimensionReader.getImageDimensions(stream);
+                }
                 if (dims != null) {
                     processed = setBitstreamMetadata(context, bitstream, dims);
+                    bitstreamService.update(context, bitstream);
                 }
             }
         }
@@ -216,14 +234,12 @@ public class IIIFCanvasDimensionProcessor implements InitializingBean {
         try {
             dSpaceObjectService.clearMetadata(context, bitstream, "iiif",
                 "image", "width", Item.ANY);
-            dSpaceObjectService.addAndShiftRightMetadata(context, bitstream, "iiif",
-                "image", "width", null,
-                String.valueOf(dims[0]), null, -1, -1);
+            dSpaceObjectService.setMetadataSingleValue(context, bitstream, "iiif",
+                "image", "width", Item.ANY, String.valueOf(dims[0]));
             dSpaceObjectService.clearMetadata(context, bitstream, "iiif",
                 "image", "height", Item.ANY);
-            dSpaceObjectService.addAndShiftRightMetadata(context, bitstream, "iiif",
-                "image", "height", null,
-                String.valueOf(dims[1]), null, -1, -1);
+            dSpaceObjectService.setMetadataSingleValue(context, bitstream, "iiif",
+                "image", "height", Item.ANY, String.valueOf(dims[1]));
             return true;
         } catch (SQLException e) {
             System.out.println("Unable to update metadata: " + e.getMessage());

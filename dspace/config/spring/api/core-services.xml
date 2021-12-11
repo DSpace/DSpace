@@ -17,6 +17,9 @@
     <!--Ensure that bean remains prototype ! -->
     <bean class="org.dspace.app.mediafilter.MediaFilterServiceImpl" scope="prototype"/>
 
+    <bean class="org.dspace.app.canvasdimension.IIIFCanvasDimensionServiceImpl" scope="prototype"/>
+    <bean class="org.dspace.app.canvasdimension.IIIFApiQueryServiceImpl" scope="prototype"/>
+
     <bean class="org.dspace.app.sfx.SFXFileReaderServiceImpl" scope="prototype"/>
 
     <bean class="org.dspace.app.util.MetadataExposureServiceImpl"/>
