@@ -8,17 +8,29 @@
 package org.dspace.app.canvasdimension;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 import org.apache.commons.cli.*;
+import org.dspace.app.canvasdimension.factory.IIIFCanvasDimensionServiceFactory;
+import org.dspace.app.canvasdimension.service.IIIFCanvasDimensionService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class CanvasDimensionCLI {
+
+    private static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
+                                                                                          .getConfigurationService();
 
     private CanvasDimensionCLI() {}
 
@@ -27,16 +39,26 @@ public class CanvasDimensionCLI {
         boolean force = false;
         boolean isQuiet = false;
         String identifier = null;
+        String eperson = null;
         int max2Process = Integer.MAX_VALUE;
+        boolean iiifEnabled = configurationService.getBooleanProperty("iiif.enabled");
+
+        if (!iiifEnabled) {
+            System.out.println("IIIF is not enabled on this DSpace server.");
+            return;
+        }
 
         Context context = new Context();
-        IIIFCanvasDimensionProcessor canvasProcessor = new IIIFCanvasDimensionProcessor();
+        IIIFCanvasDimensionService canvasProcessor = IIIFCanvasDimensionServiceFactory.getInstance()
+                                                                                      .getIiifCanvasDimensionService();
 
         CommandLineParser parser = new DefaultParser();
 
         Options options = new Options();
         options.addOption("i", "identifier", true,
             "process IIIF canvas dimensions for images belonging to identifier");
+        options.addOption("e", "eperson", true,
+            "email of eperson setting canvas dimensions");
         options.addOption("f", "force", false,
             "force update of all IIIF canvas height and width dimensions");
         options.addOption("q", "quiet", false,
@@ -73,6 +95,9 @@ public class CanvasDimensionCLI {
         }
         if (line.hasOption('q')) {
             isQuiet = true;
+        }
+        if (line.hasOption('e')) {
+            eperson = line.getOptionValue('e');
         }
         if (line.hasOption('i')) {
             identifier = line.getOptionValue('i');
@@ -111,6 +136,21 @@ public class CanvasDimensionCLI {
                 + identifier + " to a DSpace object");
         }
 
+        EPerson user;
+
+        if (eperson.indexOf('@') != -1) {
+            // @ sign, must be an email
+            user = epersonService.findByEmail(context, eperson);
+        } else {
+            user = epersonService.find(context, UUID.fromString(eperson));
+        }
+
+        if (user == null) {
+            System.out.println("Error, eperson cannot be found: " + eperson);
+            System.exit(1);
+        }
+
+        context.setCurrentUser(user);
 
         canvasProcessor.setForceProcessing(force);
         canvasProcessor.setMax2Process(max2Process);
