@@ -18,8 +18,8 @@ public class ImageDimensionReader {
     public static int[] getImageDimensions(InputStream image) throws Exception {
         int[] dims = new int[2];
         BufferedImage buf = ImageIO.read(image);
-        int width = buf.getWidth();
-        int height = buf.getHeight();
+        int width = buf.getWidth(null);
+        int height = buf.getHeight(null);
         if (width > 0 && height > 0) {
             dims[0] = width;
             dims[1] = height;
