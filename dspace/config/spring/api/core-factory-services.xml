@@ -10,6 +10,7 @@
     <bean id="requestItemServiceFactory" class="org.dspace.app.requestitem.factory.RequestItemServiceFactoryImpl"/>
     <bean id="itemExportServiceFactory" class="org.dspace.app.itemexport.factory.ItemExportServiceFactoryImpl"/>
     <bean id="itemImportServiceFactory" class="org.dspace.app.itemimport.factory.ItemImportServiceFactoryImpl"/>
+    <bean id="iiifCanvasDimensionServiceFactory" class="org.dspace.app.canvasdimension.factory.IIIFCanvasDimensionServiceFactoryImpl"/>
     <bean id="mediaFilterServiceFactory" class="org.dspace.app.mediafilter.factory.MediaFilterServiceFactoryImpl"/>
     <bean id="sfxServiceFactory" class="org.dspace.app.sfx.factory.SfxServiceFactoryImpl"/>
     <bean id="appUtilServiceFactory" class="org.dspace.app.util.factory.UtilServiceFactoryImpl"/>
