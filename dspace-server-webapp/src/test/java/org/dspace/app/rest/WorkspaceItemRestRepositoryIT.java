@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -5926,4 +5927,29 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                    .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    public void requiredQualdropTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community, "123456789/qualdrop-test")
+            .withName("Test name")
+            .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        WorkspaceItem workspaceItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("test workspace item 1")
+            .build();
+
+        // itemService.setMetadataSingleValue(context, workspaceItem1.getItem(), "dc", "identifier", "issn", null, "12");
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + workspaceItem1.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors").doesNotExist());
+
+    }
 }
