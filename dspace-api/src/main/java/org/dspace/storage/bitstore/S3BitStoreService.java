@@ -181,16 +181,20 @@ public class S3BitStoreService implements BitStoreService {
         try {
             FileUtils.copyInputStreamToFile(in, scratchFile);
             long contentLength = scratchFile.length();
+            String localChecksum = org.dspace.curate.Utils.checksum(scratchFile, "MD5");
 
             TransferManager tm = TransferManagerBuilder.standard()
+                    .withAlwaysCalculateMultipartMd5(true)
                     .withS3Client(s3Service)
                     .build();
-
+            
+            
             Upload upload = tm.upload(bucketName, key, scratchFile);
-            UploadResult result = upload.waitForUploadResult();
+            
+            upload.waitForUploadResult();
 
             bitstream.setSizeBytes(contentLength);
-            bitstream.setChecksum(result.getETag());
+            bitstream.setChecksum(localChecksum);
             bitstream.setChecksumAlgorithm(CSA);
 
             scratchFile.delete();
@@ -199,8 +203,8 @@ public class S3BitStoreService implements BitStoreService {
             log.error("put(" + bitstream.getInternalId() + ", is)", e);
             throw new IOException(e);
         } finally {
-            if (scratchFile.exists()) {
-                scratchFile.delete();
+            if (!scratchFile.delete()) {
+                scratchFile.deleteOnExit();
             }
         }
     }
