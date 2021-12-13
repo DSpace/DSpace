@@ -25,7 +25,7 @@ import org.dspace.app.rest.model.step.UploadBitstreamRest;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class UploadBitstreamAccessConditionDTO  {
+public class AccessConditionDTO  {
 
     private Integer id;
 
