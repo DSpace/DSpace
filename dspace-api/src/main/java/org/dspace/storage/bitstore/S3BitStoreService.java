@@ -181,6 +181,8 @@ public class S3BitStoreService implements BitStoreService {
         try {
             FileUtils.copyInputStreamToFile(in, scratchFile);
             long contentLength = scratchFile.length();
+            // The ETag may or may not be and MD5 digest of the object data.
+            // Therefore, we precalculate before uploading
             String localChecksum = org.dspace.curate.Utils.checksum(scratchFile, "MD5");
 
             TransferManager tm = TransferManagerBuilder.standard()
