@@ -26,7 +26,6 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
-import com.amazonaws.services.s3.transfer.model.UploadResult;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -189,10 +188,10 @@ public class S3BitStoreService implements BitStoreService {
                     .withAlwaysCalculateMultipartMd5(true)
                     .withS3Client(s3Service)
                     .build();
-            
-            
+
+
             Upload upload = tm.upload(bucketName, key, scratchFile);
-            
+
             upload.waitForUploadResult();
 
             bitstream.setSizeBytes(contentLength);
