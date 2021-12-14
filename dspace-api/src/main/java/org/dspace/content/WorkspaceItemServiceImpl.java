@@ -24,6 +24,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.WorkspaceItemDAO;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -32,6 +33,9 @@ import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.event.Event;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.factory.IdentifierServiceFactory;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -160,6 +164,18 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         }
 
         itemService.update(context, item);
+
+        // If configured, register identifiers (eg handle, DOI) now. This is typically used with the Show Identifiers
+        // submission step which previews minted handles and DOIs during the submission process. Default: false
+        if (DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getBooleanProperty("identifiers.submission.register", false)) {
+            try {
+                IdentifierServiceFactory.getInstance().getIdentifierService().register(context, item);
+            } catch (IdentifierException e) {
+                log.error("Could not register identifier(s) for item {}: {}", item.getID(), e.getMessage());
+            }
+        }
+
         workspaceItem.setItem(item);
 
         log.info(LogHelper.getHeader(context, "create_workspace_item",
