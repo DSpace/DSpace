@@ -61,4 +61,25 @@
         </property>
     </bean>
 
+    <bean id="accessConditionConfigurationService" class="org.dspace.submit.model.AccessConditionConfigurationService">
+        <property name="map">
+            <map>
+                <entry key="AccessConditionDefaultConfiguration" value-ref="accessConditionConfigurationDefault" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="accessConditionConfigurationDefault" class="org.dspace.submit.model.AccessConditionConfiguration">
+        <property name="name" value="AccessConditionDefaultConfiguration"></property>
+        <property name="discoverable" value="true"></property>
+        <property name="options">
+            <list>
+                <ref bean="openAccess"/>
+                <ref bean="lease"/>
+                <ref bean="embargoed" />
+                <ref bean="administrator"/>
+            </list>
+        </property>
+    </bean>
+
 </beans>
