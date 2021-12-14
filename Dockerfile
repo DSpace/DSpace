@@ -2,8 +2,8 @@
 # See https://github.com/DSpace/DSpace/tree/main/dspace/src/main/docker for usage details
 #
 # This version is JDK11 compatible
-# - tomcat:8-jdk11
-# - ANT 1.10.7
+# - tomcat:9-jdk11
+# - ANT 1.10.12
 # - maven:3-jdk-11 (see dspace-dependencies)
 # - note: default tag for branch: dspace/dspace: dspace/dspace:dspace-7_x
 
@@ -30,13 +30,13 @@ RUN mvn package && \
   mvn clean
 
 # Step 2 - Run Ant Deploy
-FROM tomcat:8-jdk11 as ant_build
+FROM tomcat:9-jdk11 as ant_build
 ARG TARGET_DIR=dspace-installer
 COPY --from=build /install /dspace-src
 WORKDIR /dspace-src
 
 # Create the initial install deployment using ANT
-ENV ANT_VERSION 1.10.7
+ENV ANT_VERSION 1.10.12
 ENV ANT_HOME /tmp/ant-$ANT_VERSION
 ENV PATH $ANT_HOME/bin:$PATH
 
@@ -47,7 +47,7 @@ RUN ant init_installation update_configs update_code update_webapps
 
 # Step 3 - Run tomcat
 # Create a new tomcat image that does not retain the the build directory contents
-FROM tomcat:8-jdk11
+FROM tomcat:9-jdk11
 ENV DSPACE_INSTALL=/dspace
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 EXPOSE 8080 8009
