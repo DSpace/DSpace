@@ -63,42 +63,63 @@ public class MetadataValidation extends AbstractValidation {
 
                 List<String> fieldsName = new ArrayList<String>();
                 if (input.isQualdropValue()) {
-                    for (Object qualifier : input.getPairs()) {
-                        fieldsName.add(input.getFieldName() + "." + (String) qualifier);
+                    boolean foundResult = false;
+                    List<Object> inputPairs = input.getPairs();
+                    //starting from the second element of the list and skipping one every time because the display
+                    // values are also in the list and before the stored values.
+                    for (int i = 1; i < inputPairs.size(); i += 2) {
+                        String fullFieldname = input.getFieldName() + "." + (String) inputPairs.get(i);
+                        List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fullFieldname);
+                        validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey);
+                        if (mdv.size() > 0 && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
+                            foundResult = true;
+                        }
                     }
+                    if (input.isRequired() && ! foundResult) {
+                        // for this required qualdrop no value was found, add to the list of error fields
+                        addError(ERROR_VALIDATION_REQUIRED,
+                            "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                                input.getFieldName());
+                    }
+
                 } else {
                     fieldsName.add(input.getFieldName());
                 }
 
                 for (String fieldName : fieldsName) {
                     List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fieldName);
-                    for (MetadataValue md : mdv) {
-                        if (!(input.validate(md.getValue()))) {
-                            addError(ERROR_VALIDATION_REGEX,
-                                "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                                input.getFieldName() + "/" + md.getPlace());
-                        }
-                        if (isAuthorityControlled) {
-                            String authKey = md.getAuthority();
-                            if (metadataAuthorityService.isAuthorityRequired(fieldKey) &&
-                                StringUtils.isBlank(authKey)) {
-                                addError(ERROR_VALIDATION_AUTHORITY_REQUIRED,
-                                    "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() +
-                                    "/" + input.getFieldName() + "/" + md.getPlace());
-                            }
-                        }
-                    }
+                    validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey);
                     if ((input.isRequired() && mdv.size() == 0) && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
                         // since this field is missing add to list of error
                         // fields
                         addError(ERROR_VALIDATION_REQUIRED,
                             "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                            input.getFieldName());
+                                input.getFieldName());
                     }
                 }
             }
         }
         return getErrors();
+    }
+
+    private void validateMetadataValues(List<MetadataValue> mdv, DCInput input, SubmissionStepConfig config,
+                                        boolean isAuthorityControlled, String fieldKey) {
+        for (MetadataValue md : mdv) {
+            if (! (input.validate(md.getValue()))) {
+                addError(ERROR_VALIDATION_REGEX,
+                    "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                        input.getFieldName() + "/" + md.getPlace());
+            }
+            if (isAuthorityControlled) {
+                String authKey = md.getAuthority();
+                if (metadataAuthorityService.isAuthorityRequired(fieldKey) &&
+                    StringUtils.isBlank(authKey)) {
+                    addError(ERROR_VALIDATION_AUTHORITY_REQUIRED,
+                        "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() +
+                            "/" + input.getFieldName() + "/" + md.getPlace());
+                }
+            }
+        }
     }
 
     public void setItemService(ItemService itemService) {
