@@ -8,7 +8,7 @@
 package org.dspace.app.rest.submit.factory.impl;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -52,21 +52,17 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
         String[] split = getAbsolutePath(path).split("/");
         Item item = source.getItem();
 
-        List<AccessConditionDTO> accessConditions = new ArrayList<AccessConditionDTO>();
-
-        if (split.length == 1) {
-            // to replace completely the access conditions
-            authorizeService.removePoliciesActionFilter(context, item, Constants.READ);
-            accessConditions = evaluateArrayObject((LateObjectEvaluator) value);
-        } else if (split.length == 2) {
-            // to add an access condition
-            // contains "-", call index-based accessConditions it make not sense
-            accessConditions.add(evaluateSingleObject((LateObjectEvaluator) value));
-        }
+        List<AccessConditionDTO> accessConditions = Arrays.asList(evaluateSingleObject((LateObjectEvaluator) value));
 
         verifyAccessConditions(context, configuration, accessConditions);
         // check duplicate policy
         checkDuplication(context, item, accessConditions);
+
+        if (split.length == 1) {
+            // to replace completely the access conditions
+            authorizeService.removePoliciesActionFilter(context, item, Constants.READ);
+        }
+
         // apply policies
         AccessConditionResourcePolicyUtils.findApplyResourcePolicy(context, configuration.getOptions(), item,
                 accessConditions);
