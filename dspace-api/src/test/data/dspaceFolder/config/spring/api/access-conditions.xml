@@ -82,7 +82,7 @@
     </bean>
 
     <bean id="accessConditionConfigurationNotDiscoverable" class="org.dspace.submit.model.AccessConditionConfiguration">
-        <property name="name" value="defaultAC"></property>
+        <property name="name" value="notDiscoverable"></property>
         <property name="discoverable" value="false"></property>
         <property name="options">
             <list>
