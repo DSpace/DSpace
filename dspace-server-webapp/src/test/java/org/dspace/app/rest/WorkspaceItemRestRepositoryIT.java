@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,6 +68,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
@@ -5938,18 +5938,47 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         //disable file upload mandatory
         configurationService.setProperty("webui.submit.upload.required", false);
 
+        MetadataFieldName issnFieldName = new MetadataFieldName("dc", "identifier", "issn");
+        MetadataFieldName isbnFieldName = new MetadataFieldName("dc", "identifier", "isbn");
+        MetadataFieldName urlfieldName = new MetadataFieldName("dc", "identifier", "url");
+
         WorkspaceItem workspaceItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
             .withTitle("test workspace item 1")
             .build();
+        itemService.setMetadataSingleValue(context, workspaceItem1.getItem(), issnFieldName, null, "12");
 
-        // itemService.setMetadataSingleValue(context, workspaceItem1.getItem(), "dc", "identifier", "issn", null, "12");
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("test workspace item 2")
+            .build();
+        itemService.setMetadataSingleValue(context, workspaceItem2.getItem(), issnFieldName, null, "13");
+        itemService.setMetadataSingleValue(context, workspaceItem2.getItem(), isbnFieldName, null, "14");
+
+        WorkspaceItem workspaceItem3 = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("test workspace item 3")
+            .build();
+        itemService.setMetadataSingleValue(context, workspaceItem3.getItem(), urlfieldName, null, "url");
 
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/submission/workspaceitems/" + workspaceItem1.getID()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors").doesNotExist());
 
+
+        String workspaceItemsUri = "/api/submission/workspaceitems/";
+        String errorPath = "$.errors";
+        getClient(authToken).perform(get(workspaceItemsUri + workspaceItem1.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath(errorPath).doesNotExist());
+
+        getClient(authToken).perform(get(workspaceItemsUri + workspaceItem2.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath(errorPath).doesNotExist());
+
+        getClient(authToken).perform(get(workspaceItemsUri + workspaceItem3.getItem()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
+                Matchers.contains(
+                    hasJsonPath("$.paths", Matchers.contains(
+                        hasJsonPath("$", Matchers.is("/sections/qualdroptest/dc.identifier"))
+                    )))));
     }
 }
