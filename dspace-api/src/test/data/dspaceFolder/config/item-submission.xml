@@ -76,9 +76,9 @@
             <scope visibilityOutside="read-only">submission</scope>
         </step-definition>
 
-        <step-definition id="qualdrop">
+        <step-definition id="qualdroptest">
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
-            <type></type>
+            <type>submission-form</type>
         </step-definition>
 
         <!-- Step Upload Item with Embargo Features to enable this step, please
@@ -174,7 +174,7 @@
         </submission-process>
 
         <submission-process name="qualdroptest">
-            <step id="qualdrop" />
+            <step id="qualdroptest" />
         </submission-process>
 
     </submission-definitions>

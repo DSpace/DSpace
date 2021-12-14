@@ -286,7 +286,7 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
    </form>
 
-   <form name="qualdrop">
+   <form name="qualdroptest">
      <row>
        <field>
          <dc-schema>dc</dc-schema>
