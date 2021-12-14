@@ -55,7 +55,7 @@ public class AccessConditionRemovePatchOperation extends RemovePatchOperation<Ac
             }
 
             List<ResourcePolicy> policies = resourcePolicyService.find(context, item, ResourcePolicy.TYPE_CUSTOM);
-            if ((idxToDelete < 0 || idxToDelete >= policies.size()) && policies.isEmpty()) {
+            if (idxToDelete < 0 || idxToDelete >= policies.size()) {
                 throw new UnprocessableEntityException("The provided index:" + idxToDelete + " is not supported,"
                         + " currently the are " + policies.size() + " access conditions");
             }

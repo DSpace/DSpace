@@ -86,7 +86,7 @@
                             <bean
                                     class="org.dspace.app.rest.submit.factory.impl.BitstreamRemovePatchOperation" />
                         </entry>
-                        <entry key="accessConditions">
+                        <entry key="upload.accessConditions">
                             <bean
                                     class="org.dspace.app.rest.submit.factory.impl.BitstreamResourcePolicyRemovePatchOperation"/>
                         </entry>
