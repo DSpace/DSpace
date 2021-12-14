@@ -9,7 +9,7 @@ package org.dspace.app.rest.submit.factory.impl;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +29,8 @@ import org.dspace.core.Context;
 import org.dspace.submit.model.AccessConditionConfiguration;
 import org.dspace.submit.model.AccessConditionConfigurationService;
 import org.dspace.submit.model.AccessConditionOption;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -37,6 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<AccessConditionDTO> {
+
+    private static final Logger log = LoggerFactory.getLogger(AccessConditionReplacePatchOperation.class);
 
     @Autowired
     private ResourcePolicyService resourcePolicyService;
@@ -53,15 +57,16 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
         // "path" : "/sections/<:name-of-the-form>/accessConditions/0"
         String[] split = getAbsolutePath(path).split("/");
         Item item = source.getItem();
+        int toReplace = Integer.parseInt(split[1]);
+        List<ResourcePolicy> policies = resourcePolicyService.find(context, item, ResourcePolicy.TYPE_CUSTOM);
+        if (toReplace < 0 || toReplace >= policies.size()) {
+            throw new UnprocessableEntityException("The provided index:" + toReplace + " is not supported,"
+                    + " currently the are " + policies.size() + " access conditions");
+        }
+
         if (split.length == 2) {
-            int toReplace = Integer.parseInt(split[1]);
             AccessConditionDTO accessConditionDTO = evaluateSingleObject((LateObjectEvaluator) value);
             if (Objects.nonNull(accessConditionDTO) && Objects.nonNull(getOption(configuration, accessConditionDTO))) {
-                List<ResourcePolicy> policies = resourcePolicyService.find(context, item, ResourcePolicy.TYPE_CUSTOM);
-                if (toReplace < 0 || toReplace >= policies.size()) {
-                    throw new UnprocessableEntityException("The provided index:" + toReplace + " is not supported,"
-                            + " currently the are " + policies.size() + " access conditions");
-                }
                 verifyAccessCondition(context, configuration, accessConditionDTO);
                 if (checkDuplication(context, policies, accessConditionDTO, toReplace, item)) {
                     context.commit();
@@ -73,13 +78,7 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
             }
         } else if (split.length == 3) {
             String valueToReplace = getValue(value);
-            int toReplace = Integer.parseInt(split[1]);
             String attributeReplace = split[2];
-            List<ResourcePolicy> policies = resourcePolicyService.find(context, item, ResourcePolicy.TYPE_CUSTOM);
-            if (toReplace < 0 || toReplace >= policies.size()) {
-                throw new UnprocessableEntityException("The provided index:" + toReplace + " is not supported,"
-                        + " currently the are " + policies.size() + " access conditions");
-            }
             ResourcePolicy rpToReplace = policies.get(toReplace);
             AccessConditionDTO accessConditionDTO = createDTO(rpToReplace, attributeReplace, valueToReplace);
             verifyAccessCondition(context, configuration, accessConditionDTO);
@@ -162,21 +161,21 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
     }
 
     private Date parsDate(String date) {
-        List<SimpleDateFormat> knownPatterns = new ArrayList<SimpleDateFormat>();
-        knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd"));
-        knownPatterns.add(new SimpleDateFormat("dd-MM-yyyy"));
-        knownPatterns.add(new SimpleDateFormat("yyyy/MM/dd"));
-        knownPatterns.add(new SimpleDateFormat("dd/MM/yyyy"));
-
+        List<SimpleDateFormat> knownPatterns = Arrays.asList(
+                                new SimpleDateFormat("yyyy-MM-dd"),
+                                new SimpleDateFormat("dd-MM-yyyy"),
+                                new SimpleDateFormat("yyyy/MM/dd"),
+                                new SimpleDateFormat("dd/MM/yyyy"));
         for (SimpleDateFormat pattern : knownPatterns) {
             try {
                 return pattern.parse(date);
-            } catch (ParseException pe) {
-                throw new UnprocessableEntityException("");
+            } catch (ParseException e) {
+                log.error(e.getMessage(), e);
             }
         }
-        return null;
+        throw new UnprocessableEntityException("Provided format of date:" + date + " is not supported!");
     }
+
     private String getValue(Object value) {
         if (value instanceof JsonValueEvaluator) {
             JsonValueEvaluator jsonValue = (JsonValueEvaluator) value;
