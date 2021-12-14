@@ -8,6 +8,8 @@
 package org.dspace.app.rest.submit.factory.impl;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -56,83 +58,41 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
             AccessConditionDTO accessConditionDTO = evaluateSingleObject((LateObjectEvaluator) value);
             if (Objects.nonNull(accessConditionDTO) && Objects.nonNull(getOption(configuration, accessConditionDTO))) {
                 List<ResourcePolicy> policies = resourcePolicyService.find(context, item, ResourcePolicy.TYPE_CUSTOM);
-                if ((toReplace < 0 || toReplace >= policies.size()) && policies.isEmpty()) {
+                if (toReplace < 0 || toReplace >= policies.size()) {
                     throw new UnprocessableEntityException("The provided index:" + toReplace + " is not supported,"
                             + " currently the are " + policies.size() + " access conditions");
                 }
-                if (checkDubblication(context, configuration, policies, accessConditionDTO, toReplace, item)) {
+                verifyAccessCondition(context, configuration, accessConditionDTO);
+                if (checkDuplication(context, policies, accessConditionDTO, toReplace, item)) {
                     context.commit();
                     resourcePolicyService.delete(context, policies.get(toReplace));
-                    getOption(configuration, accessConditionDTO).createPolicy(context, item,
-                            accessConditionDTO.getName(), null, accessConditionDTO.getStartDate(),
-                            accessConditionDTO.getEndDate());
+                    AccessConditionOption option = getOption(configuration, accessConditionDTO);
+                    option.createPolicy(context, item, accessConditionDTO.getName(), null,
+                            accessConditionDTO.getStartDate(),accessConditionDTO.getEndDate());
                 }
             }
         } else if (split.length == 3) {
-            String valueToReplare = getValue(value);
+            String valueToReplace = getValue(value);
             int toReplace = Integer.parseInt(split[1]);
             String attributeReplace = split[2];
             List<ResourcePolicy> policies = resourcePolicyService.find(context, item, ResourcePolicy.TYPE_CUSTOM);
-            if ((toReplace < 0 || toReplace >= policies.size()) && policies.isEmpty()) {
+            if (toReplace < 0 || toReplace >= policies.size()) {
                 throw new UnprocessableEntityException("The provided index:" + toReplace + " is not supported,"
                         + " currently the are " + policies.size() + " access conditions");
             }
             ResourcePolicy rpToReplace = policies.get(toReplace);
-            AccessConditionDTO accessConditionDTO = createDTO(rpToReplace, attributeReplace, valueToReplare);
-            boolean canApplay = AccessConditionResourcePolicyUtils.canApplyResourcePolicy(context,
-                    configuration.getOptions(), accessConditionDTO.getName(), accessConditionDTO.getStartDate(),
-                    accessConditionDTO.getEndDate());
-            if (canApplay) {
-                switch (attributeReplace) {
-                    case "name":
-                        rpToReplace.setRpName(valueToReplare);
-                        break;
-                    case "startDate":
-                        rpToReplace.setStartDate(new Date(valueToReplare));
-                        break;
-                    case "endDate":
-                        rpToReplace.setEndDate(new Date(valueToReplare));
-                        break;
-                    default:
-                }
-            }
-            resourcePolicyService.update(context, rpToReplace);
+            AccessConditionDTO accessConditionDTO = createDTO(rpToReplace, attributeReplace, valueToReplace);
+            verifyAccessCondition(context, configuration, accessConditionDTO);
+            updatePolicy(context, valueToReplace, attributeReplace, rpToReplace);
         }
     }
 
-    private AccessConditionDTO createDTO(ResourcePolicy rpToReplace, String attributeReplace, String valueToReplare) {
-        AccessConditionDTO accessCondition = new AccessConditionDTO();
-        switch (attributeReplace) {
-            case "name":
-                accessCondition.setName(valueToReplare);
-                accessCondition.setStartDate(rpToReplace.getStartDate());
-                accessCondition.setEndDate(rpToReplace.getEndDate());
-                return accessCondition;
-            case "startDate":
-                accessCondition.setName(rpToReplace.getRpName());
-                accessCondition.setStartDate(new Date(valueToReplare));
-                accessCondition.setEndDate(rpToReplace.getEndDate());
-                return accessCondition;
-            case "endDate":
-                accessCondition.setName(rpToReplace.getRpName());
-                accessCondition.setStartDate(rpToReplace.getStartDate());
-                accessCondition.setEndDate(new Date(valueToReplare));
-                return accessCondition;
-            default:
-                throw new UnprocessableEntityException("The provided attribute: "
-                                                       + attributeReplace + " is not supported");
-        }
+    private void verifyAccessCondition(Context context, AccessConditionConfiguration configuration,
+            AccessConditionDTO dto) throws SQLException, AuthorizeException, ParseException {
+        AccessConditionResourcePolicyUtils.canApplyResourcePolicy(context, configuration.getOptions(),
+                dto.getName(), dto.getStartDate(), dto.getEndDate());
     }
 
-    private String getValue(Object value) {
-        if (value instanceof JsonValueEvaluator) {
-            JsonValueEvaluator jsonValue = (JsonValueEvaluator) value;
-            if (jsonValue.getValueNode().fields().hasNext()) {
-                return jsonValue.getValueNode().fields().next().getValue().asText();
-            }
-        }
-        return StringUtils.EMPTY;
-    }
     private AccessConditionOption getOption(AccessConditionConfiguration configuration,
             AccessConditionDTO accessConditionDTO) {
         for (AccessConditionOption option :configuration.getOptions()) {
@@ -143,26 +103,88 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
         return null;
     }
 
-    private boolean checkDubblication(Context context, AccessConditionConfiguration configuration,
-            List<ResourcePolicy> policies, AccessConditionDTO accessConditionDTO, int toReplace, Item item)
+    private boolean checkDuplication(Context context, List<ResourcePolicy> policies,
+            AccessConditionDTO accessConditionDTO, int toReplace, Item item)
             throws SQLException, AuthorizeException, ParseException {
-        ResourcePolicy rp = policies.get(toReplace);
-        if (rp.getRpName().equals(accessConditionDTO.getName())) {
-            boolean canApplay = AccessConditionResourcePolicyUtils.canApplyResourcePolicy(context,
-                                      configuration.getOptions(), accessConditionDTO.getName(),
-                                      accessConditionDTO.getStartDate(), accessConditionDTO.getEndDate());
-            if (canApplay) {
-                item.getResourcePolicies().remove(rp);
-                return true;
-            }
+        ResourcePolicy policyToReplace = policies.get(toReplace);
+        // check if the resource policy is of the same type
+        if (policyToReplace.getRpName().equals(accessConditionDTO.getName())) {
+            item.getResourcePolicies().remove(policyToReplace);
+            return true;
         }
+        // check if there is not already a policy of the same type
         for (ResourcePolicy resourcePolicy : policies) {
             if (resourcePolicy.getRpName().equals(accessConditionDTO.getName())) {
                 return false;
             }
         }
-        item.getResourcePolicies().remove(rp);
+        item.getResourcePolicies().remove(policyToReplace);
         return true;
+    }
+
+    private AccessConditionDTO createDTO(ResourcePolicy rpToReplace, String attributeReplace, String valueToReplare)
+            throws ParseException {
+        AccessConditionDTO accessCondition = new AccessConditionDTO();
+        accessCondition.setName(rpToReplace.getRpName());
+        accessCondition.setStartDate(rpToReplace.getStartDate());
+        accessCondition.setEndDate(rpToReplace.getEndDate());
+        switch (attributeReplace) {
+            case "name":
+                accessCondition.setName(valueToReplare);
+                return accessCondition;
+            case "startDate":
+                accessCondition.setStartDate(parsDate(valueToReplare));
+                return accessCondition;
+            case "endDate":
+                accessCondition.setEndDate(parsDate(valueToReplare));
+                return accessCondition;
+            default:
+                throw new UnprocessableEntityException("The provided attribute: "
+                                                       + attributeReplace + " is not supported");
+        }
+    }
+
+    private void updatePolicy(Context context, String valueToReplare, String attributeReplace,
+            ResourcePolicy rpToReplace) throws SQLException, AuthorizeException {
+        switch (attributeReplace) {
+            case "name":
+                rpToReplace.setRpName(valueToReplare);
+                break;
+            case "startDate":
+                rpToReplace.setStartDate(parsDate(valueToReplare));
+                break;
+            case "endDate":
+                rpToReplace.setEndDate(parsDate(valueToReplare));
+                break;
+            default:
+        }
+        resourcePolicyService.update(context, rpToReplace);
+    }
+
+    private Date parsDate(String date) {
+        List<SimpleDateFormat> knownPatterns = new ArrayList<SimpleDateFormat>();
+        knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd"));
+        knownPatterns.add(new SimpleDateFormat("dd-MM-yyyy"));
+        knownPatterns.add(new SimpleDateFormat("yyyy/MM/dd"));
+        knownPatterns.add(new SimpleDateFormat("dd/MM/yyyy"));
+
+        for (SimpleDateFormat pattern : knownPatterns) {
+            try {
+                return pattern.parse(date);
+            } catch (ParseException pe) {
+                throw new UnprocessableEntityException("");
+            }
+        }
+        return null;
+    }
+    private String getValue(Object value) {
+        if (value instanceof JsonValueEvaluator) {
+            JsonValueEvaluator jsonValue = (JsonValueEvaluator) value;
+            if (jsonValue.getValueNode().fields().hasNext()) {
+                return jsonValue.getValueNode().fields().next().getValue().asText();
+            }
+        }
+        return StringUtils.EMPTY;
     }
 
     @Override

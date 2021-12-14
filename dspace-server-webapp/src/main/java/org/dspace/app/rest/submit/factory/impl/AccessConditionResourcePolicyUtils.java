@@ -65,6 +65,6 @@ public class AccessConditionResourcePolicyUtils {
                 return accessConditionOption.canCreateResourcePolicy(context, name, startDate, endDate);
             }
         }
-        return false;
+        throw new UnprocessableEntityException("The provided policy: " + name + " is not supported!");
     }
 }
