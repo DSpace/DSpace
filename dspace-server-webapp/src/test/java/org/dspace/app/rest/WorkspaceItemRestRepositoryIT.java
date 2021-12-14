@@ -6590,4 +6590,211 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                              .andExpect(jsonPath("$.sections.defaultAC.accessConditions[2].name").doesNotExist());
     }
 
+    @Test
+    public void patchReplaceAccesConditionTest() throws Exception {
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Example Title")
+                                                  .withIssueDate("2019-11-21")
+                                                  .withSubject("ExtraEntry")
+                                                  .build();
+
+        ResourcePolicyBuilder.createResourcePolicy(context)
+                             .withDspaceObject(witem.getItem())
+                             .withPolicyType(TYPE_CUSTOM)
+                             .withName("openaccess")
+                             .build();
+
+        ResourcePolicyBuilder.createResourcePolicy(context)
+                             .withDspaceObject(witem.getItem())
+                             .withPolicyType(TYPE_CUSTOM)
+                             .withName("administrator")
+                             .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name",
+                                              is("openaccess")))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name",
+                                              is("administrator")))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[2].name").doesNotExist());
+
+        List<Operation> replaceAccessCondition = new ArrayList<Operation>();
+        Map<String, String> accessCondition = new HashMap<String, String>();
+        accessCondition.put("name", "embargo");
+        accessCondition.put("startDate", "2021-10-23");
+        replaceAccessCondition.add(new ReplaceOperation("/sections/defaultAC/accessConditions/1",
+                               accessCondition));
+
+        String patchBody = getPatchContent(replaceAccessCondition);
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name",
+                                     is("openaccess")))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name",
+                                     is("embargo")))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].startDate",
+                                     is("2021-10-23")))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[2].name").doesNotExist());
+    }
+
+    @Test
+    public void patchReplaceAccesConditionsUpdateEmbargoStartDateTest() throws Exception {
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Example Title")
+                                                  .withIssueDate("2019-11-21")
+                                                  .withSubject("ExtraEntry")
+                                                  .build();
+
+        ResourcePolicyBuilder.createResourcePolicy(context)
+                             .withDspaceObject(witem.getItem())
+                             .withPolicyType(TYPE_CUSTOM)
+                             .withName("openaccess")
+                             .build();
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.YEAR, 2020);
+        calendar.set(Calendar.MONTH, 1);
+        calendar.set(Calendar.DATE, 1);
+
+        Date data = calendar.getTime();
+
+        ResourcePolicyBuilder.createResourcePolicy(context)
+                             .withDspaceObject(witem.getItem())
+                             .withPolicyType(TYPE_CUSTOM)
+                             .withName("embargo")
+                             .withStartDate(data)
+                             .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name",
+                                              is("openaccess")))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name",
+                                              is("embargo")))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].startDate",
+                                              is("2020-02-01")))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[2].name").doesNotExist());
+
+        List<Operation> replaceAccessCondition = new ArrayList<Operation>();
+        Map<String, String> accessCondition = new HashMap<String, String>();
+        accessCondition.put("value", "2021-12-31");
+        replaceAccessCondition.add(new ReplaceOperation("/sections/defaultAC/accessConditions/1/startDate",
+                               accessCondition));
+
+        String patchBody = getPatchContent(replaceAccessCondition);
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name",
+                                     is("openaccess")))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name",
+                                     is("embargo")))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].startDate",
+                                     is("2021-12-31")))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[2].name").doesNotExist());
+    }
+
+    @Test
+    public void patchReplaceAccesConditionsFromOpenaccessToAdministratorTest() throws Exception {
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Example Title")
+                                                  .withIssueDate("2019-11-21")
+                                                  .withSubject("ExtraEntry")
+                                                  .build();
+
+        ResourcePolicyBuilder.createResourcePolicy(context)
+                             .withDspaceObject(witem.getItem())
+                             .withPolicyType(TYPE_CUSTOM)
+                             .withName("openaccess")
+                             .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name",
+                                              is("openaccess")))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name").doesNotExist());
+
+        List<Operation> replaceAccessCondition = new ArrayList<Operation>();
+        Map<String, String> accessCondition = new HashMap<String, String>();
+        accessCondition.put("value", "administrator");
+        replaceAccessCondition.add(new ReplaceOperation("/sections/defaultAC/accessConditions/0/name",
+                               accessCondition));
+
+        String patchBody = getPatchContent(replaceAccessCondition);
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name",
+                                     is("administrator")))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name").doesNotExist());
+    }
+
 }
