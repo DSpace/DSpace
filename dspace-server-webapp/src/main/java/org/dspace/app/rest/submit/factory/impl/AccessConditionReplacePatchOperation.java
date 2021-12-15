@@ -57,10 +57,15 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
         // "path" : "/sections/<:name-of-the-form>/accessConditions/0"
         String[] split = getAbsolutePath(path).split("/");
         Item item = source.getItem();
-        int toReplace = Integer.parseInt(split[1]);
+        Integer idxToReplace = null;
+        try {
+            idxToReplace = Integer.parseInt(split[1]);
+        } catch (NumberFormatException e) {
+            throw new UnprocessableEntityException("The provided index format is not correct! Must be a number!");
+        }
         List<ResourcePolicy> policies = resourcePolicyService.find(context, item, ResourcePolicy.TYPE_CUSTOM);
-        if (toReplace < 0 || toReplace >= policies.size()) {
-            throw new UnprocessableEntityException("The provided index:" + toReplace + " is not supported,"
+        if (idxToReplace < 0 || idxToReplace >= policies.size()) {
+            throw new UnprocessableEntityException("The provided index:" + idxToReplace + " is not supported,"
                     + " currently the are " + policies.size() + " access conditions");
         }
 
@@ -68,9 +73,10 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
             AccessConditionDTO accessConditionDTO = evaluateSingleObject((LateObjectEvaluator) value);
             if (Objects.nonNull(accessConditionDTO) && Objects.nonNull(getOption(configuration, accessConditionDTO))) {
                 verifyAccessCondition(context, configuration, accessConditionDTO);
-                if (checkDuplication(context, policies, accessConditionDTO, toReplace, item)) {
+                if (checkDuplication(context, policies, accessConditionDTO, idxToReplace, item)) {
+                    item.getResourcePolicies().remove(policies.get(idxToReplace));
                     context.commit();
-                    resourcePolicyService.delete(context, policies.get(toReplace));
+                    resourcePolicyService.delete(context, policies.get(idxToReplace));
                     AccessConditionOption option = getOption(configuration, accessConditionDTO);
                     option.createPolicy(context, item, accessConditionDTO.getName(), null,
                             accessConditionDTO.getStartDate(),accessConditionDTO.getEndDate());
@@ -79,10 +85,12 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
         } else if (split.length == 3) {
             String valueToReplace = getValue(value);
             String attributeReplace = split[2];
-            ResourcePolicy rpToReplace = policies.get(toReplace);
+            ResourcePolicy rpToReplace = policies.get(idxToReplace);
             AccessConditionDTO accessConditionDTO = createDTO(rpToReplace, attributeReplace, valueToReplace);
             verifyAccessCondition(context, configuration, accessConditionDTO);
             updatePolicy(context, valueToReplace, attributeReplace, rpToReplace);
+        } else {
+            throw new UnprocessableEntityException("The patch operation for path:" + path + " is not supported!");
         }
     }
 
@@ -108,7 +116,6 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
         ResourcePolicy policyToReplace = policies.get(toReplace);
         // check if the resource policy is of the same type
         if (policyToReplace.getRpName().equals(accessConditionDTO.getName())) {
-            item.getResourcePolicies().remove(policyToReplace);
             return true;
         }
         // check if there is not already a policy of the same type
@@ -117,7 +124,6 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
                 return false;
             }
         }
-        item.getResourcePolicies().remove(policyToReplace);
         return true;
     }
 
@@ -132,10 +138,10 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
                 accessCondition.setName(valueToReplare);
                 return accessCondition;
             case "startDate":
-                accessCondition.setStartDate(parsDate(valueToReplare));
+                accessCondition.setStartDate(parseDate(valueToReplare));
                 return accessCondition;
             case "endDate":
-                accessCondition.setEndDate(parsDate(valueToReplare));
+                accessCondition.setEndDate(parseDate(valueToReplare));
                 return accessCondition;
             default:
                 throw new UnprocessableEntityException("The provided attribute: "
@@ -150,17 +156,18 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
                 rpToReplace.setRpName(valueToReplare);
                 break;
             case "startDate":
-                rpToReplace.setStartDate(parsDate(valueToReplare));
+                rpToReplace.setStartDate(parseDate(valueToReplare));
                 break;
             case "endDate":
-                rpToReplace.setEndDate(parsDate(valueToReplare));
+                rpToReplace.setEndDate(parseDate(valueToReplare));
                 break;
             default:
+                throw new IllegalArgumentException("Attribute to replace is not valid:" + attributeReplace);
         }
         resourcePolicyService.update(context, rpToReplace);
     }
 
-    private Date parsDate(String date) {
+    private Date parseDate(String date) {
         List<SimpleDateFormat> knownPatterns = Arrays.asList(
                                 new SimpleDateFormat("yyyy-MM-dd"),
                                 new SimpleDateFormat("dd-MM-yyyy"),

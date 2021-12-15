@@ -64,6 +64,8 @@ public class AccessConditionRemovePatchOperation extends RemovePatchOperation<Ac
             item.getResourcePolicies().remove(resourcePolicyToDelete);
             context.commit();
             resourcePolicyService.delete(context, resourcePolicyToDelete);
+        } else {
+            throw new UnprocessableEntityException("The patch operation for path:" + path + " is not supported!");
         }
     }
 
