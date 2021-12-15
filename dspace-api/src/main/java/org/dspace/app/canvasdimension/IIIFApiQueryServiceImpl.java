@@ -1,4 +1,13 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.canvasdimension;
+
+import static org.dspace.app.canvasdimension.Util.checkDimensions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,9 +32,14 @@ public class IIIFApiQueryServiceImpl implements IIIFApiQueryService, Initializin
 
     @Override
     public void afterPropertiesSet() throws Exception {
-       iiifImageServer = configurationService.getProperty("iiif.image.server");
+        iiifImageServer = configurationService.getProperty("iiif.image.server");
     }
 
+    /**
+     * Returns array with canvas height and width
+     * @param bitstream
+     * @return
+     */
     public int[] getImageDimensions(Bitstream bitstream) {
         return getIiifImageDimensions(bitstream);
     }
@@ -54,7 +68,7 @@ public class IIIFApiQueryServiceImpl implements IIIFApiQueryService, Initializin
             JsonNode parent = new ObjectMapper().readTree(response.toString());
             arr[0] = parent.get("width").asInt();
             arr[1] = parent.get("height").asInt();
-            return arr;
+            return checkDimensions(arr);
         } catch (IOException e) {
             e.printStackTrace();
         }
