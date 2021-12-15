@@ -43,19 +43,18 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
     @Before
     public void setup() throws IOException {
         context.turnOffAuthorisationSystem();
+
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
         child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                                 .withName("Sub Community")
+                                 .withName("Sub Community 1")
                                  .build();
-        col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-
-        // second sub-community
         child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                  .withName("Sub Community 2")
                                  .build();
 
+        col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
         context.restoreAuthSystemState();
