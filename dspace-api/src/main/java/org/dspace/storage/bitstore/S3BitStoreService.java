@@ -182,7 +182,7 @@ public class S3BitStoreService implements BitStoreService {
             long contentLength = scratchFile.length();
             // The ETag may or may not be and MD5 digest of the object data.
             // Therefore, we precalculate before uploading
-            String localChecksum = org.dspace.curate.Utils.checksum(scratchFile, "MD5");
+            String localChecksum = org.dspace.curate.Utils.checksum(scratchFile, CSA);
 
             TransferManager tm = TransferManagerBuilder.standard()
                     .withAlwaysCalculateMultipartMd5(true)
