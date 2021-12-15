@@ -139,8 +139,6 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
             if (isIIIFItem) {
                 if (processItemBundles(context, item)) {
                     ++processed;
-                    // commit changes
-                    context.commit();
                 }
             }
         }
@@ -164,7 +162,7 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
         }
         if (done) {
             // update the item
-            itemService.update(context, item);
+            // itemService.update(context, item);
             if (!isQuiet) {
                 System.out.println("Updated canvas metadata for item: " + item.getID());
             }
