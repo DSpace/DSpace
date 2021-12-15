@@ -9,13 +9,10 @@ package org.dspace.app.canvasdimension;
 
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.canvasdimension.service.IIIFApiQueryService;
 import org.dspace.app.canvasdimension.service.IIIFCanvasDimensionService;
 import org.dspace.content.Bitstream;
@@ -28,9 +25,8 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.license.CreativeCommonsServiceImpl;
+import org.dspace.iiif.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionService {
@@ -46,18 +42,14 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
     @Autowired(required = true)
     IIIFApiQueryService iiifApiQuery;
 
-    // metadata used to enable the iiif features on the item
-    public static final String METADATA_IIIF_ENABLED = "dspace.iiif.enabled";
+    // field used to check for existing bitstream metadata
     private static final String IIIF_WIDTH_METADATA = "iiif.image.width";
-    // The DSpace bundle for other content related to item.
-    protected static final String OTHER_CONTENT_BUNDLE = "OtherContent";
 
     private boolean forceProcessing = false;
     private boolean isQuiet = false;
     private List<String> skipList = null;
-    private int max2Process = Integer.MAX_VALUE;  // TODO no option for this yet.
+    private int max2Process = Integer.MAX_VALUE;
     private int processed = 0;
-    protected Item currentItem = null; // TODO needed?
 
     /**
      * Set the force processing property. If true, existing canvas
@@ -69,6 +61,10 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
         forceProcessing = force;
     }
 
+    /**
+     * Set whether to output messages during processing.
+     * @param quiet
+     */
     @Override
     public void setIsQuiet(boolean quiet) {
         isQuiet = quiet;
@@ -92,29 +88,6 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
         this.skipList = skipList;
     }
 
-    /**
-     * Set IIIF canvas dimensions on all IIIF items in the site.
-     * @param context
-     * @throws Exception
-     */
-    @Override
-    public void processSite(Context context) throws Exception {
-        if (skipList != null) {
-            //if a skip-list exists, we need to filter community-by-community
-            //so we can respect what is in the skip-list
-            List<Community> topLevelCommunities = communityService.findAllTop(context);
-
-            for (Community topLevelCommunity : topLevelCommunities) {
-                processCommunity(context, topLevelCommunity);
-            }
-        } else {
-            //otherwise, just find every item and process
-            Iterator<Item> itemIterator = itemService.findAll(context);
-            while (itemIterator.hasNext() && processed < max2Process) {
-                processItem(context, itemIterator.next());
-            }
-        }
-    }
 
     /**
      * Set IIIF canvas dimensions on all IIIF items in a community and its
@@ -162,15 +135,10 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
     @Override
     public void processItem(Context context, Item item) throws Exception {
         if (!inSkipList(item.getHandle())) {
-            boolean isIIIFItem = item.getMetadata().stream().filter(m -> m.getMetadataField().toString('.')
-                                                                          .contentEquals(METADATA_IIIF_ENABLED))
-                                     .anyMatch(m -> m.getValue().equalsIgnoreCase("true") ||
-                                         m.getValue().equalsIgnoreCase("yes"));
+            boolean isIIIFItem = Utils.isIIIFItem(item);
             if (isIIIFItem) {
                 if (processItemBundles(context, item)) {
                     ++processed;
-                    // commit changes
-                    context.commit();
                 }
             }
         }
@@ -184,7 +152,7 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
      * @throws Exception
      */
     private boolean processItemBundles(Context context, Item item) throws Exception {
-        List<Bundle> bundles = getIIIFBundles(item);
+        List<Bundle> bundles = Utils.getIIIFBundles(item);
         boolean done = false;
         for (Bundle bundle : bundles) {
             List<Bitstream> bitstreams = bundle.getBitstreams();
@@ -192,14 +160,27 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
                 done |= processBitstream(context, bit);
             }
         }
-        itemService.update(context, item);
+        if (done) {
+            // update the item
+            // itemService.update(context, item);
+            if (!isQuiet) {
+                System.out.println("Updated canvas metadata for item: " + item.getID());
+            }
+        }
         return done;
 
     }
 
     /**
+<<<<<<< HEAD
      * Sets the IIIF height and width metadata for all images. If width metadata already exists,
      * the bitstream is processed only if forceProcessing is true.
+=======
+     * Gets image height and width for the bitstream. For jp2 images, height and width are
+     * obtained from the IIIF image server. For other formats supported by ImageIO these values
+     * are read from the actual DSpace bitstream content. If bitstream width metadata already exists,
+     * the bitstream is processed when forceProcessing is true.
+>>>>>>> aa0840668aca847c57410c2c9be1cd551c0ae841
      * @param context
      * @param bitstream
      * @return
@@ -214,6 +195,9 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
                                                   .filter(m -> m.getMetadataField().toString('.')
                                                                 .contentEquals(IIIF_WIDTH_METADATA)).findFirst();
             if (op.isEmpty() || forceProcessing) {
+                if (forceProcessing && !isQuiet) {
+                    System.out.println("Force processing for bitstream: " + bitstream.getID());
+                }
                 int[] dims;
                 if (isUnsupported) {
                     dims = iiifApiQuery.getImageDimensions(bitstream);
@@ -223,6 +207,7 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
                 }
                 if (dims != null) {
                     processed = setBitstreamMetadata(context, bitstream, dims);
+                    // update the bitstream
                     bitstreamService.update(context, bitstream);
                 }
             }
@@ -230,6 +215,13 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
         return processed;
     }
 
+    /**
+     * Sets bitstream metadata for "iiif.image.width" and "iiif.image.height".
+     * @param context
+     * @param bitstream
+     * @param dims
+     * @return
+     */
     private boolean setBitstreamMetadata(Context context, Bitstream bitstream, int[] dims) {
         try {
             dSpaceObjectService.clearMetadata(context, bitstream, "iiif",
@@ -240,6 +232,9 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
                 "image", "height", Item.ANY);
             dSpaceObjectService.setMetadataSingleValue(context, bitstream, "iiif",
                 "image", "height", Item.ANY, String.valueOf(dims[1]));
+            if (!isQuiet) {
+                System.out.println("Added IIIF canvas metadata to bitstream: " + bitstream.getID());
+            }
             return true;
         } catch (SQLException e) {
             System.out.println("Unable to update metadata: " + e.getMessage());
@@ -247,6 +242,11 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
         }
     }
 
+    /**
+     * Tests whether the identifier is in the skip list.
+     * @param identifier
+     * @return
+     */
     private boolean inSkipList(String identifier) {
         if (skipList != null && skipList.contains(identifier)) {
             if (!isQuiet) {
@@ -256,55 +256,6 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
         } else {
             return false;
         }
-    }
-
-    /**
-     * This method returns the bundles holding IIIF resources if any.
-     * If there is no IIIF content available an empty bundle list is returned.
-     * @param item the DSpace item
-     *
-     * @return list of DSpace bundles with IIIF content
-     */
-    private List<Bundle> getIIIFBundles(Item item) {
-        boolean iiif = isIIIFEnabled(item);
-        List<Bundle> bundles = new ArrayList<>();
-        if (iiif) {
-            bundles = item.getBundles().stream().filter(b -> isIIIFBundle(b)).collect(Collectors.toList());
-        }
-        return bundles;
-    }
-
-    /**
-     * This method verify if the IIIF feature is enabled on the item or parent collection.
-     *
-     * @param item the dspace item
-     * @return true if the item supports IIIF
-     */
-    private boolean isIIIFEnabled(Item item) {
-        return item.getOwningCollection().getMetadata().stream()
-                   .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
-                   .anyMatch(m -> m.getValue().equalsIgnoreCase("true") ||
-                       m.getValue().equalsIgnoreCase("yes"))
-            || item.getMetadata().stream()
-                   .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
-                   .anyMatch(m -> m.getValue().equalsIgnoreCase("true")  ||
-                       m.getValue().equalsIgnoreCase("yes"));
-    }
-
-    /**
-     * Utility method to check is a bundle can contain bitstreams to use as IIIF
-     * resources
-     *
-     * @param b the DSpace bundle to check
-     * @return true if the bundle can contain bitstreams to use as IIIF resources
-     */
-    private boolean isIIIFBundle(Bundle b) {
-        return !StringUtils.equalsAnyIgnoreCase(b.getName(), Constants.LICENSE_BUNDLE_NAME,
-            Constants.METADATA_BUNDLE_NAME, CreativeCommonsServiceImpl.CC_BUNDLE_NAME, "THUMBNAIL",
-            "BRANDED_PREVIEW", "TEXT", OTHER_CONTENT_BUNDLE)
-            && b.getMetadata().stream()
-                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
-                .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
     }
 
 }

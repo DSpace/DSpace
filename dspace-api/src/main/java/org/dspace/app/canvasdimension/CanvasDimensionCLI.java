@@ -10,7 +10,13 @@ package org.dspace.app.canvasdimension;
 import java.util.Arrays;
 import java.util.UUID;
 
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingArgumentException;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.dspace.app.canvasdimension.factory.IIIFCanvasDimensionServiceFactory;
 import org.dspace.app.canvasdimension.service.IIIFCanvasDimensionService;
 import org.dspace.content.Collection;
@@ -41,11 +47,11 @@ public class CanvasDimensionCLI {
         String identifier = null;
         String eperson = null;
         int max2Process = Integer.MAX_VALUE;
-        boolean iiifEnabled = configurationService.getBooleanProperty("iiif.enabled");
 
+        boolean iiifEnabled = configurationService.getBooleanProperty("iiif.enabled");
         if (!iiifEnabled) {
             System.out.println("IIIF is not enabled on this DSpace server.");
-            return;
+            System.exit(0);
         }
 
         Context context = new Context();
@@ -56,18 +62,16 @@ public class CanvasDimensionCLI {
 
         Options options = new Options();
         options.addOption("i", "identifier", true,
-            "process IIIF canvas dimensions for images belonging to identifier");
+            "process IIIF canvas dimensions for images belonging to this identifier");
         options.addOption("e", "eperson", true,
-            "email of eperson setting canvas dimensions");
+            "email of eperson setting the canvas dimensions");
         options.addOption("f", "force", false,
             "force update of all IIIF canvas height and width dimensions");
         options.addOption("q", "quiet", false,
             "do not print anything except in the event of errors.");
-        options.addOption("s", "skipList", false,
-            "force update of all IIIF canvas height and width dimensions");
         options.addOption("m", "maximum", true,
             "process no more than maximum items");
-        //create a "skip" option (to specify communities/collections/items to skip)
+
         Option skipOption = Option.builder("s")
                                   .longOpt("skip")
                                   .hasArg()
@@ -81,12 +85,13 @@ public class CanvasDimensionCLI {
         options.addOption(skipOption);
 
         CommandLine line = null;
+
         try {
             line = parser.parse(options, argv);
         } catch (MissingArgumentException e) {
             System.out.println("ERROR: " + e.getMessage());
-            HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("CanvasDimension processor\n", options);
+            HelpFormatter help = new HelpFormatter();
+            help.printHelp("CanvasDimension processor\n", options);
             System.exit(1);
         }
 
@@ -103,6 +108,7 @@ public class CanvasDimensionCLI {
             identifier = line.getOptionValue('i');
         } else {
             System.out.println("An identifier for a Community, Collection, or Item must be provided.");
+            System.exit(1);
         }
         if (line.hasOption('m')) {
             max2Process = Integer.parseInt(line.getOptionValue('m'));
@@ -112,7 +118,7 @@ public class CanvasDimensionCLI {
                 max2Process = Integer.MAX_VALUE;
             }
         }
-        String skipIds[] = null;
+        String[] skipIds;
 
         if (line.hasOption('s')) {
             //specified which identifiers to skip when processing
@@ -123,8 +129,8 @@ public class CanvasDimensionCLI {
                     "Make sure to separate multiple identifiers with a comma!\n" +
                     "(e.g. -s 123456789/34,123456789/323)\n");
                 HelpFormatter myhelp = new HelpFormatter();
-                myhelp.printHelp("MediaFilterManager\n", options);
-                System.exit(0);
+                myhelp.printHelp("Canvas Dimensions\n", options);
+                System.exit(1);
             }
             canvasProcessor.setSkipList(Arrays.asList(skipIds));
         }
@@ -137,6 +143,11 @@ public class CanvasDimensionCLI {
         }
 
         EPerson user;
+
+        if (eperson == null) {
+            System.out.println("You must provide an eperson.");
+            System.exit(1);
+        }
 
         if (eperson.indexOf('@') != -1) {
             // @ sign, must be an email
@@ -157,9 +168,6 @@ public class CanvasDimensionCLI {
         canvasProcessor.setIsQuiet(isQuiet);
 
         switch (dso.getType()) {
-            case Constants.SITE:
-                canvasProcessor.processSite(context);
-                break;
             case Constants.COMMUNITY:
                 canvasProcessor.processCommunity(context, (Community) dso);
                 break;
@@ -172,6 +180,8 @@ public class CanvasDimensionCLI {
             default:
                 break;
         }
+        // commit changes
+        context.commit();
     }
 
 }

@@ -7,6 +7,8 @@
  */
 package org.dspace.app.iiif.service.utils;
 
+import static org.dspace.iiif.Utils.getIIIFBundles;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +29,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.license.CreativeCommonsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -77,6 +77,7 @@ public class IIIFUtils {
     protected BitstreamService bitstreamService;
 
     /**
+<<<<<<< HEAD
      * This method returns the bundles holding IIIF resources if any.
      * If there is no IIIF content available an empty bundle list is returned.
      * @param item the DSpace item
@@ -126,6 +127,8 @@ public class IIIFUtils {
     }
 
     /**
+=======
+>>>>>>> aa0840668aca847c57410c2c9be1cd551c0ae841
      * Return all the bitstreams in the item to be used as IIIF resources
      * 
      * @param context the DSpace Context
