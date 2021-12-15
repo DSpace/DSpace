@@ -3,7 +3,7 @@
 #
 # This version is JDK11 compatible
 # - openjdk:11
-# - ANT 1.10.7
+# - ANT 1.10.12
 # - maven:3-jdk-11 (see dspace-dependencies)
 # - note: default tag for branch: dspace/dspace-cli: dspace/dspace-cli:dspace-7_x
 
@@ -35,7 +35,7 @@ COPY --from=build /install /dspace-src
 WORKDIR /dspace-src
 
 # Create the initial install deployment using ANT
-ENV ANT_VERSION 1.10.7
+ENV ANT_VERSION 1.10.12
 ENV ANT_HOME /tmp/ant-$ANT_VERSION
 ENV PATH $ANT_HOME/bin:$PATH
 
