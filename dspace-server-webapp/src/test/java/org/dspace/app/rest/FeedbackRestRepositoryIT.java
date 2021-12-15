@@ -41,14 +41,14 @@ public class FeedbackRestRepositoryIT extends AbstractControllerIntegrationTest 
     @Test
     public void findAllTest() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/core/feedbacks"))
+        getClient(authToken).perform(get("/api/tools/feedbacks"))
                             .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
     public void findOneTest() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/core/feedbacks/1"))
+        getClient(authToken).perform(get("/api/tools/feedbacks/1"))
                             .andExpect(status().isMethodNotAllowed());
     }
 
@@ -67,7 +67,7 @@ public class FeedbackRestRepositoryIT extends AbstractControllerIntegrationTest 
             feedbackRest.setMessage("My feedback!");
 
             String authToken = getAuthToken(admin.getEmail(), password);
-            getClient(authToken).perform(post("/api/core/feedbacks")
+            getClient(authToken).perform(post("/api/tools/feedbacks")
                                 .content(mapper.writeValueAsBytes(feedbackRest))
                                 .contentType(contentType))
                                 .andExpect(status().isCreated());
@@ -96,7 +96,7 @@ public class FeedbackRestRepositoryIT extends AbstractControllerIntegrationTest 
             feedbackRest.setMessage("My feedback!");
 
             String authToken = getAuthToken(admin.getEmail(), password);
-            getClient(authToken).perform(post("/api/core/feedbacks")
+            getClient(authToken).perform(post("/api/tools/feedbacks")
                                 .content(mapper.writeValueAsBytes(feedbackRest))
                                 .contentType(contentType))
                                 .andExpect(status().isNotFound());
@@ -119,7 +119,7 @@ public class FeedbackRestRepositoryIT extends AbstractControllerIntegrationTest 
             feedbackRest.setMessage("My feedback!");
 
             String authToken = getAuthToken(admin.getEmail(), password);
-            getClient(authToken).perform(post("/api/core/feedbacks")
+            getClient(authToken).perform(post("/api/tools/feedbacks")
                                 .content(mapper.writeValueAsBytes(feedbackRest))
                                 .contentType(contentType))
                                 .andExpect(status().isBadRequest());

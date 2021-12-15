@@ -19,7 +19,7 @@ public class FeedbackRest extends BaseObjectRest<Integer> {
     private static final long serialVersionUID = 1L;
 
     public static final String NAME = "feedback";
-    public static final String CATEGORY = RestAddressableModel.CORE;
+    public static final String CATEGORY = RestAddressableModel.TOOLS;
 
     private String page;
     private String email;
