@@ -180,6 +180,8 @@ public class CanvasDimensionCLI {
             default:
                 break;
         }
+        // commit changes
+        context.commit();
     }
 
 }
