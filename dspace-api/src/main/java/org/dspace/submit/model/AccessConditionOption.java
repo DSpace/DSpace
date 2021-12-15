@@ -196,7 +196,17 @@ public class AccessConditionOption {
                 endDate);
     }
 
-    public boolean canCreateResourcePolicy(Context context, String name, Date startDate, Date endDate)
+    /**
+     * Validate the policy properties, throws exceptions if any is not valid
+     * 
+     * @param context                DSpace context
+     * @param name                   Name of the resource policy
+     * @param startDate              Start date of the resource policy. If {@link #getHasStartDate()}
+     *                                    returns false, startDate should be null. Otherwise startDate may not be null.
+     * @param endDate                End date of the resource policy. If {@link #getHasEndDate()}
+     *                                    returns false, endDate should be null. Otherwise endDate may not be null.
+     */
+    public void canCreateResourcePolicy(Context context, String name, Date startDate, Date endDate)
            throws SQLException, AuthorizeException, ParseException {
         if (getHasStartDate() && Objects.isNull(startDate)) {
             throw new IllegalStateException("The access condition " + getName() + " requires a start date.");
@@ -236,13 +246,29 @@ public class AccessConditionOption {
                 getName(), getEndDateLimit()
             ));
         }
-        return true;
     }
 
+    /**
+     * Create a new resource policy for a DSpaceObject
+     * NOTICE: This method does not take care of validating the parameters
+     *         like name, startDate and endDate, before executing it you should invoke
+     *         the #canCreateResourcePolicy method so validating the parameters.
+     * 
+     * @param context         DSpace context
+     * @param obj             DSpaceObject for which resource policy is created
+     * @param name            Name of the resource policy
+     * @param description     Description of the resource policy
+     * @param startDate       Start date of the resource policy. If {@link #getHasStartDate()}
+     *                                 returns false, startDate should be null. Otherwise startDate may not be null.
+     * @param endDate         End date of the resource policy. If {@link #getHasEndDate()}
+     *                                 returns false, endDate should be null. Otherwise endDate may not be null.
+     * @return                ResourcePolicy
+     */
     public ResourcePolicy createPolicy(Context context, DSpaceObject obj, String name, String description,
             Date startDate, Date endDate) throws SQLException, AuthorizeException {
         Group group = groupService.findByName(context, getGroupName());
         return authorizeService.createResourcePolicy(context, obj, group, null, READ, TYPE_CUSTOM,
                name, description, startDate, endDate);
     }
+
 }

@@ -48,20 +48,21 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
         String stepId = (String) currentRequest.getAttribute("accessConditionSectionId");
         AccessConditionConfiguration configuration = accessConditionConfigurationService.getMap().get(stepId);
 
-        //"path": "/sections/<:name-of-the-form>/accessConditions/-"
-        String[] split = getAbsolutePath(path).split("/");
-        Item item = source.getItem();
 
+        Item item = source.getItem();
         List<AccessConditionDTO> accessConditions = Arrays.asList(evaluateSingleObject((LateObjectEvaluator) value));
 
         verifyAccessConditions(context, configuration, accessConditions);
-        // check duplicate policy
-        checkDuplication(context, item, accessConditions);
 
+        //"path": "/sections/<:name-of-the-form>/accessConditions/-"
+        String[] split = getAbsolutePath(path).split("/");
         if (split.length == 1) {
             // to replace completely the access conditions
             authorizeService.removePoliciesActionFilter(context, item, Constants.READ);
         }
+
+        // check duplicate policy
+        checkDuplication(context, item, accessConditions);
 
         // apply policies
         AccessConditionResourcePolicyUtils.findApplyResourcePolicy(context, configuration.getOptions(), item,

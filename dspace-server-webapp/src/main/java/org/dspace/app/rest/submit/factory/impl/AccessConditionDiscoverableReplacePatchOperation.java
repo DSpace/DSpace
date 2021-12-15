@@ -32,7 +32,6 @@ public class AccessConditionDiscoverableReplacePatchOperation extends ReplacePat
     @Override
     void replace(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String string,
             Object value) throws Exception {
-        Boolean discoverable = null;
 
         String stepId = (String) currentRequest.getAttribute("accessConditionSectionId");
         AccessConditionConfiguration configuration = accessConditionConfigurationService.getMap().get(stepId);
@@ -42,6 +41,7 @@ public class AccessConditionDiscoverableReplacePatchOperation extends ReplacePat
                                                    " the user to specify the visibility of the item");
         }
 
+        Boolean discoverable;
         if (value instanceof String) {
             discoverable = BooleanUtils.toBooleanObject((String) value);
         } else {
@@ -57,11 +57,8 @@ public class AccessConditionDiscoverableReplacePatchOperation extends ReplacePat
 
         if (discoverable == item.isDiscoverable()) {
             return;
-        } else if (discoverable) {
-            item.setDiscoverable(discoverable);
-        } else {
-            item.setDiscoverable(discoverable);
         }
+        item.setDiscoverable(discoverable);
     }
 
     @Override

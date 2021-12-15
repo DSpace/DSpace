@@ -41,7 +41,6 @@ public class AccessConditionResourcePolicyUtils {
         }
     }
 
-
     public static void findApplyResourcePolicy(Context context,
             List<AccessConditionOption> accessConditionOptions, DSpaceObject obj, String name,
             String description, Date startDate, Date endDate) throws SQLException, AuthorizeException, ParseException {
@@ -57,14 +56,12 @@ public class AccessConditionResourcePolicyUtils {
         }
     }
 
-    public static boolean canApplyResourcePolicy(Context context,
-            List<AccessConditionOption> accessConditionOptions, String name, Date startDate, Date endDate)
-            throws SQLException, AuthorizeException, ParseException {
-        for (AccessConditionOption accessConditionOption : accessConditionOptions) {
-            if (accessConditionOption.getName().equalsIgnoreCase(name)) {
-                return accessConditionOption.canCreateResourcePolicy(context, name, startDate, endDate);
-            }
-        }
-        throw new UnprocessableEntityException("The provided policy: " + name + " is not supported!");
+    public static void canApplyResourcePolicy(Context context, List<AccessConditionOption> accessConditionOptions,
+            String name, Date startDate, Date endDate) throws SQLException, AuthorizeException, ParseException {
+        accessConditionOptions.stream()
+            .filter(ac -> ac.getName().equalsIgnoreCase(name))
+            .findFirst()
+            .orElseThrow(() -> new UnprocessableEntityException("The provided policy: " + name + " is not supported!"));
     }
+
 }
