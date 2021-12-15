@@ -7,6 +7,8 @@
  */
 package org.dspace.app.iiif.service.utils;
 
+import static org.dspace.iiif.Utils.getIIIFBundles;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +29,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.license.CreativeCommonsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -75,55 +75,6 @@ public class IIIFUtils {
 
     @Autowired
     protected BitstreamService bitstreamService;
-
-    /**
-     * This method returns the bundles holding IIIF resources if any.
-     * If there is no IIIF content available an empty bundle list is returned.
-     * @param item the DSpace item
-     * 
-     * @return list of DSpace bundles with IIIF content
-     */
-    public List<Bundle> getIIIFBundles(Item item) {
-        boolean iiif = isIIIFEnabled(item);
-        List<Bundle> bundles = new ArrayList<>();
-        if (iiif) {
-            bundles = item.getBundles().stream().filter(b -> isIIIFBundle(b)).collect(Collectors.toList());
-        }
-        return bundles;
-    }
-
-    /**
-     * This method verify if the IIIF feature is enabled on the item or parent collection.
-     * 
-     * @param item the dspace item
-     * @return true if the item supports IIIF
-     */
-    public boolean isIIIFEnabled(Item item) {
-        return item.getOwningCollection().getMetadata().stream()
-                   .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
-                   .anyMatch(m -> m.getValue().equalsIgnoreCase("true") ||
-                       m.getValue().equalsIgnoreCase("yes"))
-            || item.getMetadata().stream()
-                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
-                .anyMatch(m -> m.getValue().equalsIgnoreCase("true")  ||
-                    m.getValue().equalsIgnoreCase("yes"));
-    }
-
-    /**
-     * Utility method to check is a bundle can contain bitstreams to use as IIIF
-     * resources
-     * 
-     * @param b the DSpace bundle to check
-     * @return true if the bundle can contain bitstreams to use as IIIF resources
-     */
-    private boolean isIIIFBundle(Bundle b) {
-        return !StringUtils.equalsAnyIgnoreCase(b.getName(), Constants.LICENSE_BUNDLE_NAME,
-                Constants.METADATA_BUNDLE_NAME, CreativeCommonsServiceImpl.CC_BUNDLE_NAME, "THUMBNAIL",
-                "BRANDED_PREVIEW", "TEXT", OTHER_CONTENT_BUNDLE)
-                && b.getMetadata().stream()
-                        .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
-                        .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
-    }
 
     /**
      * Return all the bitstreams in the item to be used as IIIF resources
