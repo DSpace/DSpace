@@ -81,7 +81,7 @@ public class MetadataValidation extends AbstractValidation {
                         if (isAuthorityControlled) {
                             String authKey = md.getAuthority();
                             if (metadataAuthorityService.isAuthorityRequired(fieldKey) &&
-                                StringUtils.isNotBlank(authKey)) {
+                                StringUtils.isBlank(authKey)) {
                                 addError(ERROR_VALIDATION_AUTHORITY_REQUIRED,
                                     "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() +
                                     "/" + input.getFieldName() + "/" + md.getPlace());

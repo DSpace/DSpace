@@ -174,8 +174,13 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                                                            Boolean.FALSE),
                                                                    true);
                                         if (!ignorePrefered) {
-                                            preferedLabel = choiceAuthorityService
-                                                .getLabel(values.get(x), collection, values.get(x).getLanguage());
+                                            try {
+                                                preferedLabel = choiceAuthorityService
+                                                    .getLabel(values.get(x), collection, values.get(x).getLanguage());
+                                            } catch (Exception e) {
+                                                log.warn("Failed to get preferred label for "
+                                                             + values.get(x).getMetadataField().toString('.'), e);
+                                            }
                                         }
                                         List<String> variants = null;
 
@@ -193,9 +198,13 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                                                                            Boolean.FALSE),
                                                                    true);
                                         if (!ignoreVariants) {
-                                            variants = choiceAuthorityService
-                                                .getVariants(
-                                                    values.get(x), collection);
+                                            try {
+                                                variants = choiceAuthorityService
+                                                    .getVariants(values.get(x), collection);
+                                            } catch (Exception e) {
+                                                log.warn("Failed to get variants for "
+                                                             + values.get(x).getMetadataField().toString(), e);
+                                            }
                                         }
 
                                         if (StringUtils

@@ -16,6 +16,7 @@ import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -43,7 +44,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
@@ -210,7 +211,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         DSpaceObject dso = null;
 
         try {
-            log.info(LogManager.getHeader(context, "package_parse",
+            log.info(LogHelper.getHeader(context, "package_parse",
                                           "Parsing package for ingest, file=" + pkgFile.getName()));
 
             // Parse our ingest package, extracting out the METS manifest in the
@@ -257,7 +258,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 if (params.restoreModeEnabled()) {
                     action = "package_restore";
                 }
-                log.info(LogManager.getHeader(context, action,
+                log.info(LogHelper.getHeader(context, action,
                                               "Created new Object, type="
                                                   + Constants.typeText[dso.getType()] + ", handle="
                                                   + dso.getHandle() + ", dbID="
@@ -387,7 +388,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 //If user specified to skip item ingest if any "missing parent" error message occur
                 if (params.getBooleanProperty("skipIfParentMissing", false)) {
                     //log a warning instead of throwing an error
-                    log.warn(LogManager.getHeader(context, "package_ingest",
+                    log.warn(LogHelper.getHeader(context, "package_ingest",
                                                   "SKIPPING ingest of object '" + manifest.getObjID()
                                                       + "' as parent DSpace Object could not be found. "
                                                       + "If you are running a recursive ingest, it is likely this " +
@@ -409,6 +410,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // get handle from manifest
             handle = getObjectHandle(manifest);
         }
+        UUID uuid = getObjectID(manifest);
 
         // -- Step 2 --
         // Create our DSpace Object based on info parsed from manifest, and
@@ -416,7 +418,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         DSpaceObject dso;
         try {
             dso = PackageUtils.createDSpaceObject(context, parent,
-                                                  type, handle, params);
+                                                  type, handle, uuid, params);
         } catch (SQLException sqle) {
             throw new PackageValidationException("Exception while ingesting "
                                                      + pkgFile.getPath(), sqle);
@@ -727,7 +729,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
 
             // retrieve path/name of file in manifest
             String path = METSManifest.getFileName(mfile);
-
             // extract the file input stream from package (or retrieve
             // externally, if it is an externally referenced file)
             InputStream fileStream = getFileInputStream(pkgFile, params, path);
@@ -1025,7 +1026,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         DSpaceObject dso = null;
 
         try {
-            log.info(LogManager.getHeader(context, "package_parse",
+            log.info(LogHelper.getHeader(context, "package_parse",
                                           "Parsing package for replace, file=" + pkgFile.getName()));
 
             // Parse our ingest package, extracting out the METS manifest in the
@@ -1077,7 +1078,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 //if ingestion was successful
                 if (dso != null) {
                     // Log that we created an object
-                    log.info(LogManager.getHeader(context, "package_replace",
+                    log.info(LogHelper.getHeader(context, "package_replace",
                                                   "Created new Object, type="
                                                       + Constants.typeText[dso.getType()]
                                                       + ", handle=" + dso.getHandle() + ", dbID="
@@ -1093,7 +1094,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                                     params, null);
 
                 // Log that we replaced an object
-                log.info(LogManager.getHeader(context, "package_replace",
+                log.info(LogHelper.getHeader(context, "package_replace",
                                               "Replaced Object, type="
                                                   + Constants.typeText[dso.getType()]
                                                   + ", handle=" + dso.getHandle() + ", dbID="
@@ -1505,5 +1506,23 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
      * @return name
      */
     public abstract String getConfigurationName();
+
+    public UUID getObjectID(METSManifest manifest)
+            throws PackageValidationException {
+        Element mets = manifest.getMets();
+        String idStr = mets.getAttributeValue("ID");
+        if (idStr == null || idStr.length() == 0) {
+            throw new PackageValidationException("Manifest is missing the required mets@ID attribute.");
+        }
+        if (idStr.contains("DB-ID-")) {
+            idStr = idStr.substring(idStr.lastIndexOf("DB-ID-") + 6, idStr.length());
+        }
+        try {
+            return UUID.fromString(idStr);
+        } catch (IllegalArgumentException ignored) {
+            //do nothing
+        }
+        return null;
+    }
 
 }

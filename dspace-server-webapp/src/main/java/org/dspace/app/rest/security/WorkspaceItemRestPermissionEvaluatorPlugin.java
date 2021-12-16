@@ -56,7 +56,7 @@ public class WorkspaceItemRestPermissionEvaluatorPlugin extends RestObjectPermis
         }
 
         Request request = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext(request.getServletRequest());
+        Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
 
         EPerson ePerson = null;
         WorkspaceItem witem = null;

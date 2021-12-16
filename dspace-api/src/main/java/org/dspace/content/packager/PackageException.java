@@ -19,7 +19,6 @@ import org.apache.logging.log4j.Logger;
  * exceptions. This class is intended for declarations and catch clauses.
  *
  * @author Larry Stone
- * @version $Revision$
  */
 public class PackageException extends Exception {
     /**
@@ -75,11 +74,5 @@ public class PackageException extends Exception {
             cause.printStackTrace(new PrintWriter(sw));
             log.error(sw.toString());
         }
-    }
-
-    public String toString() {
-        String base = getClass().getName() + ": " + getMessage();
-        return (getCause() == null) ? base :
-            base + ", Reason: " + getCause().toString();
     }
 }

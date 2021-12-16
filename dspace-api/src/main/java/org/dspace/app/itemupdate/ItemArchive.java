@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -55,7 +56,7 @@ public class ItemArchive {
     protected Transformer transformer = null;
 
     protected List<DtoMetadata> dtomList = null;
-    protected List<DtoMetadata> undoDtomList = new ArrayList<DtoMetadata>();
+    protected List<DtoMetadata> undoDtomList = new ArrayList<>();
 
     protected List<UUID> undoAddContents = new ArrayList<>(); // for undo of add
 
@@ -325,7 +326,7 @@ public class ItemArchive {
                 PrintWriter pw = null;
                 try {
                     File f = new File(dir, ItemUpdate.DELETE_CONTENTS_FILE);
-                    pw = new PrintWriter(new BufferedWriter(new FileWriter(f)));
+                    pw = new PrintWriter(new BufferedWriter(new FileWriter(f, StandardCharsets.UTF_8)));
                     for (UUID i : undoAddContents) {
                         pw.println(i);
                     }

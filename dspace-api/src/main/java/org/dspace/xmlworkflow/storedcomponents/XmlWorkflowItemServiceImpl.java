@@ -18,7 +18,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.storedcomponents.dao.XmlWorkflowItemDAO;
@@ -77,12 +77,12 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
 
         if (workflowItem == null) {
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(context, "find_workflow_item",
+                log.debug(LogHelper.getHeader(context, "find_workflow_item",
                                                "not_found,workflowitem_id=" + id));
             }
         } else {
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(context, "find_workflow_item",
+                log.debug(LogHelper.getHeader(context, "find_workflow_item",
                                                "workflowitem_id=" + id));
             }
         }
@@ -176,7 +176,7 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     @Override
     public void update(Context context, XmlWorkflowItem workflowItem) throws SQLException, AuthorizeException {
         // FIXME check auth
-        log.info(LogManager.getHeader(context, "update_workflow_item",
+        log.info(LogHelper.getHeader(context, "update_workflow_item",
                                       "workflowitem_id=" + workflowItem.getID()));
 
         // Update the item

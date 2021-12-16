@@ -350,20 +350,30 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
      */
     @Override
     public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException {
-        Bitstream clonedBitstream = bitstreamService.clone(context, bitstream);
-        clonedBitstream.setStoreNumber(bitstream.getStoreNumber());
+        Bitstream clonedBitstream = null;
+        try {
+            // Update our bitstream but turn off the authorization system since permissions
+            // haven't been set at this point in time.
+            context.turnOffAuthorisationSystem();
+            clonedBitstream = bitstreamService.clone(context, bitstream);
+            clonedBitstream.setStoreNumber(bitstream.getStoreNumber());
 
-        List<MetadataValue> metadataValues = bitstreamService
-            .getMetadata(bitstream, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            List<MetadataValue> metadataValues = bitstreamService.getMetadata(bitstream, Item.ANY, Item.ANY, Item.ANY,
+                    Item.ANY);
 
-        for (MetadataValue metadataValue : metadataValues) {
-            bitstreamService.addMetadata(context, clonedBitstream, metadataValue.getMetadataField(),
-                metadataValue.getLanguage(), metadataValue.getValue(), metadataValue.getAuthority(),
-                metadataValue.getConfidence());
+            for (MetadataValue metadataValue : metadataValues) {
+                bitstreamService.addMetadata(context, clonedBitstream, metadataValue.getMetadataField(),
+                        metadataValue.getLanguage(), metadataValue.getValue(), metadataValue.getAuthority(),
+                        metadataValue.getConfidence());
+            }
+            bitstreamService.update(context, clonedBitstream);
+        } catch (AuthorizeException e) {
+            log.error(e);
+            // Can never happen since we turn off authorization before we update
+        } finally {
+            context.restoreAuthSystemState();
         }
-        bitstreamService.update(context, clonedBitstream);
         return clonedBitstream;
-
     }
 
     /**

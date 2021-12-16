@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-lazy-init="true">
+
+    <bean id="openAIRERestConnector" class="org.dspace.external.OpenAIRERestConnector">
+        <constructor-arg value="${openaire.api.url:https://api.openaire.eu}"/>
+		<property name="tokenEnabled" value="${openaire.token.enabled:false}"/>
+		<property name="tokenServiceUrl" value="${openaire.token.url:https://aai.openaire.eu/oidc/token}"/>
+		<property name="clientId" value="${openaire.token.clientId}"/>
+		<property name="clientSecret" value="${openaire.token.clientSecret}"/>
+    </bean>
+	<bean
+		class="org.dspace.external.provider.impl.OpenAIREFundingDataProvider"
+		init-method="init">
+		<property name="sourceIdentifier" value="openAIREFunding" />
+		<property name="connector" ref="openAIRERestConnector" />
+		<property name="supportedEntityTypes">
+			<list>
+				<value>Project</value>
+			</list>
+		</property>
+	</bean>
+	
+</beans>
+

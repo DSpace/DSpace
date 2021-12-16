@@ -77,7 +77,7 @@ public class AbstractDSpaceTest {
 
             //load the properties of the tests
             testProps = new Properties();
-            URL properties = AbstractUnitTest.class.getClassLoader()
+            URL properties = AbstractDSpaceTest.class.getClassLoader()
                                                    .getResource("test-config.properties");
             testProps.load(properties.openStream());
 

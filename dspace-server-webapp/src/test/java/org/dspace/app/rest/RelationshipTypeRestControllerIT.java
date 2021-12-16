@@ -6,7 +6,7 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
-
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,6 +20,7 @@ import org.dspace.app.rest.matcher.RelationshipTypeMatcher;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.content.Collection;
@@ -48,7 +49,8 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
-                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7))))
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 8))))
+                   // Expect it to return these specific Entity Types (in any order)
                    .andExpect(jsonPath("$._embedded.entitytypes", containsInAnyOrder(
                        EntityTypeMatcher.matchEntityTypeEntryForLabel("Publication"),
                        EntityTypeMatcher.matchEntityTypeEntryForLabel("Person"),
@@ -56,8 +58,10 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
                        EntityTypeMatcher.matchEntityTypeEntryForLabel("OrgUnit"),
                        EntityTypeMatcher.matchEntityTypeEntryForLabel("Journal"),
                        EntityTypeMatcher.matchEntityTypeEntryForLabel("JournalVolume"),
-                       EntityTypeMatcher.matchEntityTypeEntryForLabel("JournalIssue")
-
+                       EntityTypeMatcher.matchEntityTypeEntryForLabel("JournalIssue"),
+                       // None is the "empty" entity type used for allowing Collections / External Sources to work with
+                       // non-Entities (i.e. normal items)
+                       EntityTypeMatcher.matchEntityTypeEntryForLabel("none")
                    )))
         ;
     }
@@ -86,8 +90,7 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
         RelationshipType relationshipType5 = relationshipTypeService
             .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isAuthorOfPublication",
                                   "isPublicationOfAuthor");
-        getClient().perform(get("/api/core/entitytypes/" + publicationEntityType.getID() + "/relationshiptypes")
-                   .param("projection", "full"))
+        getClient().perform(get("/api/core/entitytypes/" + publicationEntityType.getID() + "/relationshiptypes"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType1),
@@ -95,7 +98,115 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType3),
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType4),
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType5)
-                   )));
+                       )))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(5)))
+                   .andExpect(jsonPath("$.page.number", is(0)));
+    }
+
+    @Test
+    public void findAllRelationshipTypesEmptyResponseTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType testEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "TestEntityType").build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/entitytypes/" + testEntityType.getID() + "/relationshiptypes"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationshiptypes").isEmpty())
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$.page.number", is(0)));
+    }
+
+    @Test
+    public void findAllRelationshipTypesForPublicationsPaginationTest() throws Exception {
+
+        EntityType person = entityTypeService.findByEntityType(context, "Person");
+        EntityType orgunit = entityTypeService.findByEntityType(context, "OrgUnit");
+        EntityType project = entityTypeService.findByEntityType(context, "Project");
+        EntityType publication = entityTypeService.findByEntityType(context, "Publication");
+        EntityType journalIssue = entityTypeService.findByEntityType(context, "journalIssue");
+
+        RelationshipType relationshipType1 = relationshipTypeService.findbyTypesAndTypeName(context,
+                             publication, person, "isAuthorOfPublication", "isPublicationOfAuthor");
+        RelationshipType relationshipType2 = relationshipTypeService.findbyTypesAndTypeName(context,
+                          publication, project, "isProjectOfPublication", "isPublicationOfProject");
+        RelationshipType relationshipType3 = relationshipTypeService.findbyTypesAndTypeName(context,
+                          publication, orgunit, "isOrgUnitOfPublication", "isPublicationOfOrgUnit");
+        RelationshipType relationshipType4 = relationshipTypeService.findbyTypesAndTypeName(context,
+           journalIssue, publication, "isPublicationOfJournalIssue", "isJournalIssueOfPublication");
+        RelationshipType relationshipType5 = relationshipTypeService.findbyTypesAndTypeName(context,
+                             publication, orgunit, "isAuthorOfPublication","isPublicationOfAuthor");
+
+        getClient().perform(get("/api/core/entitytypes/" + publication.getID() + "/relationshiptypes")
+                   .param("size", "2"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
+                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType1),
+                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType2)
+                       )))
+                   .andExpect(jsonPath("$.page.size", is(2)))
+                   .andExpect(jsonPath("$.page.totalElements", is(5)))
+                   .andExpect(jsonPath("$.page.number", is(0)));
+
+        getClient().perform(get("/api/core/entitytypes/" + publication.getID() + "/relationshiptypes")
+                   .param("size", "2")
+                   .param("page", "1"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
+                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType3),
+                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType5)
+                       )))
+                   .andExpect(jsonPath("$.page.size", is(2)))
+                   .andExpect(jsonPath("$.page.totalElements", is(5)))
+                   .andExpect(jsonPath("$.page.number", is(1)));
+
+        getClient().perform(get("/api/core/entitytypes/" + publication.getID() + "/relationshiptypes")
+                   .param("size", "2")
+                   .param("page", "2"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", contains(
+                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType4)
+                       )))
+                   .andExpect(jsonPath("$.page.size", is(2)))
+                   .andExpect(jsonPath("$.page.totalElements", is(5)))
+                   .andExpect(jsonPath("$.page.number", is(2)));
+    }
+
+    @Test
+    public void findAllRelationshipTypesForPublicationsEmbedTest() throws Exception {
+
+        EntityType publicationEntityType = entityTypeService.findByEntityType(context, "Publication");
+        EntityType personEntityType = entityTypeService.findByEntityType(context, "Person");
+        EntityType projectEntityType = entityTypeService.findByEntityType(context, "Project");
+        EntityType orgunitEntityType = entityTypeService.findByEntityType(context, "OrgUnit");
+        EntityType journalIssueEntityType = entityTypeService.findByEntityType(context, "journalIssue");
+
+        RelationshipType relationshipType1 = relationshipTypeService
+            .findbyTypesAndTypeName(context, publicationEntityType, personEntityType, "isAuthorOfPublication",
+                                  "isPublicationOfAuthor");
+        RelationshipType relationshipType2 = relationshipTypeService
+            .findbyTypesAndTypeName(context, publicationEntityType, projectEntityType, "isProjectOfPublication",
+                                  "isPublicationOfProject");
+        RelationshipType relationshipType3 = relationshipTypeService
+            .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isOrgUnitOfPublication",
+                                  "isPublicationOfOrgUnit");
+        RelationshipType relationshipType4 = relationshipTypeService
+            .findbyTypesAndTypeName(context, journalIssueEntityType, publicationEntityType,
+                    "isPublicationOfJournalIssue", "isJournalIssueOfPublication");
+        RelationshipType relationshipType5 = relationshipTypeService
+            .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isAuthorOfPublication",
+                                  "isPublicationOfAuthor");
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/relationships?embed=relationshipType"))
+                             .andExpect(status().isOk());
+    }
+
+    @Test
+    public void findAllRelationshipTypesNotFoundTest() throws Exception {
+        getClient().perform(get("/api/core/entitytypes/" + Integer.MAX_VALUE + "/relationshiptypes"))
+                   .andExpect(status().isNotFound());
     }
 
     @Test
@@ -110,56 +221,56 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
-        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .withEntityType("Person").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                                           .withEntityType("Person").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits")
+                                           .withEntityType("OrgUnit").build();
+        Collection col4 = CollectionBuilder.createCollection(context, child1).withName("Publications")
+                                           .withEntityType("Publication").build();
+        Collection col5 = CollectionBuilder.createCollection(context, child1).withName("without entityType")
+                                           .build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author1")
                                   .withIssueDate("2017-10-17")
                                   .withAuthor("Smith, Donald")
-                                  .withEntityType("Person")
                                   .build();
 
         Item author2 = ItemBuilder.createItem(context, col2)
                                   .withTitle("Author2")
                                   .withIssueDate("2016-02-13")
                                   .withAuthor("Smith, Maria")
-                                  .withEntityType("Person")
                                   .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
                                   .withTitle("Author3")
                                   .withIssueDate("2016-02-13")
                                   .withAuthor("Maybe, Maybe")
-                                  .withEntityType("Person")
                                   .build();
 
         Item orgUnit1 = ItemBuilder.createItem(context, col3)
                                    .withTitle("OrgUnit1")
                                    .withAuthor("Testy, TEst")
                                    .withIssueDate("2015-01-01")
-                                   .withEntityType("OrgUnit")
                                    .build();
 
-        Item project1 = ItemBuilder.createItem(context, col3)
+        Item project1 = ItemBuilder.createItem(context, col5)
                                    .withTitle("Project1")
                                    .withAuthor("Testy, TEst")
                                    .withIssueDate("2015-01-01")
-                                   .withEntityType("Project")
                                    .build();
 
-        Item publication = ItemBuilder.createItem(context, col3)
+        Item publication = ItemBuilder.createItem(context, col4)
                                       .withTitle("Publication1")
                                       .withAuthor("Testy, TEst")
                                       .withIssueDate("2015-01-01")
-                                      .withEntityType("Publication")
                                       .build();
 
-        Item publication2 = ItemBuilder.createItem(context, col3)
+        Item publication2 = ItemBuilder.createItem(context, col4)
                                        .withTitle("Publication2")
                                        .withIssueDate("2015-01-01")
-                                       .withEntityType("Publication")
                                        .build();
 
         RelationshipType isOrgUnitOfPersonRelationshipType = relationshipTypeService
