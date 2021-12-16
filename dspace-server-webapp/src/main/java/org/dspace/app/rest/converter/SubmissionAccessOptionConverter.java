@@ -33,7 +33,7 @@ public class SubmissionAccessOptionConverter
     public SubmissionAccessOptionRest convert(AccessConditionConfiguration config, Projection projection) {
         SubmissionAccessOptionRest model = new SubmissionAccessOptionRest();
         model.setId(config.getName());
-        model.setDiscoverable(config.getDiscoverable());
+        model.setCanChangeDiscoverable(config.getCanChangeDiscoverable());
         model.setProjection(projection);
         for (AccessConditionOption option : config.getOptions()) {
             AccessConditionOptionRest optionRest = new AccessConditionOptionRest();

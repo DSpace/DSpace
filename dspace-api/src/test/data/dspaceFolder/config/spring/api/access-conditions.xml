@@ -71,7 +71,7 @@
 
     <bean id="accessConditionConfigurationDefault" class="org.dspace.submit.model.AccessConditionConfiguration">
         <property name="name" value="defaultAC"></property>
-        <property name="discoverable" value="true"></property>
+        <property name="canChangeDiscoverable" value="true"></property>
         <property name="options">
             <list>
                 <ref bean="openAccess"/>
@@ -83,7 +83,7 @@
 
     <bean id="accessConditionConfigurationNotDiscoverable" class="org.dspace.submit.model.AccessConditionConfiguration">
         <property name="name" value="notDiscoverable"></property>
-        <property name="discoverable" value="false"></property>
+        <property name="canChangeDiscoverable" value="false"></property>
         <property name="options">
             <list>
                 <ref bean="embargoed" />

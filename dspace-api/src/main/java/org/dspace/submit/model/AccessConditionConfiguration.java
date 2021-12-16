@@ -14,7 +14,7 @@ import java.util.List;
 public class AccessConditionConfiguration {
 
     private String name;
-    private Boolean discoverable;
+    private Boolean canChangeDiscoverable;
     private List<AccessConditionOption> options;
 
     public String getName() {
@@ -25,12 +25,12 @@ public class AccessConditionConfiguration {
         this.name = name;
     }
 
-    public Boolean getDiscoverable() {
-        return discoverable;
+    public Boolean getCanChangeDiscoverable() {
+        return canChangeDiscoverable;
     }
 
-    public void setDiscoverable(Boolean discoverable) {
-        this.discoverable = discoverable;
+    public void setCanChangeDiscoverable(Boolean canChangeDiscoverable) {
+        this.canChangeDiscoverable = canChangeDiscoverable;
     }
 
     public List<AccessConditionOption> getOptions() {

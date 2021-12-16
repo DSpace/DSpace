@@ -71,7 +71,7 @@
 
     <bean id="accessConditionConfigurationDefault" class="org.dspace.submit.model.AccessConditionConfiguration">
         <property name="name" value="AccessConditionDefaultConfiguration"></property>
-        <property name="discoverable" value="true"></property>
+        <property name="canChangeDiscoverable" value="true"></property>
         <property name="options">
             <list>
                 <ref bean="openAccess"/>

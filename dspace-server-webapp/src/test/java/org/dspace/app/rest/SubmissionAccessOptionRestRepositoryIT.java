@@ -38,7 +38,7 @@ public class SubmissionAccessOptionRestRepositoryIT extends AbstractControllerIn
         getClient(tokenAdmin).perform(get("/api/config/submissionaccessoptions/defaultAC"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is("defaultAC")))
-                .andExpect(jsonPath("$.discoverable", is(true)))
+                .andExpect(jsonPath("$.canChangeDiscoverable", is(true)))
                 .andExpect(jsonPath("$.accessConditionOptions", Matchers.containsInAnyOrder(
                     AccessConditionOptionMatcher.matchAccessConditionOption(
                           "openaccess", false , false, null, null),
@@ -54,7 +54,7 @@ public class SubmissionAccessOptionRestRepositoryIT extends AbstractControllerIn
         getClient(tokenEPerson).perform(get("/api/config/submissionaccessoptions/defaultAC"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is("defaultAC")))
-                .andExpect(jsonPath("$.discoverable", is(true)))
+                .andExpect(jsonPath("$.canChangeDiscoverable", is(true)))
                 .andExpect(jsonPath("$.accessConditionOptions", Matchers.containsInAnyOrder(
                         AccessConditionOptionMatcher.matchAccessConditionOption(
                               "openaccess", false , false, null, null),
@@ -68,7 +68,7 @@ public class SubmissionAccessOptionRestRepositoryIT extends AbstractControllerIn
         getClient().perform(get("/api/config/submissionaccessoptions/defaultAC"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.id", is("defaultAC")))
-                   .andExpect(jsonPath("$.discoverable", is(true)))
+                   .andExpect(jsonPath("$.canChangeDiscoverable", is(true)))
                    .andExpect(jsonPath("$.accessConditionOptions", Matchers.containsInAnyOrder(
                            AccessConditionOptionMatcher.matchAccessConditionOption(
                                  "openaccess", false , false, null, null),
@@ -78,6 +78,22 @@ public class SubmissionAccessOptionRestRepositoryIT extends AbstractControllerIn
                                  "administrator", false , false, null, null))
                            ))
                    .andExpect(jsonPath("$.type", is("submissionaccessoption")));
+    }
+
+    @Test
+    public void findOneCanNotChangeDiscoverableTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/config/submissionaccessoptions/notDiscoverable"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", is("notDiscoverable")))
+                             .andExpect(jsonPath("$.canChangeDiscoverable", is(false)))
+                             .andExpect(jsonPath("$.accessConditionOptions", Matchers.containsInAnyOrder(
+                                 AccessConditionOptionMatcher.matchAccessConditionOption(
+                                       "embargo", true , false, "+36MONTHS", null),
+                                 AccessConditionOptionMatcher.matchAccessConditionOption(
+                                       "administrator", false , false, null, null))
+                                 ))
+                             .andExpect(jsonPath("$.type", is("submissionaccessoption")));
     }
 
     @Test
