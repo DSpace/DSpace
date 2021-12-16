@@ -8,11 +8,19 @@
 package org.dspace.app.rest.utils;
 
 import java.sql.SQLException;
+import java.util.Enumeration;
+import java.util.Locale;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
+import org.dspace.services.RequestService;
+import org.dspace.services.model.Request;
+import org.dspace.utils.DSpace;
 
 /**
  * Miscellaneous UI utility methods methods for managing DSpace context.
@@ -60,7 +68,7 @@ public class ContextUtil {
      * @param request the servlet request object
      * @return a context object
      */
-    public static Context obtainContext(ServletRequest request) {
+    public static Context obtainContext(HttpServletRequest request) {
         Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
         if (context == null) {
@@ -74,8 +82,59 @@ public class ContextUtil {
             // Store the context in the request
             request.setAttribute(DSPACE_CONTEXT, context);
         }
-
+        // this need to be verified each time that the context is extracted from the request
+        // as some call happen before that the login process is completed and user settings can
+        // change the locale
+        Locale currentLocale = getLocale(context, request);
+        context.setCurrentLocale(currentLocale);
         return context;
+    }
+
+    /**
+     * Shortcut for {@link #obtainContext(Request)} using the {@link RequestService}
+     * to retrieve the current thread request
+     * 
+     * @return the DSpace Context associated with the current thread-bound request
+     */
+    public static Context obtainCurrentRequestContext() {
+        Context context = null;
+        RequestService requestService = new DSpace().getRequestService();
+        Request currentRequest = requestService.getCurrentRequest();
+        if (currentRequest != null) {
+            context = ContextUtil.obtainContext(currentRequest.getHttpServletRequest());
+        }
+        return context;
+    }
+
+    private static Locale getLocale(Context context, HttpServletRequest request) {
+        Locale userLocale = null;
+        Locale supportedLocale = null;
+
+        // Locales requested from client
+        String locale = request.getHeader("Accept-Language");
+        if (StringUtils.isNotBlank(locale)) {
+            Enumeration<Locale> locales = request.getLocales();
+            if (locales != null) {
+                while (locales.hasMoreElements()) {
+                    Locale current = locales.nextElement();
+                    if (I18nUtil.isSupportedLocale(current)) {
+                        userLocale = current;
+                        break;
+                    }
+                }
+            }
+        }
+        if (userLocale == null && context.getCurrentUser() != null) {
+            String userLanguage = context.getCurrentUser().getLanguage();
+            if (userLanguage != null) {
+                userLocale = new Locale(userLanguage);
+            }
+        }
+        if (userLocale == null) {
+            return I18nUtil.getDefaultLocale();
+        }
+        supportedLocale = I18nUtil.getSupportedLocale(userLocale);
+        return supportedLocale;
     }
 
     /**

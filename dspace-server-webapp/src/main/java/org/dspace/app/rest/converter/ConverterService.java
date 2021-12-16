@@ -31,7 +31,6 @@ import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
-import org.dspace.app.rest.security.DSpacePermissionEvaluator;
 import org.dspace.app.rest.security.WebSecurityExpressionEvaluator;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.services.RequestService;
@@ -78,9 +77,6 @@ public class ConverterService {
 
     @Autowired
     private List<Projection> projections;
-
-    @Autowired
-    private DSpacePermissionEvaluator dSpacePermissionEvaluator;
 
     @Autowired
     private WebSecurityExpressionEvaluator webSecurityExpressionEvaluator;

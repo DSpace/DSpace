@@ -17,8 +17,9 @@ import org.dspace.app.sherpa.v2.SHERPAResponse;
 
 /**
  * Mock implementation for SHERPA API service (used by SHERPA submit service to check
- * journal policies)
- * This class will return mock SHERPA responses so they can be parsed and turned into external data objects downstream
+ * journal policies).
+ * This class will return mock SHERPA responses so they can be parsed and turned
+ * into external data objects downstream.
  *
  * @author Kim Shepherd
  */
@@ -110,7 +111,7 @@ public class MockSHERPAService extends SHERPAService {
             try {
                 // Prepare the URI - this will not be used but should be evaluated
                 // in case a syntax exception is thrown
-                URI uri = prepareQuery(value, endpoint, apiKey);
+                URI unuseduri = prepareQuery(value, endpoint, apiKey);
 
                 // Get mock JSON - in this case, a known good result for PLOS
                 content = getClass().getResourceAsStream("plos.json");

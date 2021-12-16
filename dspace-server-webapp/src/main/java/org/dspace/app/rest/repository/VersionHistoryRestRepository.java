@@ -38,7 +38,7 @@ public class VersionHistoryRestRepository extends DSpaceRestRepository<VersionHi
     private ConverterService converterService;
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'VERSIONHISTORY', 'READ')")
+    @PreAuthorize("@versioningSecurity.isEnableVersioning() && hasPermission(#id, 'VERSIONHISTORY', 'READ')")
     public VersionHistoryRest findOne(Context context, Integer id) {
         try {
             VersionHistory versionHistory = versionHistoryService.find(context, id);

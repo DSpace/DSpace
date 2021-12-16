@@ -14,8 +14,13 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
+import javax.annotation.Nullable;
+
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.hamcrest.Matcher;
 
 /**
@@ -27,6 +32,27 @@ import org.hamcrest.Matcher;
 public class ResourcePolicyMatcher {
 
     private ResourcePolicyMatcher() {
+    }
+
+    public static Matcher<? super Object> matchResourcePolicyProperties(@Nullable Group group,
+        @Nullable EPerson eperson, DSpaceObject dso, @Nullable String rpType, int action, @Nullable String name) {
+        return allOf(
+            hasJsonPath("$.name", is(name)),
+            hasJsonPath("$.action", is(Constants.actionText[action])),
+            rpType != null ?
+                hasJsonPath("$.policyType", is(rpType)) :
+                hasNoJsonPath("$.policyType"),
+            hasJsonPath("$.type", is("resourcepolicy")),
+            hasJsonPath("$._embedded.resource.id", is(dso.getID().toString())),
+            eperson != null ?
+                hasJsonPath("$._embedded.eperson.id",
+                    is(eperson.getID().toString())) :
+                hasJsonPath("$._embedded.eperson", nullValue()),
+            group != null ?
+                hasJsonPath("$._embedded.group.id",
+                    is(group.getID().toString())) :
+                hasJsonPath("$._embedded.group", nullValue())
+                    );
     }
 
     public static Matcher<? super Object> matchResourcePolicy(ResourcePolicy resourcePolicy) {
