@@ -12,13 +12,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
+import com.google.common.io.Files;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
@@ -56,6 +58,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
             itemsSubject1[i] = ItemBuilder.createItem(context, collection)
                 .withTitle(String.format("%s item %d", subject1, i))
                 .withSubject(subject1)
+                .withIssueDate("2020-09-" + i)
                 .build();
         }
 
@@ -63,22 +66,26 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
             itemsSubject2[i] = ItemBuilder.createItem(context, collection)
                 .withTitle(String.format("%s item %d", subject2, i))
                 .withSubject(subject2)
+                .withIssueDate("2021-09-" + i)
                 .build();
         }
         context.restoreAuthSystemState();
     }
 
-    private void checkItemsPresentInFile(String filename, Item[] items) throws IOException {
+    private void checkItemsPresentInFile(String filename, Item[] items) throws IOException, CsvException {
         File file = new File(filename);
-        String fileContent = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
-        String[] lines = fileContent.split("\\r?\\n");
+        Reader reader = Files.newReader(file, Charset.defaultCharset());
+        CSVReader csvReader = new CSVReader(reader);
+
+
+        List<String[]> lines = csvReader.readAll();
         //length + 1 is because of 1 row extra for the headers
-        assertEquals(items.length + 1, lines.length);
+        assertEquals(items.length + 1, lines.size());
 
         List<String> ids = new ArrayList<>();
         //ignoring the first row as this only contains headers;
-        for (int i = 1; i < lines.length; i++) {
-            ids.add(lines[i].split(",", 2)[0].replaceAll("\"", ""));
+        for (int i = 1; i < lines.size(); i++) {
+            ids.add(lines.get(i)[0]);
         }
 
         for (Item item : items) {
@@ -88,7 +95,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
 
     @Test
     public void metadateExportSearchQueryTest()
-        throws InstantiationException, IllegalAccessException, IOException {
+        throws InstantiationException, IllegalAccessException, IOException, CsvException {
         String[] args = new String[] {"metadata-export-search", "-q", "subject:" + subject1};
 
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
@@ -103,7 +110,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
 
     @Test
     public void exportMetadataSearchSpecificContainerTest()
-        throws IOException, InstantiationException, IllegalAccessException {
+        throws IOException, InstantiationException, IllegalAccessException, CsvException {
         context.turnOffAuthorisationSystem();
         Community community2 = CommunityBuilder.createCommunity(context).build();
         Collection collection2 = CollectionBuilder.createCollection(context, community2).build();
@@ -130,5 +137,21 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
             new String[] {"metadata-export-search", "-q", "subject: " + subject1, "-s", collection2.getID().toString()};
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
         checkItemsPresentInFile(filename, itemsDifferentCollection);
+    }
+
+    @Test
+    public void exportMetadataSearchFilter()
+        throws InstantiationException, IllegalAccessException, IOException, CsvException {
+        String[] args = new String[] {"metadata-export-search", "-f", "subject,equals=" + subject1};
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        checkItemsPresentInFile(filename, itemsSubject1);
+    }
+
+    @Test
+    public void exportMetadataSearchFilterDate()
+        throws InstantiationException, IllegalAccessException, IOException, CsvException {
+        String[] args = new String[] {"metadata-export-search", "-f", "dateIssued,equals=[2000 TO 2020]"};
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        checkItemsPresentInFile(filename, itemsSubject1);
     }
 }
