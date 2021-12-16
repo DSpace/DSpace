@@ -41,11 +41,11 @@ public class SubmissionAccessOptionRestRepositoryIT extends AbstractControllerIn
                 .andExpect(jsonPath("$.discoverable", is(true)))
                 .andExpect(jsonPath("$.accessConditionOptions", Matchers.containsInAnyOrder(
                     AccessConditionOptionMatcher.matchAccessConditionOption(
-                          "openaccess","Anonymous", false , false, null, null),
+                          "openaccess", false , false, null, null),
                     AccessConditionOptionMatcher.matchAccessConditionOption(
-                          "embargo","Anonymous", true , false, "+36MONTHS", null),
+                          "embargo", true , false, "+36MONTHS", null),
                     AccessConditionOptionMatcher.matchAccessConditionOption(
-                          "administrator","Administrator", false , false, null, null))
+                          "administrator", false , false, null, null))
                     ))
                 .andExpect(jsonPath("$.type", is("submissionaccessoption")));
 
@@ -56,13 +56,13 @@ public class SubmissionAccessOptionRestRepositoryIT extends AbstractControllerIn
                 .andExpect(jsonPath("$.id", is("defaultAC")))
                 .andExpect(jsonPath("$.discoverable", is(true)))
                 .andExpect(jsonPath("$.accessConditionOptions", Matchers.containsInAnyOrder(
-                    AccessConditionOptionMatcher.matchAccessConditionOption(
-                          "openaccess","Anonymous", false , false, null, null),
-                    AccessConditionOptionMatcher.matchAccessConditionOption(
-                          "embargo","Anonymous", true , false, "+36MONTHS", null),
-                    AccessConditionOptionMatcher.matchAccessConditionOption(
-                          "administrator","Administrator", false , false, null, null))
-                    ))
+                        AccessConditionOptionMatcher.matchAccessConditionOption(
+                              "openaccess", false , false, null, null),
+                        AccessConditionOptionMatcher.matchAccessConditionOption(
+                              "embargo", true , false, "+36MONTHS", null),
+                        AccessConditionOptionMatcher.matchAccessConditionOption(
+                              "administrator", false , false, null, null))
+                        ))
                 .andExpect(jsonPath("$.type", is("submissionaccessoption")));
 
         getClient().perform(get("/api/config/submissionaccessoptions/defaultAC"))
@@ -70,13 +70,13 @@ public class SubmissionAccessOptionRestRepositoryIT extends AbstractControllerIn
                    .andExpect(jsonPath("$.id", is("defaultAC")))
                    .andExpect(jsonPath("$.discoverable", is(true)))
                    .andExpect(jsonPath("$.accessConditionOptions", Matchers.containsInAnyOrder(
-                       AccessConditionOptionMatcher.matchAccessConditionOption(
-                             "openaccess","Anonymous", false , false, null, null),
-                       AccessConditionOptionMatcher.matchAccessConditionOption(
-                             "embargo","Anonymous", true , false, "+36MONTHS", null),
-                       AccessConditionOptionMatcher.matchAccessConditionOption(
-                             "administrator","Administrator", false , false, null, null))
-                       ))
+                           AccessConditionOptionMatcher.matchAccessConditionOption(
+                                 "openaccess", false , false, null, null),
+                           AccessConditionOptionMatcher.matchAccessConditionOption(
+                                 "embargo", true , false, "+36MONTHS", null),
+                           AccessConditionOptionMatcher.matchAccessConditionOption(
+                                 "administrator", false , false, null, null))
+                           ))
                    .andExpect(jsonPath("$.type", is("submissionaccessoption")));
     }
 
