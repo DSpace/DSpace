@@ -150,7 +150,7 @@
                     <hint>If the item has any identification numbers or codes associated with
                         it, please enter the types and the actual numbers or codes.
                     </hint>
-                    <required>test for requred</required>
+                    <required></required>
                 </field>
             </row>
             <row>
