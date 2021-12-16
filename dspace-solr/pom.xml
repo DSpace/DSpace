@@ -238,9 +238,8 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-    <artifactId>log4j-core</artifactId>
-
+            <artifactId>log4j</artifactId>
+            <groupId>log4j</groupId>
             <type>jar</type>
         </dependency>
         <dependency>
