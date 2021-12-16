@@ -12,7 +12,6 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
-import org.dspace.submit.model.AccessConditionOption;
 
 /**
  * The Access Condition Section Configuration REST Resource
@@ -31,7 +30,7 @@ public class SubmissionAccessOptionRest extends BaseObjectRest<String> {
 
     private Boolean discoverable;
 
-    private List<AccessConditionOption> accessConditionOptions;
+    private List<AccessConditionOptionRest> accessConditionOptions;
 
     public String getId() {
         return id;
@@ -49,14 +48,14 @@ public class SubmissionAccessOptionRest extends BaseObjectRest<String> {
         this.discoverable = discoverable;
     }
 
-    public List<AccessConditionOption> getAccessConditionOptions() {
+    public List<AccessConditionOptionRest> getAccessConditionOptions() {
         if (Objects.isNull(accessConditionOptions)) {
             accessConditionOptions = new ArrayList<>();
         }
         return accessConditionOptions;
     }
 
-    public void setAccessConditionOptions(List<AccessConditionOption> accessConditionOptions) {
+    public void setAccessConditionOptions(List<AccessConditionOptionRest> accessConditionOptions) {
         this.accessConditionOptions = accessConditionOptions;
     }
 

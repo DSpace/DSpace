@@ -6,11 +6,15 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.matcher;
-
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
+import java.util.Objects;
+
+import org.apache.commons.lang.StringUtils;
 import org.hamcrest.Matcher;
 
 /**
@@ -23,15 +27,19 @@ public class AccessConditionOptionMatcher {
 
     private AccessConditionOptionMatcher() {}
 
-    public static Matcher<? super Object> matchAccessConditionOption(String name, String groupName,
-            boolean hasStartDate, boolean hasEndDate, String startDateLimit, String endDateLimit) {
+    public static Matcher<? super Object> matchAccessConditionOption(String name,
+            Boolean hasStartDate, Boolean hasEndDate, String maxStartDate, String maxEndDate) {
         return allOf(
                 hasJsonPath("$.name", is(name)),
-                hasJsonPath("$.groupName", is(groupName)),
-                hasJsonPath("$.hasStartDate", is(hasStartDate)),
-                hasJsonPath("$.hasEndDate", is(hasEndDate)),
-                hasJsonPath("$.startDateLimit", is(startDateLimit)),
-                hasJsonPath("$.endDateLimit", is(endDateLimit))
+                Objects.nonNull(hasStartDate) ? hasJsonPath("$.hasStartDate", is(hasStartDate))
+                                              : hasNoJsonPath("$.hasStartDate"),
+                Objects.nonNull(hasEndDate) ? hasJsonPath("$.hasEndDate", is(hasEndDate))
+                                            : hasNoJsonPath("$.hasEndDate"),
+                StringUtils.isNotBlank(maxStartDate) ? hasJsonPath("$.maxStartDate", notNullValue())
+                                                     : hasNoJsonPath("$.maxStartDate"),
+                StringUtils.isNotBlank(maxEndDate) ? hasJsonPath("$.maxEndDate", notNullValue())
+                                                     : hasNoJsonPath("$.maxEndDate")
                 );
     }
+
 }
