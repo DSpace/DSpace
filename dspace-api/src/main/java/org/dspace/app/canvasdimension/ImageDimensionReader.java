@@ -13,6 +13,11 @@ import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
 
+/**
+ * Reads and return height and width dimensions for image bitstreams.
+ *
+ * @author Michael Spalti mspalti@willamette.edu
+ */
 public class ImageDimensionReader {
 
     private ImageDimensionReader() {}

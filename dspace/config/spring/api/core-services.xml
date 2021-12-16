@@ -3,7 +3,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
        default-lazy-init="true">
 
-
     <!-- ******************** -->
     <!-- Service declarations -->
     <!-- ******************** -->
@@ -16,9 +15,6 @@
 
     <!--Ensure that bean remains prototype ! -->
     <bean class="org.dspace.app.mediafilter.MediaFilterServiceImpl" scope="prototype"/>
-
-    <bean class="org.dspace.app.canvasdimension.IIIFCanvasDimensionServiceImpl" scope="prototype"/>
-    <bean class="org.dspace.app.canvasdimension.IIIFApiQueryServiceImpl" scope="prototype"/>
 
     <bean class="org.dspace.app.sfx.SFXFileReaderServiceImpl" scope="prototype"/>
 

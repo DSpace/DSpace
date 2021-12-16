@@ -10,6 +10,11 @@ package org.dspace.app.canvasdimension.factory;
 import org.dspace.app.canvasdimension.service.IIIFCanvasDimensionService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
+/**
+ * Factory for the image dimension service.
+ *
+ * @author Michael Spalti mspalti@willamette.edu
+ */
 public abstract class IIIFCanvasDimensionServiceFactory {
 
     public static IIIFCanvasDimensionServiceFactory getInstance() {

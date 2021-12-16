@@ -10,9 +10,14 @@ package org.dspace.app.canvasdimension.factory;
 import org.dspace.app.canvasdimension.service.IIIFCanvasDimensionService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Factory for the image dimension service.
+ *
+ * @author Michael Spalti mspalti@willamette.edu
+ */
 public class IIIFCanvasDimensionServiceFactoryImpl extends IIIFCanvasDimensionServiceFactory {
 
-    @Autowired(required = true)
+    @Autowired()
     private IIIFCanvasDimensionService iiifCanvasDimensionService;
 
     @Override

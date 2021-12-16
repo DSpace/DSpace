@@ -23,9 +23,16 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
+/**
+ * Queries the configured IIIF server for image dimensions. Used for
+ * formats that cannot be easily read using ImageIO (jpeg 2000).
+ *
+ * @author Michael Spalti mspalti@willamette.edu
+ */
 public class IIIFApiQueryServiceImpl implements IIIFApiQueryService, InitializingBean {
 
-    @Autowired(required = true)
+    @Autowired()
     protected ConfigurationService configurationService;
 
     String iiifImageServer;
@@ -35,11 +42,7 @@ public class IIIFApiQueryServiceImpl implements IIIFApiQueryService, Initializin
         iiifImageServer = configurationService.getProperty("iiif.image.server");
     }
 
-    /**
-     * Returns array with canvas height and width
-     * @param bitstream
-     * @return
-     */
+    @Override
     public int[] getImageDimensions(Bitstream bitstream) {
         return getIiifImageDimensions(bitstream);
     }

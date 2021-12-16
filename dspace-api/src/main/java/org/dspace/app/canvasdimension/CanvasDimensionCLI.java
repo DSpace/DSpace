@@ -32,6 +32,11 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
+/**
+ * Sets IIIF canvas metadata on bitstreams based on image size.
+ *
+ * @author Michael Spalti mspalti@willamette.edu
+ */
 public class CanvasDimensionCLI {
 
     private static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
@@ -42,17 +47,22 @@ public class CanvasDimensionCLI {
 
     public static void main(String[] argv) throws Exception {
 
-        boolean force = false;
-        boolean isQuiet = false;
-        String identifier = null;
-        String eperson = null;
-        int max2Process = Integer.MAX_VALUE;
 
         boolean iiifEnabled = configurationService.getBooleanProperty("iiif.enabled");
         if (!iiifEnabled) {
             System.out.println("IIIF is not enabled on this DSpace server.");
             System.exit(0);
         }
+
+        // default to not updating existing dimensions
+        boolean force = false;
+        // default to printing messages
+        boolean isQuiet = false;
+        // default to no limit
+        int max2Process = Integer.MAX_VALUE;
+
+        String identifier = null;
+        String eperson = null;
 
         Context context = new Context();
         IIIFCanvasDimensionService canvasProcessor = IIIFCanvasDimensionServiceFactory.getInstance()
@@ -145,7 +155,7 @@ public class CanvasDimensionCLI {
         EPerson user;
 
         if (eperson == null) {
-            System.out.println("You must provide an eperson.");
+            System.out.println("You must provide an eperson using the \"-e\" flag.");
             System.exit(1);
         }
 
@@ -167,21 +177,27 @@ public class CanvasDimensionCLI {
         canvasProcessor.setMax2Process(max2Process);
         canvasProcessor.setIsQuiet(isQuiet);
 
+        int processed = 0;
         switch (dso.getType()) {
             case Constants.COMMUNITY:
-                canvasProcessor.processCommunity(context, (Community) dso);
+                processed = canvasProcessor.processCommunity(context, (Community) dso);
                 break;
             case Constants.COLLECTION:
-                canvasProcessor.processCollection(context, (Collection) dso);
+                processed = canvasProcessor.processCollection(context, (Collection) dso);
                 break;
             case Constants.ITEM:
                 canvasProcessor.processItem(context, (Item) dso);
+                processed = 1;
                 break;
             default:
                 break;
         }
         // commit changes
         context.commit();
+
+        // Always print summary to standard out.
+        System.out.println(processed + " IIIF items were processed.");
+
     }
 
 }

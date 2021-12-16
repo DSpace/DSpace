@@ -8,7 +8,6 @@
 package org.dspace.app.canvasdimension;
 
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -26,24 +25,27 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.iiif.Utils;
+import org.dspace.iiif.IIIFSharedUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * This service sets canvas dimensions for bitstreams. Processes communities,
+ * collections, and individual items.
+ *
+ * @author Michael Spalti mspalti@willamette.edu
+ */
 public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionService {
 
-    @Autowired(required = true)
+    @Autowired()
     ItemService itemService;
-    @Autowired(required = true)
+    @Autowired()
     CommunityService communityService;
-    @Autowired(required = true)
+    @Autowired()
     BitstreamService bitstreamService;
-    @Autowired(required = true)
+    @Autowired()
     DSpaceObjectService<Bitstream> dSpaceObjectService;
-    @Autowired(required = true)
+    @Autowired()
     IIIFApiQueryService iiifApiQuery;
-
-    // field used to check for existing bitstream metadata
-    private static final String IIIF_WIDTH_METADATA = "iiif.image.width";
 
     private boolean forceProcessing = false;
     private boolean isQuiet = false;
@@ -51,53 +53,31 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
     private int max2Process = Integer.MAX_VALUE;
     private int processed = 0;
 
-    /**
-     * Set the force processing property. If true, existing canvas
-     * metadata will be replaced.
-     * @param force
-     */
+    // used to check for existing canvas dimension
+    private static final String IIIF_WIDTH_METADATA = "iiif.image.width";
+
     @Override
     public void setForceProcessing(boolean force) {
         forceProcessing = force;
     }
 
-    /**
-     * Set whether to output messages during processing.
-     * @param quiet
-     */
     @Override
     public void setIsQuiet(boolean quiet) {
         isQuiet = quiet;
     }
 
-    /**
-     * Set the maximum number of items to process.
-     * @param max2Process
-     */
     @Override
     public void setMax2Process(int max2Process) {
         this.max2Process = max2Process;
     }
 
-    /**
-     * Set dso identifiers to skip.
-     * @param skipList
-     */
     @Override
     public void setSkipList(List<String> skipList) {
         this.skipList = skipList;
     }
 
-
-    /**
-     * Set IIIF canvas dimensions on all IIIF items in a community and its
-     * sub-communities.
-     * @param context
-     * @param community
-     * @throws Exception
-     */
     @Override
-    public void processCommunity(Context context, Community community) throws Exception {
+    public int processCommunity(Context context, Community community) throws Exception {
         if (!inSkipList(community.getHandle())) {
             List<Community> subcommunities = community.getSubcommunities();
             for (Community subcommunity : subcommunities) {
@@ -108,34 +88,24 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
                 processCollection(context, collection);
             }
         }
+        return processed;
     }
 
-    /**
-     * Set IIIF canvas dimensions on all IIIF items in a collection.
-     * @param context
-     * @param collection
-     * @throws Exception
-     */
     @Override
-    public void processCollection(Context context, Collection collection) throws Exception {
+    public int processCollection(Context context, Collection collection) throws Exception {
         if (!inSkipList(collection.getHandle())) {
             Iterator<Item> itemIterator = itemService.findAllByCollection(context, collection);
             while (itemIterator.hasNext() && processed < max2Process) {
                 processItem(context, itemIterator.next());
             }
         }
+        return processed;
     }
 
-    /**
-     * Set IIIF canvas dimensions for an item.
-     * @param context
-     * @param item
-     * @throws Exception
-     */
     @Override
     public void processItem(Context context, Item item) throws Exception {
         if (!inSkipList(item.getHandle())) {
-            boolean isIIIFItem = Utils.isIIIFItem(item);
+            boolean isIIIFItem = IIIFSharedUtils.isIIIFItem(item);
             if (isIIIFItem) {
                 if (processItemBundles(context, item)) {
                     ++processed;
@@ -152,7 +122,7 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
      * @throws Exception
      */
     private boolean processItemBundles(Context context, Item item) throws Exception {
-        List<Bundle> bundles = Utils.getIIIFBundles(item);
+        List<Bundle> bundles = IIIFSharedUtils.getIIIFBundles(item);
         boolean done = false;
         for (Bundle bundle : bundles) {
             List<Bitstream> bitstreams = bundle.getBitstreams();
@@ -161,8 +131,6 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
             }
         }
         if (done) {
-            // update the item
-            // itemService.update(context, item);
             if (!isQuiet) {
                 System.out.println("Updated canvas metadata for item: " + item.getID());
             }
@@ -172,15 +140,10 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
     }
 
     /**
-<<<<<<< HEAD
-     * Sets the IIIF height and width metadata for all images. If width metadata already exists,
-     * the bitstream is processed only if forceProcessing is true.
-=======
      * Gets image height and width for the bitstream. For jp2 images, height and width are
      * obtained from the IIIF image server. For other formats supported by ImageIO these values
      * are read from the actual DSpace bitstream content. If bitstream width metadata already exists,
      * the bitstream is processed when forceProcessing is true.
->>>>>>> aa0840668aca847c57410c2c9be1cd551c0ae841
      * @param context
      * @param bitstream
      * @return
@@ -222,24 +185,19 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
      * @param dims
      * @return
      */
-    private boolean setBitstreamMetadata(Context context, Bitstream bitstream, int[] dims) {
-        try {
-            dSpaceObjectService.clearMetadata(context, bitstream, "iiif",
+    private boolean setBitstreamMetadata(Context context, Bitstream bitstream, int[] dims) throws Exception {
+        dSpaceObjectService.clearMetadata(context, bitstream, "iiif",
                 "image", "width", Item.ANY);
-            dSpaceObjectService.setMetadataSingleValue(context, bitstream, "iiif",
+        dSpaceObjectService.setMetadataSingleValue(context, bitstream, "iiif",
                 "image", "width", Item.ANY, String.valueOf(dims[0]));
-            dSpaceObjectService.clearMetadata(context, bitstream, "iiif",
+        dSpaceObjectService.clearMetadata(context, bitstream, "iiif",
                 "image", "height", Item.ANY);
-            dSpaceObjectService.setMetadataSingleValue(context, bitstream, "iiif",
+        dSpaceObjectService.setMetadataSingleValue(context, bitstream, "iiif",
                 "image", "height", Item.ANY, String.valueOf(dims[1]));
-            if (!isQuiet) {
-                System.out.println("Added IIIF canvas metadata to bitstream: " + bitstream.getID());
-            }
-            return true;
-        } catch (SQLException e) {
-            System.out.println("Unable to update metadata: " + e.getMessage());
-            return false;
+        if (!isQuiet) {
+            System.out.println("Added IIIF canvas metadata to bitstream: " + bitstream.getID());
         }
+        return true;
     }
 
     /**

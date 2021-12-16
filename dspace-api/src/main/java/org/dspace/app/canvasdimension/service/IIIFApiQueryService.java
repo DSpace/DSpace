@@ -9,8 +9,16 @@ package org.dspace.app.canvasdimension.service;
 
 import org.dspace.content.Bitstream;
 
+/**
+ * @author Michael Spalti mspalti@willamette.edu
+ */
 public interface IIIFApiQueryService {
 
+    /**
+     * Returns array with canvas height and width
+     * @param bitstream
+     * @return
+     */
     int[] getImageDimensions(Bitstream bitstream);
 
 }

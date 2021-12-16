@@ -7,8 +7,6 @@
  */
 package org.dspace.app.iiif;
 
-import static org.dspace.iiif.Utils.isIIIFEnabled;
-
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -79,7 +77,7 @@ public class IIIFServiceFacade {
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        if (item == null || !isIIIFEnabled(item)) {
+        if (item == null || !utils.isIIIFEnabled(item)) {
             throw new ResourceNotFoundException("IIIF manifest for  id " + id + " not found");
         }
         return manifestService.getManifest(item, context);

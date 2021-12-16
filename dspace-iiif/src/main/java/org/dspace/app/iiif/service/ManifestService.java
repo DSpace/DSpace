@@ -7,8 +7,6 @@
  */
 package org.dspace.app.iiif.service;
 
-import static org.dspace.iiif.Utils.getIIIFBundles;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -143,7 +141,7 @@ public class ManifestService extends AbstractResourceService {
      * @param manifestId the generated manifestId
      */
     private void addRanges(Context context, Item item, String manifestId) {
-        List<Bundle> bundles = getIIIFBundles(item);
+        List<Bundle> bundles = utils.getIIIFBundles(item);
         RangeGenerator root = new RangeGenerator(rangeService);
         root.setLabel(I18nUtil.getMessage("iiif.toc.root-label"));
         root.setIdentifier(manifestId + "/range/r0");
@@ -333,7 +331,7 @@ public class ManifestService extends AbstractResourceService {
      * @param context DSpace context
      */
     private void addRendering(Item item, Context context) {
-        List<Bundle> bundles = getIIIFBundles(item);
+        List<Bundle> bundles = utils.getIIIFBundles(item);
         for (Bundle bundle : bundles) {
             List<Bitstream> bitstreams = bundle.getBitstreams();
             for (Bitstream bitstream : bitstreams) {
