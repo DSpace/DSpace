@@ -28,7 +28,7 @@ public class SubmissionAccessOptionRest extends BaseObjectRest<String> {
 
     private String id;
 
-    private Boolean discoverable;
+    private Boolean canChangeDiscoverable;
 
     private List<AccessConditionOptionRest> accessConditionOptions;
 
@@ -40,12 +40,12 @@ public class SubmissionAccessOptionRest extends BaseObjectRest<String> {
         this.id = id;
     }
 
-    public Boolean getDiscoverable() {
-        return discoverable;
+    public Boolean getCanChangeDiscoverable() {
+        return canChangeDiscoverable;
     }
 
-    public void setDiscoverable(Boolean discoverable) {
-        this.discoverable = discoverable;
+    public void setCanChangeDiscoverable(Boolean canChangeDiscoverable) {
+        this.canChangeDiscoverable = canChangeDiscoverable;
     }
 
     public List<AccessConditionOptionRest> getAccessConditionOptions() {

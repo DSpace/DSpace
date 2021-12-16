@@ -36,7 +36,7 @@ public class AccessConditionDiscoverableReplacePatchOperation extends ReplacePat
         String stepId = (String) currentRequest.getAttribute("accessConditionSectionId");
         AccessConditionConfiguration configuration = accessConditionConfigurationService.getMap().get(stepId);
 
-        if (Objects.isNull(configuration) || !configuration.getDiscoverable().booleanValue()) {
+        if (Objects.isNull(configuration) || !configuration.getCanChangeDiscoverable().booleanValue()) {
             throw new UnprocessableEntityException("The current access configurations does not allow" +
                                                    " the user to specify the visibility of the item");
         }
