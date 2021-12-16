@@ -141,10 +141,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </dependency>
+       <dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-core</artifactId>
+</dependency>
+
         <dependency>
             <!-- needed to ensure that all JCL is 1.1.1 -->
             <groupId>commons-logging</groupId>

@@ -404,10 +404,11 @@
             <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
         </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </dependency>
+       <dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-core</artifactId>
+</dependency>
+
         <dependency>
             <groupId>oro</groupId>
             <artifactId>oro</artifactId>
