@@ -7,6 +7,11 @@
  */
 package org.dspace.app.canvasdimension;
 
+/**
+ * Utilities for IIIF canvas dimension processing.
+ *
+ * @author Michael Spalti mspalti@willamette.edu
+ */
 public class Util {
 
     private Util() {}

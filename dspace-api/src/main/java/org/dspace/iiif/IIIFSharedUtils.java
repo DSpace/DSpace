@@ -17,15 +17,20 @@ import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.license.CreativeCommonsServiceImpl;
 
-public class Utils {
+/**
+ * Shared utilities for IIIF processing.
+ *
+ * @author Michael Spalti  mspalti@willamette.edu
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ */
+public class IIIFSharedUtils {
 
     // metadata used to enable the iiif features on the item
     public static final String METADATA_IIIF_ENABLED = "dspace.iiif.enabled";
-    private static final String IIIF_WIDTH_METADATA = "iiif.image.width";
     // The DSpace bundle for other content related to item.
     protected static final String OTHER_CONTENT_BUNDLE = "OtherContent";
 
-    private Utils() {}
+    private IIIFSharedUtils() {}
 
     public static boolean isIIIFItem(Item item) {
         return item.getMetadata().stream().filter(m -> m.getMetadataField().toString('.')
@@ -45,7 +50,7 @@ public class Utils {
         boolean iiif = isIIIFEnabled(item);
         List<Bundle> bundles = new ArrayList<>();
         if (iiif) {
-            bundles = item.getBundles().stream().filter(Utils::isIIIFBundle).collect(Collectors.toList());
+            bundles = item.getBundles().stream().filter(IIIFSharedUtils::isIIIFBundle).collect(Collectors.toList());
         }
         return bundles;
     }
