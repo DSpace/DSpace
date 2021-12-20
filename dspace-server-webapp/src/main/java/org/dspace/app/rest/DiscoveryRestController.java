@@ -73,7 +73,7 @@ public class DiscoveryRestController implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService
-            .register(this, Arrays.asList(new Link("/api/" + SearchResultsRest.CATEGORY, SearchResultsRest.CATEGORY)));
+            .register(this, Arrays.asList(Link.of("/api/" + SearchResultsRest.CATEGORY, SearchResultsRest.CATEGORY)));
     }
 
     @RequestMapping(method = RequestMethod.GET)
