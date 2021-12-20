@@ -72,7 +72,7 @@
         <skipIntegrationTests>true</skipIntegrationTests>
 
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
-                     as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
+                     as it is used to reference the LICENSE.header and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
     </properties>
 
@@ -400,13 +400,13 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
-            <!-- Check license headers in all files using LICENSE_HEADER template -->
+            <!-- Check license headers in all files using LICENSE.header template -->
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
                     <!-- License header file (can be a URL, but that's less stable if external site is down on occasion) -->
-                    <header>${root.basedir}/LICENSE_HEADER</header>
+                    <header>${root.basedir}/LICENSE.header</header>
                     <!--Just check headers of everything in the /src directory -->
                     <includes>
                         <include>src/**</include>
