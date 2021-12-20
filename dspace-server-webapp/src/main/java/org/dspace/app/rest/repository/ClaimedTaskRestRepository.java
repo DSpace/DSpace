@@ -287,7 +287,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     @Override
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService.register(this, Arrays.asList(
-                new Link("/api/" + ClaimedTaskRest.CATEGORY + "/" + ClaimedTaskRest.PLURAL_NAME + "/search",
+                Link.of("/api/" + ClaimedTaskRest.CATEGORY + "/" + ClaimedTaskRest.PLURAL_NAME + "/search",
                         ClaimedTaskRest.PLURAL_NAME + "-search")));
     }
 }

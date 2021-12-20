@@ -66,8 +66,8 @@ public class IdentifierRestController implements InitializingBean {
         discoverableEndpointsService
             .register(this,
                     Arrays.asList(
-                            new Link(
-                                    new UriTemplate("/api/" + CATEGORY + "/" + ACTION,
+                            Link.of(
+                                    UriTemplate.of("/api/" + CATEGORY + "/" + ACTION,
                                             new TemplateVariables(
                                                     new TemplateVariable(PARAM, VariableType.REQUEST_PARAM))),
                                     CATEGORY)));
