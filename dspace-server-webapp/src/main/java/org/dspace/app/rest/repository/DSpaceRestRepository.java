@@ -214,6 +214,14 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     @Override
     /**
+     * Deletes all instances of the type T with the given IDs.
+     */
+    public void deleteAllById(Iterable<? extends ID> ids) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    /**
      * Method to implement to support bulk delete of ALL entity instances
      */
     public void deleteAll() {
