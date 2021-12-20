@@ -8,7 +8,7 @@
 package org.dspace.app.rest.submit.factory.impl;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -48,25 +48,38 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
         String stepId = (String) currentRequest.getAttribute("accessConditionSectionId");
         AccessConditionConfiguration configuration = accessConditionConfigurationService.getMap().get(stepId);
 
-
         Item item = source.getItem();
-        List<AccessConditionDTO> accessConditions = Arrays.asList(evaluateSingleObject((LateObjectEvaluator) value));
-
-        verifyAccessConditions(context, configuration, accessConditions);
 
         //"path": "/sections/<:name-of-the-form>/accessConditions/-"
         String[] split = getAbsolutePath(path).split("/");
+        List<AccessConditionDTO> accessConditions = parseAccessConditions(path, value, split);
+
+        verifyAccessConditions(context, configuration, accessConditions);
+
         if (split.length == 1) {
             // to replace completely the access conditions
             authorizeService.removePoliciesActionFilter(context, item, Constants.READ);
         }
-
-        // check duplicate policy
-        checkDuplication(context, item, accessConditions);
+        if (split.length == 2) {
+            // check duplicate policy
+            checkDuplication(context, item, accessConditions);
+        }
 
         // apply policies
         AccessConditionResourcePolicyUtils.findApplyResourcePolicy(context, configuration.getOptions(), item,
                 accessConditions);
+    }
+
+    private List<AccessConditionDTO> parseAccessConditions(String path, Object value, String[] split) {
+        List<AccessConditionDTO> accessConditions = new ArrayList<AccessConditionDTO>();
+        if (split.length == 1) {
+            accessConditions = evaluateArrayObject((LateObjectEvaluator) value);
+        } else if (split.length == 2) {
+            accessConditions.add(evaluateSingleObject((LateObjectEvaluator) value));
+        } else {
+            throw new UnprocessableEntityException("The patch operation for path:" + path + " is not supported!");
+        }
+        return accessConditions;
     }
 
     private void verifyAccessConditions(Context context, AccessConditionConfiguration configuration,
