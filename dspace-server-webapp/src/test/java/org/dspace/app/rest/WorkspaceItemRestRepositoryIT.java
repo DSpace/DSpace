@@ -6275,12 +6275,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withSubject("ExtraEntry")
                                                   .build();
 
-        ResourcePolicyBuilder.createResourcePolicy(context)
-                             .withDspaceObject(witem.getItem())
-                             .withPolicyType(TYPE_CUSTOM)
-                             .withName("openaccess")
-                             .build();
-
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -6288,15 +6282,21 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
-                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name",
-                                              is("openaccess")))
-                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name").doesNotExist());
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name").doesNotExist());
 
         List<Operation> addAccessCondition = new ArrayList<Operation>();
-        Map<String, String> accessCondition = new HashMap<String, String>();
-        accessCondition.put("name", "administrator");
+        List<Map<String, String>> accessConditions = new ArrayList<Map<String,String>>();
+
+        Map<String, String> accessCondition1 = new HashMap<String, String>();
+        accessCondition1.put("name", "administrator");
+        accessConditions.add(accessCondition1);
+
+        Map<String, String> accessCondition2 = new HashMap<String, String>();
+        accessCondition2.put("name", "openaccess");
+        accessConditions.add(accessCondition2);
+
         addAccessCondition.add(new AddOperation("/sections/defaultAC/accessConditions",
-                               accessCondition));
+                               accessConditions));
 
         String patchBody = getPatchContent(addAccessCondition);
         getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
@@ -6309,7 +6309,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                              .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
                              .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name",
                                               is("administrator")))
-                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name").doesNotExist());
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name",
+                                              is("openaccess")))
+                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[2].name").doesNotExist());
     }
 
     @Test
