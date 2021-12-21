@@ -107,11 +107,14 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
             discoveryConfigurationService.getDiscoveryConfiguration(discoveryConfigName);
 
         if (filterQueryString != null) {
+            String field = filterQueryString.split(",", 2)[0];
+            String operator = filterQueryString.split("('|=)", 3)[1];
+            String value = filterQueryString.split("=", 2)[1];
             DiscoverFilterQuery filterQuery = searchService.toFilterQuery(
                 context,
-                filterQueryString.split(",", 2)[0],
-                filterQueryString.split("('|=)", 3)[1],
-                filterQueryString.split("=", 2)[1],
+                field,
+                operator,
+                value,
                 discoveryConfiguration);
             discoverQuery.addFilterQueries(filterQuery.getFilterQuery());
         }
