@@ -69,32 +69,31 @@ public class UsageReportRestPermissionEvaluatorPlugin extends RestObjectPermissi
             Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
             UUID uuidObject = null;
             try {
+                if (Objects.isNull(targetId)) {
+                    return true;
+                }
                 if (configurationService.getBooleanProperty("usage-statistics.authorization.admin.usage", true)) {
                     return authorizeService.isAdmin(context);
-                }
-                if (Objects.nonNull(targetId)) {
-                    if (StringUtils.equalsIgnoreCase(UsageReportRest.NAME, targetType)) {
-                        if (StringUtils.countMatches(targetId.toString(), "_") != 1) {
-                            throw new IllegalArgumentException("Must end in objectUUID_reportId, example: "
-                                    + "1911e8a4-6939-490c-b58b-a5d70f8d91fb_TopCountries");
-                        }
-                        // Get uuid from uuidDSO_reportId pathParam
-                        uuidObject = UUID.fromString(StringUtils.substringBefore(targetId.toString(), "_"));
-                    } else if (StringUtils.equalsIgnoreCase(UsageReportRest.NAME + "search", targetType)) {
-                        // Get uuid from url (selfLink of dso) queryParam
-                        uuidObject = UUID.fromString(StringUtils.substringAfterLast(targetId.toString(), "/"));
-                    } else {
-                        return false;
+                } else  if (StringUtils.equalsIgnoreCase(UsageReportRest.NAME, targetType)) {
+                    if (StringUtils.countMatches(targetId.toString(), "_") != 1) {
+                        throw new IllegalArgumentException("Must end in objectUUID_reportId, example: "
+                                + "1911e8a4-6939-490c-b58b-a5d70f8d91fb_TopCountries");
                     }
-
-                    DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuidObject);
-                    // If the dso is null then we give permission so we can throw another status code instead
-                    if (Objects.isNull(dso)) {
-                        return true;
-                    }
-
-                    return authorizeService.authorizeActionBoolean(context, dso, restPermission.getDspaceApiActionId());
+                    // Get uuid from uuidDSO_reportId pathParam
+                    uuidObject = UUID.fromString(StringUtils.substringBefore(targetId.toString(), "_"));
+                } else if (StringUtils.equalsIgnoreCase(UsageReportRest.NAME + "search", targetType)) {
+                    // Get uuid from url (selfLink of dso) queryParam
+                    uuidObject = UUID.fromString(StringUtils.substringAfterLast(targetId.toString(), "/"));
+                } else {
+                    return false;
                 }
+
+                DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuidObject);
+                // If the dso is null then we give permission so we can throw another status code instead
+                if (Objects.isNull(dso)) {
+                    return true;
+                }
+                return authorizeService.authorizeActionBoolean(context, dso, restPermission.getDspaceApiActionId());
             } catch (SQLException e) {
                 log.error(e.getMessage(), e);
             }
