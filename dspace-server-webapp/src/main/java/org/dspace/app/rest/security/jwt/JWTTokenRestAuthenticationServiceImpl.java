@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.app.rest.security.DSpaceAuthentication;
 import org.dspace.app.rest.security.RestAuthenticationService;
-import org.dspace.app.rest.security.WebSecurityConfiguration;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.service.AuthenticationService;
@@ -32,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -65,8 +65,9 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     @Autowired
     private AuthenticationService authenticationService;
 
+    @Lazy
     @Autowired
-    private WebSecurityConfiguration webSecurityConfiguration;
+    private CsrfTokenRepository csrfTokenRepository;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -331,9 +332,6 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
      * @param response current response
      */
     private void resetCSRFToken(HttpServletRequest request, HttpServletResponse response) {
-        // Get access to our enabled CSRF token repository
-        CsrfTokenRepository csrfTokenRepository = webSecurityConfiguration.getCsrfTokenRepository();
-
         // Remove current CSRF token & generate a new one
         // We do this as we want the token to change anytime you login or logout
         csrfTokenRepository.saveToken(null, request, response);
