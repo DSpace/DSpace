@@ -264,7 +264,7 @@ public class LDAPAuthentication
 
             if (ldap.ldapAuthenticate(dn, password, context)) {
                 context.setCurrentUser(eperson);
-                request.getSession().setAttribute(LDAP_AUTHENTICATED, true);
+                request.setAttribute(LDAP_AUTHENTICATED, true);
 
                 // assign user to groups based on ldap dn
                 assignGroups(dn, ldap.ldapGroup, context);
@@ -315,7 +315,7 @@ public class LDAPAuthentication
                             context.dispatchEvents();
                             context.restoreAuthSystemState();
                             context.setCurrentUser(eperson);
-                            request.getSession().setAttribute(LDAP_AUTHENTICATED, true);
+                            request.setAttribute(LDAP_AUTHENTICATED, true);
 
 
                             // assign user to groups based on ldap dn
@@ -347,7 +347,7 @@ public class LDAPAuthentication
                                     ePersonService.update(context, eperson);
                                     context.dispatchEvents();
                                     context.setCurrentUser(eperson);
-                                    request.getSession().setAttribute(LDAP_AUTHENTICATED, true);
+                                    request.setAttribute(LDAP_AUTHENTICATED, true);
 
 
                                     // assign user to groups based on ldap dn
@@ -747,7 +747,7 @@ public class LDAPAuthentication
     public boolean isUsed(final Context context, final HttpServletRequest request) {
         if (request != null &&
                 context.getCurrentUser() != null &&
-                request.getSession().getAttribute(LDAP_AUTHENTICATED) != null) {
+                request.getAttribute(LDAP_AUTHENTICATED) != null) {
             return true;
         }
         return false;
