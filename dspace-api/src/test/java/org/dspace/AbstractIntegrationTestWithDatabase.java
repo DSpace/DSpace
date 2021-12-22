@@ -105,7 +105,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
     public void setUp() throws Exception {
         try {
             //Start a new context
-            context = new Context(Context.Mode.BATCH_EDIT);
+            context = new Context(Context.Mode.READ_WRITE);
             context.turnOffAuthorisationSystem();
 
             //Find our global test EPerson account. If it doesn't exist, create it.
