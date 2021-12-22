@@ -37,7 +37,8 @@ public class OidcAuthenticationFilter extends StatelessLoginFilter {
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)
         throws AuthenticationException {
         req.setAttribute(OIDC_AUTH_ATTRIBUTE, OIDC_AUTH_ATTRIBUTE);
-        return authenticationManager.authenticate(new DSpaceAuthentication(null, null, new ArrayList<>()));
+        // NOTE: because this authentication is implicit, we pass in an empty DSpaceAuthentication
+        return authenticationManager.authenticate(new DSpaceAuthentication());
     }
 
     @Override
