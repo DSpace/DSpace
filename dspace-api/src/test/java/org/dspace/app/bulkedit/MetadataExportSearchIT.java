@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.io.Files;
@@ -153,5 +154,15 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         String[] args = new String[] {"metadata-export-search", "-f", "dateIssued,equals=[2000 TO 2020]"};
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
         checkItemsPresentInFile(filename, itemsSubject1);
+    }
+
+    @Test
+    public void exportMetadataSearchMultipleFilters()
+        throws InstantiationException, IllegalAccessException, IOException, CsvException {
+        String[] args = new String[] {"metadata-export-search", "-f", "subject,equals=" + subject1, "-f",
+            "title,equals=" + String.format("%s item %d", subject1, 0)};
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        Item[] expectedResult = Arrays.copyOfRange(itemsSubject1, 0, 1);
+        checkItemsPresentInFile(filename, expectedResult);
     }
 }

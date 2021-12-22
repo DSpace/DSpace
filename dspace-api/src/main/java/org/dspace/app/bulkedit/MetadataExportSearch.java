@@ -39,7 +39,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     private String identifier;
     private String discoveryConfigName;
     private String advancedFilter;
-    private String filterQueryString;
+    private String[] filterQueryStrings;
     private boolean exportAllItems = true;
 
     private SearchService searchService =
@@ -81,7 +81,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
         }
 
         if (commandLine.hasOption('f')) {
-            filterQueryString = commandLine.getOptionValue('f');
+            filterQueryStrings = commandLine.getOptionValues('f');
         }
     }
 
@@ -106,17 +106,19 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
         DiscoveryConfiguration discoveryConfiguration =
             discoveryConfigurationService.getDiscoveryConfiguration(discoveryConfigName);
 
-        if (filterQueryString != null) {
-            String field = filterQueryString.split(",", 2)[0];
-            String operator = filterQueryString.split("('|=)", 3)[1];
-            String value = filterQueryString.split("=", 2)[1];
-            DiscoverFilterQuery filterQuery = searchService.toFilterQuery(
-                context,
-                field,
-                operator,
-                value,
-                discoveryConfiguration);
-            discoverQuery.addFilterQueries(filterQuery.getFilterQuery());
+        if (filterQueryStrings != null) {
+            for(String filterQueryString: filterQueryStrings) {
+                String field = filterQueryString.split(",", 2)[0];
+                String operator = filterQueryString.split("('|=)", 3)[1];
+                String value = filterQueryString.split("=", 2)[1];
+                DiscoverFilterQuery filterQuery = searchService.toFilterQuery(
+                    context,
+                    field,
+                    operator,
+                    value,
+                    discoveryConfiguration);
+                discoverQuery.addFilterQueries(filterQuery.getFilterQuery());
+            }
         }
         Iterator<Item> itemIterator = searchService.iteratorSearch(context, dso, discoverQuery);
         DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService.export(context, itemIterator, true);
