@@ -546,7 +546,7 @@ public class X509Authentication implements AuthenticationMethod {
                         context.dispatchEvents();
                         context.restoreAuthSystemState();
                         context.setCurrentUser(eperson);
-                        request.getSession().setAttribute(X509_AUTHENTICATED, true);
+                        request.setAttribute(X509_AUTHENTICATED, true);
                         setSpecialGroupsFlag(request, email);
                         return SUCCESS;
                     } else {
@@ -603,7 +603,7 @@ public class X509Authentication implements AuthenticationMethod {
     public boolean isUsed(final Context context, final HttpServletRequest request) {
         if (request != null &&
                 context.getCurrentUser() != null &&
-                request.getSession().getAttribute(X509_AUTHENTICATED) != null) {
+                request.getAttribute(X509_AUTHENTICATED) != null) {
             return true;
         }
         return false;

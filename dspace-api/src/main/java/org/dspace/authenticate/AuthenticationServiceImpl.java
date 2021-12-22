@@ -194,6 +194,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return getAuthenticationMethodStack().iterator();
     }
 
+    @Override
     public String getAuthenticationMethod(final Context context, final HttpServletRequest request) {
         final Iterator<AuthenticationMethod> authenticationMethodIterator = authenticationMethodIterator();
 

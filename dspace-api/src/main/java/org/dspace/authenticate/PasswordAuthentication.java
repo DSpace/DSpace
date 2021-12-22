@@ -220,7 +220,7 @@ public class PasswordAuthentication
                 // login is ok if password matches:
                 context.setCurrentUser(eperson);
                 if (request != null) {
-                    request.getSession().setAttribute(PASSWORD_AUTHENTICATED, true);
+                    request.setAttribute(PASSWORD_AUTHENTICATED, true);
                 }
                 log.info(LogHelper.getHeader(context, "authenticate", "type=PasswordAuthentication"));
                 return SUCCESS;
@@ -259,7 +259,7 @@ public class PasswordAuthentication
     public boolean isUsed(final Context context, final HttpServletRequest request) {
         if (request != null &&
                 context.getCurrentUser() != null &&
-                request.getSession().getAttribute(PASSWORD_AUTHENTICATED) != null) {
+                request.getAttribute(PASSWORD_AUTHENTICATED) != null) {
             return true;
         }
         return false;
