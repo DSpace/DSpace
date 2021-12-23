@@ -10,7 +10,6 @@ package org.dspace.app.rest.security;
 import static org.dspace.authenticate.OidcAuthenticationBean.OIDC_AUTH_ATTRIBUTE;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

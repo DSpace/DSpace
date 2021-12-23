@@ -14,7 +14,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.PostConstruct;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -49,7 +48,7 @@ public class OidcClientImpl implements OidcClient {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @PostConstruct
-    private void setup(){
+    private void setup() {
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
