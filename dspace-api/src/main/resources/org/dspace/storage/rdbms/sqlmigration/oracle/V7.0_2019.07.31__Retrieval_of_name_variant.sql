@@ -14,5 +14,5 @@
 ALTER TABLE relationship ADD leftward_value VARCHAR2(50);
 ALTER TABLE relationship ADD rightward_value VARCHAR2(50);
 
-ALTER TABLE relationship_type RENAME left_label TO leftward_type;
-ALTER TABLE relationship_type RENAME right_label TO rightward_type;
+ALTER TABLE relationship_type RENAME COLUMN left_label TO leftward_type;
+ALTER TABLE relationship_type RENAME COLUMN right_label TO rightward_type;
