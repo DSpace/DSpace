@@ -25,8 +25,6 @@
 - docker-compose-shibboleth.yml
   - Docker compose file that will start a *test/demo* Shibboleth SP container (in Apache) that proxies requests to the DSpace container
   - ONLY useful for testing/development. NOT production ready.
-- environment.dev.ts
-  - Default angular environment when testing DSpace-angular from this repo
 
 ## To refresh / pull DSpace images from Dockerhub
 ```
