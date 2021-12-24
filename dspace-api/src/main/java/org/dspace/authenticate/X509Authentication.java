@@ -566,7 +566,7 @@ public class X509Authentication implements AuthenticationMethod {
                     log.info(LogHelper.getHeader(context, "login",
                                                   "type=x509certificate"));
                     context.setCurrentUser(eperson);
-                    request.getSession().setAttribute(X509_AUTHENTICATED, true);
+                    request.setAttribute(X509_AUTHENTICATED, true);
                     setSpecialGroupsFlag(request, email);
                     return SUCCESS;
                 }
