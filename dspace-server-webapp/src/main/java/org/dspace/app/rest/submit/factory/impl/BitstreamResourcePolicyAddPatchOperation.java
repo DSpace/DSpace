@@ -16,7 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
-import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
@@ -40,7 +41,7 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
     ItemService itemService;
 
     @Autowired
-    AuthorizeService authorizeService;
+    private ResourcePolicyService resourcePolicyService;
 
     @Autowired
     UploadConfigurationService uploadConfigurationService;
@@ -61,10 +62,9 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
             for (Bitstream bitstream : bb.getBitstreams()) {
                 if (idx == Integer.parseInt(split[1])) {
 
-                    List<AccessConditionDTO> newAccessConditions =
-                                                            new ArrayList<AccessConditionDTO>();
+                    List<AccessConditionDTO> newAccessConditions = new ArrayList<AccessConditionDTO>();
                     if (split.length == 3) {
-                        authorizeService.removePoliciesActionFilter(context, bitstream, Constants.READ);
+                        resourcePolicyService.removePolicies(context, bitstream, ResourcePolicy.TYPE_CUSTOM);
                         newAccessConditions = evaluateArrayObject((LateObjectEvaluator) value);
                     } else if (split.length == 4) {
                         // contains "-", call index-based accessConditions it make not sense
