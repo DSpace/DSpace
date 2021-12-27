@@ -86,6 +86,9 @@
                         <entry key="cclicense/uri">
                             <bean class="org.dspace.app.rest.submit.factory.impl.CCLicenseRemovePatchOperation"/>
                         </entry>
+                        <entry key="url">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.CustomUrlRemoveOperation"/>
+                        </entry>
                         <entry key="accessConditions">
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionRemovePatchOperation"/>
                         </entry>
@@ -116,6 +119,9 @@
                         </entry>
                         <entry key="collection">
                             <bean class="org.dspace.app.rest.submit.factory.impl.CollectionReplacePatchOperation"/>
+                        </entry>
+                        <entry key="url">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.CustomUrlReplaceOperation"/>
                         </entry>
                         <entry key="discoverable">
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionDiscoverableReplacePatchOperation"/>

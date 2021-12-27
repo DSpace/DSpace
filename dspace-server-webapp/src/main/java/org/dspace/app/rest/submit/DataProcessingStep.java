@@ -28,21 +28,23 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public interface DataProcessingStep extends RestProcessingStep {
 
-    public static final String DESCRIBE_STEP_METADATA_OPERATION_ENTRY = "itemmetadata";
-    public static final String COLLECTION_STEP_OPERATION_ENTRY = "collection";
-    public static final String UPLOAD_STEP_METADATA_OPERATION_ENTRY = "bitstreammetadata";
-    public static final String UPLOAD_STEP_REMOVE_OPERATION_ENTRY = "bitstreamremove";
-    public static final String UPLOAD_STEP_MOVE_OPERATION_ENTRY = "bitstreammove";
-    public static final String UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY = "accessConditions";
-    public static final String LICENSE_STEP_OPERATION_ENTRY = "granted";
-    public static final String CCLICENSE_STEP_OPERATION_ENTRY = "cclicense/uri";
-    public static final String ACCESS_CONDITION_STEP_OPERATION_ENTRY = "discoverable";
-    public static final String ACCESS_CONDITION_POLICY_STEP_OPERATION_ENTRY = "accessConditions";
-    public static final String SHOW_IDENTIFIERS_ENTRY = "identifiers";
-    public static final String PRIMARY_FLAG_ENTRY = "primary";
+    String DESCRIBE_STEP_METADATA_OPERATION_ENTRY = "itemmetadata";
+    String COLLECTION_STEP_OPERATION_ENTRY = "collection";
+    String UPLOAD_STEP_METADATA_OPERATION_ENTRY = "bitstreammetadata";
+    String UPLOAD_STEP_REMOVE_OPERATION_ENTRY = "bitstreamremove";
+    String UPLOAD_STEP_MOVE_OPERATION_ENTRY = "bitstreammove";
+    String UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY = "accessConditions";
+    String CUSTOM_URL_STEP_URL_OPERATION_ENTRY = "url";
+    String CUSTOM_URL_STEP_REDIRECTED_URL_OPERATION_ENTRY = "redirected-urls";
+    String LICENSE_STEP_OPERATION_ENTRY = "granted";
+    String CCLICENSE_STEP_OPERATION_ENTRY = "cclicense/uri";
+    String ACCESS_CONDITION_STEP_OPERATION_ENTRY = "discoverable";
+    String ACCESS_CONDITION_POLICY_STEP_OPERATION_ENTRY = "accessConditions";
+    String SHOW_IDENTIFIERS_ENTRY = "identifiers";
+    String PRIMARY_FLAG_ENTRY = "primary";
 
-    public static final String UPLOAD_STEP_METADATA_PATH = "metadata";
-    public static final String COARNOTIFY_STEP_PATH = "coarnotify";
+    String UPLOAD_STEP_METADATA_PATH = "metadata";
+    String COARNOTIFY_STEP_PATH = "coarnotify";
 
     /**
      * Method to expose data in the a dedicated section of the in progress submission. The step needs to return a
@@ -58,8 +60,8 @@ public interface DataProcessingStep extends RestProcessingStep {
      * @return the serializable object to include in the step generated section
      * @throws Exception
      */
-    public <T extends Serializable> T getData(SubmissionService submissionService, InProgressSubmission obj,
-                                              SubmissionStepConfig config) throws Exception;
+    <T extends Serializable> T getData(SubmissionService submissionService, InProgressSubmission obj,
+                                       SubmissionStepConfig config) throws Exception;
 
     /**
      * The method will expose the list of validation errors identified by the step. The default implementation will
@@ -71,8 +73,8 @@ public interface DataProcessingStep extends RestProcessingStep {
      * @return
      * @throws Exception
      */
-    default public List<ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
-                                            SubmissionStepConfig config) throws Exception {
+    default List<ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
+                                     SubmissionStepConfig config) throws Exception {
         List<ErrorRest> errors = new ArrayList<ErrorRest>();
 
         List<Validation> validations = DSpaceServicesFactory.getInstance().getServiceManager()
@@ -100,7 +102,7 @@ public interface DataProcessingStep extends RestProcessingStep {
      *            the json patch operation
      * @throws Exception
      */
-    public void doPatchProcessing(Context context, HttpServletRequest currentRequest, InProgressSubmission source,
-            Operation op, SubmissionStepConfig stepConf) throws Exception;
+    void doPatchProcessing(Context context, HttpServletRequest currentRequest, InProgressSubmission source,
+                           Operation op, SubmissionStepConfig stepConf) throws Exception;
 
 }
