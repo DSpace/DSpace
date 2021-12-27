@@ -17,11 +17,9 @@ import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.submit.model.AccessConditionConfiguration;
 import org.dspace.submit.model.AccessConditionConfigurationService;
@@ -34,8 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessConditionDTO> {
 
-    @Autowired
-    private AuthorizeService authorizeService;
     @Autowired
     private ResourcePolicyService resourcePolicyService;
     @Autowired
@@ -58,7 +54,7 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
 
         if (split.length == 1) {
             // to replace completely the access conditions
-            authorizeService.removePoliciesActionFilter(context, item, Constants.READ);
+            resourcePolicyService.removePolicies(context, item, ResourcePolicy.TYPE_CUSTOM);
         }
         if (split.length == 2) {
             // check duplicate policy
