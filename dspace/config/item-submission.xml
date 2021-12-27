@@ -149,6 +149,13 @@
 	        <type>cclicense</type>
         </step-definition>
 
+		<!-- This optional step may allow the user to select access conditions on the item -->
+        <step-definition id="itemAccessConditions">
+            <heading>submit.progressbar.accessCondition</heading>
+            <processing-class>org.dspace.app.rest.submit.step.AccessConditionStep</processing-class>
+            <type>accessCondition</type>
+        </step-definition>
+
         <!-- This optional step may enrich the current submission using information extracted
              from uploaded files or metadata.  -->
         <!-- Please note that this step will be triggered only when a request is performed,

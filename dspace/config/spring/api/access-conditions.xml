@@ -64,13 +64,13 @@
     <bean id="accessConditionConfigurationService" class="org.dspace.submit.model.AccessConditionConfigurationService">
         <property name="map">
             <map>
-                <entry key="AccessConditionDefaultConfiguration" value-ref="accessConditionConfigurationDefault" />
+                <entry key="itemAccessConditions" value-ref="accessConditionConfigurationDefault" />
             </map>
         </property>
     </bean>
 
     <bean id="accessConditionConfigurationDefault" class="org.dspace.submit.model.AccessConditionConfiguration">
-        <property name="name" value="AccessConditionDefaultConfiguration"></property>
+        <property name="name" value="itemAccessConditions"></property>
         <property name="canChangeDiscoverable" value="true"></property>
         <property name="options">
             <list>
