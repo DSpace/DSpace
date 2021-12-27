@@ -23,10 +23,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -6854,6 +6857,177 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                              .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name",
                                      is("administrator")))
                              .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name").doesNotExist());
+    }
+
+    @Test
+    public void affterAddingAccessConditionBitstreamMustBeDownloadableTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password)
+                                          .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                                  .withName("Collection 1")
+                                                  .build();
+
+        Bitstream bitstream = null;
+        WorkspaceItem witem = null;
+
+        String bitstreamContent = "0123456789";
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, Charset.defaultCharset())) {
+
+            context.setCurrentUser(submitter);
+            witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
+                                        .withTitle("Test WorkspaceItem")
+                                        .withIssueDate("2019-10-01")
+                                        .build();
+
+            bitstream = BitstreamBuilder.createBitstream(context, witem.getItem(), is)
+                                        .withName("Test bitstream")
+                                        .withDescription("This is a bitstream to test range requests")
+                                        .withMimeType("text/plain")
+                                        .build();
+
+            context.restoreAuthSystemState();
+
+            String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+            String tokenSubmitter = getAuthToken(submitter.getEmail(), password);
+
+            // submitter can download the bitstream
+            getClient(tokenSubmitter).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                     .andExpect(status().isOk())
+                                     .andExpect(header().string("Accept-Ranges", "bytes"))
+                                     .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
+                                     .andExpect(content().contentType("text/plain"))
+                                     .andExpect(content().bytes(bitstreamContent.getBytes()));
+
+            // others can't download the bitstream
+            getClient(tokenEPerson).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                   .andExpect(status().isForbidden());
+
+            // create a list of values to use in add operation
+            List<Operation> addAccessCondition = new ArrayList<>();
+            List<Map<String, String>> accessConditions = new ArrayList<Map<String,String>>();
+
+            Map<String, String> value = new HashMap<>();
+            value.put("name", "administrator");
+            accessConditions.add(value);
+
+            addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions", accessConditions));
+
+            String patchBody = getPatchContent(addAccessCondition);
+            getClient(tokenSubmitter).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                                     .andExpect(status().isOk())
+                         .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name",is("administrator")))
+                         .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate",nullValue()))
+                         .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
+
+            // verify that the patch changes have been persisted
+            getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                                     .andExpect(status().isOk())
+                         .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name",is("administrator")))
+                         .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate",nullValue()))
+                         .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
+
+            // submitter can download the bitstream jet
+            getClient(tokenSubmitter).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                     .andExpect(status().isOk())
+                                     .andExpect(header().string("Accept-Ranges", "bytes"))
+                                     .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
+                                     .andExpect(content().contentType("text/plain"))
+                                     .andExpect(content().bytes(bitstreamContent.getBytes()));
+
+            // others can't download the bitstream
+            getClient(tokenEPerson).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                   .andExpect(status().isForbidden());
+        }
+    }
+
+    @Test
+    public void affterAddingAccessConditionItemMustBeAccessibleTest() throws Exception {
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password)
+                                          .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        context.setCurrentUser(submitter);
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Example Title")
+                                                  .withIssueDate("2019-11-21")
+                                                  .withSubject("ExtraEntry")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenSubmitter = getAuthToken(submitter.getEmail(), password);
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+
+        // submitter can see the item
+        getClient(tokenSubmitter).perform(get("/api/core/items/" + witem.getItem().getID()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$",  ItemMatcher.matchItemWithTitleAndDateIssued(witem.getItem(),
+                                         "Example Title", "2019-11-21")));
+
+        // others can't see the item
+        getClient(tokenEPerson).perform(get("/api/core/items/" + witem.getItem().getID()))
+                               .andExpect(status().isForbidden());
+
+        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
+                               .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name")
+                               .doesNotExist());
+
+        List<Operation> addAccessCondition = new ArrayList<Operation>();
+        List<Map<String, String>> accessConditions = new ArrayList<Map<String,String>>();
+
+        Map<String, String> accessCondition2 = new HashMap<String, String>();
+        accessCondition2.put("name", "administrator");
+        accessConditions.add(accessCondition2);
+
+        addAccessCondition.add(new AddOperation("/sections/defaultAC/accessConditions",
+                               accessConditions));
+
+        String patchBody = getPatchContent(addAccessCondition);
+        getClient(tokenSubmitter).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                 .content(patchBody)
+                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                                 .andExpect(status().isOk());
+
+        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                              .andExpect(status().isOk())
+                              .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
+                              .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name", is("administrator")))
+                              .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name").doesNotExist());
+
+        getClient(tokenSubmitter).perform(get("/api/core/items/" + witem.getItem().getID()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$",  ItemMatcher.matchItemWithTitleAndDateIssued(witem.getItem(),
+                                         "Example Title", "2019-11-21")));
+
+        getClient(tokenEPerson).perform(get("/api/core/items/" + witem.getItem().getID()))
+                               .andExpect(status().isForbidden());
     }
 
 }
