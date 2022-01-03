@@ -180,4 +180,14 @@
             UPDATE chair SET chair_name = 'Кафедра комп’ютерної механіки імені Володимира Марцинковського' WHERE chair_id = 11;
         </sql>
     </changeSet>
+
+    <changeSet author="Sergey Petrov" id="25">
+        <sql>
+            INSERT INTO chair(chair_name, chair_id, uuid, faculty_id) VALUES ('Кафедра кібербезпеки', 103, gen_random_uuid(), 4);
+        </sql>
+        <sql>
+            insert into dspaceobject(uuid) select uuid from chair where chair_id = 103;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
