@@ -69,6 +69,7 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
         Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(colWithWorkflow);
         ClaimedTask taskToReject = ClaimedTaskBuilder.createClaimedTask(context, colWithWorkflow, submitter)
                                                      .withTitle("Test workflow item to reject").build();
+        context.restoreAuthSystemState();
 
         // Submitter person is both original submitter as well as reviewer, should have edit access of claimed task
         assertTrue(this.containsRPForUser(taskToReject.getWorkflowItem().getItem(), submitter, Constants.WRITE));
