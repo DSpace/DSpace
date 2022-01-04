@@ -150,7 +150,6 @@ public class IdentifierServiceImpl implements IdentifierService {
                                  + "Identifier for " + contentServiceFactory.getDSpaceObjectService(dso)
                                                                             .getTypeText(dso) + ", "
                                  + dso.getID().toString() + ".");
-                    log.debug(ex.getMessage(), ex);
                 } catch (IdentifierException e) {
                     log.error(e.getMessage(), e);
                 }
@@ -181,7 +180,6 @@ public class IdentifierServiceImpl implements IdentifierService {
                              + "Identifier for " + contentServiceFactory.getDSpaceObjectService(dso)
                                                                         .getTypeText(dso) + ", "
                              + dso.getID().toString() + ".");
-                log.debug(ex.getMessage(), ex);
             } catch (IdentifierException ex) {
                 log.error(ex.getMessage(), ex);
             }
@@ -228,7 +226,6 @@ public class IdentifierServiceImpl implements IdentifierService {
                     log.info(service.getClass().getName() + " cannot resolve "
                                  + "Identifier " + identifier + ": identifier not "
                                  + "found.");
-                    log.debug(ex.getMessage(), ex);
                 } catch (IdentifierException ex) {
                     log.error(ex.getMessage(), ex);
                 }
