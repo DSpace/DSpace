@@ -128,6 +128,8 @@ public class X509Authentication implements AuthenticationMethod {
     protected ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    private static final String X509_AUTHENTICATED = "x509.authenticated";
+
 
     /**
      * Initialization: Set caPublicKey and/or keystore. This loads the
@@ -544,6 +546,7 @@ public class X509Authentication implements AuthenticationMethod {
                         context.dispatchEvents();
                         context.restoreAuthSystemState();
                         context.setCurrentUser(eperson);
+                        request.setAttribute(X509_AUTHENTICATED, true);
                         setSpecialGroupsFlag(request, email);
                         return SUCCESS;
                     } else {
@@ -563,6 +566,7 @@ public class X509Authentication implements AuthenticationMethod {
                     log.info(LogHelper.getHeader(context, "login",
                                                   "type=x509certificate"));
                     context.setCurrentUser(eperson);
+                    request.setAttribute(X509_AUTHENTICATED, true);
                     setSpecialGroupsFlag(request, email);
                     return SUCCESS;
                 }
@@ -593,5 +597,15 @@ public class X509Authentication implements AuthenticationMethod {
     @Override
     public String getName() {
         return "x509";
+    }
+
+    @Override
+    public boolean isUsed(final Context context, final HttpServletRequest request) {
+        if (request != null &&
+                context.getCurrentUser() != null &&
+                request.getAttribute(X509_AUTHENTICATED) != null) {
+            return true;
+        }
+        return false;
     }
 }

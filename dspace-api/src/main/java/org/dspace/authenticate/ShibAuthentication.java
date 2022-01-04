@@ -235,7 +235,7 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             // Step 4: Log the user in.
             context.setCurrentUser(eperson);
-            request.getSession().setAttribute("shib.authenticated", true);
+            request.setAttribute("shib.authenticated", true);
             AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
 
             log.info(eperson.getEmail() + " has been authenticated via shibboleth.");
@@ -403,7 +403,7 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             // Cache the special groups, so we don't have to recalculate them again
             // for this session.
-            request.getSession().setAttribute("shib.specialgroup", groupIds);
+            request.setAttribute("shib.specialgroup", groupIds);
 
             return new ArrayList<>(groups);
         } catch (Throwable t) {
@@ -1283,5 +1283,14 @@ public class ShibAuthentication implements AuthenticationMethod {
 
     }
 
+    @Override
+    public boolean isUsed(final Context context, final HttpServletRequest request) {
+        if (request != null &&
+                context.getCurrentUser() != null &&
+                request.getAttribute("shib.authenticated") != null) {
+            return true;
+        }
+        return false;
+    }
 }
 

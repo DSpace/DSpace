@@ -51,6 +51,9 @@ public class PasswordAuthentication
      */
     private static final Logger log = LogManager.getLogger();
 
+    private static final String PASSWORD_AUTHENTICATED = "password.authenticated";
+
+
 
     /**
      * Look to see if this email address is allowed to register.
@@ -216,6 +219,9 @@ public class PasswordAuthentication
                                             .checkPassword(context, eperson, password)) {
                 // login is ok if password matches:
                 context.setCurrentUser(eperson);
+                if (request != null) {
+                    request.setAttribute(PASSWORD_AUTHENTICATED, true);
+                }
                 log.info(LogHelper.getHeader(context, "authenticate", "type=PasswordAuthentication"));
                 return SUCCESS;
             } else {
@@ -246,5 +252,16 @@ public class PasswordAuthentication
     @Override
     public String getName() {
         return "password";
+    }
+
+
+    @Override
+    public boolean isUsed(final Context context, final HttpServletRequest request) {
+        if (request != null &&
+                context.getCurrentUser() != null &&
+                request.getAttribute(PASSWORD_AUTHENTICATED) != null) {
+            return true;
+        }
+        return false;
     }
 }
