@@ -7,10 +7,23 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.cli
-    #environment:
+    environment:
+      # Below syntax may look odd, but it is how to override dspace.cfg settings via env variables.
+      # See https://github.com/DSpace/DSpace/blob/main/dspace/config/config-definition.xml
+      # __P__ => "." (e.g. dspace__P__dir => dspace.dir)
+      # __D__ => "-" (e.g. google__D__metadata => google-metadata)
+      # dspace.dir: Must match with Dockerfile's DSPACE_INSTALL directory.
+      dspace__P__dir: /dspace
+      # db.url: Ensure we are using the 'dspacedb' image for our database
+      db__P__url: 'jdbc:postgresql://dspacedb:5432/dspace'
+      # solr.server: Ensure we are using the 'dspacesolr' image for Solr
+      solr__P__server: http://dspacesolr:8983/solr
     volumes:
-    - ./dspace/src/main/docker-compose/local.cfg:/dspace/config/local.cfg
+    # Keep DSpace assetstore directory between reboots
     - assetstore:/dspace/assetstore
+    # Mount local [src]/dspace/config/ to container. This syncs your local configs with container
+    # NOTE: Environment variables specified above will OVERRIDE any configs in local.cfg or dspace.cfg
+    - ./dspace/config:/dspace/config
     entrypoint: /dspace/bin/dspace
     command: help
     networks:
