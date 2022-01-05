@@ -20,6 +20,7 @@
         <name-map collection-handle="default" submission-name="traditional"/>
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
         <name-map collection-handle="123456789/extraction-test" submission-name="extractiontestprocess"/>
+        <name-map collection-handle="123456789/qualdrop-test" submission-name="qualdroptest"/>
     </submission-map>
 
 
@@ -73,6 +74,11 @@
             <processing-class>org.dspace.app.rest.submit.step.LicenseStep</processing-class>
             <type>license</type>
             <scope visibilityOutside="read-only">submission</scope>
+        </step-definition>
+
+        <step-definition id="qualdroptest">
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
         </step-definition>
 
         <!-- Step Upload Item with Embargo Features to enable this step, please
@@ -165,6 +171,10 @@
             <step id="extractionstep"/>
             <step id="license"/>
             <step id="cclicense"/>
+        </submission-process>
+
+        <submission-process name="qualdroptest">
+            <step id="qualdroptest" />
         </submission-process>
 
     </submission-definitions>
