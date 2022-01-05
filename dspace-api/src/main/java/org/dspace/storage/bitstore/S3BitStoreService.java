@@ -14,11 +14,13 @@ import java.util.Map;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -88,13 +90,28 @@ public class S3BitStoreService implements BitStoreService {
      */
     @Override
     public void init() throws IOException {
-        if (StringUtils.isBlank(getAwsAccessKey()) || StringUtils.isBlank(getAwsSecretKey())) {
-            log.warn("Empty S3 access or secret");
+        if(StringUtils.isNotBlank(getAwsAccessKey()) && StringUtils.isNotBlank(getAwsSecretKey())) {
+            log.warn("Use local defined S3 credentials");
+            // region
+            Regions regions = Regions.DEFAULT_REGION;
+            if (StringUtils.isNotBlank(awsRegionName)) {
+                try {
+                    regions = Regions.fromName(awsRegionName);
+                } catch (IllegalArgumentException e) {
+                    log.warn("Invalid aws_region: " + awsRegionName);
+                }
+            }
+            // init client
+            AWSCredentials awsCredentials = new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey());
+            s3Service = AmazonS3ClientBuilder.standard()
+                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                    .withRegion(regions)
+                    .build();
+            log.warn("S3 Region set to: " + regions.getName());
+        } else {
+            log.info("Using a IAM role or aws environment credentials");
+            s3Service = AmazonS3ClientBuilder.defaultClient();
         }
-
-        // init client
-        AWSCredentials awsCredentials = new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey());
-        s3Service = new AmazonS3Client(awsCredentials);
 
         // bucket name
         if (StringUtils.isEmpty(bucketName)) {
@@ -112,18 +129,6 @@ public class S3BitStoreService implements BitStoreService {
         } catch (AmazonClientException e) {
             log.error(e);
             throw new IOException(e);
-        }
-
-        // region
-        if (StringUtils.isNotBlank(awsRegionName)) {
-            try {
-                Regions regions = Regions.fromName(awsRegionName);
-                Region region = Region.getRegion(regions);
-                s3Service.setRegion(region);
-                log.info("S3 Region set to: " + region.getName());
-            } catch (IllegalArgumentException e) {
-                log.warn("Invalid aws_region: " + awsRegionName);
-            }
         }
 
         log.info("AWS S3 Assetstore ready to go! bucket:" + bucketName);
