@@ -51,6 +51,8 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OidcAuthenticationBean.class);
 
+    private static final String OIDC_AUTHENTICATED = "oidc.authenticated";
+
     @Autowired
     private ConfigurationService configurationService;
 
@@ -129,6 +131,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
 
         EPerson ePerson = ePersonService.findByEmail(context, email);
         if (ePerson != null) {
+            request.setAttribute(OIDC_AUTHENTICATED, true);
             return ePerson.canLogIn() ? logInEPerson(context, ePerson) : BAD_ARGS;
         }
 
@@ -254,6 +257,16 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
 
     public void setOidcClient(OidcClient oidcClient) {
         this.oidcClient = oidcClient;
+    }
+
+    @Override
+    public boolean isUsed(final Context context, final HttpServletRequest request) {
+        if (request != null &&
+                context.getCurrentUser() != null &&
+                request.getAttribute(OIDC_AUTHENTICATED) != null) {
+            return true;
+        }
+        return false;
     }
 
 }
