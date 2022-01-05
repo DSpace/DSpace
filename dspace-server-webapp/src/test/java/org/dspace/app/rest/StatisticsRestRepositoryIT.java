@@ -57,6 +57,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -102,6 +103,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
         // Explicitly use solr commit in SolrLoggerServiceImpl#postView
         configurationService.setProperty("solr-statistics.autoCommit", false);
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", true);
 
         context.turnOffAuthorisationSystem();
 
@@ -122,6 +124,12 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         adminToken = getAuthToken(admin.getEmail(), password);
 
         context.restoreAuthSystemState();
+    }
+
+    @After
+    public void tearDown()  {
+
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
     }
 
     @Test
