@@ -44,6 +44,7 @@ import org.dspace.content.Item;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
 import org.dspace.services.ConfigurationService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,6 +128,13 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
         collectionARest = collectionConverter.convert(collectionA, Projection.DEFAULT);
         itemARest = itemConverter.convert(itemA, Projection.DEFAULT);
         bitstreamARest = bitstreamConverter.convert(bitstreamA, Projection.DEFAULT);
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", true);
+    }
+
+    @After
+    public void tearDown()  {
+
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
     }
 
     @Test
