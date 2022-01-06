@@ -29,6 +29,21 @@ import org.dspace.services.ConfigurationService;
 /**
  * Factory for HTTP clients sharing a pool of connections.
  *
+ * <p>You may create multiple pools.  Each is identified by a configuration
+ * "prefix" (passed to the constructor) which is used to create names of
+ * properties which will configure the pool.  The properties are:
+ *
+ * <dl>
+ *   <dt>PREFIX.client.keepAlive</dt>
+ *   <dd>Default keep-alive time for open connections, in milliseconds</dd>
+ *   <dt>PREFIX.client.maxTotalConnections</dt>
+ *   <dd>maximum open connections</dd>
+ *   <dt>PREFIX.client.maxPerRoute</dt>
+ *   <dd>maximum open connections per service instance</dd>
+ *   <dt>PREFIX.client.timeToLive</dt>
+ *   <dd>maximum lifetime of a pooled connection, in seconds</dd>
+ * </dl>
+ *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
 @Named
