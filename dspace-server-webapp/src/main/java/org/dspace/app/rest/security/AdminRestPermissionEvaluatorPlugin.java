@@ -49,12 +49,11 @@ public class AdminRestPermissionEvaluatorPlugin extends RestObjectPermissionEval
         //We do not check the "permission" object here because administrators are allowed to do everything
 
         Request request = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext(request.getServletRequest());
+        Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
         EPerson ePerson = null;
 
         try {
-            ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
-
+            ePerson = context.getCurrentUser();
             if (ePerson != null) {
 
                 //Check if user is a repository admin

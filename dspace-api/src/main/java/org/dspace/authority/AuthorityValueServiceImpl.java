@@ -21,7 +21,7 @@ import org.apache.solr.common.SolrDocument;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.authority.SolrAuthority;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -220,7 +220,7 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
                 }
             }
         } catch (Exception e) {
-            log.error(LogManager.getHeader(context, "Error while retrieving AuthorityValue from solr",
+            log.error(LogHelper.getHeader(context, "Error while retrieving AuthorityValue from solr",
                                            "query: " + queryString), e);
         }
 

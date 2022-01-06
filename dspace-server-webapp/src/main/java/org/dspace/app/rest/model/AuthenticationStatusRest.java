@@ -16,6 +16,7 @@ import org.dspace.app.rest.RestResourceController;
 public class AuthenticationStatusRest extends BaseObjectRest<Integer> {
     private boolean okay;
     private boolean authenticated;
+    private String authenticationMethod;
 
     public static final String NAME = "status";
     public static final String CATEGORY = RestAddressableModel.AUTHENTICATION;
@@ -80,5 +81,13 @@ public class AuthenticationStatusRest extends BaseObjectRest<Integer> {
 
     public void setOkay(boolean okay) {
         this.okay = okay;
+    }
+
+    public String getAuthenticationMethod() {
+        return authenticationMethod;
+    }
+
+    public void setAuthenticationMethod(final String authenticationMethod) {
+        this.authenticationMethod = authenticationMethod;
     }
 }

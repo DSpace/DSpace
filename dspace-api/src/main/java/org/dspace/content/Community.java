@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -24,7 +25,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.logging.log4j.Logger;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
@@ -42,18 +42,12 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * <code>update</code> is called.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 @Entity
 @Table(name = "community")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 public class Community extends DSpaceObject implements DSpaceObjectLegacySupport {
-    /**
-     * log4j category
-     */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Community.class);
-
     @Column(name = "community_id", insertable = false, updatable = false)
     private Integer legacyId;
 
@@ -94,6 +88,16 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     protected Community() {
 
+    }
+
+    /**
+     * Takes a pre-determined UUID to be passed to the object to allow for the
+     * restoration of previously defined UUID's.
+     *
+     * @param uuid Takes a uuid to be passed to the Pre-Defined UUID Generator
+     */
+    protected Community(UUID uuid) {
+        this.predefinedUUID = uuid;
     }
 
     void addSubCommunity(Community subCommunity) {
@@ -215,7 +219,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     @Override
     public boolean equals(Object other) {
-        if (other == null) {
+        if (!(other instanceof Community)) {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(other);
@@ -223,11 +227,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
             return false;
         }
         final Community otherCommunity = (Community) other;
-        if (!this.getID().equals(otherCommunity.getID())) {
-            return false;
-        }
-
-        return true;
+        return this.getID().equals(otherCommunity.getID());
     }
 
     @Override

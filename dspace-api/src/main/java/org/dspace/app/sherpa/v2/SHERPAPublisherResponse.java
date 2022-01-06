@@ -10,7 +10,8 @@ package org.dspace.app.sherpa.v2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -74,7 +75,7 @@ public class SHERPAPublisherResponse {
      * @param jsonData - the JSON input stream from the API result response body
      */
     private void parseJSON(InputStream jsonData) throws IOException {
-        InputStreamReader streamReader = new InputStreamReader(jsonData);
+        InputStreamReader streamReader = new InputStreamReader(jsonData, StandardCharsets.UTF_8);
         JSONTokener jsonTokener = new JSONTokener(streamReader);
         JSONObject httpResponse;
         try {
@@ -86,7 +87,7 @@ public class SHERPAPublisherResponse {
                 // parsing the full journal / policy responses
                 if (items.length() > 0) {
                     metadata = new SHERPASystemMetadata();
-                    this.publishers = new LinkedList<>();
+                    this.publishers = new ArrayList<>();
                     // Iterate search result items
                     for (int itemIndex = 0; itemIndex < items.length(); itemIndex++) {
                         SHERPAPublisher sherpaPublisher = new SHERPAPublisher();

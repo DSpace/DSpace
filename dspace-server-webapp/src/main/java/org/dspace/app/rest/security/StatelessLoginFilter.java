@@ -8,7 +8,6 @@
 package org.dspace.app.rest.security;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -70,9 +69,9 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
         String password = req.getParameter("password");
 
         // Attempt to authenticate by passing user & password (if provided) to AuthenticationProvider class(es)
-        return authenticationManager.authenticate(
-                new DSpaceAuthentication(user, password, new ArrayList<>())
-        );
+        // NOTE: This method will check if the user was already authenticated by StatelessAuthenticationFilter,
+        // and, if so, just refresh their token.
+        return authenticationManager.authenticate(new DSpaceAuthentication(user, password));
     }
 
     /**
@@ -98,6 +97,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
                                             Authentication auth) throws IOException, ServletException {
 
         DSpaceAuthentication dSpaceAuthentication = (DSpaceAuthentication) auth;
+        log.debug("Authentication successful for EPerson {}", dSpaceAuthentication.getName());
         restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication, false);
     }
 

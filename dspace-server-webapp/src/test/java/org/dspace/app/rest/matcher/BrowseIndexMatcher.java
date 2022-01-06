@@ -32,6 +32,7 @@ public class BrowseIndexMatcher {
         return allOf(
             hasJsonPath("$.metadata", contains("dc.subject.*")),
             hasJsonPath("$.metadataBrowse", Matchers.is(true)),
+            hasJsonPath("$.dataType", equalToIgnoringCase("text")),
             hasJsonPath("$.order", equalToIgnoringCase(order)),
             hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
             hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "discover/browses/subject")),
@@ -44,6 +45,7 @@ public class BrowseIndexMatcher {
         return allOf(
             hasJsonPath("$.metadata", contains("dc.title")),
             hasJsonPath("$.metadataBrowse", Matchers.is(false)),
+            hasJsonPath("$.dataType", equalToIgnoringCase("title")),
             hasJsonPath("$.order", equalToIgnoringCase(order)),
             hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
             hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "discover/browses/title")),
@@ -55,6 +57,7 @@ public class BrowseIndexMatcher {
         return allOf(
             hasJsonPath("$.metadata", contains("dc.contributor.*", "dc.creator")),
             hasJsonPath("$.metadataBrowse", Matchers.is(true)),
+            hasJsonPath("$.dataType", equalToIgnoringCase("text")),
             hasJsonPath("$.order", equalToIgnoringCase(order)),
             hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
             hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "discover/browses/author")),
@@ -67,6 +70,7 @@ public class BrowseIndexMatcher {
         return allOf(
             hasJsonPath("$.metadata", contains("dc.date.issued")),
             hasJsonPath("$.metadataBrowse", Matchers.is(false)),
+            hasJsonPath("$.dataType", equalToIgnoringCase("date")),
             hasJsonPath("$.order", equalToIgnoringCase(order)),
             hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
             hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "discover/browses/dateissued")),

@@ -168,4 +168,13 @@ public interface AuthenticationService {
      */
     public Iterator<AuthenticationMethod> authenticationMethodIterator();
 
+    /**
+     * Retrieves the currently used authentication method name based on the context and the request
+     *
+     * @param context A valid DSpace context.
+     * @param request The request that started this operation, or null if not applicable.
+     * @return the currently used authentication method name
+     */
+    public String getAuthenticationMethod(Context context, HttpServletRequest request);
+
 }
