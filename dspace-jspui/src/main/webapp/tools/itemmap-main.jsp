@@ -127,7 +127,7 @@
 
     <form method="post" class="standard10" action="">
     <div class="form-group">
-    	<div class="input-group col-md-10">
+    	<div class="col-md-10">
         	<input type="hidden" name="cid" value="<%=collection.getID()%>"/>
         	<input type="hidden" name="action" value="search"/>
         	<span class="col-md-4">        	

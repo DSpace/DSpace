@@ -89,7 +89,7 @@ function AuthorLookup(url, authorityInput, collectionID) {
                 initialInput = $('textarea[name=' + authorityInput + ']').val();
             } else {   // submission
                 var lastName = $('input[name=' + authorityInput + '_last]');
-                if (lastName.size()) { // author input type
+                if (lastName.length > 0) { // author input type
                     initialInput = (lastName.val() + " " + $('input[name=' + authorityInput + '_first]').val()).trim();
                 } else { // other input types
                     initialInput = $('input[name=' + authorityInput + ']').val();
@@ -153,7 +153,7 @@ function AuthorLookup(url, authorityInput, collectionID) {
                         '<label>' + label + ': </label>';
 
                     if(key == 'orcid'){
-                        dataString +='<span><a target="_blank" href="http://orcid.org/' + aData[key] + '">' + aData[key] + '</a></span>';
+                        dataString +='<span><a target="_blank" rel="noopener" href="http://orcid.org/' + aData[key] + '">' + aData[key] + '</a></span>';
                     } else {
                         dataString += '<span>' + aData[key] + '</span>';
                     }
@@ -176,10 +176,31 @@ function AuthorLookup(url, authorityInput, collectionID) {
                         var oldAuthority = $('input[name=' + authorityInput + '_authority]');
                         oldAuthority.val(vcard.data('authorityID'));
                         $('textarea[name='+ authorityInput+']').val(vcard.data('name'));
+
+                        /*
+
+                        Manually setting confidence hidden value and class of graphic
+                        confidence indicator as onchange event handler won't do the trick.
+
+                         */
+
+                        var elem = document.getElementById('aspect_administrative_item_EditItemMetadataForm_field_' + authorityInput + '_authority')
+                        var conf = 'aspect_administrative_item_EditItemMetadataForm_field_' + authorityInput + '_confidence';
+                        var ind = conf + '_indicator';
+
+                        DSpaceAuthorityOnChange(elem, conf, ind);
+
+                        var ind_elem = $('#' + ind)[0];
+                        var ind_classes = ind_elem.className;
+                        ind_elem.title = 'This authority value has been confirmed as accurate by an interactive user';
+                        var new_classes = ind_classes.replace(new RegExp(" glyphicon-.* "), '');
+
+                        ind_elem.className = new_classes + " glyphicon-thumbs-up";
+
                     } else {
                         // submission
                         var lastName = $('input[name=' + authorityInput + '_last]');
-                        if (lastName.size()) { // author input type
+                        if (lastName.length > 0) { // author input type
                             lastName.val(vcard.find('.vcard-last-name span').text());
                             $('input[name=' + authorityInput + '_first]').val(vcard.find('.vcard-first-name span').text());
                         }

@@ -177,7 +177,7 @@
 									<div class="sherpaPaid">
 										<p>
 											<strong><fmt:message key="jsp.sherpa.paidoption-label"/>: </strong>
-											<a href='<c:out value="${publisher.paidAccessUrl}"/>' target="_blank">
+											<a href='<c:out value="${publisher.paidAccessUrl}"/>' target="_blank" rel="noopener">
 												<c:out value="${publisher.paidAccessDescription}"/>
 											</a>. <fmt:message key="jsp.sherpa.paidoption-message"/>.
 										</p>
@@ -191,7 +191,7 @@
 										<fmt:message key="jsp.sherpa.copyright" />
 										<ul class="sherpa-copyright-links">
 											<c:forEach var="copyright_url" items="${policy.urls}">
-												<li><a href="${copyright_url.key}" target="_blank">${copyright_url.value}</a></li>
+												<li><a href="${copyright_url.key}" target="_blank" rel="noopener">${copyright_url.value}</a></li>
 											</c:forEach>
 										</ul>
 									</div>

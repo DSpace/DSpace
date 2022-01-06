@@ -99,17 +99,21 @@ if (error!=null) {
          <p class="alert alert-info">
              <fmt:message key="jsp.dspace-admin.list-metadata-schemas.instruction"/>
          </p>
-         <div class="input-group col-md-6">
-	     	<div class="input-group-addon">
-		 		<span class="col-md-2"><fmt:message key="jsp.dspace-admin.list-metadata-schemas.namespace"/>:</span>
-		 	</div>
-          	<input class="form-control" type="text" name="namespace" value=""/>
+         <div class="col-md-6">
+	         <div class="input-group">
+		     	<div class="input-group-addon">
+			 		<span class="col-md-2"><fmt:message key="jsp.dspace-admin.list-metadata-schemas.namespace"/>:</span>
+			 	</div>
+	          	<input class="form-control" type="text" name="namespace" value=""/>
+			</div>
 		</div>
-       <div class="input-group col-md-6">
-       		<div class="input-group-addon">
-       			<span class="col-md-2"><fmt:message key="jsp.dspace-admin.list-metadata-schemas.name"/>:</span>
-    	   </div>			
-       		<input class="form-control" type="text" name="short_name" value=""/>
+         <div class="col-md-6">
+	        <div class="input-group">
+	       		<div class="input-group-addon">
+	       			<span class="col-md-2"><fmt:message key="jsp.dspace-admin.list-metadata-schemas.name"/>:</span>
+	    	   </div>			
+	       		<input class="form-control" type="text" name="short_name" value=""/>
+		    </div>
 	    </div>
         <br/><br/><br/>
        <div class="row col-md-offset-5">

@@ -41,6 +41,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
@@ -97,6 +98,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     private SourceValidity validity;
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private ItemCounter itemCounter = null;
+    private boolean showCount = configurationService.getBooleanProperty("webui.strengths.show");
 
     /**
      * Set the component up, pulling any configuration values from the sitemap
@@ -120,6 +124,13 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         depth = parameters.getParameterAsInteger("depth", DEFAULT_DEPTH);
         excludeCollections = parameters.getParameterAsBoolean(
                 "exclude-collections", false);
+        if (showCount) {
+            try {
+                itemCounter = new ItemCounter(context);
+            } catch (ItemCountException e) {
+                log.error(e);
+            }
+        }
     }
 
     /**
@@ -164,13 +175,12 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	                theValidity.add(context, node.getDSO());
 	                
 	                // If we are configured to use collection strengths (i.e. item counts) then include that number in the validity.
-	                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
 	                if (showCount)
 	        		{
 	                    try
 	                    {	//try to determine Collection size (i.e. # of items)
 	                    	
-	                    	int size = new ItemCounter(context).getCount(node.getDSO());
+	                    	int size = itemCounter.getCount(node.getDSO());
 	                    	theValidity.add("size:"+size);
 	                    }
 	                    catch(ItemCountException e) { /* ignore */ }

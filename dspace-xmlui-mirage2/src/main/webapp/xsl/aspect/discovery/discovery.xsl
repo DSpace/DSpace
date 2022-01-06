@@ -386,6 +386,16 @@
     </xsl:template>
 
     <xsl:template match="dri:table[@id='aspect.discovery.SimpleSearch.table.discovery-filters']/dri:row">
+        <xsl:variable name="display-value">
+            <xsl:choose>
+                <xsl:when test="dri:cell/dri:field[@rend = 'discovery-filter-display-value']/dri:value">
+                    <xsl:value-of select="stringescapeutils:escapeEcmaScript(dri:cell/dri:field[@rend = 'discovery-filter-display-value']/dri:value)"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="stringescapeutils:escapeEcmaScript(dri:cell/dri:field[@rend = 'discovery-filter-input']/dri:value)"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
         <script type="text/javascript">
             <xsl:text>
                 if (!window.DSpace) {
@@ -401,6 +411,7 @@
                     type: '</xsl:text><xsl:value-of select="stringescapeutils:escapeEcmaScript(dri:cell/dri:field[starts-with(@n, 'filtertype')]/dri:value/@option)"/><xsl:text>',
                     relational_operator: '</xsl:text><xsl:value-of select="stringescapeutils:escapeEcmaScript(dri:cell/dri:field[starts-with(@n, 'filter_relational_operator')]/dri:value/@option)"/><xsl:text>',
                     query: '</xsl:text><xsl:value-of select="stringescapeutils:escapeEcmaScript(dri:cell/dri:field[@rend = 'discovery-filter-input']/dri:value)"/><xsl:text>',
+                    display_value: '</xsl:text><xsl:value-of select="$display-value"/><xsl:text>'
                 });
             </xsl:text>
         </script>

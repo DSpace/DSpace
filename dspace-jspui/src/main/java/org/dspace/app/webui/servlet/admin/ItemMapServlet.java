@@ -129,7 +129,7 @@ public class ItemMapServlet extends DSpaceServlet
     		Map<UUID, Integer> myCounts = new HashMap<>(); // counts for each collection
     		
     		// get all items from that collection, add them to a hash
-    		Iterator<Item> i = itemService.findAllByCollection(context, myCollection);
+    		Iterator<Item> i = itemService.findByCollection(context, myCollection);
             // iterate through the items in this collection, and count how many
             // are native, and how many are imports, and which collections they
             // came from
