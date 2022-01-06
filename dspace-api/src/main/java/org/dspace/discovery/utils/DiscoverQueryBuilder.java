@@ -41,9 +41,7 @@ import org.dspace.discovery.utils.parameter.QueryBuilderSearchFilter;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class DiscoverQueryBuilder implements InitializingBean {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DiscoverQueryBuilder.class);
