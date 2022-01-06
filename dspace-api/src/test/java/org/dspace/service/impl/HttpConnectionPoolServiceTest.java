@@ -60,8 +60,8 @@ public class HttpConnectionPoolServiceTest
             throws IOException, URISyntaxException {
         System.out.println("getClient");
 
-        configurationService.setProperty("solrClient.maxTotalConnections", 2);
-        configurationService.setProperty("solrClient.maxPerRoute", 2);
+        configurationService.setProperty("solr.client.maxTotalConnections", 2);
+        configurationService.setProperty("solr.client.maxPerRoute", 2);
         HttpConnectionPoolService instance = new HttpConnectionPoolService("solr");
         instance.configurationService = configurationService;
         instance.init();
