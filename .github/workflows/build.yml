@@ -47,6 +47,7 @@ jobs:
       # Do NOT exit immediately if one matrix job fails
       # This ensures ITs continue running even if Unit Tests fail, or visa versa
       fail-fast: false
+    name: Run ${{ matrix.type }}
     # These are the actual CI steps to perform per job
     steps:
       # https://github.com/actions/checkout
