@@ -17,11 +17,17 @@ jobs:
     strategy:
       # Create a matrix of two separate configurations for Unit vs Integration Tests
       # This will ensure those tasks are run in parallel
+      # Also ensure both are run for multiple versions of Java.
       matrix:
         include:
           # NOTE: Unit Tests include deprecated REST API v6 (as it has unit tests)
           #  - surefire.rerunFailingTestsCount => try again for flakey tests, and keep track of/report on number of retries
-          - type: "Unit Tests"
+          - type: "Unit Tests on Java 11"
+            java: 11
+            mvnflags: "-DskipUnitTests=false -Pdspace-rest -Dsurefire.rerunFailingTestsCount=2"
+            resultsdir: "**/target/surefire-reports/**"
+          - type: "Unit Tests on Java 17"
+            java: 17
             mvnflags: "-DskipUnitTests=false -Pdspace-rest -Dsurefire.rerunFailingTestsCount=2"
             resultsdir: "**/target/surefire-reports/**"
           # NOTE: ITs skip all code validation checks, as they are already done by Unit Test job.
@@ -30,7 +36,12 @@ jobs:
           #  - license.skip      => Skip all license header checks by license-maven-plugin
           #  - xml.skip          => Skip all XML/XSLT validation by xml-maven-plugin
           #  - failsafe.rerunFailingTestsCount => try again for flakey tests, and keep track of/report on number of retries
-          - type: "Integration Tests"
+          - type: "Integration Tests on Java 11"
+            java: 11
+            mvnflags: "-DskipIntegrationTests=false -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true -Dfailsafe.rerunFailingTestsCount=2"
+            resultsdir: "**/target/failsafe-reports/**"
+          - type: "Integration Tests on Java 17"
+            java: 17
             mvnflags: "-DskipIntegrationTests=false -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true -Dfailsafe.rerunFailingTestsCount=2"
             resultsdir: "**/target/failsafe-reports/**"
       # Do NOT exit immediately if one matrix job fails
@@ -43,10 +54,10 @@ jobs:
         uses: actions/checkout@v2
 
       # https://github.com/actions/setup-java
-      - name: Install JDK 11
+      - name: Install JDK ${{ matrix.java }}
         uses: actions/setup-java@v2
         with:
-          java-version: 11
+          java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
       # https://github.com/actions/cache
@@ -73,7 +84,6 @@ jobs:
         with:
           name: ${{ matrix.type }} results
           path: ${{ matrix.resultsdir }}
-          retention-days: 7
 
       # https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
