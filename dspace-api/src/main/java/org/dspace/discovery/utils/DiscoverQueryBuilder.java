@@ -39,6 +39,8 @@ import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.utils.parameter.QueryBuilderSearchFilter;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -46,14 +48,11 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DiscoverQueryBuilder.class);
 
-    @Autowired
-    private SearchService searchService;
+    private SearchService searchService = new DSpace().getServiceManager().getServicesByType(SearchService.class).get(0);
 
-    @Autowired
-    private ConfigurationService configurationService;
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    @Autowired
-    private List<IndexFactory> indexableFactories;
+    private List<IndexFactory> indexableFactories = new DSpace().getServiceManager().getServicesByType(IndexFactory.class);
 
     private int pageSizeLimit;
 
