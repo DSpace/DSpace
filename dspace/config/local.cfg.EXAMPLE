@@ -144,19 +144,19 @@ db.schema = public
 # Items in DSpace receive a unique URL, stored in dc.identifier.uri
 # after it is generated during the submission process.
 #
-# If you register with CNRI's handle service at http://www.handle.net/,
-# these links can be generated as permalinks using http://hdl.handle.net/
+# If you register with CNRI's handle service at https://www.handle.net/,
+# these links can be generated as permalinks using https://hdl.handle.net/
 # as canonical prefix. Please make sure to change handle.canonical.prefix
 # after registering with handle.net by uncommenting one of the following
-# lines, depending if you prefer to use http or https:
-# handle.canonical.prefix = http://hdl.handle.net/
+# lines, depending if you prefer to use https or http:
 # handle.canonical.prefix = https://hdl.handle.net/
+# handle.canonical.prefix = http://hdl.handle.net/
 #
 # Note that this will not alter dc.identifier.uri metadata for existing
 # items (only for subsequent submissions).
 
 # CNRI Handle prefix
-# (Defaults to a dummy/fake prefix of 123456789)
+# (Defaults to the reserved dummy/fake prefix of 123456789)
 #handle.prefix = 123456789
 
 #######################

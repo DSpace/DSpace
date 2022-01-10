@@ -76,7 +76,7 @@
             <AppenderRef ref='A2'/>
         </Logger>
 
-        # Block services logging except on exceptions
+        <!-- Block services logging except on exceptions -->
         <Logger name='org.dspace.kernel'
                 level='ERROR'/>
         <Logger name='org.dspace.services'
@@ -88,8 +88,7 @@
         <Logger name='org.dspace.utils'
                 level='ERROR'/>
 
-        # Block passwords from being exposed in Axis logs.
-        # (DEBUG exposes passwords in Basic Auth)
+        <!-- Block passwords from being exposed in Axis logs. (DEBUG exposes passwords in Basic Auth) -->
         <Logger name='org.apache.axis.handlers.http.HTTPAuthHandler'
                 level='INFO'/>
         <!-- Anything not a part of DSpace -->

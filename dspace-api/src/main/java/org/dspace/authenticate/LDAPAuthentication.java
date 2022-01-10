@@ -83,6 +83,9 @@ public class LDAPAuthentication
     protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    private static final String LDAP_AUTHENTICATED = "ldap.authenticated";
+
+
     /**
      * Let a real auth method return true if it wants.
      *
@@ -261,6 +264,7 @@ public class LDAPAuthentication
 
             if (ldap.ldapAuthenticate(dn, password, context)) {
                 context.setCurrentUser(eperson);
+                request.setAttribute(LDAP_AUTHENTICATED, true);
 
                 // assign user to groups based on ldap dn
                 assignGroups(dn, ldap.ldapGroup, context);
@@ -311,6 +315,8 @@ public class LDAPAuthentication
                             context.dispatchEvents();
                             context.restoreAuthSystemState();
                             context.setCurrentUser(eperson);
+                            request.setAttribute(LDAP_AUTHENTICATED, true);
+
 
                             // assign user to groups based on ldap dn
                             assignGroups(dn, ldap.ldapGroup, context);
@@ -341,6 +347,8 @@ public class LDAPAuthentication
                                     ePersonService.update(context, eperson);
                                     context.dispatchEvents();
                                     context.setCurrentUser(eperson);
+                                    request.setAttribute(LDAP_AUTHENTICATED, true);
+
 
                                     // assign user to groups based on ldap dn
                                     assignGroups(dn, ldap.ldapGroup, context);
@@ -733,5 +741,15 @@ public class LDAPAuthentication
                 groupMap = configurationService.getProperty("authentication-ldap.login.groupmap." + ++i);
             }
         }
+    }
+
+    @Override
+    public boolean isUsed(final Context context, final HttpServletRequest request) {
+        if (request != null &&
+                context.getCurrentUser() != null &&
+                request.getAttribute(LDAP_AUTHENTICATED) != null) {
+            return true;
+        }
+        return false;
     }
 }

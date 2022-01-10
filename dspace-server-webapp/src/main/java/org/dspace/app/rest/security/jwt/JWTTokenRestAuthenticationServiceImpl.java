@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Iterator;
-import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +27,6 @@ import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,10 +80,8 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             Context context = ContextUtil.obtainContext(request);
             context.setCurrentUser(ePersonService.findByEmail(context, authentication.getName()));
 
-            List<Group> groups = authenticationService.getSpecialGroups(context, request);
-
             String token = loginJWTTokenHandler.createTokenForEPerson(context, request,
-                                                                 authentication.getPreviousLoginDate(), groups);
+                                                                 authentication.getPreviousLoginDate());
             context.commit();
 
             // Add newly generated auth token to the response
@@ -107,9 +103,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     @Override
     public AuthenticationToken getShortLivedAuthenticationToken(Context context, HttpServletRequest request) {
         try {
-            String token;
-            List<Group> groups = authenticationService.getSpecialGroups(context, request);
-            token = shortLivedJWTTokenHandler.createTokenForEPerson(context, request, null, groups);
+            String token = shortLivedJWTTokenHandler.createTokenForEPerson(context, request, null);
             context.commit();
             return new AuthenticationToken(token);
         } catch (JOSEException e) {
