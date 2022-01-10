@@ -21,6 +21,7 @@
         <!-- AWS Security credentials, with policies for specified bucket -->
         <property name="awsAccessKey" value="${assetstore.s3.awsAccessKey}"/>
         <property name="awsSecretKey" value="${assetstore.s3.awsSecretKey}"/>
+        <property name="useRelativePath" value="${assetstore.useRelativePath}"/>
 
         <!-- S3 bucket name to store assets in. example: longsight-dspace-auk -->
         <property name="bucketName" value="${assetstore.s3.bucketName}"/>

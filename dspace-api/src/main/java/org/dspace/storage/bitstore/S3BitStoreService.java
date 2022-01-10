@@ -64,6 +64,7 @@ public class S3BitStoreService implements BitStoreService {
     private String awsAccessKey;
     private String awsSecretKey;
     private String awsRegionName;
+    private boolean useRelativePath;
 
     /**
      * container for all the assets
@@ -281,7 +282,7 @@ public class S3BitStoreService implements BitStoreService {
             bufFilename.append(File.separator);
         }
 
-        if (configurationService.getBooleanProperty("useRelativePath", false)) {
+        if (this.useRelativePath) {
             bufFilename.append(getRelativePath(id));
         } else {
             bufFilename.append(id);
@@ -375,6 +376,14 @@ public class S3BitStoreService implements BitStoreService {
 
     public void setSubfolder(String subfolder) {
         this.subfolder = subfolder;
+    }
+
+    public boolean isUseRelativePath() {
+        return useRelativePath;
+    }
+
+    public void setUseRelativePath(boolean useRelativePath) {
+        this.useRelativePath = useRelativePath;
     }
 
     /**
