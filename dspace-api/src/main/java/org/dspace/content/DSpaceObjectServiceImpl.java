@@ -95,20 +95,6 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             }
         }
 
-        if (log.isDebugEnabled()) {
-            StringBuilder dbgMsg = new StringBuilder();
-            for (String id : identifiers) {
-                if (dbgMsg.capacity() == 0) {
-                    dbgMsg.append("This DSO's Identifiers are: ");
-                } else {
-                    dbgMsg.append(", ");
-                }
-                dbgMsg.append(id);
-            }
-            dbgMsg.append(".");
-            log.debug(dbgMsg.toString());
-        }
-
         return identifiers;
     }
 

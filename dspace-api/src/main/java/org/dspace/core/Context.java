@@ -99,6 +99,11 @@ public class Context implements AutoCloseable {
     private List<UUID> specialGroupsPreviousState;
 
     /**
+     * The currently used authentication method
+     */
+    private String authenticationMethod;
+
+    /**
      * Content events
      */
     private LinkedList<Event> events = null;
@@ -892,4 +897,11 @@ public class Context implements AutoCloseable {
         currentUser = reloadEntity(currentUser);
     }
 
+    public String getAuthenticationMethod() {
+        return authenticationMethod;
+    }
+
+    public void setAuthenticationMethod(final String authenticationMethod) {
+        this.authenticationMethod = authenticationMethod;
+    }
 }
