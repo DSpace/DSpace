@@ -36,6 +36,8 @@ import org.dspace.content.Bitstream;
 import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.storage.bitstore.factory.StorageServiceFactory;
+import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -56,6 +58,8 @@ public class S3BitStoreService implements BitStoreService {
      * Checksum algorithm
      */
     private static final String CSA = "MD5";
+    protected static final int digitsPerLevel = 2;
+    protected static final int directoryLevels = 3;
 
     private String awsAccessKey;
     private String awsSecretKey;
@@ -78,8 +82,8 @@ public class S3BitStoreService implements BitStoreService {
 
     private static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
-    public S3BitStoreService() {
-    }
+
+    public S3BitStoreService() {}
 
     /**
      * Initialize the asset store
@@ -90,7 +94,7 @@ public class S3BitStoreService implements BitStoreService {
      */
     @Override
     public void init() throws IOException {
-        if(StringUtils.isNotBlank(getAwsAccessKey()) && StringUtils.isNotBlank(getAwsSecretKey())) {
+        if (StringUtils.isNotBlank(getAwsAccessKey()) && StringUtils.isNotBlank(getAwsSecretKey())) {
             log.warn("Use local defined S3 credentials");
             // region
             Regions regions = Regions.DEFAULT_REGION;
@@ -271,11 +275,63 @@ public class S3BitStoreService implements BitStoreService {
      * @return full key prefixed with a subfolder, if applicable
      */
     public String getFullKey(String id) {
+        StringBuilder bufFilename = new StringBuilder();
         if (StringUtils.isNotEmpty(subfolder)) {
-            return subfolder + "/" + id;
-        } else {
-            return id;
+            bufFilename.append(subfolder);
+            bufFilename.append(File.separator);
         }
+
+        if (configurationService.getBooleanProperty("useRelativePath", false)) {
+            bufFilename.append(getRelativePath(id));
+        } else {
+            bufFilename.append(id);
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("S3 filepath for " + id + " is "
+                    + bufFilename.toString());
+        }
+
+        return bufFilename.toString();
+    }
+
+    private String getRelativePath(String sInternalId) {
+        BitstreamStorageService bitstreamStorageService = StorageServiceFactory.getInstance()
+                .getBitstreamStorageService();
+        // there are 2 cases:
+        // -conventional bitstream, conventional storage
+        // -registered bitstream, conventional storage
+        // conventional bitstream - dspace ingested, dspace random name/path
+        // registered bitstream - registered to dspace, any name/path
+        String sIntermediatePath = StringUtils.EMPTY;
+        if (bitstreamStorageService.isRegisteredBitstream(sInternalId)) {
+            sInternalId = sInternalId.substring(2);
+        } else {
+            // Sanity Check: If the internal ID contains a
+            // pathname separator, it's probably an attempt to
+            // make a path traversal attack, so ignore the path
+            // prefix.  The internal-ID is supposed to be just a
+            // filename, so this will not affect normal operation.
+            if (sInternalId.contains(File.separator)) {
+                sInternalId = sInternalId.substring(sInternalId.lastIndexOf(File.separator) + 1);
+            }
+            sIntermediatePath = intermediatePath(sInternalId);
+        }
+
+        return sIntermediatePath + sInternalId;
+    }
+
+    public String intermediatePath(String internalId) {
+        StringBuilder buf = new StringBuilder();
+        for (int i = 0; i < directoryLevels; i++) {
+            int digits = i * digitsPerLevel;
+            if (i > 0) {
+                buf.append(File.separator);
+            }
+            buf.append(internalId.substring(digits, digits + digitsPerLevel));
+        }
+        buf.append(File.separator);
+        return buf.toString();
     }
 
     public String getAwsAccessKey() {
