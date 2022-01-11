@@ -334,16 +334,30 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     /**
+     * Removes all documents from the Lucene index
+     */
+    public void deleteIndex() {
+        try {
+            final List<IndexFactory> indexableObjectServices = indexObjectServiceFactory.
+                    getIndexFactories();
+            for (IndexFactory indexableObjectService : indexableObjectServices) {
+                indexableObjectService.deleteAll();
+            }
+        } catch (IOException | SolrServerException e) {
+            log.error("Error cleaning discovery index: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * Iterates over all documents in the Lucene index and verifies they are in
      * database, if not, they are removed.
      *
-     * @param force whether or not to force a clean index
      * @throws IOException            IO exception
      * @throws SQLException           sql exception
      * @throws SearchServiceException occurs when something went wrong with querying the solr server
      */
     @Override
-    public void cleanIndex(boolean force) throws IOException, SQLException, SearchServiceException {
+    public void cleanIndex() throws IOException, SQLException, SearchServiceException {
         Context context = new Context();
         context.turnOffAuthorisationSystem();
 
@@ -351,56 +365,48 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (solrSearchCore.getSolr() == null) {
                 return;
             }
-            if (force) {
-                final List<IndexFactory> indexableObjectServices = indexObjectServiceFactory.
-                        getIndexFactories();
-                for (IndexFactory indexableObjectService : indexableObjectServices) {
-                    indexableObjectService.deleteAll();
-                }
-            } else {
-                // First, we'll just get a count of the total results
-                SolrQuery countQuery = new SolrQuery("*:*");
-                countQuery.setRows(0);  // don't actually request any data
-                // Get the total amount of results
-                QueryResponse totalResponse = solrSearchCore.getSolr().query(countQuery,
-                                                                             solrSearchCore.REQUEST_METHOD);
-                long total = totalResponse.getResults().getNumFound();
+            // First, we'll just get a count of the total results
+            SolrQuery countQuery = new SolrQuery("*:*");
+            countQuery.setRows(0);  // don't actually request any data
+            // Get the total amount of results
+            QueryResponse totalResponse = solrSearchCore.getSolr().query(countQuery,
+                                                                         solrSearchCore.REQUEST_METHOD);
+            long total = totalResponse.getResults().getNumFound();
 
-                int start = 0;
-                int batch = 100;
+            int start = 0;
+            int batch = 100;
 
-                // Now get actual Solr Documents in batches
-                SolrQuery query = new SolrQuery();
-                query.setFields(SearchUtils.RESOURCE_UNIQUE_ID, SearchUtils.RESOURCE_ID_FIELD,
-                                SearchUtils.RESOURCE_TYPE_FIELD);
-                query.addSort(SearchUtils.RESOURCE_UNIQUE_ID, SolrQuery.ORDER.asc);
-                query.setQuery("*:*");
-                query.setRows(batch);
-                // Keep looping until we hit the total number of Solr docs
-                while (start < total) {
-                    query.setStart(start);
-                    QueryResponse rsp = solrSearchCore.getSolr().query(query, solrSearchCore.REQUEST_METHOD);
-                    SolrDocumentList docs = rsp.getResults();
+            // Now get actual Solr Documents in batches
+            SolrQuery query = new SolrQuery();
+            query.setFields(SearchUtils.RESOURCE_UNIQUE_ID, SearchUtils.RESOURCE_ID_FIELD,
+                            SearchUtils.RESOURCE_TYPE_FIELD);
+            query.addSort(SearchUtils.RESOURCE_UNIQUE_ID, SolrQuery.ORDER.asc);
+            query.setQuery("*:*");
+            query.setRows(batch);
+            // Keep looping until we hit the total number of Solr docs
+            while (start < total) {
+                query.setStart(start);
+                QueryResponse rsp = solrSearchCore.getSolr().query(query, solrSearchCore.REQUEST_METHOD);
+                SolrDocumentList docs = rsp.getResults();
 
-                    for (SolrDocument doc : docs) {
-                        String uniqueID = (String) doc.getFieldValue(SearchUtils.RESOURCE_UNIQUE_ID);
+                for (SolrDocument doc : docs) {
+                    String uniqueID = (String) doc.getFieldValue(SearchUtils.RESOURCE_UNIQUE_ID);
 
-                        IndexableObject o = findIndexableObject(context, doc);
+                    IndexableObject o = findIndexableObject(context, doc);
 
-                        if (o == null) {
-                            log.info("Deleting: " + uniqueID);
-                            /*
-                             * Use IndexWriter to delete, its easier to manage
-                             * write.lock
-                             */
-                            unIndexContent(context, uniqueID);
-                        } else {
-                            log.debug("Keeping: " + o.getUniqueIndexID());
-                        }
+                    if (o == null) {
+                        log.info("Deleting: " + uniqueID);
+                        /*
+                         * Use IndexWriter to delete, its easier to manage
+                         * write.lock
+                         */
+                        unIndexContent(context, uniqueID);
+                    } else {
+                        log.debug("Keeping: " + o.getUniqueIndexID());
                     }
-
-                    start += batch;
                 }
+
+                start += batch;
             }
         } catch (IOException | SQLException | SolrServerException e) {
             log.error("Error cleaning discovery index: " + e.getMessage(), e);
