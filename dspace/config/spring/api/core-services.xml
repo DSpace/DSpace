@@ -63,6 +63,13 @@
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
 
+    <bean class='org.dspace.service.impl.HttpConnectionPoolService'
+          id='solrHttpConnectionPoolService'
+          scope='singleton'
+          autowire-candidate='true'>
+        <constructor-arg name='configPrefix' value='solr'/>
+    </bean>
+
     <!-- Ensure PluginService is initialized properly via init() method -->
     <bean class="org.dspace.core.LegacyPluginServiceImpl" init-method="init"/>
     <bean class="org.dspace.core.LicenseServiceImpl"/>
