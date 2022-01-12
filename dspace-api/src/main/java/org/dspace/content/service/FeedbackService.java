@@ -19,6 +19,17 @@ import org.dspace.core.Context;
  */
 public interface FeedbackService {
 
+    /**
+     * This method sends the feeback email to the recipient passed as parameter
+     * @param context current DSpace application context
+     * @param request current servlet request
+     * @param recipientEmail recipient to which mail is sent
+     * @param senderEmail email address of the sender
+     * @param message message body
+     * @param page page from which user accessed and filled feedback form
+     * @throws IOException
+     * @throws MessagingException
+     */
     public void sendEmail(Context context, HttpServletRequest request, String recipientEmail, String senderEmail,
             String message, String page) throws IOException, MessagingException;
 

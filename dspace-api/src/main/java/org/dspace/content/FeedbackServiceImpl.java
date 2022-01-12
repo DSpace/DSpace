@@ -18,12 +18,17 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 
+/**
+ * Implementation of {@link FeedbackService} interface.
+ * It is responsible for sendint a feedback email with content a DSpace user
+ * fills from feedback section of DSpace.
+ */
 public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public void sendEmail(Context context, HttpServletRequest request, String recipientEmail, String senderEmail,
             String message, String page) throws IOException, MessagingException {
-        String session = request.getSession().getId();
+        String session = request.getHeader("x-correlation-id");
         String agent = request.getHeader("User-Agent");
         String currentUserEmail = StringUtils.EMPTY;
 
