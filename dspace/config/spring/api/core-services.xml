@@ -134,5 +134,9 @@
     <bean class="org.dspace.discovery.indexobject.WorkspaceItemIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.MetadataFieldIndexFactoryImpl" autowire-candidate="true"/>
 
+    <!-- OIDC Authentication -->
+    <bean class="org.dspace.authenticate.OidcAuthenticationBean" id="oidcAuthentication"/>
+    <bean class="org.dspace.authenticate.oidc.impl.OidcClientImpl" />
+
 </beans>
 
