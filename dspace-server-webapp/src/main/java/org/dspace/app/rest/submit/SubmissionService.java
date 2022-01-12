@@ -265,7 +265,7 @@ public class SubmissionService {
             wi = workflowService.start(context, wsi);
         } catch (IOException e) {
             throw new RuntimeException("The workflow could not be started for workspaceItem with" +
-                                               "id:  " + id, e);
+                                               " id:  " + id, e);
         }
 
         return wi;
