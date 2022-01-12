@@ -62,7 +62,8 @@ public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, I
 
         String recipientEmail = configurationService.getProperty("feedback.recipient");
         if (StringUtils.isBlank(recipientEmail)) {
-            throw new DSpaceFeedbackNotFoundException("Recipient's email was not found!");
+            throw new DSpaceFeedbackNotFoundException("Feedback cannot be sent at this time, Feedback recipient " +
+                "is disabled");
         }
 
         try {
@@ -75,7 +76,7 @@ public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, I
         String message = feedbackRest.getMessage();
 
         if (StringUtils.isBlank(senderEmail) || StringUtils.isBlank(message)) {
-            throw new DSpaceBadRequestException("Filds as e-mail and message are mandatory!");
+            throw new DSpaceBadRequestException("e-mail and message fields are mandatory!");
         }
 
         try {
