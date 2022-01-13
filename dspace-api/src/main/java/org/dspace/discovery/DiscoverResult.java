@@ -7,6 +7,8 @@
  */
 package org.dspace.discovery;
 
+import org.apache.log4j.Logger;
+import org.dspace.browse.SolrBrowseDAO;
 import org.dspace.content.DSpaceObject;
 
 import java.util.*;
@@ -17,6 +19,8 @@ import java.util.*;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class DiscoverResult {
+
+    private static final Logger log = Logger.getLogger(DiscoverResult.class);
 
     private long totalSearchResults;
     private int start;
@@ -95,6 +99,9 @@ public class DiscoverResult {
     }
 
     public List<FacetResult> getFacetResult(String facet){
+        for (String s : facetResults.keySet()) {
+            log.debug("facetResults for s=" + s + " : " + facetResults.get(s).size());
+        }
         return facetResults.get(facet) == null ? new ArrayList<FacetResult>() : facetResults.get(facet);
     }
 

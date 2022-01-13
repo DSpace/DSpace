@@ -432,8 +432,10 @@
                 <list name="values">
                     <string>EC/FP</string>
                     <string>EC/H2020</string>
+                    <string>EC/HEU</string>
                     <string>info:eu-repo/grantAgreement/EC/FP</string>
                     <string>info:eu-repo/grantAgreement/EC/H2020</string>
+                    <string>info:eu-repo/grantAgreement/EC/HEU</string>
                 </list>
             </Configuration>
         </CustomCondition>

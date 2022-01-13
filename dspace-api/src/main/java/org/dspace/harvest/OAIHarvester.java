@@ -380,14 +380,19 @@ public class OAIHarvester {
 				}
 
 				// keep going if there are more records to process
-				resumptionToken = listRecords.getResumptionToken();
+				try {
+					resumptionToken = listRecords.getResumptionToken();
+				} catch (NoSuchFieldException e) {
+					resumptionToken = null;
+					log.error("Something is wrong with resumptionToken: ", e);
+				}
 				if (resumptionToken == null || resumptionToken.length() == 0) {
 					listRecords = null;
 				}
 				else {
 					listRecords = new ListRecords(oaiSource, resumptionToken);
 				}
-                ourContext.turnOffAuthorisationSystem();
+				ourContext.turnOffAuthorisationSystem();
                 try {
                     collectionService.update(ourContext, targetCollection);
 
@@ -612,8 +617,15 @@ public class OAIHarvester {
 						bvs.versionBundles(ourContext, item);
 					} else {
 						List<Bundle> allBundles = item.getBundles();
-						for (Bundle bundle : allBundles) {
-							itemService.removeBundle(ourContext, item, bundle);
+						try {
+							for (Bundle bundle : allBundles) {
+								itemService.removeBundle(ourContext, item, bundle);
+
+							}
+						} catch (ConcurrentModificationException e) {
+							log.error("Collection: " + targetCollection.getName() + " " + targetCollection.getHandle() +
+									" - item: "+ item.getName() + " " + item.getID());
+							log.error("Could not remove bundle since hibernate is unbalanced. ", e);
 						}
 					}
 				}

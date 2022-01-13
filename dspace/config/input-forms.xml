@@ -261,10 +261,13 @@
                     <repeatable>true</repeatable>
                     <label>Project</label>
                     <input-type>onebox</input-type>
-                    <hint>For projects funded by the European Commission use: EC/[Funding programme]/[project reference]
-                        where H2020 must be used for Horizon 2020
-                        and FP7 for the 7th Framework Program. F.ex.: EC/H2020/641918 or EC/FP7/266213.
-                        For other projects use: [Funder]: [project reference]). F.ex. Norges forskningsråd: 227607.
+                    <hint>If Horizon Europe: EC/HEU/[number]/EU/[name]/[acronym]
+
+                        If Horizon 2020: EC/H2020/[number]
+
+                        If 7th Framework: Programme: EC/FP7/[number]
+
+                        If others: [Source]: [number], f.ex. Norges forskningsråd: 295704)
                     </hint>
                     <required></required>
                 </field>
@@ -322,7 +325,7 @@
                     <dc-qualifier>holder</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Copyright</label>
-                    <input-type>textarea</input-type>
+                    <input-type>onebox</input-type>
                     <hint>Information about copyright holder.</hint>
                     <required></required>
                 </field>
@@ -343,7 +346,7 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
                     <dc-qualifier>localcode</dc-qualifier>
-                    <repeatable>false</repeatable>
+                    <repeatable>true</repeatable>
                     <label>Local code</label>
                     <input-type>onebox</input-type>
                     <hint></hint>

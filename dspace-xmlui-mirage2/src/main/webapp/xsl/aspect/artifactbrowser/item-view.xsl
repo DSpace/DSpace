@@ -120,9 +120,18 @@
                     <xsl:call-template name="itemSummaryView-collections"/>
                 </div>
                 <div class="col-sm-8">
-                    <xsl:call-template name="itemSummaryView-DIM-citation"/>
-                    <xsl:call-template name="itemSummaryView-DIM-abstract"/>
-                    <xsl:call-template name="itemSummaryView-DIM-description"/>
+                    <xsl:choose>
+                        <xsl:when test="//mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE']/mets:file">
+                            <xsl:call-template name="itemSummaryView-DIM-citation"/>
+                            <xsl:call-template name="itemSummaryView-DIM-abstract"/>
+                            <xsl:call-template name="itemSummaryView-DIM-description"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:call-template name="itemSummaryView-DIM-description"/>
+                            <xsl:call-template name="itemSummaryView-DIM-citation"/>
+                            <xsl:call-template name="itemSummaryView-DIM-abstract"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                     <xsl:call-template name="itemSummaryView-DIM-hasparts"/>
                     <xsl:call-template name="itemSummaryView-DIM-publisher"/>
                     <xsl:call-template name="itemSummaryView-DIM-ispartofseries"/>

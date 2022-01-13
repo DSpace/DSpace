@@ -121,7 +121,8 @@
         <xsl:param name="id"/>
         <dim:field mdschema="dc" element="relation" qualifier="project">
             <xsl:choose>
-                <xsl:when test="$project='EU' or starts-with($project, 'EC/FP') or starts-with($project, 'EC/H2020')">
+                <xsl:when test="$project='EU' or starts-with($project, 'EC/FP') or starts-with($project, 'EC/H2020')
+                    or starts-with($project, 'EC/HEU')">
                     <xsl:value-of select="concat($project, '/', $id)"/>
                 </xsl:when>
                 <xsl:otherwise>

@@ -1,0 +1,5 @@
+- name: Utfør operasjonen for alle kunder på {{appserver}}
+  include_tasks: webdeployment.yml
+  loop: "{{ hostvars[appserver]['kunder'] }}"
+  loop_control:
+    loop_var: kunde

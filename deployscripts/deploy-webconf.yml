@@ -1,18 +1,9 @@
 - hosts: webservers
   gather_facts: false
   tasks:
-    - name: Leser inn konfigurasjon
-      include_vars:
-        file: ../customizations/common_vars.yml
-    
-    - name: Leser inn informasjon om alle kunder
-      include_vars:
-        file: ../customizations/institusjoner.yml
-        name: kundedata
-
-    - name: Hent AJP secret
-      set_fact:
-        ajpsecret: "{{ lookup('hashi_vault', 'secret=secret/service/brage/produksjon:ajpsecret auth_method=approle role_id=brage-client-produksjon secret_id=' ~ vault_secret ~ ' url=https://vault.bibsys.no:8200')}}"
+    - name: Bootstrap and sanity checks
+      import_tasks:
+        file: bootstrap.yml
 
     - name: Utfør operasjonen for alle kunder på den angitte appserveren
       include_tasks: webconf.yml

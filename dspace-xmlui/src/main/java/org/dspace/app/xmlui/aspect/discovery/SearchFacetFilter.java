@@ -440,18 +440,15 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                 jumpList.addItemXref(linkUrl, Character
                         .toString(c));
             }
-            char c = 'Æ';
-            linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH +  "=" + Character.toString(c).toLowerCase();
-            jumpList.addItemXref(linkUrl, Character
-                    .toString(c));
-            c = 'Ø';
-            linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH +  "=" + Character.toString(c).toLowerCase();
-            jumpList.addItemXref(linkUrl, Character
-                    .toString(c));
-            c = 'Å';
-            linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH +  "=" + Character.toString(c).toLowerCase();
-            jumpList.addItemXref(linkUrl, Character
-                    .toString(c));
+            String c = "Æ";
+            linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH +  "=" + c.toLowerCase();
+            jumpList.addItemXref(linkUrl, c);
+            c = "Ø";
+            linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH +  "=" + c.toLowerCase();
+            jumpList.addItemXref(linkUrl, c);
+            c = "Å";
+            linkUrl = basicUrl + "&" +  SearchFilterParam.STARTS_WITH +  "=" + c.toLowerCase();
+            jumpList.addItemXref(linkUrl, c);
 
             // Create a free text field for the initial characters
             Para jumpForm = jump.addPara();

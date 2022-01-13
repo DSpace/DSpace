@@ -31,12 +31,14 @@ public class ListNumberOfDownloadedBitstreamsPerInstitution {
     public static void main(String[] args) {
         Map<String, String> instCountMap = new HashMap<>();
         String year = "";
+        String statistics_folder = "statistics";
 
         CommandLineParser parser = new DefaultParser();
 
         Options options = new Options();
         options.addOption("h", "help", false, "help");
         options.addOption("y", "year", true, "year to list number of downloaded bistreams for");
+        options.addOption("sd", "shard-destination", false, "if you want to read the statistics from the sharded folder of the given year");
 
         try {
             CommandLine line = parser.parse(options, args);
@@ -44,7 +46,9 @@ public class ListNumberOfDownloadedBitstreamsPerInstitution {
             if (line.hasOption('h')) {
                 HelpFormatter myhelp = new HelpFormatter();
                 myhelp.printHelp("\nlist-number-of-downloaded-bitstreams\n", options);
-                System.out.println("\nList number of downloads for year 2016: list-number-of-downloaded-bitstreams -y 2016");
+                System.out.println("\nList number of downloads for the given year: list-number-of-downloaded-bitstreams -y 2021\n" +
+                        "by adding the param 'shard-destination' the statistics will be run against the sharded-index (e.g. /statistics-2021/):" +
+                        "list-number-of-downloaded-bitstreams -y 2021 -sd\n");
                 System.exit(0);
             }
 
@@ -56,6 +60,8 @@ public class ListNumberOfDownloadedBitstreamsPerInstitution {
                 System.out.println("\n\n" + "Error - year must be provided");
                 System.out.println(" (run with -h flag for details)" + "\n");
                 System.exit(1);
+            } else if (line.hasOption("sd")) {
+                statistics_folder = statistics_folder + "-" + year;
             }
 
             Context context = new Context();
@@ -68,7 +74,7 @@ public class ListNumberOfDownloadedBitstreamsPerInstitution {
             for (Community topCommunity : topCommunities) {
                 String communityID = topCommunity.getID().toString();
                 String numFound = new ListNumberOfDownloadedBitstreamsPerInstitution()
-                        .findDownloadedItems(solrServer + "/statistics/select?", communityID, year);
+                        .findDownloadedItems(solrServer + "/" + statistics_folder + "/select?", communityID, year);
                 instCountMap.put(topCommunity.getName(), numFound);
             }
 
@@ -84,12 +90,14 @@ public class ListNumberOfDownloadedBitstreamsPerInstitution {
     }
 
     private static void printResult(Map<String, String> instCountMap, String year) {
+        System.out.println("----------------------------------------------");
         System.out.println("Statistikk for nedlastinger " + year + ":\n\n");
-        for (String inst : new TreeSet<String>(instCountMap.keySet())) {
+        for (String inst : new TreeSet<>(instCountMap.keySet())) {
             String count = instCountMap.get(inst);
             String s = inst + ": " + count;
             System.out.println(s);
         }
+        System.out.println("----------------------------------------------\n");
     }
 
     public String findDownloadedItems(String solrHost, String topCommunityId, String year) {

@@ -212,7 +212,7 @@ public class XOAI {
                 if (fieldValueItemId != null) {
                     Item item = itemService.find(context,
                             UUID.fromString((String) fieldValueItemId));
-                    if (item.getLastModified().before(last)) {
+                    if (item.getLastModified() != null && item.getLastModified().before(last)) {
                         items.add(item);
                     }
                 }

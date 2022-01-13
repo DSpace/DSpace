@@ -1,12 +1,20 @@
 <VirtualHost *:80>
-ServerName {{ kundedata[kunde]["virtualhost"] | default(bragevirtualhost) }}
+ServerName {{ kundedata[kunde]["virtualhost"] | default((fase == 'produksjon') | ternary(kunde ~ '.brage.unit.no', 'brage-' ~ fase ~ '.bibsys.no')) }}
+{% if kundedata[kunde]["virtualhost"] is defined %}
+ServerAlias {{ kunde }}.brage.unit.no
+{% endif %}
 ServerAdmin webmaster@unit.no
 DocumentRoot /home/httpd/domains/brage.unit.no
 ErrorLog logs/{{ appserver.split(".")[0] }}_error_log
 CustomLog logs/{{ appserver.split(".")[0] }}_access_log combined
-RedirectMatch ^/$ https://{{ kundedata[kunde]["virtualhost"] | default(bragevirtualhost) }}/{{ kunde }}-xmlui/
-RedirectMatch ^/{{ kunde }}-xmlui$ https://{{ kundedata[kunde]["virtualhost"] | default(bragevirtualhost) }}/{{ kunde }}-xmlui/
+RedirectMatch ^/$ https://{{ kundedata[kunde]["virtualhost"] | default((fase == 'produksjon') | ternary(kunde ~ '.brage.unit.no', 'brage-' ~ fase ~ '.bibsys.no')) }}/{{ kunde }}-xmlui/
+RedirectMatch ^/{{ kunde }}-xmlui$ https://{{ kundedata[kunde]["virtualhost"] | default((fase == 'produksjon') | ternary(kunde ~ '.brage.unit.no', 'brage-' ~ fase ~ '.bibsys.no')) }}/{{ kunde }}-xmlui/
 ProxyPass /{{ kunde }}-oai ajp://{{ appserver }}:8009/{{ kunde }}-oai secret={{ ajpsecret }}
 ProxyPass /{{ kunde }}-rest ajp://{{ appserver }}:8009/{{ kunde }}-rest secret={{ ajpsecret }}
 ProxyPass /{{ kunde }}-xmlui ajp://{{ appserver }}:8009/{{ kunde }}-xmlui secret={{ ajpsecret }}
+{% if kundedata[kunde]["customvhostconfigs"] is defined %}
+{% for customcfg in kundedata[kunde]["customvhostconfigs"] %}
+Include conf/vhosts/active/brage/{{ customcfg }}
+{% endfor %}
+{% endif %}
 </VirtualHost>

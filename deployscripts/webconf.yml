@@ -6,8 +6,24 @@
   set_fact:
     kunde: "{{ item }}"
 
+- name: Create config directory
+  file:
+    path: "{{ webconfpath | default('/etc/httpd/conf/vhosts/active/brage') }}"
+    state: directory
+
 - name: Copy VirtualHost configuration file
   template:
     src: virtualhost.conf.j2
     mode: 0644
     dest: "{{ webconfpath | default('/etc/httpd/conf/vhosts/active/brage') }}/{{ item }}.conf"
+
+- name: Create custom configuration file
+  template:
+    dest: "{{ webconfpath | default('/etc/httpd/conf/vhosts/active/brage') }}/{{ customcfg }}"
+    src: "../customizations/customvhosts/{{ customcfg }}"
+    mode: 0644
+    force: no
+  loop: "{{ kundedata[item]['customvhostconfigs'] }}"
+  loop_control:
+    loop_var: customcfg
+  when: kundedata[item]['customvhostconfigs'] is defined

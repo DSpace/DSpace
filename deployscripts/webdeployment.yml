@@ -1,21 +1,19 @@
-- name: Hent AJP secret
-  set_fact:
-    ajpsecret: "{{ lookup('hashi_vault', 'secret=secret/service/brage/produksjon:ajpsecret auth_method=approle role_id=brage-client-produksjon secret_id=' ~ vault_secret ~ ' url=https://vault.bibsys.no:8200')}}"
-
 - name: Copy VirtualHost configuration file
   template:
     src: virtualhost.conf.j2
-    dest: /etc/httpd/conf/vhosts/active/brage/{{ kunde }}.conf
+    dest: "{{ webconfpath | default('/etc/httpd/conf/vhosts/active/brage') }}/{{ kunde }}.conf"
+    mode: 0644
+
+- name: Copy custom configuration file
+  template:
+    src: "../customizations/customvhosts/{{ item }}"
+    dest: "{{ webconfpath | default('/etc/httpd/conf/vhosts/active/brage') }}/{{ item }}"
+    mode: 0644
+    force: no
+  loop: "{{ kundedata[kunde]['customvhostconfigs'] }}"
+  when: kundedata[kunde]["customvhostconfigs"] is defined
 
 - name: Publish SAML metadata
   template:
     src: feide-metadata.j2.xml
     dest: /home/httpd/domains/brage.unit.no/saml-metadata/{{ kunde }}.xml
-
-- name: Notify Slack
-  slack:
-    channel: "{{ SlackConfig.channel }}"
-    icon_emoji: "{{ SlackConfig.icon }}"
-    msg: "`[{{kunde}}]` Webserver {{inventory_hostname_short|upper}} konfigurert."
-    token: "{{ SlackConfig.token }}"
-    username: "{{ SlackConfig.sender }}"
