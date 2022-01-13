@@ -407,6 +407,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.structures[0].@id",
                         Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0")))
                 .andExpect(jsonPath("$.structures[0].label", is("Table of Contents")))
+                .andExpect(jsonPath("$.structures[0].viewingHint", is("top")))
                 .andExpect(jsonPath("$.structures[0].ranges[0]",
                         Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-0")))
                 .andExpect(jsonPath("$.structures[0].ranges[1]",
@@ -484,6 +485,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.structures[0].@id",
                         Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0")))
                 .andExpect(jsonPath("$.structures[0].label", is("Table of Contents")))
+                .andExpect(jsonPath("$.structures[0].viewingHint", is("top")))
                 .andExpect(jsonPath("$.structures[0].ranges[0]",
                         Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-0")))
                 .andExpect(jsonPath("$.structures[0].ranges[1]",
@@ -636,6 +638,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                         Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0")))
                 // the toc contains two top sections 1 & 2 without direct children canvases
                 .andExpect(jsonPath("$.structures[0].label", is("Table of Contents")))
+                .andExpect(jsonPath("$.structures[0].viewingHint", is("top")))
                 .andExpect(jsonPath("$.structures[0].ranges", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.structures[0].ranges[0]",
                         Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-0")))
