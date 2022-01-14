@@ -17,11 +17,11 @@ import java.net.URL;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.canvasdimension.service.IIIFApiQueryService;
 import org.dspace.content.Bitstream;
-import org.dspace.services.ConfigurationService;
+import org.dspace.iiif.IIIFSharedUtils;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
@@ -32,14 +32,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class IIIFApiQueryServiceImpl implements IIIFApiQueryService, InitializingBean {
 
-    @Autowired()
-    protected ConfigurationService configurationService;
-
-    String iiifImageServer;
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(IIIFApiQueryServiceImpl.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        iiifImageServer = configurationService.getProperty("iiif.image.server");
+        // do nothing
     }
 
     @Override
@@ -54,29 +51,39 @@ public class IIIFApiQueryServiceImpl implements IIIFApiQueryService, Initializin
      */
     private int[] getIiifImageDimensions(Bitstream bitstream) {
         int[] arr = new int[2];
-        String path = iiifImageServer + bitstream.getID() + "/info.json";
+        String path = IIIFSharedUtils.getInfoJsonPath(bitstream);
         URL url;
+        BufferedReader in = null;
         try {
             url = new URL(path);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(
+            in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
             String inputLine;
             StringBuilder response = new StringBuilder();
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
             }
-            in.close();
             JsonNode parent = new ObjectMapper().readTree(response.toString());
-            arr[0] = parent.get("width").asInt();
-            arr[1] = parent.get("height").asInt();
-            return checkDimensions(arr);
+            // return dimensions if found.
+            if (parent.has("width") && parent.has("height")) {
+                arr[0] = parent.get("width").asInt();
+                arr[1] = parent.get("height").asInt();
+                return checkDimensions(arr);
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
         }
         return null;
     }
-
 
 }

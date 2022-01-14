@@ -12,10 +12,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.license.CreativeCommonsServiceImpl;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Shared utilities for IIIF processing.
@@ -29,6 +32,15 @@ public class IIIFSharedUtils {
     public static final String METADATA_IIIF_ENABLED = "dspace.iiif.enabled";
     // The DSpace bundle for other content related to item.
     protected static final String OTHER_CONTENT_BUNDLE = "OtherContent";
+    // The IIIF image server url from configuration
+    protected static final String IMAGE_SERVER_PATH = "iiif.image.server";
+    public static final String METADATA_IIIF_SCHEMA  = "iiif";
+    public static final String METADATA_IIIF_IMAGE  = "image";
+    public static final String METADATA_IIIF_HEIGHT  = "height";
+    public static final String METADATA_IIIF_WIDTH  = "width";
+
+    protected static final ConfigurationService configurationService
+        = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private IIIFSharedUtils() {}
 
@@ -86,5 +98,15 @@ public class IIIFSharedUtils {
             && b.getMetadata().stream()
                 .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
                 .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
+    }
+
+    /**
+     * Returns url for retrieving info.json metadata from the image server.
+     * @param bitstream
+     * @return
+     */
+    public static String getInfoJsonPath(Bitstream bitstream) {
+        String iiifImageServer = configurationService.getProperty(IMAGE_SERVER_PATH);
+        return iiifImageServer + bitstream.getID() + "/info.json";
     }
 }
