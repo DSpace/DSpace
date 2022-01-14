@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.canvasdimension.service.IIIFApiQueryService;
 import org.dspace.content.Bitstream;
-import org.dspace.iiif.IIIFSharedUtils;
+import org.dspace.iiif.util.IIIFSharedUtils;
 import org.springframework.beans.factory.InitializingBean;
 
 
