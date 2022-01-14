@@ -7,10 +7,10 @@
  */
 package org.dspace.app.canvasdimension;
 
-import static org.dspace.iiif.IIIFSharedUtils.METADATA_IIIF_HEIGHT;
-import static org.dspace.iiif.IIIFSharedUtils.METADATA_IIIF_IMAGE;
-import static org.dspace.iiif.IIIFSharedUtils.METADATA_IIIF_SCHEMA;
-import static org.dspace.iiif.IIIFSharedUtils.METADATA_IIIF_WIDTH;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_HEIGHT;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_SCHEMA;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_WIDTH;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +33,7 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.iiif.IIIFSharedUtils;
+import org.dspace.iiif.util.IIIFSharedUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

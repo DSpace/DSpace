@@ -7,10 +7,10 @@
  */
 package org.dspace.app.iiif.service.utils;
 
-import static org.dspace.iiif.IIIFSharedUtils.METADATA_IIIF_HEIGHT;
-import static org.dspace.iiif.IIIFSharedUtils.METADATA_IIIF_IMAGE;
-import static org.dspace.iiif.IIIFSharedUtils.METADATA_IIIF_SCHEMA;
-import static org.dspace.iiif.IIIFSharedUtils.METADATA_IIIF_WIDTH;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_HEIGHT;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_SCHEMA;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_WIDTH;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
-import org.dspace.iiif.IIIFSharedUtils;
+import org.dspace.iiif.util.IIIFSharedUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

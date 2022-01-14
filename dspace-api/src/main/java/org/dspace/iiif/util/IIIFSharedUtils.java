@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.iiif;
+package org.dspace.iiif.util;
 
 import java.util.ArrayList;
 import java.util.List;
