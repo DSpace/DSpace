@@ -10,6 +10,7 @@ package org.dspace.app.canvasdimension;
 import static org.dspace.app.canvasdimension.Util.checkDimensions;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
 
@@ -25,18 +26,20 @@ public class ImageDimensionReader {
     /**
      * Uses ImageIO to read height and width dimensions.
      * @param image inputstream for dspace image
-     * @return image dimensions
+     * @return image dimensions or null if the image format cannot be read.
      * @throws Exception
      */
-    public static int[] getImageDimensions(InputStream image) throws Exception {
+    public static int[] getImageDimensions(InputStream image) throws IOException {
         int[] dims = new int[2];
         BufferedImage buf = ImageIO.read(image);
-        int width = buf.getWidth(null);
-        int height = buf.getHeight(null);
-        if (width > 0 && height > 0) {
-            dims[0] = width;
-            dims[1] = height;
-            return checkDimensions(dims);
+        if (buf != null) {
+            int width = buf.getWidth(null);
+            int height = buf.getHeight(null);
+            if (width > 0 && height > 0) {
+                dims[0] = width;
+                dims[1] = height;
+                return checkDimensions(dims);
+            }
         }
         return null;
     }

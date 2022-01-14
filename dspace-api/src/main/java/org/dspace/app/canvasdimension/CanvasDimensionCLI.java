@@ -50,8 +50,7 @@ public class CanvasDimensionCLI {
 
         boolean iiifEnabled = configurationService.getBooleanProperty("iiif.enabled");
         if (!iiifEnabled) {
-            System.out.println("IIIF is not enabled on this DSpace server.");
-            System.exit(0);
+            System.out.println("WARNING: IIIF is not enabled on this DSpace server.");
         }
 
         // default to not updating existing dimensions
