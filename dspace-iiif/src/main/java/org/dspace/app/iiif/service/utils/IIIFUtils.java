@@ -7,6 +7,11 @@
  */
 package org.dspace.app.iiif.service.utils;
 
+import static org.dspace.iiif.IIIFSharedUtils.METADATA_IIIF_HEIGHT;
+import static org.dspace.iiif.IIIFSharedUtils.METADATA_IIIF_IMAGE;
+import static org.dspace.iiif.IIIFSharedUtils.METADATA_IIIF_SCHEMA;
+import static org.dspace.iiif.IIIFSharedUtils.METADATA_IIIF_WIDTH;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,9 +63,11 @@ public class IIIFUtils {
     // metadata used to set the iiif viewing hint
     public static final String METADATA_IIIF_VIEWING_HINT  = "iiif.viewing.hint";
     // metadata used to set the width of the canvas that has not an explicit name
-    public static final String METADATA_IMAGE_WIDTH = "iiif.image.width";
+    public static final String METADATA_IMAGE_WIDTH = METADATA_IIIF_SCHEMA + "." + METADATA_IIIF_IMAGE
+        + "." + METADATA_IIIF_WIDTH;
     // metadata used to set the height of the canvas that has not an explicit name
-    public static final String METADATA_IMAGE_HEIGTH = "iiif.image.height";
+    public static final String METADATA_IMAGE_HEIGHT = METADATA_IIIF_SCHEMA + "." + METADATA_IIIF_IMAGE
+        + "." + METADATA_IIIF_HEIGHT;
 
     // string used in the metadata toc as separator among the different levels
     public static final String TOC_SEPARATOR = "|||";
@@ -348,9 +355,9 @@ public class IIIFUtils {
      * @return the height in pixel for the canvas associated with the bitstream
      */
     public int getCanvasHeight(Bitstream bitstream, Bundle bundle, Item item, int defaultHeight) {
-        return getSizeFromMetadata(bitstream, METADATA_IMAGE_HEIGTH,
-                getSizeFromMetadata(bundle, METADATA_IMAGE_HEIGTH,
-                    getSizeFromMetadata(item, METADATA_IMAGE_HEIGTH, defaultHeight)));
+        return getSizeFromMetadata(bitstream, METADATA_IMAGE_HEIGHT,
+                getSizeFromMetadata(bundle, METADATA_IMAGE_HEIGHT,
+                    getSizeFromMetadata(item, METADATA_IMAGE_HEIGHT, defaultHeight)));
     }
 
     /**

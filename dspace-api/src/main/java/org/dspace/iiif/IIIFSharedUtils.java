@@ -34,6 +34,7 @@ public class IIIFSharedUtils {
     protected static final String OTHER_CONTENT_BUNDLE = "OtherContent";
     // The IIIF image server url from configuration
     protected static final String IMAGE_SERVER_PATH = "iiif.image.server";
+    // IIIF metadata definitions
     public static final String METADATA_IIIF_SCHEMA  = "iiif";
     public static final String METADATA_IIIF_IMAGE  = "image";
     public static final String METADATA_IIIF_HEIGHT  = "height";
