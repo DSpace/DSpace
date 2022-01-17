@@ -60,6 +60,13 @@ public interface DBConnection<T> {
     public void rollback() throws SQLException;
 
     /**
+     * Force this session to flush.
+     * 
+     * @throws SQLException passed through.
+     */
+    public void flush() throws SQLException;
+
+    /**
      * Close this session:  close DBMS connection(s) and clean up resources.
      *
      * @throws SQLException passed through.

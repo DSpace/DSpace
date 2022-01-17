@@ -9,6 +9,10 @@ package org.dspace.submit.model;
 import java.util.List;
 
 /**
+ * Simple bean used to configure the access conditions section
+ * in particular the set of available policies
+ * and the possibility to modify discoverability.
+ * 
 * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
 */
 public class AccessConditionConfiguration {

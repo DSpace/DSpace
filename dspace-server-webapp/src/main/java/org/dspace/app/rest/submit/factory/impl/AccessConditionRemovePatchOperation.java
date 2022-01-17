@@ -38,18 +38,18 @@ public class AccessConditionRemovePatchOperation extends RemovePatchOperation<Ac
 
         // "path" : "/sections/<:name-of-the-form>/accessConditions/0"
         // "abspath" : "/accessConditions/0"
-        String[] split = getAbsolutePath(path).split("/");
+        String[] absolutePath = getAbsolutePath(path).split("/");
         Item item = source.getItem();
 
-        if (split.length == 1) {
+        if (absolutePath.length == 1) {
             // reset the access condition to the empty array
             authorizeService.removePoliciesActionFilter(context, item, Constants.READ);
-        } else if (split.length == 2) {
+        } else if (absolutePath.length == 2) {
             // to remove an access condition
             // contains "<:access-idx>"
             Integer idxToDelete = null;
             try {
-                idxToDelete = Integer.parseInt(split[1]);
+                idxToDelete = Integer.parseInt(absolutePath[1]);
             } catch (NumberFormatException e) {
                 throw new UnprocessableEntityException("The provided index format is not correct! Must be a number!");
             }
