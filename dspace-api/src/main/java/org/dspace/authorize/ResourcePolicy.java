@@ -120,19 +120,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
             return false;
         }
         final ResourcePolicy other = (ResourcePolicy) obj;
-        if (getAction() != other.getAction()) {
-            return false;
-        }
-        if (!Objects.equals(getEPerson(), other.getEPerson())) {
-            return false;
-        }
-        if (!Objects.equals(getGroup(), other.getGroup())) {
-            return false;
-        }
-        if (!Objects.equals(getStartDate(), other.getStartDate())) {
-            return false;
-        }
-        if (!Objects.equals(getEndDate(), other.getEndDate())) {
+        if (!Objects.equals(getID(), other.getID())) {
             return false;
         }
         return true;

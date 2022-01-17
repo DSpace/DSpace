@@ -54,12 +54,13 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
         String stepId = (String) currentRequest.getAttribute("accessConditionSectionId");
         AccessConditionConfiguration configuration = accessConditionConfigurationService.getMap().get(stepId);
 
-        // "path" : "/sections/<:name-of-the-form>/accessConditions/0"
-        String[] split = getAbsolutePath(path).split("/");
+        // "path" : "/sections/<:name-of-the-form>/accessConditions/0/name"
+        // the absolutePath will be : accessConditions/0 or accessConditions/0/name
+        String[] absolutePath = getAbsolutePath(path).split("/");
         Item item = source.getItem();
         Integer idxToReplace = null;
         try {
-            idxToReplace = Integer.parseInt(split[1]);
+            idxToReplace = Integer.parseInt(absolutePath[1]);
         } catch (NumberFormatException e) {
             throw new UnprocessableEntityException("The provided index format is not correct! Must be a number!");
         }
@@ -69,35 +70,32 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
                     + " currently the are " + policies.size() + " access conditions");
         }
 
-        if (split.length == 2) {
+        if (absolutePath.length == 2) {
+            // "/sections/<:name-of-the-form>/accessConditions/0"
+            // to replace an access condition with a new one
             AccessConditionDTO accessConditionDTO = evaluateSingleObject((LateObjectEvaluator) value);
             if (Objects.nonNull(accessConditionDTO) && Objects.nonNull(getOption(configuration, accessConditionDTO))) {
-                verifyAccessCondition(context, configuration, accessConditionDTO);
                 if (checkDuplication(context, policies, accessConditionDTO, idxToReplace, item)) {
                     item.getResourcePolicies().remove(policies.get(idxToReplace));
-                    context.commit();
                     resourcePolicyService.delete(context, policies.get(idxToReplace));
+                    context.flush();
                     AccessConditionOption option = getOption(configuration, accessConditionDTO);
-                    option.createPolicy(context, item, accessConditionDTO.getName(), null,
+                    option.createResourcePolicy(context, item, accessConditionDTO.getName(), null,
                             accessConditionDTO.getStartDate(),accessConditionDTO.getEndDate());
                 }
             }
-        } else if (split.length == 3) {
+        } else if (absolutePath.length == 3) {
+            // "/sections/<:name-of-the-form>/accessConditions/0/startDate"
+            // to update the embargo start|end date or changing the policy name
             String valueToReplace = getValue(value);
-            String attributeReplace = split[2];
+            String attributeReplace = absolutePath[2];
             ResourcePolicy rpToReplace = policies.get(idxToReplace);
             AccessConditionDTO accessConditionDTO = createDTO(rpToReplace, attributeReplace, valueToReplace);
-            verifyAccessCondition(context, configuration, accessConditionDTO);
             updatePolicy(context, valueToReplace, attributeReplace, rpToReplace);
+            getOption(configuration, accessConditionDTO).updateResourcePolicy(context, rpToReplace);
         } else {
             throw new UnprocessableEntityException("The patch operation for path:" + path + " is not supported!");
         }
-    }
-
-    private void verifyAccessCondition(Context context, AccessConditionConfiguration configuration,
-            AccessConditionDTO dto) throws SQLException, AuthorizeException, ParseException {
-        AccessConditionResourcePolicyUtils.canApplyResourcePolicy(context, configuration.getOptions(),
-                dto.getName(), dto.getStartDate(), dto.getEndDate());
     }
 
     private AccessConditionOption getOption(AccessConditionConfiguration configuration,
@@ -164,7 +162,6 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
             default:
                 throw new IllegalArgumentException("Attribute to replace is not valid:" + attributeReplace);
         }
-        resourcePolicyService.update(context, rpToReplace);
     }
 
     private Date parseDate(String date) {

@@ -19,8 +19,7 @@ import org.dspace.submit.model.AccessConditionConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Submission "add" PATCH operation
- * to change item discoverable true|false.
+ * Submission "replace" PATCH operation to change a previous discoverable flag value.
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */

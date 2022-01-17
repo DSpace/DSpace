@@ -32,7 +32,7 @@ public class SubmissionAccessOptionRestRepository extends DSpaceRestRepository<S
     private AccessConditionConfigurationService accessConditionConfigurationService;
 
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public SubmissionAccessOptionRest findOne(Context context, String id) {
         AccessConditionConfiguration configuration = accessConditionConfigurationService.getMap().get(id);
         return Objects.nonNull(configuration) ? converter.toRest(configuration, utils.obtainProjection()) : null;

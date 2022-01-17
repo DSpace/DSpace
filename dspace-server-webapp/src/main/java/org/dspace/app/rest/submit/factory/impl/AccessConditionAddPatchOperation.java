@@ -47,16 +47,17 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
         Item item = source.getItem();
 
         //"path": "/sections/<:name-of-the-form>/accessConditions/-"
-        String[] split = getAbsolutePath(path).split("/");
-        List<AccessConditionDTO> accessConditions = parseAccessConditions(path, value, split);
+        // "abspath" : "accessConditions" or "accessConditions/-"
+        String[] absolutePath = getAbsolutePath(path).split("/");
+        List<AccessConditionDTO> accessConditions = parseAccessConditions(path, value, absolutePath);
 
         verifyAccessConditions(context, configuration, accessConditions);
 
-        if (split.length == 1) {
+        if (absolutePath.length == 1) {
             // to replace completely the access conditions
             resourcePolicyService.removePolicies(context, item, ResourcePolicy.TYPE_CUSTOM);
         }
-        if (split.length == 2) {
+        if (absolutePath.length == 2) {
             // check duplicate policy
             checkDuplication(context, item, accessConditions);
         }

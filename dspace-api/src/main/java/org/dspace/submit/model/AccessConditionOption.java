@@ -6,10 +6,6 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.submit.model;
-
-import static org.dspace.authorize.ResourcePolicy.TYPE_CUSTOM;
-import static org.dspace.core.Constants.READ;
-
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
@@ -18,6 +14,7 @@ import java.util.Objects;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -43,6 +40,9 @@ public class AccessConditionOption {
 
     @Autowired
     GroupService groupService;
+
+    @Autowired
+    private ResourcePolicyService resourcePolicyService;
 
     DateMathParser dateMathParser = new DateMathParser();
 
@@ -151,49 +151,27 @@ public class AccessConditionOption {
     public void createResourcePolicy(Context context, DSpaceObject obj, String name, String description,
                                      Date startDate, Date endDate)
             throws SQLException, AuthorizeException, ParseException {
-        if (getHasStartDate() && startDate == null) {
-            throw new IllegalStateException("The access condition " + getName() + " requires a start date.");
-        }
-        if (getHasEndDate() && endDate == null) {
-            throw new IllegalStateException("The access condition " + getName() + " requires an end date.");
-        }
-        if (!getHasStartDate() && startDate != null) {
-            throw new IllegalStateException("The access condition " + getName() + " cannot contain a start date.");
-        }
-        if (!getHasEndDate() && endDate != null) {
-            throw new IllegalStateException("The access condition " + getName() + " cannot contain an end date.");
-        }
-
-        Date latestStartDate = null;
-        if (getStartDateLimit() != null) {
-            latestStartDate = dateMathParser.parseMath(getStartDateLimit());
-        }
-
-        Date latestEndDate = null;
-        if (getEndDateLimit() != null) {
-            latestEndDate = dateMathParser.parseMath(getEndDateLimit());
-        }
-
-        // throw if startDate after latestStartDate
-        if (startDate != null && latestStartDate != null && startDate.after(latestStartDate)) {
-            throw new IllegalStateException(String.format(
-                "The start date of access condition %s should be earlier than %s from now.",
-                getName(), getStartDateLimit()
-            ));
-        }
-
-        // throw if endDate after latestEndDate
-        if (endDate != null && latestEndDate != null && endDate.after(latestEndDate)) {
-            throw new IllegalStateException(String.format(
-                "The end date of access condition %s should be earlier than %s from now.",
-                getName(), getEndDateLimit()
-            ));
-        }
-
+        validateResourcePolicy(context, name, startDate, endDate);
         Group group = groupService.findByName(context, getGroupName());
         authorizeService.createResourcePolicy(context, obj, group, null, Constants.READ,
                 ResourcePolicy.TYPE_CUSTOM, name, description, startDate,
                 endDate);
+    }
+
+    /**
+     * Validate ResourcePolicy and after update it
+     * 
+     * @param context               DSpace context
+     * @param resourcePolicy        ResourcePolicy to update
+     * @throws SQLException         If database error
+     * @throws AuthorizeException   If authorize error
+     * @throws ParseException       If parser error
+     */
+    public void updateResourcePolicy(Context context, ResourcePolicy resourcePolicy)
+           throws SQLException, AuthorizeException, ParseException {
+        validateResourcePolicy(context, resourcePolicy.getRpName(),
+                               resourcePolicy.getStartDate(), resourcePolicy.getEndDate());
+        resourcePolicyService.update(context, resourcePolicy);
     }
 
     /**
@@ -206,7 +184,7 @@ public class AccessConditionOption {
      * @param endDate                End date of the resource policy. If {@link #getHasEndDate()}
      *                                    returns false, endDate should be null. Otherwise endDate may not be null.
      */
-    public void canCreateResourcePolicy(Context context, String name, Date startDate, Date endDate)
+    private void validateResourcePolicy(Context context, String name, Date startDate, Date endDate)
            throws SQLException, AuthorizeException, ParseException {
         if (getHasStartDate() && Objects.isNull(startDate)) {
             throw new IllegalStateException("The access condition " + getName() + " requires a start date.");
@@ -246,29 +224,6 @@ public class AccessConditionOption {
                 getName(), getEndDateLimit()
             ));
         }
-    }
-
-    /**
-     * Create a new resource policy for a DSpaceObject
-     * NOTICE: This method does not take care of validating the parameters
-     *         like name, startDate and endDate, before executing it you should invoke
-     *         the #canCreateResourcePolicy method so validating the parameters.
-     * 
-     * @param context         DSpace context
-     * @param obj             DSpaceObject for which resource policy is created
-     * @param name            Name of the resource policy
-     * @param description     Description of the resource policy
-     * @param startDate       Start date of the resource policy. If {@link #getHasStartDate()}
-     *                                 returns false, startDate should be null. Otherwise startDate may not be null.
-     * @param endDate         End date of the resource policy. If {@link #getHasEndDate()}
-     *                                 returns false, endDate should be null. Otherwise endDate may not be null.
-     * @return                ResourcePolicy
-     */
-    public ResourcePolicy createPolicy(Context context, DSpaceObject obj, String name, String description,
-            Date startDate, Date endDate) throws SQLException, AuthorizeException {
-        Group group = groupService.findByName(context, getGroupName());
-        return authorizeService.createResourcePolicy(context, obj, group, null, READ, TYPE_CUSTOM,
-               name, description, startDate, endDate);
     }
 
 }
