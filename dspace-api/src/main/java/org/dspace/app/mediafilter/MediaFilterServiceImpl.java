@@ -228,14 +228,15 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                     int assetstore = myBitstream.getStoreNumber();
 
                     // Printout helpful information to find the errored bitstream.
-                    logError("ERROR filtering, skipping bitstream:\n");
-                    logError("\tItem Handle: " + handle);
+                    StringBuilder sb = new StringBuilder("ERROR filtering, skipping bitstream:\n");
+                    sb.append("\tItem Handle: ").append(handle);
                     for (Bundle bundle : bundles) {
-                        logError("\tBundle Name: " + bundle.getName());
+                        sb.append("\tBundle Name: ").append(bundle.getName());
                     }
-                    logError("\tFile Size: " + size);
-                    logError("\tChecksum: " + checksum);
-                    logError("\tAsset Store: " + assetstore);
+                    sb.append("\tFile Size: ").append(size);
+                    sb.append("\tChecksum: ").append(checksum);
+                    sb.append("\tAsset Store: ").append(assetstore);
+                    logError(sb.toString());
                     logError(e.getMessage(), e);
                 }
             } else if (filterClass instanceof SelfRegisterInputFormats) {
