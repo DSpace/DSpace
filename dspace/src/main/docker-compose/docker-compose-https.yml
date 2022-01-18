@@ -1,0 +1,39 @@
+#
+# Test environment for DSpace UI & REST API via https://localhost and https://localhost/server, respectively.
+# See README for instructions.
+# This should NEVER be used in production scenarios.
+#
+version: '3.7'
+networks:
+  dspacenet:
+services:
+  # dspace-https container runs an Apache-based proxy to ensure everything is accessible via HTTPS
+  dspace-https:
+    container_name: dspace-https
+    depends_on:
+      - dspace-angular
+      - dspace
+    image: dspace/dspace-dev-ssl-proxy:dspace-7_x
+    build:
+      # Must be relative to root, so that it can be built alongside [src]/docker-compose.yml
+      context: ./dspace/src/main/docker/dspace-dev-ssl-proxy
+    networks:
+      dspacenet:
+    ports:
+      - published: 443
+        target: 443
+  dspace-angular:
+    ### OVERRIDE default 'environment' in 'docker-compose-angular.yml' ####
+    # This ensures the UI's "rest" settings point at https://localhost/server
+    # NOTE: The UI's "ui" settings do not need to be updated.
+    environment:
+      DSPACE_REST_SSL: 'true'
+      DSPACE_REST_HOST: 'localhost'
+      DSPACE_REST_PORT: '443'
+      DSPACE_REST_NAMESPACE: '/server'
+  dspace:
+    ### OVERRIDE default 'environment' in 'docker-compose.yml' ####
+    # This ensures the backend's "dspace.ui.url" and "dspace.server.url" are configured for HTTPS
+    environment:
+      dspace__P__ui__P__url: 'https://localhost'
+      dspace__P__server__P__url: 'https://localhost/server'
