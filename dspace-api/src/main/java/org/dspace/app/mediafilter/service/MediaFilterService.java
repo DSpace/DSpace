@@ -16,6 +16,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
 /**
  * MediaFilterManager is the class that invokes the media/format filters over the
@@ -124,4 +125,10 @@ public interface MediaFilterService {
     public void setSkipList(List<String> skipList);
 
     public void setFilterFormats(Map<String, List<String>> filterFormats);
+
+    /**
+     * Set the log handler used in the DSpace scripts and processes framework
+     * @param handler
+     */
+    public void setLogHandler(DSpaceRunnableHandler handler);
 }
