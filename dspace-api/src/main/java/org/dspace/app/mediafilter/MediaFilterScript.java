@@ -122,6 +122,7 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
         }
 
         MediaFilterService mediaFilterService = MediaFilterServiceFactory.getInstance().getMediaFilterService();
+        mediaFilterService.setLogHandler(handler);
         mediaFilterService.setForce(isForce);
         mediaFilterService.setQuiet(isQuiet);
         mediaFilterService.setVerbose(isVerbose);
