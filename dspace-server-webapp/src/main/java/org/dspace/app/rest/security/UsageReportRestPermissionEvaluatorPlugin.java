@@ -72,7 +72,7 @@ public class UsageReportRestPermissionEvaluatorPlugin extends RestObjectPermissi
                 if (Objects.isNull(targetId)) {
                     return true;
                 }
-                if (configurationService.getBooleanProperty("usage-statistics.authorization.admin.usage", true)) {
+                if (configurationService.getBooleanProperty("usage-statistics.authorization.admin.usage", false)) {
                     return authorizeService.isAdmin(context);
                 } else  if (StringUtils.equalsIgnoreCase(UsageReportRest.NAME, targetType)) {
                     if (StringUtils.countMatches(targetId.toString(), "_") != 1) {
