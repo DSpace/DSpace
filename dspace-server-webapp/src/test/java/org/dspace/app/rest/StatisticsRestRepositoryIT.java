@@ -57,7 +57,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.hamcrest.Matchers;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -126,12 +125,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
     }
 
-    @After
-    public void tearDown()  {
-
-        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
-    }
-
     @Test
     public void usagereports_withoutId_NotImplementedException() throws Exception {
         getClient().perform(get("/api/statistics/usagereports"))
@@ -153,6 +146,13 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     @Test
     public void usagereports_nonValidReportIDpart_Exception() throws Exception {
         getClient(adminToken).perform(get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() +
+                                "_NotValidReport"))
+                   .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @Test
+    public void usagereports_nonValidReportIDpart_Exception_By_Anonymous_Test() throws Exception {
+        getClient().perform(get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() +
                                 "_NotValidReport"))
                    .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
     }
@@ -679,7 +679,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         // make statistics visible to all
         configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
 
-        // only admin has access to downloads report
         getClient(loggedInToken).perform(
                 get("/api/statistics/usagereports/" + bitstreamVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID))
                 .andExpect(status().isOk())
