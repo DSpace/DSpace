@@ -151,10 +151,18 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void usagereports_nonValidReportIDpart_Exception_By_Anonymous_Test() throws Exception {
+    public void usagereports_nonValidReportIDpart_Exception_By_Anonymous_Unauthorized_Test() throws Exception {
         getClient().perform(get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() +
                                 "_NotValidReport"))
-                   .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void usagereports_nonValidReportIDpart_Exception_By_Anonymous_Test() throws Exception {
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+        getClient().perform(get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() +
+                                "_NotValidReport"))
+                   .andExpect(status().isNotFound());
     }
 
     @Test
@@ -222,6 +230,39 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(anotherLoggedInUserToken).perform(
             get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                                            // ** THEN **
+                                           .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void usagereport_loggedInUserReadRights_and_usage_statistics_admin_is_false_Test() throws Exception {
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+        context.turnOffAuthorisationSystem();
+        authorizeService.removeAllPolicies(context, itemNotVisitedWithBitstreams);
+        ResourcePolicyBuilder.createResourcePolicy(context)
+                             .withDspaceObject(itemNotVisitedWithBitstreams)
+                             .withAction(Constants.READ)
+                             .withUser(eperson).build();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("eperson1@mail.com")
+                                         .withPassword(password)
+                                         .build();
+        context.restoreAuthSystemState();
+        String anotherLoggedInUserToken = getAuthToken(eperson1.getEmail(), password);
+        // We request a dso's TotalVisits usage stat report as anon but dso has no read policy for anon
+        getClient().perform(get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" +
+                                TOTAL_VISITS_REPORT_ID))
+                   .andExpect(status().isUnauthorized());
+
+        // We request a dso's TotalVisits usage stat report as logged in eperson and has read policy for this user
+        getClient(loggedInToken).perform(get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() +
+                                             "_" + TOTAL_VISITS_REPORT_ID))
+                                .andExpect(status().isOk());
+
+        // We request a dso's TotalVisits usage stat report as another logged
+        // in eperson and has no read policy for this user
+        getClient(anotherLoggedInUserToken).perform(
+             get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                                            .andExpect(status().isForbidden());
     }
 
