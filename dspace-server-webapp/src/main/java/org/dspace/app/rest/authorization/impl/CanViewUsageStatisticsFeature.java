@@ -31,9 +31,9 @@ import org.springframework.stereotype.Component;
  * is the object's admin. Otherwise, authorization is granted if the current user can view the object.
  */
 @Component
-@AuthorizationFeatureDocumentation(name = ViewUsageStatisticsFeature.NAME,
+@AuthorizationFeatureDocumentation(name = CanViewUsageStatisticsFeature.NAME,
     description = "It can be used to verify if statistics can be viewed")
-public class ViewUsageStatisticsFeature implements AuthorizationFeature {
+public class CanViewUsageStatisticsFeature implements AuthorizationFeature {
 
     public final static String NAME = "canViewUsageStatistics";
 
@@ -47,6 +47,7 @@ public class ViewUsageStatisticsFeature implements AuthorizationFeature {
     private Utils utils;
 
     @Override
+    @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         if (object instanceof SiteRest
             || object instanceof CommunityRest
