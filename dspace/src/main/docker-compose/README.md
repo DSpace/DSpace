@@ -18,13 +18,16 @@
   - Docker compose file that will run an AIP ingest into DSpace 7.
 - db.entities.yml
   - Docker compose file that pre-populate a database instance using a SQL dump.  The default dataset is the configurable entities test dataset.
-- local.cfg
-  - Sets the environment used across containers run with docker-compose
 - docker-compose-angular.yml
   - Docker compose file that will start a published DSpace angular container that interacts with the branch.
+- docker-compose-https.yml
+  - Docker compose file that will run both the UI and REST API via HTTPS on localhost (on https://localhost/ and https://localhost/server/).
+- docker-compose-iiif.yml
+  - Docker compose file that runs a Cantaloupe IIIF image server in Docker, for testing IIIF integration.
+- docker-compose-oidc.yml
+  - Docker compose file that runs Keycloak in Docker, for testing OIDC (OpenID Connect) authentication integration.
 - docker-compose-shibboleth.yml
-  - Docker compose file that will start a *test/demo* Shibboleth SP container (in Apache) that proxies requests to the DSpace container
-  - ONLY useful for testing/development. NOT production ready.
+  - Docker compose file that will start a *test/demo* Shibboleth SP container (in Apache HTTPD) that proxies requests to the DSpace container
 
 ## To refresh / pull DSpace images from Dockerhub
 ```
@@ -40,12 +43,28 @@ docker-compose -f docker-compose.yml -f docker-compose-cli.yml build
 ```
 docker-compose -p d7 up -d
 ```
+REST API will be available at http://localhost:8080/server/
 
 ## Run DSpace 7 REST and Angular from your branch
 
 ```
+# This starts 2 containers: dspace (backend) and dspace-angular
 docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml up -d
 ```
+* UI will be available at http://localhost:4000/
+* REST API will be available at http://localhost:8080/server/
+
+## Run DSpace 7 REST and Angular via HTTPS on localhost
+
+```
+# This starts 3 containers: dspace (backend), dspace-angular, dspace-https
+docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml -f dspace/src/main/docker-compose/docker-compose-https.yml up -d
+```
+
+* UI will be available at https://localhost/
+* REST API will be available at https://localhost/server/
+* NOTE: Your browser will likely warn you that these URLs are "insecure" or "unsafe".
+This is because a localhost SSL certificate is generated on the fly and used for HTTPS.
 
 ## Run DSpace 7 REST with a IIIF Image Server from your branch
 *Only useful for testing IIIF support in a development environment*
@@ -55,8 +74,16 @@ That container provides a [Cantaloupe image server](https://cantaloupe-project.g
 which can be used when IIIF support is enabled in DSpace (`iiif.enabled=true`).
 
 ```
+# This starts 2 containers: dspace (backend) and dspace-iiif
 docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-iiif.yml up -d
+
+# Optionally, you can also start dspace-angular by adding it to the '-f' list like:
+docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml -f dspace/src/main/docker-compose/docker-compose-iiif.yml up -d
 ```
+
+The Cantaloupe image server will be available at http://localhost:8182/, which means the default settings
+for `iiif.image.server` will work with this container. You will however need to ensure `iiif.enabled=true` and 
+one or more Items have IIIF enabled (the metadata field `dspace.iiif.enabled` must be set to "true")
 
 ## Run DSpace 7 REST with Keycloak for OIDC (OpenID Connect) auth
 *Only useful for testing OIDC authentication support in a development environment*
@@ -66,25 +93,29 @@ The `dspace-oidc` container provides a [Keycloak server](https://www.keycloak.or
 which can be used when OIDC authentication is enabled in DSpace,
 i.e. when `org.dspace.authenticate.OidcAuthentication` is listed in the `AuthenticationMethod` configs.
 
-NOTE: For OIDC login to work properly, you MUST make your OIDC server available to the external web.
+```
+# This starts 4 main containers: dspace (backend), dspace-angular, dspace-https, dspace-oidc
+docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml -f dspace/src/main/docker-compose/docker-compose-https.yml -f dspace/src/main/docker-compose/docker-compose-oidc.yml up -d
+```
+* UI will be available at https://localhost/
+* REST API will be available at https://localhost/server/
+* Keycloak will be available at https://localhost/keycloak/
+    * NOTE: Keycloak takes a while (~2-3mins) to boot up. Please be patient.
+* NOTE: Your browser will likely warn you that these URLs are "insecure" or "unsafe".
+  This is because a localhost SSL certificate is generated on the fly and used for HTTPS.
 
-One option is to use a development proxy service like https://ngrok.com/, which creates a temporary public proxy for your localhost.
-The remainder of these instructions assume you are using ngrok (though other proxies may be used).
+After starting all 4 containers (dspace, dspace-angular, dspace-https, and dspace-oidc) above,
+additional steps are required to enabled OIDC authentication:
 
-1. If you use ngrok, start it first (in order to obtain a random URL that looks like https://a6eb2e55ad17.ngrok.io).
-   Keep in mind we are pointing `ngrok` at the OIDC server which will run on port 8180:
-   ```
-   ./ngrok http 8180
-   ```
-2. Then, update your `local.cfg` (if you don't have one create it in `[src]/dspace/config/local.cfg`) to use that ngrok URL & configure OIDC:
+1. Update your `local.cfg` (if you don't have one create it in `[src]/dspace/config/local.cfg`) to enable & configure OIDC:
    ```
    # Enable both Password auth & OIDC
    plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
    plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.OIDCAuthentication
 
    # Settings for OIDC
-   # THIS MUST BE A PUBLIC URL provided by ngrok (or similar)
-   authentication-oidc.auth-server-url = https://[subdomain].ngrok.io/
+   # Must be the HTTPS URL
+   authentication-oidc.auth-server-url = https://localhost
    authentication-oidc.realm = dspace-realm
    authentication-oidc.token-endpoint = ${authentication-oidc.auth-server-url}/auth/realms/${authentication-oidc.realm}/protocol/openid-connect/token
    authentication-oidc.authorize-endpoint = ${authentication-oidc.auth-server-url}/auth/realms/${authentication-oidc.realm}/protocol/openid-connect/auth
@@ -99,33 +130,24 @@ The remainder of these instructions assume you are using ngrok (though other pro
    authentication-oidc.user-info.last-name = family_name
    authentication-oidc.redirect-url = ${dspace.server.url}/api/authn/oidc
    ```
-3. Start the DSpace backend container & the OIDC container:
-   ```
-   docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-oidc.yml up -d
-   ```
-4. Visit the Keycloak Admin Console via `https://[subdomain].ngrok.io/`
+3. Visit the Keycloak Admin Console via https://localhost/auth
    (if it doesn't respond immediately be patient. Keycloak sometimes takes a minute or two).
-5. Login as default Admin (admin/admin)
-6. Add a new Realm (hover over realm selector). Name it "dspace-realm"
-7. Add a new Client (Clients -> Create). Give it a Client ID of "dspace-rest" & a root URL of http://localhost:8080/server/
-8. Edit that Client, on the "Settings" tab change the "Access Type" dropdown from "public" to "confidential". Click Save
-9. Now for that Client, a "Credentials" tab appears. There you'll find the Secret key.
+4. Login as default Admin (admin/admin)
+5. Add a new Realm (hover over realm selector). Name it "dspace-realm"
+6. Add a new Client (Clients -> Create). Give it a Client ID of "dspace-rest" & a root URL of https://localhost/server
+7. Edit that Client, on the "Settings" tab change the "Access Type" dropdown from "public" to "confidential". Click Save
+8. Now for that Client, a "Credentials" tab appears. There you'll find the Secret key.
    This key MUST be added to this setting in your `local.cfg`:
    ```
    authentication-oidc.client-secret = zsrDp1sJDyAbRiOAba9NrISQ7Lrlo07b
    ```
-10. Finally, create a test user (e.g. named "dspace") for this new Realm.
-    * Click on "Users" menu.
-    * Click "Add user" button.
-    * Username: 'dspace', email: 'dspace@test.edu', First Name: 'DSpace', Last Name: 'OIDC'. Click "Save".
-    * Click "Credentials" tab for that user.
-    * Set a Password (e.g. "dspace"). Turn "Temporary" to "OFF"`
-11. Optionally, start the UI on http://localhost:4000.  There are two options:
-    * Either build & run it locally via `yarn install` and `yarn start`
-    * Or, you can spin it up in Docker alongside the existing containers by running:
-      ```
-      docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml -f dspace/src/main/docker-compose/docker-compose-oidc.yml up -d
-      ```
+9. Finally, create a test user (e.g. named "dspace") for this new Realm.
+   * Click on "Users" menu.
+   * Click "Add user" button.
+   * Username: 'dspace', email: 'dspace@test.edu', First Name: 'DSpace', Last Name: 'OIDC'. Click "Save".
+   * Click "Credentials" tab for that user.
+   * Set a Password (e.g. "dspace"). Turn "Temporary" to "OFF". Click "Set Password"
+10. Now, test it out. Access the UI at https://localhost and attempt to login via OIDC using the new user.
 
 ## Run DSpace 7 REST and Shibboleth SP (in Apache) from your branch
 
