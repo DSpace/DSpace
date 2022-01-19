@@ -38,5 +38,3 @@ services:
       KEYCLOAK_PASSWORD: '${KEYCLOAK_PASSWORD:-admin}'
       # Required when running Keycloak behind a proxy (which we are doing in dspace-https)
       PROXY_ADDRESS_FORWARDING: 'true'
-      # Main URL we use (via dspace-https) for Keycloak
-      KEYCLOAK_FRONTEND_URL: 'https://localhost/auth'
