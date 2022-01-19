@@ -14,13 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.MissingArgumentException;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.dspace.app.mediafilter.factory.MediaFilterServiceFactory;
 import org.dspace.app.mediafilter.service.MediaFilterService;
@@ -33,7 +27,9 @@ import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 
 /**
  * MediaFilterManager is the class that invokes the media/format filters over the
@@ -44,7 +40,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * scope to a community, collection or item; and -m [max] limits processing to a
  * maximum number of items.
  */
-public class MediaFilterCLITool {
+public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfiguration> {
 
     //key (in dspace.cfg) which lists all enabled filters by name
     private static final String MEDIA_FILTER_PLUGINS_KEY = "filter.plugins";
@@ -55,127 +51,78 @@ public class MediaFilterCLITool {
     //suffix (in dspace.cfg) for input formats supported by each filter
     private static final String INPUT_FORMATS_SUFFIX = "inputFormats";
 
-    /**
-     * Default constructor
-     */
-    private MediaFilterCLITool() { }
+    private boolean help;
+    private boolean isVerbose = false;
+    private boolean isQuiet = false;
+    private boolean isForce = false; // default to not forced
+    private String identifier = null; // object scope limiter
+    private int max2Process = Integer.MAX_VALUE;
+    private String[] filterNames;
+    private String[] skipIds = null;
+    private Map<String, List<String>> filterFormats = new HashMap<>();
 
-    public static void main(String[] argv) throws Exception {
+    public MediaFilterScriptConfiguration getScriptConfiguration() {
+        return new DSpace().getServiceManager()
+                           .getServiceByName("filter-media", MediaFilterScriptConfiguration.class);
+    }
+
+    public void setup() throws ParseException {
+
         // set headless for non-gui workstations
         System.setProperty("java.awt.headless", "true");
 
-        // create an options object and populate it
-        CommandLineParser parser = new DefaultParser();
 
-        int status = 0;
+        help = commandLine.hasOption('h');
 
-        Options options = new Options();
-
-        options.addOption("v", "verbose", false,
-                          "print all extracted text and other details to STDOUT");
-        options.addOption("q", "quiet", false,
-                          "do not print anything except in the event of errors.");
-        options.addOption("f", "force", false,
-                          "force all bitstreams to be processed");
-        options.addOption("i", "identifier", true,
-                          "ONLY process bitstreams belonging to identifier");
-        options.addOption("m", "maximum", true,
-                          "process no more than maximum items");
-        options.addOption("h", "help", false, "help");
-
-        //create a "plugin" option (to specify specific MediaFilter plugins to run)
-        Option pluginOption = Option.builder("p")
-                .longOpt("plugins")
-                .hasArg()
-                .hasArgs()
-                .valueSeparator(',')
-                .desc(
-                        "ONLY run the specified Media Filter plugin(s)\n" +
-                        "listed from '" + MEDIA_FILTER_PLUGINS_KEY + "' in dspace.cfg.\n" +
-                        "Separate multiple with a comma (,)\n" +
-                        "(e.g. MediaFilterManager -p \n\"Word Text Extractor\",\"PDF Text Extractor\")")
-                .build();
-        options.addOption(pluginOption);
-
-        //create a "skip" option (to specify communities/collections/items to skip)
-        Option skipOption = Option.builder("s")
-                .longOpt("skip")
-                .hasArg()
-                .hasArgs()
-                .valueSeparator(',')
-                .desc(
-                        "SKIP the bitstreams belonging to identifier\n" +
-                        "Separate multiple identifiers with a comma (,)\n" +
-                        "(e.g. MediaFilterManager -s \n 123456789/34,123456789/323)")
-                .build();
-        options.addOption(skipOption);
-
-        boolean isVerbose = false;
-        boolean isQuiet = false;
-        boolean isForce = false; // default to not forced
-        String identifier = null; // object scope limiter
-        int max2Process = Integer.MAX_VALUE;
-        Map<String, List<String>> filterFormats = new HashMap<>();
-
-        CommandLine line = null;
-        try {
-            line = parser.parse(options, argv);
-        } catch (MissingArgumentException e) {
-            System.out.println("ERROR: " + e.getMessage());
-            HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("MediaFilterManager\n", options);
-            System.exit(1);
-        }
-
-        if (line.hasOption('h')) {
-            HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("MediaFilterManager\n", options);
-
-            System.exit(0);
-        }
-
-        if (line.hasOption('v')) {
+        if (commandLine.hasOption('v')) {
             isVerbose = true;
         }
 
-        isQuiet = line.hasOption('q');
+        isQuiet = commandLine.hasOption('q');
 
-        if (line.hasOption('f')) {
+        if (commandLine.hasOption('f')) {
             isForce = true;
         }
 
-        if (line.hasOption('i')) {
-            identifier = line.getOptionValue('i');
+        if (commandLine.hasOption('i')) {
+            identifier = commandLine.getOptionValue('i');
         }
 
-        if (line.hasOption('m')) {
-            max2Process = Integer.parseInt(line.getOptionValue('m'));
+        if (commandLine.hasOption('m')) {
+            max2Process = Integer.parseInt(commandLine.getOptionValue('m'));
             if (max2Process <= 1) {
-                System.out.println("Invalid maximum value '" +
-                                       line.getOptionValue('m') + "' - ignoring");
+                handler.logWarning("Invalid maximum value '" +
+                                           commandLine.getOptionValue('m') + "' - ignoring");
                 max2Process = Integer.MAX_VALUE;
             }
         }
 
-        String filterNames[] = null;
-        if (line.hasOption('p')) {
+        if (commandLine.hasOption('p')) {
             //specified which media filter plugins we are using
-            filterNames = line.getOptionValues('p');
-
-            if (filterNames == null || filterNames.length == 0) {   //display error, since no plugins specified
-                System.err.println("\nERROR: -p (-plugin) option requires at least one plugin to be specified.\n" +
-                                       "(e.g. MediaFilterManager -p \"Word Text Extractor\",\"PDF Text Extractor\")\n");
-                HelpFormatter myhelp = new HelpFormatter();
-                myhelp.printHelp("MediaFilterManager\n", options);
-                System.exit(1);
-            }
+            filterNames = commandLine.getOptionValues('p');
         } else {
             //retrieve list of all enabled media filter plugins!
             filterNames = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                .getArrayProperty(MEDIA_FILTER_PLUGINS_KEY);
         }
 
+        //save to a global skip list
+        if (commandLine.hasOption('s')) {
+            //specified which identifiers to skip when processing
+            skipIds = commandLine.getOptionValues('s');
+        }
+
+
+    }
+
+    public void internalRun() throws Exception {
+        if (help) {
+            printHelp();
+            return;
+        }
+
         MediaFilterService mediaFilterService = MediaFilterServiceFactory.getInstance().getMediaFilterService();
+        mediaFilterService.setLogHandler(handler);
         mediaFilterService.setForce(isForce);
         mediaFilterService.setQuiet(isQuiet);
         mediaFilterService.setVerbose(isVerbose);
@@ -184,16 +131,17 @@ public class MediaFilterCLITool {
         //initialize an array of our enabled filters
         List<FormatFilter> filterList = new ArrayList<>();
 
+
         //set up each filter
         for (int i = 0; i < filterNames.length; i++) {
             //get filter of this name & add to list of filters
             FormatFilter filter = (FormatFilter) CoreServiceFactory.getInstance().getPluginService()
                                                                    .getNamedPlugin(FormatFilter.class, filterNames[i]);
             if (filter == null) {
-                System.err.println(
-                    "\nERROR: Unknown MediaFilter specified (either from command-line or in dspace.cfg): '" +
-                        filterNames[i] + "'");
-                System.exit(1);
+                handler.handleException("ERROR: Unknown MediaFilter specified (either from command-line or in " +
+                                                "dspace.cfg): '" + filterNames[i] + "'");
+                handler.logError("ERROR: Unknown MediaFilter specified (either from command-line or in " +
+                                         "dspace.cfg): '" + filterNames[i] + "'");
             } else {
                 filterList.add(filter);
 
@@ -218,10 +166,10 @@ public class MediaFilterCLITool {
                 //For other MediaFilters, format of key is:
                 //  filter.<class-name>.inputFormats
                 String[] formats =
-                    DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty(
-                        FILTER_PREFIX + "." + filterClassName +
-                            (pluginName != null ? "." + pluginName : "") +
-                            "." + INPUT_FORMATS_SUFFIX);
+                        DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty(
+                                FILTER_PREFIX + "." + filterClassName +
+                                        (pluginName != null ? "." + pluginName : "") +
+                                        "." + INPUT_FORMATS_SUFFIX);
 
                 //add to internal map of filters to supported formats
                 if (ArrayUtils.isNotEmpty(formats)) {
@@ -230,8 +178,8 @@ public class MediaFilterCLITool {
                     //For other MediaFilters, map key is just:
                     //  <class-name>
                     filterFormats.put(filterClassName +
-                                          (pluginName != null ? MediaFilterService.FILTER_PLUGIN_SEPARATOR +
-                                              pluginName : ""),
+                                              (pluginName != null ? MediaFilterService.FILTER_PLUGIN_SEPARATOR +
+                                                      pluginName : ""),
                                       Arrays.asList(formats));
                 }
             } //end if filter!=null
@@ -239,11 +187,11 @@ public class MediaFilterCLITool {
 
         //If verbose, print out loaded mediafilter info
         if (isVerbose) {
-            System.out.println("The following MediaFilters are enabled: ");
+            handler.logInfo("The following MediaFilters are enabled: ");
             Iterator<String> i = filterFormats.keySet().iterator();
             while (i.hasNext()) {
                 String filterName = i.next();
-                System.out.println("Full Filter Name: " + filterName);
+                handler.logInfo("Full Filter Name: " + filterName);
                 String pluginName = null;
                 if (filterName.contains(MediaFilterService.FILTER_PLUGIN_SEPARATOR)) {
                     String[] fields = filterName.split(MediaFilterService.FILTER_PLUGIN_SEPARATOR);
@@ -251,8 +199,7 @@ public class MediaFilterCLITool {
                     pluginName = fields[1];
                 }
 
-                System.out.println(filterName +
-                                       (pluginName != null ? " (Plugin: " + pluginName + ")" : ""));
+                handler.logInfo(filterName + (pluginName != null ? " (Plugin: " + pluginName + ")" : ""));
             }
         }
 
@@ -262,20 +209,8 @@ public class MediaFilterCLITool {
 
 
         //Retrieve list of identifiers to skip (if any)
-        String skipIds[] = null;
-        if (line.hasOption('s')) {
-            //specified which identifiers to skip when processing
-            skipIds = line.getOptionValues('s');
 
-            if (skipIds == null || skipIds.length == 0) {   //display error, since no identifiers specified to skip
-                System.err.println("\nERROR: -s (-skip) option requires at least one identifier to SKIP.\n" +
-                                       "Make sure to separate multiple identifiers with a comma!\n" +
-                                       "(e.g. MediaFilterManager -s 123456789/34,123456789/323)\n");
-                HelpFormatter myhelp = new HelpFormatter();
-                myhelp.printHelp("MediaFilterManager\n", options);
-                System.exit(0);
-            }
-
+        if (skipIds != null && skipIds.length > 0) {
             //save to a global skip list
             mediaFilterService.setSkipList(Arrays.asList(skipIds));
         }
@@ -296,7 +231,7 @@ public class MediaFilterCLITool {
                 DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(c, identifier);
                 if (dso == null) {
                     throw new IllegalArgumentException("Cannot resolve "
-                                                           + identifier + " to a DSpace object");
+                                                               + identifier + " to a DSpace object");
                 }
 
                 switch (dso.getType()) {
@@ -317,12 +252,11 @@ public class MediaFilterCLITool {
             c.complete();
             c = null;
         } catch (Exception e) {
-            status = 1;
+            handler.handleException(e);
         } finally {
             if (c != null) {
                 c.abort();
             }
         }
-        System.exit(status);
     }
 }
