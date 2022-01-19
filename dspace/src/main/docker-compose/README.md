@@ -132,7 +132,7 @@ The remainder of these instructions assume you are using ngrok (though other pro
    # NOTE: THIS IS PURPOSEFULLY EMPTY & WILL BE SET BELOW
    authentication-oidc.client-secret =
    authentication-oidc.scopes = openid,email,profile
-   authentication-oidc.can-self-register = false
+   authentication-oidc.can-self-register = true
    authentication-oidc.user-info.email = email
    authentication-oidc.user-info.first-name = given_name
    authentication-oidc.user-info.last-name = family_name
