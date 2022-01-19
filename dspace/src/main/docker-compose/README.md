@@ -99,23 +99,31 @@ docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/doc
 ```
 * UI will be available at https://localhost/
 * REST API will be available at https://localhost/server/
-* Keycloak will be available at https://localhost/keycloak/
+* Keycloak will be available at https://localhost/auth/
     * NOTE: Keycloak takes a while (~2-3mins) to boot up. Please be patient.
 * NOTE: Your browser will likely warn you that these URLs are "insecure" or "unsafe".
   This is because a localhost SSL certificate is generated on the fly and used for HTTPS.
 
 After starting all 4 containers (dspace, dspace-angular, dspace-https, and dspace-oidc) above,
-additional steps are required to enabled OIDC authentication:
+additional steps are required to enabled OIDC authentication.
 
-1. Update your `local.cfg` (if you don't have one create it in `[src]/dspace/config/local.cfg`) to enable & configure OIDC:
+For OIDC authentication to work in Docker, we need the URL of Keycloak to be a non-localhost URL.
+One option is to use a development proxy service like https://ngrok.com/, which creates a temporary public proxy for your localhost.
+The remainder of these instructions assume you are using ngrok (though other proxies may be used).
+
+1. If you use ngrok, start it first (in order to obtain a random URL that looks like `https://a6eb2e55ad17.ngrok.io`):
+   ```
+   ./ngrok http 443
+   ```
+2. Update your `local.cfg` (if you don't have one create it in `[src]/dspace/config/local.cfg`) to enable & configure OIDC:
    ```
    # Enable both Password auth & OIDC
    plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
    plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.OIDCAuthentication
 
    # Settings for OIDC
-   # Must be the HTTPS URL
-   authentication-oidc.auth-server-url = https://localhost
+   # THIS MUST BE A non-localhost, HTTPS URL
+   authentication-oidc.auth-server-url = https://[subdomain].ngrok.io
    authentication-oidc.realm = dspace-realm
    authentication-oidc.token-endpoint = ${authentication-oidc.auth-server-url}/auth/realms/${authentication-oidc.realm}/protocol/openid-connect/token
    authentication-oidc.authorize-endpoint = ${authentication-oidc.auth-server-url}/auth/realms/${authentication-oidc.realm}/protocol/openid-connect/auth
@@ -133,7 +141,7 @@ additional steps are required to enabled OIDC authentication:
 3. Visit the Keycloak Admin Console via https://localhost/auth
    (if it doesn't respond immediately be patient. Keycloak sometimes takes a minute or two).
 4. Login as default Admin (admin/admin)
-5. Add a new Realm (hover over realm selector). Name it "dspace-realm"
+5. Add a new Realm (hover over realm selector, top-left corner where it says "Master"). Name it "dspace-realm"
 6. Add a new Client (Clients -> Create). Give it a Client ID of "dspace-rest" & a root URL of https://localhost/server
 7. Edit that Client, on the "Settings" tab change the "Access Type" dropdown from "public" to "confidential". Click Save
 8. Now for that Client, a "Credentials" tab appears. There you'll find the Secret key.
