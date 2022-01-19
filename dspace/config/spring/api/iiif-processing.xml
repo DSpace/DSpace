@@ -3,8 +3,8 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
        default-lazy-init="true">
 
-    <bean id="iiifCanvasDimensionServiceFactory" class="org.dspace.app.canvasdimension.factory.IIIFCanvasDimensionServiceFactoryImpl"/>
-    <bean class="org.dspace.app.canvasdimension.IIIFCanvasDimensionServiceImpl" scope="prototype"/>
-    <bean class="org.dspace.app.canvasdimension.IIIFApiQueryServiceImpl" scope="prototype"/>
+    <bean id="iiifCanvasDimensionServiceFactory" class="org.dspace.iiif.canvasdimension.factory.IIIFCanvasDimensionServiceFactoryImpl"/>
+    <bean class="org.dspace.iiif.canvasdimension.IIIFCanvasDimensionServiceImpl" scope="prototype"/>
+    <bean class="org.dspace.iiif.canvasdimension.IIIFApiQueryServiceImpl" scope="prototype"/>
 
 </beans>

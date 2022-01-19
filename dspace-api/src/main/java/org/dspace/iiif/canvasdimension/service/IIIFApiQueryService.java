@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.canvasdimension.service;
+package org.dspace.iiif.canvasdimension.service;
 
 import org.dspace.content.Bitstream;
 

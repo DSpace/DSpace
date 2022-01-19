@@ -367,10 +367,10 @@
         </step>
     </command>
     <command>
-        <name>canvas-dimensions</name>
-        <description>Add canvas width and height metadata for IIIF enabled items.</description>
+        <name>iiif-canvas-dimensions</name>
+        <description>Automatically add the IIIF canvas width/height metadata to Bitstreams of IIIF enabled Items.</description>
         <step>
-            <class>org.dspace.app.canvasdimension.CanvasDimensionCLI</class>
+            <class>org.dspace.iiif.canvasdimension.CanvasDimensionCLI</class>
         </step>
     </command>
 </commands>

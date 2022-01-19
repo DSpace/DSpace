@@ -5,9 +5,9 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.canvasdimension;
+package org.dspace.iiif.canvasdimension;
 
-import static org.dspace.app.canvasdimension.Util.checkDimensions;
+import static org.dspace.iiif.canvasdimension.Util.checkDimensions;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

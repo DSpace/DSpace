@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.canvasdimension;
+package org.dspace.iiif.canvasdimension;
 
 /**
  * Utilities for IIIF canvas dimension processing.

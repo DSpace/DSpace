@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.canvasdimension;
+package org.dspace.iiif.canvasdimension;
 
 import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_HEIGHT;
 import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE;
@@ -19,8 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import org.dspace.app.canvasdimension.service.IIIFApiQueryService;
-import org.dspace.app.canvasdimension.service.IIIFCanvasDimensionService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -33,6 +31,8 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.iiif.canvasdimension.service.IIIFApiQueryService;
+import org.dspace.iiif.canvasdimension.service.IIIFCanvasDimensionService;
 import org.dspace.iiif.util.IIIFSharedUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 

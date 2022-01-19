@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.canvasdimension;
+package org.dspace.iiif.canvasdimension;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -17,18 +17,19 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.dspace.app.canvasdimension.factory.IIIFCanvasDimensionServiceFactory;
-import org.dspace.app.canvasdimension.service.IIIFCanvasDimensionService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.iiif.canvasdimension.factory.IIIFCanvasDimensionServiceFactory;
+import org.dspace.iiif.canvasdimension.service.IIIFCanvasDimensionService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -61,7 +62,9 @@ public class CanvasDimensionCLI {
         int max2Process = Integer.MAX_VALUE;
 
         String identifier = null;
+        String typeString = null;
         String eperson = null;
+        int dsoType = -1;
 
         Context context = new Context();
         IIIFCanvasDimensionService canvasProcessor = IIIFCanvasDimensionServiceFactory.getInstance()
@@ -72,14 +75,18 @@ public class CanvasDimensionCLI {
         Options options = new Options();
         options.addOption("i", "identifier", true,
             "process IIIF canvas dimensions for images belonging to this identifier");
+        options.addOption("t", "type", true,
+            "type: COMMUNITY, COLLECTION or ITEM\"");
         options.addOption("e", "eperson", true,
             "email of eperson setting the canvas dimensions");
         options.addOption("f", "force", false,
             "force update of all IIIF canvas height and width dimensions");
         options.addOption("q", "quiet", false,
-            "do not print anything except in the event of errors.");
+            "do not print anything except in the event of errors");
         options.addOption("m", "maximum", true,
             "process no more than maximum items");
+        options.addOption("h", "help", false,
+            "display help");
 
         Option skipOption = Option.builder("s")
                                   .longOpt("skip")
@@ -104,6 +111,17 @@ public class CanvasDimensionCLI {
             System.exit(1);
         }
 
+        if (line.hasOption('h')) {
+            HelpFormatter help = new HelpFormatter();
+            help.printHelp("CanvasDimension processor\n", options);
+            System.out
+                .println("\nUUID example:    iiif-canvas-dimensions -e user@email.org " +
+                    "-i 1086306d-8a51-43c3-98b9-c3b00f49105f -t COLLECTION");
+            System.out
+                .println("\nHandle example:    iiif-canvas-dimensions -e user@email.org -i 123456/21");
+            System.exit(0);
+        }
+
         if (line.hasOption('f')) {
             force = true;
         }
@@ -116,8 +134,28 @@ public class CanvasDimensionCLI {
         if (line.hasOption('i')) {
             identifier = line.getOptionValue('i');
         } else {
+            HelpFormatter help = new HelpFormatter();
+            help.printHelp("CanvasDimension processor\n", options);
             System.out.println("An identifier for a Community, Collection, or Item must be provided.");
             System.exit(1);
+        }
+        if (line.hasOption('t')) {
+            typeString = line.getOptionValue('t');
+            if ("ITEM".equalsIgnoreCase(typeString)) {
+                dsoType = Constants.ITEM;
+            } else if ("COLLECTION".equals(typeString)) {
+                dsoType = Constants.COLLECTION;
+            } else if ("COMMUNITY".equalsIgnoreCase(typeString)) {
+                dsoType = Constants.COMMUNITY;
+            }
+        } else {
+            // If the identifier is a handle dsoType is not required.
+            if (identifier.indexOf('/') == -1) {
+                HelpFormatter help = new HelpFormatter();
+                help.printHelp("CanvasDimension processor\n", options);
+                System.out.println("A DSpace type must be provided: COMMUNITY, COLLECTION or ITEM.");
+                System.exit(1);
+            }
         }
         if (line.hasOption('m')) {
             max2Process = Integer.parseInt(line.getOptionValue('m'));
@@ -144,11 +182,20 @@ public class CanvasDimensionCLI {
             canvasProcessor.setSkipList(Arrays.asList(skipIds));
         }
 
+        DSpaceObject dso = null;
+        if (identifier.indexOf('/') != -1) {
+            dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, identifier);
+        } else if (dsoType == Constants.COMMUNITY) {
+            dso = ContentServiceFactory.getInstance().getCommunityService().find(context, UUID.fromString(identifier));
+        } else if (dsoType == Constants.COLLECTION) {
+            dso = ContentServiceFactory.getInstance().getCollectionService().find(context, UUID.fromString(identifier));
+        } else if (dsoType == Constants.ITEM) {
+            dso = ContentServiceFactory.getInstance().getItemService().find(context, UUID.fromString(identifier));
+        }
 
-        DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, identifier);
         if (dso == null) {
             throw new IllegalArgumentException("Cannot resolve "
-                + identifier + " to a DSpace object");
+                + identifier + " to a DSpace object using type: " + typeString);
         }
 
         EPerson user;
@@ -189,10 +236,13 @@ public class CanvasDimensionCLI {
                 processed = 1;
                 break;
             default:
+                System.out.println("Unsupported object type.");
                 break;
         }
         // commit changes
-        context.commit();
+        if (processed >= 1) {
+            context.commit();
+        }
 
         // Always print summary to standard out.
         System.out.println(processed + " IIIF items were processed.");
