@@ -5,6 +5,7 @@
 #
 # http://www.dspace.org/license/
 #
+
 FROM httpd:2
 
 # Default environment variables

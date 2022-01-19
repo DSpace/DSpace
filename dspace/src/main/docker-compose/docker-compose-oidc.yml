@@ -14,10 +14,13 @@ version: '3.7'
 networks:
   dspacenet:
 services:
+  # dspace-oidc container runs Keycloak service
   dspace-oidc:
     container_name: dspace-oidc
+    # Require running DSpace with HTTPS enabled.
+    # This container also creates an HTTPS proxy for Keycloak under https://localhost/keycloak
     depends_on:
-      - dspace
+      - dspace-https
     # https://github.com/keycloak/keycloak-containers/blob/main/server/README.md
     # https://hub.docker.com/r/jboss/keycloak/tags
     image: jboss/keycloak:16.1.0
@@ -27,7 +30,13 @@ services:
     ports:
       - published: 8180
         target: 8080
+    stdin_open: true
+    tty: true
     environment:
       # Default Admin Acct for Keycloak
       KEYCLOAK_USER: '${KEYCLOAK_USER:-admin}'
       KEYCLOAK_PASSWORD: '${KEYCLOAK_PASSWORD:-admin}'
+      # Required when running Keycloak behind a proxy (which we are doing in dspace-https)
+      PROXY_ADDRESS_FORWARDING: 'true'
+      # Main URL we use (via dspace-https) for Keycloak
+      KEYCLOAK_FRONTEND_URL: 'https://localhost/auth'
