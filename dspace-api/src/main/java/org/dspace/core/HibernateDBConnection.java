@@ -114,11 +114,6 @@ public class HibernateDBConnection implements DBConnection<Session> {
         return sessionFactory.getCurrentSession() != null && sessionFactory.getCurrentSession().isOpen();
     }
 
-    @Override
-    public void flush() throws SQLException {
-        getSession().flush();
-    }
-
     /**
      * Rollback any changes applied to the current Transaction. This also closes the Transaction. A new Transaction
      * may be opened the next time getSession() is called.
