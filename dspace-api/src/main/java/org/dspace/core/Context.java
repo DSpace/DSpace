@@ -897,15 +897,6 @@ public class Context implements AutoCloseable {
         currentUser = reloadEntity(currentUser);
     }
 
-    /**
-     * Force this session to flush.
-     * 
-     * @throws SQLException passed through.
-     */
-    public void flush() throws SQLException {
-        dbConnection.flush();
-    }
-
     public String getAuthenticationMethod() {
         return authenticationMethod;
     }

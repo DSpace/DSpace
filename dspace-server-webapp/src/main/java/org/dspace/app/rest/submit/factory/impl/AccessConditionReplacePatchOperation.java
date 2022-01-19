@@ -78,7 +78,6 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
                 if (checkDuplication(context, policies, accessConditionDTO, idxToReplace, item)) {
                     item.getResourcePolicies().remove(policies.get(idxToReplace));
                     resourcePolicyService.delete(context, policies.get(idxToReplace));
-                    context.flush();
                     AccessConditionOption option = getOption(configuration, accessConditionDTO);
                     option.createResourcePolicy(context, item, accessConditionDTO.getName(), null,
                             accessConditionDTO.getStartDate(),accessConditionDTO.getEndDate());
