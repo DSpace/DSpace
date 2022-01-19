@@ -134,10 +134,17 @@ public class BitstreamRestController {
         }
 
         try {
+            long filesize;
+            if (citationDocumentService.isCitationEnabledForBitstream(bit, context)) {
+                filesize = citationDocumentService.getCitedDocumentLength(context, bit);
+            } else {
+                filesize = bit.getSizeBytes();
+            }
+
             HttpHeadersInitializer httpHeadersInitializer = new HttpHeadersInitializer()
                 .withBufferSize(BUFFER_SIZE)
                 .withFileName(name)
-                .withLength(bit.getSizeBytes())
+                .withLength(filesize)
                 .withChecksum(bit.getChecksum())
                 .withMimetype(mimetype)
                 .with(request)
@@ -149,16 +156,10 @@ public class BitstreamRestController {
 
             //Determine if we need to send the file as a download or if the browser can open it inline
             long dispositionThreshold = configurationService.getLongProperty("webui.content_disposition_threshold");
-            if (dispositionThreshold >= 0 && bit.getSizeBytes() > dispositionThreshold) {
+            if (dispositionThreshold >= 0 && filesize > dispositionThreshold) {
                 httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_ATTACHMENT);
             }
 
-            long filesize;
-            if (citationDocumentService.isCitationEnabledForBitstream(bit, context)) {
-                filesize = citationDocumentService.getCitedDocumentLength(context, bit);
-            } else {
-                filesize = bit.getSizeBytes();
-            }
 
 
             org.dspace.app.rest.utils.BitstreamResource bitstreamResource =
