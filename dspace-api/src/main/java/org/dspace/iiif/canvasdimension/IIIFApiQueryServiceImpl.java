@@ -5,9 +5,9 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.canvasdimension;
+package org.dspace.iiif.canvasdimension;
 
-import static org.dspace.app.canvasdimension.Util.checkDimensions;
+import static org.dspace.iiif.canvasdimension.Util.checkDimensions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,10 +18,9 @@ import java.net.URL;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.canvasdimension.service.IIIFApiQueryService;
 import org.dspace.content.Bitstream;
+import org.dspace.iiif.canvasdimension.service.IIIFApiQueryService;
 import org.dspace.iiif.util.IIIFSharedUtils;
-import org.springframework.beans.factory.InitializingBean;
 
 
 /**
@@ -30,14 +29,9 @@ import org.springframework.beans.factory.InitializingBean;
  *
  * @author Michael Spalti mspalti@willamette.edu
  */
-public class IIIFApiQueryServiceImpl implements IIIFApiQueryService, InitializingBean {
+public class IIIFApiQueryServiceImpl implements IIIFApiQueryService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(IIIFApiQueryServiceImpl.class);
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        // do nothing
-    }
 
     @Override
     public int[] getImageDimensions(Bitstream bitstream) {

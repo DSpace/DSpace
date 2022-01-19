@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.canvasdimension.service;
+package org.dspace.iiif.canvasdimension.service;
 
 import java.util.List;
 

@@ -5,9 +5,9 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.canvasdimension.factory;
+package org.dspace.iiif.canvasdimension.factory;
 
-import org.dspace.app.canvasdimension.service.IIIFCanvasDimensionService;
+import org.dspace.iiif.canvasdimension.service.IIIFCanvasDimensionService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
