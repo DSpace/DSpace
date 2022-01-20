@@ -196,15 +196,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     @Test
     public void discoverFacetsAuthorWithAuthorityWithSizeParameter() throws Exception {
-        configurationService.setProperty("choices.plugin.dc.contributor.author",
-                                         "SolrAuthorAuthority");
-        configurationService.setProperty("authority.controlled.dc.contributor.author",
-                                         "true");
-        configurationService.setProperty("discovery.browse.authority.ignore-prefered.author", true);
-        configurationService.setProperty("discovery.index.authority.ignore-prefered.dc.contributor.author", true);
-        configurationService.setProperty("discovery.browse.authority.ignore-variants.author", true);
-        configurationService.setProperty("discovery.index.authority.ignore-variants.dc.contributor.author", true);
-
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "SolrAuthorAuthority");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
 
         metadataAuthorityService.clearCache();
 
@@ -1449,6 +1442,29 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
+
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", "test"))
+                .andExpect(status().isOk());
+
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", "test:"))
+                .andExpect(status().isUnprocessableEntity());
+
+    }
+
+
+    @Test
+    public void discoverSearchObjectsTestWithInvalidSolrQuery() throws Exception {
+
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", "test"))
+                .andExpect(status().isOk());
+
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", "test:"))
+                .andExpect(status().isUnprocessableEntity());
+
     }
 
 
@@ -3917,7 +3933,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/discover/search/objects")
                                 .param("query", "OR"))
 
-                   .andExpect(status().isBadRequest())
+                   .andExpect(status().isUnprocessableEntity())
         ;
 
     }

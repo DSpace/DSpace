@@ -104,7 +104,9 @@ public class ConsumerProfile {
                 "No filters configured for consumer named: " + name);
         }
 
-        consumer = (Consumer) Class.forName(className.trim()).getDeclaredConstructor().newInstance();
+        consumer = Class.forName(className.trim())
+                .asSubclass(Consumer.class)
+                .getDeclaredConstructor().newInstance();
 
         // Each "filter" is <objectTypes> + <eventTypes> : ...
         filters = new ArrayList<>();

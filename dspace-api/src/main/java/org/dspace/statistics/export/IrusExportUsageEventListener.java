@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.model.Event;
 import org.dspace.statistics.export.processor.BitstreamEventProcessor;
@@ -66,7 +66,7 @@ public class IrusExportUsageEventListener extends AbstractUsageEventListener {
                     } catch (Exception e1) {
                         type = -1;
                     }
-                    log.error(LogManager.getHeader(ue.getContext(), "Error while processing export of use event",
+                    log.error(LogHelper.getHeader(ue.getContext(), "Error while processing export of use event",
                                                    "Id: " + id + " type: " + type), e);
                 }
             }

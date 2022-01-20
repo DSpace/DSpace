@@ -118,6 +118,7 @@ public class AuthenticationRestController implements InitializingBean {
 
             response.setHeader("WWW-Authenticate", authenticateHeaderValue);
         }
+        authenticationStatusRest.setAuthenticationMethod(context.getAuthenticationMethod());
         authenticationStatusRest.setProjection(projection);
         AuthenticationStatusResource authenticationStatusResource = converter.toResource(authenticationStatusRest);
 

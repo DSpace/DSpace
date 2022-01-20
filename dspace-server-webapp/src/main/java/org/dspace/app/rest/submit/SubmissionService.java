@@ -250,7 +250,7 @@ public class SubmissionService {
             id = Integer.parseInt(split[1]);
             wsi = workspaceItemService.find(context, id);
         } catch (NumberFormatException e) {
-            throw new UnprocessableEntityException("The provided workspaceitem URI is not valid");
+            throw new UnprocessableEntityException("The provided workspaceitem URI is not valid", e);
         }
         if (wsi == null) {
             throw new UnprocessableEntityException("Workspace item is not found");
@@ -265,7 +265,7 @@ public class SubmissionService {
             wi = workflowService.start(context, wsi);
         } catch (IOException e) {
             throw new RuntimeException("The workflow could not be started for workspaceItem with" +
-                                               "id:  " + id);
+                                               " id:  " + id, e);
         }
 
         return wi;

@@ -9,6 +9,7 @@ package org.dspace.content.service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
@@ -335,4 +336,40 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      */
     void forceDelete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
         throws SQLException, AuthorizeException;
+
+    /**
+     * This method is used to retrieve relationships that match focusItem
+     * on the one hand and matches list of related items elsewhere.
+     *
+     * @param context            DSpace context object
+     * @param focusUUID          UUID of Item that will match left side if the param isLeft is true otherwise right side
+     * @param relationshipType   Relationship type to filter by
+     * @param items              List of UUID that will use to filter other side respect the focusUUID
+     * @param isLeft             Indicating whether the counted Relationships should have
+     *                           the given Item on the left side or not
+     * @param limit              paging limit
+     * @param offset             paging offset
+     * @return
+     * @throws SQLException      If database error
+     */
+    public List<Relationship> findByItemRelationshipTypeAndRelatedList(Context context, UUID focusUUID,
+                RelationshipType relationshipType, List<UUID> items, boolean isLeft,
+                int offset, int limit) throws SQLException;
+
+    /**
+     * Count total number of relationships that match focusItem
+     * on the one hand and matches list of related items elsewhere.
+     *
+     * @param context            DSpace context object
+     * @param focusUUID          UUID of Item that will match left side if the param isLeft is true otherwise right side
+     * @param relationshipType   Relationship type to filter by
+     * @param items              List of UUID that will use to filter other side respect the focusUUID
+     * @param isLeft             Indicating whether the counted Relationships should have
+     *                           the given Item on the left side or not
+     * @return
+     * @throws SQLException      If database error
+     */
+    public int countByItemRelationshipTypeAndRelatedList(Context context, UUID focusUUID,
+           RelationshipType relationshipType, List<UUID> items, boolean isLeft) throws SQLException;
+
 }
