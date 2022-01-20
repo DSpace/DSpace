@@ -40,7 +40,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Time: 10:05
  *
  * Notify Google Analytics of... well anything we want really.
+ * @deprecated Use org.dspace.google.GoogleAsyncEventListener instead
  */
+@Deprecated
 public class GoogleRecorderEventListener extends AbstractUsageEventListener {
 
     private String analyticsKey;

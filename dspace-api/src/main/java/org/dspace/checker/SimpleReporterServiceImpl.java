@@ -77,7 +77,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
         osw.write(applyDateFormatShort(endDate));
         osw.write("\n\n\n");
 
-        if (recentChecksums.size() == 0) {
+        if (recentChecksums.isEmpty()) {
             osw.write("\n\n");
             osw.write(msg("no-bitstreams-to-delete"));
             osw.write("\n");
@@ -119,7 +119,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
         osw.write(applyDateFormatShort(endDate));
         osw.write("\n\n\n");
 
-        if (history.size() == 0) {
+        if (history.isEmpty()) {
             osw.write("\n\n");
             osw.write(msg("no-changed-bitstreams"));
             osw.write("\n");
@@ -159,7 +159,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
         osw.write(applyDateFormatShort(endDate));
         osw.write("\n\n\n");
 
-        if (history.size() == 0) {
+        if (history.isEmpty()) {
             osw.write("\n\n");
             osw.write(msg("no-bitstreams-changed"));
             osw.write("\n");
@@ -201,7 +201,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
         osw.write(applyDateFormatShort(endDate));
         osw.write("\n\n\n");
 
-        if (mostRecentChecksums.size() == 0) {
+        if (mostRecentChecksums.isEmpty()) {
             osw.write("\n\n");
             osw.write(msg("no-bitstreams-to-no-longer-be-processed"));
             osw.write("\n");
@@ -233,7 +233,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
         osw.write(applyDateFormatShort(new Date()));
         osw.write("\n\n\n");
 
-        if (bitstreams.size() == 0) {
+        if (bitstreams.isEmpty()) {
             osw.write("\n\n");
             osw.write(msg("no-unchecked-bitstreams"));
             osw.write("\n");
@@ -257,7 +257,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
     protected void printHistoryRecords(List<MostRecentChecksum> mostRecentChecksums, OutputStreamWriter osw)
         throws IOException {
         for (MostRecentChecksum mostRecentChecksum : mostRecentChecksums) {
-            StringBuffer buf = new StringBuffer(1000);
+            StringBuilder buf = new StringBuilder(1000);
             buf.append("------------------------------------------------ \n");
             buf.append(msg("bitstream-id")).append(" = ").append(
                 mostRecentChecksum.getBitstream().getID()).append("\n");
@@ -292,7 +292,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
         throws IOException, SQLException {
 
         for (Bitstream info : bitstreams) {
-            StringBuffer buf = new StringBuffer(1000);
+            StringBuilder buf = new StringBuilder(1000);
             buf.append("------------------------------------------------ \n");
             buf.append(msg("format-id")).append(" =  ").append(
                 info.getFormat(context).getID()).append("\n");

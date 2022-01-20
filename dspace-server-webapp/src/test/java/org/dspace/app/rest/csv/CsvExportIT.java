@@ -60,7 +60,6 @@ public class CsvExportIT extends AbstractControllerIntegrationTest {
         Item article = ItemBuilder.createItem(context, col1)
                                   .withTitle("Article")
                                   .withIssueDate("2017-10-17")
-                                  .withEntityType("Publication")
                                   .build();
 
         AtomicReference<Integer> idRef = new AtomicReference<>();
@@ -104,14 +103,14 @@ public class CsvExportIT extends AbstractControllerIntegrationTest {
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .withEntityType("Publication").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
 
         Item article = ItemBuilder.createItem(context, col1)
                                   .withTitle("Article")
                                   .withIssueDate("2017-10-17")
-                                  .withEntityType("Publication")
                                   .build();
 
         AtomicReference<Integer> idRef = new AtomicReference<>();

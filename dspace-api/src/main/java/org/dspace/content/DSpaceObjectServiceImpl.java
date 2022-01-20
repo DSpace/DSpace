@@ -13,11 +13,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.NotImplementedException;
@@ -93,20 +93,6 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             if (dso.getHandle() != null) {
                 identifiers.add(handleService.getCanonicalForm(dso.getHandle()));
             }
-        }
-
-        if (log.isDebugEnabled()) {
-            StringBuilder dbgMsg = new StringBuilder();
-            for (String id : identifiers) {
-                if (dbgMsg.capacity() == 0) {
-                    dbgMsg.append("This DSO's Identifiers are: ");
-                } else {
-                    dbgMsg.append(", ");
-                }
-                dbgMsg.append(id);
-            }
-            dbgMsg.append(".");
-            log.debug(dbgMsg.toString());
         }
 
         return identifiers;
@@ -435,7 +421,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public String getMetadataFirstValue(T dso, MetadataFieldName field, String language) {
         List<MetadataValue> metadataValues
-                = getMetadata(dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER, language);
+                = getMetadata(dso, field.schema, field.element, field.qualifier, language);
         if (CollectionUtils.isNotEmpty(metadataValues)) {
             return metadataValues.get(0).getValue();
         }
@@ -462,11 +448,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             String language, String value)
             throws SQLException {
         if (value != null) {
-            clearMetadata(context, dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER,
+            clearMetadata(context, dso, field.schema, field.element, field.qualifier,
                     language);
 
-            String newValueLanguage = (Item.ANY.equals(language)) ? null : language;
-            addMetadata(context, dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER,
+            String newValueLanguage = Item.ANY.equals(language) ? null : language;
+            addMetadata(context, dso, field.schema, field.element, field.qualifier,
                     newValueLanguage, value);
             dso.setMetadataModified();
         }
@@ -610,7 +596,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
              */
             // A map created to store the latest place for each metadata field
             Map<MetadataField, Integer> fieldToLastPlace = new HashMap<>();
-            List<MetadataValue> metadataValues = new LinkedList<>();
+            List<MetadataValue> metadataValues;
             if (dso.getType() == Constants.ITEM) {
                 metadataValues = getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             } else {
@@ -625,7 +611,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 public int compare(MetadataValue o1, MetadataValue o2) {
                     int compare = o1.getPlace() - o2.getPlace();
                     if (compare == 0) {
-                        if (o1 instanceof RelationshipMetadataValue) {
+                        if (o1 instanceof RelationshipMetadataValue && o2 instanceof RelationshipMetadataValue) {
+                            return compare;
+                        } else if (o1 instanceof RelationshipMetadataValue) {
                             return 1;
                         } else if (o2 instanceof RelationshipMetadataValue) {
                             return -1;
@@ -643,7 +631,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     String authority = metadataValue.getAuthority();
                     String relationshipId = StringUtils.split(authority, "::")[1];
                     Relationship relationship = relationshipService.find(context, Integer.parseInt(relationshipId));
-                    if (relationship.getLeftItem() == (Item) dso) {
+                    if (relationship.getLeftItem().equals((Item) dso)) {
                         relationship.setLeftPlace(mvPlace);
                     } else {
                         relationship.setRightPlace(mvPlace);
@@ -742,12 +730,15 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to)
             throws SQLException, IllegalArgumentException {
-
         if (from == to) {
             throw new IllegalArgumentException("The \"from\" location MUST be different from \"to\" location");
         }
 
-        List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
+        List<MetadataValue> list =
+            getMetadata(dso, schema, element, qualifier).stream()
+                                                        .sorted(Comparator.comparing(MetadataValue::getPlace))
+                                                        .collect(Collectors.toList());
+
 
         if (from >= list.size() || to >= list.size() || to < 0 || from < 0) {
             throw new IllegalArgumentException(

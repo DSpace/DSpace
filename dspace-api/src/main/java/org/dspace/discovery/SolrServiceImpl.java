@@ -59,7 +59,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;
@@ -153,7 +153,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     getIndexableObjectFactory(indexableObject);
             if (force || requiresIndexing(indexableObject.getUniqueIndexID(), indexableObject.getLastModified())) {
                 update(context, indexableObjectFactory, indexableObject);
-                log.info(LogManager.getHeader(context, "indexed_object", indexableObject.getUniqueIndexID()));
+                log.info(LogHelper.getHeader(context, "indexed_object", indexableObject.getUniqueIndexID()));
             }
         } catch (IOException | SQLException | SolrServerException | SearchServiceException e) {
             log.error(e.getMessage(), e);
@@ -334,16 +334,30 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     /**
+     * Removes all documents from the Lucene index
+     */
+    public void deleteIndex() {
+        try {
+            final List<IndexFactory> indexableObjectServices = indexObjectServiceFactory.
+                    getIndexFactories();
+            for (IndexFactory indexableObjectService : indexableObjectServices) {
+                indexableObjectService.deleteAll();
+            }
+        } catch (IOException | SolrServerException e) {
+            log.error("Error cleaning discovery index: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * Iterates over all documents in the Lucene index and verifies they are in
      * database, if not, they are removed.
      *
-     * @param force whether or not to force a clean index
      * @throws IOException            IO exception
      * @throws SQLException           sql exception
      * @throws SearchServiceException occurs when something went wrong with querying the solr server
      */
     @Override
-    public void cleanIndex(boolean force) throws IOException, SQLException, SearchServiceException {
+    public void cleanIndex() throws IOException, SQLException, SearchServiceException {
         Context context = new Context();
         context.turnOffAuthorisationSystem();
 
@@ -351,56 +365,48 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (solrSearchCore.getSolr() == null) {
                 return;
             }
-            if (force) {
-                final List<IndexFactory> indexableObjectServices = indexObjectServiceFactory.
-                        getIndexFactories();
-                for (IndexFactory indexableObjectService : indexableObjectServices) {
-                    indexableObjectService.deleteAll();
-                }
-            } else {
-                // First, we'll just get a count of the total results
-                SolrQuery countQuery = new SolrQuery("*:*");
-                countQuery.setRows(0);  // don't actually request any data
-                // Get the total amount of results
-                QueryResponse totalResponse = solrSearchCore.getSolr().query(countQuery,
-                                                                             solrSearchCore.REQUEST_METHOD);
-                long total = totalResponse.getResults().getNumFound();
+            // First, we'll just get a count of the total results
+            SolrQuery countQuery = new SolrQuery("*:*");
+            countQuery.setRows(0);  // don't actually request any data
+            // Get the total amount of results
+            QueryResponse totalResponse = solrSearchCore.getSolr().query(countQuery,
+                                                                         solrSearchCore.REQUEST_METHOD);
+            long total = totalResponse.getResults().getNumFound();
 
-                int start = 0;
-                int batch = 100;
+            int start = 0;
+            int batch = 100;
 
-                // Now get actual Solr Documents in batches
-                SolrQuery query = new SolrQuery();
-                query.setFields(SearchUtils.RESOURCE_UNIQUE_ID, SearchUtils.RESOURCE_ID_FIELD,
-                                SearchUtils.RESOURCE_TYPE_FIELD);
-                query.addSort(SearchUtils.RESOURCE_UNIQUE_ID, SolrQuery.ORDER.asc);
-                query.setQuery("*:*");
-                query.setRows(batch);
-                // Keep looping until we hit the total number of Solr docs
-                while (start < total) {
-                    query.setStart(start);
-                    QueryResponse rsp = solrSearchCore.getSolr().query(query, solrSearchCore.REQUEST_METHOD);
-                    SolrDocumentList docs = rsp.getResults();
+            // Now get actual Solr Documents in batches
+            SolrQuery query = new SolrQuery();
+            query.setFields(SearchUtils.RESOURCE_UNIQUE_ID, SearchUtils.RESOURCE_ID_FIELD,
+                            SearchUtils.RESOURCE_TYPE_FIELD);
+            query.addSort(SearchUtils.RESOURCE_UNIQUE_ID, SolrQuery.ORDER.asc);
+            query.setQuery("*:*");
+            query.setRows(batch);
+            // Keep looping until we hit the total number of Solr docs
+            while (start < total) {
+                query.setStart(start);
+                QueryResponse rsp = solrSearchCore.getSolr().query(query, solrSearchCore.REQUEST_METHOD);
+                SolrDocumentList docs = rsp.getResults();
 
-                    for (SolrDocument doc : docs) {
-                        String uniqueID = (String) doc.getFieldValue(SearchUtils.RESOURCE_UNIQUE_ID);
+                for (SolrDocument doc : docs) {
+                    String uniqueID = (String) doc.getFieldValue(SearchUtils.RESOURCE_UNIQUE_ID);
 
-                        IndexableObject o = findIndexableObject(context, doc);
+                    IndexableObject o = findIndexableObject(context, doc);
 
-                        if (o == null) {
-                            log.info("Deleting: " + uniqueID);
-                            /*
-                             * Use IndexWriter to delete, its easier to manage
-                             * write.lock
-                             */
-                            unIndexContent(context, uniqueID);
-                        } else {
-                            log.debug("Keeping: " + o.getUniqueIndexID());
-                        }
+                    if (o == null) {
+                        log.info("Deleting: " + uniqueID);
+                        /*
+                         * Use IndexWriter to delete, its easier to manage
+                         * write.lock
+                         */
+                        unIndexContent(context, uniqueID);
+                    } else {
+                        log.debug("Keeping: " + o.getUniqueIndexID());
                     }
-
-                    start += batch;
                 }
+
+                start += batch;
             }
         } catch (IOException | SQLException | SolrServerException e) {
             log.error("Error cleaning discovery index: " + e.getMessage(), e);
@@ -890,7 +896,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         result.addIndexableObject(indexableObject);
                     } else {
                         // log has warn because we try to fix the issue
-                        log.warn(LogManager.getHeader(context,
+                        log.warn(LogHelper.getHeader(context,
                                 "Stale entry found in Discovery index,"
                               + " as we could not find the DSpace object it refers to. ",
                                 "Unique identifier: " + doc.getFirstValue(SearchUtils.RESOURCE_UNIQUE_ID)));
@@ -1116,7 +1122,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         } catch (IOException | SQLException | SolrServerException e) {
             // Any acception that we get ignore it.
             // We do NOT want any crashed to shown by the user
-            log.error(LogManager.getHeader(context, "Error while quering solr", "Query: " + query), e);
+            log.error(LogHelper.getHeader(context, "Error while quering solr", "Query: " + query), e);
             return new ArrayList<>(0);
         }
     }
@@ -1224,8 +1230,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             }
         } catch (IOException | SQLException | SolrServerException e) {
-            log.error(
-                LogManager.getHeader(context, "Error while retrieving related items", "Handle: "
+            log.error(LogHelper.getHeader(context, "Error while retrieving related items", "Handle: "
                     + item.getHandle()), e);
         }
         return results;
