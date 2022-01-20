@@ -34,6 +34,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 /**
@@ -72,6 +74,10 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     @Column(name = "last_modified", columnDefinition = "timestamp with time zone")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastModified = new Date();
+
+    @Generated(GenerationTime.INSERT)
+    @Column(name = "sorting_number", unique = true, nullable = false)
+    private Integer sortingNumber;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "owning_collection")
@@ -388,6 +394,14 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     protected void setMetadataModified() {
         super.setMetadataModified();
         modifiedMetadataCache = true;
+    }
+
+    public Integer getSortingNumber() {
+        return sortingNumber;
+    }
+
+    public void setSortingNumber(final Integer sortingNumber) {
+        this.sortingNumber = sortingNumber;
     }
 
     public boolean isModifiedMetadataCache() {

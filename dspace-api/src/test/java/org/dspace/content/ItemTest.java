@@ -65,9 +65,13 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemTest.class);
 
     /**
-     * Item instance for the tests
+     * Item instances for the tests
      */
-    private Item it;
+    private Item item1;
+    private Item item2;
+    private Item item3;
+    private Item item4;
+    private Item item5;
 
     private MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance()
                                                                                .getMetadataSchemaService();
@@ -101,9 +105,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
             context.turnOffAuthorisationSystem();
             this.owningCommunity = communityService.create(null, context);
             this.collection = collectionService.create(context, owningCommunity);
-            WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
-            this.it = installItemService.installItem(context, workspaceItem);
-            this.dspaceObject = it;
+            WorkspaceItem workspaceItem1 = workspaceItemService.create(context, collection, true);
+            this.item1 = installItemService.installItem(context, workspaceItem1);
+            this.dspaceObject = item1;
             context.restoreAuthSystemState();
 
             // Initialize our spy of the autowired (global) authorizeService bean.
@@ -140,7 +144,21 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void destroy() {
         context.turnOffAuthorisationSystem();
         try {
-            itemService.delete(context, it);
+            if (item1 != null) {
+                itemService.delete(context, item1);
+            }
+            if (item2 != null) {
+                itemService.delete(context, item2);
+            }
+            if (item3 != null) {
+                itemService.delete(context, item3);
+            }
+            if (item4 != null) {
+                itemService.delete(context, item4);
+            }
+            if (item5 != null) {
+                itemService.delete(context, item5);
+            }
         } catch (Exception e) {
             // ignore
         }
@@ -158,7 +176,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         }
 
         context.restoreAuthSystemState();
-        it = null;
+        item1 = null;
         collection = null;
         owningCommunity = null;
         try {
@@ -175,7 +193,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testItemFind() throws Exception {
         // Get ID of item created in init()
-        UUID id = it.getID();
+        UUID id = item1.getID();
         // Make sure we can find it via its ID
         Item found = itemService.find(context, id);
         assertThat("testItemFind 0", found, notNullValue());
@@ -207,12 +225,100 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         boolean added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
-            if (tmp.equals(it)) {
+            if (tmp.equals(item1)) {
                 added = true;
             }
         }
         assertTrue("testFindAll 1", added);
     }
+
+    /**
+     * Test of findAll method with sorting, of class Item.
+     */
+    @Test
+    public void testFindAllWithSorting() throws Exception {
+        // Add additional items to test sorting
+        context.turnOffAuthorisationSystem();
+        WorkspaceItem workspaceItem2 = workspaceItemService.create(context, collection, true);
+        this.item2 = installItemService.installItem(context, workspaceItem2);
+        WorkspaceItem workspaceItem3 = workspaceItemService.create(context, collection, true);
+        this.item3 = installItemService.installItem(context, workspaceItem3);
+        WorkspaceItem workspaceItem4 = workspaceItemService.create(context, collection, true);
+        this.item4 = installItemService.installItem(context, workspaceItem4);
+        WorkspaceItem workspaceItem5 = workspaceItemService.create(context, collection, true);
+        this.item5 = installItemService.installItem(context, workspaceItem5);
+        context.restoreAuthSystemState();
+
+
+        Iterator<Item> all = itemService.findAll(context);
+        assertThat("testFindAllWithSorting 0", all, notNullValue());
+
+        Item testItem1 = all.next();
+        Item testItem2 = all.next();
+        Item testItem3 = all.next();
+        Item testItem4 = all.next();
+        Item testItem5 = all.next();
+
+        assertFalse("testFindAllWithSorting 1", all.hasNext());
+
+        assertEquals("testFindAllWithSorting 1", item1, testItem1);
+        assertEquals("testFindAllWithSorting 2", item2, testItem2);
+        assertEquals("testFindAllWithSorting 3", item3, testItem3);
+        assertEquals("testFindAllWithSorting 4", item4, testItem4);
+        assertEquals("testFindAllWithSorting 5", item5, testItem5);
+    }
+
+    /**
+     * Test of findAll method with sorting, of class Item.
+     */
+    @Test
+    public void testFindAllWithSortingAndOffsets() throws Exception {
+        // Add additional items to test sorting
+        context.turnOffAuthorisationSystem();
+        WorkspaceItem workspaceItem2 = workspaceItemService.create(context, collection, true);
+        this.item2 = installItemService.installItem(context, workspaceItem2);
+        WorkspaceItem workspaceItem3 = workspaceItemService.create(context, collection, true);
+        this.item3 = installItemService.installItem(context, workspaceItem3);
+        WorkspaceItem workspaceItem4 = workspaceItemService.create(context, collection, true);
+        this.item4 = installItemService.installItem(context, workspaceItem4);
+        WorkspaceItem workspaceItem5 = workspaceItemService.create(context, collection, true);
+        this.item5 = installItemService.installItem(context, workspaceItem5);
+        context.restoreAuthSystemState();
+
+        Iterator<Item> partial1 = itemService.findAll(context, 2, 0);
+        assertThat("testFindAllWithSortingAndOffsets 0", partial1, notNullValue());
+
+        Item testItem1 = partial1.next();
+        Item testItem2 = partial1.next();
+
+        assertFalse("testFindAllWithSorting 1", partial1.hasNext());
+
+        assertEquals("testFindAllWithSorting 2", item1, testItem1);
+        assertEquals("testFindAllWithSorting 3", item2, testItem2);
+
+
+        Iterator<Item> partial2 = itemService.findAll(context, 2, 2);
+        assertThat("testFindAllWithSortingAndOffsets 4", partial2, notNullValue());
+
+        Item testItem3 = partial2.next();
+        Item testItem4 = partial2.next();
+
+        assertFalse("testFindAllWithSorting 5", partial2.hasNext());
+
+        assertEquals("testFindAllWithSorting 6", item3, testItem3);
+        assertEquals("testFindAllWithSorting 7", item4, testItem4);
+
+
+        Iterator<Item> partial3 = itemService.findAll(context, 2, 4);
+        assertThat("testFindAllWithSortingAndOffsets 8", partial3, notNullValue());
+
+        Item testItem5 = partial3.next();
+
+        assertFalse("testFindAllWithSorting 8", partial3.hasNext());
+
+        assertEquals("testFindAllWithSorting 9", item5, testItem5);
+    }
+
 
     /**
      * Test of findBySubmitter method, of class Item.
@@ -225,7 +331,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         boolean added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
-            if (tmp.equals(it)) {
+            if (tmp.equals(item1)) {
                 added = true;
             }
         }
@@ -245,17 +351,17 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testFindInArchiveOrWithdrawnDiscoverableModifiedSince() throws Exception {
         // Init item to be both withdrawn and discoverable
-        it.setWithdrawn(true);
-        it.setArchived(false);
-        it.setDiscoverable(true);
+        item1.setWithdrawn(true);
+        item1.setArchived(false);
+        item1.setDiscoverable(true);
          // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
         Iterator<Item> all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
-                DateUtils.addDays(it.getLastModified(),1));
+                DateUtils.addDays(item1.getLastModified(), 1));
         assertThat("Returned list should not be null", all, notNullValue());
         boolean added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
-            if (tmp.equals(it)) {
+            if (tmp.equals(item1)) {
                 added = true;
             }
         }
@@ -263,42 +369,42 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertFalse("List should not contain item when passing a date newer than item last-modified date", added);
          // Test 2: Using a past 'modified since' date, we should get a non-null list containing our item
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
-                DateUtils.addDays(it.getLastModified(),-1));
+                DateUtils.addDays(item1.getLastModified(), -1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
-            if (tmp.equals(it)) {
+            if (tmp.equals(item1)) {
                 added = true;
             }
         }
         // Test 3: we should find our item in this list
         assertTrue("List should contain item when passing a date older than item last-modified date", added);
          // Repeat Tests 2, 3 with withdrawn = false and archived = true as this should result in same behaviour
-        it.setWithdrawn(false);
-        it.setArchived(true);
+        item1.setWithdrawn(false);
+        item1.setArchived(true);
          // Test 4: Using a past 'modified since' date, we should get a non-null list containing our item
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
-                DateUtils.addDays(it.getLastModified(),-1));
+                DateUtils.addDays(item1.getLastModified(), -1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
-            if (tmp.equals(it)) {
+            if (tmp.equals(item1)) {
                 added = true;
             }
         }
         // Test 5: We should find our item in this list
         assertTrue("List should contain item when passing a date older than item last-modified date", added);
          // Test 6: Make sure non-discoverable items are not returned, regardless of archived/withdrawn state
-        it.setDiscoverable(false);
+        item1.setDiscoverable(false);
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
-                DateUtils.addDays(it.getLastModified(),-1));
+                DateUtils.addDays(item1.getLastModified(), -1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
-            if (tmp.equals(it)) {
+            if (tmp.equals(item1)) {
                 added = true;
             }
         }
@@ -312,17 +418,17 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testFindInArchiveOrWithdrawnNonDiscoverableModifiedSince() throws Exception {
         // Init item to be both withdrawn and discoverable
-        it.setWithdrawn(true);
-        it.setArchived(false);
-        it.setDiscoverable(false);
+        item1.setWithdrawn(true);
+        item1.setArchived(false);
+        item1.setDiscoverable(false);
          // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
         Iterator<Item> all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
-                DateUtils.addDays(it.getLastModified(),1));
+                DateUtils.addDays(item1.getLastModified(), 1));
         assertThat("Returned list should not be null", all, notNullValue());
         boolean added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
-            if (tmp.equals(it)) {
+            if (tmp.equals(item1)) {
                 added = true;
             }
         }
@@ -330,27 +436,27 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertFalse("List should not contain item when passing a date newer than item last-modified date", added);
          // Test 2: Using a past 'modified since' date, we should get a non-null list containing our item
         all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
-                DateUtils.addDays(it.getLastModified(),-1));
+                DateUtils.addDays(item1.getLastModified(), -1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
-            if (tmp.equals(it)) {
+            if (tmp.equals(item1)) {
                 added = true;
             }
         }
          // Test 3: We should find our item in this list
         assertTrue("List should contain item when passing a date older than item last-modified date", added);
          // Repeat Tests 2, 3 with discoverable = true
-        it.setDiscoverable(true);
+        item1.setDiscoverable(true);
          // Test 4: Now we should still get a non-null list with NO items since item is discoverable
         all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
-                DateUtils.addDays(it.getLastModified(),-1));
+                DateUtils.addDays(item1.getLastModified(), -1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
-            if (tmp.equals(it)) {
+            if (tmp.equals(item1)) {
                 added = true;
             }
         }
@@ -364,7 +470,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Override
     @Test
     public void testGetID() {
-        assertTrue("testGetID 0", it.getID() != null);
+        assertTrue("testGetID 0", item1.getID() != null);
     }
 
     /**
@@ -374,7 +480,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testGetHandle() {
         //default instance has a random handle
-        assertThat("testGetHandle 0", it.getHandle(), notNullValue());
+        assertThat("testGetHandle 0", item1.getHandle(), notNullValue());
     }
 
     /**
@@ -383,7 +489,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testIsArchived() throws SQLException, AuthorizeException, IOException, IllegalAccessException {
         //we are archiving items in the test by default so other tests run
-        assertTrue("testIsArchived 0", it.isArchived());
+        assertTrue("testIsArchived 0", item1.isArchived());
 
         //false by default
         context.turnOffAuthorisationSystem();
@@ -397,7 +503,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testIsWithdrawn() {
-        assertFalse("testIsWithdrawn 0", it.isWithdrawn());
+        assertFalse("testIsWithdrawn 0", item1.isWithdrawn());
     }
 
     /**
@@ -405,8 +511,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetLastModified() {
-        assertThat("testGetLastModified 0", it.getLastModified(), notNullValue());
-        assertTrue("testGetLastModified 1", DateUtils.isSameDay(it.getLastModified(), new Date()));
+        assertThat("testGetLastModified 0", item1.getLastModified(), notNullValue());
+        assertTrue("testGetLastModified 1", DateUtils.isSameDay(item1.getLastModified(), new Date()));
     }
 
     /**
@@ -414,8 +520,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testSetArchived() {
-        it.setArchived(true);
-        assertTrue("testSetArchived 0", it.isArchived());
+        item1.setArchived(true);
+        assertTrue("testSetArchived 0", item1.isArchived());
     }
 
     /**
@@ -427,9 +533,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         Collection c = createCollection();
         context.restoreAuthSystemState();
 
-        it.setOwningCollection(c);
-        assertThat("testSetOwningCollection 0", it.getOwningCollection(), notNullValue());
-        assertThat("testSetOwningCollection 1", it.getOwningCollection(), equalTo(c));
+        item1.setOwningCollection(c);
+        assertThat("testSetOwningCollection 0", item1.getOwningCollection(), notNullValue());
+        assertThat("testSetOwningCollection 1", item1.getOwningCollection(), equalTo(c));
     }
 
     /**
@@ -437,8 +543,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetOwningCollection() throws Exception {
-        assertThat("testGetOwningCollection 0", it.getOwningCollection(), notNullValue());
-        assertEquals("testGetOwningCollection 1", it.getOwningCollection(), collection);
+        assertThat("testGetOwningCollection 0", item1.getOwningCollection(), notNullValue());
+        assertEquals("testGetOwningCollection 1", item1.getOwningCollection(), collection);
     }
 
     /**
@@ -450,7 +556,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String element = "contributor";
         String qualifier = "author";
         String lang = Item.ANY;
-        List<MetadataValue> dc = itemService.getMetadata(it, schema, element, qualifier, lang);
+        List<MetadataValue> dc = itemService.getMetadata(item1, schema, element, qualifier, lang);
         assertThat("testGetMetadata_4args 0", dc, notNullValue());
         assertTrue("testGetMetadata_4args 1", dc.size() == 0);
     }
@@ -461,17 +567,17 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testGetMetadata_String() {
         String mdString = "dc.contributor.author";
-        List<MetadataValue> dc = itemService.getMetadataByMetadataString(it, mdString);
+        List<MetadataValue> dc = itemService.getMetadataByMetadataString(item1, mdString);
         assertThat("testGetMetadata_String 0", dc, notNullValue());
         assertTrue("testGetMetadata_String 1", dc.size() == 0);
 
         mdString = "dc.contributor.*";
-        dc = itemService.getMetadataByMetadataString(it, mdString);
+        dc = itemService.getMetadataByMetadataString(item1, mdString);
         assertThat("testGetMetadata_String 2", dc, notNullValue());
         assertTrue("testGetMetadata_String 3", dc.size() == 0);
 
         mdString = "dc.contributor";
-        dc = itemService.getMetadataByMetadataString(it, mdString);
+        dc = itemService.getMetadataByMetadataString(item1, mdString);
         assertThat("testGetMetadata_String 4", dc, notNullValue());
         assertTrue("testGetMetadata_String 5", dc.size() == 0);
     }
@@ -490,16 +596,16 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // Set the item to have two pieces of metadata for dc.type and dc2.type
         String dcType = "DC-TYPE";
         String testType = "TEST-TYPE";
-        itemService.addMetadata(context, it, "dc", "type", null, null, dcType);
-        itemService.addMetadata(context, it, "test", "type", null, null, testType);
+        itemService.addMetadata(context, item1, "dc", "type", null, null, dcType);
+        itemService.addMetadata(context, item1, "test", "type", null, null, testType);
 
         // Check that only one is returned when we ask for all dc.type values
-        List<MetadataValue> values = itemService.getMetadata(it, "dc", "type", null, null);
+        List<MetadataValue> values = itemService.getMetadata(item1, "dc", "type", null, null);
         assertTrue("Return results", values.size() == 1);
 
         //Delete the field & schema
         context.turnOffAuthorisationSystem();
-        itemService.clearMetadata(context, it, "test", "type", null, Item.ANY);
+        itemService.clearMetadata(context, item1, "test", "type", null, Item.ANY);
         metadataFieldService.delete(context, metadataField);
         metadataSchemaService.delete(context, metadataSchema);
         context.restoreAuthSystemState();
@@ -515,9 +621,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String qualifier = "author";
         String lang = Item.ANY;
         String[] values = {"value0", "value1"};
-        itemService.addMetadata(context, it, schema, element, qualifier, lang, Arrays.asList(values));
+        itemService.addMetadata(context, item1, schema, element, qualifier, lang, Arrays.asList(values));
 
-        List<MetadataValue> dc = itemService.getMetadata(it, schema, element, qualifier, lang);
+        List<MetadataValue> dc = itemService.getMetadata(item1, schema, element, qualifier, lang);
         assertThat("testAddMetadata_5args_1 0", dc, notNullValue());
         assertTrue("testAddMetadata_5args_1 1", dc.size() == 2);
         assertThat("testAddMetadata_5args_1 2", dc.get(0).getMetadataField().getMetadataSchema().getName(),
@@ -551,9 +657,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         List<String> values = Arrays.asList("en_US", "en");
         List<String> authorities = Arrays.asList("accepted", "uncertain");
         List<Integer> confidences = Arrays.asList(0, 0);
-        itemService.addMetadata(context, it, schema, element, qualifier, lang, values, authorities, confidences);
+        itemService.addMetadata(context, item1, schema, element, qualifier, lang, values, authorities, confidences);
 
-        List<MetadataValue> dc = itemService.getMetadata(it, schema, element, qualifier, lang);
+        List<MetadataValue> dc = itemService.getMetadata(item1, schema, element, qualifier, lang);
         assertThat("testAddMetadata_7args_1 0", dc, notNullValue());
         assertTrue("testAddMetadata_7args_1 1", dc.size() == 2);
         assertThat("testAddMetadata_7args_1 2", dc.get(0).getMetadataField().getMetadataSchema().getName(),
@@ -588,9 +694,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         List<String> values = Arrays.asList("value0", "value1");
         List<String> authorities = Arrays.asList("auth0", "auth2");
         List<Integer> confidences = Arrays.asList(0, 0);
-        itemService.addMetadata(context, it, schema, element, qualifier, lang, values, authorities, confidences);
+        itemService.addMetadata(context, item1, schema, element, qualifier, lang, values, authorities, confidences);
 
-        List<MetadataValue> dc = itemService.getMetadata(it, schema, element, qualifier, lang);
+        List<MetadataValue> dc = itemService.getMetadata(item1, schema, element, qualifier, lang);
         assertThat("testAddMetadata_7args_1 0", dc, notNullValue());
         assertTrue("testAddMetadata_7args_1 1", dc.size() == 2);
         assertThat("testAddMetadata_7args_1 2", dc.get(0).getMetadataField().getMetadataSchema().getName(),
@@ -621,9 +727,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String qualifier = "author";
         String lang = Item.ANY;
         List<String> values = Arrays.asList("value0", "value1");
-        itemService.addMetadata(context, it, schema, element, qualifier, lang, values);
+        itemService.addMetadata(context, item1, schema, element, qualifier, lang, values);
 
-        List<MetadataValue> dc = itemService.getMetadata(it, schema, element, qualifier, lang);
+        List<MetadataValue> dc = itemService.getMetadata(item1, schema, element, qualifier, lang);
         assertThat("testAddMetadata_5args_2 0", dc, notNullValue());
         assertTrue("testAddMetadata_5args_2 1", dc.size() == 2);
         assertThat("testAddMetadata_5args_2 2", dc.get(0).getMetadataField().getMetadataSchema().getName(),
@@ -655,9 +761,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String values = "en";
         String authorities = "accepted";
         int confidences = 0;
-        itemService.addMetadata(context, it, schema, element, qualifier, lang, values, authorities, confidences);
+        itemService.addMetadata(context, item1, schema, element, qualifier, lang, values, authorities, confidences);
 
-        List<MetadataValue> dc = itemService.getMetadata(it, schema, element, qualifier, lang);
+        List<MetadataValue> dc = itemService.getMetadata(item1, schema, element, qualifier, lang);
         assertThat("testAddMetadata_7args_2 0", dc, notNullValue());
         assertTrue("testAddMetadata_7args_2 1", dc.size() == 1);
         assertThat("testAddMetadata_7args_2 2", dc.get(0).getMetadataField().getMetadataSchema().getName(),
@@ -684,9 +790,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String values = "value0";
         String authorities = "auth0";
         int confidences = 0;
-        itemService.addMetadata(context, it, schema, element, qualifier, lang, values, authorities, confidences);
+        itemService.addMetadata(context, item1, schema, element, qualifier, lang, values, authorities, confidences);
 
-        List<MetadataValue> dc = itemService.getMetadata(it, schema, element, qualifier, lang);
+        List<MetadataValue> dc = itemService.getMetadata(item1, schema, element, qualifier, lang);
         assertThat("testAddMetadata_7args_2 0", dc, notNullValue());
         assertTrue("testAddMetadata_7args_2 1", dc.size() == 1);
         assertThat("testAddMetadata_7args_2 2", dc.get(0).getMetadataField().getMetadataSchema().getName(),
@@ -709,11 +815,11 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String qualifier = "author";
         String lang = Item.ANY;
         String values = "value0";
-        itemService.addMetadata(context, it, schema, element, qualifier, lang, values);
+        itemService.addMetadata(context, item1, schema, element, qualifier, lang, values);
 
-        itemService.clearMetadata(context, it, schema, element, qualifier, lang);
+        itemService.clearMetadata(context, item1, schema, element, qualifier, lang);
 
-        List<MetadataValue> dc = itemService.getMetadata(it, schema, element, qualifier, lang);
+        List<MetadataValue> dc = itemService.getMetadata(item1, schema, element, qualifier, lang);
         assertThat("testClearMetadata 0", dc, notNullValue());
         assertTrue("testClearMetadata 1", dc.size() == 0);
     }
@@ -723,7 +829,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetSubmitter() throws Exception {
-        assertThat("testGetSubmitter 0", it.getSubmitter(), notNullValue());
+        assertThat("testGetSubmitter 0", item1.getSubmitter(), notNullValue());
 
         //null by default
         context.turnOffAuthorisationSystem();
@@ -741,10 +847,10 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         EPerson sub = ePersonService.create(context);
         context.restoreAuthSystemState();
 
-        it.setSubmitter(sub);
+        item1.setSubmitter(sub);
 
-        assertThat("testSetSubmitter 0", it.getSubmitter(), notNullValue());
-        assertThat("testSetSubmitter 1", it.getSubmitter().getID(), equalTo(sub.getID()));
+        assertThat("testSetSubmitter 0", item1.getSubmitter(), notNullValue());
+        assertThat("testSetSubmitter 1", item1.getSubmitter().getID(), equalTo(sub.getID()));
     }
 
     /**
@@ -756,16 +862,16 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         Collection collection = collectionService.create(context, owningCommunity);
         collectionService.setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
                                                  "title", null, Item.ANY, "collection B");
-        it.addCollection(collection);
+        item1.addCollection(collection);
         collection = collectionService.create(context, owningCommunity);
         collectionService.setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
                                                  "title", null, Item.ANY, "collection A");
-        it.addCollection(collection);
+        item1.addCollection(collection);
         context.restoreAuthSystemState();
-        assertThat("testGetCollections 0", it.getCollections(), notNullValue());
-        assertTrue("testGetCollections 1", it.getCollections().size() == 3);
-        assertTrue("testGetCollections 2", it.getCollections().get(1).getName().equals("collection A"));
-        assertTrue("testGetCollections 3", it.getCollections().get(2).getName().equals("collection B"));
+        assertThat("testGetCollections 0", item1.getCollections(), notNullValue());
+        assertTrue("testGetCollections 1", item1.getCollections().size() == 3);
+        assertTrue("testGetCollections 2", item1.getCollections().get(1).getName().equals("collection A"));
+        assertTrue("testGetCollections 3", item1.getCollections().get(2).getName().equals("collection B"));
     }
 
     /**
@@ -773,8 +879,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetCommunities() throws Exception {
-        assertThat("testGetCommunities 0", itemService.getCommunities(context, it), notNullValue());
-        assertTrue("testGetCommunities 1", itemService.getCommunities(context, it).size() == 1);
+        assertThat("testGetCommunities 0", itemService.getCommunities(context, item1), notNullValue());
+        assertTrue("testGetCommunities 1", itemService.getCommunities(context, item1).size() == 1);
     }
 
     /**
@@ -782,8 +888,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetBundles_0args() throws Exception {
-        assertThat("testGetBundles_0args 0", it.getBundles(), notNullValue());
-        assertTrue("testGetBundles_0args 1", it.getBundles().size() == 0);
+        assertThat("testGetBundles_0args 0", item1.getBundles(), notNullValue());
+        assertTrue("testGetBundles_0args 1", item1.getBundles().size() == 0);
     }
 
     /**
@@ -792,8 +898,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testGetBundles_String() throws Exception {
         String name = "name";
-        assertThat("testGetBundles_String 0", itemService.getBundles(it, name), notNullValue());
-        assertTrue("testGetBundles_String 1", itemService.getBundles(it, name).size() == 0);
+        assertThat("testGetBundles_String 0", itemService.getBundles(item1, name), notNullValue());
+        assertTrue("testGetBundles_String 1", itemService.getBundles(item1, name).size() == 0);
     }
 
     /**
@@ -802,14 +908,14 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testCreateBundleAuth() throws Exception {
         // Allow Item ADD perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.ADD);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item1, Constants.ADD);
 
         String name = "bundle";
-        Bundle created = bundleService.create(context, it, name);
+        Bundle created = bundleService.create(context, item1, name);
         assertThat("testCreateBundleAuth 0", created, notNullValue());
         assertThat("testCreateBundleAuth 1", created.getName(), equalTo(name));
-        assertThat("testCreateBundleAuth 2", itemService.getBundles(it, name), notNullValue());
-        assertTrue("testCreateBundleAuth 3", itemService.getBundles(it, name).size() == 1);
+        assertThat("testCreateBundleAuth 2", itemService.getBundles(item1, name), notNullValue());
+        assertTrue("testCreateBundleAuth 3", itemService.getBundles(item1, name).size() == 1);
     }
 
     /**
@@ -817,7 +923,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = SQLException.class)
     public void testCreateBundleNoName() throws Exception {
-        bundleService.create(context, it, "");
+        bundleService.create(context, item1, "");
         fail("Exception expected");
     }
 
@@ -826,7 +932,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = SQLException.class)
     public void testCreateBundleNullName() throws Exception {
-        bundleService.create(context, it, null);
+        bundleService.create(context, item1, null);
         fail("Exception expected");
     }
 
@@ -836,7 +942,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test(expected = AuthorizeException.class)
     public void testCreateBundleNoAuth() throws Exception {
         String name = "bundle";
-        bundleService.create(context, it, name);
+        bundleService.create(context, item1, name);
         fail("Exception expected");
     }
 
@@ -846,16 +952,16 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testAddBundleAuth() throws Exception {
         // Allow Item ADD perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.ADD);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item1, Constants.ADD);
 
         String name = "bundle";
-        Bundle created = bundleService.create(context, it, name);
+        Bundle created = bundleService.create(context, item1, name);
         created.setName(context, name);
-        itemService.addBundle(context, it, created);
+        itemService.addBundle(context, item1, created);
 
-        assertThat("testAddBundleAuth 0", itemService.getBundles(it, name), notNullValue());
-        assertTrue("testAddBundleAuth 1", itemService.getBundles(it, name).size() == 1);
-        assertThat("testAddBundleAuth 2", itemService.getBundles(it, name).get(0), equalTo(created));
+        assertThat("testAddBundleAuth 0", itemService.getBundles(item1, name), notNullValue());
+        assertTrue("testAddBundleAuth 1", itemService.getBundles(item1, name).size() == 1);
+        assertThat("testAddBundleAuth 2", itemService.getBundles(item1, name).get(0), equalTo(created));
     }
 
     /**
@@ -864,9 +970,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test(expected = AuthorizeException.class)
     public void testAddBundleNoAuth() throws Exception {
         String name = "bundle";
-        Bundle created = bundleService.create(context, it, name);
+        Bundle created = bundleService.create(context, item1, name);
         created.setName(context, name);
-        itemService.addBundle(context, it, created);
+        itemService.addBundle(context, item1, created);
         fail("Exception expected");
     }
 
@@ -878,19 +984,19 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // First create a bundle for test
         context.turnOffAuthorisationSystem();
         String name = "bundle";
-        Bundle created = bundleService.create(context, it, name);
+        Bundle created = bundleService.create(context, item1, name);
         created.setName(context, name);
-        itemService.addBundle(context, it, created);
+        itemService.addBundle(context, item1, created);
         context.restoreAuthSystemState();
 
         // Allow Item REMOVE perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.REMOVE);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item1, Constants.REMOVE);
         // Allow Bundle DELETE
         doNothing().when(authorizeServiceSpy).authorizeAction(context, created, Constants.DELETE);
 
-        itemService.removeBundle(context, it, created);
-        assertThat("testRemoveBundleAuth 0", itemService.getBundles(it, name), notNullValue());
-        assertTrue("testRemoveBundleAuth 1", itemService.getBundles(it, name).size() == 0);
+        itemService.removeBundle(context, item1, created);
+        assertThat("testRemoveBundleAuth 0", itemService.getBundles(item1, name), notNullValue());
+        assertTrue("testRemoveBundleAuth 1", itemService.getBundles(item1, name).size() == 0);
     }
 
     /**
@@ -901,12 +1007,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // First create a bundle for test
         context.turnOffAuthorisationSystem();
         String name = "bundle";
-        Bundle created = bundleService.create(context, it, name);
+        Bundle created = bundleService.create(context, item1, name);
         created.setName(context, name);
-        itemService.addBundle(context, it, created);
+        itemService.addBundle(context, item1, created);
         context.restoreAuthSystemState();
 
-        itemService.removeBundle(context, it, created);
+        itemService.removeBundle(context, item1, created);
         fail("Exception expected");
     }
 
@@ -916,9 +1022,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testCreateSingleBitstream_InputStream_StringAuth() throws Exception {
         // Allow Item ADD perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.ADD);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item1, Constants.ADD);
         // Allow Item WRITE perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE, true);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item1, Constants.WRITE, true);
         // Allow Bundle ADD perms
         doNothing().when(authorizeServiceSpy).authorizeAction(any(Context.class), any(Bundle.class), eq(Constants.ADD));
         // Allow Bitstream WRITE perms
@@ -927,7 +1033,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         String name = "new bundle";
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, name);
+        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), item1, name);
         assertThat("testCreateSingleBitstream_InputStream_StringAuth 0", result, notNullValue());
     }
 
@@ -938,7 +1044,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testCreateSingleBitstream_InputStream_StringNoAuth() throws Exception {
         String name = "new bundle";
         File f = new File(testProps.get("test.bitstream").toString());
-        itemService.createSingleBitstream(context, new FileInputStream(f), it, name);
+        itemService.createSingleBitstream(context, new FileInputStream(f), item1, name);
         fail("Exception expected");
     }
 
@@ -948,9 +1054,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testCreateSingleBitstream_InputStreamAuth() throws Exception {
         // Allow Item ADD perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.ADD);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item1, Constants.ADD);
         // Allow Item WRITE perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE, true);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item1, Constants.WRITE, true);
         // Allow Bundle ADD perms
         doNothing().when(authorizeServiceSpy).authorizeAction(any(Context.class), any(Bundle.class), eq(Constants.ADD));
         // Allow Bitstream WRITE perms
@@ -959,7 +1065,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
 
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it);
+        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), item1);
         assertThat("testCreateSingleBitstream_InputStreamAuth 0", result, notNullValue());
     }
 
@@ -969,7 +1075,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test(expected = AuthorizeException.class)
     public void testCreateSingleBitstream_InputStreamNoAuth() throws Exception {
         File f = new File(testProps.get("test.bitstream").toString());
-        itemService.createSingleBitstream(context, new FileInputStream(f), it);
+        itemService.createSingleBitstream(context, new FileInputStream(f), item1);
         fail("Expected exception");
     }
 
@@ -978,8 +1084,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetNonInternalBitstreams() throws Exception {
-        assertThat("testGetNonInternalBitstreams 0", itemService.getNonInternalBitstreams(context, it), notNullValue());
-        assertTrue("testGetNonInternalBitstreams 1", itemService.getNonInternalBitstreams(context, it).size() == 0);
+        assertThat("testGetNonInternalBitstreams 0", itemService.getNonInternalBitstreams(context, item1),
+                   notNullValue());
+        assertTrue("testGetNonInternalBitstreams 1", itemService.getNonInternalBitstreams(context, item1).size() == 0);
     }
 
     /**
@@ -990,18 +1097,18 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // First create a bundle for test
         context.turnOffAuthorisationSystem();
         String name = "LICENSE";
-        Bundle created = bundleService.create(context, it, name);
+        Bundle created = bundleService.create(context, item1, name);
         created.setName(context, name);
         context.restoreAuthSystemState();
 
         // Allow Item REMOVE perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.REMOVE);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item1, Constants.REMOVE);
         // Allow Bundle DELETE perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, created, Constants.DELETE);
 
-        itemService.removeDSpaceLicense(context, it);
-        assertThat("testRemoveDSpaceLicenseAuth 0", itemService.getBundles(it, name), notNullValue());
-        assertTrue("testRemoveDSpaceLicenseAuth 1", itemService.getBundles(it, name).size() == 0);
+        itemService.removeDSpaceLicense(context, item1);
+        assertThat("testRemoveDSpaceLicenseAuth 0", itemService.getBundles(item1, name), notNullValue());
+        assertTrue("testRemoveDSpaceLicenseAuth 1", itemService.getBundles(item1, name).size() == 0);
     }
 
     /**
@@ -1012,11 +1119,11 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // First create a bundle for test
         context.turnOffAuthorisationSystem();
         String name = "LICENSE";
-        Bundle created = bundleService.create(context, it, name);
+        Bundle created = bundleService.create(context, item1, name);
         created.setName(context, name);
         context.restoreAuthSystemState();
 
-        itemService.removeDSpaceLicense(context, it);
+        itemService.removeDSpaceLicense(context, item1);
         fail("Exception expected");
     }
 
@@ -1028,20 +1135,20 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // First create test content
         context.turnOffAuthorisationSystem();
         String name = "LICENSE";
-        Bundle created = bundleService.create(context, it, name);
+        Bundle created = bundleService.create(context, item1, name);
         created.setName(context, name);
 
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, bsname);
+        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), item1, bsname);
         bitstreamService.setFormat(context, result, bitstreamFormatService.findByShortDescription(context, bsname));
         bundleService.addBitstream(context, created, result);
         context.restoreAuthSystemState();
 
         // Allow Item REMOVE perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.REMOVE);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item1, Constants.REMOVE);
         // Allow Item WRITE perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item1, Constants.WRITE);
         // Allow Bundle REMOVE perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, created, Constants.REMOVE);
         // Allow Bundle DELETE perms
@@ -1049,9 +1156,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // Allow Bitstream DELETE perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, result, Constants.DELETE);
 
-        itemService.removeLicenses(context, it);
-        assertThat("testRemoveLicensesAuth 0", itemService.getBundles(it, name), notNullValue());
-        assertTrue("testRemoveLicensesAuth 1", itemService.getBundles(it, name).size() == 0);
+        itemService.removeLicenses(context, item1);
+        assertThat("testRemoveLicensesAuth 0", itemService.getBundles(item1, name), notNullValue());
+        assertTrue("testRemoveLicensesAuth 1", itemService.getBundles(item1, name).size() == 0);
     }
 
     /**
@@ -1062,17 +1169,17 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // First create test content
         context.turnOffAuthorisationSystem();
         String name = "LICENSE";
-        Bundle created = bundleService.create(context, it, name);
+        Bundle created = bundleService.create(context, item1, name);
         created.setName(context, name);
 
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, bsname);
+        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), item1, bsname);
         bitstreamService.setFormat(context, result, bitstreamFormatService.findByShortDescription(context, bsname));
         bundleService.addBitstream(context, created, result);
         context.restoreAuthSystemState();
 
-        itemService.removeLicenses(context, it);
+        itemService.removeLicenses(context, item1);
         fail("Exception expected");
     }
 
@@ -1082,9 +1189,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testUpdateAuth() throws Exception {
         // Allow Item WRITE perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item1, Constants.WRITE);
 
-        itemService.update(context, it);
+        itemService.update(context, item1);
     }
 
     /**
@@ -1094,13 +1201,13 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testUpdateAuth2() throws Exception {
         context.turnOffAuthorisationSystem();
         Collection c = createCollection();
-        it.setOwningCollection(c);
+        item1.setOwningCollection(c);
         context.restoreAuthSystemState();
 
         // Allow parent Collection WRITE perms (to test inheritance)
         doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE, false);
 
-        itemService.update(context, it);
+        itemService.update(context, item1);
     }
 
     /**
@@ -1110,10 +1217,10 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testUpdateNoAuth() throws Exception {
         context.turnOffAuthorisationSystem();
         Collection c = createCollection();
-        it.setOwningCollection(c);
+        item1.setOwningCollection(c);
         context.restoreAuthSystemState();
 
-        itemService.update(context, it);
+        itemService.update(context, item1);
     }
 
     /**
@@ -1122,12 +1229,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testWithdrawAuth() throws Exception {
         // Allow Item WRITE perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item1, Constants.WRITE);
         // Allow Collection ADMIN perms
         when(authorizeServiceSpy.authorizeActionBoolean(context, collection, Constants.ADMIN)).thenReturn(true);
 
-        itemService.withdraw(context, it);
-        assertTrue("testWithdrawAuth 0", it.isWithdrawn());
+        itemService.withdraw(context, item1);
+        assertTrue("testWithdrawAuth 0", item1.isWithdrawn());
     }
 
     /**
@@ -1135,7 +1242,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testWithdrawNoAuth() throws Exception {
-        itemService.withdraw(context, it);
+        itemService.withdraw(context, item1);
         fail("Exception expected");
     }
 
@@ -1145,17 +1252,17 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testReinstateAuth() throws Exception {
         // Allow Item WRITE perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item1, Constants.WRITE);
         // Allow Collection ADD perms (needed to reinstate)
         doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
 
         // initialize item as withdrawn
         context.turnOffAuthorisationSystem();
-        itemService.withdraw(context, it);
+        itemService.withdraw(context, item1);
         context.restoreAuthSystemState();
 
-        itemService.reinstate(context, it);
-        assertFalse("testReinstate 0", it.isWithdrawn());
+        itemService.reinstate(context, item1);
+        assertFalse("testReinstate 0", item1.isWithdrawn());
     }
 
     /**
@@ -1165,10 +1272,10 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testReinstateNoAuth() throws Exception {
         // initialize item as withdrawn
         context.turnOffAuthorisationSystem();
-        itemService.withdraw(context, it);
+        itemService.withdraw(context, item1);
         context.restoreAuthSystemState();
 
-        itemService.reinstate(context, it);
+        itemService.reinstate(context, item1);
         fail("Exception expected");
     }
 
@@ -1200,7 +1307,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testDeleteNoAuth() throws Exception {
-        itemService.delete(context, it);
+        itemService.delete(context, item1);
         fail("Exception expected");
     }
 
@@ -1210,7 +1317,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     @SuppressWarnings("ObjectEqualsNull")
     public void testEquals() throws SQLException, AuthorizeException, IOException, IllegalAccessException {
-        assertFalse("testEquals 0", it.equals(null));
+        assertFalse("testEquals 0", item1.equals(null));
 
         // create a new item to test against
         context.turnOffAuthorisationSystem();
@@ -1218,8 +1325,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         context.restoreAuthSystemState();
 
         try {
-            assertFalse("testEquals 1", it.equals(item));
-            assertTrue("testEquals 2", it.equals(it));
+            assertFalse("testEquals 1", item1.equals(item));
+            assertTrue("testEquals 2", item1.equals(item1));
         } finally {
             //delete item we created
             context.turnOffAuthorisationSystem();
@@ -1237,7 +1344,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         Collection c = createCollection();
         context.restoreAuthSystemState();
 
-        boolean result = itemService.isOwningCollection(it, c);
+        boolean result = itemService.isOwningCollection(item1, c);
         assertFalse("testIsOwningCollection 0", result);
     }
 
@@ -1247,7 +1354,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Override
     @Test
     public void testGetType() {
-        assertThat("testGetType 0", it.getType(), equalTo(Constants.ITEM));
+        assertThat("testGetType 0", item1.getType(), equalTo(Constants.ITEM));
     }
 
     /**
@@ -1258,9 +1365,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         List<ResourcePolicy> newpolicies = new ArrayList<ResourcePolicy>();
         ResourcePolicy pol1 = resourcePolicyService.create(context);
         newpolicies.add(pol1);
-        itemService.replaceAllItemPolicies(context, it, newpolicies);
+        itemService.replaceAllItemPolicies(context, item1, newpolicies);
 
-        List<ResourcePolicy> retrieved = authorizeService.getPolicies(context, it);
+        List<ResourcePolicy> retrieved = authorizeService.getPolicies(context, item1);
         assertThat("testReplaceAllItemPolicies 0", retrieved, notNullValue());
         assertThat("testReplaceAllItemPolicies 1", retrieved.size(), equalTo(newpolicies.size()));
     }
@@ -1273,12 +1380,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         context.turnOffAuthorisationSystem();
         //we add some bundles for the test
         String name = "LICENSE";
-        Bundle created = bundleService.create(context, it, name);
+        Bundle created = bundleService.create(context, item1, name);
         created.setName(context, name);
 
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, bsname);
+        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), item1, bsname);
         bitstreamService.setFormat(context, result, bitstreamFormatService.findByShortDescription(context, bsname));
         bundleService.addBitstream(context, created, result);
 
@@ -1288,10 +1395,10 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         newpolicies.add(resourcePolicyService.create(context));
         context.restoreAuthSystemState();
 
-        itemService.replaceAllBitstreamPolicies(context, it, newpolicies);
+        itemService.replaceAllBitstreamPolicies(context, item1, newpolicies);
 
         List<ResourcePolicy> retrieved = new ArrayList<ResourcePolicy>();
-        List<Bundle> bundles = it.getBundles();
+        List<Bundle> bundles = item1.getBundles();
         for (Bundle b : bundles) {
             retrieved.addAll(authorizeService.getPolicies(context, b));
             retrieved.addAll(bundleService.getBitstreamPolicies(context, b));
@@ -1318,12 +1425,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         ResourcePolicy pol1 = resourcePolicyService.create(context);
         newpolicies.add(pol1);
         pol1.setGroup(g);
-        itemService.replaceAllItemPolicies(context, it, newpolicies);
+        itemService.replaceAllItemPolicies(context, item1, newpolicies);
 
-        itemService.removeGroupPolicies(context, it, g);
+        itemService.removeGroupPolicies(context, item1, g);
         context.restoreAuthSystemState();
 
-        List<ResourcePolicy> retrieved = authorizeService.getPolicies(context, it);
+        List<ResourcePolicy> retrieved = authorizeService.getPolicies(context, item1);
         assertThat("testRemoveGroupPolicies 0", retrieved, notNullValue());
         assertTrue("testRemoveGroupPolicies 1", retrieved.isEmpty());
     }
@@ -1349,24 +1456,24 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         //we add some bundles for the test
         String name = "LICENSE";
-        Bundle created = bundleService.create(context, it, name);
+        Bundle created = bundleService.create(context, item1, name);
         created.setName(context, name);
 
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, bsname);
+        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), item1, bsname);
         bitstreamService.setFormat(context, result, bitstreamFormatService.findByShortDescription(context, bsname));
         bundleService.addBitstream(context, created, result);
 
         context.restoreAuthSystemState();
 
         // Allow Item WRITE perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE, true);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item1, Constants.WRITE, true);
 
-        itemService.inheritCollectionDefaultPolicies(context, it, c);
+        itemService.inheritCollectionDefaultPolicies(context, item1, c);
 
         //test item policies
-        List<ResourcePolicy> retrieved = authorizeService.getPolicies(context, it);
+        List<ResourcePolicy> retrieved = authorizeService.getPolicies(context, item1);
         boolean equals = true;
         for (int i = 0; i < retrieved.size() && equals; i++) {
             if (!newPolicies.contains(retrieved.get(i))) {
@@ -1376,7 +1483,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertTrue("testInheritCollectionDefaultPolicies 0", equals);
 
         retrieved = new ArrayList<ResourcePolicy>();
-        List<Bundle> bundles = it.getBundles();
+        List<Bundle> bundles = item1.getBundles();
         for (Bundle b : bundles) {
             retrieved.addAll(authorizeService.getPolicies(context, b));
             retrieved.addAll(bundleService.getBitstreamPolicies(context, b));
@@ -1401,13 +1508,13 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         context.turnOffAuthorisationSystem();
         Collection from = createCollection();
         Collection to = createCollection();
-        it.addCollection(from);
-        it.setOwningCollection(from);
+        item1.addCollection(from);
+        item1.setOwningCollection(from);
 
-        itemService.move(context, it, from, to);
+        itemService.move(context, item1, from, to);
         context.restoreAuthSystemState();
-        assertThat("testMove 0", it.getOwningCollection(), notNullValue());
-        assertThat("testMove 1", it.getOwningCollection(), equalTo(to));
+        assertThat("testMove 0", item1.getOwningCollection(), notNullValue());
+        assertThat("testMove 1", item1.getOwningCollection(), equalTo(to));
     }
 
     /**
@@ -1415,7 +1522,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testHasUploadedFiles() throws Exception {
-        assertFalse("testHasUploadedFiles 0", itemService.hasUploadedFiles(it));
+        assertFalse("testHasUploadedFiles 0", itemService.hasUploadedFiles(item1));
     }
 
     /**
@@ -1423,12 +1530,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetCollectionsNotLinked() throws Exception {
-        List<Collection> result = itemService.getCollectionsNotLinked(context, it);
+        List<Collection> result = itemService.getCollectionsNotLinked(context, item1);
         boolean isin = false;
         for (Collection c : result) {
             Iterator<Item> iit = itemService.findByCollection(context, c);
             while (iit.hasNext()) {
-                if (iit.next().getID().equals(it.getID())) {
+                if (iit.next().getID().equals(item1.getID())) {
                     isin = true;
                 }
             }
@@ -1442,9 +1549,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testCanEditBooleanAuth() throws Exception {
         // Allow Item WRITE perms
-        when(authorizeServiceSpy.authorizeActionBoolean(context, it, Constants.WRITE)).thenReturn(true);
+        when(authorizeServiceSpy.authorizeActionBoolean(context, item1, Constants.WRITE)).thenReturn(true);
 
-        assertTrue("testCanEditBooleanAuth 0", itemService.canEdit(context, it));
+        assertTrue("testCanEditBooleanAuth 0", itemService.canEdit(context, item1));
     }
 
     /**
@@ -1456,7 +1563,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         when(authorizeServiceSpy.authorizeActionBoolean(context, owningCommunity, Constants.WRITE, false))
             .thenReturn(true);
 
-        assertTrue("testCanEditBooleanAuth2 0", itemService.canEdit(context, it));
+        assertTrue("testCanEditBooleanAuth2 0", itemService.canEdit(context, item1));
     }
 
     /**
@@ -1467,14 +1574,14 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // Create a new Collection and assign it as the owner
         context.turnOffAuthorisationSystem();
         Collection c = createCollection();
-        it.setOwningCollection(c);
+        item1.setOwningCollection(c);
         context.restoreAuthSystemState();
 
         // Allow parent Collection WRITE perms (test inheritance from new collection)
         doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE, false);
 
         // Ensure person with WRITE perms on the Collection can edit item
-        assertTrue("testCanEditBooleanAuth3 0", itemService.canEdit(context, it));
+        assertTrue("testCanEditBooleanAuth3 0", itemService.canEdit(context, item1));
     }
 
     /**
@@ -1482,7 +1589,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCanEditBooleanNoAuth() throws Exception {
-        assertFalse("testCanEditBooleanNoAuth 0", itemService.canEdit(context, it));
+        assertFalse("testCanEditBooleanNoAuth 0", itemService.canEdit(context, item1));
     }
 
     /**
@@ -1559,7 +1666,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Override
     @Test
     public void testGetName() {
-        assertThat("testGetName 0", it.getName(), nullValue());
+        assertThat("testGetName 0", item1.getName(), nullValue());
     }
 
     /**
@@ -1578,14 +1685,14 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         // add new metadata to item
         context.turnOffAuthorisationSystem();
-        itemService.addMetadata(context, it, schema, element, qualifier, Item.ANY, value);
-        itemService.update(context, it);
+        itemService.addMetadata(context, item1, schema, element, qualifier, Item.ANY, value);
+        itemService.update(context, item1);
         context.restoreAuthSystemState();
 
         result = itemService.findByMetadataField(context, schema, element, qualifier, value);
         assertThat("testFindByMetadataField 3", result, notNullValue());
         assertTrue("testFindByMetadataField 4", result.hasNext());
-        assertTrue("testFindByMetadataField 5", result.next().equals(it));
+        assertTrue("testFindByMetadataField 5", result.next().equals(item1));
     }
 
     /**
@@ -1595,13 +1702,14 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Override
     public void testGetAdminObject() throws SQLException {
         //default community has no admin object
-        assertThat("testGetAdminObject 0", (Item) itemService.getAdminObject(context, it, Constants.REMOVE),
-                   equalTo(it));
-        assertThat("testGetAdminObject 1", (Item) itemService.getAdminObject(context, it, Constants.ADD), equalTo(it));
-        assertThat("testGetAdminObject 2", (Item) itemService.getAdminObject(context, it, Constants.DELETE),
-                   equalTo(it));
-        assertThat("testGetAdminObject 3", (Item) itemService.getAdminObject(context, it, Constants.ADMIN),
-                   equalTo(it));
+        assertThat("testGetAdminObject 0", (Item) itemService.getAdminObject(context, item1, Constants.REMOVE),
+                   equalTo(item1));
+        assertThat("testGetAdminObject 1", (Item) itemService.getAdminObject(context, item1, Constants.ADD), equalTo(
+                item1));
+        assertThat("testGetAdminObject 2", (Item) itemService.getAdminObject(context, item1, Constants.DELETE),
+                   equalTo(item1));
+        assertThat("testGetAdminObject 3", (Item) itemService.getAdminObject(context, item1, Constants.ADMIN),
+                   equalTo(item1));
     }
 
     /**
@@ -1612,14 +1720,15 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testGetParentObject() throws SQLException {
         try {
             //default has no parent
-            assertThat("testGetParentObject 0", itemService.getParentObject(context, it), notNullValue());
+            assertThat("testGetParentObject 0", itemService.getParentObject(context, item1), notNullValue());
 
             context.turnOffAuthorisationSystem();
             Collection parent = createCollection();
-            it.setOwningCollection(parent);
+            item1.setOwningCollection(parent);
             context.restoreAuthSystemState();
-            assertThat("testGetParentObject 1", itemService.getParentObject(context, it), notNullValue());
-            assertThat("testGetParentObject 2", (Collection) itemService.getParentObject(context, it), equalTo(parent));
+            assertThat("testGetParentObject 1", itemService.getParentObject(context, item1), notNullValue());
+            assertThat("testGetParentObject 2", (Collection) itemService.getParentObject(context, item1),
+                       equalTo(parent));
         } catch (AuthorizeException ex) {
             throw new AssertionError("Authorize Exception occurred", ex);
         }
@@ -1643,14 +1752,14 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         // add new metadata (with authority) to item
         context.turnOffAuthorisationSystem();
-        itemService.addMetadata(context, it, schema, element, qualifier, Item.ANY, value, authority, confidence);
-        itemService.update(context, it);
+        itemService.addMetadata(context, item1, schema, element, qualifier, Item.ANY, value, authority, confidence);
+        itemService.update(context, item1);
         context.restoreAuthSystemState();
 
         result = itemService.findByAuthorityValue(context, schema, element, qualifier, authority);
         assertThat("testFindByAuthorityValue 3", result, notNullValue());
         assertTrue("testFindByAuthorityValue 4", result.hasNext());
-        assertThat("testFindByAuthorityValue 5", result.next(), equalTo(it));
+        assertThat("testFindByAuthorityValue 5", result.next(), equalTo(item1));
     }
 
     /**
