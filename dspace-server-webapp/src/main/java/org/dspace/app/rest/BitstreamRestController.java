@@ -107,9 +107,6 @@ public class BitstreamRestController {
         Context context = ContextUtil.obtainContext(request);
 
         Bitstream bit = bitstreamService.find(context, uuid);
-        if (bit == null) {
-            throw new ResourceNotFoundException();
-        }
         EPerson currentUser = context.getCurrentUser();
 
         if (bit == null) {
