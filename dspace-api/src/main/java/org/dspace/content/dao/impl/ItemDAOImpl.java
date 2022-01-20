@@ -292,7 +292,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                                                    Integer offset) throws SQLException {
         Query query = createQuery(context,
               "select i from Item i join i.collections c " +
-              "WHERE :collection IN c AND i.inArchive=:in_archive ORDER BY i.sorting_number");
+              "WHERE :collection IN c AND i.inArchive=:in_archive ORDER BY sorting_number");
         query.setParameter("collection", collection);
         query.setParameter("in_archive", true);
         if (offset != null) {
@@ -336,7 +336,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     @Override
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException {
         Query query = createQuery(context,
-                "select i from Item i join i.collections c WHERE :collection IN c ORDER BY i.sorting_number");
+                "select i from Item i join i.collections c WHERE :collection IN c ORDER BY sorting_number");
         query.setParameter("collection", collection);
 
         return iterate(query);
@@ -346,7 +346,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
         throws SQLException {
         Query query = createQuery(context,
-                "select i from Item i join i.collections c WHERE :collection IN c ORDER BY i.sorting_number");
+                "select i from Item i join i.collections c WHERE :collection IN c ORDER BY sorting_number");
         query.setParameter("collection", collection);
 
         if (offset != null) {
