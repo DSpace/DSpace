@@ -138,6 +138,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
             return ePerson.canLogIn() ? logInEPerson(context, ePerson) : BAD_ARGS;
         }
 
+        LOGGER.warn("Self registration is currently disabled for OIDC, and no ePerson could be found for email: {}", email);
         return canSelfRegister() ? registerNewEPerson(context, userInfo, email) : NO_SUCH_USER;
     }
 
