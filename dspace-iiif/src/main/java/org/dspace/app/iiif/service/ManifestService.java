@@ -9,7 +9,6 @@ package org.dspace.app.iiif.service;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +28,6 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -125,7 +123,7 @@ public class ManifestService extends AbstractResourceService {
         addMetadata(context, item);
         addViewingHint(item);
         addThumbnail(item, context);
-        addRanges(context, item, manifestId);
+        addCanvasAndRange(context, item, manifestId);
         manifestGenerator.addSequence(
                 sequenceService.getSequence(item));
         addRendering(item, context);
@@ -133,68 +131,37 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Add the ranges to the manifest structure. Ranges are generated from the
-     * iiif.toc metadata
+     * Adds Canvases and Ranges to the manifest. Ranges are generated from bitstream
+     * or bundle iiif metadata.
      * 
      * @param context the DSpace Context
      * @param item the DSpace Item to represent
      * @param manifestId the generated manifestId
      */
-    private void addRanges(Context context, Item item, String manifestId) {
-        List<Bundle> bundles = utils.getIIIFBundles(item);
-        RangeGenerator root = new RangeGenerator(rangeService);
-        root.setLabel(I18nUtil.getMessage("iiif.toc.root-label"));
-        root.setIdentifier(manifestId + "/range/r0");
+    private void addCanvasAndRange(Context context, Item item, String manifestId) {
 
-        Map<String, RangeGenerator> tocRanges = new LinkedHashMap<String, RangeGenerator>();
+        // Set the root Range for this manifest.
+        rangeService.setRootRange(manifestId);
+        // Get bundles that can contain IIIF manifest data.
+        List<Bundle> bundles = utils.getIIIFBundles(item);
         for (Bundle bnd : bundles) {
             String bundleToCPrefix = null;
             if (bundles.size() > 1) {
+                // Check for bundle Range metadata if multiple IIIF bundles exist.
                 bundleToCPrefix = utils.getBundleIIIFToC(bnd);
             }
-            RangeGenerator lastRange = root;
-            for (Bitstream b : utils.getIIIFBitstreams(context, bnd)) {
-                CanvasGenerator canvasId = sequenceService.addCanvas(context, item, bnd, b);
-                List<String> tocs = utils.getIIIFToCs(b, bundleToCPrefix);
-                if (tocs.size() > 0) {
-                    for (String toc : tocs) {
-                        RangeGenerator currRange = root;
-                        String[] parts = toc.split(IIIFUtils.TOC_SEPARATOR_REGEX);
-                        String key = "";
-                        for (int pIdx = 0; pIdx < parts.length; pIdx++) {
-                            if (pIdx > 0) {
-                                key += IIIFUtils.TOC_SEPARATOR;
-                            }
-                            key += parts[pIdx];
-                            if (tocRanges.get(key) != null) {
-                                currRange = tocRanges.get(key);
-                            } else {
-                                // create the sub range
-                                RangeGenerator range = new RangeGenerator(rangeService);
-                                range.setLabel(parts[pIdx]);
-                                // add the range reference to the currRange so to get an identifier
-                                currRange.addSubRange(range);
-
-                                // add the range to the manifest
-//                                manifestGenerator.addRange(range);
-
-                                // move the current range
-                                currRange = range;
-                                tocRanges.put(key, range);
-                            }
-                        }
-                        // add the bitstream canvas to the currRange
-                        currRange
-                                .addCanvas(canvasService.getRangeCanvasReference(canvasId.getIdentifier()));
-                        lastRange = currRange;
-                    }
-                } else {
-                    lastRange.addCanvas(canvasService.getRangeCanvasReference(canvasId.getIdentifier()));
-                }
+            for (Bitstream bitstream : utils.getIIIFBitstreams(context, bnd)) {
+                // Add the Canvas to the manifest Sequence.
+                CanvasGenerator canvas = sequenceService.addCanvas(context, item, bnd, bitstream);
+                // Update the Ranges.
+                rangeService.updateRanges(bitstream, bundleToCPrefix, canvas);
             }
         }
-        if (tocRanges.size() > 0) {
-            manifestGenerator.addRange(root);
+        // If Ranges were created, add them to manifest Structures element.
+        Map<String, RangeGenerator> tocRanges = rangeService.getTocRanges();
+        if (tocRanges != null && tocRanges.size() > 0) {
+            RangeGenerator rootRange = rangeService.getRootRange();
+            manifestGenerator.addRange(rootRange);
             for (RangeGenerator range : tocRanges.values()) {
                 manifestGenerator.addRange(range);
             }
@@ -324,8 +291,8 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * This method looks for a PDF rendering in the Item's ORIGINAL bundle and adds
-     * it to the Sequence if found.
+     * This method looks for a PDF in the Item's ORIGINAL bundle and adds
+     * it as the Rendering resource if found.
      *
      * @param item DSpace Item
      * @param context DSpace context
