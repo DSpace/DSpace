@@ -54,17 +54,23 @@ docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/doc
 * UI will be available at http://localhost:4000/
 * REST API will be available at http://localhost:8080/server/
 
-## Run DSpace 7 REST and Angular via HTTPS on localhost
+## Run DSpace 7 REST and Angular via HTTPS (https://dspace-dev.local)
 
+First, if you have not done so, build these images locally:
+```
+docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml -f dspace/src/main/docker-compose/docker-compose-https.yml build
+```
+
+Then start the containers:
 ```
 # This starts 3 containers: dspace (backend), dspace-angular, dspace-https
 docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml -f dspace/src/main/docker-compose/docker-compose-https.yml up -d
 ```
-
-* UI will be available at https://localhost/
-* REST API will be available at https://localhost/server/
+* UI will be available at https://dspace-dev.local
+* REST API will be available at https://dspace-dev.local/server/
 * NOTE: Your browser will likely warn you that these URLs are "insecure" or "unsafe".
-This is because a localhost SSL certificate is generated on the fly and used for HTTPS.
+This is because a self-signed SSL certificate is generated in Docker and used for HTTPS.
+You can either ignore these browser warnings, or you can install that certificate locally among your trusted certs.
 
 ## Run DSpace 7 REST with a IIIF Image Server from your branch
 *Only useful for testing IIIF support in a development environment*
@@ -97,25 +103,18 @@ i.e. when `org.dspace.authenticate.OidcAuthentication` is listed in the `Authent
 # This starts 4 main containers: dspace (backend), dspace-angular, dspace-https, dspace-oidc
 docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml -f dspace/src/main/docker-compose/docker-compose-https.yml -f dspace/src/main/docker-compose/docker-compose-oidc.yml up -d
 ```
-* UI will be available at https://localhost/
-* REST API will be available at https://localhost/server/
-* Keycloak will be available at https://localhost/auth/
+* UI will be available at https://dspace-dev.local
+* REST API will be available at https://dspace-dev.local/server/
+* Keycloak will be available at https://dspace-dev.local/auth/
     * NOTE: Keycloak takes a while (~2-3mins) to boot up. Please be patient.
 * NOTE: Your browser will likely warn you that these URLs are "insecure" or "unsafe".
-  This is because a localhost SSL certificate is generated on the fly and used for HTTPS.
+  This is because a self-signed SSL certificate is generated in Docker and used for HTTPS.
+  You can either ignore these browser warnings, or you can install that certificate locally among your trusted certs.
 
 After starting all 4 containers (dspace, dspace-angular, dspace-https, and dspace-oidc) above,
 additional steps are required to enabled OIDC authentication.
 
-For OIDC authentication to work in Docker, we need the URL of Keycloak to be a non-localhost URL.
-One option is to use a development proxy service like https://ngrok.com/, which creates a temporary public proxy for your localhost.
-The remainder of these instructions assume you are using ngrok (though other proxies may be used).
-
-1. If you use ngrok, start it first (in order to obtain a random URL that looks like `https://a6eb2e55ad17.ngrok.io`):
-   ```
-   ./ngrok http 443
-   ```
-2. Update your `local.cfg` (if you don't have one create it in `[src]/dspace/config/local.cfg`) to enable & configure OIDC:
+1. Update your `local.cfg` (if you don't have one create it in `[src]/dspace/config/local.cfg`) to enable & configure OIDC:
    ```
    # Enable both Password auth & OIDC
    plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
@@ -123,7 +122,7 @@ The remainder of these instructions assume you are using ngrok (though other pro
 
    # Settings for OIDC
    # THIS MUST BE A non-localhost, HTTPS URL
-   authentication-oidc.auth-server-url = https://[subdomain].ngrok.io
+   authentication-oidc.auth-server-url = https://dspace-dev.local
    authentication-oidc.realm = dspace-realm
    authentication-oidc.token-endpoint = ${authentication-oidc.auth-server-url}/auth/realms/${authentication-oidc.realm}/protocol/openid-connect/token
    authentication-oidc.authorize-endpoint = ${authentication-oidc.auth-server-url}/auth/realms/${authentication-oidc.realm}/protocol/openid-connect/auth
@@ -138,24 +137,24 @@ The remainder of these instructions assume you are using ngrok (though other pro
    authentication-oidc.user-info.last-name = family_name
    authentication-oidc.redirect-url = ${dspace.server.url}/api/authn/oidc
    ```
-3. Visit the Keycloak Admin Console via https://localhost/auth
+2. Visit the Keycloak Admin Console via https://dspace-dev.local/auth
    (if it doesn't respond immediately be patient. Keycloak sometimes takes a minute or two).
-4. Login as default Admin (admin/admin)
-5. Add a new Realm (hover over realm selector, top-left corner where it says "Master"). Name it "dspace-realm"
-6. Add a new Client (Clients -> Create). Give it a Client ID of "dspace-rest" & a root URL of https://localhost/server
-7. Edit that Client, on the "Settings" tab change the "Access Type" dropdown from "public" to "confidential". Click Save
-8. Now for that Client, a "Credentials" tab appears. There you'll find the Secret key.
+3. Login as default Admin (admin/admin)
+4. Add a new Realm (hover over realm selector, top-left corner where it says "Master"). Name it "dspace-realm"
+5. Add a new Client (Clients -> Create). Give it a Client ID of "dspace-rest" & a root URL of https://dspace-dev.local/server
+6. Edit that Client, on the "Settings" tab change the "Access Type" dropdown from "public" to "confidential". Click Save
+7. Now for that Client, a "Credentials" tab appears. There you'll find the Secret key.
    This key MUST be added to this setting in your `local.cfg`:
    ```
    authentication-oidc.client-secret = zsrDp1sJDyAbRiOAba9NrISQ7Lrlo07b
    ```
-9. Finally, create a test user (e.g. named "dspace") for this new Realm.
+8. Finally, create a test user (e.g. named "dspace") for this new Realm.
    * Click on "Users" menu.
    * Click "Add user" button.
    * Username: 'dspace', email: 'dspace@test.edu', First Name: 'DSpace', Last Name: 'OIDC'. Click "Save".
    * Click "Credentials" tab for that user.
    * Set a Password (e.g. "dspace"). Turn "Temporary" to "OFF". Click "Set Password"
-10. Now, test it out. Access the UI at https://localhost and attempt to login via OIDC using the new user.
+9. Now, test it out. Access the UI at https://dspace-dev.local and attempt to login via OIDC using the new user.
 
 ## Run DSpace 7 REST and Shibboleth SP (in Apache) from your branch
 
