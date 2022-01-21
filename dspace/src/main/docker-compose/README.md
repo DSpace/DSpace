@@ -56,7 +56,17 @@ docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/doc
 
 ## Run DSpace 7 REST and Angular via HTTPS (https://dspace-dev.local)
 
-First, if you have not done so, build these images locally:
+First, because the `dspace-https` image uses a local URL, you will need to add it to your "hosts" file.
+* On Linux or Mac OS, add this to your `/etc/hosts` file:
+  ```
+  127.0.0.1 dspace-dev.local
+  ```
+* On Windows 10, add this to your `C:\Windows\System32\Drivers\etc\hosts` file:
+  ```
+  127.0.0.1 dspace-dev.local
+  ```
+
+Then, if you have not done so, build these images locally:
 ```
 docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml -f dspace/src/main/docker-compose/docker-compose-https.yml build
 ```
@@ -114,7 +124,16 @@ docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/doc
 After starting all 4 containers (dspace, dspace-angular, dspace-https, and dspace-oidc) above,
 additional steps are required to enabled OIDC authentication.
 
-1. Update your `local.cfg` (if you don't have one create it in `[src]/dspace/config/local.cfg`) to enable & configure OIDC:
+1. First, because the `dspace-https` image uses a local URL, you will need to add it to your "hosts" file.
+    * On Linux or Mac OS, add this to your `/etc/hosts` file:
+      ```
+      127.0.0.1 dspace-dev.local
+      ```
+    * On Windows 10, add this to your `C:\Windows\System32\Drivers\etc\hosts` file:
+      ```
+      127.0.0.1 dspace-dev.local
+      ```
+2. Update your `local.cfg` (if you don't have one create it in `[src]/dspace/config/local.cfg`) to enable & configure OIDC:
    ```
    # Enable both Password auth & OIDC
    plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
@@ -137,24 +156,24 @@ additional steps are required to enabled OIDC authentication.
    authentication-oidc.user-info.last-name = family_name
    authentication-oidc.redirect-url = ${dspace.server.url}/api/authn/oidc
    ```
-2. Visit the Keycloak Admin Console via https://dspace-dev.local/auth
+3. Visit the Keycloak Admin Console via https://dspace-dev.local/auth
    (if it doesn't respond immediately be patient. Keycloak sometimes takes a minute or two).
-3. Login as default Admin (admin/admin)
-4. Add a new Realm (hover over realm selector, top-left corner where it says "Master"). Name it "dspace-realm"
-5. Add a new Client (Clients -> Create). Give it a Client ID of "dspace-rest" & a root URL of https://dspace-dev.local/server
-6. Edit that Client, on the "Settings" tab change the "Access Type" dropdown from "public" to "confidential". Click Save
-7. Now for that Client, a "Credentials" tab appears. There you'll find the Secret key.
+4. Login as default Admin (admin/admin)
+5. Add a new Realm (hover over realm selector, top-left corner where it says "Master"). Name it "dspace-realm"
+6. Add a new Client (Clients -> Create). Give it a Client ID of "dspace-rest" & a root URL of https://dspace-dev.local/server
+7. Edit that Client, on the "Settings" tab change the "Access Type" dropdown from "public" to "confidential". Click Save
+8. Now for that Client, a "Credentials" tab appears. There you'll find the Secret key.
    This key MUST be added to this setting in your `local.cfg`:
    ```
    authentication-oidc.client-secret = zsrDp1sJDyAbRiOAba9NrISQ7Lrlo07b
    ```
-8. Finally, create a test user (e.g. named "dspace") for this new Realm.
+9. Finally, create a test user (e.g. named "dspace") for this new Realm.
    * Click on "Users" menu.
    * Click "Add user" button.
    * Username: 'dspace', email: 'dspace@test.edu', First Name: 'DSpace', Last Name: 'OIDC'. Click "Save".
    * Click "Credentials" tab for that user.
    * Set a Password (e.g. "dspace"). Turn "Temporary" to "OFF". Click "Set Password"
-9. Now, test it out. Access the UI at https://dspace-dev.local and attempt to login via OIDC using the new user.
+10. Now, test it out. Access the UI at https://dspace-dev.local and attempt to login via OIDC using the new user.
 
 ## Run DSpace 7 REST and Shibboleth SP (in Apache) from your branch
 
