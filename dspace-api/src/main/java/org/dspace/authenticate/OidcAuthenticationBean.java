@@ -16,8 +16,11 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -147,11 +150,26 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
         String redirectUri = configurationService.getProperty("authentication-oidc.redirect-url");
         String tokenUrl = configurationService.getProperty("authentication-oidc.token-endpoint");
         String userInfoUrl = configurationService.getProperty("authentication-oidc.user-info-endpoint");
-        String scopes = String.join(" ", configurationService.getArrayProperty("authentication-oidc.scopes"));
-        String email = getEmailAttribute();
+        String[] defaultScopes =
+            new String[] {
+                "openid", "email", "profile"
+            };
+        String scopes = String.join(" ", configurationService.getArrayProperty("authentication-oidc.scopes", defaultScopes));
 
-        if (isAnyBlank(authorizeUrl, clientId, redirectUri, scopes, clientSecret, tokenUrl, userInfoUrl, email)) {
+        if (isAnyBlank(authorizeUrl, clientId, redirectUri, clientSecret, tokenUrl, userInfoUrl)) {
             LOGGER.error("Missing mandatory configuration properties for OidcAuthenticationBean");
+
+            // prepare a Map of the properties which can not have sane defaults, but are still required
+            final Map<String, String> map = Map.of("authorizeUrl", authorizeUrl, "clientId", clientId, "redirectUri", redirectUri, "clientSecret", clientSecret, "tokenUrl", tokenUrl, "userInfoUrl", userInfoUrl);
+            final Iterator<Entry<String, String>> iterator = map.entrySet().iterator();
+    
+            while (iterator.hasNext()) {
+                final Entry<String, String> entry = iterator.next();
+    
+                if (isBlank(entry.getValue())) {   
+                    LOGGER.error(" * {} is missing", entry.getKey());
+                }
+            }
             return "";
         }
 
@@ -232,15 +250,15 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
     }
 
     private String getEmailAttribute() {
-        return configurationService.getProperty("authentication-oidc.user-info.email");
+        return configurationService.getProperty("authentication-oidc.user-info.email", "email");
     }
 
     private String getFirstNameAttribute() {
-        return configurationService.getProperty("authentication-oidc.user-info.first-name");
+        return configurationService.getProperty("authentication-oidc.user-info.first-name", "given_name");
     }
 
     private String getLastNameAttribute() {
-        return configurationService.getProperty("authentication-oidc.user-info.last-name");
+        return configurationService.getProperty("authentication-oidc.user-info.last-name", "family_name");
     }
 
     private boolean canSelfRegister() {
