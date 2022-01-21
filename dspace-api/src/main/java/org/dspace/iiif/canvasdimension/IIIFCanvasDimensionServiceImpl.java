@@ -31,7 +31,7 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.iiif.canvasdimension.service.IIIFApiQueryService;
+import org.dspace.iiif.IIIFApiQueryService;
 import org.dspace.iiif.canvasdimension.service.IIIFCanvasDimensionService;
 import org.dspace.iiif.util.IIIFSharedUtils;
 import org.springframework.beans.factory.annotation.Autowired;
