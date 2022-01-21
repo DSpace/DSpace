@@ -216,4 +216,12 @@ public interface AuthenticationMethod {
      * @return The authentication method name
      */
     public String getName();
+
+    /**
+     * Get whether the authentication method is being used.
+     * @param context   The DSpace context
+     * @param request   The current request
+     * @return whether the authentication method is being used.
+     */
+    public boolean isUsed(Context context, HttpServletRequest request);
 }

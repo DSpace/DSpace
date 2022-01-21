@@ -25,8 +25,6 @@
 - docker-compose-shibboleth.yml
   - Docker compose file that will start a *test/demo* Shibboleth SP container (in Apache) that proxies requests to the DSpace container
   - ONLY useful for testing/development. NOT production ready.
-- environment.dev.ts
-  - Default angular environment when testing DSpace-angular from this repo
 
 ## To refresh / pull DSpace images from Dockerhub
 ```
@@ -181,7 +179,9 @@ docker-compose -p d7 -f docker-compose-cli.yml -f dspace/src/main/docker-compose
 ```
 
 ## Modify DSpace Configuration in Docker
-While your Docker containers are running, you may directly modify the `local.cfg` in this directory which will change the DSpace configuration for the running Docker container. (Keep in mind, this works because our `docker-compose.yml` mounts this `[src]/dspace/src/main/docker-compose/local.cfg` from the host into the running Docker instance.)
+While your Docker containers are running, you may directly modify any configurations under
+`[dspace-src]/dspace/config/`. Those config changes will be synced to the container.
+(This works because our `docker-compose.yml` mounts the `[src]/dspace/config` directory from the host into the running Docker instance.)
 
 Many DSpace configuration settings will reload automatically (after a few seconds).  However, configurations which are cached by DSpace (or by Spring Boot) may require you to quickly reboot the Docker containers by running `docker-compose -p d7 down` followed by `docker-compose -p d7 up -d`.
 

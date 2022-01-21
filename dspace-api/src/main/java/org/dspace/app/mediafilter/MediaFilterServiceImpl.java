@@ -34,6 +34,7 @@ import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,8 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     protected ItemService itemService;
     @Autowired(required = true)
     protected ConfigurationService configurationService;
+
+    protected DSpaceRunnableHandler handler;
 
     protected int max2Process = Integer.MAX_VALUE;  // maximum number items to process
 
@@ -225,16 +228,16 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                     int assetstore = myBitstream.getStoreNumber();
 
                     // Printout helpful information to find the errored bitstream.
-                    System.out.println("ERROR filtering, skipping bitstream:\n");
-                    System.out.println("\tItem Handle: " + handle);
+                    StringBuilder sb = new StringBuilder("ERROR filtering, skipping bitstream:\n");
+                    sb.append("\tItem Handle: ").append(handle);
                     for (Bundle bundle : bundles) {
-                        System.out.println("\tBundle Name: " + bundle.getName());
+                        sb.append("\tBundle Name: ").append(bundle.getName());
                     }
-                    System.out.println("\tFile Size: " + size);
-                    System.out.println("\tChecksum: " + checksum);
-                    System.out.println("\tAsset Store: " + assetstore);
-                    System.out.println(e);
-                    e.printStackTrace();
+                    sb.append("\tFile Size: ").append(size);
+                    sb.append("\tChecksum: ").append(checksum);
+                    sb.append("\tAsset Store: ").append(assetstore);
+                    logError(sb.toString());
+                    logError(e.getMessage(), e);
                 }
             } else if (filterClass instanceof SelfRegisterInputFormats) {
                 // Filter implements self registration, so check to see if it should be applied
@@ -287,7 +290,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                             filtered = true;
                         }
                     } catch (Exception e) {
-                        System.out.println("ERROR filtering, skipping bitstream #"
+                        logError("ERROR filtering, skipping bitstream #"
                                                + myBitstream.getID() + " " + e);
                         e.printStackTrace();
                     }
@@ -332,7 +335,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         // if exists and overwrite = false, exit
         if (!overWrite && (existingBitstream != null)) {
             if (!isQuiet) {
-                System.out.println("SKIPPED: bitstream " + source.getID()
+                logInfo("SKIPPED: bitstream " + source.getID()
                                        + " (item: " + item.getHandle() + ") because '" + newName + "' already exists");
             }
 
@@ -340,11 +343,11 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         }
 
         if (isVerbose) {
-            System.out.println("PROCESSING: bitstream " + source.getID()
+            logInfo("PROCESSING: bitstream " + source.getID()
                                    + " (item: " + item.getHandle() + ")");
         }
 
-        System.out.println("File: " + newName);
+        logInfo("File: " + newName);
 
         // start filtering of the bitstream, using try with resource to close all InputStreams properly
         try (
@@ -356,7 +359,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         ) {
             if (destStream == null) {
                 if (!isQuiet) {
-                    System.out.println("SKIPPED: bitstream " + source.getID()
+                    logInfo("SKIPPED: bitstream " + source.getID()
                             + " (item: " + item.getHandle() + ") because filtering was unsuccessful");
                 }
                 return false;
@@ -402,7 +405,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             formatFilter.postProcessBitstream(context, item, b);
 
         } catch (OutOfMemoryError oome) {
-            System.out.println("!!! OutOfMemoryError !!!");
+            logError("!!! OutOfMemoryError !!!");
         }
 
         // fixme - set date?
@@ -412,7 +415,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         }
 
         if (!isQuiet) {
-            System.out.println("FILTERED: bitstream " + source.getID()
+            logInfo("FILTERED: bitstream " + source.getID()
                                    + " (item: " + item.getHandle() + ") and created '" + newName + "'");
         }
 
@@ -428,11 +431,33 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     public boolean inSkipList(String identifier) {
         if (skipList != null && skipList.contains(identifier)) {
             if (!isQuiet) {
-                System.out.println("SKIP-LIST: skipped bitstreams within identifier " + identifier);
+                logInfo("SKIP-LIST: skipped bitstreams within identifier " + identifier);
             }
             return true;
         } else {
             return false;
+        }
+    }
+
+    private void logInfo(String message) {
+        if (handler != null) {
+            handler.logInfo(message);
+        } else {
+            System.out.println(message);
+        }
+    }
+    private void logError(String message) {
+        if (handler != null) {
+            handler.logError(message);
+        } else {
+            System.out.println(message);
+        }
+    }
+    private void logError(String message, Exception e) {
+        if (handler != null) {
+            handler.logError(message, e);
+        } else {
+            System.out.println(message);
         }
     }
 
@@ -469,5 +494,10 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     @Override
     public void setFilterFormats(Map<String, List<String>> filterFormats) {
         this.filterFormats = filterFormats;
+    }
+
+    @Override
+    public void setLogHandler(DSpaceRunnableHandler handler) {
+        this.handler = handler;
     }
 }

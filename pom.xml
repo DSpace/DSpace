@@ -36,7 +36,7 @@
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
         <jetty.version>9.4.41.v20210516</jetty.version>
-        <log4j.version>2.15.0</log4j.version>
+        <log4j.version>2.17.1</log4j.version>
         <pdfbox-version>2.0.24</pdfbox-version>
         <poi-version>3.17</poi-version>
         <slf4j.version>1.7.25</slf4j.version>
@@ -72,7 +72,7 @@
         <skipIntegrationTests>true</skipIntegrationTests>
 
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
-                     as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
+                     as it is used to reference the LICENSE.header and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
     </properties>
 
@@ -400,13 +400,13 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
-            <!-- Check license headers in all files using LICENSE_HEADER template -->
+            <!-- Check license headers in all files using LICENSE.header template -->
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
                     <!-- License header file (can be a URL, but that's less stable if external site is down on occasion) -->
-                    <header>${root.basedir}/LICENSE_HEADER</header>
+                    <header>${root.basedir}/LICENSE.header</header>
                     <!--Just check headers of everything in the /src directory -->
                     <includes>
                         <include>src/**</include>
@@ -1439,9 +1439,9 @@
                 <version>2.9.2</version>
             </dependency>
             <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>mail</artifactId>
-                <version>1.4.7</version>
+                <groupId>com.sun.mail</groupId>
+                <artifactId>javax.mail</artifactId>
+                <version>1.6.2</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
