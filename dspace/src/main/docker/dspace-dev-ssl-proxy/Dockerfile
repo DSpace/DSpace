@@ -6,11 +6,14 @@
 # http://www.dspace.org/license/
 #
 
+# Use official Apache HTTPD image
+# https://hub.docker.com/_/httpd
 FROM httpd:2
 
 # Default environment variables
 ENV APACHE_HOME /usr/local/apache2
-ENV APACHE_SERVER_NAME localhost
+# This is the hostname/domain where DSpace will be available via HTTPS
+ENV APACHE_SERVER_NAME dspace-dev.local
 
 # Install openssl to generate our cert
 RUN apt-get update \
@@ -20,7 +23,7 @@ RUN apt-get update \
 # Generate our self-signed 'localhost' certificate to /ssl/cert.pem
 RUN mkdir -p /ssl
 WORKDIR /ssl
-RUN openssl req -subj '/CN=localhost' -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem -days 365
+RUN openssl req -subj "/CN=${APACHE_SERVER_NAME}" -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem -days 365
 
 # Enable SSL/HTTPS in Apache
 RUN sed -i \
