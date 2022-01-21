@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.canvasdimension;
+package org.dspace.iiif.canvasdimension;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -97,7 +97,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
         context.restoreAuthSystemState();
 
         String handle = iiifItem.getHandle();
-        execCanvasScriptHandle(handle);
+        execCanvasScript(handle);
         // The test image is small so the canvas dimension should be doubled, e.g. height 200 -> height 400
         assertTrue(bitstream.getMetadata().stream()
                         .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_HEIGHT))
@@ -128,7 +128,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
         context.restoreAuthSystemState();
 
         String id = col1.getID().toString();
-        execCanvasScript(id, "COLLECTION");
+        execCanvasScript(id);
         // The test image is small so the canvas dimension should be doubled, e.g. height 200 -> height 400
         assertTrue(bitstream.getMetadata().stream()
                             .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_HEIGHT))
@@ -159,7 +159,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
         context.restoreAuthSystemState();
 
         String id = child1.getID().toString();
-        execCanvasScript(id, "COMMUNITY");
+        execCanvasScript(id);
 
         // The test image is small so the canvas dimension should be doubled, e.g. height 200 -> height 400
         assertTrue(bitstream.getMetadata().stream()
@@ -191,7 +191,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
         context.restoreAuthSystemState();
 
         String handle = parentCommunity.getHandle();
-        execCanvasScriptHandle(handle);
+        execCanvasScript(handle);
         // The test image is small so the canvas dimension should be doubled, e.g. height 200 -> height 400
         assertTrue(bitstream.getMetadata().stream()
                             .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_HEIGHT))
@@ -235,7 +235,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
         context.restoreAuthSystemState();
 
         String id = parentCommunity.getID().toString();
-        execCanvasScript(id, "COMMUNITY");
+        execCanvasScript(id);
 
         // All bitstreams should be updated with canvas metadata.
         assertTrue(bitstream.getMetadata().stream()
@@ -275,7 +275,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
         context.restoreAuthSystemState();
 
         String id = iiifItem.getID().toString();
-        execCanvasScriptForceOption(id, "ITEM");
+        execCanvasScriptForceOption(id);
 
         // The existing metadata should be updated
         assertTrue(bitstream.getMetadata().stream()
@@ -309,7 +309,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
         context.restoreAuthSystemState();
 
         String id = col1.getID().toString();
-        execCanvasScriptForceOption(id, "COLLECTION");
+        execCanvasScriptForceOption(id);
 
         // The existing metadata should be updated
         assertTrue(bitstream.getMetadata().stream()
@@ -343,7 +343,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
         context.restoreAuthSystemState();
 
         String handle = iiifItem.getHandle();
-        execCanvasScriptHandle(handle);
+        execCanvasScript(handle);
         // The existing canvas metadata should be unchanged
         assertTrue(bitstream.getMetadata().stream()
                             .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_HEIGHT))
@@ -406,7 +406,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
 
         String id = parentCommunity.getID().toString();
 
-        execCanvasScriptWithMaxRecs(id, "COMMUNITY");
+        execCanvasScriptWithMaxRecs(id);
         // check System.out for number of items processed.
         assertEquals("2 IIIF items were processed.\n", outContent.toString());
     }
@@ -465,7 +465,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
 
         String id = parentCommunity.getID().toString();
 
-        execCanvasScriptWithSkipList(id, "COMMUNITY", col2.getHandle() + "," + col3.getHandle());
+        execCanvasScriptWithSkipList(id,col2.getHandle() + "," + col3.getHandle());
         // The test image is small so the canvas dimension should be doubled, e.g. height 200 -> height 400
         assertTrue(bitstream.getMetadata().stream()
                             .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_HEIGHT))
@@ -528,7 +528,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
 
         String id = parentCommunity.getID().toString();
 
-        execCanvasScriptWithSkipList(id, "COMMUNITY", col2.getHandle());
+        execCanvasScriptWithSkipList(id, col2.getHandle());
         // The test image is small so the canvas dimension should be doubled, e.g. height 200 -> height 400
         assertTrue(bitstream.getMetadata().stream()
                             .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_HEIGHT))
@@ -546,26 +546,21 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
 
     }
 
-    private void execCanvasScriptHandle(String handle) throws Exception {
-        runDSpaceScript("iiif-canvas-dimensions", "-e", "admin@email.com", "-i", handle);
+    private void execCanvasScript(String id) throws Exception {
+        runDSpaceScript("iiif-canvas-dimensions", "-e", "admin@email.com", "-i", id);
     }
 
-    private void execCanvasScript(String id, String type) throws Exception {
-        runDSpaceScript("iiif-canvas-dimensions", "-e", "admin@email.com", "-i", id, "-t", type);
+    private void execCanvasScriptForceOption(String id) throws Exception {
+        runDSpaceScript("iiif-canvas-dimensions", "-e", "admin@email.com", "-i", id, "-f");
     }
 
-    private void execCanvasScriptForceOption(String id, String type) throws Exception {
-        runDSpaceScript("iiif-canvas-dimensions", "-e", "admin@email.com", "-i", id, "-f", "-t", type);
-    }
-
-    private void execCanvasScriptWithMaxRecs(String id, String type) throws Exception {
+    private void execCanvasScriptWithMaxRecs(String id) throws Exception {
         // maximum 2
-        runDSpaceScript("iiif-canvas-dimensions", "-e", "admin@email.com", "-i",
-            id, "-t", type, "-m", "2", "-f", "-q");
+        runDSpaceScript("iiif-canvas-dimensions", "-e", "admin@email.com", "-i",  id, "-m", "2", "-f", "-q");
     }
 
-    private void execCanvasScriptWithSkipList(String id, String type, String skip) throws Exception {
-        runDSpaceScript("iiif-canvas-dimensions", "-e", "admin@email.com", "-i", id, "-t", type, "-s", skip, "-f");
+    private void execCanvasScriptWithSkipList(String id, String skip) throws Exception {
+        runDSpaceScript("iiif-canvas-dimensions", "-e", "admin@email.com", "-i", id, "-s", skip, "-f");
     }
 
 }

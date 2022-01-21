@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.iiif.canvasdimension;
+package org.dspace.iiif;
 
 import static org.dspace.iiif.canvasdimension.Util.checkDimensions;
 
@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
-import org.dspace.iiif.canvasdimension.service.IIIFApiQueryService;
 import org.dspace.iiif.util.IIIFSharedUtils;
 
 

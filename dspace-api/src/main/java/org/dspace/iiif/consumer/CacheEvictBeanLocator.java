@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.iiif;
+package org.dspace.iiif.consumer;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

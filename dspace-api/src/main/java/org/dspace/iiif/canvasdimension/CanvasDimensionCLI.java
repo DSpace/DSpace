@@ -17,11 +17,11 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -62,9 +62,7 @@ public class CanvasDimensionCLI {
         int max2Process = Integer.MAX_VALUE;
 
         String identifier = null;
-        String typeString = null;
         String eperson = null;
-        int dsoType = -1;
 
         Context context = new Context();
         IIIFCanvasDimensionService canvasProcessor = IIIFCanvasDimensionServiceFactory.getInstance()
@@ -75,8 +73,6 @@ public class CanvasDimensionCLI {
         Options options = new Options();
         options.addOption("i", "identifier", true,
             "process IIIF canvas dimensions for images belonging to this identifier");
-        options.addOption("t", "type", true,
-            "type: COMMUNITY, COLLECTION or ITEM\"");
         options.addOption("e", "eperson", true,
             "email of eperson setting the canvas dimensions");
         options.addOption("f", "force", false,
@@ -116,9 +112,10 @@ public class CanvasDimensionCLI {
             help.printHelp("CanvasDimension processor\n", options);
             System.out
                 .println("\nUUID example:    iiif-canvas-dimensions -e user@email.org " +
-                    "-i 1086306d-8a51-43c3-98b9-c3b00f49105f -t COLLECTION");
+                    "-i 1086306d-8a51-43c3-98b9-c3b00f49105f");
             System.out
-                .println("\nHandle example:    iiif-canvas-dimensions -e user@email.org -i 123456/21");
+                .println("\nHandle example:    iiif-canvas-dimensions -e user@email.org " +
+                        "-i 123456789/12");
             System.exit(0);
         }
 
@@ -138,24 +135,6 @@ public class CanvasDimensionCLI {
             help.printHelp("CanvasDimension processor\n", options);
             System.out.println("An identifier for a Community, Collection, or Item must be provided.");
             System.exit(1);
-        }
-        if (line.hasOption('t')) {
-            typeString = line.getOptionValue('t');
-            if ("ITEM".equalsIgnoreCase(typeString)) {
-                dsoType = Constants.ITEM;
-            } else if ("COLLECTION".equals(typeString)) {
-                dsoType = Constants.COLLECTION;
-            } else if ("COMMUNITY".equalsIgnoreCase(typeString)) {
-                dsoType = Constants.COMMUNITY;
-            }
-        } else {
-            // If the identifier is a handle dsoType is not required.
-            if (identifier.indexOf('/') == -1) {
-                HelpFormatter help = new HelpFormatter();
-                help.printHelp("CanvasDimension processor\n", options);
-                System.out.println("A DSpace type must be provided: COMMUNITY, COLLECTION or ITEM.");
-                System.exit(1);
-            }
         }
         if (line.hasOption('m')) {
             max2Process = Integer.parseInt(line.getOptionValue('m'));
@@ -185,17 +164,14 @@ public class CanvasDimensionCLI {
         DSpaceObject dso = null;
         if (identifier.indexOf('/') != -1) {
             dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, identifier);
-        } else if (dsoType == Constants.COMMUNITY) {
-            dso = ContentServiceFactory.getInstance().getCommunityService().find(context, UUID.fromString(identifier));
-        } else if (dsoType == Constants.COLLECTION) {
-            dso = ContentServiceFactory.getInstance().getCollectionService().find(context, UUID.fromString(identifier));
-        } else if (dsoType == Constants.ITEM) {
-            dso = ContentServiceFactory.getInstance().getItemService().find(context, UUID.fromString(identifier));
+        } else {
+            dso = UtilServiceFactory.getInstance().getDSpaceObjectUtils()
+                              .findDSpaceObject(context, UUID.fromString(identifier));
         }
 
         if (dso == null) {
             throw new IllegalArgumentException("Cannot resolve "
-                + identifier + " to a DSpace object using type: " + typeString);
+                + identifier + " to a DSpace object.");
         }
 
         EPerson user;
