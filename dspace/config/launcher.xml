@@ -359,4 +359,11 @@
             <class>org.dspace.statistics.AnonymizeStatistics</class>
         </step>
     </command>
+    <command>
+        <name>iiif-canvas-dimensions</name>
+        <description>Automatically add the IIIF canvas width/height metadata to Bitstreams of IIIF enabled Items.</description>
+        <step>
+            <class>org.dspace.iiif.canvasdimension.CanvasDimensionCLI</class>
+        </step>
+    </command>
 </commands>

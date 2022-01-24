@@ -77,7 +77,7 @@ public final class Utils {
     private static final VMID vmid = new VMID();
 
     // for parseISO8601Date
-    private static final SimpleDateFormat parseFmt[]  = {
+    private static final SimpleDateFormat[] parseFmt = {
         // first try at parsing, has milliseconds (note General time zone)
         new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSz"),
 
@@ -87,7 +87,9 @@ public final class Utils {
         // finally, try without any timezone (defaults to current TZ)
         new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS"),
 
-        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss")
+        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss"),
+
+        new SimpleDateFormat("yyyy'-'MM'-'dd")
     };
 
     // for formatISO8601Date
@@ -159,11 +161,11 @@ public final class Utils {
         StringBuilder result = new StringBuilder();
 
         // This is far from the most efficient way to do things...
-        for (int i = 0; i < data.length; i++) {
-            int low = (int) (data[i] & 0x0F);
-            int high = (int) (data[i] & 0xF0);
+        for (byte datum : data) {
+            int low = datum & 0x0F;
+            int high = datum & 0xF0;
 
-            result.append(Integer.toHexString(high).substring(0, 1));
+            result.append(Integer.toHexString(high).charAt(0));
             result.append(Integer.toHexString(low));
         }
 
@@ -199,13 +201,7 @@ public final class Utils {
         byte[] junk = new byte[16];
 
         random.nextBytes(junk);
-
-        String input = new StringBuilder()
-                .append(vmid)
-                .append(new java.util.Date())
-                .append(Arrays.toString(junk))
-                .append(counter++)
-                .toString();
+        String input = String.valueOf(vmid) + new Date() + Arrays.toString(junk) + counter++;
 
         return getMD5Bytes(input.getBytes(StandardCharsets.UTF_8));
     }
@@ -294,7 +290,7 @@ public final class Utils {
         }
 
         String units = m.group(2);
-        long multiplier = MS_IN_SECOND;
+        long multiplier;
 
         if ("s".equals(units)) {
             multiplier = MS_IN_SECOND;
@@ -334,16 +330,16 @@ public final class Utils {
         char tzSign = s.charAt(s.length() - 6);
         if (s.endsWith("Z")) {
             s = s.substring(0, s.length() - 1) + "GMT+00:00";
-        } else if (tzSign == '-' || tzSign == '+') {
+        } else if ((tzSign == '-' || tzSign == '+') && s.length() > 10) {
             // check for trailing timezone
             s = s.substring(0, s.length() - 6) + "GMT" + s.substring(s.length() - 6);
         }
 
         // try to parse without milliseconds
         ParseException lastError = null;
-        for (int i = 0; i < parseFmt.length; ++i) {
+        for (SimpleDateFormat simpleDateFormat : parseFmt) {
             try {
-                return parseFmt[i].parse(s);
+                return simpleDateFormat.parse(s);
             } catch (ParseException e) {
                 lastError = e;
             }
@@ -376,7 +372,7 @@ public final class Utils {
     }
 
     public static <E> java.util.Collection<E> emptyIfNull(java.util.Collection<E> collection) {
-        return collection == null ? Collections.<E>emptyList() : collection;
+        return collection == null ? Collections.emptyList() : collection;
     }
 
     /**
@@ -457,7 +453,7 @@ public final class Utils {
             if (hostname != null) {
                 return hostname.startsWith("www.") ? hostname.substring(4) : hostname;
             }
-            return hostname;
+            return null;
         } catch (URISyntaxException e) {
             return null;
         }
