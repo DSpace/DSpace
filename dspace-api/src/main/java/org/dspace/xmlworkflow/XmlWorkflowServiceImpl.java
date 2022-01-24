@@ -681,7 +681,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             }
         } catch (MessagingException e) {
             log.warn(LogHelper.getHeader(context, "notifyOfArchive",
-                    "cannot email user" + " item_id=" + item.getID()));
+                    "cannot email user" + " item_id=" + item.getID()), e);
         }
     }
 
@@ -715,7 +715,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         } catch (MessagingException e) {
             log.warn(LogHelper.getHeader(c, "notifyOfCuration",
                     "cannot email users of workflow_item_id " + wi.getID()
-                            + ":  " + e.getMessage()));
+                            + ":  " + e.getMessage()), e);
         }
     }
 
@@ -1031,12 +1031,13 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
         itemService.update(context, myitem);
 
-        // convert into personal workspace
-        WorkspaceItem wsi = returnToWorkspace(context, wi);
-
         // remove policy for controller
         removeUserItemPolicies(context, myitem, e);
         revokeReviewerPolicies(context, myitem);
+
+        // convert into personal workspace
+        WorkspaceItem wsi = returnToWorkspace(context, wi);
+
         // notify that it's been rejected
         notifyOfReject(context, wi, e, rejection_message);
         log.info(LogHelper.getHeader(context, "reject_workflow", "workflow_item_id="
@@ -1195,7 +1196,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             log.warn(LogHelper.getHeader(c, "notify_of_reject",
                     "cannot email user" + " eperson_id" + e.getID()
                     + " eperson_email" + e.getEmail()
-                    + " workflow_item_id" + wi.getID()));
+                    + " workflow_item_id" + wi.getID()), ex);
         }
     }
 

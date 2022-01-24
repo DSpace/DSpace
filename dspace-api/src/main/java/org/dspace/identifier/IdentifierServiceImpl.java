@@ -150,9 +150,8 @@ public class IdentifierServiceImpl implements IdentifierService {
                                  + "Identifier for " + contentServiceFactory.getDSpaceObjectService(dso)
                                                                             .getTypeText(dso) + ", "
                                  + dso.getID().toString() + ".");
-                    log.debug(ex.getMessage(), ex);
                 } catch (IdentifierException e) {
-                    log.error(e.getMessage(), e);
+                    log.error(e);
                 }
             }
         }
@@ -162,6 +161,8 @@ public class IdentifierServiceImpl implements IdentifierService {
     @Override
     public List<String> lookup(Context context, DSpaceObject dso) {
         List<String> identifiers = new ArrayList<>();
+        // Attempt to lookup DSO's identifiers using every available provider
+        // TODO: We may want to eventually limit providers based on DSO type, as not every provider supports every DSO
         for (IdentifierProvider service : providers) {
             try {
                 String result = service.lookup(context, dso);
@@ -177,13 +178,14 @@ public class IdentifierServiceImpl implements IdentifierService {
                     identifiers.add(result);
                 }
             } catch (IdentifierNotFoundException ex) {
-                log.info(service.getClass().getName() + " doesn't find an "
+                // This IdentifierNotFoundException is NOT logged by default, as some providers do not apply to
+                // every DSO (e.g. DOIs usually don't apply to EPerson objects). So it is expected some may fail lookup.
+                log.debug(service.getClass().getName() + " doesn't find an "
                              + "Identifier for " + contentServiceFactory.getDSpaceObjectService(dso)
                                                                         .getTypeText(dso) + ", "
                              + dso.getID().toString() + ".");
-                log.debug(ex.getMessage(), ex);
             } catch (IdentifierException ex) {
-                log.error(ex.getMessage(), ex);
+                log.error(ex);
             }
         }
 
@@ -228,7 +230,6 @@ public class IdentifierServiceImpl implements IdentifierService {
                     log.info(service.getClass().getName() + " cannot resolve "
                                  + "Identifier " + identifier + ": identifier not "
                                  + "found.");
-                    log.debug(ex.getMessage(), ex);
                 } catch (IdentifierException ex) {
                     log.error(ex.getMessage(), ex);
                 }

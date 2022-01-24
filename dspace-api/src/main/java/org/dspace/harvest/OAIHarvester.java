@@ -701,7 +701,7 @@ public class OAIHarvester {
         if (values.size() > 0 && acceptedHandleServers != null) {
             for (MetadataValue value : values) {
                 //     0   1       2         3   4
-                //   http://hdl.handle.net/1234/12
+                //   https://hdl.handle.net/1234/12
                 String[] urlPieces = value.getValue().split("/");
                 if (urlPieces.length != 5) {
                     continue;

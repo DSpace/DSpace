@@ -27,6 +27,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -53,7 +54,7 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
         try {
             DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuidObject);
             if (dso == null) {
-                throw new IllegalArgumentException("No DSO found with uuid: " + uuidObject);
+                throw new ResourceNotFoundException("No DSO found with uuid: " + uuidObject);
             }
             usageReportRest = usageReportUtils.createUsageReport(context, dso, reportId);
 
@@ -73,7 +74,7 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
             Context context = obtainContext();
             DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuid);
             if (dso == null) {
-                throw new IllegalArgumentException("No DSO found with uuid: " + uuid);
+                throw new ResourceNotFoundException("No DSO found with uuid: " + uuid);
             }
             usageReportsOfItem = usageReportUtils.getUsageReportsOfDSO(context, dso);
         } catch (SQLException | ParseException | SolrServerException | IOException e) {

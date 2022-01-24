@@ -7,6 +7,11 @@
  */
 package org.dspace.app.iiif.service.utils;
 
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_HEIGHT;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_SCHEMA;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_WIDTH;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +32,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.license.CreativeCommonsServiceImpl;
+import org.dspace.iiif.util.IIIFSharedUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -59,9 +63,11 @@ public class IIIFUtils {
     // metadata used to set the iiif viewing hint
     public static final String METADATA_IIIF_VIEWING_HINT  = "iiif.viewing.hint";
     // metadata used to set the width of the canvas that has not an explicit name
-    public static final String METADATA_IMAGE_WIDTH = "iiif.image.width";
+    public static final String METADATA_IMAGE_WIDTH = METADATA_IIIF_SCHEMA + "." + METADATA_IIIF_IMAGE
+        + "." + METADATA_IIIF_WIDTH;
     // metadata used to set the height of the canvas that has not an explicit name
-    public static final String METADATA_IMAGE_HEIGTH = "iiif.image.height";
+    public static final String METADATA_IMAGE_HEIGHT = METADATA_IIIF_SCHEMA + "." + METADATA_IIIF_IMAGE
+        + "." + METADATA_IIIF_HEIGHT;
 
     // string used in the metadata toc as separator among the different levels
     public static final String TOC_SEPARATOR = "|||";
@@ -76,49 +82,13 @@ public class IIIFUtils {
     @Autowired
     protected BitstreamService bitstreamService;
 
-    /**
-     * This method returns the bundles holding IIIF resources if any.
-     * If there is no IIIF content available an empty bundle list is returned.
-     * @param item the DSpace item
-     * 
-     * @return list of DSpace bundles with IIIF content
-     */
+
     public List<Bundle> getIIIFBundles(Item item) {
-        boolean iiif = isIIIFEnabled(item);
-        List<Bundle> bundles = new ArrayList<>();
-        if (iiif) {
-            bundles = item.getBundles().stream().filter(b -> isIIIFBundle(b)).collect(Collectors.toList());
-        }
-        return bundles;
+        return IIIFSharedUtils.getIIIFBundles(item);
     }
 
-    /**
-     * This method verify if the IIIF feature is enabled on the item
-     * 
-     * @param item the dspace item
-     * @return true if the item supports IIIF
-     */
     public boolean isIIIFEnabled(Item item) {
-        return item.getMetadata().stream()
-                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
-                .anyMatch(m -> m.getValue().equalsIgnoreCase("true")  ||
-                        m.getValue().equalsIgnoreCase("yes"));
-    }
-
-    /**
-     * Utility method to check is a bundle can contain bitstreams to use as IIIF
-     * resources
-     * 
-     * @param b the DSpace bundle to check
-     * @return true if the bundle can contain bitstreams to use as IIIF resources
-     */
-    private boolean isIIIFBundle(Bundle b) {
-        return !StringUtils.equalsAnyIgnoreCase(b.getName(), Constants.LICENSE_BUNDLE_NAME,
-                Constants.METADATA_BUNDLE_NAME, CreativeCommonsServiceImpl.CC_BUNDLE_NAME, "THUMBNAIL",
-                "BRANDED_PREVIEW", "TEXT", OTHER_CONTENT_BUNDLE)
-                && b.getMetadata().stream()
-                        .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
-                        .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
+        return IIIFSharedUtils.isIIIFEnabled(item);
     }
 
     /**
@@ -131,7 +101,7 @@ public class IIIFUtils {
      */
     public List<Bitstream> getIIIFBitstreams(Context context, Item item) {
         List<Bitstream> bitstreams = new ArrayList<Bitstream>();
-        for (Bundle bnd : getIIIFBundles(item)) {
+        for (Bundle bnd : IIIFSharedUtils.getIIIFBundles(item)) {
             bitstreams
                     .addAll(getIIIFBitstreams(context, bnd));
         }
@@ -385,9 +355,9 @@ public class IIIFUtils {
      * @return the height in pixel for the canvas associated with the bitstream
      */
     public int getCanvasHeight(Bitstream bitstream, Bundle bundle, Item item, int defaultHeight) {
-        return getSizeFromMetadata(bitstream, METADATA_IMAGE_HEIGTH,
-                getSizeFromMetadata(bundle, METADATA_IMAGE_HEIGTH,
-                    getSizeFromMetadata(item, METADATA_IMAGE_HEIGTH, defaultHeight)));
+        return getSizeFromMetadata(bitstream, METADATA_IMAGE_HEIGHT,
+                getSizeFromMetadata(bundle, METADATA_IMAGE_HEIGHT,
+                    getSizeFromMetadata(item, METADATA_IMAGE_HEIGHT, defaultHeight)));
     }
 
     /**
