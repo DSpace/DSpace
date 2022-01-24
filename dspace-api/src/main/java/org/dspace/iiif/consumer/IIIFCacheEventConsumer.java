@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.iiif;
+package org.dspace.iiif.consumer;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -74,7 +74,8 @@ public class IIIFCacheEventConsumer implements Consumer {
                 clearAll = true;
             }
 
-            if ((et == Event.ADD || et == Event.MODIFY_METADATA  ) && subject != null) {
+            if ((et == Event.ADD || et == Event.MODIFY_METADATA  ) && subject != null
+                && ((Bitstream) subject).getBundles().size() > 0) {
                 // set subject to be the parent Item.
                 Bundle bundle = ((Bitstream) subject).getBundles().get(0);
                 subject = bundle.getItems().get(0);

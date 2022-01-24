@@ -39,7 +39,7 @@
             <include>README</include>
          </includes>
          <excludes>
-            <exclude>LICENSE_HEADER</exclude>
+            <exclude>LICENSE.header</exclude>
          </excludes>
       </fileSet>
       <!-- If local.cfg is in the root folder, copy it to config folder -->
