@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -138,7 +137,8 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
             return ePerson.canLogIn() ? logInEPerson(context, ePerson) : BAD_ARGS;
         }
 
-        LOGGER.warn("Self registration is currently disabled for OIDC, and no ePerson could be found for email: {}", email);
+        LOGGER.warn("Self registration is currently disabled for OIDC, and no ePerson could be found for email: {}",
+            email);
         return canSelfRegister() ? registerNewEPerson(context, userInfo, email) : NO_SUCH_USER;
     }
 
@@ -155,19 +155,21 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
             new String[] {
                 "openid", "email", "profile"
             };
-        String scopes = String.join(" ", configurationService.getArrayProperty("authentication-oidc.scopes", defaultScopes));
+        String scopes = String.join(" ", configurationService.getArrayProperty("authentication-oidc.scopes",
+            defaultScopes));
 
         if (isAnyBlank(authorizeUrl, clientId, redirectUri, clientSecret, tokenUrl, userInfoUrl)) {
             LOGGER.error("Missing mandatory configuration properties for OidcAuthenticationBean");
 
             // prepare a Map of the properties which can not have sane defaults, but are still required
-            final Map<String, String> map = Map.of("authorizeUrl", authorizeUrl, "clientId", clientId, "redirectUri", redirectUri, "clientSecret", clientSecret, "tokenUrl", tokenUrl, "userInfoUrl", userInfoUrl);
+            final Map<String, String> map = Map.of("authorizeUrl", authorizeUrl, "clientId", clientId, "redirectUri",
+                redirectUri, "clientSecret", clientSecret, "tokenUrl", tokenUrl, "userInfoUrl", userInfoUrl);
             final Iterator<Entry<String, String>> iterator = map.entrySet().iterator();
-    
+
             while (iterator.hasNext()) {
                 final Entry<String, String> entry = iterator.next();
-    
-                if (isBlank(entry.getValue())) {   
+
+                if (isBlank(entry.getValue())) {
                     LOGGER.error(" * {} is missing", entry.getKey());
                 }
             }
