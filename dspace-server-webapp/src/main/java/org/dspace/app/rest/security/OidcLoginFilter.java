@@ -25,9 +25,9 @@ import org.springframework.security.core.AuthenticationException;
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
 
-public class OidcAuthenticationFilter extends StatelessLoginFilter {
+public class OidcLoginFilter extends StatelessLoginFilter {
 
-    public OidcAuthenticationFilter(String url, AuthenticationManager authenticationManager,
+    public OidcLoginFilter(String url, AuthenticationManager authenticationManager,
             RestAuthenticationService restAuthenticationService) {
         super(url, authenticationManager, restAuthenticationService);
     }
