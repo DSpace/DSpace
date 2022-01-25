@@ -97,13 +97,6 @@
         </step>
     </command>
     <command>
-        <name>filter-media</name>
-        <description>Perform the media filtering to extract full text from documents and to create thumbnails</description>
-        <step>
-            <class>org.dspace.app.mediafilter.MediaFilterCLITool</class>
-        </step>
-    </command>
-    <command>
         <name>generate-sitemaps</name>
         <description>Generate search engine and html sitemaps</description>
         <step>
@@ -364,6 +357,13 @@
         <description>Anonymize the ip values of the solr statistics</description>
         <step>
             <class>org.dspace.statistics.AnonymizeStatistics</class>
+        </step>
+    </command>
+    <command>
+        <name>iiif-canvas-dimensions</name>
+        <description>Automatically add the IIIF canvas width/height metadata to Bitstreams of IIIF enabled Items.</description>
+        <step>
+            <class>org.dspace.iiif.canvasdimension.CanvasDimensionCLI</class>
         </step>
     </command>
 </commands>
