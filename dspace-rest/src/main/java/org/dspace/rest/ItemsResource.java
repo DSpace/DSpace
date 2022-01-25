@@ -181,7 +181,7 @@ public class ItemsResource extends Resource {
         try {
             context = createContext();
 
-            Iterator<org.dspace.content.Item> dspaceItems = itemService.findAllUnfiltered(context);
+            Iterator<org.dspace.content.Item> dspaceItems = itemService.findAllUnfilteredReadOnly(context);
             items = new ArrayList<Item>();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0))) {
