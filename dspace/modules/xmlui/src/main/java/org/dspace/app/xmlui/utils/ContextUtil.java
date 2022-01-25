@@ -87,7 +87,7 @@ public class ContextUtil
      */
     public static Context obtainContext(HttpServletRequest request) throws SQLException
     {
-        Context context = retrieveContext(request);
+        Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
         if (context == null)
         {
@@ -110,21 +110,7 @@ public class ContextUtil
             }
 
             // Set the session ID and IP address
-            String ip = request.getRemoteAddr();
-            if (useProxies == null) {
-                useProxies = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("useProxies", false);
-            }
-            if(useProxies && request.getHeader("X-Forwarded-For") != null)
-            {
-                /* This header is a comma delimited list */
-	            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
-                {
-                    if(!request.getHeader("X-Forwarded-For").contains(ip))
-                    {
-                        ip = xfip.trim();
-                    }
-                }
-	        }
+            String ip = getRealRemoteIp(request);
             context.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + ip);
 
             // Store the context in the request
@@ -143,7 +129,7 @@ public class ContextUtil
      */
     public static void completeContext(HttpServletRequest request) throws ServletException
     {
-        Context context = retrieveContext(request);
+    	Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
     	if (context != null && context.isValid())
     	{
@@ -165,7 +151,7 @@ public class ContextUtil
      */
 	public static void abortContext(HttpServletRequest request)
 	{
-        Context context = retrieveContext(request);
+    	Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
     	if (context != null && context.isValid())
     	{
@@ -173,8 +159,23 @@ public class ContextUtil
     	}
 	}
 
-    private static Context retrieveContext(final HttpServletRequest request) {
-        return (Context) request.getAttribute(DSPACE_CONTEXT);
-	}
+    public static String getRealRemoteIp(HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        if (useProxies == null) {
+            useProxies = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("useProxies", false);
+        }
+        if(useProxies && request.getHeader("X-Forwarded-For") != null)
+        {
+            /* This header is a comma delimited list */
+            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
+            {
+                if(!request.getHeader("X-Forwarded-For").contains(ip))
+                {
+                    ip = xfip.trim();
+                }
+            }
+        }
+        return ip;
+    }
 
 }

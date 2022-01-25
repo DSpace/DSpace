@@ -212,8 +212,8 @@ public class AuthenticationUtil
 
         // and the remote IP address to compare against later requests
         // so we can detect session hijacking.
-        session.setAttribute(CURRENT_IP_ADDRESS, request.getRemoteAddr());
-        
+        session.setAttribute(CURRENT_IP_ADDRESS, ContextUtil.getRealRemoteIp(request));
+
         // Set both the effective and authenticated user to the same.
         session.setAttribute(EFFECTIVE_USER_ID, eperson.getID());
         session.setAttribute(AUTHENTICATED_USER_ID,eperson.getID());
@@ -265,7 +265,7 @@ public class AuthenticationUtil
                 boolean ipcheck = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.session.ipcheck", true);
 
                 String address = (String)session.getAttribute(CURRENT_IP_ADDRESS);
-                if (!ipcheck || (address != null && address.equals(request.getRemoteAddr())))
+                if (!ipcheck || (address != null && address.equals(ContextUtil.getRealRemoteIp(request))))
                 {
                     EPerson eperson = ePersonService.find(context, id);
                     context.setCurrentUser(eperson);
