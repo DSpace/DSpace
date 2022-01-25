@@ -7,6 +7,13 @@
  */
 package org.dspace.app.itemimport;
 
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_HEIGHT_QUALIFIER;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE_ELEMENT;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_LABEL_ELEMENT;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_SCHEMA;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_TOC_ELEMENT;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_WIDTH_QUALIFIER;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -1662,6 +1669,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             Bitstream bs = null;
             boolean notfound = true;
+            boolean updateRequired = false;
+
             if (!isTest) {
                 // find bitstream
                 List<Bitstream> bitstreams = itemService.getNonInternalBitstreams(c, myItem);
@@ -1696,40 +1705,45 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     System.out.println("\tSetting description for "
                         + bitstreamName);
                     bs.setDescription(c, thisDescription);
-                    bitstreamService.update(c, bs);
+                    updateRequired = true;
                 }
 
                 if (labelExists) {
                     MetadataField metadataField = metadataFieldService
-                        .findByElement(c, "iiif", "label", null);
+                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_LABEL_ELEMENT, null);
                     System.out.println("\tSetting label to " + thisLabel + " in element "
                         + metadataField.getElement() + " on " + bitstreamName);
                     bitstreamService.addMetadata(c, bs, metadataField, null, thisLabel);
-                    bitstreamService.update(c, bs);
+                    updateRequired = true;
                 }
 
                 if (heightExists) {
                     MetadataField metadataField = metadataFieldService
-                        .findByElement(c, "iiif", "image", "height");
+                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_IMAGE_ELEMENT,
+                            METADATA_IIIF_HEIGHT_QUALIFIER);
                     System.out.println("\tSetting height to " + thisHeight + " in element "
                         + metadataField.getElement() + " on " + bitstreamName);
                     bitstreamService.addMetadata(c, bs, metadataField, null, thisHeight);
-                    bitstreamService.update(c, bs);
+                    updateRequired = true;
                 }
                 if (widthExists) {
                     MetadataField metadataField = metadataFieldService
-                        .findByElement(c, "iiif", "image", "width");
+                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_IMAGE_ELEMENT,
+                            METADATA_IIIF_WIDTH_QUALIFIER);
                     System.out.println("\tSetting width to " + thisWidth + " in element "
                         + metadataField.getElement() + " on " + bitstreamName);
                     bitstreamService.addMetadata(c, bs, metadataField, null, thisWidth);
-                    bitstreamService.update(c, bs);
+                    updateRequired = true;
                 }
                 if (tocExists) {
                     MetadataField metadataField = metadataFieldService
-                        .findByElement(c, "iiif", "toc", null);
+                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_TOC_ELEMENT, null);
                     System.out.println("\tSetting toc to " + thisToc + " in element "
                         + metadataField.getElement() + " on " + bitstreamName);
                     bitstreamService.addMetadata(c, bs, metadataField, null, thisToc);
+                    updateRequired = true;
+                }
+                if (updateRequired) {
                     bitstreamService.update(c, bs);
                 }
             }
