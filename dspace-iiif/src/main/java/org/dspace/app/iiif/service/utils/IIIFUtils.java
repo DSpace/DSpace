@@ -12,11 +12,6 @@ import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE;
 import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_SCHEMA;
 import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_WIDTH;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +19,6 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
@@ -39,6 +33,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
+import org.dspace.iiif.IIIFApiQueryService;
 import org.dspace.iiif.util.IIIFSharedUtils;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +86,9 @@ public class IIIFUtils {
 
     @Autowired
     ConfigurationService configurationService;
+
+    @Autowired
+    IIIFApiQueryService iiifApiQueryService;
 
     public List<Bundle> getIIIFBundles(Item item) {
         return IIIFSharedUtils.getIIIFBundles(item);
@@ -310,32 +308,7 @@ public class IIIFUtils {
      * @return image dimensions
      */
     public int[] getImageDimensions(Bitstream bitstream) {
-        int[] arr = new int[2];
-        String imageServer = configurationService.getProperty("iiif.image.server");
-        String path = imageServer + bitstream.getID() + "/info.json";
-        URL url;
-        try {
-            url = new URL(path);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-            int responseCode = con.getResponseCode();
-            log.info("Retrieve dimensions from the IIIF image server response status: " + responseCode);
-            BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            JsonNode parent = new ObjectMapper().readTree(response.toString());
-            arr[0] = parent.get("width").asInt();
-            arr[1] = parent.get("height").asInt();
-            return arr;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+       return iiifApiQueryService.getImageDimensions(bitstream);
     }
 
     /**
