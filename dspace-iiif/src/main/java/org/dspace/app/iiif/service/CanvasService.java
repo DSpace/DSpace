@@ -56,6 +56,7 @@ public class CanvasService extends AbstractResourceService {
 
     protected String[] BITSTREAM_METADATA_FIELDS;
 
+
     /**
      * Constructor.
      * 
@@ -70,7 +71,7 @@ public class CanvasService extends AbstractResourceService {
      * Checks for bitstream height and width metadata in the first
      * bitstream in first IIIF bundle. If the bitstream metadata is not
      * found, uses the IIIF image service to update the default canvas
-     * dimensions for this request.
+     * dimensions for this request. Called once for each manifest.
      * @param bundles IIIF bundles for this item
      */
     protected void setCanvasDimensions(List<Bundle> bundles) {
