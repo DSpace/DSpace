@@ -227,7 +227,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findAll(Context context) throws SQLException {
+    public Iterator<Item> findAllReadOnly(Context context) throws SQLException {
         return itemDAO.findAll(context, true);
     }
 
@@ -237,7 +237,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findAllUnfiltered(Context context) throws SQLException {
+    public Iterator<Item> findAllUnfilteredReadOnly(Context context) throws SQLException {
         return itemDAO.findAll(context, true, true);
     }
 
@@ -267,7 +267,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findByCollection(Context context, Collection collection) throws SQLException {
+    public Iterator<Item> findByCollectionReadOnly(Context context, Collection collection) throws SQLException {
         return findByCollection(context, collection, null, null);
     }
 
@@ -289,7 +289,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException {
+    public Iterator<Item> findAllByCollectionReadOnly(Context context, Collection collection) throws SQLException {
         return itemDAO.findAllByCollection(context, collection);
     }
 

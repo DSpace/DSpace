@@ -416,7 +416,7 @@ public class RDFizer {
         }
 
         if (dso instanceof Collection) {
-            Iterator<Item> items = itemService.findAllByCollection(context, (Collection) dso);
+            Iterator<Item> items = itemService.findAllByCollectionReadOnly(context, (Collection) dso);
             while (items.hasNext()) {
                 Item item = items.next();
                 this.dspaceDFS(item, callback, check, false);

@@ -223,7 +223,7 @@ public class ItemExportCLITool {
                 items = myItems.iterator();
             } else {
                 System.out.println("Exporting from collection: " + myIDString);
-                items = itemService.findByCollection(c, mycollection);
+                items = itemService.findByCollectionReadOnly(c, mycollection);
             }
             itemExportService.exportAsZip(c, items, destDirName, zipFileName, seqStart, migrate, excludeBitstreams);
         } else {
@@ -236,7 +236,7 @@ public class ItemExportCLITool {
                 System.out.println("Exporting from collection: " + myIDString);
 
                 // it's a collection, so do a bunch of items
-                Iterator<Item> i = itemService.findByCollection(c, mycollection);
+                Iterator<Item> i = itemService.findByCollectionReadOnly(c, mycollection);
                 itemExportService.exportItem(c, i, destDirName, seqStart, migrate, excludeBitstreams);
             }
         }

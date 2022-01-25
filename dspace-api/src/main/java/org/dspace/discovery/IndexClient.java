@@ -221,7 +221,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         throws IOException, SearchServiceException, SQLException {
         long count = 0;
 
-        final Iterator<Item> itemIterator = itemService.findByCollection(context, collection);
+        final Iterator<Item> itemIterator = itemService.findByCollectionReadOnly(context, collection);
         while (itemIterator.hasNext()) {
             Item item = itemIterator.next();
             indexingService.indexContent(context, new IndexableItem(item), true, false);

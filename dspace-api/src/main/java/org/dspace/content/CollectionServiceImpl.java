@@ -742,7 +742,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         // Remove items
         // Remove items
-        Iterator<Item> items = itemService.findAllByCollection(context, collection);
+        Iterator<Item> items = itemService.findAllByCollectionReadOnly(context, collection);
         while (items.hasNext()) {
             Item item = items.next();
 //            items.remove();

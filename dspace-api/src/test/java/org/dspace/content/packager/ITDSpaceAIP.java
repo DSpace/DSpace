@@ -1159,7 +1159,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
                         collectionService.getTypeText(collection) + valueseparator + collection.getName());
 
             // Recursively call method for each Item in Collection
-            Iterator<Item> items = itemService.findByCollection(context, collection);
+            Iterator<Item> items = itemService.findByCollectionReadOnly(context, collection);
             while (items.hasNext()) {
                 Item i = items.next();
                 saveObjectInfo(i, infoMap);

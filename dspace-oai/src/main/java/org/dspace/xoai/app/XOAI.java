@@ -665,7 +665,7 @@ public class XOAI {
 
             if (last == null) {
                 System.out.println("Retrieving all items to be compiled");
-                iterator = itemService.findAll(context);
+                iterator = itemService.findAllReadOnly(context);
             } else {
                 System.out.println("Retrieving items modified after " + last + " to be compiled");
                 iterator = itemService.findByLastModifiedSince(context, last);

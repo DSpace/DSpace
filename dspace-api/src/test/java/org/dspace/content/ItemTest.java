@@ -219,7 +219,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testFindAll() throws Exception {
-        Iterator<Item> all = itemService.findAll(context);
+        Iterator<Item> all = itemService.findAllReadOnly(context);
         assertThat("testFindAll 0", all, notNullValue());
 
         boolean added = false;
@@ -250,7 +250,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         context.restoreAuthSystemState();
 
 
-        Iterator<Item> all = itemService.findAll(context);
+        Iterator<Item> all = itemService.findAllReadOnly(context);
         assertThat("testFindAllWithSorting 0", all, notNullValue());
 
         Item testItem1 = all.next();
@@ -1533,7 +1533,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         List<Collection> result = itemService.getCollectionsNotLinked(context, item1);
         boolean isin = false;
         for (Collection c : result) {
-            Iterator<Item> iit = itemService.findByCollection(context, c);
+            Iterator<Item> iit = itemService.findByCollectionReadOnly(context, c);
             while (iit.hasNext()) {
                 if (iit.next().getID().equals(item1.getID())) {
                     isin = true;

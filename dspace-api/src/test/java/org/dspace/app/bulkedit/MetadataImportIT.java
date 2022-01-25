@@ -218,7 +218,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
     private Item findItemByName(String name) throws SQLException {
         Item importedItem = null;
-        List<Item> allItems = IteratorUtils.toList(itemService.findAll(context));
+        List<Item> allItems = IteratorUtils.toList(itemService.findAllReadOnly(context));
         for (Item item : allItems) {
             if (item.getName().equals(name)) {
                 importedItem = item;

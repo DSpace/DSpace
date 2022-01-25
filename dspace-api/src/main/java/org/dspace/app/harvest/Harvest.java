@@ -330,7 +330,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
             context.turnOffAuthorisationSystem();
 
             ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-            Iterator<Item> it = itemService.findByCollection(context, collection);
+            Iterator<Item> it = itemService.findByCollectionReadOnly(context, collection);
             int i = 0;
             while (it.hasNext()) {
                 i++;

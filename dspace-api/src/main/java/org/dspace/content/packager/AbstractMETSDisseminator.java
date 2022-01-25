@@ -971,7 +971,7 @@ public abstract class AbstractMETSDisseminator
             }
         } else if (dso.getType() == Constants.COLLECTION) {
             Collection collection = (Collection) dso;
-            Iterator<Item> ii = itemService.findByCollection(context, collection);
+            Iterator<Item> ii = itemService.findByCollectionReadOnly(context, collection);
             while (ii.hasNext()) {
                 //add a child <div> for each item in collection
                 Item item = ii.next();

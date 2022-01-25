@@ -81,7 +81,7 @@ public abstract class AbstractCurationTask implements CurationTask {
             //next, we'll try to distribute to all child objects, based on container type
             int type = dso.getType();
             if (Constants.COLLECTION == type) {
-                Iterator<Item> iter = itemService.findByCollection(Curator.curationContext(), (Collection) dso);
+                Iterator<Item> iter = itemService.findByCollectionReadOnly(Curator.curationContext(), (Collection) dso);
                 while (iter.hasNext()) {
                     Item item = iter.next();
                     performObject(item);

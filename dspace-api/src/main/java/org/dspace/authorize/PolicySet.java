@@ -213,7 +213,7 @@ public class PolicySet {
             Collection collection = collectionService.find(c, containerID);
             Group group = groupService.find(c, groupID);
 
-            Iterator<Item> i = itemService.findAllByCollection(c, collection);
+            Iterator<Item> i = itemService.findAllByCollectionReadOnly(c, collection);
             if (contentType == Constants.ITEM) {
                 // build list of all items in a collection
                 while (i.hasNext()) {

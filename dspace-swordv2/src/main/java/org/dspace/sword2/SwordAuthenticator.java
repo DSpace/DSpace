@@ -688,7 +688,7 @@ public class SwordAuthenticator {
         try {
             List<Item> allowed = new ArrayList<>();
             Iterator<Item> ii = itemService
-                .findByCollection(swordContext.getContext(), collection);
+                .findByCollectionReadOnly(swordContext.getContext(), collection);
 
             while (ii.hasNext()) {
                 Item item = ii.next();

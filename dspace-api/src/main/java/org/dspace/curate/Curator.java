@@ -499,7 +499,7 @@ public class Curator {
                 return false;
             }
             Context context = curationContext();
-            Iterator<Item> iter = itemService.findByCollection(context, coll);
+            Iterator<Item> iter = itemService.findByCollectionReadOnly(context, coll);
             while (iter.hasNext()) {
                 Item item = iter.next();
                 boolean shouldContinue = tr.run(item);
