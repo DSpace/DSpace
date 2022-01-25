@@ -1,4 +1,4 @@
-package org.dspace.iiif;
+package org.dspace.iiif.consumer;
 
 import java.util.Objects;
 

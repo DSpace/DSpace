@@ -24,9 +24,9 @@ import org.dspace.event.Event;
 /**
  * This consumer is used to evict modified items from the manifests cache.
  */
-public class CacheEventConsumer implements Consumer {
+public class IIIFCacheEventConsumer implements Consumer {
 
-    private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(CacheEventConsumer.class);
+    private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(IIIFCacheEventConsumer.class);
 
     // When true all entries will be cleared from cache.
     private boolean clearAll = false;
