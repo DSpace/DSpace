@@ -511,7 +511,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         //and non-custom policies as these are manually applied when appropriate
         List<ResourcePolicy> nonAdminPolicies = new ArrayList<>();
         for (ResourcePolicy rp : policies) {
-            if (rp.getAction() != Constants.ADMIN && !ResourcePolicy.TYPE_CUSTOM.contentEquals(rp.getRpType())) {
+            if (rp.getAction() != Constants.ADMIN && !StringUtils.equals(rp.getRpType(), ResourcePolicy.TYPE_CUSTOM)) {
                 nonAdminPolicies.add(rp);
             }
         }
