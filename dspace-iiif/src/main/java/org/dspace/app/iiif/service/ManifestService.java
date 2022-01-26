@@ -85,6 +85,12 @@ public class ManifestService extends AbstractResourceService {
     MetadataExposureService metadataExposureService;
 
     protected String[] METADATA_FIELDS;
+
+    /**
+     * Estimate image dimension metadata.
+     */
+    boolean guessCanvasDimension;
+
     /**
      * Constructor.
      * @param configurationService the DSpace configuration service.
@@ -102,7 +108,10 @@ public class ManifestService extends AbstractResourceService {
      * @return manifest as JSON
      */
     public String getManifest(Item item, Context context) {
-
+        // If default dimensions are provided via configuration do not guess the default dimension.
+        String wid = configurationService.getProperty("iiif.canvas.default-width");
+        String hgt = configurationService.getProperty("iiif.canvas.default-height");
+        guessCanvasDimension = (wid == null && hgt == null);
         populateManifest(item, context);
         return utils.asJson(manifestGenerator.generateResource());
     }
@@ -146,7 +155,10 @@ public class ManifestService extends AbstractResourceService {
         // Get bundles that contain manifest data.
         List<Bundle> bundles = utils.getIIIFBundles(item);
         // Set the default canvas dimensions.
-        canvasService.setCanvasDimensions(bundles);
+        if (guessCanvasDimension) {
+            canvasService.guessCanvasDimensions(bundles);
+        }
+        // canvasService.setDefaultCanvasDimensions();
         for (Bundle bnd : bundles) {
             String bundleToCPrefix = null;
             if (bundles.size() > 1) {
