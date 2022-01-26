@@ -196,7 +196,7 @@ public class S3BitStoreService implements BitStoreService
             log.info("ingestLimitbytes: " + FileUtils.byteCountToDisplaySize(ingestLimitbytes));
             log.info("-----------------------------------------");
 
-            if (enableMultipart && (ingestLimitbytes < contentLength)){
+            if ( getEnableMultipart() && (ingestLimitbytes < contentLength)){
                 log.info("Este fichero puede subirse por multipart");
                 // Create a list of ETag objects. You retrieve ETags for each object part uploaded,
                 // then, after each individual part has been uploaded, pass the list of ETags to
