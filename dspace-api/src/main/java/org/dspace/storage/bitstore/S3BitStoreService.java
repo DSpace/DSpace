@@ -32,10 +32,12 @@ import java.util.Map;
 
 /**
  * Asset store using Amazon's Simple Storage Service (S3).
+ * and others S3 compatible storage
  * S3 is a commercial, web-service accessible, remote storage facility.
  * NB: you must have obtained an account with Amazon to use this store
  *
  * @author Richard Rodgers, Peter Dietz
+ * @author Gerardo Flores Petlacalco
  */
 
 public class S3BitStoreService implements BitStoreService
@@ -61,9 +63,9 @@ public class S3BitStoreService implements BitStoreService
     private AmazonS3 s3Service = null;
 
     /** S3 multipart options **/
-    private Boolean enableMultipart;
-    private Long ingestLimit;
-    private Long minPartSize;
+    private boolean enableMultipart;
+    private long ingestLimit;
+    private long minPartSize;
 
     public S3BitStoreService()
     {
@@ -179,8 +181,8 @@ public class S3BitStoreService implements BitStoreService
         String key = getFullKey(bitstream.getInternalId());
         //Copy istream to temp file, and send the file, with some metadata
         File scratchFile = File.createTempFile(bitstream.getInternalId(), "s3bs");
-        Long partSizeBytes = minPartSize * 1024 * 1024;
-        Long ingestLimitbytes = ingestLimit * 1024 * 1024;
+        long partSizeBytes = getMinPartSize() * 1024 * 1024;
+        long ingestLimitbytes = getIngestLimit() * 1024 * 1024;
 
         try {
             FileUtils.copyInputStreamToFile(in, scratchFile);
@@ -388,19 +390,19 @@ public class S3BitStoreService implements BitStoreService
     }
 
     @Required
-    public Boolean getEnableMultipart(){
+    public boolean getEnableMultipart(){
         return enableMultipart;
     }
 
-    public void setEnableMultipart(Boolean enableMultipart){
+    public void setEnableMultipart(boolean enableMultipart){
         this.enableMultipart = enableMultipart;
     }
 
-    public Long getIngestLimit() {
+    public long getIngestLimit() {
         return ingestLimit;
     }
 
-    public void setIngestLimit(Long ingestLimit) {
+    public void setIngestLimit(long ingestLimit) {
         this.ingestLimit = ingestLimit;
     }
 
