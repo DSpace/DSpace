@@ -36,5 +36,7 @@ services:
       # Default Admin Acct for Keycloak
       KEYCLOAK_USER: '${KEYCLOAK_USER:-admin}'
       KEYCLOAK_PASSWORD: '${KEYCLOAK_PASSWORD:-admin}'
+      # Default frontend URL for Keycloak (via dspace-https)
+      KEYCLOAK_FRONTEND_URL: '${KEYCLOAK_FRONTEND_URL:-https://dspace-dev.local/auth}'
       # Required when running Keycloak behind a proxy (which we are doing in dspace-https)
       PROXY_ADDRESS_FORWARDING: 'true'
