@@ -7,6 +7,10 @@
  */
 package org.dspace.storage.bitstore;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Region;
@@ -38,6 +42,7 @@ import java.util.Map;
  *
  * @author Richard Rodgers, Peter Dietz
  * @author Gerardo Flores Petlacalco
+ * @author Alejandra Tenorio Robles
  */
 
 public class S3BitStoreService implements BitStoreService
@@ -420,10 +425,19 @@ public class S3BitStoreService implements BitStoreService
      *
      * @param args
      *        Command line arguments
+     * @throws Exception if error
      */
     public static void main(String[] args) throws Exception
     {
-        //TODO use proper CLI, or refactor to be a unit test. Can't mock this without keys though.
+        CommandLineParser parser = new PosixParser();
+        Options options = new Options();
+
+        options.addOption("a", "accessKey", true, "S3 accessKey");
+        options.addOption("s", "secretKey", true, "S3 secretKey");
+        options.addOption("f", "assetFile", true, "AssetFile");
+        options.addOption("e", "endPoint", false, "S3 endPoint");
+
+        CommandLine line = parser.parse(options, args);
 
         // parse command line
         String assetFile = null;
@@ -431,30 +445,19 @@ public class S3BitStoreService implements BitStoreService
         String secretKey = null;
         String endPoint = null;
 
-        for (int i = 0; i < args.length; i+= 2)
-        {
-            if (args[i].startsWith("-a"))
-            {
-                accessKey = args[i+1];
-            }
-            else if (args[i].startsWith("-s"))
-            {
-                secretKey = args[i+1];
-            }
-            else if (args[i].startsWith("-f"))
-            {
-                assetFile = args[i+1];
-            }
-            else if (args[i].startsWith("-e"))
-            {
-                endPoint = args[i+1];
-            }
-        }
+        if (line.hasOption('a'))
+            accessKey = line.getOptionValue('a');
+        if (line.hasOption('s'))
+            secretKey = line.getOptionValue('s');
+        if (line.hasOption('f'))
+            assetFile = line.getOptionValue('f');
+        if (line.hasOption('e'))
+            endPoint = line.getOptionValue('e');
 
         if (accessKey == null || secretKey == null ||assetFile == null)
         {
-            System.out.println("Missing arguments - exiting");
-            return;
+            System.out.println("Error: missing arguments, accessKey, secretKey and  assetFile must be specified");
+            System.exit(1);
         }
         S3BitStoreService store = new S3BitStoreService();
 
