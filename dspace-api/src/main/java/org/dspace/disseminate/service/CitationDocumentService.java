@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
@@ -83,12 +84,8 @@ public interface CitationDocumentService {
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
-    public InputStream getCitedDocument(Context context, Bitstream bitstream)
-        throws SQLException, AuthorizeException, IOException;
-
-    public Long getCitedDocumentLength(Context context, Bitstream bitstream)
-        throws SQLException, AuthorizeException, IOException;
-
+    public Pair<InputStream, Long> makeCitedDocument(Context context, Bitstream bitstream)
+            throws IOException, SQLException, AuthorizeException;
 
     /**
      * @param page          page

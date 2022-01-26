@@ -154,7 +154,7 @@ public class CitationPage extends AbstractCurationTask {
                     try {
                         //Create the cited document
                         InputStream citedInputStream =
-                            citationDocument.getCitedDocument(Curator.curationContext(), bitstream);
+                            citationDocument.makeCitedDocument(Curator.curationContext(), bitstream).getLeft();
                         //Add the cited document to the approiate bundle
                         this.addCitedPageToItem(citedInputStream, bundle, pBundle,
                                                 dBundle, displayMap, item, bitstream);

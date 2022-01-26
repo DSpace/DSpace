@@ -66,7 +66,7 @@ public class BitstreamResource extends AbstractResource {
             InputStream out;
 
             if (citationDocumentService.isCitationEnabledForBitstream(bitstream, context)) {
-                out = citationDocumentService.getCitedDocument(context, bitstream);
+                out = citationDocumentService.makeCitedDocument(context, bitstream).getLeft();
             } else {
                 out = bitstreamService.retrieve(context, bitstream);
             }
