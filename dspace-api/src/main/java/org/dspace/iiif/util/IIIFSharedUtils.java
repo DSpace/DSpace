@@ -43,6 +43,7 @@ public class IIIFSharedUtils {
     protected static final ConfigurationService configurationService
         = DSpaceServicesFactory.getInstance().getConfigurationService();
 
+
     private IIIFSharedUtils() {}
 
     public static boolean isIIIFItem(Item item) {

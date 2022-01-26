@@ -368,9 +368,6 @@ public class IIIFUtils {
      * @return the width in pixel for the canvas associated with the bitstream
      */
     public int getCanvasWidth(Bitstream bitstream, Bundle bundle, Item item, int defaultWidth) {
-        if (defaultWidth == -1) {
-            defaultWidth = setDefaultSize(bitstream, METADATA_IMAGE_WIDTH, defaultWidth);
-        }
         return getSizeFromMetadata(bitstream, METADATA_IMAGE_WIDTH,
                     getSizeFromMetadata(bundle, METADATA_IMAGE_WIDTH,
                         getSizeFromMetadata(item, METADATA_IMAGE_WIDTH, defaultWidth)));
@@ -389,9 +386,6 @@ public class IIIFUtils {
      * @return the height in pixel for the canvas associated with the bitstream
      */
     public int getCanvasHeight(Bitstream bitstream, Bundle bundle, Item item, int defaultHeight) {
-        if (defaultHeight == -1) {
-            defaultHeight = setDefaultSize(bitstream, METADATA_IMAGE_HEIGHT, defaultHeight);
-        }
         return getSizeFromMetadata(bitstream, METADATA_IMAGE_HEIGHT,
                 getSizeFromMetadata(bundle, METADATA_IMAGE_HEIGHT,
                     getSizeFromMetadata(item, METADATA_IMAGE_HEIGHT, defaultHeight)));
@@ -412,30 +406,6 @@ public class IIIFUtils {
                 .filter(m -> m.getMetadataField().toString('.').contentEquals(metadata))
                 .findFirst().map(m -> castToInt(m, defaultValue))
                   .orElse(defaultValue);
-    }
-
-    /**
-     * Updates the default value for image width or height. The dimension is updated
-     * when the iiif default configuration is set to -1. The default dimension is
-     * updated only when the bitstream lacks the dimension metadata.
-     * @param bitstream bistream
-     * @param metadata iiif metadata field
-     * @param defaultValue current default dimension
-     * @return default dimension
-     */
-    private int setDefaultSize(Bitstream bitstream, String metadata, int defaultValue) {
-        if (bitstream.getMetadata().stream().noneMatch(m -> m.getMetadataField().toString('.')
-                                                             .contentEquals(metadata))) {
-            if (metadata.contentEquals(METADATA_IMAGE_WIDTH)) {
-                int[] dims = getImageDimensions(bitstream);
-                return dims[0];
-            }
-            if (metadata.contentEquals(METADATA_IMAGE_HEIGHT)) {
-                int[] dims = getImageDimensions(bitstream);
-                return dims[1];
-            }
-        }
-        return defaultValue;
     }
 
     /**
