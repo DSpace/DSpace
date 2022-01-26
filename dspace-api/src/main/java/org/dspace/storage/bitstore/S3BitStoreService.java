@@ -26,36 +26,44 @@ import org.springframework.beans.factory.annotation.Required;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Asset store using Amazon's Simple Storage Service (S3).
  * S3 is a commercial, web-service accessible, remote storage facility.
  * NB: you must have obtained an account with Amazon to use this store
- * 
+ *
  * @author Richard Rodgers, Peter Dietz
- */ 
+ */
 
 public class S3BitStoreService implements BitStoreService
 {
     /** log4j log */
     private static Logger log = Logger.getLogger(S3BitStoreService.class);
-    
+
     /** Checksum algorithm */
     private static final String CSA = "MD5";
 
     private String awsAccessKey;
     private String awsSecretKey;
     private String awsRegionName;
+    private String awsEndPoint;
 
     /** container for all the assets */
-	private String bucketName = null;
+    private String bucketName = null;
 
     /** (Optional) subfolder within bucket where objects are stored */
     private String subfolder = null;
-	
-	/** S3 service */
-	private AmazonS3 s3Service = null;
+
+    /** S3 service */
+    private AmazonS3 s3Service = null;
+
+    /** S3 multipart options **/
+    private Boolean enableMultipart;
+    private Long ingestLimit;
+    private Long minPartSize;
 
     public S3BitStoreService()
     {
@@ -77,6 +85,11 @@ public class S3BitStoreService implements BitStoreService
         AWSCredentials awsCredentials = new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey());
         s3Service = new AmazonS3Client(awsCredentials);
 
+        if (StringUtils.isNotBlank(getAwsEndPoint())) {
+            s3Service.setEndpoint(awsEndPoint);
+        }
+
+
         // bucket name
         if(StringUtils.isEmpty(bucketName)) {
             bucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname");
@@ -96,7 +109,7 @@ public class S3BitStoreService implements BitStoreService
         }
 
         // region
-        if(StringUtils.isNotBlank(awsRegionName)) {
+        if(StringUtils.isNotBlank(awsRegionName) && StringUtils.isBlank(awsEndPoint)) {
             try {
                 Regions regions = Regions.fromName(awsRegionName);
                 Region region = Region.getRegion(regions);
@@ -109,23 +122,23 @@ public class S3BitStoreService implements BitStoreService
 
         log.info("AWS S3 Assetstore ready to go! bucket:"+bucketName);
     }
-	
 
-	
-	/**
+
+
+    /**
      * Return an identifier unique to this asset store instance
-     * 
+     *
      * @return a unique ID
      */
-	public String generateId()
-	{
+    public String generateId()
+    {
         return Utils.generateKey();
-	}
+    }
 
-	/**
+    /**
      * Retrieve the bits for the asset with ID. If the asset does not
      * exist, returns null.
-     * 
+     *
      * @param bitstream
      *            The ID of the asset to retrieve
      * @exception java.io.IOException
@@ -133,20 +146,20 @@ public class S3BitStoreService implements BitStoreService
      *
      * @return The stream of bits, or null
      */
-	public InputStream get(Bitstream bitstream) throws IOException
-	{
+    public InputStream get(Bitstream bitstream) throws IOException
+    {
         String key = getFullKey(bitstream.getInternalId());
-		try
-		{
+        try
+        {
             S3Object object = s3Service.getObject(new GetObjectRequest(bucketName, key));
-			return (object != null) ? object.getObjectContent() : null;
-		}
+            return (object != null) ? object.getObjectContent() : null;
+        }
         catch (Exception e)
-		{
+        {
             log.error("get("+key+")", e);
-        	throw new IOException(e);
-		}
-	}
+            throw new IOException(e);
+        }
+    }
 
     /**
      * Store a stream of bits.
@@ -161,20 +174,71 @@ public class S3BitStoreService implements BitStoreService
      * @exception java.io.IOException
      *             If a problem occurs while storing the bits
      */
-	public void put(Bitstream bitstream, InputStream in) throws IOException
-	{
+    public void put(Bitstream bitstream, InputStream in) throws IOException
+    {
         String key = getFullKey(bitstream.getInternalId());
         //Copy istream to temp file, and send the file, with some metadata
         File scratchFile = File.createTempFile(bitstream.getInternalId(), "s3bs");
+        Long partSizeBytes = minPartSize * 1024 * 1024;
+        Long ingestLimitbytes = ingestLimit * 1024 * 1024;
+
         try {
             FileUtils.copyInputStreamToFile(in, scratchFile);
             Long contentLength = Long.valueOf(scratchFile.length());
 
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, scratchFile);
-            PutObjectResult putObjectResult = s3Service.putObject(putObjectRequest);
+            log.info("-----------------------------------------");
+            log.info("El tamano de este fichero es: " + FileUtils.byteCountToDisplaySize(contentLength));
+            log.info("minPartSize: " + FileUtils.byteCountToDisplaySize(minPartSize));
+            log.info("partSizeBytes: " + FileUtils.byteCountToDisplaySize(partSizeBytes));
+            log.info("enableMultipart: " + Boolean.toString(enableMultipart));
+            log.info("ingestLimitbytes: " + FileUtils.byteCountToDisplaySize(ingestLimitbytes));
+            log.info("-----------------------------------------");
+
+            if (enableMultipart && (ingestLimitbytes < contentLength)){
+                log.info("Este fichero puede subirse por multipart");
+                // Create a list of ETag objects. You retrieve ETags for each object part uploaded,
+                // then, after each individual part has been uploaded, pass the list of ETags to
+                // the request to complete the upload.
+                List<PartETag> partETags = new ArrayList<PartETag>();
+                // Initiate the multipart upload.
+                InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(bucketName, key);
+                InitiateMultipartUploadResult initResponse = s3Service.initiateMultipartUpload(initRequest);
+                long filePosition = 0;
+                for (int i = 1; filePosition < contentLength; i++) {
+                    // Because the last part could be less than 5 MB, adjust the part size as needed.
+                    partSizeBytes = Math.min(partSizeBytes, (contentLength - filePosition));
+
+                    // Create the request to upload a part.
+                    UploadPartRequest uploadRequest = new UploadPartRequest()
+                            .withBucketName(bucketName)
+                            .withKey(key)
+                            .withUploadId(initResponse.getUploadId())
+                            .withPartNumber(i)
+                            .withFileOffset(filePosition)
+                            .withFile(scratchFile)
+                            .withPartSize(partSizeBytes);
+
+                    // Upload the part and add the response's ETag to our list.
+                    UploadPartResult uploadResult = s3Service.uploadPart(uploadRequest);
+                    partETags.add(uploadResult.getPartETag());
+
+                    filePosition += partSizeBytes;
+                }
+                CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(bucketName, key,
+                        initResponse.getUploadId(), partETags);
+                CompleteMultipartUploadResult objectResult = s3Service.completeMultipartUpload(compRequest);
+                bitstream.setChecksum(objectResult.getETag());
+            }
+            else
+            {
+                log.info("Este fichero se subirá normalmente");
+                PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, scratchFile);
+                PutObjectResult putObjectResult = s3Service.putObject(putObjectRequest);
+                bitstream.setChecksum(putObjectResult.getETag());
+            }
+
 
             bitstream.setSizeBytes(contentLength);
-            bitstream.setChecksum(putObjectResult.getETag());
             bitstream.setChecksumAlgorithm(CSA);
 
             scratchFile.delete();
@@ -187,7 +251,7 @@ public class S3BitStoreService implements BitStoreService
                 scratchFile.delete();
             }
         }
-	}
+    }
 
     /**
      * Obtain technical metadata about an asset in the asset store.
@@ -206,8 +270,8 @@ public class S3BitStoreService implements BitStoreService
      *            A Map with key/value pairs of desired metadata
      *            If file not found, then return null
      */
-	public Map about(Bitstream bitstream, Map attrs) throws IOException
-	{
+    public Map about(Bitstream bitstream, Map attrs) throws IOException
+    {
         String key = getFullKey(bitstream.getInternalId());
         try {
             ObjectMetadata objectMetadata = s3Service.getObjectMetadata(bucketName, key);
@@ -234,7 +298,7 @@ public class S3BitStoreService implements BitStoreService
             throw new IOException(e);
         }
         return null;
-	}
+    }
 
     /**
      * Remove an asset from the asset store. An irreversible operation.
@@ -244,8 +308,11 @@ public class S3BitStoreService implements BitStoreService
      * @exception java.io.IOException
      *             If a problem occurs while removing the asset
      */
-	public void remove(Bitstream bitstream) throws IOException
-	{
+    public void remove(Bitstream bitstream) throws IOException
+    {
+        log.info("-----------------------------------------");
+        log.info("Estoy aqui para eliminar datos del bucket");
+        log.info("-----------------------------------------");
         String key = getFullKey(bitstream.getInternalId());
         try {
             s3Service.deleteObject(bucketName, key);
@@ -253,7 +320,7 @@ public class S3BitStoreService implements BitStoreService
             log.error("remove("+key+")", e);
             throw new IOException(e);
         }
-	}
+    }
 
     /**
      * Utility Method: Prefix the key with a subfolder, if this instance assets are stored within subfolder
@@ -270,6 +337,15 @@ public class S3BitStoreService implements BitStoreService
 
     public String getAwsAccessKey() {
         return awsAccessKey;
+    }
+
+    public String getAwsEndPoint() {
+        return awsEndPoint;
+    }
+
+    @Required
+    public void setAwsEndPoint(String awsEndPoint) {
+        this.awsEndPoint = awsEndPoint;
     }
 
     @Required
@@ -311,52 +387,87 @@ public class S3BitStoreService implements BitStoreService
         this.subfolder = subfolder;
     }
 
-	/**
-	 * Contains a command-line testing tool. Expects arguments:
-	 *  -a accessKey -s secretKey -f assetFileName
-	 *
-	 * @param args
-	 *        Command line arguments
-	 */
-	public static void main(String[] args) throws Exception
-	{
+    @Required
+    public Boolean getEnableMultipart(){
+        return enableMultipart;
+    }
+
+    public void setEnableMultipart(Boolean enableMultipart){
+        this.enableMultipart = enableMultipart;
+    }
+
+    public Long getIngestLimit() {
+        return ingestLimit;
+    }
+
+    public void setIngestLimit(Long ingestLimit) {
+        this.ingestLimit = ingestLimit;
+    }
+
+    public Long getMinPartSize() {
+        return minPartSize;
+    }
+
+    public void setMinPartSize(Long minPartSize) {
+        this.minPartSize = minPartSize;
+    }
+
+    /**
+     * Contains a command-line testing tool. Expects arguments:
+     *  -a accessKey -s secretKey -f assetFileName -e endPoint
+     *
+     * @param args
+     *        Command line arguments
+     */
+    public static void main(String[] args) throws Exception
+    {
         //TODO use proper CLI, or refactor to be a unit test. Can't mock this without keys though.
 
-		// parse command line
-		String assetFile = null;
-		String accessKey = null;
-		String secretKey = null;
+        // parse command line
+        String assetFile = null;
+        String accessKey = null;
+        String secretKey = null;
+        String endPoint = null;
 
-		for (int i = 0; i < args.length; i+= 2)
-		{
-			if (args[i].startsWith("-a"))
-			{
-				accessKey = args[i+1];
-			}
-			else if (args[i].startsWith("-s"))
-			{
-				secretKey = args[i+1];
-			}
-			else if (args[i].startsWith("-f"))
-			{
-				assetFile = args[i+1];
-			}
-		}
+        for (int i = 0; i < args.length; i+= 2)
+        {
+            if (args[i].startsWith("-a"))
+            {
+                accessKey = args[i+1];
+            }
+            else if (args[i].startsWith("-s"))
+            {
+                secretKey = args[i+1];
+            }
+            else if (args[i].startsWith("-f"))
+            {
+                assetFile = args[i+1];
+            }
+            else if (args[i].startsWith("-e"))
+            {
+                endPoint = args[i+1];
+            }
+        }
 
-		if (accessKey == null || secretKey == null ||assetFile == null)
-		{
-			System.out.println("Missing arguments - exiting");
-			return;
-		}
-		S3BitStoreService store = new S3BitStoreService();
+        if (accessKey == null || secretKey == null ||assetFile == null)
+        {
+            System.out.println("Missing arguments - exiting");
+            return;
+        }
+        S3BitStoreService store = new S3BitStoreService();
 
         AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
 
         store.s3Service = new AmazonS3Client(awsCredentials);
 
-        //Todo configurable region
-        Region usEast1 = Region.getRegion(Regions.US_EAST_1);
-        store.s3Service.setRegion(usEast1);
+        if (endPoint != null) {
+            store.s3Service.setEndpoint(endPoint);
+        }
+        else {
+            //Todo configurable region
+            Region usEast1 = Region.getRegion(Regions.US_EAST_1);
+            store.s3Service.setRegion(usEast1);
+        }
 
         //Bucketname should be lowercase
         store.bucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname") + ".s3test";
@@ -413,5 +524,5 @@ public class S3BitStoreService implements BitStoreService
         // should get nothing back now - will throw exception
         store.get(id);
 */
-	}
+    }
 }
