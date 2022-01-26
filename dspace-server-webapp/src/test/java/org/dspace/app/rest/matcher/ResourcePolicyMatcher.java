@@ -43,7 +43,7 @@ public class ResourcePolicyMatcher {
                 hasJsonPath("$.policyType", is(rpType)) :
                 hasNoJsonPath("$.policyType"),
             hasJsonPath("$.type", is("resourcepolicy")),
-            hasJsonPath("$._embedded.resource.id", is(dso.getID().toString())),
+            hasJsonPath("$._embedded.resource.uuid", is(dso.getID().toString())),
             eperson != null ?
                 hasJsonPath("$._embedded.eperson.id",
                     is(eperson.getID().toString())) :
