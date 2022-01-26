@@ -68,6 +68,7 @@ import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
@@ -7083,6 +7084,167 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         getClient(tokenEPerson).perform(get("/api/core/items/" + witem.getItem().getID()))
                                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void verifyCorrectInheritanceOfAccessConditionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group anonymousGroup = EPersonServiceFactory.getInstance().getGroupService()
+                                                    .findByName(context, Group.ANONYMOUS);
+        Group adminGroup = EPersonServiceFactory.getInstance().getGroupService()
+                                                .findByName(context, Group.ADMIN);
+
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("Com")
+                                              .build();
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                 .withName("Col")
+                                                 .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        InputStream xml = getClass().getResourceAsStream("pubmed-test.xml");
+
+        final MockMultipartFile xmlFile = new MockMultipartFile("file", "/local/path/pubmed-test.xml",
+                                                                "application/xml", xml);
+
+        WorkspaceItem wItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                             .withTitle("My Article")
+                             .withIssueDate("2019-03-16")
+                             .withFulltext("upload.pdf", "/local/path/simple-article.pdf", pdf)
+                             .build();
+
+        Bundle bundle = wItem.getItem().getBundles().get(0);
+        Bitstream bitstream = bundle.getBitstreams().get(0);
+
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> addAccessCondition = new ArrayList<Operation>();
+        List<Map<String, String>> accessConditions = new ArrayList<Map<String,String>>();
+
+        Map<String, String> accessCondition1 = new HashMap<String, String>();
+        accessCondition1.put("name", "administrator");
+        accessConditions.add(accessCondition1);
+
+        Map<String, String> accessCondition2 = new HashMap<String, String>();
+        accessCondition2.put("name", "embargo");
+        accessCondition2.put("startDate", "2022-01-31T01:00:00Z");
+        accessConditions.add(accessCondition2);
+
+        addAccessCondition.add(new AddOperation("/sections/defaultAC/accessConditions",
+                               accessConditions));
+
+        String patchBody = getPatchContent(addAccessCondition);
+        // add access conditions
+        getClient(tokenEPerson).perform(patch("/api/submission/workspaceitems/" + wItem.getID())
+                               .content(patchBody)
+                               .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                               .andExpect(status().isOk());
+
+        getClient(tokenEPerson).perform(get("/api/submission/workspaceitems/" + wItem.getID()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
+                               .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name",
+                                                is("administrator")))
+                               .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name",
+                                                is("embargo")))
+                               .andExpect(jsonPath("$.sections.defaultAC.accessConditions[2].name").doesNotExist())
+                               .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()))
+                               .andExpect(jsonPath("$.sections.upload.files[1]").doesNotExist());
+
+        // upload second file
+        getClient(tokenEPerson).perform(fileUpload("/api/submission/workspaceitems/" + wItem.getID())
+                               .file(xmlFile))
+                               .andExpect(status().isCreated());
+
+        // prepare patch body with accessCondition for second file
+        List<Operation> ops = new ArrayList<>();
+        Map<String, String> accessCondition = new HashMap<>();
+        accessCondition.put("name", "embargo");
+        accessCondition.put("startDate", "2022-03-22T01:00:00Z");
+        ops.add(new AddOperation("/sections/upload/files/1/accessConditions/-", accessCondition));
+        patchBody = getPatchContent(ops);
+
+        // submit patch
+        getClient(tokenEPerson).perform(patch("/api/submission/workspaceitems/" + wItem.getID())
+                               .content(patchBody)
+                               .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                               .andExpect(status().isOk());
+
+        // verify if the access conditions have been applied correctly
+        getClient(tokenEPerson).perform(get("/api/submission/workspaceitems/" + wItem.getID()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
+                               .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name",
+                                                is("administrator")))
+                               .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name",
+                                                is("embargo")))
+                               .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].startDate",
+                                                is("2022-01-31")))
+                               .andExpect(jsonPath("$.sections.defaultAC.accessConditions[2].name").doesNotExist())
+                               .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()))
+                               .andExpect(jsonPath("$.sections.upload.files[1].accessConditions[0].name",
+                                                is("embargo")))
+                               .andExpect(jsonPath("$.sections.upload.files[1].accessConditions[0].startDate",
+                                                is("2022-03-22")));
+
+        // submit the workspaceitem to complete the deposit
+        getClient(tokenAdmin).perform(post("/api/workflow/workflowitems")
+                             .content("/api/submission/workspaceitems/" + wItem.getID())
+                             .contentType(textUriContentType))
+                             .andExpect(status().isCreated());
+
+        // verify bundle policies
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/search/resource")
+                             .param("uuid", bundle.getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.containsInAnyOrder(
+                                     ResourcePolicyMatcher.matchResourcePolicyProperties(adminGroup, null,
+                                             bundle, ResourcePolicy.TYPE_CUSTOM, Constants.READ, "administrator"),
+                                     ResourcePolicyMatcher.matchResourcePolicyProperties(anonymousGroup, null,
+                                             bundle, ResourcePolicy.TYPE_CUSTOM, Constants.READ, "embargo")
+                              )))
+                             .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        // verify bitstream policies
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/search/resource")
+                             .param("uuid", bitstream.getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.containsInAnyOrder(
+                                     ResourcePolicyMatcher.matchResourcePolicyProperties(adminGroup, null,
+                                             bitstream, ResourcePolicy.TYPE_CUSTOM, Constants.READ, "administrator"),
+                                     ResourcePolicyMatcher.matchResourcePolicyProperties(anonymousGroup, null,
+                                             bitstream, ResourcePolicy.TYPE_CUSTOM, Constants.READ, "embargo")
+                              )))
+                             .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        // verify item policies
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/search/resource")
+                             .param("uuid", wItem.getItem().getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.containsInAnyOrder(
+                                     ResourcePolicyMatcher.matchResourcePolicyProperties(adminGroup, null,
+                                          wItem.getItem(), ResourcePolicy.TYPE_CUSTOM, Constants.READ, "administrator"),
+                                     ResourcePolicyMatcher.matchResourcePolicyProperties(anonymousGroup, null,
+                                          wItem.getItem(), ResourcePolicy.TYPE_CUSTOM, Constants.READ, "embargo")
+                              )))
+                             .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        bundle = context.reloadEntity(bundle);
+        Bitstream bitstream2 =  bundle.getBitstreams().get(1);
+
+        // verify bitstream2 policies
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/search/resource")
+                             .param("uuid", bitstream2.getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.contains(
+                                     ResourcePolicyMatcher.matchResourcePolicyProperties(anonymousGroup, null,
+                                             bitstream2, ResourcePolicy.TYPE_CUSTOM, Constants.READ, "embargo")
+                              )))
+                             .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
 }
