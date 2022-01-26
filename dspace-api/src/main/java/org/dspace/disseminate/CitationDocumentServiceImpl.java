@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -296,33 +297,30 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     }
 
     @Override
-    public InputStream getCitedDocument(Context context, Bitstream bitstream)
-        throws SQLException, AuthorizeException, IOException {
-        byte [] citedDocumentContent = getCitedDocumentContent(context, bitstream);
-        return new ByteArrayInputStream(citedDocumentContent);
-    }
-
-    @Override
-    public Long getCitedDocumentLength(Context context, Bitstream bitstream)
-        throws SQLException, AuthorizeException, IOException {
-        byte[] citedDocumentContent = getCitedDocumentContent(context, bitstream);
-        return Long.valueOf(citedDocumentContent.length);
-    }
-
-    private byte[] getCitedDocumentContent(Context context, Bitstream bitstream)
-        throws SQLException, AuthorizeException, IOException {
+    public Pair<InputStream, Long> makeCitedDocument(Context context, Bitstream bitstream)
+            throws IOException, SQLException, AuthorizeException {
         PDDocument document = new PDDocument();
         PDDocument sourceDocument = new PDDocument();
         try {
             Item item = (Item) bitstreamService.getParentObject(context, bitstream);
-            sourceDocument = sourceDocument.load(bitstreamService.retrieve(context, bitstream));
+            final InputStream inputStream = bitstreamService.retrieve(context, bitstream);
+            try {
+                sourceDocument = sourceDocument.load(inputStream);
+            } finally {
+                inputStream.close();
+            }
             PDPage coverPage = new PDPage(citationPageFormat);
             generateCoverPage(context, document, coverPage, item);
             addCoverPageToDocument(document, sourceDocument, coverPage);
+
+            //We already have the full PDF in memory, so keep it there
             try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 document.save(out);
-                return out.toByteArray();
+
+                byte[] data = out.toByteArray();
+                return Pair.of(new ByteArrayInputStream(data), Long.valueOf(data.length));
             }
+
         } finally {
             sourceDocument.close();
             document.close();
