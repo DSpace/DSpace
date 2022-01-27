@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -154,10 +153,10 @@ public class CitationPage extends AbstractCurationTask {
                             .append(" is citable.");
                     try {
                         //Create the cited document
-                        Pair<InputStream, Long> citedDocument =
-                            citationDocument.makeCitedDocument(Curator.curationContext(), bitstream);
+                        InputStream citedInputStream =
+                            citationDocument.makeCitedDocument(Curator.curationContext(), bitstream).getLeft();
                         //Add the cited document to the approiate bundle
-                        this.addCitedPageToItem(citedDocument.getLeft(), bundle, pBundle,
+                        this.addCitedPageToItem(citedInputStream, bundle, pBundle,
                                                 dBundle, displayMap, item, bitstream);
                     } catch (Exception e) {
                         //Could be many things, but nothing that should be
