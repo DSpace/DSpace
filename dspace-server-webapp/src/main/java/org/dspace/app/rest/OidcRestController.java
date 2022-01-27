@@ -67,7 +67,7 @@ public class OidcRestController {
 
         if (StringUtils.equalsAnyIgnoreCase(redirectHostName, allowedHostNames.toArray(new String[0]))) {
             log.debug("OIDC redirecting to " + redirectUrl);
-            response.sendRedirect(redirectUrl);
+            response.sendRedirect(redirectUrl); // lgtm [java/unvalidated-url-redirection]
         } else {
             log.error("Invalid OIDC redirectURL=" + redirectUrl +
                           ". URL doesn't match hostname of server or UI!");
