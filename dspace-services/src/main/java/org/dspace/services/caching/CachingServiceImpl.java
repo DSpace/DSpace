@@ -19,8 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Statistics;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.kernel.mixins.ConfigChangeListener;
 import org.dspace.services.CachingService;
@@ -32,6 +30,8 @@ import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
 import org.dspace.services.model.CacheConfig.CacheScope;
 import org.dspace.services.model.RequestInterceptor;
+import org.ehcache.core.Ehcache;
+import org.ehcache.Statistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,14 +120,14 @@ public final class CachingServiceImpl
     /**
      * The underlying cache manager; injected.
      */
-    protected net.sf.ehcache.CacheManager cacheManager;
+    protected org.ehcache.CacheManager cacheManager;
 
     @Autowired(required = true)
-    public void setCacheManager(net.sf.ehcache.CacheManager cacheManager) {
+    public void setCacheManager(org.ehcache.CacheManager cacheManager) {
         this.cacheManager = cacheManager;
     }
 
-    public net.sf.ehcache.CacheManager getCacheManager() {
+    public org.ehcache.CacheManager getCacheManager() {
         return cacheManager;
     }
 

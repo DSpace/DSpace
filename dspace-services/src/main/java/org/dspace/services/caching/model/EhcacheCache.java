@@ -11,12 +11,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.Status;
 import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
 import org.dspace.services.model.CacheConfig.CacheScope;
+import org.ehcache.core.Ehcache;
+import org.ehcache.Element;
+import org.ehcache.Status;
 
 
 /**
