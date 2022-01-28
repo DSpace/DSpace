@@ -6259,62 +6259,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void patchAddDuplicateAccesConditionTest() throws Exception {
-        //disable file upload mandatory
-        configurationService.setProperty("webui.submit.upload.required", false);
-        context.turnOffAuthorisationSystem();
-
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
-
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withName("Collection 1")
-                                           .build();
-
-        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
-                                                  .withTitle("Example Title")
-                                                  .withIssueDate("2019-11-21")
-                                                  .withSubject("ExtraEntry")
-                                                  .build();
-
-        ResourcePolicyBuilder.createResourcePolicy(context)
-                             .withDspaceObject(witem.getItem())
-                             .withPolicyType(TYPE_CUSTOM)
-                             .withName("openaccess")
-                             .build();
-
-        context.restoreAuthSystemState();
-
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-
-        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
-                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name",
-                                              is("openaccess")))
-                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name").doesNotExist());
-
-        List<Operation> addAccessCondition = new ArrayList<Operation>();
-        Map<String, String> accessCondition = new HashMap<String, String>();
-        accessCondition.put("name", "openaccess");
-        addAccessCondition.add(new AddOperation("/sections/defaultAC/accessConditions/-", accessCondition));
-
-        String patchBody = getPatchContent(addAccessCondition);
-        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
-                             .content(patchBody)
-                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                             .andExpect(status().isUnprocessableEntity());
-
-        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
-                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name",
-                                              is("openaccess")))
-                             .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name").doesNotExist());
-    }
-
-    @Test
     public void patchAddAccesConditionReplaceCompletelyTest() throws Exception {
         //disable file upload mandatory
         configurationService.setProperty("webui.submit.upload.required", false);
