@@ -7,6 +7,13 @@
  */
 package org.dspace.app.itemimport;
 
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_HEIGHT_QUALIFIER;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE_ELEMENT;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_LABEL_ELEMENT;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_SCHEMA;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_TOC_ELEMENT;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_WIDTH_QUALIFIER;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -1129,7 +1136,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         if (iAssetstore == -1 || sFilePath == null) {
                             System.out.println("\tERROR: invalid contents file line");
                             System.out.println("\t\tSkipping line: "
-                                                   + sRegistrationLine);
+                                + sRegistrationLine);
                             continue;
                         }
 
@@ -1153,9 +1160,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
                         registerBitstream(c, i, iAssetstore, sFilePath, sBundle, sDescription);
                         System.out.println("\tRegistering Bitstream: " + sFilePath
-                                               + "\tAssetstore: " + iAssetstore
-                                               + "\tBundle: " + sBundle
-                                               + "\tDescription: " + sDescription);
+                            + "\tAssetstore: " + iAssetstore
+                            + "\tBundle: " + sBundle
+                            + "\tDescription: " + sDescription);
                         continue;                // process next line in contents file
                     }
 
@@ -1172,6 +1179,59 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         boolean bundleExists = false;
                         boolean permissionsExist = false;
                         boolean descriptionExists = false;
+                        boolean labelExists = false;
+                        boolean heightExists = false;
+                        boolean widthExists = false;
+                        boolean tocExists = false;
+
+                        // look for label
+                        String labelMarker = "\tiiif-label";
+                        int lMarkerIndex = line.indexOf(labelMarker);
+                        int lEndIndex = 0;
+                        if (lMarkerIndex > 0) {
+                            lEndIndex = line.indexOf("\t", lMarkerIndex + 1);
+                            if (lEndIndex == -1) {
+                                lEndIndex = line.length();
+                            }
+                            labelExists = true;
+                        }
+
+                        // look for height
+                        String heightMarker = "\tiiif-height";
+                        int hMarkerIndex = line.indexOf(heightMarker);
+                        int hEndIndex = 0;
+                        if (hMarkerIndex > 0) {
+                            hEndIndex = line.indexOf("\t", hMarkerIndex + 1);
+                            if (hEndIndex == -1) {
+                                hEndIndex = line.length();
+                            }
+                            heightExists = true;
+                        }
+
+                        // look for width
+                        String widthMarker = "\tiiif-width";
+                        int wMarkerIndex = line.indexOf(widthMarker);
+                        int wEndIndex = 0;
+                        if (wMarkerIndex > 0) {
+                            wEndIndex = line.indexOf("\t", wMarkerIndex + 1);
+                            if (wEndIndex == -1) {
+                                wEndIndex = line.length();
+                            }
+                            widthExists = true;
+                        }
+
+                        // look for toc
+                        String tocMarker = "\tiiif-toc";
+                        int tMarkerIndex = line.indexOf(tocMarker);
+                        int tEndIndex = 0;
+                        if (tMarkerIndex > 0) {
+                            tEndIndex = line.indexOf("\t", tMarkerIndex + 1);
+                            if (tEndIndex == -1) {
+                                tEndIndex = line.length();
+                            }
+                            tocExists = true;
+                        }
+
 
                         // look for a bundle name
                         String bundleMarker = "\tbundle:";
@@ -1220,18 +1280,20 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
                         if (bundleExists) {
                             String bundleName = line.substring(bMarkerIndex
-                                                                   + bundleMarker.length(), bEndIndex).trim();
+                                + bundleMarker.length(), bEndIndex).trim();
 
                             processContentFileEntry(c, i, path, bitstreamName, bundleName, primary);
                             System.out.println("\tBitstream: " + bitstreamName +
-                                                   "\tBundle: " + bundleName +
-                                                   primaryStr);
+                                "\tBundle: " + bundleName +
+                                primaryStr);
                         } else {
                             processContentFileEntry(c, i, path, bitstreamName, null, primary);
                             System.out.println("\tBitstream: " + bitstreamName + primaryStr);
                         }
 
-                        if (permissionsExist || descriptionExists) {
+                        if (permissionsExist || descriptionExists || labelExists || heightExists
+                            || widthExists || tocExists) {
+                            System.out.println("Gathering options.");
                             String extraInfo = bitstreamName;
 
                             if (permissionsExist) {
@@ -1242,6 +1304,26 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                             if (descriptionExists) {
                                 extraInfo = extraInfo
                                     + line.substring(dMarkerIndex, dEndIndex);
+                            }
+
+                            if (labelExists) {
+                                extraInfo = extraInfo
+                                    + line.substring(lMarkerIndex, lEndIndex);
+                            }
+
+                            if (heightExists) {
+                                extraInfo = extraInfo
+                                    + line.substring(hMarkerIndex, hEndIndex);
+                            }
+
+                            if (widthExists) {
+                                extraInfo = extraInfo
+                                    + line.substring(wMarkerIndex, wEndIndex);
+                            }
+
+                            if (tocExists) {
+                                extraInfo = extraInfo
+                                    + line.substring(tMarkerIndex, tEndIndex);
                             }
 
                             options.add(extraInfo);
@@ -1425,11 +1507,16 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      */
     protected void processOptions(Context c, Item myItem, List<String> options)
         throws SQLException, AuthorizeException {
+        System.out.println("Processing options.");
         for (String line : options) {
             System.out.println("\tprocessing " + line);
 
             boolean permissionsExist = false;
             boolean descriptionExists = false;
+            boolean labelExists = false;
+            boolean heightExists = false;
+            boolean widthExists = false;
+            boolean tocExists = false;
 
             String permissionsMarker = "\tpermissions:";
             int pMarkerIndex = line.indexOf(permissionsMarker);
@@ -1453,6 +1540,56 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 descriptionExists = true;
             }
 
+
+            // look for label
+            String labelMarker = "\tiiif-label:";
+            int lMarkerIndex = line.indexOf(labelMarker);
+            int lEndIndex = 0;
+            if (lMarkerIndex > 0) {
+                lEndIndex = line.indexOf("\t", lMarkerIndex + 1);
+                if (lEndIndex == -1) {
+                    lEndIndex = line.length();
+                }
+                labelExists = true;
+            }
+
+            // look for height
+            String heightMarker = "\tiiif-height:";
+            int hMarkerIndex = line.indexOf(heightMarker);
+            int hEndIndex = 0;
+            if (hMarkerIndex > 0) {
+                hEndIndex = line.indexOf("\t", hMarkerIndex + 1);
+                if (hEndIndex == -1) {
+                    hEndIndex = line.length();
+                }
+                heightExists = true;
+            }
+
+            // look for width
+            String widthMarker = "\tiiif-width:";
+            int wMarkerIndex = line.indexOf(widthMarker);
+            int wEndIndex = 0;
+            if (wMarkerIndex > 0) {
+                wEndIndex = line.indexOf("\t", wMarkerIndex + 1);
+                if (wEndIndex == -1) {
+                    wEndIndex = line.length();
+                }
+                widthExists = true;
+            }
+
+            // look for toc
+            String tocMarker = "\tiiif-toc:";
+            int tMarkerIndex = line.indexOf(tocMarker);
+            int tEndIndex = 0;
+            if (tMarkerIndex > 0) {
+                tEndIndex = line.indexOf("\t", tMarkerIndex + 1);
+                if (tEndIndex == -1) {
+                    tEndIndex = line.length();
+                }
+                tocExists = true;
+            }
+
+
             int bsEndIndex = line.indexOf("\t");
             String bitstreamName = line.substring(0, bsEndIndex);
 
@@ -1461,7 +1598,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             Group myGroup = null;
             if (permissionsExist) {
                 String thisPermission = line.substring(pMarkerIndex
-                                                           + permissionsMarker.length(), pEndIndex);
+                    + permissionsMarker.length(), pEndIndex);
 
                 // get permission type ("read" or "write")
                 int pTypeIndex = thisPermission.indexOf('-');
@@ -1478,7 +1615,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 }
 
                 groupName = thisPermission.substring(groupIndex + 1,
-                                                     groupEndIndex);
+                    groupEndIndex);
 
                 if (thisPermission.toLowerCase().charAt(pTypeIndex + 1) == 'r') {
                     actionID = Constants.READ;
@@ -1490,7 +1627,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     myGroup = groupService.findByName(c, groupName);
                 } catch (SQLException sqle) {
                     System.out.println("SQL Exception finding group name: "
-                                           + groupName);
+                        + groupName);
                     // do nothing, will check for null group later
                 }
             }
@@ -1498,12 +1635,42 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             String thisDescription = "";
             if (descriptionExists) {
                 thisDescription = line.substring(
-                    dMarkerIndex + descriptionMarker.length(), dEndIndex)
+                                          dMarkerIndex + descriptionMarker.length(), dEndIndex)
                                       .trim();
+            }
+
+            String thisLabel = "";
+            if (labelExists) {
+                thisLabel = line.substring(
+                                    lMarkerIndex + labelMarker.length(), lEndIndex)
+                                .trim();
+            }
+
+            String thisHeight = "";
+            if (heightExists) {
+                thisHeight = line.substring(
+                                     hMarkerIndex + heightMarker.length(), hEndIndex)
+                                 .trim();
+            }
+
+            String thisWidth = "";
+            if (widthExists) {
+                thisWidth = line.substring(
+                                    wMarkerIndex + widthMarker.length(), wEndIndex)
+                                .trim();
+            }
+
+            String thisToc = "";
+            if (tocExists) {
+                thisToc = line.substring(
+                                  tMarkerIndex + tocMarker.length(), tEndIndex)
+                              .trim();
             }
 
             Bitstream bs = null;
             boolean notfound = true;
+            boolean updateRequired = false;
+
             if (!isTest) {
                 // find bitstream
                 List<Bitstream> bitstreams = itemService.getNonInternalBitstreams(c, myItem);
@@ -1518,26 +1685,65 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             if (notfound && !isTest) {
                 // this should never happen
                 System.out.println("\tdefault permissions set for "
-                                       + bitstreamName);
+                    + bitstreamName);
             } else if (!isTest) {
                 if (permissionsExist) {
                     if (myGroup == null) {
                         System.out.println("\t" + groupName
-                                               + " not found, permissions set to default");
+                            + " not found, permissions set to default");
                     } else if (actionID == -1) {
                         System.out
                             .println("\tinvalid permissions flag, permissions set to default");
                     } else {
                         System.out.println("\tSetting special permissions for "
-                                               + bitstreamName);
+                            + bitstreamName);
                         setPermission(c, myGroup, actionID, bs);
                     }
                 }
 
                 if (descriptionExists) {
                     System.out.println("\tSetting description for "
-                                           + bitstreamName);
+                        + bitstreamName);
                     bs.setDescription(c, thisDescription);
+                    updateRequired = true;
+                }
+
+                if (labelExists) {
+                    MetadataField metadataField = metadataFieldService
+                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_LABEL_ELEMENT, null);
+                    System.out.println("\tSetting label to " + thisLabel + " in element "
+                        + metadataField.getElement() + " on " + bitstreamName);
+                    bitstreamService.addMetadata(c, bs, metadataField, null, thisLabel);
+                    updateRequired = true;
+                }
+
+                if (heightExists) {
+                    MetadataField metadataField = metadataFieldService
+                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_IMAGE_ELEMENT,
+                            METADATA_IIIF_HEIGHT_QUALIFIER);
+                    System.out.println("\tSetting height to " + thisHeight + " in element "
+                        + metadataField.getElement() + " on " + bitstreamName);
+                    bitstreamService.addMetadata(c, bs, metadataField, null, thisHeight);
+                    updateRequired = true;
+                }
+                if (widthExists) {
+                    MetadataField metadataField = metadataFieldService
+                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_IMAGE_ELEMENT,
+                            METADATA_IIIF_WIDTH_QUALIFIER);
+                    System.out.println("\tSetting width to " + thisWidth + " in element "
+                        + metadataField.getElement() + " on " + bitstreamName);
+                    bitstreamService.addMetadata(c, bs, metadataField, null, thisWidth);
+                    updateRequired = true;
+                }
+                if (tocExists) {
+                    MetadataField metadataField = metadataFieldService
+                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_TOC_ELEMENT, null);
+                    System.out.println("\tSetting toc to " + thisToc + " in element "
+                        + metadataField.getElement() + " on " + bitstreamName);
+                    bitstreamService.addMetadata(c, bs, metadataField, null, thisToc);
+                    updateRequired = true;
+                }
+                if (updateRequired) {
                     bitstreamService.update(c, bs);
                 }
             }
