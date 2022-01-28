@@ -76,13 +76,11 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
             // to replace an access condition with a new one
             AccessConditionDTO accessConditionDTO = evaluateSingleObject((LateObjectEvaluator) value);
             if (Objects.nonNull(accessConditionDTO) && Objects.nonNull(getOption(configuration, accessConditionDTO))) {
-                if (checkDuplication(context, policies, accessConditionDTO, idxToReplace, item)) {
-                    item.getResourcePolicies().remove(policies.get(idxToReplace));
-                    resourcePolicyService.delete(context, policies.get(idxToReplace));
-                    AccessConditionOption option = getOption(configuration, accessConditionDTO);
-                    option.createResourcePolicy(context, item, accessConditionDTO.getName(), null,
-                            accessConditionDTO.getStartDate(),accessConditionDTO.getEndDate());
-                }
+                item.getResourcePolicies().remove(policies.get(idxToReplace));
+                resourcePolicyService.delete(context, policies.get(idxToReplace));
+                AccessConditionOption option = getOption(configuration, accessConditionDTO);
+                option.createResourcePolicy(context, item, accessConditionDTO.getName(), null,
+                                            accessConditionDTO.getStartDate(),accessConditionDTO.getEndDate());
             }
         } else if (absolutePath.length == 3) {
             // "/sections/<:name-of-the-form>/accessConditions/0/startDate"
@@ -106,23 +104,6 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
             }
         }
         return null;
-    }
-
-    private boolean checkDuplication(Context context, List<ResourcePolicy> policies,
-            AccessConditionDTO accessConditionDTO, int toReplace, Item item)
-            throws SQLException, AuthorizeException, ParseException {
-        ResourcePolicy policyToReplace = policies.get(toReplace);
-        // check if the resource policy is of the same type
-        if (policyToReplace.getRpName().equals(accessConditionDTO.getName())) {
-            return true;
-        }
-        // check if there is not already a policy of the same type
-        for (ResourcePolicy resourcePolicy : policies) {
-            if (resourcePolicy.getRpName().equals(accessConditionDTO.getName())) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private AccessConditionDTO createDTO(ResourcePolicy rpToReplace, String attributeReplace, String valueToReplare)

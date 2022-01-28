@@ -58,10 +58,6 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
             // to replace completely the access conditions
             resourcePolicyService.removePolicies(context, item, ResourcePolicy.TYPE_CUSTOM);
         }
-        if (absolutePath.length == 2) {
-            // check duplicate policy
-            checkDuplication(context, item, accessConditions);
-        }
 
         // apply policies
         AccessConditionResourcePolicyUtils.findApplyResourcePolicy(context, configuration.getOptions(), item,
@@ -85,18 +81,6 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
         for (AccessConditionDTO dto : accessConditions) {
             AccessConditionResourcePolicyUtils.canApplyResourcePolicy(context, configuration.getOptions(),
                     dto.getName(), dto.getStartDate(), dto.getEndDate());
-        }
-    }
-
-    private void checkDuplication(Context context, Item item, List<AccessConditionDTO> accessConditions)
-            throws SQLException {
-        List<ResourcePolicy> policies = resourcePolicyService.find(context, item, ResourcePolicy.TYPE_CUSTOM);
-        for (ResourcePolicy resourcePolicy : policies) {
-            for (AccessConditionDTO dto : accessConditions) {
-                if (dto.getName().equals(resourcePolicy.getRpName())) {
-                    throw new UnprocessableEntityException("A policy of the same type already exists!");
-                }
-            }
         }
     }
 
