@@ -33,7 +33,8 @@ public class AccessConditionDiscoverableReplacePatchOperation extends ReplacePat
             Object value) throws Exception {
 
         String stepId = (String) currentRequest.getAttribute("accessConditionSectionId");
-        AccessConditionConfiguration configuration = accessConditionConfigurationService.getMap().get(stepId);
+        AccessConditionConfiguration configuration = accessConditionConfigurationService
+                .getAccessConfigurationById(stepId);
 
         if (Objects.isNull(configuration) || !configuration.getCanChangeDiscoverable().booleanValue()) {
             throw new UnprocessableEntityException("The current access configurations does not allow" +

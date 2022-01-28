@@ -60,16 +60,10 @@
         </property>
     </bean>
 
-    <bean id="accessConditionConfigurationService" class="org.dspace.submit.model.AccessConditionConfigurationService">
-        <property name="map">
-            <map>
-                <entry key="defaultAC" value-ref="accessConditionConfigurationDefault" />
-                <entry key="notDiscoverable" value-ref="accessConditionConfigurationNotDiscoverable" />
-            </map>
-        </property>
-    </bean>
+    <bean id="accessConditionConfigurationService" class="org.dspace.submit.model.AccessConditionConfigurationService" />
 
     <bean id="accessConditionConfigurationDefault" class="org.dspace.submit.model.AccessConditionConfiguration">
+        <!-- This name must match the id of the step as defined in the item-submission.xml -->
         <property name="name" value="defaultAC"></property>
         <property name="canChangeDiscoverable" value="true"></property>
         <property name="options">
@@ -82,6 +76,7 @@
     </bean>
 
     <bean id="accessConditionConfigurationNotDiscoverable" class="org.dspace.submit.model.AccessConditionConfiguration">
+        <!-- This name must match the id of the step as defined in the item-submission.xml -->
         <property name="name" value="notDiscoverable"></property>
         <property name="canChangeDiscoverable" value="false"></property>
         <property name="options">

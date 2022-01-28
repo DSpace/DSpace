@@ -42,7 +42,8 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
         throws Exception {
 
         String stepId = (String) currentRequest.getAttribute("accessConditionSectionId");
-        AccessConditionConfiguration configuration = accessConditionConfigurationService.getMap().get(stepId);
+        AccessConditionConfiguration configuration = accessConditionConfigurationService
+                .getAccessConfigurationById(stepId);
 
         Item item = source.getItem();
 

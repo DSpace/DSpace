@@ -52,7 +52,8 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
             Object value) throws Exception {
 
         String stepId = (String) currentRequest.getAttribute("accessConditionSectionId");
-        AccessConditionConfiguration configuration = accessConditionConfigurationService.getMap().get(stepId);
+        AccessConditionConfiguration configuration = accessConditionConfigurationService
+                .getAccessConfigurationById(stepId);
 
         // "path" : "/sections/<:name-of-the-form>/accessConditions/0/name"
         // the absolutePath will be : accessConditions/0 or accessConditions/0/name

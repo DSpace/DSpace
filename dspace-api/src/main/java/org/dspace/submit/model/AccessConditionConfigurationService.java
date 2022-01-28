@@ -6,7 +6,10 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.submit.model;
-import java.util.Map;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Simple bean to manage different Access Condition configurations
@@ -15,18 +18,11 @@ import java.util.Map;
  */
 public class AccessConditionConfigurationService {
 
-    /**
-     * Mapping the submission step process identifier with the configuration
-     * (see configuration at access-conditions.xml)
-     */
-    private Map<String, AccessConditionConfiguration> map;
+    @Autowired
+    private List<AccessConditionConfiguration> accessConditionConfigurations;
 
-    public Map<String, AccessConditionConfiguration> getMap() {
-        return map;
-    }
-
-    public void setMap(Map<String, AccessConditionConfiguration> map) {
-        this.map = map;
+    public AccessConditionConfiguration getAccessConfigurationById(String name) {
+        return accessConditionConfigurations.stream().filter(x -> name.equals(x.getName())).findFirst().get();
     }
 
 }
