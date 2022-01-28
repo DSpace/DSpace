@@ -14,13 +14,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
 import org.dspace.services.caching.model.EhcacheCache;
 import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
 import org.dspace.services.model.CacheConfig.CacheScope;
 import org.dspace.test.DSpaceAbstractKernelTest;
+import org.ehcache.CacheManager;
+import org.ehcache.core.Ehcache;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
