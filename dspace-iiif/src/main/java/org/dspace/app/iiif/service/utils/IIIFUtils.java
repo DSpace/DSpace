@@ -7,10 +7,10 @@
  */
 package org.dspace.app.iiif.service.utils;
 
-import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_HEIGHT;
-import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_HEIGHT_QUALIFIER;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE_ELEMENT;
 import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_SCHEMA;
-import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_WIDTH;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_WIDTH_QUALIFIER;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -63,11 +63,11 @@ public class IIIFUtils {
     // metadata used to set the iiif viewing hint
     public static final String METADATA_IIIF_VIEWING_HINT  = "iiif.viewing.hint";
     // metadata used to set the width of the canvas that has not an explicit name
-    public static final String METADATA_IMAGE_WIDTH = METADATA_IIIF_SCHEMA + "." + METADATA_IIIF_IMAGE
-        + "." + METADATA_IIIF_WIDTH;
+    public static final String METADATA_IMAGE_WIDTH = METADATA_IIIF_SCHEMA + "." + METADATA_IIIF_IMAGE_ELEMENT
+        + "." + METADATA_IIIF_WIDTH_QUALIFIER;
     // metadata used to set the height of the canvas that has not an explicit name
-    public static final String METADATA_IMAGE_HEIGHT = METADATA_IIIF_SCHEMA + "." + METADATA_IIIF_IMAGE
-        + "." + METADATA_IIIF_HEIGHT;
+    public static final String METADATA_IMAGE_HEIGHT = METADATA_IIIF_SCHEMA + "." + METADATA_IIIF_IMAGE_ELEMENT
+        + "." + METADATA_IIIF_HEIGHT_QUALIFIER;
 
     // string used in the metadata toc as separator among the different levels
     public static final String TOC_SEPARATOR = "|||";
