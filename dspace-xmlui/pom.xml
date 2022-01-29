@@ -121,6 +121,10 @@
                     <groupId>org.apache.excalibur.components</groupId>
                     <artifactId>excalibur-sourceresolve</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -173,6 +177,12 @@
         <dependency>
             <groupId>org.swordapp</groupId>
             <artifactId>sword-common</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Explicitly Specify Latest Version of Spring -->
