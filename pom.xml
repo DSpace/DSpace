@@ -431,7 +431,7 @@
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>#license-maven-plugin</artifactId>
+                        <artifactId>license-maven-plugin</artifactId>
                         <version>1.8</version>
                         <!-- This plugin only needs to be run on the Parent POM
                              as it aggregates results from all child POMs. -->
