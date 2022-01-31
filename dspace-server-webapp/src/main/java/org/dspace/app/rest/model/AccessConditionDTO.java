@@ -9,13 +9,11 @@ package org.dspace.app.rest.model;
 
 import java.util.Date;
 
-import org.dspace.app.rest.model.step.UploadBitstreamRest;
-
 /**
- * The UploadAccessConditionDTO is a partial representation of the DSpace
- * {@link ResourcePolicyRest} as used in the patch payload for the upload
- * submission section (see {@link UploadBitstreamRest}. The main reason for this
- * class is to have a DTO to use serialize/deserialize the REST model, that
+ * The AccessConditionDTO is a partial representation of the DSpace
+ * {@link ResourcePolicyRest} as used in the patch payload for the upload and itemAccessConditions
+ * submission sections (see {@link UploadBitstreamRest, @link DataAccessCondition}.
+ * The main reason for this class is to have a DTO to use serialize/deserialize the REST model, that
  * include reference to the GroupRest and EPersonRest object, in the upload
  * section data in a simpler way where such reference are just UUID. Indeed, due
  * to the fact that the RestModel class are serialized according to the HAL
@@ -25,7 +23,7 @@ import org.dspace.app.rest.model.step.UploadBitstreamRest;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class UploadBitstreamAccessConditionDTO  {
+public class AccessConditionDTO  {
 
     private Integer id;
 
