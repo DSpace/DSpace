@@ -72,7 +72,7 @@ public class UploadStep extends AbstractProcessingStep
             if (op.getPath().contains(UPLOAD_STEP_METADATA_PATH)) {
                 instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
             } else if (op.getPath().contains(UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY)) {
-                instance = UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY;
+                instance = stepConf.getType() + "." + UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY;
             } else {
                 instance = UPLOAD_STEP_REMOVE_OPERATION_ENTRY;
             }
@@ -84,7 +84,7 @@ public class UploadStep extends AbstractProcessingStep
             }
         } else {
             if (op.getPath().contains(UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY)) {
-                instance = UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY;
+                instance = stepConf.getType() + "." + UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY;
             } else if (op.getPath().contains(UPLOAD_STEP_METADATA_PATH)) {
                 instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
             }
