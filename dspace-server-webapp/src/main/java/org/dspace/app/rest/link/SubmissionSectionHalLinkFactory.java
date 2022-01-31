@@ -6,13 +6,14 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.link;
-
+import static org.dspace.app.rest.model.SubmissionFormRest.NAME_LINK_ON_PANEL;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.util.LinkedList;
 
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.RestResourceController;
+import org.dspace.app.rest.model.SubmissionAccessOptionRest;
 import org.dspace.app.rest.model.SubmissionFormRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.SubmissionUploadRest;
@@ -36,26 +37,22 @@ public class SubmissionSectionHalLinkFactory extends HalLinkFactory<SubmissionSe
         SubmissionSectionRest sd = halResource.getContent();
 
         if (SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(sd.getSectionType())) {
-            UriComponentsBuilder uriComponentsBuilder = linkTo(
-                getMethodOn(SubmissionFormRest.CATEGORY, SubmissionFormRest.NAME)
-                    .findRel(null, null, SubmissionFormRest.CATEGORY, English.plural(SubmissionFormRest.NAME),
-                            sd.getId(), "", null, null))
-                .toUriComponentsBuilder();
-            String uribuilder = uriComponentsBuilder.build().toString();
-            list.add(
-                buildLink(SubmissionFormRest.NAME_LINK_ON_PANEL, uribuilder.substring(0, uribuilder.lastIndexOf("/"))));
+            buildLink(list, sd, SubmissionFormRest.CATEGORY, SubmissionFormRest.NAME);
         }
         if (SubmissionStepConfig.UPLOAD_STEP_NAME.equals(sd.getSectionType())) {
-            UriComponentsBuilder uriComponentsBuilder = linkTo(
-                getMethodOn(RestResourceController.class, SubmissionUploadRest.CATEGORY, SubmissionUploadRest.NAME)
-                    .findRel(null, null, SubmissionUploadRest.CATEGORY, English.plural(SubmissionUploadRest.NAME),
-                           sd.getId(), "", null, null))
-                .toUriComponentsBuilder();
-            String uribuilder = uriComponentsBuilder.build().toString();
-            list.add(
-                buildLink(SubmissionFormRest.NAME_LINK_ON_PANEL, uribuilder.substring(0, uribuilder.lastIndexOf("/"))));
+            buildLink(list, sd, SubmissionUploadRest.CATEGORY, SubmissionUploadRest.NAME);
         }
+        if (SubmissionStepConfig.ACCESS_CONDITION_STEP_NAME.equals(sd.getSectionType())) {
+            buildLink(list, sd, SubmissionAccessOptionRest.CATEGORY, SubmissionAccessOptionRest.NAME);
+        }
+    }
 
+    private void buildLink(final LinkedList<Link> list, SubmissionSectionRest sd, String category, String name) {
+        UriComponentsBuilder uriComponentsBuilder = linkTo(getMethodOn(category, name)
+                    .findRel(null, null, category, English.plural(name), sd.getId(), "", null, null))
+                    .toUriComponentsBuilder();
+        String uribuilder = uriComponentsBuilder.build().toString();
+        list.add(buildLink(NAME_LINK_ON_PANEL, uribuilder.substring(0, uribuilder.lastIndexOf("/"))));
     }
 
     protected Class<RestResourceController> getControllerClass() {
