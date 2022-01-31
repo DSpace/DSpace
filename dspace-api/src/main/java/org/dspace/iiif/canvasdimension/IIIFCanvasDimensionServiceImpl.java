@@ -7,10 +7,10 @@
  */
 package org.dspace.iiif.canvasdimension;
 
-import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_HEIGHT;
-import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_HEIGHT_QUALIFIER;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE_ELEMENT;
 import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_SCHEMA;
-import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_WIDTH;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_WIDTH_QUALIFIER;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,7 +62,8 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
     private int processed = 0;
 
     // used to check for existing canvas dimension
-    private static final String IIIF_WIDTH_METADATA = "iiif.image.width";
+    private static final String IIIF_WIDTH_METADATA = METADATA_IIIF_SCHEMA + "." + METADATA_IIIF_IMAGE_ELEMENT +
+        "." + METADATA_IIIF_WIDTH_QUALIFIER;
 
     @Override
     public void setForceProcessing(boolean force) {
@@ -209,13 +210,13 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
      */
     private boolean setBitstreamMetadata(Context context, Bitstream bitstream, int[] dims) throws SQLException {
         dSpaceObjectService.clearMetadata(context, bitstream, METADATA_IIIF_SCHEMA,
-            METADATA_IIIF_IMAGE, METADATA_IIIF_WIDTH, Item.ANY);
+            METADATA_IIIF_IMAGE_ELEMENT, METADATA_IIIF_WIDTH_QUALIFIER, Item.ANY);
         dSpaceObjectService.setMetadataSingleValue(context, bitstream, METADATA_IIIF_SCHEMA,
-            METADATA_IIIF_IMAGE, METADATA_IIIF_WIDTH, null, String.valueOf(dims[0]));
+            METADATA_IIIF_IMAGE_ELEMENT, METADATA_IIIF_WIDTH_QUALIFIER, null, String.valueOf(dims[0]));
         dSpaceObjectService.clearMetadata(context, bitstream, METADATA_IIIF_SCHEMA,
-            METADATA_IIIF_IMAGE, METADATA_IIIF_HEIGHT, Item.ANY);
+            METADATA_IIIF_IMAGE_ELEMENT, METADATA_IIIF_HEIGHT_QUALIFIER, Item.ANY);
         dSpaceObjectService.setMetadataSingleValue(context, bitstream, METADATA_IIIF_SCHEMA,
-            METADATA_IIIF_IMAGE, METADATA_IIIF_HEIGHT, null, String.valueOf(dims[1]));
+            METADATA_IIIF_IMAGE_ELEMENT, METADATA_IIIF_HEIGHT_QUALIFIER, null, String.valueOf(dims[1]));
         if (!isQuiet) {
             System.out.println("Added IIIF canvas metadata to bitstream: " + bitstream.getID());
         }

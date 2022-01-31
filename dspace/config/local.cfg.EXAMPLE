@@ -190,6 +190,9 @@ db.schema = public
 # LDAP authentication/authorization. See authentication-ldap.cfg for default configuration.
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.LDAPAuthentication
 
+# OIDC authentication/authorization. See authenication-oidc.cfg for default configuration.
+#plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.OidcAuthentication
+
 # Shibboleth authentication/authorization. See authentication-shibboleth.cfg for default configuration.
 # Check also the cors settings below
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.ShibAuthentication
