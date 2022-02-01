@@ -13,14 +13,15 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 /**
- * Exposes the Spring web application's IIIF cache evict service to the DSpace event consumer.
+ * Exposes the Spring application's IIIF cache evict service to the DSpace event consumer.
  */
 @Component
 public class CacheEvictBeanLocator implements ApplicationContextAware {
 
     private static ApplicationContext context;
 
-    private static final String CACHE_SERVICE = "cacheEvictService";
+    private static final String MANIFESTS_CACHE_EVICT_SERVICE = "manifestsCacheEvictService";
+    private static final String CANVAS_DIMENSIONS_EVICT_SERVICE = "canvasCacheEvictService";
 
     @Override
     public void setApplicationContext(ApplicationContext appContext)
@@ -32,9 +33,16 @@ public class CacheEvictBeanLocator implements ApplicationContextAware {
         return context;
     }
 
-    public static CacheEvictService getCacheEvictService() {
+    public static ManifestsCacheEvictService getManifestsCacheEvictService() {
         if (context != null) {
-            return (CacheEvictService) context.getBean(CACHE_SERVICE);
+            return (ManifestsCacheEvictService) context.getBean(MANIFESTS_CACHE_EVICT_SERVICE);
+        }
+        return null;
+    }
+
+    public static CanvasCacheEvictService getCanvasCacheEvictService() {
+        if (context != null) {
+            return (CanvasCacheEvictService) context.getBean(CANVAS_DIMENSIONS_EVICT_SERVICE);
         }
         return null;
     }
