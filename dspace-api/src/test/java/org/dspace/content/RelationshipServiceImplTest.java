@@ -123,32 +123,6 @@ public class RelationshipServiceImplTest {
     }
 
     @Test
-    public void testFindLeftPlaceByLeftItem() throws Exception {
-        // Declare objects utilized in unit test
-        Item item = mock(Item.class);
-
-        // Mock DAO to return mocked left place as 0
-        when(relationshipDAO.findNextLeftPlaceByLeftItem(context, item)).thenReturn(0);
-
-        // The left place reported from out mocked item should match the DAO's report of the left place
-        assertEquals("TestFindLeftPlaceByLeftItem 0", relationshipDAO.findNextLeftPlaceByLeftItem(context, item),
-                relationshipService.findNextLeftPlaceByLeftItem(context, item));
-    }
-
-    @Test
-    public void testFindRightPlaceByRightItem() throws Exception {
-        // Declare objects utilized in unit test
-        Item item = mock(Item.class);
-
-        // Mock lower level DAO to return mocked right place as 0
-        when(relationshipDAO.findNextRightPlaceByRightItem(context, item)).thenReturn(0);
-
-        // The right place reported from out mocked item should match the DAO's report of the right place
-        assertEquals("TestFindRightPlaceByRightItem 0", relationshipDAO.findNextRightPlaceByRightItem(context, item),
-                relationshipService.findNextRightPlaceByRightItem(context, item));
-    }
-
-    @Test
     public void testFindByItemAndRelationshipType() throws Exception {
         // Declare objects utilized in unit test
         List<Relationship> relList = new ArrayList<>();

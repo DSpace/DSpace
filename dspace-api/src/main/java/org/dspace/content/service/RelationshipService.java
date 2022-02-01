@@ -78,26 +78,49 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     public Relationship create(Context context, Relationship relationship) throws SQLException, AuthorizeException;
 
     /**
-     * This method returns the next leftplace integer to use for a relationship with this item as the leftItem
+     * Move the given relationship to a new leftPlace and/or rightPlace.
      *
-     * @param context   The relevant DSpace context
-     * @param item      The item that has to be the leftItem of a relationship for it to qualify
-     * @return          The next integer to be used for the leftplace of a relationship with the given item
-     *                  as a left item
-     * @throws SQLException If something goes wrong
+     * This will
+     *   1. verify whether the move is authorized
+     *   2. move the relationship to the specified left/right place
+     *   3. update the left/right place of other relationships and/or metadata in order to resolve the move without
+     *      leaving any gaps
+     *
+     * At least one of the new places should be non-null, otherwise no changes will be made.
+     *
+     * @param context               The relevant DSpace context
+     * @param relationship          The Relationship to move
+     * @param newLeftPlace          The value to set the leftPlace of this Relationship to
+     * @param newRightPlace         The value to set the rightPlace of this Relationship to
+     * @return                      The moved relationship with updated place variables
+     * @throws SQLException         If something goes wrong
+     * @throws AuthorizeException   If the user is not authorized to update the Relationship or its Items
      */
-    int findNextLeftPlaceByLeftItem(Context context, Item item) throws SQLException;
+    Relationship move(Context context, Relationship relationship, Integer newLeftPlace, Integer newRightPlace)
+            throws SQLException, AuthorizeException;
 
     /**
-     * This method returns the next rightplace integer to use for a relationship with this item as the rightItem
+     * Move the given relationship to a new leftItem and/or rightItem.
      *
-     * @param context   The relevant DSpace context
-     * @param item      The item that has to be the rightitem of a relationship for it to qualify
-     * @return          The next integer to be used for the rightplace of a relationship with the given item
-     *                  as a right item
-     * @throws SQLException If something goes wrong
+     * This will
+     *   1. move the relationship to the last place in its current left or right Item. This ensures that we don't leave
+     *      any gaps when moving the relationship to a new Item.
+     *      If only one of the relationship's Items is changed,the order of relationships and metadatain the other
+     *      will not be affected
+     *   2. insert the relationship into the new Item(s)
+     *
+     * At least one of the new Items should be non-null, otherwise no changes will be made.
+     *
+     * @param context               The relevant DSpace context
+     * @param relationship          The Relationship to move
+     * @param newLeftItem           The value to set the leftItem of this Relationship to
+     * @param newRightItem          The value to set the rightItem of this Relationship to
+     * @return                      The moved relationship with updated left/right Items variables
+     * @throws SQLException         If something goes wrong
+     * @throws AuthorizeException   If the user is not authorized to update the Relationship or its Items
      */
-    int findNextRightPlaceByRightItem(Context context, Item item) throws SQLException;
+    Relationship move(Context context, Relationship relationship, Item newLeftItem, Item newRightItem)
+            throws SQLException, AuthorizeException;
 
     /**
      * This method returns a list of Relationships for which the leftItem or rightItem is equal to the given
@@ -142,19 +165,6 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
                                                             RelationshipType relationshipType, boolean isLeft,
                                                             int limit, int offset)
             throws SQLException;
-
-    /**
-     * This method will update the place for the Relationship and all other relationships found by the items and
-     * relationship type of the given Relationship. It will give this Relationship the last place in both the
-     * left and right place determined by querying for the list of leftRelationships and rightRelationships
-     * by the leftItem, rightItem and relationshipType of the given Relationship.
-     * @param context           The relevant DSpace context
-     * @param relationship      The Relationship object that will have it's place updated and that will be used
-     *                          to retrieve the other relationships whose place might need to be updated
-     * @throws SQLException     If something goes wrong
-     */
-    public void updatePlaceInRelationship(Context context, Relationship relationship)
-            throws SQLException, AuthorizeException;
 
     /**
      * This method will update the given item's metadata order.

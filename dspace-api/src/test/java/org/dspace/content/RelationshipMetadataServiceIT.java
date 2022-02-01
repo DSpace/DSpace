@@ -600,49 +600,6 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
     }
 
     @Test
-    public void testGetNextRightPlace() throws Exception {
-        assertThat(relationshipService.findNextRightPlaceByRightItem(context, rightItem), equalTo(0));
-        initPublicationAuthor();
-
-        assertThat(relationshipService.findNextRightPlaceByRightItem(context, rightItem), equalTo(1));
-
-        context.turnOffAuthorisationSystem();
-        Community community = CommunityBuilder.createCommunity(context).build();
-
-        Collection col = CollectionBuilder.createCollection(context, community).build();
-        Item secondItem = ItemBuilder.createItem(context, col).withEntityType("Publication").build();
-        RelationshipBuilder.createRelationshipBuilder(context, secondItem, rightItem,
-            isAuthorOfPublicationRelationshipType).build();
-        context.restoreAuthSystemState();
-
-        assertThat(relationshipService.findNextRightPlaceByRightItem(context, rightItem), equalTo(2));
-    }
-
-    @Test
-    public void testGetNextLeftPlace() throws Exception {
-        assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, leftItem), equalTo(0));
-        initPublicationAuthor();
-
-        assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, leftItem), equalTo(1));
-
-        context.turnOffAuthorisationSystem();
-        Community community = CommunityBuilder.createCommunity(context).build();
-        Collection col = CollectionBuilder.createCollection(context, community).build();
-
-        Item secondAuthor = ItemBuilder.createItem(context, col).withEntityType("Author")
-                                       .withPersonIdentifierFirstName("firstName")
-                                       .withPersonIdentifierLastName("familyName").build();
-
-        RelationshipBuilder.createRelationshipBuilder(context, leftItem, secondAuthor,
-            isAuthorOfPublicationRelationshipType).build();
-        context.restoreAuthSystemState();
-
-        assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, leftItem), equalTo(2));
-
-
-    }
-
-    @Test
     public void testGetVirtualMetadata() throws SQLException, AuthorizeException {
         // Journal, JournalVolume, JournalIssue, Publication items, related to each other using the relationship types
         // isJournalOfVolume, isJournalVolumeOfIssue, isJournalIssueOfPublication.
