@@ -6,21 +6,20 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.model.step;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.model.UploadBitstreamAccessConditionDTO;
 
 /**
  * This Java Bean is used to represent a single bitstream with all its metadata
- * and access conditions ({@link UploadBitstreamAccessConditionDTO}) inside an
+ * and access conditions ({@link AccessConditionDTO}) inside an
  * upload submission section ({@link DataUpload}
  *
  */
@@ -28,7 +27,7 @@ public class UploadBitstreamRest extends UploadStatusResponse {
 
     private UUID uuid;
     private Map<String, List<MetadataValueRest>> metadata = new HashMap<>();
-    private List<UploadBitstreamAccessConditionDTO> accessConditions;
+    private List<AccessConditionDTO> accessConditions;
     private BitstreamFormatRest format;
     private Long sizeBytes;
     private CheckSumRest checkSum;
@@ -74,14 +73,14 @@ public class UploadBitstreamRest extends UploadStatusResponse {
         this.metadata = metadata;
     }
 
-    public List<UploadBitstreamAccessConditionDTO> getAccessConditions() {
+    public List<AccessConditionDTO> getAccessConditions() {
         if (accessConditions == null) {
             accessConditions = new ArrayList<>();
         }
         return accessConditions;
     }
 
-    public void setAccessConditions(List<UploadBitstreamAccessConditionDTO> accessConditions) {
+    public void setAccessConditions(List<AccessConditionDTO> accessConditions) {
         this.accessConditions = accessConditions;
     }
 

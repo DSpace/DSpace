@@ -7,28 +7,23 @@
  */
 package org.dspace.iiif.consumer;
 
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
-/**
- * Removes items from the iiif manifests cache.
- */
 @Component
-public class CacheEvictService {
+public class CanvasCacheEvictService {
 
     // The cache that is managed by this service.
-    static final String CACHE_NAME = "manifests";
+    static final String CACHE_NAME = "canvasdimensions";
 
     @Autowired
     CacheManager cacheManager;
 
     public void evictSingleCacheValue(String cacheKey) {
-        cacheManager.getCache(CACHE_NAME).evict(cacheKey);
-    }
-
-    public void evictAllCacheValues() {
-        cacheManager.getCache(CACHE_NAME).clear();
+        Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).evict(cacheKey);
     }
 
 }
