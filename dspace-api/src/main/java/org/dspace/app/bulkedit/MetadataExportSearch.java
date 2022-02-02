@@ -57,6 +57,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
         new DSpace().getServiceManager().getServicesByType(DiscoveryConfigurationService.class).get(0);
     private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    private DiscoverQueryBuilder queryBuilder = new DSpace().getServiceManager().getServicesByType(DiscoverQueryBuilder.class).get(0);
 
     @Override
     public MetadataExportSearchScriptConfiguration getScriptConfiguration() {
@@ -101,7 +102,6 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
         IndexableObject dso = null;
         Context context = new Context();
         context.turnOffAuthorisationSystem();
-        DiscoverQueryBuilder queryBuilder = new DiscoverQueryBuilder();
         context.setCurrentUser(ePersonService.find(context, this.getEpersonIdentifier()));
 
         if (! exportAllItems) {
