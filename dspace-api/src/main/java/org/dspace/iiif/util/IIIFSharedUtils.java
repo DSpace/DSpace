@@ -36,12 +36,15 @@ public class IIIFSharedUtils {
     protected static final String IMAGE_SERVER_PATH = "iiif.image.server";
     // IIIF metadata definitions
     public static final String METADATA_IIIF_SCHEMA  = "iiif";
-    public static final String METADATA_IIIF_IMAGE  = "image";
-    public static final String METADATA_IIIF_HEIGHT  = "height";
-    public static final String METADATA_IIIF_WIDTH  = "width";
+    public static final String METADATA_IIIF_IMAGE_ELEMENT = "image";
+    public static final String METADATA_IIIF_TOC_ELEMENT = "toc";
+    public static final String METADATA_IIIF_LABEL_ELEMENT = "label";
+    public static final String METADATA_IIIF_HEIGHT_QUALIFIER = "height";
+    public static final String METADATA_IIIF_WIDTH_QUALIFIER = "width";
 
     protected static final ConfigurationService configurationService
         = DSpaceServicesFactory.getInstance().getConfigurationService();
+
 
     private IIIFSharedUtils() {}
 
