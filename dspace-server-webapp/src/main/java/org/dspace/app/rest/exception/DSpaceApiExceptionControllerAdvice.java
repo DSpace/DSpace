@@ -54,7 +54,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     private static final Logger log = LogManager.getLogger(DSpaceApiExceptionControllerAdvice.class);
 
     /**
-     * Set of HTTP error codes to log as ERROR with full stacktrace.
+     * Set of HTTP error codes to log as ERROR with full stack trace.
      */
     private static final Set<Integer> LOG_AS_ERROR = Set.of(422);
 
@@ -126,8 +126,14 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
 
     /**
      * Add user-friendly error messages to the response body for selected errors.
-     * Since the error messages will be exposed to the API user, the exception classes are expected to implement
-     * {@link TranslatableException} such that the error messages can be translated.
+     * Since the error messages will be exposed to the API user, the
+     * exception classes are expected to implement {@link TranslatableException}
+     * such that the error messages can be translated.
+     *
+     * @param request the client's request
+     * @param response our response
+     * @param ex exception thrown in handling request
+     * @throws java.io.IOException passed through.
      */
     @ExceptionHandler({
         RESTEmptyWorkflowGroupException.class,
@@ -192,8 +198,9 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
 
     /**
      * Send the error to the response.
-     * 5xx errors will be logged as ERROR with a full stack trace, 4xx errors will be logged as WARN without a
-     * stacktrace. Specific 4xx errors where an ERROR log with full stacktrace is more appropriate are configured in
+     * 5xx errors will be logged as ERROR with a full stack trace.  4xx errors
+     * will be logged as WARN without a stack trace. Specific 4xx errors where
+     * an ERROR log with full stack trace is more appropriate are configured in
      * {@link #LOG_AS_ERROR}
      * @param request current request
      * @param response current response
@@ -202,8 +209,10 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
      * @param statusCode status code to send in response
      * @throws IOException
      */
-    private void sendErrorResponse(final HttpServletRequest request, final HttpServletResponse response,
-                                   final Exception ex, final String message, final int statusCode) throws IOException {
+    private void sendErrorResponse(final HttpServletRequest request,
+            final HttpServletResponse response,
+            final Exception ex, final String message, final int statusCode)
+            throws IOException {
         //Make sure Spring picks up this exception
         request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
 
@@ -213,7 +222,10 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
             log.error("{} (status:{})", message, statusCode, ex);
         } else if (HttpStatus.valueOf(statusCode).is4xxClientError()) {
             // Log the error as a single-line WARN
-            log.warn("{} (status:{})", message, statusCode);
+            StackTraceElement[] trace = ex.getStackTrace();
+            String location = trace.length <= 0 ? "unknown" : trace[0].toString();
+            log.warn("{} (status:{} exception: {} at: {})", message, statusCode,
+                    ex.getMessage(), location);
         }
 
         //Exception properties will be set by org.springframework.boot.web.support.ErrorPageFilter
