@@ -61,6 +61,7 @@ public class MetadataValidation extends AbstractValidation {
 
         List<ErrorRest> errors = new ArrayList<>();
         String documentTypeValue = "";
+        List<ErrorRest> errors = new ArrayList<>();
         DCInputSet inputConfig = getInputReader().getInputsByFormName(config.getId());
         List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(), DOCUMENT_TYPE_FIELD);
         if (documentType.size() > 0) {
