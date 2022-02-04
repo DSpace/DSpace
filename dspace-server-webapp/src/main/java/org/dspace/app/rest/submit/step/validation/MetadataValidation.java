@@ -42,6 +42,8 @@ public class MetadataValidation extends AbstractValidation {
 
     private static final String ERROR_VALIDATION_REGEX = "error.validation.regex";
 
+    private static final String DOCUMENT_TYPE_FIELD = "dc.type";
+
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataValidation.class);
 
     private DCInputsReader inputReader;
@@ -55,12 +57,22 @@ public class MetadataValidation extends AbstractValidation {
                                     SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
 
         List<ErrorRest> errors = new ArrayList<>();
+        String documentTypeValue = "";
         DCInputSet inputConfig = getInputReader().getInputsByFormName(config.getId());
+        List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(), DOCUMENT_TYPE_FIELD);
+        if (documentType.size() > 0) {
+            documentTypeValue = documentType.get(0).getValue();
+        }
         for (DCInput[] row : inputConfig.getFields()) {
             for (DCInput input : row) {
                 String fieldKey =
                     metadataAuthorityService.makeFieldKey(input.getSchema(), input.getElement(), input.getQualifier());
                 boolean isAuthorityControlled = metadataAuthorityService.isAuthorityControlled(fieldKey);
+
+                // Skip validation if field is not allowed for the current document type
+                if (input.isAllowedFor(documentTypeValue) == false) {
+                    continue;
+                }
 
                 List<String> fieldsName = new ArrayList<String>();
                 if (input.isQualdropValue()) {
