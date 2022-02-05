@@ -14,6 +14,11 @@ import org.dspace.content.Item;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 
+/**
+ * A "no operation" curation task which does nothing.
+ *
+ * @author Kim Shepherd
+ */
 public class NoOpCurationTask extends AbstractCurationTask {
 
     protected int status = Curator.CURATE_UNSET;
