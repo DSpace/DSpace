@@ -222,10 +222,18 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
             log.error("{} (status:{})", message, statusCode, ex);
         } else if (HttpStatus.valueOf(statusCode).is4xxClientError()) {
             // Log the error as a single-line WARN
-            StackTraceElement[] trace = ex.getStackTrace();
-            String location = trace.length <= 0 ? "unknown" : trace[0].toString();
+            String location;
+            String exceptionMessage;
+            if (null == ex) {
+                exceptionMessage = "none";
+                location = "unknown";
+            } else {
+                exceptionMessage = ex.getMessage();
+                StackTraceElement[] trace = ex.getStackTrace();
+                location = trace.length <= 0 ? "unknown" : trace[0].toString();
+            }
             log.warn("{} (status:{} exception: {} at: {})", message, statusCode,
-                    ex.getMessage(), location);
+                    exceptionMessage, location);
         }
 
         //Exception properties will be set by org.springframework.boot.web.support.ErrorPageFilter
