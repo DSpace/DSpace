@@ -9,9 +9,12 @@
 
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean id="patchConfigurationService" class="org.dspace.app.rest.submit.PatchConfigurationService">
         <property name="map">
@@ -125,4 +128,11 @@
     </bean>
 
     <bean id="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils" class="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils"/>
+
+    <util:set id='org.dspace.app.rest.StackTracedHttpStatuses'>
+      <description>
+        HTTP status codes to be logged at ERROR level with stack trace.
+      </description>
+      <value>422</value>
+    </util:set>
 </beans>

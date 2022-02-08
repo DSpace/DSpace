@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -51,12 +53,22 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  */
 @ControllerAdvice
 public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler {
-    private static final Logger log = LogManager.getLogger(DSpaceApiExceptionControllerAdvice.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * Set of HTTP error codes to log as ERROR with full stack trace.
      */
-    private static final Set<Integer> LOG_AS_ERROR = Set.of(422);
+    private final Set<Integer> LOG_AS_ERROR;
+
+    /**
+     * @param statuses HTTP status codes to be logged as ERROR, with stack trace.
+     */
+    @Inject
+    public DSpaceApiExceptionControllerAdvice(
+            @Named("org.dspace.app.rest.StackTracedHttpStatuses")
+                    Set<Integer> statuses) {
+        LOG_AS_ERROR = statuses;
+    }
 
     @ExceptionHandler({AuthorizeException.class, RESTAuthorizationException.class, AccessDeniedException.class})
     protected void handleAuthorizeException(HttpServletRequest request, HttpServletResponse response, Exception ex)
