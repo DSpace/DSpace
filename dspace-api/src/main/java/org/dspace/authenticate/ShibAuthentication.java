@@ -235,7 +235,6 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             // Step 4: Log the user in.
             context.setCurrentUser(eperson);
-            request.setAttribute("shib.authenticated", true);
             AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
 
             log.info(eperson.getEmail() + " has been authenticated via shibboleth.");
@@ -290,20 +289,13 @@ public class ShibAuthentication implements AuthenticationMethod {
         try {
             // User has not successfuly authenticated via shibboleth.
             if (request == null ||
-                context.getCurrentUser() == null ||
-                request.getSession().getAttribute("shib.authenticated") == null) {
+                context.getCurrentUser() == null) {
                 return Collections.EMPTY_LIST;
             }
 
-            // If we have already calculated the special groups then return them.
-            if (request.getSession().getAttribute("shib.specialgroup") != null) {
+            if (context.getSpecialGroups().size() > 0 ) {
                 log.debug("Returning cached special groups.");
-                List<UUID> sessionGroupIds = (List<UUID>) request.getSession().getAttribute("shib.specialgroup");
-                List<Group> result = new ArrayList<>();
-                for (UUID uuid : sessionGroupIds) {
-                    result.add(groupService.find(context, uuid));
-                }
-                return result;
+                return context.getSpecialGroups();
             }
 
             log.debug("Starting to determine special groups");
@@ -401,11 +393,8 @@ public class ShibAuthentication implements AuthenticationMethod {
                 groupIds.add(group.getID());
             }
 
-            // Cache the special groups, so we don't have to recalculate them again
-            // for this session.
-            request.setAttribute("shib.specialgroup", groupIds);
-
             return new ArrayList<>(groups);
+
         } catch (Throwable t) {
             log.error("Unable to validate any sepcial groups this user may belong too because of an exception.", t);
             return Collections.EMPTY_LIST;
