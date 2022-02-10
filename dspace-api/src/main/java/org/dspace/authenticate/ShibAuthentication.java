@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -235,6 +234,7 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             // Step 4: Log the user in.
             context.setCurrentUser(eperson);
+            request.setAttribute("shib.authenticated", true);
             AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
 
             log.info(eperson.getEmail() + " has been authenticated via shibboleth.");
@@ -387,11 +387,6 @@ public class ShibAuthentication implements AuthenticationMethod {
 
 
             log.info("Added current EPerson to special groups: " + groups);
-
-            List<UUID> groupIds = new ArrayList<>();
-            for (Group group : groups) {
-                groupIds.add(group.getID());
-            }
 
             return new ArrayList<>(groups);
 
