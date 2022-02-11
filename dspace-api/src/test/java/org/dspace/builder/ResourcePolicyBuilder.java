@@ -82,6 +82,7 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
     public void delete(ResourcePolicy rp) throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+            c.setDispatcher("noindex");
             ResourcePolicy attachedDso = c.reloadEntity(rp);
             if (attachedDso != null) {
                 getService().delete(c, attachedDso);
