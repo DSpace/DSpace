@@ -10,9 +10,14 @@ package org.dspace.app.rest.configuration;
 import java.util.Arrays;
 
 import org.dspace.app.rest.DiscoverableEndpointsService;
+import org.dspace.app.rest.health.GeoIpHealthIndicator;
+import org.dspace.discovery.SolrSearchCore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.health.ConditionalOnEnabledHealthIndicator;
+import org.springframework.boot.actuate.solr.SolrHealthIndicator;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.hateoas.Link;
@@ -36,4 +41,17 @@ public class ActuatorConfiguration {
     public void registerActuatorEndpoints() {
         discoverableEndpointsService.register(this, Arrays.asList(new Link(actuatorBasePath, "actuator")));
     }
+
+    @Bean
+    @ConditionalOnEnabledHealthIndicator("solr")
+    public SolrHealthIndicator solrHealthIndicator(SolrSearchCore solrSearchCore) {
+        return new SolrHealthIndicator(solrSearchCore.getSolr());
+    }
+
+    @Bean
+    @ConditionalOnEnabledHealthIndicator("geoIp")
+    public GeoIpHealthIndicator geoIpHealthIndicator() {
+        return new GeoIpHealthIndicator();
+    }
+
 }

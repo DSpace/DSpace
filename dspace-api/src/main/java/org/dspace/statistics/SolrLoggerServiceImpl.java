@@ -8,7 +8,6 @@
 package org.dspace.statistics;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -142,6 +141,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     private ClientInfoService clientInfoService;
     @Autowired
     private SolrStatisticsCore solrStatisticsCore;
+    @Autowired
+    private GeoIpService geoIpService;
 
     /** URL to the current-year statistics core.  Prior-year shards will have a year suffixed. */
     private String statisticsCoreURL;
@@ -179,26 +180,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         //spiderIps = SpiderDetector.getSpiderIpAddresses();
 
         DatabaseReader service = null;
-        // Get the db file for the location
-        String dbPath = configurationService.getProperty("usage-statistics.dbfile");
-        if (dbPath != null) {
-            try {
-                File dbFile = new File(dbPath);
-                service = new DatabaseReader.Builder(dbFile).build();
-            } catch (FileNotFoundException fe) {
-                log.error(
-                    "The GeoLite Database file is missing (" + dbPath + ")! Solr Statistics cannot generate location " +
-                        "based reports! Please see the DSpace installation instructions for instructions to install " +
-                        "this file.",
-                    fe);
-            } catch (IOException e) {
-                log.error(
-                    "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. See the " +
-                        "DSpace installation instructions for more details.",
-                    e);
-            }
-        } else {
-            log.error("The required 'dbfile' configuration is missing in solr-statistics.cfg!");
+        try {
+            service = geoIpService.getDatabaseReader();
+        } catch (IllegalStateException ex) {
+            log.error(ex);
         }
         locationService = service;
     }

@@ -47,5 +47,7 @@
     <bean id="org.dspace.statistics.SolrStatisticsCore"
           class="org.dspace.statistics.MockSolrStatisticsCore"
           autowire-candidate="true"/>
+          
+    <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
 
 </beans>
