@@ -11,6 +11,7 @@ import org.dspace.app.rest.exception.DSpaceAccessDeniedHandler;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -63,6 +64,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private DSpaceAccessDeniedHandler accessDeniedHandler;
 
+    @Value("${management.endpoints.web.base-path:/actuator}")
+    private String actuatorBasePath;
+
     @Override
     public void configure(WebSecurity webSecurity) throws Exception {
         // Define URL patterns which Spring Security will ignore entirely.
@@ -81,7 +85,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Configure authentication requirements for ${dspace.server.url}/api/ URL only
         // NOTE: REST API is hardcoded to respond on /api/. Other modules (OAI, SWORD, IIIF, etc) use other root paths.
         http.requestMatchers()
-            .antMatchers("/api/**", "/iiif/**", "/actuator/**")
+            .antMatchers("/api/**", "/iiif/**", actuatorBasePath + "/**")
             .and()
             // Enable Spring Security authorization on these paths
             .authorizeRequests()
