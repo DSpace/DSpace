@@ -11,10 +11,10 @@ import static org.springframework.web.servlet.DispatcherServlet.EXCEPTION_ATTRIB
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
@@ -56,19 +57,15 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     private static final Logger log = LogManager.getLogger();
 
     /**
-     * Set of HTTP error codes to log as ERROR with full stack trace.
+     * Default collection of HTTP error codes to log as ERROR with full stack trace.
      */
-    private final Set<Integer> LOG_AS_ERROR;
+    private static final String[] LOG_AS_ERROR_DEFAULT = { "422" };
 
-    /**
-     * @param statuses HTTP status codes to be logged as ERROR, with stack trace.
-     */
+    /** Configuration parameter for ERROR treatment. */
+    private static final String P_LOG_AS_ERROR = "logging.server.include-stacktrace-for-httpcode";
+
     @Inject
-    public DSpaceApiExceptionControllerAdvice(
-            @Named("org.dspace.app.rest.StackTracedHttpStatuses")
-                    Set<Integer> statuses) {
-        LOG_AS_ERROR = statuses;
-    }
+    private ConfigurationService configurationService;
 
     @ExceptionHandler({AuthorizeException.class, RESTAuthorizationException.class, AccessDeniedException.class})
     protected void handleAuthorizeException(HttpServletRequest request, HttpServletResponse response, Exception ex)
@@ -212,8 +209,10 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
      * Send the error to the response.
      * 5xx errors will be logged as ERROR with a full stack trace.  4xx errors
      * will be logged as WARN without a stack trace. Specific 4xx errors where
-     * an ERROR log with full stack trace is more appropriate are configured in
-     * {@link #LOG_AS_ERROR}
+     * an ERROR log with full stack trace is more appropriate are configured
+     * using property {@code logging.server.include-stacktrace-for-httpcode}
+     * (see {@link P_LOG_AS_ERROR} and {@link LOG_AS_ERROR_DEFAULT}).
+     *
      * @param request current request
      * @param response current response
      * @param ex Exception thrown
@@ -227,6 +226,19 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
             throws IOException {
         //Make sure Spring picks up this exception
         request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
+
+        // Which status codes should be treated as ERROR?
+        final Set<Integer> LOG_AS_ERROR = new HashSet<>();
+        String[] error_codes = configurationService.getArrayProperty(
+                P_LOG_AS_ERROR, LOG_AS_ERROR_DEFAULT);
+        for (String code : error_codes) {
+            try {
+                LOG_AS_ERROR.add(Integer.valueOf(code));
+            } catch (NumberFormatException e) {
+                log.warn("Non-integer HTTP status code {} in {}", code, P_LOG_AS_ERROR);
+                // And continue
+            }
+        }
 
         // We don't want to fill logs with bad/invalid REST API requests.
         if (HttpStatus.valueOf(statusCode).is5xxServerError() || LOG_AS_ERROR.contains(statusCode)) {
