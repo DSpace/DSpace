@@ -254,7 +254,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         assertNotNull(authCookie);
         String token = authCookie.getValue();
 
-        // This step is _not required_ to successfully authenticate, but it mocks the behavior of our UI & HAL Browser.
+        // This step is _not required_ to successfully authenticate, but it mocks the behavior of our UI & HAL Explorer.
         // We'll send a "/status" request to the REST API with our auth cookie. This should return that we have a
         // *valid* authentication (as auth cookie is valid), however the cookie will remain. To complete the login
         // process we MUST call the "/login" endpoint (see the next step in this test).
@@ -377,7 +377,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         // via Password auth, but this test proves it would work if enabled)
         Cookie authCookie = new Cookie(AUTHORIZATION_COOKIE, token);
 
-        // Now, similar to how both the UI & Hal Browser authentication works, send a "/status" request to the REST API
+        // Now, similar to how both the UI & Hal Explorer authentication works, send a "/status" request to the REST API
         // with our auth cookie. This should return that we *have a valid* authentication (in the auth cookie).
         // However, this is just a validation check, so this auth cookie will remain. To complete the login process
         // we'll need to call the "/login" endpoint (see the next step in this test).

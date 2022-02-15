@@ -242,7 +242,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
                                     final String token, final Boolean addCookie) {
         // If addCookie=true, create a temporary authentication cookie. This is primarily used for the initial
         // Shibboleth response (which requires a number of redirects), as headers cannot be sent via a redirect. As soon
-        // as the UI (or Hal Browser) obtains the Shibboleth login data, it makes a call to /login (addCookie=false)
+        // as the UI (or Hal Explorer) obtains the Shibboleth login data, it makes a call to /login (addCookie=false)
         // which destroys this temporary auth cookie. So, the auth cookie only exists a few seconds.
         if (addCookie) {
             ResponseCookie cookie = ResponseCookie.from(AUTHORIZATION_COOKIE, token)

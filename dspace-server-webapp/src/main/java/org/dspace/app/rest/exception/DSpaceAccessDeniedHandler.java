@@ -67,7 +67,7 @@ public class DSpaceAccessDeniedHandler implements AccessDeniedHandler {
 
         // If we had an InvalidCsrfTokenException, this means the client sent a CSRF token which did *not* match the
         // token on the server. In this scenario, we trigger a refresh of the CSRF token...as it's possible the user
-        // switched clients (from HAL Browser to UI or visa versa) and has an out-of-sync token.
+        // switched clients (from HAL Explorer to UI or visa versa) and has an out-of-sync token.
         // NOTE: this logic is tested in AuthenticationRestControllerIT.testRefreshTokenWithInvalidCSRF()
         if (ex instanceof InvalidCsrfTokenException) {
             // Remove current token & generate a new one

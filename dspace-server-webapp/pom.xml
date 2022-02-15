@@ -65,10 +65,6 @@
                     <excludes>
                         <exclude>**/src/test/resources/**</exclude>
                         <exclude>**/src/test/data/**</exclude>
-                        <!--Skip license check of third party files included/customized from HAL Browser -->
-                        <exclude>src/main/webapp/index.html</exclude>
-                        <exclude>src/main/webapp/login.html</exclude>
-                        <exclude>src/main/webapp/js/hal/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -237,25 +233,7 @@
     </dependencyManagement>
 
     <dependencies>
-
-        <!-- These next two dependencies build a WAR that is BOTH executable
-             AND deployable into an external container (Tomcat).
-             See: http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging -->
-        <!-- NOTE: For rapid development (if you don't need Solr or other webapps),
-             you can temporarily comment these out, and switch <packaging> to "jar".
-             This lets you develop in a standalone, runnable JAR application. -->
-        <!--<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>-->
-        <!-- Ensure embedded servlet container doesn't interfere when this
-             WAR is deployed to an external Tomcat (i.e. provided). -->
-        <!--<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
-        </dependency>-->
-
+        <!-- Spring Boot dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -280,26 +258,23 @@
             <version>${spring-boot.version}</version>
         </dependency>
 
+        <!-- Adds support for JSON Patch -->
         <dependency>
             <groupId>com.flipkart.zjsonpatch</groupId>
             <artifactId>zjsonpatch</artifactId>
-            <version>0.4.6</version>
+            <version>0.4.11</version>
         </dependency>
 
-        <!-- The HAL Browser -->
+        <!-- The HAL Explorer -->
         <dependency>
             <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-rest-hal-browser</artifactId>
-            <version>${spring-hal-browser.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.data</groupId>
-                    <artifactId>spring-data-rest-webmvc</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>spring-data-rest-hal-explorer</artifactId>
+            <version>${spring-hal-explorer.version}</version>
         </dependency>
 
-        <!-- WebJars dependencies used to update/enhance the default HAL Browser -->
+        <!-- WebJars dependencies used to update/enhance interfaces.
+             These are included here so that they are accessible to all interfaces enabled in server webapp.
+             However, at this time they are only used by OAI-PMH. -->
         <!-- Pull in current version of JQuery via WebJars
              Made available at: webjars/jquery/dist/jquery.min.js -->
         <dependency>
@@ -307,15 +282,7 @@
             <artifactId>jquery-dist</artifactId>
             <version>3.5.1</version>
         </dependency>
-        <!-- Pull in current version of Toastr (toastrjs.com) via WebJars
-             Made available at: webjars/toastr/build/toastr.min.js -->
-        <dependency>
-            <groupId>org.webjars.bowergithub.codeseven</groupId>
-            <artifactId>toastr</artifactId>
-            <version>2.1.4</version>
-        </dependency>
-        <!-- Also pull in current version of Bootstrap via WebJars. This is currently ONLY used by our OAI-PMH
-             interface. But, it is include here so that it's accessible to all interfaces enabled in server webapp.
+        <!-- Pull in current version of Bootstrap via WebJars.
              Made available at: webjars/bootstrap/dist/js/bootstrap.min.js and
              webjars/bootstrap/dist/css/bootstrap.min.css -->
         <dependency>
@@ -345,7 +312,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
@@ -360,13 +326,6 @@
 
         <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-api</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
         </dependency>
 
@@ -375,7 +334,7 @@
             <artifactId>dspace-iiif</artifactId>
         </dependency>
 
-        <!-- DSpace modules to deploy (this modules are all optional, but add features/endpoints to webapp) -->
+        <!-- DSpace modules to deploy (these modules are all optional, but add features/endpoints to webapp) -->
         <!-- You may choose to comment out any of these modules if you do not want/need its features -->
         <dependency>
             <groupId>org.dspace</groupId>
@@ -394,14 +353,10 @@
             <artifactId>dspace-swordv2</artifactId>
         </dependency>
 
+        <!-- Other dependencies -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-            <version>1.8</version>
         </dependency>
         <dependency>
             <groupId>commons-validator</groupId>
@@ -415,7 +370,10 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
@@ -423,6 +381,12 @@
         </dependency>
 
         <!-- TEST DEPENDENCIES -->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -432,11 +396,6 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <version>${spring-security.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
