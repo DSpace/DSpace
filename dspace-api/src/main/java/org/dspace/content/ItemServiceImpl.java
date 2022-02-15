@@ -822,6 +822,12 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public void move(Context context, Item item, Collection from, Collection to) throws SQLException, AuthorizeException, IOException {
+
+        // If the two collections are the same, do nothing.
+        if (from.equals(to)) {
+            return;
+        }
+
         // Use the normal move method, and default to not inherit permissions
         this.move(context, item, from, to, false);
     }

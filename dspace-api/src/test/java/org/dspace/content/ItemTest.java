@@ -15,6 +15,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Constants;
@@ -34,6 +35,7 @@ import java.util.*;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit Tests for class Item
@@ -1631,6 +1633,27 @@ public class ItemTest extends AbstractDSpaceObjectTest
         context.restoreAuthSystemState();
         assertThat("testMove 0",it.getOwningCollection(), notNullValue());
         assertThat("testMove 1", it.getOwningCollection(), equalTo(to));
+    }
+
+    /**
+     * Test of move method, of class Item, where both Collections are the same.
+     */
+    @Test
+    public void testMoveSameCollection() throws Exception {
+        context.turnOffAuthorisationSystem();
+        while (it.getCollections().size() > 1) {
+            it.removeCollection(it.getCollections().get(0));
+        }
+
+        Collection collection = it.getCollections().get(0);
+        it.setOwningCollection(collection);
+        ItemService itemServiceSpy = spy(itemService);
+
+        itemService.move(context, it, collection, collection);
+        context.restoreAuthSystemState();
+        assertThat("testMoveSameCollection 0", it.getOwningCollection(), notNullValue());
+        assertThat("testMoveSameCollection 1", it.getOwningCollection(), equalTo(collection));
+        verify(itemServiceSpy, times(0)).delete(context, it);
     }
 
     /**
