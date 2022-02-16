@@ -13,6 +13,7 @@ import org.dspace.app.nbevent.service.NBEventService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.NBEvent;
+import org.dspace.content.NBSourceName;
 import org.dspace.core.Context;
 
 /**
@@ -24,7 +25,7 @@ public class NBEventBuilder extends AbstractBuilder<NBEvent, NBEventService> {
 
     private Item item;
     private NBEvent target;
-
+    private NBSourceName source = NBSourceName.OPENAIRE;
     private String title;
     private String topic;
     private String message;
@@ -95,8 +96,8 @@ public class NBEventBuilder extends AbstractBuilder<NBEvent, NBEventService> {
 
     @Override
     public NBEvent build() {
-        target = new NBEvent("oai:www.dspace.org:" + item.getHandle(), item.getID().toString(), title, topic, trust,
-                message, lastUpdate);
+        target = new NBEvent(source, "oai:www.dspace.org:" + item.getHandle(), item.getID().toString(), title, topic,
+            trust, message, lastUpdate);
         target.setRelated(relatedItem);
         try {
             nbEventService.store(context, target);

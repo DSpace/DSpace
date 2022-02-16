@@ -14,8 +14,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.dspace.app.nbevent.service.dto.MessageDto;
+import org.dspace.app.nbevent.service.dto.OpenaireMessageDto;
 import org.dspace.app.rest.model.NBEventMessageRest;
 import org.dspace.app.rest.model.NBEventRest;
+import org.dspace.app.rest.model.OpenaireNBEventMessageRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.NBEvent;
 import org.springframework.stereotype.Component;
@@ -36,7 +38,8 @@ public class NBEventConverter implements DSpaceConverter<NBEvent, NBEventRest> {
         NBEventRest rest = new NBEventRest();
         rest.setId(modelObject.getEventId());
         try {
-            rest.setMessage(convertMessage(jsonMapper.readValue(modelObject.getMessage(), MessageDto.class)));
+            rest.setMessage(convertMessage(jsonMapper.readValue(modelObject.getMessage(),
+                getMessageDtoClass(modelObject))));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -51,19 +54,33 @@ public class NBEventConverter implements DSpaceConverter<NBEvent, NBEventRest> {
         return rest;
     }
 
+    private Class<? extends MessageDto> getMessageDtoClass(NBEvent modelObject) {
+        switch (modelObject.getSource()) {
+            case OPENAIRE:
+                return OpenaireMessageDto.class;
+            default:
+                throw new IllegalArgumentException("Unknown event's source: " + modelObject.getSource());
+        }
+    }
+
     private NBEventMessageRest convertMessage(MessageDto dto) {
-        NBEventMessageRest message = new NBEventMessageRest();
-        message.setAbstractValue(dto.getAbstracts());
-        message.setOpenaireId(dto.getOpenaireId());
-        message.setAcronym(dto.getAcronym());
-        message.setCode(dto.getCode());
-        message.setFunder(dto.getFunder());
-        message.setFundingProgram(dto.getFundingProgram());
-        message.setJurisdiction(dto.getJurisdiction());
-        message.setTitle(dto.getTitle());
-        message.setType(dto.getType());
-        message.setValue(dto.getValue());
-        return message;
+        if (dto instanceof OpenaireMessageDto) {
+            OpenaireMessageDto openaireDto = (OpenaireMessageDto) dto;
+            OpenaireNBEventMessageRest message = new OpenaireNBEventMessageRest();
+            message.setAbstractValue(openaireDto.getAbstracts());
+            message.setOpenaireId(openaireDto.getOpenaireId());
+            message.setAcronym(openaireDto.getAcronym());
+            message.setCode(openaireDto.getCode());
+            message.setFunder(openaireDto.getFunder());
+            message.setFundingProgram(openaireDto.getFundingProgram());
+            message.setJurisdiction(openaireDto.getJurisdiction());
+            message.setTitle(openaireDto.getTitle());
+            message.setType(openaireDto.getType());
+            message.setValue(openaireDto.getValue());
+            return message;
+        }
+
+        throw new IllegalArgumentException("Unknown message type: " + dto.getClass());
     }
 
     @Override

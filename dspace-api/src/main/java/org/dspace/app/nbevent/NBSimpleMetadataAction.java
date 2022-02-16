@@ -10,6 +10,7 @@ package org.dspace.app.nbevent;
 import java.sql.SQLException;
 
 import org.dspace.app.nbevent.service.dto.MessageDto;
+import org.dspace.app.nbevent.service.dto.OpenaireMessageDto;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
@@ -46,7 +47,7 @@ public class NBSimpleMetadataAction implements NBAction {
     public void applyCorrection(Context context, Item item, Item relatedItem, MessageDto message) {
         try {
             itemService.addMetadata(context, item, metadataSchema, metadataElement, metadataQualifier, null,
-                    message.getAbstracts());
+                ((OpenaireMessageDto) message).getAbstracts());
             itemService.update(context, item);
         } catch (SQLException | AuthorizeException e) {
             throw new RuntimeException(e);

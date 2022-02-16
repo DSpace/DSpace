@@ -509,6 +509,7 @@
        when adding a document.
    -->
 	
+    <field name="source" type="string" indexed="true" stored="true" omitNorms="true" />
     <field name="event_id" type="string" indexed="true" stored="true" omitNorms="true" />
     <field name="original_id" type="string" indexed="true" stored="true" omitNorms="true" />
     <field name="title" type="string" indexed="true" stored="true" omitNorms="true" />

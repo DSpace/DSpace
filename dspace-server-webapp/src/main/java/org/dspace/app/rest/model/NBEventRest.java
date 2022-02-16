@@ -26,6 +26,7 @@ public class NBEventRest extends BaseObjectRest<String> {
     public static final String TOPIC = "topic";
     public static final String TARGET = "target";
     public static final String RELATED = "related";
+    private String source;
     private String originalId;
     private String title;
     private String topic;
@@ -111,5 +112,19 @@ public class NBEventRest extends BaseObjectRest<String> {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    /**
+     * @return the source
+     */
+    public String getSource() {
+        return source;
+    }
+
+    /**
+     * @param source the source to set
+     */
+    public void setSource(String source) {
+        this.source = source;
     }
 }

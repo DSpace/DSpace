@@ -21,6 +21,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.nbevent.service.NBEventService;
 import org.dspace.content.NBEvent;
+import org.dspace.content.NBSourceName;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -102,6 +103,7 @@ public class NBEventsRunnable extends DSpaceRunnable<NBEventsScriptConfiguration
         }
 
         for (NBEvent entry : entries) {
+            entry.setSource(NBSourceName.OPENAIRE);
             if (!StringUtils.equalsAny(entry.getTopic(), topicsToImport)) {
                 LOGGER.info("Skip event for topic " + entry.getTopic() + " is not allowed in the oaire-nbevents.cfg");
                 continue;

@@ -26,6 +26,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.nbevent.service.NBEventService;
 import org.dspace.app.nbevent.service.dto.MessageDto;
+import org.dspace.app.nbevent.service.dto.OpenaireMessageDto;
 import org.dspace.content.Item;
 import org.dspace.content.NBEvent;
 import org.dspace.content.service.ItemService;
@@ -72,11 +73,20 @@ public class NBEventActionServiceImpl implements NBEventActionService {
                 related = itemService.find(context, UUID.fromString(nbevent.getRelated()));
             }
             topicsToActions.get(nbevent.getTopic()).applyCorrection(context, item, related,
-                    jsonMapper.readValue(nbevent.getMessage(), MessageDto.class));
+                jsonMapper.readValue(nbevent.getMessage(), getMessageDtoClass(nbevent)));
             nbEventService.deleteEventByEventId(context, nbevent.getEventId());
             makeAcknowledgement(nbevent.getEventId(), NBEvent.ACCEPTED);
         } catch (SQLException | JsonProcessingException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private Class<? extends MessageDto> getMessageDtoClass(NBEvent modelObject) {
+        switch (modelObject.getSource()) {
+            case OPENAIRE:
+                return OpenaireMessageDto.class;
+            default:
+                throw new IllegalArgumentException("Unknown event's source: " + modelObject.getSource());
         }
     }
 

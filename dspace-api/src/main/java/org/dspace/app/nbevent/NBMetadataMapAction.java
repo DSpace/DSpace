@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.dspace.app.nbevent.service.dto.MessageDto;
+import org.dspace.app.nbevent.service.dto.OpenaireMessageDto;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
@@ -38,13 +39,21 @@ public class NBMetadataMapAction implements NBAction {
 
     @Override
     public void applyCorrection(Context context, Item item, Item relatedItem, MessageDto message) {
+
+        if (!(message instanceof OpenaireMessageDto)) {
+            throw new IllegalArgumentException("Unsupported message type: " + message.getClass());
+        }
+
+        OpenaireMessageDto openaireMessage = (OpenaireMessageDto) message;
+
         try {
-            String targetMetadata = types.get(message.getType());
+            String targetMetadata = types.get(openaireMessage.getType());
             if (targetMetadata == null) {
                 targetMetadata = types.get(DEFAULT);
             }
             String[] metadata = splitMetadata(targetMetadata);
-            itemService.addMetadata(context, item, metadata[0], metadata[1], metadata[2], null, message.getValue());
+            itemService.addMetadata(context, item, metadata[0], metadata[1], metadata[2], null,
+                openaireMessage.getValue());
             itemService.update(context, item);
         } catch (SQLException | AuthorizeException e) {
             throw new RuntimeException(e);

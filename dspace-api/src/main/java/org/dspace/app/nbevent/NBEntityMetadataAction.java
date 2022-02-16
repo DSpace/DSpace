@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.nbevent.service.dto.MessageDto;
+import org.dspace.app.nbevent.service.dto.OpenaireMessageDto;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.EntityType;
@@ -141,21 +142,28 @@ public class NBEntityMetadataAction implements NBAction {
     }
 
     private String getValue(MessageDto message, String key) {
-        if (StringUtils.equals(key, "acronym")) {
-            return message.getAcronym();
-        } else if (StringUtils.equals(key, "code")) {
-            return message.getCode();
-        } else if (StringUtils.equals(key, "funder")) {
-            return message.getFunder();
-        } else if (StringUtils.equals(key, "fundingProgram")) {
-            return message.getFundingProgram();
-        } else if (StringUtils.equals(key, "jurisdiction")) {
-            return message.getJurisdiction();
-        } else if (StringUtils.equals(key, "openaireId")) {
-            return message.getOpenaireId();
-        } else if (StringUtils.equals(key, "title")) {
-            return message.getTitle();
+        if (!(message instanceof OpenaireMessageDto)) {
+            return null;
         }
+
+        OpenaireMessageDto openaireMessage = (OpenaireMessageDto) message;
+
+        if (StringUtils.equals(key, "acronym")) {
+            return openaireMessage.getAcronym();
+        } else if (StringUtils.equals(key, "code")) {
+            return openaireMessage.getCode();
+        } else if (StringUtils.equals(key, "funder")) {
+            return openaireMessage.getFunder();
+        } else if (StringUtils.equals(key, "fundingProgram")) {
+            return openaireMessage.getFundingProgram();
+        } else if (StringUtils.equals(key, "jurisdiction")) {
+            return openaireMessage.getJurisdiction();
+        } else if (StringUtils.equals(key, "openaireId")) {
+            return openaireMessage.getOpenaireId();
+        } else if (StringUtils.equals(key, "title")) {
+            return openaireMessage.getTitle();
+        }
+
         return null;
     }
 }

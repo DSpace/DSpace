@@ -9,9 +9,11 @@ package org.dspace.app.nbevent.service.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,11 +31,13 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.app.nbevent.NBSource;
 import org.dspace.app.nbevent.NBTopic;
 import org.dspace.app.nbevent.dao.impl.NBEventsDaoImpl;
 import org.dspace.app.nbevent.service.NBEventService;
 import org.dspace.content.Item;
 import org.dspace.content.NBEvent;
+import org.dspace.content.NBSourceName;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
@@ -69,6 +73,7 @@ public class NBEventServiceImpl implements NBEventService {
      */
     protected SolrClient solr = null;
 
+    public static final String SOURCE = "source";
     public static final String ORIGINAL_ID = "original_id";
     public static final String TITLE = "title";
     public static final String TOPIC = "topic";
@@ -97,6 +102,25 @@ public class NBEventServiceImpl implements NBEventService {
         // we would like to get eventually topic that has no longer active nb events
         solrQuery.setFacetMinCount(0);
         solrQuery.addFacetField(TOPIC);
+        QueryResponse response;
+        try {
+            response = getSolr().query(solrQuery);
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        return response.getFacetField(TOPIC).getValueCount();
+    }
+
+    @Override
+    public long countTopicsBySource(Context context, NBSourceName source) {
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setRows(0);
+        solrQuery.setQuery("*:*");
+        solrQuery.setFacet(true);
+        // we would like to get eventually topic that has no longer active nb events
+        solrQuery.setFacetMinCount(0);
+        solrQuery.addFacetField(TOPIC);
+        solrQuery.addFilterQuery("source:" + source);
         QueryResponse response;
         try {
             response = getSolr().query(solrQuery);
@@ -169,6 +193,11 @@ public class NBEventServiceImpl implements NBEventService {
      */
     @Override
     public List<NBTopic> findAllTopics(Context context, long offset, long count) {
+        return findAllTopicsBySource(context, null, offset, count);
+    }
+
+    @Override
+    public List<NBTopic> findAllTopicsBySource(Context context, NBSourceName source, long offset, long count) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setQuery("*:*");
@@ -177,6 +206,9 @@ public class NBEventServiceImpl implements NBEventService {
         solrQuery.setFacetMinCount(0);
         solrQuery.setFacetLimit((int) (offset + count));
         solrQuery.addFacetField(TOPIC);
+        if (source != null) {
+            solrQuery.addFilterQuery("source:" + source);
+        }
         QueryResponse response;
         List<NBTopic> nbTopics = null;
         try {
@@ -212,6 +244,7 @@ public class NBEventServiceImpl implements NBEventService {
             try {
                 if (!nbEventsDao.isEventStored(context, checksum)) {
                     SolrInputDocument doc = new SolrInputDocument();
+                    doc.addField(SOURCE, dto.getSource().name());
                     doc.addField(EVENT_ID, checksum);
                     doc.addField(ORIGINAL_ID, dto.getOriginalId());
                     doc.addField(TITLE, dto.getTitle());
@@ -258,6 +291,7 @@ public class NBEventServiceImpl implements NBEventService {
 
     private NBEvent getNBEventFromSOLR(SolrDocument doc) {
         NBEvent item = new NBEvent();
+        item.setSource(NBSourceName.valueOf((String) doc.get(SOURCE)));
         item.setEventId((String) doc.get(EVENT_ID));
         item.setLastUpdate((Date) doc.get(LAST_UPDATE));
         item.setMessage((String) doc.get(MESSAGE));
@@ -335,6 +369,47 @@ public class NBEventServiceImpl implements NBEventService {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public NBSource findSource(NBSourceName sourceName) {
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setRows(0);
+        solrQuery.setQuery(SOURCE + ":" + sourceName);
+        solrQuery.setFacet(true);
+        // we would like to get eventually topic that has no longer active nb events
+        solrQuery.setFacetMinCount(0);
+        solrQuery.addFacetField(SOURCE);
+        QueryResponse response;
+        try {
+            response = getSolr().query(solrQuery);
+            FacetField facetField = response.getFacetField(SOURCE);
+            for (Count c : facetField.getValues()) {
+                if (c.getName().equalsIgnoreCase(sourceName.name())) {
+                    NBSource source = new NBSource();
+                    source.setName(c.getName());
+                    source.setTotalEvents(c.getCount());
+                    source.setLastEvent(new Date());
+                    return source;
+                }
+            }
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        NBSource source = new NBSource();
+        source.setName(sourceName.name());
+        source.setTotalEvents(0L);
+        return source;
+    }
+
+    @Override
+    public List<NBSource> findAllSources(Context context, long offset, int pageSize) {
+        return Arrays.stream(NBSourceName.values()).sorted()
+            .map((sourceName) -> findSource(sourceName))
+            .skip(offset)
+            .limit(pageSize)
+            .collect(Collectors.toList());
     }
 
 }

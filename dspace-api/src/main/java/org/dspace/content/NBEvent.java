@@ -13,7 +13,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.apache.solr.client.solrj.beans.Field;
 import org.dspace.app.nbevent.RawJsonDeserializer;
 
 /**
@@ -27,32 +26,26 @@ public class NBEvent {
     public static final String ACCEPTED = "accepted";
     public static final String REJECTED = "rejected";
     public static final String DISCARDED = "discarded";
-    @Field("event_id")
+
+    private NBSourceName source;
+
     private String eventId;
 
-    @Field("original_id")
     private String originalId;
 
-    @Field("resource_uuid")
     private String target;
 
-    @Field("related_uuid")
     private String related;
 
-    @Field("title")
     private String title;
 
-    @Field("topic")
     private String topic;
 
-    @Field("trust")
     private double trust;
 
-    @Field("message")
     @JsonDeserialize(using = RawJsonDeserializer.class)
     private String message;
 
-    @Field("last_update")
     private Date lastUpdate;
 
     private String status = "PENDING";
@@ -60,9 +53,10 @@ public class NBEvent {
     public NBEvent() {
     }
 
-    public NBEvent(String originalId, String target, String title, String topic, double trust, String message,
-            Date lastUpdate) {
+    public NBEvent(NBSourceName source, String originalId, String target, String title,
+        String topic, double trust, String message, Date lastUpdate) {
         super();
+        this.source = source;
         this.originalId = originalId;
         this.target = target;
         this.title = title;
@@ -165,14 +159,22 @@ public class NBEvent {
         return status;
     }
 
+    public NBSourceName getSource() {
+        return source != null ? source : NBSourceName.OPENAIRE;
+    }
+
+    public void setSource(NBSourceName source) {
+        this.source = source;
+    }
+
     /*
      * DTO constructed via Jackson use empty constructor. In this case, the eventId
      * must be compute on the get method
      */
     private void computedEventId() throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest digester = MessageDigest.getInstance("MD5");
-        String dataToString = "originalId=" + originalId + ", title=" + title + ", topic=" + topic + ", trust=" + trust
-                + ", message=" + message;
+        String dataToString = "source=" + source + ",originalId=" + originalId + ", title=" + title + ", topic="
+            + topic + ", trust=" + trust + ", message=" + message;
         digester.update(dataToString.getBytes("UTF-8"));
         byte[] signature = digester.digest();
         char[] arr = new char[signature.length << 1];
