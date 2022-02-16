@@ -413,6 +413,33 @@ public interface CollectionService
         int offset, int limit) throws SQLException, SearchServiceException;
 
     /**
+     * Retrieve the first collection in the community or its descending that support
+     * the provided entityType
+     *
+     * @param  context    the DSpace context
+     * @param  community  the root from where the search start
+     * @param  entityType the requested entity type
+     * @return            the first collection in the community or its descending
+     *                    that support the provided entityType
+     */
+    public Collection retrieveCollectionByCommunityAndEntityType(Context context, Community community,
+        String entityType);
+
+    /**
+     * Retrieve the close collection to the item that support the provided
+     * entityType. Close mean the collection that can be reach with the minimum
+     * steps starting from the item (owningCollection, brothers collections, etc)
+     *
+     * @param  context    the DSpace context
+     * @param  item       the item from where the search start
+     * @param  entityType the requested entity type
+     * @return            the first collection in the community or its descending
+     *                    that support the provided entityType
+     */
+    public Collection retrieveCollectionByEntityType(Context context, Item item, String entityType)
+        throws SQLException;
+
+    /**
      * Counts the number of Collection for which the current user has 'submit' privileges.
      * NOTE: for better performance, this method retrieves its results from an index (cache)
      *       and does not query the database directly.

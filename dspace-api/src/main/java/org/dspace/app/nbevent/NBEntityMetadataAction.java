@@ -19,6 +19,7 @@ import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
@@ -50,6 +51,9 @@ public class NBEntityMetadataAction implements NBAction {
 
     @Autowired
     private WorkspaceItemService workspaceItemService;
+
+    @Autowired
+    private CollectionService collectionService;
 
     public void setItemService(ItemService itemService) {
         this.itemService = itemService;
@@ -96,11 +100,11 @@ public class NBEntityMetadataAction implements NBAction {
             if (relatedItem != null) {
                 link(context, item, relatedItem);
             } else {
-                Collection collection = item.getOwningCollection();
+                Collection collection = collectionService.retrieveCollectionByEntityType(context, item, entityType);
                 WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
                 relatedItem = workspaceItem.getItem();
                 if (StringUtils.isNotBlank(entityType)) {
-                    itemService.addMetadata(context, relatedItem, "relationship", "type", null, null, entityType);
+                    itemService.addMetadata(context, relatedItem, "dspace", "entity", "type", null, entityType);
                 }
                 for (String key : entityMetadata.keySet()) {
                     String value = getValue(message, key);
