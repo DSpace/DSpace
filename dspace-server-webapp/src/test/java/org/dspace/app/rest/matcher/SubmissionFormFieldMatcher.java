@@ -28,13 +28,15 @@ public class SubmissionFormFieldMatcher {
 
     /**
      * Shortcut for the
-     * {@link SubmissionFormFieldMatcher#matchFormFieldDefinition(String, String, String, boolean, String, String, String, String)}
+     * {@link SubmissionFormFieldMatcher#matchFormFieldDefinition(String, String, String, String, boolean, String, String, String, String)}
      * with a null style and vocabulary name
      *
      * @param type
      *            the expected input type
      * @param label
      *            the expected label
+     * @param typeBind
+     *            the expected type-bind field(s)
      * @param mandatoryMessage
      *            the expected mandatoryMessage, can be null. If not empty the fiedl is expected to be flagged as
      *            mandatory
@@ -46,21 +48,23 @@ public class SubmissionFormFieldMatcher {
      *            the expected metadata
      * @return a Matcher for all the condition above
      */
-    public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String mandatoryMessage,
-                                                                   boolean repeatable,
+    public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String typeBind,
+                                                                   String mandatoryMessage, boolean repeatable,
                                                                    String hints, String metadata) {
-        return matchFormFieldDefinition(type, label, mandatoryMessage, repeatable, hints, null, metadata);
+        return matchFormFieldDefinition(type, label, typeBind, mandatoryMessage, repeatable, hints, null, metadata);
     }
 
     /**
      * Shortcut for the
-     * {@link SubmissionFormFieldMatcher#matchFormFieldDefinition(String, String, String, boolean, String, String, String, String)}
+     * {@link SubmissionFormFieldMatcher#matchFormFieldDefinition(String, String, String, String, boolean, String, String, String, String)}
      * with a null controlled vocabulary
      *
      * @param type
      *            the expected input type
      * @param label
      *            the expected label
+     * @param typeBind
+     *            the expected type-bind field(s)
      * @param mandatoryMessage
      *            the expected mandatoryMessage, can be null. If not empty the field is expected to be flagged as
      *            mandatory
@@ -75,10 +79,10 @@ public class SubmissionFormFieldMatcher {
      *            the expected metadata
      * @return a Matcher for all the condition above
      */
-    public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String mandatoryMessage,
-            boolean repeatable,
-            String hints, String style, String metadata) {
-        return matchFormFieldDefinition(type, label, mandatoryMessage, repeatable, hints, style, metadata, null);
+    public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String typeBind,
+            String mandatoryMessage, boolean repeatable, String hints, String style, String metadata) {
+        return matchFormFieldDefinition(type, label, typeBind, mandatoryMessage, repeatable, hints, style, metadata,
+                null);
     }
 
     /**
@@ -88,6 +92,8 @@ public class SubmissionFormFieldMatcher {
      *            the expected input type
      * @param label
      *            the expected label
+     * @param typeBind
+     *            the expected type-bind field(s)
      * @param mandatoryMessage
      *            the expected mandatoryMessage, can be null. If not empty the field is expected to be flagged as
      *            mandatory
@@ -100,18 +106,20 @@ public class SubmissionFormFieldMatcher {
      *            missing
      * @param metadata
      *            the expected metadata
-     * @param controlled vocabulary
+     * @param controlledVocabulary
      *            the expected controlled vocabulary, can be null. If null the corresponding json path is expected to be
      *            missing
      * @return a Matcher for all the condition above
      */
-    public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String mandatoryMessage,
-                                                                   boolean repeatable, String hints, String style,
-                                                                   String metadata, String controlledVocabulary) {
+    public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String typeBind,
+                                                                   String mandatoryMessage, boolean repeatable,
+                                                                   String hints, String style, String metadata,
+                                                                   String controlledVocabulary) {
         return allOf(
             // check each field definition
             hasJsonPath("$.input.type", is(type)),
             hasJsonPath("$.label", containsString(label)),
+            typeBind != null ? hasJsonPath("$.typeBind[0]", is(typeBind)) : hasNoJsonPath("$.typeBind"),
             hasJsonPath("$.selectableMetadata[0].metadata", is(metadata)),
             controlledVocabulary != null ? hasJsonPath("$.selectableMetadata[0].controlledVocabulary",
                     is(controlledVocabulary)) : hasNoJsonPath("$.selectableMetadata[0].controlledVocabulary"),
@@ -166,7 +174,7 @@ public class SubmissionFormFieldMatcher {
             hasJsonPath("$.selectableRelationship.filter", is(filter)),
             hasJsonPath("$.selectableRelationship.searchConfiguration", is(searchConfiguration)),
             hasJsonPath("$.selectableRelationship.nameVariants", is(String.valueOf(nameVariants))),
-            matchFormFieldDefinition(type, label, mandatoryMessage, repeatable, hints, metadata));
+            matchFormFieldDefinition(type, label, null, mandatoryMessage, repeatable, hints, metadata));
     }
 
     /**
