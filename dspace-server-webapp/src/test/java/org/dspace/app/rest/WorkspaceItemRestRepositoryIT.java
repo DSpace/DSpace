@@ -6976,7 +6976,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                      .andExpect(status().isOk())
                                      .andExpect(header().string("Accept-Ranges", "bytes"))
                                      .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
-                                     .andExpect(content().contentType("text/plain"))
+                                     .andExpect(content().contentType("text/plain;charset=UTF-8"))
                                      .andExpect(content().bytes(bitstreamContent.getBytes()));
 
             // others can't download the bitstream
@@ -7014,7 +7014,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                      .andExpect(status().isOk())
                                      .andExpect(header().string("Accept-Ranges", "bytes"))
                                      .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
-                                     .andExpect(content().contentType("text/plain"))
+                                     .andExpect(content().contentType("text/plain;charset=UTF-8"))
                                      .andExpect(content().bytes(bitstreamContent.getBytes()));
 
             // others can't download the bitstream
