@@ -25,6 +25,7 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Execute three validation check on fields validation:
@@ -42,7 +43,9 @@ public class MetadataValidation extends AbstractValidation {
 
     private static final String ERROR_VALIDATION_REGEX = "error.validation.regex";
 
-    private static final String DOCUMENT_TYPE_FIELD = "dc.type";
+    private static final String DOCUMENT_TYPE_FIELD =
+            DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("submit.type-bind.field",
+                    "dc.type");
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataValidation.class);
 
