@@ -107,8 +107,7 @@ public class NBEventServiceImpl implements NBEventService {
         solrQuery.setRows(0);
         solrQuery.setQuery("*:*");
         solrQuery.setFacet(true);
-        // we would like to get eventually topic that has no longer active nb events
-        solrQuery.setFacetMinCount(0);
+        solrQuery.setFacetMinCount(1);
         solrQuery.addFacetField(TOPIC);
         QueryResponse response;
         try {
@@ -125,8 +124,7 @@ public class NBEventServiceImpl implements NBEventService {
         solrQuery.setRows(0);
         solrQuery.setQuery("*:*");
         solrQuery.setFacet(true);
-        // we would like to get eventually topic that has no longer active nb events
-        solrQuery.setFacetMinCount(0);
+        solrQuery.setFacetMinCount(1);
         solrQuery.addFacetField(TOPIC);
         solrQuery.addFilterQuery("source:" + source);
         QueryResponse response;
@@ -164,8 +162,7 @@ public class NBEventServiceImpl implements NBEventService {
         solrQuery.setRows(0);
         solrQuery.setQuery(TOPIC + ":" + topicId.replaceAll("!", "/"));
         solrQuery.setFacet(true);
-        // we would like to get eventually topic that has no longer active nb events
-        solrQuery.setFacetMinCount(0);
+        solrQuery.setFacetMinCount(1);
         solrQuery.addFacetField(TOPIC);
         QueryResponse response;
         try {
@@ -194,16 +191,20 @@ public class NBEventServiceImpl implements NBEventService {
 
     @Override
     public List<NBTopic> findAllTopicsBySource(String source, long offset, long count) {
+
+        if (source != null && isNotSupportedSource(source)) {
+            return null;
+        }
+
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setQuery("*:*");
         solrQuery.setFacet(true);
-        // we would like to get eventually topic that has no longer active nb events
-        solrQuery.setFacetMinCount(0);
+        solrQuery.setFacetMinCount(1);
         solrQuery.setFacetLimit((int) (offset + count));
         solrQuery.addFacetField(TOPIC);
         if (source != null) {
-            solrQuery.addFilterQuery("source:" + source);
+            solrQuery.addFilterQuery(SOURCE + ":" + source);
         }
         QueryResponse response;
         List<NBTopic> nbTopics = null;
@@ -236,7 +237,7 @@ public class NBEventServiceImpl implements NBEventService {
         UpdateRequest updateRequest = new UpdateRequest();
         String topic = dto.getTopic();
 
-        if (!ArrayUtils.contains(getSupportedSources(), dto.getSource())) {
+        if (isNotSupportedSource(dto.getSource())) {
             throw new IllegalArgumentException("The source of the given event is not supported: " + dto.getSource());
         }
 
@@ -374,7 +375,7 @@ public class NBEventServiceImpl implements NBEventService {
     @Override
     public NBSource findSource(String sourceName) {
 
-        if (!ArrayUtils.contains(getSupportedSources(), sourceName)) {
+        if (isNotSupportedSource(sourceName)) {
             return null;
         }
 
@@ -382,7 +383,7 @@ public class NBEventServiceImpl implements NBEventService {
         solrQuery.setRows(0);
         solrQuery.addFilterQuery(SOURCE + ":" + sourceName);
         solrQuery.setFacet(true);
-        solrQuery.setFacetMinCount(0);
+        solrQuery.setFacetMinCount(1);
         solrQuery.addFacetField(SOURCE);
 
         QueryResponse response;
@@ -422,6 +423,10 @@ public class NBEventServiceImpl implements NBEventService {
     @Override
     public long countSources() {
         return getSupportedSources().length;
+    }
+
+    private boolean isNotSupportedSource(String source) {
+        return !ArrayUtils.contains(getSupportedSources(), source);
     }
 
     private String[] getSupportedSources() {

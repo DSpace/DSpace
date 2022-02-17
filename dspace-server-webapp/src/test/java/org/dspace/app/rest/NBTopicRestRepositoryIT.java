@@ -20,9 +20,10 @@ import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.NBEventBuilder;
 import org.dspace.content.Collection;
-import org.dspace.content.NBEvent;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Integration tests for {@link NBTopicRestRepository}.
@@ -32,6 +33,9 @@ import org.junit.Test;
  */
 public class NBTopicRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     @Test
     public void findAllTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -39,16 +43,16 @@ public class NBTopicRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withName("Parent Community")
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
-        NBEvent event1 = NBEventBuilder.createTarget(context, col1, "Science and Freedom")
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom")
                 .withTopic("ENRICH/MISSING/PID")
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
-        NBEvent event2 = NBEventBuilder.createTarget(context, col1, "Science and Freedom 2")
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 2")
                 .withTopic("ENRICH/MISSING/PID")
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
-        NBEvent event3 = NBEventBuilder.createTarget(context, col1, "Science and Freedom 3")
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 3")
                 .withTopic("ENRICH/MORE/PID")
                 .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
-        NBEvent event4 = NBEventBuilder.createTarget(context, col1, "Science and Freedom 4")
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 4")
                 .withTopic("ENRICH/MISSING/ABSTRACT")
                 .withMessage(
                         "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
@@ -84,16 +88,16 @@ public class NBTopicRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         //create collection
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
-        NBEvent event1 = NBEventBuilder.createTarget(context, col1, "Science and Freedom")
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom")
                 .withTopic("ENRICH/MISSING/PID")
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
-        NBEvent event2 = NBEventBuilder.createTarget(context, col1, "Science and Freedom 2")
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 2")
                 .withTopic("ENRICH/MISSING/PID")
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
-        NBEvent event3 = NBEventBuilder.createTarget(context, col1, "Science and Freedom 3")
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 3")
                 .withTopic("ENRICH/MORE/PID")
                 .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
-        NBEvent event4 = NBEventBuilder.createTarget(context, col1, "Science and Freedom 4")
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 4")
                 .withTopic("ENRICH/MISSING/ABSTRACT")
                 .withMessage(
                         "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
@@ -119,16 +123,16 @@ public class NBTopicRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withName("Parent Community")
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
-        NBEvent event1 = NBEventBuilder.createTarget(context, col1, "Science and Freedom")
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom")
                 .withTopic("ENRICH/MISSING/PID")
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
-        NBEvent event2 = NBEventBuilder.createTarget(context, col1, "Science and Freedom 2")
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 2")
                 .withTopic("ENRICH/MISSING/PID")
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
-        NBEvent event3 = NBEventBuilder.createTarget(context, col1, "Science and Freedom 3")
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 3")
                 .withTopic("ENRICH/MORE/PID")
                 .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
-        NBEvent event4 = NBEventBuilder.createTarget(context, col1, "Science and Freedom 4")
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 4")
                 .withTopic("ENRICH/MISSING/ABSTRACT")
                 .withMessage(
                         "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
@@ -148,7 +152,7 @@ public class NBTopicRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withName("Parent Community")
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
-        NBEvent event1 = NBEventBuilder.createTarget(context, col1, "Science and Freedom")
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom")
                 .withTopic("ENRICH/MISSING/PID").build();
         context.restoreAuthSystemState();
         getClient().perform(get("/api/integration/nbtopics/ENRICH!MISSING!PID")).andExpect(status().isUnauthorized());
@@ -163,13 +167,106 @@ public class NBTopicRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withName("Parent Community")
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
-        NBEvent event1 = NBEventBuilder.createTarget(context, col1, "Science and Freedom")
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom")
                 .withTopic("ENRICH/MISSING/PID").build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(get("/api/integration/nbtopics/ENRICH!MISSING!PID"))
             .andExpect(status().isForbidden());
         getClient(authToken).perform(get("/api/integration/nbtopics/ENRICH!MISSING!ABSTRACT"))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findBySourceTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("nbevent.sources",
+            new String[] { "openaire", "test-source", "test-source-2" });
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom")
+            .withTopic("ENRICH/MISSING/PID")
+            .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 2")
+            .withTopic("ENRICH/MISSING/PID")
+            .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 3")
+            .withTopic("ENRICH/MORE/PID")
+            .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 4")
+            .withTopic("ENRICH/MISSING/ABSTRACT")
+            .withMessage(
+                "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
+            .build();
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 5")
+            .withTopic("TEST/TOPIC")
+            .withSource("test-source")
+            .build();
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 6")
+            .withTopic("TEST/TOPIC")
+            .withSource("test-source")
+            .build();
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom 7")
+            .withTopic("TEST/TOPIC/2")
+            .withSource("test-source")
+            .build();
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/integration/nbtopics/search/bySource")
+            .param("source", "openaire"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.nbtopics",
+                Matchers.containsInAnyOrder(NBTopicMatcher.matchNBTopicEntry("ENRICH/MISSING/PID", 2),
+                    NBTopicMatcher.matchNBTopicEntry("ENRICH/MISSING/ABSTRACT", 1),
+                    NBTopicMatcher.matchNBTopicEntry("ENRICH/MORE/PID", 1))))
+            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(3)));
+        getClient(authToken).perform(get("/api/integration/nbtopics/search/bySource")
+            .param("source", "test-source"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.nbtopics",
+                Matchers.containsInAnyOrder(NBTopicMatcher.matchNBTopicEntry("TEST/TOPIC/2", 1),
+                    NBTopicMatcher.matchNBTopicEntry("TEST/TOPIC", 2))))
+            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(2)));
+        getClient(authToken).perform(get("/api/integration/nbtopics/search/bySource")
+            .param("source", "test-source-2"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.nbtopics").doesNotExist())
+            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    @Test
+    public void findBySourceUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom")
+            .withTopic("ENRICH/MISSING/PID").build();
+        context.restoreAuthSystemState();
+        getClient().perform(get("/api/integration/nbtopics/search/bySource")
+            .param("source", "openaire"))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findBySourceForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        NBEventBuilder.createTarget(context, col1, "Science and Freedom")
+            .withTopic("ENRICH/MISSING/PID").build();
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(get("/api/integration/nbtopics/search/bySource")
+            .param("source", "openaire"))
             .andExpect(status().isForbidden());
     }
 

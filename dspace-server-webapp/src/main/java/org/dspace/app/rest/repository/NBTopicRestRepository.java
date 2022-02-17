@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.dspace.app.nbevent.NBTopic;
 import org.dspace.app.nbevent.service.NBEventService;
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.model.NBTopicRest;
 import org.dspace.core.Context;
@@ -55,7 +56,8 @@ public class NBTopicRestRepository extends DSpaceRestRepository<NBTopicRest, Str
 
     @SearchRestMethod(name = "bySource")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<NBTopicRest> findBySource(Context context, String source, Pageable pageable) {
+    public Page<NBTopicRest> findBySource(Context context,
+        @Parameter(value = "source", required = true) String source, Pageable pageable) {
         List<NBTopic> nbTopics = nbEventService.findAllTopicsBySource(source,
             pageable.getOffset(), pageable.getPageSize());
         long count = nbEventService.countTopicsBySource(source);
