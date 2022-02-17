@@ -516,7 +516,14 @@
 
 			<!-- <organization> -->
 			<xsl:for-each
-				select="dspace:field[@mdschema='sedici' and @element='contributor' and @qualifier='corporate]']">
+				select="dspace:field[@mdschema='sedici' and @element='contributor' and @qualifier='corporate']">
+				<organization contributor_role="author"
+					sequence="first">
+					<xsl:value-of select="." />
+				</organization>
+			</xsl:for-each>
+			<xsl:for-each
+				select="dspace:field[@mdschema='sedici' and @element='creator' and @qualifier='corporate']">
 				<organization contributor_role="author"
 					sequence="first">
 					<xsl:value-of select="." />
