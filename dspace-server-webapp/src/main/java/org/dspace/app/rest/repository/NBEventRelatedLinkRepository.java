@@ -55,7 +55,7 @@ public class NBEventRelatedLinkRepository extends AbstractDSpaceRestRepository i
     public ItemRest getRelated(@Nullable HttpServletRequest request, String id, @Nullable Pageable pageable,
             Projection projection) {
         Context context = obtainContext();
-        NBEvent nbEvent = nbEventService.findEventByEventId(context, id);
+        NBEvent nbEvent = nbEventService.findEventByEventId(id);
         if (nbEvent == null) {
             throw new ResourceNotFoundException("No nb event with ID: " + id);
         }

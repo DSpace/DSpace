@@ -31,7 +31,7 @@ public interface NBEventService {
      * @param  pageSize the page size
      * @return          the topics list
      */
-    public List<NBTopic> findAllTopics(Context context, long offset, long pageSize);
+    public List<NBTopic> findAllTopics(long offset, long pageSize);
 
     /**
      * Find all the event's topics related to the given source.
@@ -42,7 +42,7 @@ public interface NBEventService {
      * @param  pageSize the page size
      * @return          the topics list
      */
-    public List<NBTopic> findAllTopicsBySource(Context context, String source, long offset, long count);
+    public List<NBTopic> findAllTopicsBySource(String source, long offset, long count);
 
     /**
      * Count all the event's topics.
@@ -50,7 +50,7 @@ public interface NBEventService {
      * @param  context the DSpace context
      * @return         the count result
      */
-    public long countTopics(Context context);
+    public long countTopics();
 
     /**
      * Count all the event's topics related to the given source.
@@ -59,12 +59,11 @@ public interface NBEventService {
      * @param  source  the source to search for
      * @return         the count result
      */
-    public long countTopicsBySource(Context context, String source);
+    public long countTopicsBySource(String source);
 
     /**
      * Find all the events by topic.
      *
-     * @param  context    the DSpace context
      * @param  topic      the topic to search for
      * @param  offset     the offset to apply
      * @param  pageSize   the page size
@@ -72,27 +71,24 @@ public interface NBEventService {
      * @param  ascending  true if the order should be ascending, false otherwise
      * @return            the events
      */
-    public List<NBEvent> findEventsByTopicAndPage(Context context, String topic,
-            long offset, int pageSize,
-            String orderField, boolean ascending);
+    public List<NBEvent> findEventsByTopicAndPage(String topic, long offset, int pageSize,
+        String orderField, boolean ascending);
 
     /**
      * Find all the events by topic.
      *
-     * @param  context the DSpace context
      * @param  topic   the topic to search for
      * @return         the events count
      */
-    public long countEventsByTopic(Context context, String topic);
+    public long countEventsByTopic(String topic);
 
     /**
      * Find an event by the given id.
      *
-     * @param  context the DSpace context
      * @param  id      the id of the event to search for
      * @return         the event
      */
-    public NBEvent findEventByEventId(Context context, String id);
+    public NBEvent findEventByEventId(String id);
 
     /**
      * Store the given event.
@@ -105,18 +101,16 @@ public interface NBEventService {
     /**
      * Delete an event by the given id.
      *
-     * @param context the DSpace context
      * @param id      the id of the event to delete
      */
-    public void deleteEventByEventId(Context context, String id);
+    public void deleteEventByEventId(String id);
 
     /**
      * Delete events by the given target id.
      *
-     * @param context the DSpace context
      * @param id      the id of the target id
      */
-    public void deleteEventsByTargetId(Context context, UUID targetId);
+    public void deleteEventsByTargetId(UUID targetId);
 
     /**
      * Find a specific topid by the given id.
@@ -137,11 +131,17 @@ public interface NBEventService {
     /**
      * Find all the event's sources.
      *
-     * @param  context  the DSpace context
      * @param  offset   the offset to apply
      * @param  pageSize the page size
      * @return          the sources list
      */
-    public List<NBSource> findAllSources(Context context, long offset, int pageSize);
+    public List<NBSource> findAllSources(long offset, int pageSize);
+
+    /**
+     * Count all the event's sources.
+     *
+     * @return         the count result
+     */
+    public long countSources();
 
 }

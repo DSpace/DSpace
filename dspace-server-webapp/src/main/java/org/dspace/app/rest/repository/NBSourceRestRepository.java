@@ -35,17 +35,17 @@ public class NBSourceRestRepository extends DSpaceRestRepository<NBSourceRest, S
     @PreAuthorize("hasAuthority('ADMIN')")
     public NBSourceRest findOne(Context context, String id) {
         NBSource nbSource = nbEventService.findSource(id);
+        if (nbSource == null) {
+            return null;
+        }
         return converter.toRest(nbSource, utils.obtainProjection());
     }
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<NBSourceRest> findAll(Context context, Pageable pageable) {
-        List<NBSource> nbSources = nbEventService.findAllSources(context, pageable.getOffset(), pageable.getPageSize());
-        long count = nbEventService.countTopics(context);
-        if (nbSources == null) {
-            return null;
-        }
+        List<NBSource> nbSources = nbEventService.findAllSources(pageable.getOffset(), pageable.getPageSize());
+        long count = nbEventService.countSources();
         return converter.toRestPage(nbSources, pageable, count, utils.obtainProjection());
     }
 

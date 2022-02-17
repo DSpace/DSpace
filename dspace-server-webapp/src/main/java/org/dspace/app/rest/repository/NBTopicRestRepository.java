@@ -45,8 +45,8 @@ public class NBTopicRestRepository extends DSpaceRestRepository<NBTopicRest, Str
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<NBTopicRest> findAll(Context context, Pageable pageable) {
-        List<NBTopic> nbTopics = nbEventService.findAllTopics(context, pageable.getOffset(), pageable.getPageSize());
-        long count = nbEventService.countTopics(context);
+        List<NBTopic> nbTopics = nbEventService.findAllTopics(pageable.getOffset(), pageable.getPageSize());
+        long count = nbEventService.countTopics();
         if (nbTopics == null) {
             return null;
         }
@@ -56,9 +56,9 @@ public class NBTopicRestRepository extends DSpaceRestRepository<NBTopicRest, Str
     @SearchRestMethod(name = "bySource")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<NBTopicRest> findBySource(Context context, String source, Pageable pageable) {
-        List<NBTopic> nbTopics = nbEventService.findAllTopicsBySource(context, String.valueOf(source),
+        List<NBTopic> nbTopics = nbEventService.findAllTopicsBySource(source,
             pageable.getOffset(), pageable.getPageSize());
-        long count = nbEventService.countTopicsBySource(context, String.valueOf(source));
+        long count = nbEventService.countTopicsBySource(source);
         if (nbTopics == null) {
             return null;
         }

@@ -78,7 +78,7 @@ public class NBEventActionServiceImpl implements NBEventActionService {
             }
             topicsToActions.get(nbevent.getTopic()).applyCorrection(context, item, related,
                 jsonMapper.readValue(nbevent.getMessage(), nbevent.getMessageDtoClass()));
-            nbEventService.deleteEventByEventId(context, nbevent.getEventId());
+            nbEventService.deleteEventByEventId(nbevent.getEventId());
             makeAcknowledgement(nbevent.getEventId(), NBEvent.ACCEPTED);
         } catch (SQLException | JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -87,13 +87,13 @@ public class NBEventActionServiceImpl implements NBEventActionService {
 
     @Override
     public void discard(Context context, NBEvent nbevent) {
-        nbEventService.deleteEventByEventId(context, nbevent.getEventId());
+        nbEventService.deleteEventByEventId(nbevent.getEventId());
         makeAcknowledgement(nbevent.getEventId(), NBEvent.DISCARDED);
     }
 
     @Override
     public void reject(Context context, NBEvent nbevent) {
-        nbEventService.deleteEventByEventId(context, nbevent.getEventId());
+        nbEventService.deleteEventByEventId(nbevent.getEventId());
         makeAcknowledgement(nbevent.getEventId(), NBEvent.REJECTED);
     }
 

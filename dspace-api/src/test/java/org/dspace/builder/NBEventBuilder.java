@@ -71,6 +71,10 @@ public class NBEventBuilder extends AbstractBuilder<NBEvent, NBEventService> {
         this.topic = topic;
         return this;
     }
+    public NBEventBuilder withSource(final String source) {
+        this.source = source;
+        return this;
+    }
     public NBEventBuilder withTitle(final String title) {
         this.title = title;
         return this;
@@ -108,7 +112,7 @@ public class NBEventBuilder extends AbstractBuilder<NBEvent, NBEventService> {
 
     @Override
     public void cleanup() throws Exception {
-        nbEventService.deleteEventByEventId(context, target.getEventId());
+        nbEventService.deleteEventByEventId(target.getEventId());
     }
 
     @Override
@@ -118,7 +122,7 @@ public class NBEventBuilder extends AbstractBuilder<NBEvent, NBEventService> {
 
     @Override
     public void delete(Context c, NBEvent dso) throws Exception {
-        nbEventService.deleteEventByEventId(context, target.getEventId());
+        nbEventService.deleteEventByEventId(target.getEventId());
 
 //        nbEventService.deleteTarget(dso);
     }

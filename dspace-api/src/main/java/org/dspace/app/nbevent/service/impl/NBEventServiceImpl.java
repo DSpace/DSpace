@@ -7,6 +7,8 @@
  */
 package org.dspace.app.nbevent.service.impl;
 
+import static java.util.Comparator.comparing;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,7 +102,7 @@ public class NBEventServiceImpl implements NBEventService {
     }
 
     @Override
-    public long countTopics(Context context) {
+    public long countTopics() {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setQuery("*:*");
@@ -118,7 +120,7 @@ public class NBEventServiceImpl implements NBEventService {
     }
 
     @Override
-    public long countTopicsBySource(Context context, String source) {
+    public long countTopicsBySource(String source) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setQuery("*:*");
@@ -137,7 +139,7 @@ public class NBEventServiceImpl implements NBEventService {
     }
 
     @Override
-    public void deleteEventByEventId(Context context, String id) {
+    public void deleteEventByEventId(String id) {
         try {
             getSolr().deleteById(id);
             getSolr().commit();
@@ -147,7 +149,7 @@ public class NBEventServiceImpl implements NBEventService {
     }
 
     @Override
-    public void deleteEventsByTargetId(Context context, UUID targetId) {
+    public void deleteEventsByTargetId(UUID targetId) {
         try {
             getSolr().deleteByQuery(RESOURCE_UUID + ":" + targetId.toString());
             getSolr().commit();
@@ -185,25 +187,13 @@ public class NBEventServiceImpl implements NBEventService {
         return null;
     }
 
-    /**
-     * Method to get all topics and the number of entries for each topic
-     * 
-     * @param context DSpace context
-     * @param offset  number of results to skip
-     * @param count   number of result to fetch
-     * @return list of topics with number of events
-     * @throws IOException
-     * @throws SolrServerException
-     * @throws InvalidEnumeratedDataValueException
-     * 
-     */
     @Override
-    public List<NBTopic> findAllTopics(Context context, long offset, long count) {
-        return findAllTopicsBySource(context, null, offset, count);
+    public List<NBTopic> findAllTopics(long offset, long count) {
+        return findAllTopicsBySource(null, offset, count);
     }
 
     @Override
-    public List<NBTopic> findAllTopicsBySource(Context context, String source, long offset, long count) {
+    public List<NBTopic> findAllTopicsBySource(String source, long offset, long count) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setQuery("*:*");
@@ -282,7 +272,7 @@ public class NBEventServiceImpl implements NBEventService {
     }
 
     @Override
-    public NBEvent findEventByEventId(Context context, String eventId) {
+    public NBEvent findEventByEventId(String eventId) {
         SolrQuery param = new SolrQuery(EVENT_ID + ":" + eventId);
         QueryResponse response;
         try {
@@ -316,9 +306,8 @@ public class NBEventServiceImpl implements NBEventService {
     }
 
     @Override
-    public List<NBEvent> findEventsByTopicAndPage(Context context, String topic,
-            long offset, int pageSize,
-            String orderField, boolean ascending) {
+    public List<NBEvent> findEventsByTopicAndPage(String topic, long offset,
+        int pageSize, String orderField, boolean ascending) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setStart(((Long) offset).intValue());
         solrQuery.setRows(pageSize);
@@ -343,7 +332,7 @@ public class NBEventServiceImpl implements NBEventService {
     }
 
     @Override
-    public long countEventsByTopic(Context context, String topic) {
+    public long countEventsByTopic(String topic) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setQuery(TOPIC + ":" + topic.replace("!", "/"));
@@ -384,13 +373,18 @@ public class NBEventServiceImpl implements NBEventService {
 
     @Override
     public NBSource findSource(String sourceName) {
-        SolrQuery solrQuery = new SolrQuery();
+
+        if (!ArrayUtils.contains(getSupportedSources(), sourceName)) {
+            return null;
+        }
+
+        SolrQuery solrQuery = new SolrQuery("*:*");
         solrQuery.setRows(0);
-        solrQuery.setQuery(SOURCE + ":" + sourceName);
+        solrQuery.addFilterQuery(SOURCE + ":" + sourceName);
         solrQuery.setFacet(true);
-        // we would like to get eventually topic that has no longer active nb events
         solrQuery.setFacetMinCount(0);
         solrQuery.addFacetField(SOURCE);
+
         QueryResponse response;
         try {
             response = getSolr().query(solrQuery);
@@ -411,16 +405,23 @@ public class NBEventServiceImpl implements NBEventService {
         NBSource source = new NBSource();
         source.setName(sourceName);
         source.setTotalEvents(0L);
+
         return source;
     }
 
     @Override
-    public List<NBSource> findAllSources(Context context, long offset, int pageSize) {
-        return Arrays.stream(getSupportedSources()).sorted()
+    public List<NBSource> findAllSources(long offset, int pageSize) {
+        return Arrays.stream(getSupportedSources())
             .map((sourceName) -> findSource(sourceName))
+            .sorted(comparing(NBSource::getTotalEvents).reversed())
             .skip(offset)
             .limit(pageSize)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public long countSources() {
+        return getSupportedSources().length;
     }
 
     private String[] getSupportedSources() {

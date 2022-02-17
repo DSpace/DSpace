@@ -26,7 +26,6 @@ public class NBEventsDeleteCascadeConsumer implements Consumer {
     private NBEventService nbEventService;
 
     @Override
-    @SuppressWarnings("unchecked")
     public void initialize() throws Exception {
         nbEventService = new DSpace().getSingletonService(NBEventService.class);
     }
@@ -40,7 +39,7 @@ public class NBEventsDeleteCascadeConsumer implements Consumer {
     public void consume(Context context, Event event) throws Exception {
         if (event.getEventType() == Event.DELETE) {
             if (event.getSubjectType() == Constants.ITEM && event.getSubjectID() != null) {
-                nbEventService.deleteEventsByTargetId(context, event.getSubjectID());
+                nbEventService.deleteEventsByTargetId(event.getSubjectID());
             }
         }
     }

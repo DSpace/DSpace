@@ -66,7 +66,7 @@ public class NBEventRestRepository extends DSpaceRestRepository<NBEventRest, Str
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public NBEventRest findOne(Context context, String id) {
-        NBEvent nbEvent = nbEventService.findEventByEventId(context, id);
+        NBEvent nbEvent = nbEventService.findEventByEventId(id);
         if (nbEvent == null) {
             // HACK check if this request is part of a patch flow
             nbEvent = (NBEvent) requestService.getCurrentRequest().getAttribute("patchedNotificationEvent");
@@ -89,10 +89,9 @@ public class NBEventRestRepository extends DSpaceRestRepository<NBEventRest, Str
         if (pageable.getSort() != null && pageable.getSort().getOrderFor(ORDER_FIELD) != null) {
             ascending = pageable.getSort().getOrderFor(ORDER_FIELD).getDirection() == Direction.ASC;
         }
-        nbEvents = nbEventService.findEventsByTopicAndPage(context, topic,
-                pageable.getOffset(), pageable.getPageSize(),
-                ORDER_FIELD, ascending);
-        count = nbEventService.countEventsByTopic(context, topic);
+        nbEvents = nbEventService.findEventsByTopicAndPage(topic,
+            pageable.getOffset(), pageable.getPageSize(), ORDER_FIELD, ascending);
+        count = nbEventService.countEventsByTopic(topic);
         if (nbEvents == null) {
             return null;
         }
@@ -105,7 +104,7 @@ public class NBEventRestRepository extends DSpaceRestRepository<NBEventRest, Str
         try {
             item = itemService.find(context, UUID.fromString(id));
             EPerson eperson = context.getCurrentUser();
-            nbEventService.deleteEventByEventId(context, id);
+            nbEventService.deleteEventByEventId(id);
             nbEventDao.storeEvent(context, id, eperson, item);
         } catch (SQLException e) {
             throw new RuntimeException("Unable to delete NBEvent " + id, e);
@@ -121,7 +120,7 @@ public class NBEventRestRepository extends DSpaceRestRepository<NBEventRest, Str
     @PreAuthorize("hasAuthority('ADMIN')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model,
             String id, Patch patch) throws SQLException, AuthorizeException {
-        NBEvent nbEvent = nbEventService.findEventByEventId(context, id);
+        NBEvent nbEvent = nbEventService.findEventByEventId(id);
         resourcePatch.patch(context, nbEvent, patch.getOperations());
     }
 

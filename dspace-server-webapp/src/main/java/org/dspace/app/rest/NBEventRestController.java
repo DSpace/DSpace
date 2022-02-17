@@ -80,7 +80,7 @@ public class NBEventRestController {
             @RequestParam(required = true, name = "item") UUID relatedItemUUID)
         throws SQLException, AuthorizeException {
         Context context = ContextUtil.obtainContext(request);
-        NBEvent nbevent = nbEventService.findEventByEventId(context, nbeventId);
+        NBEvent nbevent = nbEventService.findEventByEventId(nbeventId);
         if (nbevent == null) {
             throw new ResourceNotFoundException("No such nb event: " + nbeventId);
         }
@@ -120,7 +120,7 @@ public class NBEventRestController {
             HttpServletResponse response, HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
         Context context = ContextUtil.obtainContext(request);
-        NBEvent nbevent = nbEventService.findEventByEventId(context, nbeventId);
+        NBEvent nbevent = nbEventService.findEventByEventId(nbeventId);
         if (nbevent == null) {
             throw new ResourceNotFoundException("No such nb event: " + nbeventId);
         }
