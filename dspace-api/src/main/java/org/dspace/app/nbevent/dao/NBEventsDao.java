@@ -15,22 +15,48 @@ import org.dspace.content.NBEventProcessed;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
+/**
+ * DAO that handle processed NB Events.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public interface NBEventsDao {
+
     /**
      * Search a page of notification broker events by notification ID.
      * 
-     * @param c
-     * @param eventId
-     * @param start
-     * @param size
-     * @return
-     * @throws SQLException
+     * @param  context      the DSpace context
+     * @param  eventId      the event id
+     * @param  start        the start index
+     * @param  size         the size to be applied
+     * @return              the processed events
+     * @throws SQLException if an SQL error occurs
      */
-    public List<NBEventProcessed> searchByEventId(Context c, String eventId, Integer start, Integer size)
+    public List<NBEventProcessed> searchByEventId(Context context, String eventId, Integer start, Integer size)
         throws SQLException;
 
-    public boolean isEventStored(Context c, String checksum) throws SQLException;
+    /**
+     * Check if an event with the given checksum is already stored.
+     * 
+     * @param  context      the DSpace context
+     * @param  checksum     the checksum to search for
+     * @return              true if the given checksum is related to an already
+     *                      stored event, false otherwise
+     * @throws SQLException if an SQL error occurs
+     */
+    public boolean isEventStored(Context context, String checksum) throws SQLException;
 
-    boolean storeEvent(Context c, String checksum, EPerson eperson, Item item);
+    /**
+     * Store an event related to the given checksum.
+     *
+     * @param  context  the DSpace context
+     * @param  checksum the checksum of the event to be store
+     * @param  eperson  the eperson who handle the event
+     * @param  item     the item related to the event
+     * @return          true if the creation is completed with success, false
+     *                  otherwise
+     */
+    boolean storeEvent(Context context, String checksum, EPerson eperson, Item item);
 
 }

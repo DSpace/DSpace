@@ -35,6 +35,12 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+/**
+ * Rest repository that handle NB events.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 @Component(NBEventRest.CATEGORY + "." + NBEventRest.NAME)
 public class NBEventRestRepository extends DSpaceRestRepository<NBEventRest, String> {
 

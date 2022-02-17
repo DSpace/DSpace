@@ -10,14 +10,21 @@ package org.dspace.app.nbevent;
 import java.sql.SQLException;
 import java.util.Map;
 
-import org.dspace.app.nbevent.service.dto.MessageDto;
-import org.dspace.app.nbevent.service.dto.OpenaireMessageDto;
+import org.dspace.app.nbevent.service.dto.NBMessage;
+import org.dspace.app.nbevent.service.dto.OpenaireMessage;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Implementation of {@link NBAction} that add a specific metadata on the given
+ * item based on the OPENAIRE message type.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class NBMetadataMapAction implements NBAction {
     public static final String DEFAULT = "default";
 
@@ -38,13 +45,13 @@ public class NBMetadataMapAction implements NBAction {
     }
 
     @Override
-    public void applyCorrection(Context context, Item item, Item relatedItem, MessageDto message) {
+    public void applyCorrection(Context context, Item item, Item relatedItem, NBMessage message) {
 
-        if (!(message instanceof OpenaireMessageDto)) {
+        if (!(message instanceof OpenaireMessage)) {
             throw new IllegalArgumentException("Unsupported message type: " + message.getClass());
         }
 
-        OpenaireMessageDto openaireMessage = (OpenaireMessageDto) message;
+        OpenaireMessage openaireMessage = (OpenaireMessage) message;
 
         try {
             String targetMetadata = types.get(openaireMessage.getType());

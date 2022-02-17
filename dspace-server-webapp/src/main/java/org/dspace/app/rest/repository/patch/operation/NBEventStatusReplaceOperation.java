@@ -18,6 +18,12 @@ import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Replace operation related to the {@link NBEvent} status.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 @Component
 public class NBEventStatusReplaceOperation extends PatchOperation<NBEvent> {
     @Autowired

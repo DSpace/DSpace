@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -37,7 +38,6 @@ import org.dspace.app.nbevent.dao.impl.NBEventsDaoImpl;
 import org.dspace.app.nbevent.service.NBEventService;
 import org.dspace.content.Item;
 import org.dspace.content.NBEvent;
-import org.dspace.content.NBSourceName;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
@@ -45,6 +45,12 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Implementation of {@link NBEventService} that use Solr to store events.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class NBEventServiceImpl implements NBEventService {
 
     private static final Logger log = Logger.getLogger(NBEventServiceImpl.class);
@@ -112,7 +118,7 @@ public class NBEventServiceImpl implements NBEventService {
     }
 
     @Override
-    public long countTopicsBySource(Context context, NBSourceName source) {
+    public long countTopicsBySource(Context context, String source) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setQuery("*:*");
@@ -197,7 +203,7 @@ public class NBEventServiceImpl implements NBEventService {
     }
 
     @Override
-    public List<NBTopic> findAllTopicsBySource(Context context, NBSourceName source, long offset, long count) {
+    public List<NBTopic> findAllTopicsBySource(Context context, String source, long offset, long count) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setQuery("*:*");
@@ -239,12 +245,17 @@ public class NBEventServiceImpl implements NBEventService {
     public void store(Context context, NBEvent dto) {
         UpdateRequest updateRequest = new UpdateRequest();
         String topic = dto.getTopic();
+
+        if (!ArrayUtils.contains(getSupportedSources(), dto.getSource())) {
+            throw new IllegalArgumentException("The source of the given event is not supported: " + dto.getSource());
+        }
+
         if (topic != null) {
             String checksum = dto.getEventId();
             try {
                 if (!nbEventsDao.isEventStored(context, checksum)) {
                     SolrInputDocument doc = new SolrInputDocument();
-                    doc.addField(SOURCE, dto.getSource().name());
+                    doc.addField(SOURCE, dto.getSource());
                     doc.addField(EVENT_ID, checksum);
                     doc.addField(ORIGINAL_ID, dto.getOriginalId());
                     doc.addField(TITLE, dto.getTitle());
@@ -291,7 +302,7 @@ public class NBEventServiceImpl implements NBEventService {
 
     private NBEvent getNBEventFromSOLR(SolrDocument doc) {
         NBEvent item = new NBEvent();
-        item.setSource(NBSourceName.valueOf((String) doc.get(SOURCE)));
+        item.setSource((String) doc.get(SOURCE));
         item.setEventId((String) doc.get(EVENT_ID));
         item.setLastUpdate((Date) doc.get(LAST_UPDATE));
         item.setMessage((String) doc.get(MESSAGE));
@@ -372,7 +383,7 @@ public class NBEventServiceImpl implements NBEventService {
     }
 
     @Override
-    public NBSource findSource(NBSourceName sourceName) {
+    public NBSource findSource(String sourceName) {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setQuery(SOURCE + ":" + sourceName);
@@ -385,7 +396,7 @@ public class NBEventServiceImpl implements NBEventService {
             response = getSolr().query(solrQuery);
             FacetField facetField = response.getFacetField(SOURCE);
             for (Count c : facetField.getValues()) {
-                if (c.getName().equalsIgnoreCase(sourceName.name())) {
+                if (c.getName().equalsIgnoreCase(sourceName)) {
                     NBSource source = new NBSource();
                     source.setName(c.getName());
                     source.setTotalEvents(c.getCount());
@@ -398,18 +409,22 @@ public class NBEventServiceImpl implements NBEventService {
         }
 
         NBSource source = new NBSource();
-        source.setName(sourceName.name());
+        source.setName(sourceName);
         source.setTotalEvents(0L);
         return source;
     }
 
     @Override
     public List<NBSource> findAllSources(Context context, long offset, int pageSize) {
-        return Arrays.stream(NBSourceName.values()).sorted()
+        return Arrays.stream(getSupportedSources()).sorted()
             .map((sourceName) -> findSource(sourceName))
             .skip(offset)
             .limit(pageSize)
             .collect(Collectors.toList());
+    }
+
+    private String[] getSupportedSources() {
+        return configurationService.getArrayProperty("nbevent.sources", new String[] { NBEvent.OPENAIRE_SOURCE });
     }
 
 }

@@ -42,6 +42,12 @@ import org.dspace.content.NBEvent;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
+/**
+ * Integration tests for {@link NBEventRestRepository}.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class NBEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test

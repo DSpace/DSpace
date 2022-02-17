@@ -13,7 +13,6 @@ import org.dspace.app.nbevent.NBTopic;
 import org.dspace.app.nbevent.service.NBEventService;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.model.NBTopicRest;
-import org.dspace.content.NBSourceName;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +20,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+/**
+ * Rest repository that handle NB topics.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 @Component(NBTopicRest.CATEGORY + "." + NBTopicRest.NAME)
 public class NBTopicRestRepository extends DSpaceRestRepository<NBTopicRest, String> {
 
@@ -51,9 +56,9 @@ public class NBTopicRestRepository extends DSpaceRestRepository<NBTopicRest, Str
     @SearchRestMethod(name = "bySource")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<NBTopicRest> findBySource(Context context, String source, Pageable pageable) {
-        List<NBTopic> nbTopics = nbEventService.findAllTopicsBySource(context, NBSourceName.valueOf(source),
+        List<NBTopic> nbTopics = nbEventService.findAllTopicsBySource(context, String.valueOf(source),
             pageable.getOffset(), pageable.getPageSize());
-        long count = nbEventService.countTopicsBySource(context, NBSourceName.valueOf(source));
+        long count = nbEventService.countTopicsBySource(context, String.valueOf(source));
         if (nbTopics == null) {
             return null;
         }

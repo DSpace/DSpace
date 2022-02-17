@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.matcher.NBTopicMatcher;
+import org.dspace.app.rest.repository.NBTopicRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -23,6 +24,12 @@ import org.dspace.content.NBEvent;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
+/**
+ * Integration tests for {@link NBTopicRestRepository}.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class NBTopicRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test

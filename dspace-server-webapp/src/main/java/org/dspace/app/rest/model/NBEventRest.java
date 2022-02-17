@@ -11,6 +11,12 @@ import java.util.Date;
 
 import org.dspace.app.rest.RestResourceController;
 
+/**
+ * NB event Rest object.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 @LinksRest(
         links = {
                 @LinkRest(name = "topic", method = "getTopic"),

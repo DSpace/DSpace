@@ -7,6 +7,12 @@
  */
 package org.dspace.app.rest.model;
 
+/**
+ * Interface for classes that model a message with the details of a NB event.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public interface NBEventMessageRest {
 
 }

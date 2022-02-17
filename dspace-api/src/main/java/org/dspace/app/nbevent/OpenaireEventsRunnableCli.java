@@ -15,13 +15,19 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
 import org.dspace.utils.DSpace;
 
-public class NBEventsRunnableCli extends NBEventsRunnable {
+/**
+ * Extensions of {@link OpenaireEventsRunnable} to run the script on console.
+ *
+ * @author Alessandro Martelli (alessandro.martelli at 4science.it)
+ *
+ */
+public class OpenaireEventsRunnableCli extends OpenaireEventsRunnable {
 
     @Override
     @SuppressWarnings({ "rawtypes" })
-    public NBEventsCliScriptConfiguration getScriptConfiguration() {
-        NBEventsCliScriptConfiguration configuration = new DSpace().getServiceManager()
-                .getServiceByName("import-nbevents", NBEventsCliScriptConfiguration.class);
+    public OpenaireEventsCliScriptConfiguration getScriptConfiguration() {
+        OpenaireEventsCliScriptConfiguration configuration = new DSpace().getServiceManager()
+                .getServiceByName("import-openaire-events", OpenaireEventsCliScriptConfiguration.class);
         return configuration;
     }
 

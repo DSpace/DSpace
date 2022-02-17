@@ -7,7 +7,15 @@
  */
 package org.dspace.app.nbevent.service.dto;
 
-public interface MessageDto {
+import org.dspace.content.NBEvent;
+
+/**
+ * Interface for classes that contains the details related to a {@link NBEvent}.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
+public interface NBMessage {
 
 
 }

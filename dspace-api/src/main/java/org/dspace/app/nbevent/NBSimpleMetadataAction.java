@@ -9,14 +9,21 @@ package org.dspace.app.nbevent;
 
 import java.sql.SQLException;
 
-import org.dspace.app.nbevent.service.dto.MessageDto;
-import org.dspace.app.nbevent.service.dto.OpenaireMessageDto;
+import org.dspace.app.nbevent.service.dto.NBMessage;
+import org.dspace.app.nbevent.service.dto.OpenaireMessage;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Implementation of {@link NBAction} that add a simple metadata to the given
+ * item.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class NBSimpleMetadataAction implements NBAction {
     private String metadata;
     private String metadataSchema;
@@ -44,10 +51,10 @@ public class NBSimpleMetadataAction implements NBAction {
     }
 
     @Override
-    public void applyCorrection(Context context, Item item, Item relatedItem, MessageDto message) {
+    public void applyCorrection(Context context, Item item, Item relatedItem, NBMessage message) {
         try {
             itemService.addMetadata(context, item, metadataSchema, metadataElement, metadataQualifier, null,
-                ((OpenaireMessageDto) message).getAbstracts());
+                ((OpenaireMessage) message).getAbstracts());
             itemService.update(context, item);
         } catch (SQLException | AuthorizeException e) {
             throw new RuntimeException(e);

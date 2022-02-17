@@ -9,6 +9,12 @@ package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Implementation of {@link NBEventMessageRest} related to OPENAIRE events.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class OpenaireNBEventMessageRest implements NBEventMessageRest {
     // pids
     private String type;

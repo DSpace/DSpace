@@ -19,6 +19,13 @@ import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
+/**
+ * Implementation of {@link NBEventsDao} that store processed events using an
+ * SQL DBMS.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class NBEventsDaoImpl extends AbstractHibernateDAO<NBEventProcessed> implements NBEventsDao {
 
     @Override

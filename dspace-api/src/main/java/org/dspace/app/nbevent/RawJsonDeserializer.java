@@ -16,6 +16,12 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Extension of {@link JsonDeserializer} that convert a json to a String.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class RawJsonDeserializer extends JsonDeserializer<String> {
 
     @Override

@@ -25,8 +25,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.nbevent.service.NBEventService;
-import org.dspace.app.nbevent.service.dto.MessageDto;
-import org.dspace.app.nbevent.service.dto.OpenaireMessageDto;
 import org.dspace.content.Item;
 import org.dspace.content.NBEvent;
 import org.dspace.content.service.ItemService;
@@ -34,6 +32,12 @@ import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Implementation of {@link NBEventActionService}.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class NBEventActionServiceImpl implements NBEventActionService {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(NBEventActionServiceImpl.class);
 
@@ -73,20 +77,11 @@ public class NBEventActionServiceImpl implements NBEventActionService {
                 related = itemService.find(context, UUID.fromString(nbevent.getRelated()));
             }
             topicsToActions.get(nbevent.getTopic()).applyCorrection(context, item, related,
-                jsonMapper.readValue(nbevent.getMessage(), getMessageDtoClass(nbevent)));
+                jsonMapper.readValue(nbevent.getMessage(), nbevent.getMessageDtoClass()));
             nbEventService.deleteEventByEventId(context, nbevent.getEventId());
             makeAcknowledgement(nbevent.getEventId(), NBEvent.ACCEPTED);
         } catch (SQLException | JsonProcessingException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private Class<? extends MessageDto> getMessageDtoClass(NBEvent modelObject) {
-        switch (modelObject.getSource()) {
-            case OPENAIRE:
-                return OpenaireMessageDto.class;
-            default:
-                throw new IllegalArgumentException("Unknown event's source: " + modelObject.getSource());
         }
     }
 

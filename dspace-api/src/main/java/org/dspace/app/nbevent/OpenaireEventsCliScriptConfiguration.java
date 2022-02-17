@@ -9,7 +9,15 @@ package org.dspace.app.nbevent;
 
 import org.apache.commons.cli.Options;
 
-public class NBEventsCliScriptConfiguration<T extends NBEventsRunnable> extends NBEventsScriptConfiguration<T> {
+/**
+ * Extension of {@link OpenaireEventsScriptConfiguration} to run the script on
+ * console.
+ *
+ * @author Alessandro Martelli (alessandro.martelli at 4science.it)
+ *
+ */
+public class OpenaireEventsCliScriptConfiguration<T extends OpenaireEventsRunnable>
+    extends OpenaireEventsScriptConfiguration<T> {
 
     @Override
     public Options getOptions() {

@@ -7,10 +7,25 @@
  */
 package org.dspace.app.nbevent;
 
-import org.dspace.app.nbevent.service.dto.MessageDto;
+import org.dspace.app.nbevent.service.dto.NBMessage;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
+/**
+ * Interface for classes that perform a correction on the given item.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public interface NBAction {
-    public void applyCorrection(Context context, Item item, Item relatedItem, MessageDto message);
+
+    /**
+     * Perform a correction on the given item.
+     *
+     * @param context     the DSpace context
+     * @param item        the item to correct
+     * @param relatedItem the related item, if any
+     * @param message     the message with the correction details
+     */
+    public void applyCorrection(Context context, Item item, Item relatedItem, NBMessage message);
 }

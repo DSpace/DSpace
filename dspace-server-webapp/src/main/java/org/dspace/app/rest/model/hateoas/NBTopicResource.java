@@ -11,6 +11,12 @@ import org.dspace.app.rest.model.NBTopicRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
+/**
+ * NB topic Rest resource.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 @RelNameDSpaceResource(NBTopicRest.NAME)
 public class NBTopicResource extends DSpaceResource<NBTopicRest> {
 

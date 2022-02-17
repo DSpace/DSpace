@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.nbevent.service.dto.MessageDto;
-import org.dspace.app.nbevent.service.dto.OpenaireMessageDto;
+import org.dspace.app.nbevent.service.dto.NBMessage;
+import org.dspace.app.nbevent.service.dto.OpenaireMessage;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.EntityType;
@@ -30,6 +30,13 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Implementation of {@link NBAction} that handle the relationship between the
+ * item to correct and a related item.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class NBEntityMetadataAction implements NBAction {
     private String relation;
     private String entityType;
@@ -96,7 +103,7 @@ public class NBEntityMetadataAction implements NBAction {
     }
 
     @Override
-    public void applyCorrection(Context context, Item item, Item relatedItem, MessageDto message) {
+    public void applyCorrection(Context context, Item item, Item relatedItem, NBMessage message) {
         try {
             if (relatedItem != null) {
                 link(context, item, relatedItem);
@@ -141,12 +148,12 @@ public class NBEntityMetadataAction implements NBAction {
         relationshipService.update(context, persistedRelationship);
     }
 
-    private String getValue(MessageDto message, String key) {
-        if (!(message instanceof OpenaireMessageDto)) {
+    private String getValue(NBMessage message, String key) {
+        if (!(message instanceof OpenaireMessage)) {
             return null;
         }
 
-        OpenaireMessageDto openaireMessage = (OpenaireMessageDto) message;
+        OpenaireMessage openaireMessage = (OpenaireMessage) message;
 
         if (StringUtils.equals(key, "acronym")) {
             return openaireMessage.getAcronym();

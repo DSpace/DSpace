@@ -11,6 +11,12 @@ import org.dspace.app.rest.model.NBEventRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
+/**
+ * NB event Rest resource.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 @RelNameDSpaceResource(NBEventRest.NAME)
 public class NBEventResource extends DSpaceResource<NBEventRest> {
 

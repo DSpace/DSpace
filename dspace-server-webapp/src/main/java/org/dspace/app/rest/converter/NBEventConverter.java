@@ -13,8 +13,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import org.dspace.app.nbevent.service.dto.MessageDto;
-import org.dspace.app.nbevent.service.dto.OpenaireMessageDto;
+import org.dspace.app.nbevent.service.dto.NBMessage;
+import org.dspace.app.nbevent.service.dto.OpenaireMessage;
 import org.dspace.app.rest.model.NBEventMessageRest;
 import org.dspace.app.rest.model.NBEventRest;
 import org.dspace.app.rest.model.OpenaireNBEventMessageRest;
@@ -22,6 +22,13 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.NBEvent;
 import org.springframework.stereotype.Component;
 
+/**
+ * Implementation of {@link DSpaceConverter} that converts {@link NBEvent} to
+ * {@link NBEventRest}.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 @Component
 public class NBEventConverter implements DSpaceConverter<NBEvent, NBEventRest> {
 
@@ -39,7 +46,7 @@ public class NBEventConverter implements DSpaceConverter<NBEvent, NBEventRest> {
         rest.setId(modelObject.getEventId());
         try {
             rest.setMessage(convertMessage(jsonMapper.readValue(modelObject.getMessage(),
-                getMessageDtoClass(modelObject))));
+                modelObject.getMessageDtoClass())));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -54,18 +61,9 @@ public class NBEventConverter implements DSpaceConverter<NBEvent, NBEventRest> {
         return rest;
     }
 
-    private Class<? extends MessageDto> getMessageDtoClass(NBEvent modelObject) {
-        switch (modelObject.getSource()) {
-            case OPENAIRE:
-                return OpenaireMessageDto.class;
-            default:
-                throw new IllegalArgumentException("Unknown event's source: " + modelObject.getSource());
-        }
-    }
-
-    private NBEventMessageRest convertMessage(MessageDto dto) {
-        if (dto instanceof OpenaireMessageDto) {
-            OpenaireMessageDto openaireDto = (OpenaireMessageDto) dto;
+    private NBEventMessageRest convertMessage(NBMessage dto) {
+        if (dto instanceof OpenaireMessage) {
+            OpenaireMessage openaireDto = (OpenaireMessage) dto;
             OpenaireNBEventMessageRest message = new OpenaireNBEventMessageRest();
             message.setAbstractValue(openaireDto.getAbstracts());
             message.setOpenaireId(openaireDto.getOpenaireId());

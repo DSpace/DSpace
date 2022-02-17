@@ -16,7 +16,14 @@ import org.dspace.core.Context;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class NBEventsScriptConfiguration<T extends NBEventsRunnable> extends ScriptConfiguration<T> {
+/**
+ * Extension of {@link ScriptConfiguration} to perfom a NBEvents import from
+ * file.
+ *
+ * @author Alessandro Martelli (alessandro.martelli at 4science.it)
+ *
+ */
+public class OpenaireEventsScriptConfiguration<T extends OpenaireEventsRunnable> extends ScriptConfiguration<T> {
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -30,7 +37,7 @@ public class NBEventsScriptConfiguration<T extends NBEventsRunnable> extends Scr
 
     /**
      * Generic setter for the dspaceRunnableClass
-     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this NBEventsScriptConfiguration
+     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this OpenaireEventsScriptConfiguration
      */
     @Override
     public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {

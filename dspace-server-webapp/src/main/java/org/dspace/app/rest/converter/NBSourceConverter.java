@@ -12,6 +12,13 @@ import org.dspace.app.rest.model.NBSourceRest;
 import org.dspace.app.rest.projection.Projection;
 import org.springframework.stereotype.Component;
 
+/**
+ * Implementation of {@link DSpaceConverter} that converts {@link NBSource} to
+ * {@link NBSourceRest}.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 @Component
 public class NBSourceConverter implements DSpaceConverter<NBSource, NBSourceRest> {
 

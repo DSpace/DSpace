@@ -11,8 +11,15 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
+import org.dspace.app.rest.model.hateoas.NBTopicResource;
 import org.hamcrest.Matcher;
 
+/**
+ * Matcher related to {@link NBTopicResource}.
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class NBTopicMatcher {
 
     private NBTopicMatcher() { }

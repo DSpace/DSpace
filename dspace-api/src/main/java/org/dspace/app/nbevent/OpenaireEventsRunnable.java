@@ -21,7 +21,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.nbevent.service.NBEventService;
 import org.dspace.content.NBEvent;
-import org.dspace.content.NBSourceName;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -37,9 +36,9 @@ import org.slf4j.LoggerFactory;
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  *
  */
-public class NBEventsRunnable extends DSpaceRunnable<NBEventsScriptConfiguration<NBEventsRunnable>> {
+public class OpenaireEventsRunnable extends DSpaceRunnable<OpenaireEventsScriptConfiguration<OpenaireEventsRunnable>> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NBEventsRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenaireEventsRunnable.class);
 
     protected NBEventService nbEventService;
 
@@ -55,9 +54,9 @@ public class NBEventsRunnable extends DSpaceRunnable<NBEventsScriptConfiguration
 
     @Override
     @SuppressWarnings({ "rawtypes" })
-    public NBEventsScriptConfiguration getScriptConfiguration() {
-        NBEventsScriptConfiguration configuration = new DSpace().getServiceManager()
-                .getServiceByName("import-nbevents", NBEventsScriptConfiguration.class);
+    public OpenaireEventsScriptConfiguration getScriptConfiguration() {
+        OpenaireEventsScriptConfiguration configuration = new DSpace().getServiceManager()
+                .getServiceByName("import-openaire-events", OpenaireEventsScriptConfiguration.class);
         return configuration;
     }
 
@@ -103,7 +102,7 @@ public class NBEventsRunnable extends DSpaceRunnable<NBEventsScriptConfiguration
         }
 
         for (NBEvent entry : entries) {
-            entry.setSource(NBSourceName.OPENAIRE);
+            entry.setSource(NBEvent.OPENAIRE_SOURCE);
             if (!StringUtils.equalsAny(entry.getTopic(), topicsToImport)) {
                 LOGGER.info("Skip event for topic " + entry.getTopic() + " is not allowed in the oaire-nbevents.cfg");
                 continue;

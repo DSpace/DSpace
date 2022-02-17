@@ -14,6 +14,8 @@ import java.util.Date;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.dspace.app.nbevent.RawJsonDeserializer;
+import org.dspace.app.nbevent.service.dto.NBMessage;
+import org.dspace.app.nbevent.service.dto.OpenaireMessage;
 
 /**
  * This class represent the notification broker data as loaded in our solr
@@ -27,7 +29,9 @@ public class NBEvent {
     public static final String REJECTED = "rejected";
     public static final String DISCARDED = "discarded";
 
-    private NBSourceName source;
+    public static final String OPENAIRE_SOURCE = "openaire";
+
+    private String source;
 
     private String eventId;
 
@@ -53,7 +57,7 @@ public class NBEvent {
     public NBEvent() {
     }
 
-    public NBEvent(NBSourceName source, String originalId, String target, String title,
+    public NBEvent(String source, String originalId, String target, String title,
         String topic, double trust, String message, Date lastUpdate) {
         super();
         this.source = source;
@@ -159,11 +163,11 @@ public class NBEvent {
         return status;
     }
 
-    public NBSourceName getSource() {
-        return source != null ? source : NBSourceName.OPENAIRE;
+    public String getSource() {
+        return source != null ? source : OPENAIRE_SOURCE;
     }
 
-    public void setSource(NBSourceName source) {
+    public void setSource(String source) {
         this.source = source;
     }
 
@@ -186,6 +190,15 @@ public class NBEvent {
         }
         eventId = new String(arr);
 
+    }
+
+    public Class<? extends NBMessage> getMessageDtoClass() {
+        switch (getSource()) {
+            case OPENAIRE_SOURCE:
+                return OpenaireMessage.class;
+            default:
+                throw new IllegalArgumentException("Unknown event's source: " + getSource());
+        }
     }
 
 }
