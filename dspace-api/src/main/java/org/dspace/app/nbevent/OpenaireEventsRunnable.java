@@ -7,6 +7,8 @@
  */
 package org.dspace.app.nbevent;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -96,8 +98,7 @@ public class OpenaireEventsRunnable extends DSpaceRunnable<OpenaireEventsScriptC
             this.entries = jsonMapper.readValue(getNBEventsInputStream(), new TypeReference<List<NBEvent>>() {
             });
         } catch (IOException e) {
-            LOGGER.error("File is not found or not readable: " + fileLocation);
-            e.printStackTrace();
+            LOGGER.error("File is not found or not readable: " + fileLocation, e);
             System.exit(1);
         }
 
@@ -110,7 +111,7 @@ public class OpenaireEventsRunnable extends DSpaceRunnable<OpenaireEventsScriptC
             try {
                 nbEventService.store(context, entry);
             } catch (RuntimeException e) {
-                System.out.println("Skip event for originalId " + entry.getOriginalId() + ": " + e.getMessage());
+                handler.logWarning(getRootCauseMessage(e));
             }
         }
 

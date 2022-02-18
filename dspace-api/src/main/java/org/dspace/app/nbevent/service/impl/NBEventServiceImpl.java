@@ -256,9 +256,8 @@ public class NBEventServiceImpl implements NBEventService {
                     doc.addField(LAST_UPDATE, new Date());
                     final String resourceUUID = getResourceUUID(context, dto.getOriginalId());
                     if (resourceUUID == null) {
-                        log.warn("Skipped event " + checksum + " related to the oai record " + dto.getOriginalId()
-                                + " as the record was not found");
-                        return;
+                        throw new IllegalArgumentException("Skipped event " + checksum +
+                            " related to the oai record " + dto.getOriginalId() + " as the record was not found");
                     }
                     doc.addField(RESOURCE_UUID, resourceUUID);
                     doc.addField(RELATED_UUID, dto.getRelated());
@@ -358,7 +357,7 @@ public class NBEventServiceImpl implements NBEventService {
                 return null;
             }
         } else {
-            throw new RuntimeException("Malformed originalId " + originalId);
+            throw new IllegalArgumentException("Malformed originalId " + originalId);
         }
     }
 

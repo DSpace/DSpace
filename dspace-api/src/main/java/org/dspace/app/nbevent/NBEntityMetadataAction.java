@@ -108,12 +108,15 @@ public class NBEntityMetadataAction implements NBAction {
             if (relatedItem != null) {
                 link(context, item, relatedItem);
             } else {
+
                 Collection collection = collectionService.retrieveCollectionByEntityType(context, item, entityType);
+                if (collection == null) {
+                    throw new IllegalStateException("No collection found by entity type: " + collection);
+                }
+
                 WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
                 relatedItem = workspaceItem.getItem();
-                if (StringUtils.isNotBlank(entityType)) {
-                    itemService.addMetadata(context, relatedItem, "dspace", "entity", "type", null, entityType);
-                }
+
                 for (String key : entityMetadata.keySet()) {
                     String value = getValue(message, key);
                     if (StringUtils.isNotBlank(value)) {
