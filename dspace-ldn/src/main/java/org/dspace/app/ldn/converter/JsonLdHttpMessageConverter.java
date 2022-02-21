@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.jsonldjava.utils.JsonUtils;
-
 import org.dspace.app.ldn.model.Notification;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;

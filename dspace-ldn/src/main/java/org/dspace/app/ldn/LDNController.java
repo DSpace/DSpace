@@ -42,7 +42,7 @@ public class LDNController {
 
     @PostMapping(value = "/inbox", consumes = "application/ld+json", produces = "application/ld+json")
     @ResponseStatus(value = CREATED)
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@LDNAuthorize.isAllowed()")
     public Notification inbox(@RequestBody Notification notification) throws ResourceNotFoundException {
         Context context = ContextUtil.obtainCurrentRequestContext();
 
