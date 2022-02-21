@@ -9,13 +9,7 @@ package org.dspace.app.ldn.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Object extends Base {
 
@@ -27,5 +21,33 @@ public class Object extends Base {
 
     @JsonProperty("url")
     private Url url;
+
+    public Object() {
+        super();
+    }
+
+    public String getIetfCiteAs() {
+        return ietfCiteAs;
+    }
+
+    public void setIetfCiteAs(String ietfCiteAs) {
+        this.ietfCiteAs = ietfCiteAs;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Url getUrl() {
+        return url;
+    }
+
+    public void setUrl(Url url) {
+        this.url = url;
+    }
 
 }

@@ -22,4 +22,8 @@ public final class LDNMetadataFields {
     public static final String REVIEW = "review";
     public static final String ENDORSMENT = "endorsement";
 
+    private LDNMetadataFields() {
+
+    }
+
 }

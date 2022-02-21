@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The contents of this file are subject to the license and copyright detailed 
+    in the LICENSE and NOTICE files at the root of the source tree and available 
+    online at http://www.dspace.org/license/ -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+    default-autowire-candidates="*">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+    <bean name="ldnRouter" class="org.dspace.app.ldn.LDNRouter">
+        <property name="processors">
+            <map key-type="java.util.Set" value-type="org.dspace.app.ldn.LDNProcessor">
+                <entry>
+                    <key>
+                        <set>
+                            <value>Announce</value>
+                            <value>coar-notify:ReviewAction</value>
+                        </set>
+                    </key>
+                    <ref bean="announceReviewAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Announce</value>
+                            <value>coar-notify:EndorsementAction</value>
+                        </set>
+                    </key>
+                    <ref bean="announceEndorsementAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Accept</value>
+                            <value>coar-notify:ReviewAction</value>
+                        </set>
+                    </key>
+                    <ref bean="acceptReviewAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Reject</value>
+                            <value>coar-notify:ReviewAction</value>
+                        </set>
+                    </key>
+                    <ref bean="rejectReviewAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Announce</value>
+                            <value>coar-notify:ReleaseAction</value>
+                        </set>
+                    </key>
+                    <ref bean="announceReleaseAction" />
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="announceReviewAction" class="org.dspace.app.ldn.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.LDNAction">
+                <bean name="sendEmail" class="org.dspace.app.ldn.LDNEmailAction">
+                    
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="announceEndorsementAction" class="org.dspace.app.ldn.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.LDNAction">
+                <bean name="sendEmail" class="org.dspace.app.ldn.LDNEmailAction">
+                    
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="acceptReviewAction" class="org.dspace.app.ldn.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.LDNAction">
+                <bean name="sendEmail" class="org.dspace.app.ldn.LDNEmailAction">
+                    
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="rejectReviewAction" class="org.dspace.app.ldn.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.LDNAction">
+                <bean name="sendEmail" class="org.dspace.app.ldn.LDNEmailAction">
+                    
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="announceReleaseAction" class="org.dspace.app.ldn.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.LDNAction">
+                <bean name="sendEmail" class="org.dspace.app.ldn.LDNEmailAction">
+                    
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+</beans>

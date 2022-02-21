@@ -12,14 +12,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
 @JsonInclude(Include.NON_NULL)
-@EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(value = {
     "@context",
@@ -57,5 +51,65 @@ public class Notification extends Base {
 
     @JsonProperty("inReplyTo")
     private String inReplyTo;
+
+    public Notification() {
+        super();
+    }
+
+    public String[] getC() {
+        return c;
+    }
+
+    public void setC(String[] c) {
+        this.c = c;
+    }
+
+    public Actor getActor() {
+        return actor;
+    }
+
+    public void setActor(Actor actor) {
+        this.actor = actor;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
+    public Object getObject() {
+        return object;
+    }
+
+    public void setObject(Object object) {
+        this.object = object;
+    }
+
+    public Service getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(Service origin) {
+        this.origin = origin;
+    }
+
+    public Service getTarget() {
+        return target;
+    }
+
+    public void setTarget(Service target) {
+        this.target = target;
+    }
+
+    public String getInReplyTo() {
+        return inReplyTo;
+    }
+
+    public void setInReplyTo(String inReplyTo) {
+        this.inReplyTo = inReplyTo;
+    }
 
 }
