@@ -1,0 +1,78 @@
+<dspace-dc-types>
+
+	<dspace-header>
+		<title>Coar Notify Configuration</title>
+		<contributor.author>Andrea Bollini</contributor.author>
+		<contributor.author>Luigi Andrea Pascarelli</contributor.author>
+		<contributor.author>Stefano Maffei</contributor.author>
+	</dspace-header>
+
+	<dc-schema>
+		<name>coar</name>
+		<namespace>http://dspace.org/coar</namespace>
+	</dc-schema>
+
+	<dc-type>
+		<schema>coar</schema>
+		<element>notify</element>
+		<qualifier>initialize</qualifier>
+		<scope_note>
+			Used to record the services to whom the repository needs to ask the review.
+		</scope_note>
+	</dc-type>
+
+	<dc-type>
+		<schema>coar</schema>
+		<element>notify</element>
+		<qualifier>requestreview</qualifier>
+		<scope_note>
+			Used to record the request sent to the service for review - Item goes in the pending review state.
+		</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>coar</schema>
+		<element>notify</element>
+		<qualifier>requestendorsement</qualifier>
+		<scope_note>
+			Used to record the request sent to the service for review - Item goes in the pending endorsement state.
+		</scope_note>
+	</dc-type>
+
+	<dc-type>
+		<schema>coar</schema>
+		<element>notify</element>
+		<qualifier>examination</qualifier>
+		<scope_note>
+			Used to record the acceptance of the request to make a review - Item goes in the ongoing state.
+		</scope_note>
+	</dc-type>
+
+	<dc-type>
+		<schema>coar</schema>
+		<element>notify</element>
+		<qualifier>refused</qualifier>
+		<scope_note>
+			Used to record the rejection of the request to make a review.
+		</scope_note>
+	</dc-type>
+
+	<dc-type>
+		<schema>coar</schema>
+		<element>notify</element>
+		<qualifier>review</qualifier>
+		<scope_note>
+			Used to record a received review. - Item goes in the reviewed state.
+		</scope_note>
+	</dc-type>
+
+	<dc-type>
+		<schema>coar</schema>
+		<element>notify</element>
+		<qualifier>endorsement</qualifier>
+		<scope_note>
+			Used to record a received endorsement. - Item goes in the endorsed stae.
+		</scope_note>
+	</dc-type>
+
+</dspace-dc-types>
