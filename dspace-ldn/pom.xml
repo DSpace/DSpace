@@ -58,6 +58,12 @@
             <version>${spring-boot.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-engine-core</artifactId>
+            <version>2.2</version>
+        </dependency>
+
         <!-- Internal -->
         <dependency>
             <groupId>org.dspace</groupId>

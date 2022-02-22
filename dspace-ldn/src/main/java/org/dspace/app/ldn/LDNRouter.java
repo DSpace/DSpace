@@ -16,7 +16,9 @@ import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.dspace.app.ldn.action.LDNAction;
 import org.dspace.app.ldn.model.Notification;
+import org.dspace.app.ldn.processor.LDNProcessor;
 
 @Aspect
 public class LDNRouter {

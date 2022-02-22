@@ -5,18 +5,12 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.ldn;
-
-import java.util.List;
+package org.dspace.app.ldn.action;
 
 import org.dspace.app.ldn.model.Notification;
 
-public interface LDNProcessor {
+public interface LDNAction {
 
-    public List<LDNAction> getActions();
-
-    public void setActions(List<LDNAction> actions);
-
-    public void process(Notification notification);
+    public boolean execute(Notification notification) throws Exception;
 
 }

@@ -17,6 +17,10 @@ public class LDNUtils {
         "\\p{XDigit}{8}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{12}"
     );
 
+    private LDNUtils() {
+
+    }
+
     public static UUID getUUIDFromURL(String url) {
         Matcher matcher = UUID_REGEX_PATTERN.matcher(url);
         StringBuilder handle = new StringBuilder();
@@ -24,6 +28,10 @@ public class LDNUtils {
             handle.append(matcher.group(0));
         }
         return UUID.fromString(handle.toString());
+    }
+
+    public static String removedProtocol(String url) {
+        return url.replaceFirst("^(http[s]?://www\\.|http[s]?://|www\\.)", "");
     }
 
 }

@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.ldn;
+package org.dspace.app.ldn.action;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,10 +13,10 @@ import org.dspace.app.ldn.model.Notification;
 
 public class LDNEmailAction implements LDNAction {
 
-    private static final Logger log = LogManager.getLogger(LDNProcessor.class);
+    private static final Logger log = LogManager.getLogger(LDNEmailAction.class);
 
     @Override
-    public boolean execute(Notification notification) {
+    public boolean execute(Notification notification) throws Exception {
         log.info("Email action");
         return true;
     }
