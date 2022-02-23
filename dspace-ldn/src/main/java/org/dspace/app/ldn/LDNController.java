@@ -9,8 +9,6 @@ package org.dspace.app.ldn;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.processor.LDNProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,15 +29,10 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty("ldn.enabled")
 public class LDNController {
 
-    private static final Logger log = LogManager.getLogger(LDNController.class);
-
     @ResponseStatus(value = CREATED)
-    @PreAuthorize("@LDNAuthorize.isAllowed()")
+    // @PreAuthorize("@LDNAuthorize.isAllowed()")
     @PostMapping(value = "/inbox", consumes = "application/ld+json", produces = "application/ld+json")
     public Notification inbox(@RequestBody Notification notification, LDNProcessor processor) throws Exception {
-
-        log.info("LDN processor: {}", processor);
-
         processor.process(notification);
 
         return notification;

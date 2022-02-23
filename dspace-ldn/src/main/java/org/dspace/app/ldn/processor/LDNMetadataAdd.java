@@ -13,10 +13,6 @@ public class LDNMetadataAdd extends LDNMetadataChange {
 
     private String valueTemplate;
 
-    public LDNMetadataAdd() {
-        setConditionTemplate("true");
-    }
-
     public String getQualifier() {
         return qualifier;
     }

@@ -40,7 +40,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 public class LDNMetadataProcessor implements LDNProcessor {
 
-    private final static Logger log = LogManager.getLogger(LDNProcessor.class);
+    private final static Logger log = LogManager.getLogger(LDNMetadataProcessor.class);
 
     private final static String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
@@ -59,8 +59,6 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
     private List<LDNMetadataChange> changes = new ArrayList<>();
 
-    private String idTemplate = "${notification.context.id}";
-
     private LDNMetadataProcessor() {
         velocityEngine = new VelocityEngine();
         velocityEngine.setProperty(Velocity.RESOURCE_LOADERS, "string");
@@ -70,14 +68,12 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
     @Override
     public void process(Notification notification) throws Exception {
-        log.info("Processing notification {} [{}]", String.join(",", notification.getType()), notification.getId());
+        log.info("Processing notification {} {}", notification.getId(), notification.getType());
         Context context = ContextUtil.obtainCurrentRequestContext();
 
         VelocityContext velocityContext = prepareTemplateContext(notification);
 
-        String id = renderTemplate(velocityContext, idTemplate);
-
-        UUID uuid = LDNUtils.getUUIDFromURL(id);
+        UUID uuid = LDNUtils.getUUIDFromURL(notification.getContext().getId());
 
         Item item = itemService.find(context, uuid);
 
@@ -159,10 +155,12 @@ public class LDNMetadataProcessor implements LDNProcessor {
         }
 
         context.turnOffAuthorisationSystem();
-        itemService.update(context, item);
-        context.commit();
-        context.restoreAuthSystemState();
-
+        try {
+            itemService.update(context, item);
+            context.commit();
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 
     @Override
@@ -181,14 +179,6 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
     public void setChanges(List<LDNMetadataChange> changes) {
         this.changes = changes;
-    }
-
-    public String getIdTemplate() {
-        return idTemplate;
-    }
-
-    public void setIdTemplate(String idTemplate) {
-        this.idTemplate = idTemplate;
     }
 
     private VelocityContext prepareTemplateContext(Notification notification) {

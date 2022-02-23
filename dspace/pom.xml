@@ -211,6 +211,11 @@
                 </dependency>
                 <dependency>
                     <groupId>org.dspace</groupId>
+                    <artifactId>dspace-ldn</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
                     <artifactId>dspace-services</artifactId>
                     <scope>compile</scope>
                 </dependency>
@@ -246,6 +251,11 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
     	</dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-ldn</artifactId>
+        </dependency>
 
         <!-- The Servlet API is also needed by the 'dspace oai' launcher.xml
              command. -->

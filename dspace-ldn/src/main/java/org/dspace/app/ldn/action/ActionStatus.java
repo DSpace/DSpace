@@ -7,10 +7,6 @@
  */
 package org.dspace.app.ldn.action;
 
-import org.dspace.app.ldn.model.Notification;
-
-public interface LDNAction {
-
-    public ActionStatus execute(Notification notification) throws Exception;
-
+public enum ActionStatus {
+    CONTINUE, ABORT;
 }

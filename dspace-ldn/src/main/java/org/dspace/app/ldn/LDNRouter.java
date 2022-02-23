@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.dspace.app.ldn.action.ActionStatus;
 import org.dspace.app.ldn.action.LDNAction;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.processor.LDNProcessor;
@@ -28,17 +29,31 @@ public class LDNRouter {
     private Map<Set<String>, LDNProcessor> processors = new HashMap<>();
 
     @Around("execution(* org.dspace.app.ldn.LDNController.inbox(..)) && args(notification, ..)")
-    public Object logAroundGetEmployee(ProceedingJoinPoint joinPoint, Notification notification) throws Throwable {
-        log.info("Processors {}", processors);
-
-        log.info("Process notification {} {}", notification.getType(), notification.getId());
-
+    public Object routeNotification(ProceedingJoinPoint joinPoint, Notification notification) throws Throwable {
         LDNProcessor processor = processors.get(notification.getType());
+
+        log.info(
+            "Routed notification {} {} to {}",
+            notification.getId(),
+            notification.getType(),
+            processor.getClass().getSimpleName()
+        );
 
         Object response = joinPoint.proceed(new Object[] { notification, processor });
 
+        ActionStatus operation;
         for (LDNAction action : processor.getActions()) {
-            action.execute(notification);
+            log.info(
+                "Running action {} for notification {} {}",
+                action.getClass().getSimpleName(),
+                notification.getId(),
+                notification.getType()
+            );
+
+            operation = action.execute(notification);
+            if (operation == ActionStatus.ABORT) {
+                break;
+            }
         }
 
         return response;

@@ -7,6 +7,8 @@
  */
 package org.dspace.app.ldn.processor;
 
+import static org.dspace.app.ldn.LDNMetadataFields.ELEMENT;
+import static org.dspace.app.ldn.LDNMetadataFields.SCHEMA;
 import static org.dspace.content.Item.ANY;
 
 public abstract class LDNMetadataChange {
@@ -20,7 +22,10 @@ public abstract class LDNMetadataChange {
     private String conditionTemplate;
 
     public LDNMetadataChange() {
+        schema = SCHEMA;
+        element = ELEMENT;
         language = ANY;
+        conditionTemplate = "true";
     }
 
     public String getSchema() {

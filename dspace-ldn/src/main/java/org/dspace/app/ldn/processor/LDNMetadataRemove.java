@@ -16,10 +16,6 @@ public class LDNMetadataRemove extends LDNMetadataChange {
 
     private List<String> valueTemplates = new ArrayList<>();
 
-    public LDNMetadataRemove() {
-        setConditionTemplate("false");
-    }
-
     public List<String> getQualifiers() {
         return qualifiers;
     }
