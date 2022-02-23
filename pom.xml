@@ -1106,13 +1106,6 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.driver.version}</version>
-                <exclusions>
-                    <!-- Use version provided by Solr -->
-                    <exclusion>
-                        <groupId>org.checkerframework</groupId>
-                        <artifactId>checker-qual</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
@@ -1738,7 +1731,7 @@
                 <artifactId>guava</artifactId>
                 <version>31.0.1-jre</version>
                 <exclusions>
-                    <!-- Use version provided by Solr -->
+                    <!-- Use version provided by Solr / Postgres -->
                     <exclusion>
                         <groupId>org.checkerframework</groupId>
                         <artifactId>checker-qual</artifactId>
