@@ -133,6 +133,7 @@ public class EssuirMetadataExporter {
         writer.flush();
         while (items.hasNext()) {
             Item item = items.next();
+	    System.out.printf("%s -- %s\n", item.getName(), item.getHandle());
             String line = csvMapper.writerFor(ItemExportMetadata.class)
                     .with(csvSchema).writeValueAsString(constructItemMetadata(item));
             writer.write(line);
