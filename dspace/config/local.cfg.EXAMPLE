@@ -59,6 +59,11 @@ dspace.name = DSpace at My University
 # Since DSpace 7, SOLR must be installed as a stand-alone service
 #solr.server = http://localhost:8983/solr
 
+# Solr core name prefix.
+# If you connect multiple instances of DSpace to a single Solr instance, you
+# can organize them with a common core name prefix.
+#solr.multicorePrefix =
+
 ##########################
 # DATABASE CONFIGURATION #
 ##########################
