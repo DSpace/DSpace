@@ -24,7 +24,7 @@
         <spring-security.version>5.2.2.RELEASE</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>5.4.10.Final</hibernate.version>
         <hibernate-validator.version>6.0.18.Final</hibernate-validator.version>
-        <postgresql.driver.version>42.2.25</postgresql.driver.version>
+        <postgresql.driver.version>42.3.3</postgresql.driver.version>
         <solr.client.version>8.8.1</solr.client.version>
 
         <axiom.version>1.2.22</axiom.version>
@@ -1570,7 +1570,7 @@
             <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
-                <version>2.12.0</version>
+                <version>2.12.2</version>
             </dependency>
             <dependency>
                 <groupId>xml-apis</groupId>
