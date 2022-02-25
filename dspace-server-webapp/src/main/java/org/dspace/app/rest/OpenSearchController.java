@@ -136,7 +136,7 @@ public class OpenSearchController {
                 }
                 queryArgs.setSortField(sort + "_sort", SORT_ORDER.asc);
             } else {
-                queryArgs.setSortField("score", SORT_ORDER.desc);
+                queryArgs.setSortField("dc.date.accessioned_sort", SORT_ORDER.desc);
             }
             if (dsoObject != null) {
                 container = scopeResolver.resolveScope(context, dsoObject);
@@ -147,7 +147,6 @@ public class OpenSearchController {
             try {
                 qResults = SearchUtils.getSearchService().search(context,
                     container, queryArgs);
-                log.info("RESULTS FROM OPEN SEARCH: " + qResults.getIndexableObjects().toString());
             } catch (SearchServiceException e) {
                 log.error(LogHelper.getHeader(context, "opensearch", "query="
                             + queryArgs.getQuery()
