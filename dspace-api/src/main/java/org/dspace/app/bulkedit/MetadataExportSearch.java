@@ -117,7 +117,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
         if (filterQueryStrings != null) {
             for (String filterQueryString: filterQueryStrings) {
                 String field = filterQueryString.split(",", 2)[0];
-                String operator = filterQueryString.split("('|=)", 3)[1];
+                String operator = filterQueryString.split("(,|=)", 3)[1];
                 String value = filterQueryString.split("=", 2)[1];
                 QueryBuilderSearchFilter queryBuilderSearchFilter = new QueryBuilderSearchFilter(field, operator, value);
                 queryBuilderSearchFilters.add(queryBuilderSearchFilter);

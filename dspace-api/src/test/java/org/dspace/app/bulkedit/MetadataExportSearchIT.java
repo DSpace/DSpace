@@ -43,6 +43,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
     private Item[] itemsSubject1 = new Item[numberItemsSubject1];
     private Item[] itemsSubject2 = new Item[numberItemsSubject2];
     private String filename = "metadataExportSearch.csv";
+    private Collection collection;
     TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
 
 
@@ -53,7 +54,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
 
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
-        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        collection = CollectionBuilder.createCollection(context, community).build();
 
         for (int i = 0; i < numberItemsSubject1; i++) {
             itemsSubject1[i] = ItemBuilder.createItem(context, collection)
@@ -163,6 +164,28 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
             "title,equals=" + String.format("%s item %d", subject1, 0)};
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
         Item[] expectedResult = Arrays.copyOfRange(itemsSubject1, 0, 1);
+        checkItemsPresentInFile(filename, expectedResult);
+    }
+
+    @Test
+    public void exportMetadataSearchEqualsFilterTest()
+        throws IOException, CsvException, InstantiationException, IllegalAccessException {
+        context.turnOffAuthorisationSystem();
+        Item wellBeingItem = ItemBuilder.createItem(context, collection)
+            .withTitle("test item well-being")
+            .withSubject("well-being")
+            .build();
+
+        ItemBuilder.createItem(context, collection)
+            .withTitle("test item financial well-being")
+            .withSubject("financial well-being")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String [] args = new String[]{"metadata-export-search", "-f", "subject,equals=well-being"};
+        Item[] expectedResult = new Item[]{wellBeingItem};
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
         checkItemsPresentInFile(filename, expectedResult);
     }
 }
