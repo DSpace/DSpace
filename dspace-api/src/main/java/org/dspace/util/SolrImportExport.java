@@ -252,7 +252,7 @@ public class SolrImportExport {
         //The configuration details for the statistics shards reside within the "statistics" folder
         String instanceIndexName = indexName.startsWith("statistics-") ? "statistics" : indexName;
 
-        String solrInstanceDir = configurationService.getProperty("dspace.dir")
+        String solrInstanceDir = "/opt/bin/solr/solr-8.11.1/data"
                 + File.separator + "solr" + File.separator + instanceIndexName;
         // the [dspace]/solr/[indexName]/conf directory needs to be available on the local machine for this to work
         // -- we need access to the schema.xml and solrconfig.xml file, plus files referenced from there
