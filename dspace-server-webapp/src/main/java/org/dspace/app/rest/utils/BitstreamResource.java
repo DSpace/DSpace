@@ -7,11 +7,14 @@
  */
 package org.dspace.app.rest.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -35,8 +38,10 @@ public class BitstreamResource extends AbstractResource {
     private Bitstream bitstream;
     private String name;
     private UUID uuid;
-    private long sizeBytes;
     private UUID currentUserUUID;
+    private boolean shouldGenerateCoverPage;
+    private byte[] file;
+    private Long fileSize;
 
     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
@@ -44,12 +49,30 @@ public class BitstreamResource extends AbstractResource {
         new DSpace().getServiceManager()
             .getServicesByType(CitationDocumentService.class).get(0);
 
-    public BitstreamResource(Bitstream bitstream, String name, UUID uuid, long sizeBytes, UUID currentUserUUID) {
+    public BitstreamResource(Bitstream bitstream, String name, UUID uuid, UUID currentUserUUID,
+        boolean shouldGenerateCoverPage) {
         this.bitstream = bitstream;
         this.name = name;
         this.uuid = uuid;
-        this.sizeBytes = sizeBytes;
         this.currentUserUUID = currentUserUUID;
+        this.shouldGenerateCoverPage = shouldGenerateCoverPage;
+    }
+
+    private Pair<byte[], Long> getFileData(Context context, Bitstream bitstream) throws SQLException,
+        AuthorizeException, IOException {
+        if (file == null || fileSize == null) {
+            if (shouldGenerateCoverPage) {
+                var citedDocument = citationDocumentService.makeCitedDocument(context, bitstream);
+                this.file = citedDocument.getLeft();
+                this.fileSize = citedDocument.getRight();
+            } else {
+                var inputStream = bitstreamService.retrieve(context, bitstream);
+                this.file = IOUtils.toByteArray(inputStream);
+                inputStream.close();
+                this.fileSize = bitstream.getSizeBytes();
+            }
+        }
+        return Pair.of(file, fileSize);
     }
 
     @Override
@@ -63,15 +86,8 @@ public class BitstreamResource extends AbstractResource {
         try {
             EPerson currentUser = ePersonService.find(context, currentUserUUID);
             context.setCurrentUser(currentUser);
-            InputStream out;
-
-            if (citationDocumentService.isCitationEnabledForBitstream(bitstream, context)) {
-                out = citationDocumentService.makeCitedDocument(context, bitstream).getLeft();
-            } else {
-                out = bitstreamService.retrieve(context, bitstream);
-            }
-
-            return out;
+            Bitstream bitstream = bitstreamService.find(context, uuid);
+            return new ByteArrayInputStream(getFileData(context, bitstream).getLeft());
         } catch (SQLException | AuthorizeException e) {
             throw new IOException(e);
         } finally {
@@ -90,6 +106,13 @@ public class BitstreamResource extends AbstractResource {
 
     @Override
     public long contentLength() throws IOException {
-        return sizeBytes;
+        try (Context context = new Context()) {
+            EPerson currentUser = ePersonService.find(context, currentUserUUID);
+            context.setCurrentUser(currentUser);
+            Bitstream bitstream = bitstreamService.find(context, uuid);
+            return getFileData(context, bitstream).getRight();
+        } catch (SQLException | AuthorizeException e) {
+            throw new IOException(e);
+        }
     }
 }

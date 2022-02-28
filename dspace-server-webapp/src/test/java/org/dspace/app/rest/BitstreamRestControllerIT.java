@@ -1066,10 +1066,9 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
         var bitstreamStorageService = StorageServiceFactory.getInstance().getBitstreamStorageService();
         var inputStreamSpy = spy(bitstreamStorageService.retrieve(context, bitstream));
-        var inputStreamSpy2 = spy(bitstreamStorageService.retrieve(context, bitstream));
         var bitstreamStorageServiceSpy = spy(bitstreamStorageService);
         ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", bitstreamStorageServiceSpy);
-        doReturn(inputStreamSpy, inputStreamSpy2).when(bitstreamStorageServiceSpy).retrieve(any(), eq(bitstream));
+        doReturn(inputStreamSpy).when(bitstreamStorageServiceSpy).retrieve(any(), eq(bitstream));
 
         //** WHEN **
         //We download the bitstream
@@ -1077,9 +1076,8 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
             //** THEN **
             .andExpect(status().isOk());
 
-        Mockito.verify(bitstreamStorageServiceSpy, times(2)).retrieve(any(), eq(bitstream));
+        Mockito.verify(bitstreamStorageServiceSpy, times(1)).retrieve(any(), eq(bitstream));
         Mockito.verify(inputStreamSpy, times(1)).close();
-        Mockito.verify(inputStreamSpy2, times(1)).close();
     }
 
 }
