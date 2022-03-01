@@ -81,7 +81,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Configure authentication requirements for ${dspace.server.url}/api/ URL only
         // NOTE: REST API is hardcoded to respond on /api/. Other modules (OAI, SWORD, IIIF, etc) use other root paths.
         http.requestMatchers()
-            .antMatchers("/api/**", "/iiif/**")
+            .antMatchers("/api/**", "/iiif/**", "/ldn/**")
             .and()
             // Enable Spring Security authorization on these paths
             .authorizeRequests()
@@ -89,6 +89,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST,"/api/authn/login").permitAll()
                 // Everyone can call GET on the status endpoint (used to check your authentication status)
                 .antMatchers(HttpMethod.GET, "/api/authn/status").permitAll()
+
+                .antMatchers(HttpMethod.POST, "/ldn/inbox").permitAll()
             .and()
             // Tell Spring to not create Sessions
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
@@ -102,6 +104,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             // (both are defined below as methods).
             // While we primarily use JWT in headers, CSRF protection is needed because we also support JWT via Cookies
             .csrf()
+                .ignoringAntMatchers("/ldn/inbox")
                 .csrfTokenRepository(this.getCsrfTokenRepository())
                 .sessionAuthenticationStrategy(this.sessionAuthenticationStrategy())
             .and()

@@ -849,6 +849,21 @@
             </modules>
         </profile>
 
+        <!--
+            Builds LDN extension for DSpace
+        -->
+        <profile>
+            <id>dspace-ldn</id>
+            <activation>
+                <file>
+                    <exists>dspace-ldn/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-ldn</module>
+            </modules>
+        </profile>
+
        <!-- REST Jersey (Deprecated REST API from DSpace 6.x or below) -->
        <!-- As this module is deprecated, it only builds if you activate it via -Pdspace-rest -->
        <profile>
@@ -1076,6 +1091,11 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-iiif</artifactId>
+                <version>7.3-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dspace</groupId>
+                <artifactId>dspace-ldn</artifactId>
                 <version>7.3-SNAPSHOT</version>
             </dependency>
             <dependency>

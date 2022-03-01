@@ -25,7 +25,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 @Configuration
 @EnableSpringDataWebSupport
 @ComponentScan( {"org.dspace.app.rest.converter", "org.dspace.app.rest.repository", "org.dspace.app.rest.utils",
-        "org.dspace.app.configuration", "org.dspace.iiif", "org.dspace.app.iiif"})
+        "org.dspace.app.configuration", "org.dspace.iiif", "org.dspace.app.iiif", "org.dspace.app.ldn"})
 public class ApplicationConfig {
     // Allowed CORS origins ("Access-Control-Allow-Origin" header)
     // Can be overridden in DSpace configuration
