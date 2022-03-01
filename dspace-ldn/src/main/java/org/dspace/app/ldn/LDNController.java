@@ -12,7 +12,6 @@ import static org.springframework.http.HttpStatus.CREATED;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.processor.LDNProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class LDNController {
 
     @ResponseStatus(value = CREATED)
-    // @PreAuthorize("@LDNAuthorize.isAllowed()")
     @PostMapping(value = "/inbox", consumes = "application/ld+json", produces = "application/ld+json")
     public Notification inbox(@RequestBody Notification notification, LDNProcessor processor) throws Exception {
         processor.process(notification);

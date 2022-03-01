@@ -7,6 +7,12 @@
  */
 package org.dspace.service.impl;
 
+import static java.lang.String.format;
+import static java.util.Objects.nonNull;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -37,12 +43,19 @@ public class ClientInfoServiceImpl implements ClientInfoService {
     /**
      * Sparse HashTable structure to hold IP address ranges of trusted proxies
      */
-    private IPTable trustedProxies;
+    private final IPTable trustedProxies;
 
     @Autowired(required = true)
     public ClientInfoServiceImpl(ConfigurationService configurationService) {
         this.configurationService = configurationService;
-        this.trustedProxies = parseTrustedProxyRanges();
+        this.trustedProxies = new IPTable();
+        parseTrustedProxyRanges();
+        parseTrustedDomains();
+
+        // If our IPTable is not empty, log the trusted proxies
+        if (!trustedProxies.isEmpty()) {
+            log.info("Trusted proxies (configure via 'proxies.trusted.ipranges'): {}", trustedProxies.toSet().toString());
+        }
     }
 
     @Override
@@ -93,12 +106,9 @@ public class ClientInfoServiceImpl implements ClientInfoService {
      * list of trusted proxies.
      * <P>
      * Localhost (127.0.0.1) is ALWAYS included in the list of trusted proxies
-     *
-     * @return IPTable of trusted IP addresses/ranges, or null if none could be found.
      */
-    private IPTable parseTrustedProxyRanges() {
+    private void parseTrustedProxyRanges() {
         String localhostIP = "127.0.0.1";
-        IPTable ipTable = new IPTable();
 
         // Get list of trusted proxy IP ranges
         String[] trustedIpRanges = configurationService.getArrayProperty("proxies.trusted.ipranges");
@@ -109,7 +119,7 @@ public class ClientInfoServiceImpl implements ClientInfoService {
         try {
             // Load all IPs into our IP Table
             for (String ipRange : trustedIpRanges) {
-                ipTable.add(ipRange);
+                trustedProxies.add(ipRange);
             }
         } catch (IPTable.IPFormatException e) {
             log.error("Property 'proxies.trusted.ipranges' contains an invalid IP range", e);
@@ -128,7 +138,7 @@ public class ClientInfoServiceImpl implements ClientInfoService {
                 try {
                     // Load all UI IPs into our IP Table
                     for (String ipRange : uiIpAddresses) {
-                        ipTable.add(ipRange);
+                        trustedProxies.add(ipRange);
                     }
                 } catch (IPTable.IPFormatException e) {
                     log.error("IP address lookup for dspace.ui.url={} was invalid and could not be added to trusted" +
@@ -136,14 +146,31 @@ public class ClientInfoServiceImpl implements ClientInfoService {
                 }
             }
         }
+    }
 
-        // If our IPTable is not empty, log the trusted proxies and return it
-        if (!ipTable.isEmpty()) {
-            log.info("Trusted proxies (configure via 'proxies.trusted.ipranges'): {}", ipTable.toSet().toString());
-            return ipTable;
-        } else {
-            return null;
+    private void parseTrustedDomains() {
+        // Get list of trusted domains
+        String[] trustedDomains = configurationService.getArrayProperty("proxies.trusted.domains");
+        try {
+            for (String trustedDomain : trustedDomains) {
+                String ip = getIpFromHostname(trustedDomain);
+                if (nonNull(ip)) {
+                    this.trustedProxies.add(ip);
+                }
+            }
+        } catch (IPTable.IPFormatException e) {
+            log.error("Property 'proxies.trusted.domains' contains an invalid hostname", e);
         }
+    }
+
+    private String getIpFromHostname(String hostname) {
+        try {
+            InetAddress addr = InetAddress.getByName(hostname.trim());
+            return addr.getHostName();
+        } catch (UnknownHostException e) {
+            log.error(format("Hostname %s is unknown", hostname), e);
+        }
+        return null;
     }
 
     /**
