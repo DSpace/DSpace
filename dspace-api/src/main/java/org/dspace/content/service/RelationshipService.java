@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
+import org.dspace.content.Relationship.LatestVersionStatus;
 import org.dspace.content.RelationshipType;
 import org.dspace.core.Context;
 import org.dspace.service.DSpaceCRUDService;
@@ -198,6 +199,27 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
 
     /**
      * This method is used to construct a Relationship object with all it's variables
+     * @param c                   The relevant DSpace context
+     * @param leftItem            The leftItem Item object for the relationship
+     * @param rightItem           The rightItem Item object for the relationship
+     * @param relationshipType    The RelationshipType object for the relationship
+     * @param leftPlace           The leftPlace integer for the relationship
+     * @param rightPlace          The rightPlace integer for the relationship
+     * @param leftwardValue       The leftwardValue string for the relationship
+     * @param rightwardValue      The rightwardValue string for the relationship
+     * @param latestVersionStatus The latestVersionStatus value for the relationship
+     * @return                    The created Relationship object with the given properties
+     * @throws AuthorizeException   If something goes wrong
+     * @throws SQLException         If something goes wrong
+     */
+    Relationship create(
+        Context c, Item leftItem, Item rightItem, RelationshipType relationshipType, int leftPlace, int rightPlace,
+        String leftwardValue, String rightwardValue, LatestVersionStatus latestVersionStatus
+    ) throws AuthorizeException, SQLException;
+
+    /**
+     * This method is used to construct a Relationship object with all it's variables,
+     * except the latest version status
      * @param c                 The relevant DSpace context
      * @param leftItem          The leftItem Item object for the relationship
      * @param rightItem         The rightItem Item object for the relationship
@@ -210,14 +232,15 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @throws AuthorizeException   If something goes wrong
      * @throws SQLException         If something goes wrong
      */
-    Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
-                        int leftPlace, int rightPlace, String leftwardValue, String rightwardValue)
-        throws AuthorizeException, SQLException;
+    Relationship create(
+        Context c, Item leftItem, Item rightItem, RelationshipType relationshipType, int leftPlace, int rightPlace,
+        String leftwardValue, String rightwardValue
+    ) throws AuthorizeException, SQLException;
 
 
     /**
      * This method is used to construct a Relationship object with all it's variables,
-     * except the leftward and rightward labels
+     * except the leftward label, rightward label and latest version status
      * @param c                 The relevant DSpace context
      * @param leftItem          The leftItem Item object for the relationship
      * @param rightItem         The rightItem Item object for the relationship

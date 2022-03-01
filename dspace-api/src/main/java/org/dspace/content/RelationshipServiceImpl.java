@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Relationship.LatestVersionStatus;
 import org.dspace.content.dao.RelationshipDAO;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
@@ -76,9 +77,10 @@ public class RelationshipServiceImpl implements RelationshipService {
 
 
     @Override
-    public Relationship create(Context c, Item leftItem, Item rightItem, RelationshipType relationshipType,
-                               int leftPlace, int rightPlace, String leftwardValue, String rightwardValue)
-            throws AuthorizeException, SQLException {
+    public Relationship create(
+        Context c, Item leftItem, Item rightItem, RelationshipType relationshipType, int leftPlace, int rightPlace,
+        String leftwardValue, String rightwardValue, LatestVersionStatus latestVersionStatus
+    ) throws AuthorizeException, SQLException {
         Relationship relationship = new Relationship();
         relationship.setLeftItem(leftItem);
         relationship.setRightItem(rightItem);
@@ -87,7 +89,19 @@ public class RelationshipServiceImpl implements RelationshipService {
         relationship.setRightPlace(rightPlace);
         relationship.setLeftwardValue(leftwardValue);
         relationship.setRightwardValue(rightwardValue);
+        relationship.setLatestVersionStatus(latestVersionStatus);
         return create(c, relationship);
+    }
+
+    @Override
+    public Relationship create(
+        Context c, Item leftItem, Item rightItem, RelationshipType relationshipType, int leftPlace, int rightPlace,
+        String leftwardValue, String rightwardValue
+    ) throws AuthorizeException, SQLException {
+        return create(
+            c, leftItem, rightItem, relationshipType, leftPlace, rightPlace, leftwardValue, rightwardValue,
+            LatestVersionStatus.BOTH
+        );
     }
 
     @Override
