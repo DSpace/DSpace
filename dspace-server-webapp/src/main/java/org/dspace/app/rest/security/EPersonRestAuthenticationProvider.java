@@ -65,18 +65,39 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         Context context = ContextUtil.obtainContext(request);
+        // If a user already exists in the context, then no authentication is necessary. User is already logged in
         if (context != null && context.getCurrentUser() != null) {
+            // Simply refresh/reload the auth token. If token has expired, the token will change.
+            log.debug("Request to refresh auth token");
             return authenticateRefreshTokenRequest(context);
         } else {
+            // Otherwise, this is a new login & we need to attempt authentication
+            log.debug("Request to authenticate new login");
             return authenticateNewLogin(authentication);
         }
     }
 
+    /**
+     * Trigger a JWT token refresh by updating the currently logged-in user's "lastActive" date to *now*.
+     * Since the logged-in user's "lastActive" date is used to determine whether the token has expired, this *may*
+     * cause the token to change (if expiration time has passed). If expiration has not passed, this request will
+     * return the same token as before.
+     * @param context current DSpace context (for currently logged in user information)
+     * @return DSpaceAuthentication object representing authenticated user
+     */
     private Authentication authenticateRefreshTokenRequest(Context context) {
         authenticationService.updateLastActiveDate(context);
-        return createAuthentication(null, context);
+        return createAuthentication(context);
     }
 
+    /**
+     * Attempt a new login to DSpace based on the information provided in the Authentication class.
+     * If login is successful, returns a NEW Authentication class containing the logged in EPerson and their list of
+     * GrantedAuthority objects.  If login fails, a BadCredentialsException is thrown. If no valid login found implicit
+     * or explicit, then null is returned.
+     * @param authentication Authentication class to attempt authentication.
+     * @return new Authentication class containing logged-in user information or null
+     */
     private Authentication authenticateNewLogin(Authentication authentication) {
         Context newContext = null;
         Authentication output = null;
@@ -91,7 +112,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
 
                 if (implicitStatus == AuthenticationMethod.SUCCESS) {
                     log.info(LogHelper.getHeader(newContext, "login", "type=implicit"));
-                    output = createAuthentication(password, newContext);
+                    output = createAuthentication(newContext);
                 } else {
                     int authenticateResult = authenticationService
                         .authenticate(newContext, name, password, null, request);
@@ -100,7 +121,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
                         log.info(LogHelper
                                      .getHeader(newContext, "login", "type=explicit"));
 
-                        output = createAuthentication(password, newContext);
+                        output = createAuthentication(newContext);
                     } else {
                         log.info(LogHelper.getHeader(newContext, "failed_login", "email="
                             + name + ", result="
@@ -122,7 +143,15 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
         return output;
     }
 
-    private Authentication createAuthentication(final String password, final Context context) {
+    /**
+     * Create a valid Spring Authentication object for the user currently authenticated in the Context.
+     * If no current user is found in the Context, then the login must have failed and a BadCredentialsException is
+     * thrown.
+     * @param context current DSpace context
+     * @return DSpaceAuthentication object for currently authenticated user
+     * @throws BadCredentialsException if no current user found
+     */
+    private Authentication createAuthentication(final Context context) {
         EPerson ePerson = context.getCurrentUser();
 
         if (ePerson != null && StringUtils.isNotBlank(ePerson.getEmail())) {
@@ -137,6 +166,11 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
         }
     }
 
+    /**
+     * Return list of GrantedAuthority objects for the user currently authenticated in the Context
+     * @param context current DSpace context
+     * @return List of GrantedAuthority.  Empty list is returned if no current user exists.
+     */
     public List<GrantedAuthority> getGrantedAuthorities(Context context) {
         List<GrantedAuthority> authorities = new LinkedList<>();
         EPerson eperson = context.getCurrentUser();
@@ -165,6 +199,12 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
         return authorities;
     }
 
+    /**
+     * Return whether this provider supports this Authentication type.  Only returns true if the Authentication type
+     * is a valid DSpaceAuthentication class.
+     * @param authentication
+     * @return true if valid DSpaceAuthentication class
+     */
     @Override
     public boolean supports(Class<?> authentication) {
         return DSpaceAuthentication.class.isAssignableFrom(authentication);
