@@ -20,13 +20,10 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.MetadataDSpaceCsvExportService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.discovery.DiscoverFilterQuery;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
-import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.discovery.indexobject.IndexableCollection;
@@ -37,7 +34,6 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.utils.DSpace;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScriptConfiguration> {
     private static final String EXPORT_CSV = "exportCSV";
@@ -57,7 +53,8 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
         new DSpace().getServiceManager().getServicesByType(DiscoveryConfigurationService.class).get(0);
     private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    private DiscoverQueryBuilder queryBuilder = new DSpace().getServiceManager().getServicesByType(DiscoverQueryBuilder.class).get(0);
+    private DiscoverQueryBuilder queryBuilder =
+        new DSpace().getServiceManager().getServicesByType(DiscoverQueryBuilder.class).get(0);
 
     @Override
     public MetadataExportSearchScriptConfiguration getScriptConfiguration() {
@@ -119,11 +116,13 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
                 String field = filterQueryString.split(",", 2)[0];
                 String operator = filterQueryString.split("(,|=)", 3)[1];
                 String value = filterQueryString.split("=", 2)[1];
-                QueryBuilderSearchFilter queryBuilderSearchFilter = new QueryBuilderSearchFilter(field, operator, value);
+                QueryBuilderSearchFilter queryBuilderSearchFilter =
+                    new QueryBuilderSearchFilter(field, operator, value);
                 queryBuilderSearchFilters.add(queryBuilderSearchFilter);
             }
         }
-        DiscoverQuery discoverQuery = queryBuilder.buildQuery(context, dso, discoveryConfiguration, query, queryBuilderSearchFilters,
+        DiscoverQuery discoverQuery =
+            queryBuilder.buildQuery(context, dso, discoveryConfiguration, query, queryBuilderSearchFilters,
             "Item", 10, Long.getLong("0"), null, "ASC");
         Iterator<Item> itemIterator = searchService.iteratorSearch(context, dso, discoverQuery);
         DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService.export(context, itemIterator, true);
