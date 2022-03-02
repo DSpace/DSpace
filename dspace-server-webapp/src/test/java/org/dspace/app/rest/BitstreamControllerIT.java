@@ -16,6 +16,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.codec.CharEncoding;
@@ -144,47 +146,48 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
 
         String bitstreamContent = "ThisIsSomeDummyText";
 
-        Bundle bundle1 = BundleBuilder.createBundle(context, publicItem1)
+        List<Bundle> bundles = new ArrayList();
+        bundles.add(BundleBuilder.createBundle(context, publicItem1)
                                       .withName("TEST FIRST BUNDLE")
-                                      .build();
+                                      .build());
 
         Bitstream bitstream = null;
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
-                                                createBitstream(context, bundle1, is)
+                                                createBitstream(context, bundles.get(0), is)
                                         .withName("Bitstream")
                                         .withDescription("description")
                                         .withMimeType("text/plain")
                                         .build();
         }
 
-        Bundle bundle2 = BundleBuilder.createBundle(context, publicItem1)
+        bundles.add(BundleBuilder.createBundle(context, publicItem1)
                                       .withName("TEST SECOND BUNDLE")
                                       .withBitstream(bitstream)
-                                      .build();
+                                      .build());
 
 
         context.restoreAuthSystemState();
 
+        // While in DSpace code, Bundles are *unordered*, in Hibernate v5 + H2 v2.x, they are returned sorted by UUID.
+        // So, we reorder this list of created Bundles by UUID to get their expected return order.
+        // NOTE: Once on Hibernate v6, this might need "toString()" removed as it may sort UUIDs based on RFC 4412.
+        Comparator<Bundle> compareByUUID = Comparator.comparing(b -> b.getID().toString());
+        bundles.sort(compareByUUID);
+
         String token = getAuthToken(admin.getEmail(), password);
 
+        // Expect only the first Bundle to be returned
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
                    .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                           BundleMatcher.matchBundle(bundle1.getName(),
-                                                     bundle1.getID(),
-                                                     bundle1.getHandle(),
-                                                     bundle1.getType(),
-                                                     bundle1.getBitstreams())
-
-                   ))).andExpect(jsonPath("$", Matchers.not(
-                BundleMatcher.matchBundle(bundle2.getName(),
-                                          bundle2.getID(),
-                                          bundle2.getHandle(),
-                                          bundle2.getType(),
-                                          bundle2.getBitstreams())
+                           BundleMatcher.matchBundle(bundles.get(0).getName(),
+                                                     bundles.get(0).getID(),
+                                                     bundles.get(0).getHandle(),
+                                                     bundles.get(0).getType(),
+                                                     bundles.get(0).getBitstreams())
         )));
 
 
