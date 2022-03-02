@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityService;
+import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -70,16 +71,26 @@ public class AuthorityIndexClient {
         for (AuthorityIndexerInterface indexerInterface : indexers) {
             log.info("Initialize " + indexerInterface.getClass().getName());
             System.out.println("Initialize " + indexerInterface.getClass().getName());
-            Iterator<Item> allItems = itemService.findAllReadOnly(context);
+
+            int limit = 100;
+            int offset = 0;
+
             Map<String, AuthorityValue> authorityCache = new HashMap<>();
+
+            Iterator<Item> allItems = itemService.findAll(context, limit, offset);
             while (allItems.hasNext()) {
-                Item item = allItems.next();
-                List<AuthorityValue> authorityValues = indexerInterface.getAuthorityValues(
-                    context, item, authorityCache);
-                for (AuthorityValue authorityValue : authorityValues) {
-                    toIndexValues.put(authorityValue.getId(), authorityValue);
+                while (allItems.hasNext()) {
+                    Item item = allItems.next();
+                    List<AuthorityValue> authorityValues = indexerInterface.getAuthorityValues(
+                            context, item, authorityCache);
+                    for (AuthorityValue authorityValue : authorityValues) {
+                        toIndexValues.put(authorityValue.getId(), authorityValue);
+                    }
+                    context.uncacheEntity(item);
                 }
-                context.uncacheEntity(item);
+                offset += limit;
+                context.commit();
+                allItems = itemService.findAll(context, limit, offset);
             }
         }
 

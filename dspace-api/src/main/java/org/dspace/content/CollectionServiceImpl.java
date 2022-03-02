@@ -742,19 +742,29 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         // Remove items
         // Remove items
-        Iterator<Item> items = itemService.findAllByCollectionReadOnly(context, collection);
+
+        int limit = 100;
+        int offset = 0;
+
+        Iterator<Item> items = itemService.findAllByCollection(context, collection, limit, offset);
         while (items.hasNext()) {
-            Item item = items.next();
+            while (items.hasNext()) {
+                Item item = items.next();
 //            items.remove();
-            if (itemService.isOwningCollection(item, collection)) {
-                // the collection to be deleted is the owning collection, thus remove
-                // the item from all collections it belongs to
-                itemService.delete(context, item);
-            } else {
-                // the item was only mapped to this collection, so just remove it
-                removeItem(context, collection, item);
+                if (itemService.isOwningCollection(item, collection)) {
+                    // the collection to be deleted is the owning collection, thus remove
+                    // the item from all collections it belongs to
+                    itemService.delete(context, item);
+                } else {
+                    // the item was only mapped to this collection, so just remove it
+                    removeItem(context, collection, item);
+                }
             }
+            offset += limit;
+            context.commit();
+            items = itemService.findAllByCollection(context, collection, limit, offset);
         }
+
 
 
         // Delete bitstream logo

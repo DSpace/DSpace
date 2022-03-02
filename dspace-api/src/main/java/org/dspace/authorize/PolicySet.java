@@ -213,58 +213,29 @@ public class PolicySet {
             Collection collection = collectionService.find(c, containerID);
             Group group = groupService.find(c, groupID);
 
-            Iterator<Item> i = itemService.findAllByCollectionReadOnly(c, collection);
-            if (contentType == Constants.ITEM) {
-                // build list of all items in a collection
-                while (i.hasNext()) {
-                    Item myitem = i.next();
+            int limit = 100;
+            int offset = 0;
 
-                    // is this a replace? delete policies first
-                    if (isReplace || clearOnly) {
-                        authorizeService.removeAllPolicies(c, myitem);
-                    }
+            Iterator<Item> i = itemService.findAllByCollection(c, collection, limit, offset);
+            while (i.hasNext()) {
+                if (contentType == Constants.ITEM) {
+                    // build list of all items in a collection
+                    while (i.hasNext()) {
+                        Item myitem = i.next();
 
-                    if (!clearOnly) {
-
-                        // before create a new policy check if an identical policy is already in place
-                        if (!authorizeService.isAnIdenticalPolicyAlreadyInPlace(c, myitem, group, actionID, -1)) {
-                            // now add the policy
-                            ResourcePolicy rp = resourcePolicyService.create(c);
-
-                            rp.setdSpaceObject(myitem);
-                            rp.setAction(actionID);
-                            rp.setGroup(group);
-
-                            rp.setRpName(name);
-                            rp.setRpDescription(description);
-                            rp.setStartDate(startDate);
-                            rp.setEndDate(endDate);
-
-                            resourcePolicyService.update(c, rp);
-                        }
-                    }
-                }
-            } else if (contentType == Constants.BUNDLE) {
-                // build list of all items in a collection
-                // build list of all bundles in those items
-                while (i.hasNext()) {
-                    Item myitem = i.next();
-
-                    List<Bundle> bundles = myitem.getBundles();
-
-                    for (Bundle bundle : bundles) {
                         // is this a replace? delete policies first
                         if (isReplace || clearOnly) {
-                            authorizeService.removeAllPolicies(c, bundle);
+                            authorizeService.removeAllPolicies(c, myitem);
                         }
 
                         if (!clearOnly) {
+
                             // before create a new policy check if an identical policy is already in place
-                            if (!authorizeService.isAnIdenticalPolicyAlreadyInPlace(c, bundle, group, actionID, -1)) {
+                            if (!authorizeService.isAnIdenticalPolicyAlreadyInPlace(c, myitem, group, actionID, -1)) {
                                 // now add the policy
                                 ResourcePolicy rp = resourcePolicyService.create(c);
 
-                                rp.setdSpaceObject(bundle);
+                                rp.setdSpaceObject(myitem);
                                 rp.setAction(actionID);
                                 rp.setGroup(group);
 
@@ -277,53 +248,89 @@ public class PolicySet {
                             }
                         }
                     }
-                }
-            } else if (contentType == Constants.BITSTREAM) {
-                // build list of all bitstreams in a collection
-                // iterate over items, bundles, get bitstreams
-                while (i.hasNext()) {
-                    Item myitem = i.next();
-                    System.out.println("Item " + myitem.getID());
+                } else if (contentType == Constants.BUNDLE) {
+                    // build list of all items in a collection
+                    // build list of all bundles in those items
+                    while (i.hasNext()) {
+                        Item myitem = i.next();
 
-                    List<Bundle> bundles = myitem.getBundles();
+                        List<Bundle> bundles = myitem.getBundles();
 
-                    for (Bundle bundle : bundles) {
-                        System.out.println("Bundle " + bundle.getID());
+                        for (Bundle bundle : bundles) {
+                            // is this a replace? delete policies first
+                            if (isReplace || clearOnly) {
+                                authorizeService.removeAllPolicies(c, bundle);
+                            }
 
-                        List<Bitstream> bitstreams = bundle.getBitstreams();
+                            if (!clearOnly) {
+                                // before create a new policy check if an identical policy is already in place
+                                if (!authorizeService.isAnIdenticalPolicyAlreadyInPlace(c, bundle, group, actionID, -1)) {
+                                    // now add the policy
+                                    ResourcePolicy rp = resourcePolicyService.create(c);
 
-                        for (Bitstream bitstream : bitstreams) {
-                            if (filter == null ||
-                                bitstream.getName().indexOf(filter) != -1) {
-                                // is this a replace? delete policies first
-                                if (isReplace || clearOnly) {
-                                    authorizeService.removeAllPolicies(c, bitstream);
+                                    rp.setdSpaceObject(bundle);
+                                    rp.setAction(actionID);
+                                    rp.setGroup(group);
+
+                                    rp.setRpName(name);
+                                    rp.setRpDescription(description);
+                                    rp.setStartDate(startDate);
+                                    rp.setEndDate(endDate);
+
+                                    resourcePolicyService.update(c, rp);
                                 }
+                            }
+                        }
+                    }
+                } else if (contentType == Constants.BITSTREAM) {
+                    // build list of all bitstreams in a collection
+                    // iterate over items, bundles, get bitstreams
+                    while (i.hasNext()) {
+                        Item myitem = i.next();
+                        System.out.println("Item " + myitem.getID());
 
-                                if (!clearOnly) {
-                                    // before create a new policy check if an identical policy is already in place
-                                    if (!authorizeService
-                                        .isAnIdenticalPolicyAlreadyInPlace(c, bitstream, group, actionID, -1)) {
-                                        // now add the policy
-                                        ResourcePolicy rp = resourcePolicyService.create(c);
+                        List<Bundle> bundles = myitem.getBundles();
 
-                                        rp.setdSpaceObject(bitstream);
-                                        rp.setAction(actionID);
-                                        rp.setGroup(group);
+                        for (Bundle bundle : bundles) {
+                            System.out.println("Bundle " + bundle.getID());
 
-                                        rp.setRpName(name);
-                                        rp.setRpDescription(description);
-                                        rp.setStartDate(startDate);
-                                        rp.setEndDate(endDate);
+                            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-                                        resourcePolicyService.update(c, rp);
+                            for (Bitstream bitstream : bitstreams) {
+                                if (filter == null ||
+                                        bitstream.getName().indexOf(filter) != -1) {
+                                    // is this a replace? delete policies first
+                                    if (isReplace || clearOnly) {
+                                        authorizeService.removeAllPolicies(c, bitstream);
+                                    }
+
+                                    if (!clearOnly) {
+                                        // before create a new policy check if an identical policy is already in place
+                                        if (!authorizeService
+                                                .isAnIdenticalPolicyAlreadyInPlace(c, bitstream, group, actionID, -1)) {
+                                            // now add the policy
+                                            ResourcePolicy rp = resourcePolicyService.create(c);
+
+                                            rp.setdSpaceObject(bitstream);
+                                            rp.setAction(actionID);
+                                            rp.setGroup(group);
+
+                                            rp.setRpName(name);
+                                            rp.setRpDescription(description);
+                                            rp.setStartDate(startDate);
+                                            rp.setEndDate(endDate);
+
+                                            resourcePolicyService.update(c, rp);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
+                offset += limit;
+                c.commit();
+                i = itemService.findAllByCollection(c, collection, limit, offset);            }
         }
     }
 }

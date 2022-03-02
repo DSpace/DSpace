@@ -330,18 +330,27 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
             context.turnOffAuthorisationSystem();
 
             ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-            Iterator<Item> it = itemService.findByCollectionReadOnly(context, collection);
+
+            int limit = 100;
+            int offset = 0;
             int i = 0;
-            while (it.hasNext()) {
-                i++;
-                Item item = it.next();
-                handler.logInfo("Deleting: " + item.getHandle());
-                collectionService.removeItem(context, collection, item);
-                context.uncacheEntity(item);// Dispatch events every 50 items
-                if (i % 50 == 0) {
-                    context.dispatchEvents();
-                    i = 0;
+
+            Iterator<Item> items = itemService.findByCollection(context, collection, limit, offset);
+            while (items.hasNext()) {
+                while (items.hasNext()) {
+                    i++;
+                    Item item = items.next();
+                    handler.logInfo("Deleting: " + item.getHandle());
+                    collectionService.removeItem(context, collection, item);
+                    context.uncacheEntity(item);// Dispatch events every 50 items
+                    if (i % 50 == 0) {
+                        context.dispatchEvents();
+                        i = 0;
+                    }
                 }
+                offset += limit;
+                context.commit();
+                items = itemService.findByCollection(context, collection, limit, offset);
             }
 
             HarvestedCollection hc = harvestedCollectionService.find(context, collection);
