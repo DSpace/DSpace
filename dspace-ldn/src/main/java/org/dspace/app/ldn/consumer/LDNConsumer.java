@@ -10,6 +10,7 @@ package org.dspace.app.ldn.consumer;
 import static org.dspace.app.ldn.LDNMetadataFields.ELEMENT;
 import static org.dspace.app.ldn.LDNMetadataFields.RELEASE;
 import static org.dspace.app.ldn.LDNMetadataFields.SCHEMA;
+import static org.dspace.content.Item.ANY;
 
 import java.util.HashSet;
 import java.util.List;
@@ -31,9 +32,9 @@ import org.dspace.event.Event;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
-public class LDNReleaseConsumer implements Consumer {
+public class LDNConsumer implements Consumer {
 
-    private final static Logger log = LogManager.getLogger(LDNReleaseConsumer.class);
+    private final static Logger log = LogManager.getLogger(LDNConsumer.class);
 
     private static Set<Item> itemsToRelease;
 
@@ -50,13 +51,7 @@ public class LDNReleaseConsumer implements Consumer {
         workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
         workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
         itemService = ContentServiceFactory.getInstance().getItemService();
-
-        log.info("\n\n" + LDNBusinessDelegateFactory.getInstance() + "\n\n");
-
-        if (LDNBusinessDelegateFactory.getInstance() != null) {
-            ldnBusinessDelegate = LDNBusinessDelegateFactory.getInstance().getLDNBusinessDelegate();
-            log.info("\n\n" + ldnBusinessDelegate + "\n\n");
-        }
+        ldnBusinessDelegate = LDNBusinessDelegateFactory.getInstance().getLDNBusinessDelegate();
     }
 
     @Override
@@ -90,30 +85,20 @@ public class LDNReleaseConsumer implements Consumer {
                 }
 
                 if (eventType == Event.MODIFY_METADATA) {
-                    List<MetadataValue> releaseMetadata = itemService.getMetadata(
-                            item,
-                            SCHEMA,
-                            ELEMENT,
-                            RELEASE,
-                            Item.ANY);
+                    List<MetadataValue> releaseMetadata = itemService.getMetadata(item, SCHEMA, ELEMENT, RELEASE, ANY);
 
                     if (!releaseMetadata.isEmpty()) {
                         itemsToRelease.remove(item);
                         log.info("Skipping item {} as it has been notified of release", item.getID());
                         for (MetadataValue metadatum : releaseMetadata) {
-                            log.info("\t {}.{}.{} {} {}", SCHEMA, ELEMENT, RELEASE, Item.ANY, metadatum.getValue());
+                            log.info("\t {}.{}.{} {} {}", SCHEMA, ELEMENT, RELEASE, ANY, metadatum.getValue());
                         }
                         return;
                     }
 
                 }
 
-                List<MetadataValue> researchMetadata = itemService.getMetadata(
-                        item,
-                        "dc",
-                        "data",
-                        "uri",
-                        Item.ANY);
+                List<MetadataValue> researchMetadata = itemService.getMetadata(item, "dc", "data", "uri", ANY);
 
                 if (researchMetadata.isEmpty()) {
                     log.info("Skipping item {} as it has no identifier to notify", item.getID());
@@ -143,7 +128,7 @@ public class LDNReleaseConsumer implements Consumer {
         if (itemsToRelease != null) {
             for (Item item : itemsToRelease) {
                 log.info("Item for release {} {}", item.getID(), item.getName());
-                ldnBusinessDelegate.announceRelease(context, item);
+                ldnBusinessDelegate.announceRelease(item);
             }
         }
 

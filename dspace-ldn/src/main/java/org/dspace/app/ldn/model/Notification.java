@@ -7,14 +7,9 @@
  */
 package org.dspace.app.ldn.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonInclude(Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(value = {
     "@context",
     "id",
@@ -30,8 +25,8 @@ public class Notification extends Base {
 
     @JsonProperty("@context")
     private String[] c = new String[] {
-        "https://www.w3.org/ns/activitystreams",
-        "https://purl.org/coar/notify"
+        "https://purl.org/coar/notify",
+        "https://www.w3.org/ns/activitystreams"
     };
 
     @JsonProperty("actor")

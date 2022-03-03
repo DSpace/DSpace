@@ -237,7 +237,7 @@
                     </property>
                     <property name="valueTemplates">
                         <list value-type="java.lang.String">
-                            <value>$notification.origin.id</value>
+                            <value>$notification.object.ietfCiteAs</value>
                         </list>
                     </property>
                 </bean>
@@ -249,7 +249,8 @@
                     </property>
                     <property name="valueTemplates">
                         <list value-type="java.lang.String">
-                            <value>$LDNUtils.removedProtocol($notification.origin.id)</value>
+                            <value>$notification.object.ietfCiteAs</value>
+                            <value>$LDNUtils.removedProtocol($notification.object.id)</value>
                         </list>
                     </property>
                 </bean>
@@ -257,11 +258,11 @@
                     <property name="schema" value="dc" />
                     <property name="element" value="data" />
                     <property name="qualifier" value="uri" />
-                    <property name="valueTemplate" value="$notification.object.id" />
+                    <property name="valueTemplate" value="$notification.object.ietfCiteAs" />
                 </bean>
                 <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
                     <property name="qualifier" value="release" />
-                    <property name="valueTemplate" value="$timestamp||$LDNUtils.removedProtocol($notification.origin.id)" />
+                    <property name="valueTemplate" value="$timestamp||$notification.object.ietfCiteAs||$LDNUtils.removedProtocol($notification.object.id)" />
                 </bean>
             </list>
         </property>

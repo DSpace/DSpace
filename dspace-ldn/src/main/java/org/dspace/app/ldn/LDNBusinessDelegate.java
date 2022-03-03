@@ -8,14 +8,19 @@
 package org.dspace.app.ldn;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static java.lang.String.join;
+import static org.dspace.app.ldn.RdfMediaType.APPLICATION_JSON_LD;
+import static org.dspace.app.ldn.utility.LDNUtils.processContextResolverId;
 
+import java.net.URI;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.ldn.converter.JsonLdHttpMessageConverter;
 import org.dspace.app.ldn.model.Actor;
 import org.dspace.app.ldn.model.Context;
 import org.dspace.app.ldn.model.Notification;
@@ -27,6 +32,9 @@ import org.dspace.content.MetadataValue;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.client.RestTemplate;
 
 public class LDNBusinessDelegate {
 
@@ -38,12 +46,40 @@ public class LDNBusinessDelegate {
     @Autowired
     private HandleService handleService;
 
-    public void announceRelease(org.dspace.core.Context ctx, Item item) throws SQLException {
-        String dspaceUrl = configurationService.getProperty("dsapce.url");
-        String dspaceLdnInboxUrl = format("%s/ldn/inbox", removeEnd(dspaceUrl, "/"));
+    private final RestTemplate restTemplate;
 
-        log.info("DSpace URL {}", dspaceUrl);
+    public LDNBusinessDelegate() {
+        restTemplate = new RestTemplate();
+        restTemplate.getMessageConverters().add(new JsonLdHttpMessageConverter());
+    }
+
+    public void announceRelease(Item item) throws SQLException {
+        String serviceIds = configurationService.getProperty("service.service-id.ldn");
+
+        for (String serviceId : serviceIds.split(",")) {
+            doAnnounceRelease(item, serviceId.trim());
+        }
+    }
+
+    public void doAnnounceRelease(Item item, String serviceId) throws SQLException {
+        log.info("Announcing release of item {}", item.getID());
+
+        String dspaceServerUrl = configurationService.getProperty("dspace.server.url");
+        String dspaceUIUrl = configurationService.getProperty("dspace.ui.url");
+        String dspaceName = configurationService.getProperty("dspace.name");
+        String dspaceLdnInboxUrl = configurationService.getProperty("ldn.notify.local-inbox-endpoint");
+
+        log.info("DSpace Server URL {}", dspaceServerUrl);
+        log.info("DSpace UI URL {}", dspaceUIUrl);
+        log.info("DSpace Name {}", dspaceName);
         log.info("DSpace LDN Inbox URL {}", dspaceLdnInboxUrl);
+
+        String serviceUrl = configurationService.getProperty(join(".", "service", serviceId, "url"));
+        String serviceInboxUrl = configurationService.getProperty(join(".", "service", serviceId, "inbox.url"));
+        String serviceResolverUrl = configurationService.getProperty(join(".", "service", serviceId, "resolver.url"));
+
+        log.info("Target URL {}", serviceUrl);
+        log.info("Target LDN Inbox URL {}", serviceInboxUrl);
 
         Notification notification = new Notification();
 
@@ -53,45 +89,87 @@ public class LDNBusinessDelegate {
 
         Actor actor = new Actor();
 
-        actor.setId(configurationService.getProperty("dsapce.url"));
-        actor.setName(configurationService.getProperty("dsapce.name"));
+        actor.setId(dspaceUIUrl);
+        actor.setName(dspaceName);
         actor.addType("Service");
 
         Context context = new Context();
 
+        List<Context> isSupplementedBy = new ArrayList<>();
+
         List<MetadataValue> metadata = item.getMetadata();
-        for (MetadataValue value : metadata) {
-            MetadataField field = value.getMetadataField();
-            log.info("Metadata field {} with value {}", field, value.getValue());
+        for (MetadataValue metadatum : metadata) {
+            MetadataField field = metadatum.getMetadataField();
+            log.info("Metadata field {} with value {}", field, metadatum.getValue());
+            if (field.getMetadataSchema().getName().equals("dc") &&
+                    field.getElement().equals("data") &&
+                    field.getQualifier().equals("uri")) {
+
+                String ietfCiteAs = metadatum.getValue();
+                String resolverId = processContextResolverId(ietfCiteAs);
+                String id = serviceResolverUrl != null
+                        ? format("%s%s", serviceResolverUrl, resolverId)
+                        : ietfCiteAs;
+
+                Context supplement = new Context();
+                supplement.setId(id);
+                supplement.setIetfCiteAs(ietfCiteAs);
+                supplement.addType("sorg:Dataset");
+
+                isSupplementedBy.add(supplement);
+            }
         }
+
+        context.setIsSupplementedBy(isSupplementedBy);
 
         Object object = new Object();
 
-        String itemHandleUrl = handleService.resolveToURL(ctx, item.getHandle());
         String itemUrl = handleService.getCanonicalForm(item.getHandle());
 
-        log.info("Item Handle URL {}", itemHandleUrl);
+        log.info("Item Handle URL {}", itemUrl);
 
         log.info("Item URL {}", itemUrl);
 
-        object.setId(itemHandleUrl);
+        object.setId(itemUrl);
         object.setIetfCiteAs(itemUrl);
         object.setTitle(item.getName());
         object.addType("sorg:ScholarlyArticle");
 
         Service origin = new Service();
+        origin.setId(dspaceUIUrl);
+        origin.setInbox(dspaceLdnInboxUrl);
         origin.addType("Service");
 
         Service target = new Service();
-        origin.setId(dspaceLdnInboxUrl);
-        origin.setInbox(dspaceLdnInboxUrl);
-        origin.addType("Service");
+        target.setId(serviceUrl);
+        target.setInbox(serviceInboxUrl);
+        target.addType("Service");
 
         notification.setActor(actor);
         notification.setContext(context);
         notification.setObject(object);
         notification.setOrigin(origin);
         notification.setTarget(target);
+
+        String serviceKey = configurationService.getProperty(join(".", "service", serviceId, "key"));
+        String serviceKeyHeader = configurationService.getProperty(join(".", "service", serviceId, "key.header"));
+
+        log.info("Service key {}", serviceKey);
+        log.info("Service key header {}", serviceKeyHeader);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", APPLICATION_JSON_LD.toString());
+        if (serviceKey != null && serviceKeyHeader != null) {
+            headers.add(serviceKeyHeader, serviceKey);
+        }
+
+        HttpEntity<Notification> request = new HttpEntity<Notification>(notification, headers);
+
+        log.info("Announcing notification {}", request);
+
+        URI location = restTemplate.postForLocation(URI.create(target.getInbox()), request);
+
+        log.info("Notification sent {}", location);
     }
 
 }

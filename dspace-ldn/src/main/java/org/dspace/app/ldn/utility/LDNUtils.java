@@ -7,6 +7,8 @@
  */
 package org.dspace.app.ldn.utility;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,6 +18,8 @@ public class LDNUtils {
     private final static Pattern UUID_REGEX_PATTERN = Pattern.compile(
         "\\p{XDigit}{8}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{12}"
     );
+
+    private final static String SIMPLE_PROTOCOL_REGEX = "^(http[s]?://www\\.|http[s]?://|www\\.)";
 
     private LDNUtils() {
 
@@ -37,7 +41,14 @@ public class LDNUtils {
     }
 
     public static String removedProtocol(String url) {
-        return url.replaceFirst("^(http[s]?://www\\.|http[s]?://|www\\.)", "");
+        return url.replaceFirst(SIMPLE_PROTOCOL_REGEX, EMPTY);
+    }
+
+    public static String processContextResolverId(String value) {
+        String resolverId = value;
+        resolverId = resolverId.replace("https://doi.org/", "doi:");
+
+        return resolverId;
     }
 
 }

@@ -75,15 +75,9 @@ public class LDNMetadataProcessor implements LDNProcessor {
         Iterator<Notification> iterator = repeater.iterator(notification);
 
         while (iterator.hasNext()) {
-            doProcess(iterator.next());
-        }
-
-        ActionStatus operation;
-        while (iterator.hasNext()) {
-            operation = doRunActions(iterator.next());
-            if (operation == ActionStatus.ABORT) {
-                break;
-            }
+            Notification next = iterator.next();
+            doProcess(next);
+            doRunActions(next);
         }
     }
 

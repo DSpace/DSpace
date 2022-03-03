@@ -34,8 +34,10 @@ public class LDNInboxController {
     @ResponseStatus(value = CREATED)
     @PostMapping(value = "/inbox", consumes = "application/ld+json", produces = "application/ld+json")
     public Notification inbox(@RequestBody Notification notification, LDNProcessor processor) throws Exception {
+
         processor.process(notification);
 
+        // TODO: this should become either generic response body with location header or no content with location header
         return notification;
     }
 

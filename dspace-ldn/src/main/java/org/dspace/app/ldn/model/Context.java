@@ -9,17 +9,12 @@ package org.dspace.app.ldn.model;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Context extends Base {
 
     @JsonProperty("ietf:cite-as")
     private String ietfCiteAs;
-
-    @JsonProperty("relationship")
-    private String relationship;
 
     @JsonProperty("url")
     private Url url;
@@ -40,14 +35,6 @@ public class Context extends Base {
 
     public void setIetfCiteAs(String ietfCiteAs) {
         this.ietfCiteAs = ietfCiteAs;
-    }
-
-    public String getRelationship() {
-        return relationship;
-    }
-
-    public void setRelationship(String relationship) {
-        this.relationship = relationship;
     }
 
     public Url getUrl() {
