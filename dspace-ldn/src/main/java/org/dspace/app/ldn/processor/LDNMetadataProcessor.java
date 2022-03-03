@@ -10,13 +10,16 @@ package org.dspace.app.ldn.processor;
 import static java.lang.String.format;
 
 import java.io.StringWriter;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.VelocityContext;
@@ -24,19 +27,24 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.apache.velocity.runtime.resource.util.StringResourceRepository;
+import org.dspace.app.ldn.action.ActionStatus;
 import org.dspace.app.ldn.action.LDNAction;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.utility.LDNUtils;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.handle.service.HandleService;
 import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 public class LDNMetadataProcessor implements LDNProcessor {
 
@@ -50,10 +58,15 @@ public class LDNMetadataProcessor implements LDNProcessor {
     private ItemService itemService;
 
     @Autowired
+    private HandleService handleService;
+
+    @Autowired
     private MetadataFieldService metadataFieldService;
 
     @Autowired
     private MetadataValueService metadataValueService;
+
+    private LDNContextRepeater repeater = new LDNContextRepeater();
 
     private List<LDNAction> actions = new ArrayList<>();
 
@@ -68,18 +81,28 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
     @Override
     public void process(Notification notification) throws Exception {
+        Iterator<Notification> iterator = repeater.iterator(notification);
+
+        while (iterator.hasNext()) {
+            doProcess(iterator.next());
+        }
+
+        ActionStatus operation;
+        while (iterator.hasNext()) {
+            operation = doRunActions(iterator.next());
+            if (operation == ActionStatus.ABORT) {
+                break;
+            }
+        }
+    }
+
+    private void doProcess(Notification notification) throws Exception {
         log.info("Processing notification {} {}", notification.getId(), notification.getType());
         Context context = ContextUtil.obtainCurrentRequestContext();
 
         VelocityContext velocityContext = prepareTemplateContext(notification);
 
-        UUID uuid = LDNUtils.getUUIDFromURL(notification.getContext().getId());
-
-        Item item = itemService.find(context, uuid);
-
-        if (Objects.isNull(item)) {
-            throw new ResourceNotFoundException(format("Item with uuid %s not found", uuid));
-        }
+        Item item = lookupItem(context, notification);
 
         List<MetadataValue> metadataValuesToRemove = new ArrayList<>();
 
@@ -96,34 +119,31 @@ public class LDNMetadataProcessor implements LDNProcessor {
                 LDNMetadataAdd add = ((LDNMetadataAdd) change);
                 String value = renderTemplate(velocityContext, add.getValueTemplate());
                 log.info(
-                    "Adding {}.{}.{} {}",
-                    add.getSchema(),
-                    add.getElement(),
-                    add.getQualifier(),
-                    add.getLanguage(),
-                    value
-                );
+                        "Adding {}.{}.{} {} {}",
+                        add.getSchema(),
+                        add.getElement(),
+                        add.getQualifier(),
+                        add.getLanguage(),
+                        value);
 
                 itemService.addMetadata(
-                    context,
-                    item,
-                    add.getSchema(),
-                    add.getElement(),
-                    add.getQualifier(),
-                    add.getLanguage(),
-                    value
-                );
+                        context,
+                        item,
+                        add.getSchema(),
+                        add.getElement(),
+                        add.getQualifier(),
+                        add.getLanguage(),
+                        value);
 
             } else if (change instanceof LDNMetadataRemove) {
                 LDNMetadataRemove remove = (LDNMetadataRemove) change;
 
                 for (String qualifier : remove.getQualifiers()) {
                     MetadataField metadataField = metadataFieldService.findByElement(
-                        context,
-                        change.getSchema(),
-                        change.getElement(),
-                        qualifier
-                    );
+                            context,
+                            change.getSchema(),
+                            change.getElement(),
+                            qualifier);
 
                     for (MetadataValue metadataValue : metadataValueService.findByField(context, metadataField)) {
                         boolean delete = true;
@@ -135,13 +155,12 @@ public class LDNMetadataProcessor implements LDNProcessor {
                         }
                         if (delete) {
                             log.info(
-                                "Removing {}.{}.{} {}",
-                                remove.getSchema(),
-                                remove.getElement(),
-                                qualifier,
-                                remove.getLanguage(),
-                                metadataValue.getValue()
-                            );
+                                    "Removing {}.{}.{} {} {}",
+                                    remove.getSchema(),
+                                    remove.getElement(),
+                                    qualifier,
+                                    remove.getLanguage(),
+                                    metadataValue.getValue());
 
                             metadataValuesToRemove.add(metadataValue);
                         }
@@ -163,12 +182,35 @@ public class LDNMetadataProcessor implements LDNProcessor {
         }
     }
 
-    @Override
+    private ActionStatus doRunActions(Notification notification) throws Exception {
+        ActionStatus operation = ActionStatus.CONTINUE;
+        for (LDNAction action : actions) {
+            log.info("Running action {} for notification {} {}",
+                    action.getClass().getSimpleName(),
+                    notification.getId(),
+                    notification.getType());
+
+            operation = action.execute(notification);
+            if (operation == ActionStatus.ABORT) {
+                break;
+            }
+        }
+
+        return operation;
+    }
+
+    public LDNContextRepeater getRepeater() {
+        return repeater;
+    }
+
+    public void setRepeater(LDNContextRepeater repeater) {
+        this.repeater = repeater;
+    }
+
     public List<LDNAction> getActions() {
         return actions;
     }
 
-    @Override
     public void setActions(List<LDNAction> actions) {
         this.actions = actions;
     }
@@ -181,6 +223,44 @@ public class LDNMetadataProcessor implements LDNProcessor {
         this.changes = changes;
     }
 
+    private Item lookupItem(Context context, Notification notification) throws SQLException {
+        Item item = null;
+
+        String url = notification.getContext().getId();
+
+        log.info("Looking up item {}", url);
+
+        if (LDNUtils.hasUUIDInURL(url)) {
+            UUID uuid = LDNUtils.getUUIDFromURL(url);
+
+            item = itemService.find(context, uuid);
+
+            if (Objects.isNull(item)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        format("Item with uuid %s not found", uuid));
+            }
+
+        } else {
+            String handle = handleService.resolveUrlToHandle(context, url);
+
+            DSpaceObject object = handleService.resolveToObject(context, handle);
+
+            if (Objects.isNull(object)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        format("Item with handle %s not found", handle));
+            }
+
+            if (object.getType() == Constants.ITEM) {
+                item = (Item) object;
+            } else {
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                        format("Handle %s does not resolve to an item", handle));
+            }
+        }
+
+        return item;
+    }
+
     private VelocityContext prepareTemplateContext(Notification notification) {
         VelocityContext velocityContext = new VelocityContext();
 
@@ -190,6 +270,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
         velocityContext.put("timestamp", timestamp);
         velocityContext.put("LDNUtils", LDNUtils.class);
         velocityContext.put("Objects", Objects.class);
+        velocityContext.put("StringUtils", StringUtils.class);
 
         return velocityContext;
     }

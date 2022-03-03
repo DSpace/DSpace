@@ -12,7 +12,6 @@ import static java.util.Objects.nonNull;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -54,7 +53,8 @@ public class ClientInfoServiceImpl implements ClientInfoService {
 
         // If our IPTable is not empty, log the trusted proxies
         if (!trustedProxies.isEmpty()) {
-            log.info("Trusted proxies (configure via 'proxies.trusted.ipranges'): {}", trustedProxies.toSet().toString());
+            log.info("Trusted proxies (configure via 'proxies.trusted.ipranges'): {}",
+                trustedProxies.toSet().toString());
         }
     }
 

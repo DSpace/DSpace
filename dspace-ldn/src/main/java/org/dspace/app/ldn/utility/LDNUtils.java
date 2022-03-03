@@ -21,6 +21,12 @@ public class LDNUtils {
 
     }
 
+    public static boolean hasUUIDInURL(String url) {
+        Matcher matcher = UUID_REGEX_PATTERN.matcher(url);
+
+        return matcher.find();
+    }
+
     public static UUID getUUIDFromURL(String url) {
         Matcher matcher = UUID_REGEX_PATTERN.matcher(url);
         StringBuilder handle = new StringBuilder();

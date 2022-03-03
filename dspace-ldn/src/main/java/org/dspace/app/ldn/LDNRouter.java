@@ -16,8 +16,6 @@ import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.dspace.app.ldn.action.ActionStatus;
-import org.dspace.app.ldn.action.LDNAction;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.processor.LDNProcessor;
 
@@ -39,24 +37,7 @@ public class LDNRouter {
             processor.getClass().getSimpleName()
         );
 
-        Object response = joinPoint.proceed(new Object[] { notification, processor });
-
-        ActionStatus operation;
-        for (LDNAction action : processor.getActions()) {
-            log.info(
-                "Running action {} for notification {} {}",
-                action.getClass().getSimpleName(),
-                notification.getId(),
-                notification.getType()
-            );
-
-            operation = action.execute(notification);
-            if (operation == ActionStatus.ABORT) {
-                break;
-            }
-        }
-
-        return response;
+        return joinPoint.proceed(new Object[] { notification, processor });
     }
 
     public Map<Set<String>, LDNProcessor> getProcessors() {

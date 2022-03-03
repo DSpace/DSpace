@@ -154,7 +154,7 @@
                     </property>
                 </bean>
                 <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
-                    <property name="conditionTemplate" value="$Objects.nonNull($notification.inReplyTo)" />
+                    <property name="conditionTemplate" value="$StringUtils.isNotEmpty($notification.inReplyTo)" />
                     <property name="qualifiers">
                         <list value-type="java.lang.String">
                             <value>refused</value>
@@ -168,7 +168,7 @@
                     </property>
                 </bean>
                 <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
-                    <property name="conditionTemplate" value="$Objects.nonNull($notification.inReplyTo)" />
+                    <property name="conditionTemplate" value="$StringUtils.isNotEmpty($notification.inReplyTo)" />
                     <property name="qualifier" value="examination" />
                     <property name="valueTemplate" value="$timestamp||$LDNUtils.removedProtocol($notification.origin.id)||$notification.inReplyTo" />
                 </bean>
@@ -188,7 +188,7 @@
         <property name="changes">
             <list value-type="org.dspace.app.ldn.processor.LDNMetadataChange">
                 <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
-                    <property name="conditionTemplate" value="$Objects.nonNull($notification.inReplyTo)" />
+                    <property name="conditionTemplate" value="$StringUtils.isNotEmpty($notification.inReplyTo)" />
                     <property name="qualifiers">
                         <list value-type="java.lang.String">
                             <value>examination</value>
@@ -220,6 +220,11 @@
     </bean>
 
     <bean name="announceReleaseAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="repeater">
+            <bean class="org.dspace.app.ldn.processor.LDNContextRepeater">
+                <property name="repeatOver" value="IsSupplementTo" />
+            </bean>
+        </property>
         <property name="changes">
             <list value-type="org.dspace.app.ldn.processor.LDNMetadataChange">
                 <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">

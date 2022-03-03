@@ -7,17 +7,10 @@
  */
 package org.dspace.app.ldn.processor;
 
-import java.util.List;
-
-import org.dspace.app.ldn.action.LDNAction;
 import org.dspace.app.ldn.model.Notification;
 
 public interface LDNProcessor {
 
     public void process(Notification notification) throws Exception;
-
-    public List<LDNAction> getActions();
-
-    public void setActions(List<LDNAction> actions);
 
 }

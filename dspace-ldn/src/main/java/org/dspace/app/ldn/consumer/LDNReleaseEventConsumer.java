@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.ldn.consumer;
 
 import org.apache.logging.log4j.LogManager;
@@ -17,7 +24,8 @@ public class LDNReleaseEventConsumer implements Consumer {
 
     @Override
     public void consume(Context ctx, Event event) throws Exception {
-        log.info("LDN Release Event consumer consumed {} {}", event.getObjectTypeAsString(), event.getEventTypeAsString());
+        log.info("LDN Release Event consumer consumed {} {}",
+                event.getObjectTypeAsString(), event.getEventTypeAsString());
     }
 
     @Override
