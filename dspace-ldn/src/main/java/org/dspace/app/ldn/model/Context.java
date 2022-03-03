@@ -7,6 +7,8 @@
  */
 package org.dspace.app.ldn.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -21,6 +23,12 @@ public class Context extends Base {
 
     @JsonProperty("url")
     private Url url;
+
+    @JsonProperty("IsSupplementedBy")
+    private List<Context> isSupplementedBy;
+
+    @JsonProperty("IsSupplementTo")
+    private List<Context> isSupplementTo;
 
     public Context() {
         super();
@@ -48,6 +56,22 @@ public class Context extends Base {
 
     public void setUrl(Url url) {
         this.url = url;
+    }
+
+    public List<Context> getIsSupplementedBy() {
+        return isSupplementedBy;
+    }
+
+    public void setIsSupplementedBy(List<Context> isSupplementedBy) {
+        this.isSupplementedBy = isSupplementedBy;
+    }
+
+    public List<Context> getIsSupplementTo() {
+        return isSupplementTo;
+    }
+
+    public void setIsSupplementTo(List<Context> isSupplementTo) {
+        this.isSupplementTo = isSupplementTo;
     }
 
 }
