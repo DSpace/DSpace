@@ -112,9 +112,6 @@ public class RelationshipServiceImplTest {
         relationshipTest.add(getRelationship(bob, cindy, hasMother,1,0));
         when(relationshipService.findByItem(context, cindy, -1, -1, false)).thenReturn(relationshipTest);
 
-        // Mock the state of objects utilized in findByItem() to meet the success criteria of the invocation
-        when(relationshipDAO.findByItem(context, cindy, -1, -1, false, false)).thenReturn(relationshipTest);
-
         List<Relationship> results = relationshipService.findByItem(context, cindy);
         assertEquals("TestFindByItem 0", relationshipTest, results);
         for (int i = 0; i < relationshipTest.size(); i++) {
