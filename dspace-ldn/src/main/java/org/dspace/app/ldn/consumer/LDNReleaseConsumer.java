@@ -17,6 +17,8 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.ldn.LDNBusinessDelegate;
+import org.dspace.app.ldn.factory.LDNBusinessDelegateFactory;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
@@ -42,11 +44,21 @@ public class LDNReleaseConsumer implements Consumer {
 
     private ItemService itemService;
 
+    private LDNBusinessDelegate ldnBusinessDelegate;
+
     @Override
     public void initialize() throws Exception {
         workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
         workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
         itemService = ContentServiceFactory.getInstance().getItemService();
+
+        log.info("\n\n" + LDNBusinessDelegateFactory.getInstance() + "\n\n");
+
+        if (LDNBusinessDelegateFactory.getInstance() != null) {
+            ldnBusinessDelegate = LDNBusinessDelegateFactory.getInstance().getLDNBusinessDelegate();
+            log.info("\n\n" + ldnBusinessDelegate + "\n\n");
+        }
+        
     }
 
     @Override

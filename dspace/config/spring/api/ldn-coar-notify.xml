@@ -10,10 +10,14 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.springframework.org/schema/util
-        http://www.springframework.org/schema/util/spring-util-3.0.xsd" default-autowire-candidates="*" default-lazy-init="true">
+        http://www.springframework.org/schema/util/spring-util-3.0.xsd" default-autowire-candidates="*">
 
     <context:annotation-config />
     <!-- allows us to use spring annotations in beans -->
+
+    <bean class="org.dspace.app.ldn.LDNBusinessDelegate">
+        <property name="foo" value="bar" />
+    </bean>
 
     <bean name="ldnRouter" class="org.dspace.app.ldn.LDNRouter">
         <property name="processors">
