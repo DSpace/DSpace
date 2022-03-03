@@ -80,7 +80,7 @@
 		<element>notify</element>
 		<qualifier>release</qualifier>
 		<scope_note>
-			Used to record a release. - Item goes in the link state.
+			Used to record a release. - Item goes in the linked state.
 		</scope_note>
 	</dc-type>
 

@@ -33,11 +33,8 @@ import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.utility.LDNUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.MetadataFieldService;
-import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
@@ -59,12 +56,6 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
     @Autowired
     private HandleService handleService;
-
-    @Autowired
-    private MetadataFieldService metadataFieldService;
-
-    @Autowired
-    private MetadataValueService metadataValueService;
 
     private LDNContextRepeater repeater = new LDNContextRepeater();
 
@@ -139,30 +130,36 @@ public class LDNMetadataProcessor implements LDNProcessor {
                 LDNMetadataRemove remove = (LDNMetadataRemove) change;
 
                 for (String qualifier : remove.getQualifiers()) {
-                    MetadataField metadataField = metadataFieldService.findByElement(
-                            context,
+                    List<MetadataValue> itemMetadata = itemService.getMetadata(
+                            item,
                             change.getSchema(),
                             change.getElement(),
-                            qualifier);
+                            qualifier,
+                            Item.ANY);
 
-                    for (MetadataValue metadataValue : metadataValueService.findByField(context, metadataField)) {
+                    for (MetadataValue metadatum : itemMetadata) {
+                        log.info("From Item {}.{}.{} {} {}",
+                                remove.getSchema(),
+                                remove.getElement(),
+                                qualifier,
+                                remove.getLanguage(),
+                                metadatum.getValue());
                         boolean delete = true;
                         for (String valueTemplate : remove.getValueTemplates()) {
                             String value = renderTemplate(velocityContext, valueTemplate);
-                            if (!metadataValue.getValue().contains(value)) {
+                            if (!metadatum.getValue().contains(value)) {
                                 delete = false;
                             }
                         }
                         if (delete) {
-                            log.info(
-                                    "Removing {}.{}.{} {} {}",
+                            log.info("Removing {}.{}.{} {} {}",
                                     remove.getSchema(),
                                     remove.getElement(),
                                     qualifier,
                                     remove.getLanguage(),
-                                    metadataValue.getValue());
+                                    metadatum.getValue());
 
-                            metadataValuesToRemove.add(metadataValue);
+                            metadataValuesToRemove.add(metadatum);
                         }
                     }
                 }

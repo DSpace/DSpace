@@ -26,7 +26,7 @@ public class LDNRouter {
 
     private Map<Set<String>, LDNProcessor> processors = new HashMap<>();
 
-    @Around("execution(* org.dspace.app.ldn.LDNController.inbox(..)) && args(notification, ..)")
+    @Around("execution(* org.dspace.app.ldn.LDNInboxController.inbox(..)) && args(notification, ..)")
     public Object routeNotification(ProceedingJoinPoint joinPoint, Notification notification) throws Throwable {
         LDNProcessor processor = processors.get(notification.getType());
 

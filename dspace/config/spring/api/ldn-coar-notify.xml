@@ -5,17 +5,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:context="http://www.springframework.org/schema/context"
-    xmlns:util="http://www.springframework.org/schema/util"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.springframework.org/schema/util
-        http://www.springframework.org/schema/util/spring-util-3.0.xsd"
-    default-autowire-candidates="*"
-    default-lazy-init="true">
+        http://www.springframework.org/schema/util/spring-util-3.0.xsd" default-autowire-candidates="*" default-lazy-init="true">
 
-    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+    <context:annotation-config />
+    <!-- allows us to use spring annotations in beans -->
 
     <bean name="ldnRouter" class="org.dspace.app.ldn.LDNRouter">
         <property name="processors">
@@ -228,9 +226,11 @@
         <property name="changes">
             <list value-type="org.dspace.app.ldn.processor.LDNMetadataChange">
                 <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
+                    <property name="schema" value="dc" />
+                    <property name="element" value="data" />
                     <property name="qualifiers">
                         <list value-type="java.lang.String">
-                            <value>release</value>
+                            <value>uri</value>
                         </list>
                     </property>
                     <property name="valueTemplates">
@@ -239,11 +239,27 @@
                         </list>
                     </property>
                 </bean>
+                <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
+                    <property name="qualifiers">
+                        <list value-type="java.lang.String">
+                            <value>release</value>
+                        </list>
+                    </property>
+                    <property name="valueTemplates">
+                        <list value-type="java.lang.String">
+                            <value>$LDNUtils.removedProtocol($notification.origin.id)</value>
+                        </list>
+                    </property>
+                </bean>
                 <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
                     <property name="schema" value="dc" />
                     <property name="element" value="data" />
                     <property name="qualifier" value="uri" />
                     <property name="valueTemplate" value="$notification.object.id" />
+                </bean>
+                <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
+                    <property name="qualifier" value="release" />
+                    <property name="valueTemplate" value="$timestamp||$LDNUtils.removedProtocol($notification.origin.id)" />
                 </bean>
             </list>
         </property>

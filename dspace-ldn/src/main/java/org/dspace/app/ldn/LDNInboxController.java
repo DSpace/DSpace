@@ -29,7 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/ldn")
 // Only enable this controller if "ldn.enabled=true"
 @ConditionalOnProperty("ldn.enabled")
-public class LDNController {
+public class LDNInboxController {
 
     @ResponseStatus(value = CREATED)
     @PostMapping(value = "/inbox", consumes = "application/ld+json", produces = "application/ld+json")
