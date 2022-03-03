@@ -15,9 +15,7 @@
     <context:annotation-config />
     <!-- allows us to use spring annotations in beans -->
 
-    <bean class="org.dspace.app.ldn.LDNBusinessDelegate">
-        <property name="foo" value="bar" />
-    </bean>
+    <bean class="org.dspace.app.ldn.LDNBusinessDelegate"></bean>
 
     <bean name="ldnRouter" class="org.dspace.app.ldn.LDNRouter">
         <property name="processors">

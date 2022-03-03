@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.LDNBusinessDelegate;
 import org.dspace.app.ldn.factory.LDNBusinessDelegateFactory;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -58,7 +57,6 @@ public class LDNReleaseConsumer implements Consumer {
             ldnBusinessDelegate = LDNBusinessDelegateFactory.getInstance().getLDNBusinessDelegate();
             log.info("\n\n" + ldnBusinessDelegate + "\n\n");
         }
-        
     }
 
     @Override
@@ -122,6 +120,12 @@ public class LDNReleaseConsumer implements Consumer {
                     return;
                 }
 
+                for (MetadataValue metadatum : researchMetadata) {
+                    if (!item.getMetadata().contains(metadatum)) {
+                        item.getMetadata().add(metadatum);
+                    }
+                }
+
                 if (!itemsToRelease.add(item)) {
                     itemsToRelease.remove(item);
                     itemsToRelease.add(item);
@@ -138,14 +142,8 @@ public class LDNReleaseConsumer implements Consumer {
     public void end(Context context) throws Exception {
         if (itemsToRelease != null) {
             for (Item item : itemsToRelease) {
-                List<MetadataValue> metadata = item.getMetadata();
-
-                log.info("Item for release  {}", item.getID());
-                for (MetadataValue value : metadata) {
-                    MetadataField field = value.getMetadataField();
-                    log.info("Metadata field {} with value {}", field, value.getValue());
-                }
-
+                log.info("Item for release {} {}", item.getID(), item.getName());
+                ldnBusinessDelegate.announceRelease(context, item);
             }
         }
 

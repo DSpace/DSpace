@@ -7,27 +7,91 @@
  */
 package org.dspace.app.ldn;
 
-import javax.annotation.PostConstruct;
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
 
-import org.apache.log4j.Logger;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.ldn.model.Actor;
+import org.dspace.app.ldn.model.Context;
+import org.dspace.app.ldn.model.Notification;
+import org.dspace.app.ldn.model.Object;
+import org.dspace.app.ldn.model.Service;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class LDNBusinessDelegate {
 
-    private static final Logger log = Logger.getLogger(LDNBusinessDelegate.class);
+    private final static Logger log = LogManager.getLogger(LDNBusinessDelegate.class);
 
-    private String foo;
+    @Autowired
+    private ConfigurationService configurationService;
 
-    @PostConstruct
-    public void init() {
-        log.info("\n\n" + foo + "\n\n");
-    }
+    @Autowired
+    private HandleService handleService;
 
-    public String getFoo() {
-        return foo;
-    }
+    public void announceRelease(org.dspace.core.Context ctx, Item item) throws SQLException {
+        String dspaceUrl = configurationService.getProperty("dsapce.url");
+        String dspaceLdnInboxUrl = format("%s/ldn/inbox", removeEnd(dspaceUrl, "/"));
 
-    public void setFoo(String foo) {
-        this.foo = foo;
+        log.info("DSpace URL {}", dspaceUrl);
+        log.info("DSpace LDN Inbox URL {}", dspaceLdnInboxUrl);
+
+        Notification notification = new Notification();
+
+        notification.setId(format("urn:uuid:%s", UUID.randomUUID()));
+        notification.addType("Announce");
+        notification.addType("coar-notify:ReleaseAction");
+
+        Actor actor = new Actor();
+
+        actor.setId(configurationService.getProperty("dsapce.url"));
+        actor.setName(configurationService.getProperty("dsapce.name"));
+        actor.addType("Service");
+
+        Context context = new Context();
+
+        List<MetadataValue> metadata = item.getMetadata();
+        for (MetadataValue value : metadata) {
+            MetadataField field = value.getMetadataField();
+            log.info("Metadata field {} with value {}", field, value.getValue());
+        }
+
+        Object object = new Object();
+
+        String itemHandleUrl = handleService.resolveToURL(ctx, item.getHandle());
+        String itemUrl = handleService.getCanonicalForm(item.getHandle());
+
+        log.info("Item Handle URL {}", itemHandleUrl);
+
+        log.info("Item URL {}", itemUrl);
+
+        object.setId(itemHandleUrl);
+        object.setIetfCiteAs(itemUrl);
+        object.setTitle(item.getName());
+        object.addType("sorg:ScholarlyArticle");
+
+        Service origin = new Service();
+        origin.addType("Service");
+
+        Service target = new Service();
+        origin.setId(dspaceLdnInboxUrl);
+        origin.setInbox(dspaceLdnInboxUrl);
+        origin.addType("Service");
+
+        notification.setActor(actor);
+        notification.setContext(context);
+        notification.setObject(object);
+        notification.setOrigin(origin);
+        notification.setTarget(target);
     }
 
 }

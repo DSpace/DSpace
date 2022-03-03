@@ -7,6 +7,7 @@
  */
 package org.dspace.app.ldn.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -20,7 +21,7 @@ public class Base {
     private Set<String> type;
 
     public Base() {
-
+        type = new HashSet<>();
     }
 
     public String getId() {
@@ -37,6 +38,10 @@ public class Base {
 
     public void setType(Set<String> type) {
         this.type = type;
+    }
+
+    public void addType(String type) {
+        this.type.add(type);
     }
 
     @Override
