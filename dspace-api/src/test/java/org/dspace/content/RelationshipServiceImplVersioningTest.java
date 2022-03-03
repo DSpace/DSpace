@@ -131,6 +131,13 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship5.getLatestVersionStatus());
         Relationship relationship6 = relationshipService.find(context, relationship5.getID());
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship6.getLatestVersionStatus());
+
+        // clean up
+        context.turnOffAuthorisationSystem();
+        relationshipService.delete(context, relationship1);
+        relationshipService.delete(context, relationship3);
+        relationshipService.delete(context, relationship5);
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -158,6 +165,12 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship3.getLatestVersionStatus());
         Relationship relationship4 = relationshipService.find(context, relationship3.getID());
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship4.getLatestVersionStatus());
+
+        // clean up
+        context.turnOffAuthorisationSystem();
+        relationshipService.delete(context, relationship1);
+        relationshipService.delete(context, relationship3);
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -185,6 +198,12 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         assertEquals(Relationship.LatestVersionStatus.LEFT_ONLY, relationship3.getLatestVersionStatus());
         Relationship relationship4 = relationshipService.find(context, relationship3.getID());
         assertEquals(Relationship.LatestVersionStatus.LEFT_ONLY, relationship4.getLatestVersionStatus());
+
+        // clean up
+        context.turnOffAuthorisationSystem();
+        relationshipService.delete(context, relationship1);
+        relationshipService.delete(context, relationship3);
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -212,6 +231,12 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         assertEquals(Relationship.LatestVersionStatus.RIGHT_ONLY, relationship3.getLatestVersionStatus());
         Relationship relationship4 = relationshipService.find(context, relationship3.getID());
         assertEquals(Relationship.LatestVersionStatus.RIGHT_ONLY, relationship4.getLatestVersionStatus());
+
+        // clean up
+        context.turnOffAuthorisationSystem();
+        relationshipService.delete(context, relationship1);
+        relationshipService.delete(context, relationship3);
+        context.restoreAuthSystemState();
     }
 
     protected void assertRelationship(Relationship expectedRelationship, List<Relationship> relationships) {
