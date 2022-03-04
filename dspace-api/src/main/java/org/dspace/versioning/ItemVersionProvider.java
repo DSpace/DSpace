@@ -22,5 +22,12 @@ public interface ItemVersionProvider {
 
     public void deleteVersionedItem(Context c, Version versionToDelete, VersionHistory history) throws SQLException;
 
+    /**
+     * Copy all data (minus a few exceptions) from the old item to the new item.
+     * @param c the DSpace context.
+     * @param itemNew the new version of the item.
+     * @param previousItem the old version of the item.
+     * @return the new version of the item, with data from the old item.
+     */
     public Item updateItemState(Context c, Item itemNew, Item previousItem);
 }
