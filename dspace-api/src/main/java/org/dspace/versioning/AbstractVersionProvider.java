@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -24,6 +25,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +57,9 @@ public abstract class AbstractVersionProvider {
             MetadataSchema metadataSchema = metadataField.getMetadataSchema();
             String unqualifiedMetadataField = metadataSchema.getName() + "." + metadataField.getElement();
             if (getIgnoredMetadataFields().contains(metadataField.toString('.')) ||
-                getIgnoredMetadataFields().contains(unqualifiedMetadataField + "." + Item.ANY)) {
-                //Skip this metadata field
+                getIgnoredMetadataFields().contains(unqualifiedMetadataField + "." + Item.ANY) ||
+                StringUtils.startsWith(aMd.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+                //Skip this metadata field (ignored and/or virtual)
                 continue;
             }
 
