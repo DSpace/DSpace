@@ -123,6 +123,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     /**
      * This method returns a list of Relationships for which the leftItem or rightItem is equal to the given
      * Item object and for which the RelationshipType object is equal to the relationshipType property
+     * NOTE: tilted relationships are NEVER excluded when fetching one relationship type
      * @param context           The relevant DSpace context
      * @param item              The Item object to be matched on the leftItem or rightItem for the relationship
      * @param relationshipType  The RelationshipType object that will be used to check the Relationship on
@@ -137,6 +138,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     /**
      * This method returns a list of Relationships for which the leftItem or rightItem is equal to the given
      * Item object and for which the RelationshipType object is equal to the relationshipType property
+     * NOTE: tilted relationships are NEVER excluded when fetching one relationship type
      * @param context           The relevant DSpace context
      * @param item              The Item object to be matched on the leftItem or rightItem for the relationship
      * @param relationshipType  The RelationshipType object that will be used to check the Relationship on
@@ -151,6 +153,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     /**
      * This method returns a list of Relationships for which the leftItem or rightItem is equal to the given
      * Item object and for which the RelationshipType object is equal to the relationshipType property
+     * NOTE: tilted relationships are NEVER excluded when fetching one relationship type
      * @param context           The relevant DSpace context
      * @param item              The Item object to be matched on the leftItem or rightItem for the relationship
      * @param relationshipType  The RelationshipType object that will be used to check the Relationship on
@@ -167,6 +170,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     /**
      * This method returns a list of Relationships for which the leftItem or rightItem is equal to the given
      * Item object and for which the RelationshipType object is equal to the relationshipType property
+     * NOTE: tilted relationships are NEVER excluded when fetching one relationship type
      * @param context           The relevant DSpace context
      * @param item              The Item object to be matched on the leftItem or rightItem for the relationship
      * @param relationshipType  The RelationshipType object that will be used to check the Relationship on
@@ -183,6 +187,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     /**
      * This method returns a list of Relationships for which the leftItem or rightItem is equal to the given
      * Item object and for which the RelationshipType object is equal to the relationshipType property
+     * NOTE: tilted relationships are NEVER excluded when fetching one relationship type
      * @param context            The relevant DSpace context
      * @param item               The Item object to be matched on the leftItem or rightItem for the relationship
      * @param relationshipType   The RelationshipType object that will be used to check the Relationship on
@@ -228,6 +233,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     /**
      * This method returns a list of Relationship objects for which the relationshipType property is equal to the given
      * RelationshipType object
+     * NOTE: tilted relationships are NEVER excluded when fetching one relationship type
      * @param context           The relevant DSpace context
      * @param relationshipType  The RelationshipType object that will be used to check the Relationship on
      * @return  The list of Relationship objects for which the given RelationshipType object is equal
@@ -239,6 +245,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     /**
      * This method returns a list of Relationship objets for which the relationshipType property is equal to the given
      * RelationshipType object
+     * NOTE: tilted relationships are NEVER excluded when fetching one relationship type
      * @param context           The relevant DSpace context
      * @param relationshipType  The RelationshipType object that will be used to check the Relationship on
      * @param limit             paging limit
@@ -343,7 +350,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
 
     /**
      * Count total number of relationships (rows in relationship table) by a relationship type
-     *
+     * NOTE: tilted relationships are NEVER excluded when fetching one relationship type
      * @param context context
      * @param relationshipType relationship type to filter by
      * @return total count
@@ -369,18 +376,19 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @param context           The relevant DSpace context
      * @param item              The item that should be either a leftItem or a rightItem of all
      *                          the Relationship objects in the returned list
+     * @param excludeTilted     if true, excludes tilted relationships
      * @param excludeNonLatest  if true, exclude relationships for which the opposite item is not the latest version
      *                          that is relevant
      * @return          The list of Relationship objects that contain either a left or a
      *                  right item that is equal to the given item
      * @throws SQLException If something goes wrong
      */
-    int countByItem(Context context, Item item, boolean excludeNonLatest) throws SQLException;
+    int countByItem(Context context, Item item, boolean excludeTilted, boolean excludeNonLatest) throws SQLException;
 
     /**
      * Count total number of relationships (rows in relationship table) by a relationship type and a boolean indicating
      * whether the relationship should contain the item on the left side or not
-     *
+     * NOTE: tilted relationships are NEVER excluded when fetching one relationship type
      * @param context context
      * @param relationshipType relationship type to filter by
      * @param isLeft Indicating whether the counted Relationships should have the given Item on the left side or not
@@ -393,6 +401,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     /**
      * Count total number of relationships (rows in relationship table) by a relationship type and a boolean indicating
      * whether the relationship should contain the item on the left side or not
+     * NOTE: tilted relationships are NEVER excluded when fetching one relationship type
      * @param context           context
      * @param relationshipType  relationship type to filter by
      * @param isLeft            Indicating whether the counted Relationships should have the given Item on the left side

@@ -293,10 +293,14 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
             relationshipDAO.findByItem(context, person1, -1, -1, false, true)
         );
 
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, false));
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, true));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, false));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, true));
+        assertEquals(1, relationshipDAO.countByItem(context, publication1, false, false));
+        assertEquals(1, relationshipDAO.countByItem(context, publication1, false, true));
+        assertEquals(1, relationshipDAO.countByItem(context, person1, false, false));
+        assertEquals(1, relationshipDAO.countByItem(context, person1, false, true));
+        assertEquals(1, relationshipDAO.countByItem(context, publication1, true, false));
+        assertEquals(1, relationshipDAO.countByItem(context, publication1, true, true));
+        assertEquals(1, relationshipDAO.countByItem(context, person1, true, false));
+        assertEquals(1, relationshipDAO.countByItem(context, person1, true, true));
 
         assertRelationship(
             relationship1,
@@ -490,10 +494,14 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         assertEquals(1, relationshipService.countByItem(context, publication1));
         assertEquals(1, relationshipService.countByItem(context, person1));
 
-        assertEquals(1, relationshipService.countByItem(context, publication1, false));
-        assertEquals(1, relationshipService.countByItem(context, publication1, true));
-        assertEquals(1, relationshipService.countByItem(context, person1, false));
-        assertEquals(1, relationshipService.countByItem(context, person1, true));
+        assertEquals(1, relationshipService.countByItem(context, publication1, false, false));
+        assertEquals(1, relationshipService.countByItem(context, publication1, false, true));
+        assertEquals(1, relationshipService.countByItem(context, person1, false, false));
+        assertEquals(1, relationshipService.countByItem(context, person1, false, true));
+        assertEquals(1, relationshipService.countByItem(context, publication1, true, false));
+        assertEquals(1, relationshipService.countByItem(context, publication1, true, true));
+        assertEquals(1, relationshipService.countByItem(context, person1, true, false));
+        assertEquals(1, relationshipService.countByItem(context, person1, true, true));
 
         assertEquals(
             0, relationshipService.countByItemAndRelationshipType(context, publication1, relationshipType, false)
@@ -575,10 +583,14 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
             relationshipDAO.findByItem(context, person1, -1, -1, false, true)
         );
 
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, false));
-        assertEquals(0, relationshipDAO.countByItem(context, publication1, true));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, false));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, true));
+        assertEquals(1, relationshipDAO.countByItem(context, publication1, false, false));
+        assertEquals(0, relationshipDAO.countByItem(context, publication1, false, true));
+        assertEquals(1, relationshipDAO.countByItem(context, person1, false, false));
+        assertEquals(1, relationshipDAO.countByItem(context, person1, false, true));
+        assertEquals(1, relationshipDAO.countByItem(context, publication1, true, false));
+        assertEquals(0, relationshipDAO.countByItem(context, publication1, true, true));
+        assertEquals(1, relationshipDAO.countByItem(context, person1, true, false));
+        assertEquals(1, relationshipDAO.countByItem(context, person1, true, true));
 
         assertRelationship(
             relationship1,
@@ -762,10 +774,14 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         assertEquals(0, relationshipService.countByItem(context, publication1));
         assertEquals(1, relationshipService.countByItem(context, person1));
 
-        assertEquals(1, relationshipService.countByItem(context, publication1, false));
-        assertEquals(0, relationshipService.countByItem(context, publication1, true));
-        assertEquals(1, relationshipService.countByItem(context, person1, false));
-        assertEquals(1, relationshipService.countByItem(context, person1, true));
+        assertEquals(1, relationshipService.countByItem(context, publication1, false, false));
+        assertEquals(0, relationshipService.countByItem(context, publication1, false, true));
+        assertEquals(1, relationshipService.countByItem(context, person1, false, false));
+        assertEquals(1, relationshipService.countByItem(context, person1, false, true));
+        assertEquals(1, relationshipService.countByItem(context, publication1, true, false));
+        assertEquals(0, relationshipService.countByItem(context, publication1, true, true));
+        assertEquals(1, relationshipService.countByItem(context, person1, true, false));
+        assertEquals(1, relationshipService.countByItem(context, person1, true, true));
 
         assertEquals(
             0, relationshipService.countByItemAndRelationshipType(context, publication1, relationshipType, false)
@@ -847,10 +863,14 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
             relationshipDAO.findByItem(context, person1, -1, -1, false, true)
         );
 
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, false));
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, true));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, false));
-        assertEquals(0, relationshipDAO.countByItem(context, person1, true));
+        assertEquals(1, relationshipDAO.countByItem(context, publication1, false, false));
+        assertEquals(1, relationshipDAO.countByItem(context, publication1, false, true));
+        assertEquals(1, relationshipDAO.countByItem(context, person1, false, false));
+        assertEquals(0, relationshipDAO.countByItem(context, person1, false, true));
+        assertEquals(1, relationshipDAO.countByItem(context, publication1, true, false));
+        assertEquals(1, relationshipDAO.countByItem(context, publication1, true, true));
+        assertEquals(1, relationshipDAO.countByItem(context, person1, true, false));
+        assertEquals(0, relationshipDAO.countByItem(context, person1, true, true));
 
         assertRelationship(
             relationship1,
@@ -1034,10 +1054,14 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         assertEquals(1, relationshipService.countByItem(context, publication1));
         assertEquals(0, relationshipService.countByItem(context, person1));
 
-        assertEquals(1, relationshipService.countByItem(context, publication1, false));
-        assertEquals(1, relationshipService.countByItem(context, publication1, true));
-        assertEquals(1, relationshipService.countByItem(context, person1, false));
-        assertEquals(0, relationshipService.countByItem(context, person1, true));
+        assertEquals(1, relationshipService.countByItem(context, publication1, false, false));
+        assertEquals(1, relationshipService.countByItem(context, publication1, false, true));
+        assertEquals(1, relationshipService.countByItem(context, person1, false, false));
+        assertEquals(0, relationshipService.countByItem(context, person1, false, true));
+        assertEquals(1, relationshipService.countByItem(context, publication1, true, false));
+        assertEquals(1, relationshipService.countByItem(context, publication1, true, true));
+        assertEquals(1, relationshipService.countByItem(context, person1, true, false));
+        assertEquals(0, relationshipService.countByItem(context, person1, true, true));
 
         assertEquals(
             0, relationshipService.countByItemAndRelationshipType(context, publication1, relationshipType, false)

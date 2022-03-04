@@ -200,13 +200,14 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      * @param context           The relevant DSpace context
      * @param item              The item that should be either a leftItem or a rightItem of all
      *                          the Relationship objects in the returned list
+     * @param excludeTilted     if true, excludes tilted relationships
      * @param excludeNonLatest  if true, exclude relationships for which the opposite item is not the latest version
      *                          that is relevant
      * @return          The list of Relationship objects that contain either a left or a
      *                  right item that is equal to the given item
      * @throws SQLException If something goes wrong
      */
-    int countByItem(Context context, Item item, boolean excludeNonLatest) throws SQLException;
+    int countByItem(Context context, Item item, boolean excludeTilted, boolean excludeNonLatest) throws SQLException;
 
     /**
      * Count total number of relationships (rows in relationship table) by an item and a relationship type and a boolean

@@ -159,7 +159,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     }
 
     @Override
-    public int countByItem(Context context, Item item, boolean excludeNonLatest) throws SQLException {
+    public int countByItem(
+        Context context, Item item, boolean excludeTilted, boolean excludeNonLatest
+    ) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
@@ -167,8 +169,8 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
 
         criteriaQuery.where(
             criteriaBuilder.or(
-                getLeftItemPredicate(criteriaBuilder, relationshipRoot, item, false, excludeNonLatest),
-                getRightItemPredicate(criteriaBuilder, relationshipRoot, item, false, excludeNonLatest)
+                getLeftItemPredicate(criteriaBuilder, relationshipRoot, item, excludeTilted, excludeNonLatest),
+                getRightItemPredicate(criteriaBuilder, relationshipRoot, item, excludeTilted, excludeNonLatest)
             )
         );
 

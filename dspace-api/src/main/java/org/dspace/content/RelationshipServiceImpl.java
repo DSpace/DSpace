@@ -301,10 +301,10 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public List<Relationship> findByItem(
-        Context context, Item item, Integer limit, Integer offset, boolean excludeTilted, boolean excludeNonLinked
+        Context context, Item item, Integer limit, Integer offset, boolean excludeTilted, boolean excludeNonLatest
     ) throws SQLException {
         List<Relationship> list =
-            relationshipDAO.findByItem(context, item, limit, offset, excludeTilted, excludeNonLinked);
+            relationshipDAO.findByItem(context, item, limit, offset, excludeTilted, excludeNonLatest);
 
         list.sort((o1, o2) -> {
             int relationshipType = o1.getRelationshipType().getLeftwardType()
@@ -728,12 +728,14 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public int countByItem(Context context, Item item) throws SQLException {
-        return countByItem(context, item, true);
+        return countByItem(context, item, false, true);
     }
 
     @Override
-    public int countByItem(Context context, Item item, boolean excludeNonLatest) throws SQLException {
-        return relationshipDAO.countByItem(context, item, excludeNonLatest);
+    public int countByItem(
+        Context context, Item item, boolean excludeTilted, boolean excludeNonLatest
+    ) throws SQLException {
+        return relationshipDAO.countByItem(context, item, excludeTilted, excludeNonLatest);
     }
 
     @Override
