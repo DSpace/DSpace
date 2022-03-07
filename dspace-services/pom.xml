@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>6.3-drum-7-SNAPSHOT</version>
+        <version>6.3-drum-7</version>
     </parent>
 
     <properties>
