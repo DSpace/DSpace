@@ -132,7 +132,7 @@ public class BitstreamRestController {
 
         try {
             long filesize = bit.getSizeBytes();
-            var citationEnabledForBitstream = citationDocumentService.isCitationEnabledForBitstream(bit, context);
+            Boolean citationEnabledForBitstream = citationDocumentService.isCitationEnabledForBitstream(bit, context);
 
             HttpHeadersInitializer httpHeadersInitializer = new HttpHeadersInitializer()
                 .withBufferSize(BUFFER_SIZE)
@@ -152,10 +152,9 @@ public class BitstreamRestController {
                 httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_ATTACHMENT);
             }
 
-
             org.dspace.app.rest.utils.BitstreamResource bitstreamResource =
                 new org.dspace.app.rest.utils.BitstreamResource(
-                    bit, name, uuid, currentUser != null ? currentUser.getID() : null, citationEnabledForBitstream);
+                    name, uuid, currentUser != null ? currentUser.getID() : null, citationEnabledForBitstream);
 
             //We have all the data we need, close the connection to the database so that it doesn't stay open during
             //download/streaming
