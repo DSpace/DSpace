@@ -1,0 +1,79 @@
+#
+# The contents of this file are subject to the license and copyright
+# detailed in the LICENSE and NOTICE files at the root of the source
+# tree and available online at
+#
+# http://www.dspace.org/license/
+#
+
+version: '3.7'
+networks:
+  dspacenet:
+services:
+  dspace:
+    container_name: dspace
+    depends_on:
+    - dspacedb
+    image: docker.lib.umd.edu/drum:dev
+    command:
+      - catalina.sh
+      # - jpda
+      - run
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    networks:
+      dspacenet:
+    ports:
+    - published: 8080
+      target: 8080
+    - published: 8000
+      target: 8000
+    environment:
+     - JPDA_ADDRESS=8000
+     - JPDA_TRANSPORT=dt_socket
+    #  - JPDA_SUSPEND=y
+    stdin_open: true
+    tty: true
+    volumes:
+    - ./dspace/src/main/docker-compose/local.cfg:/dspace/config/local.cfg
+    - ./dspace/src/main/docker-compose/xmlui.xconf:/dspace/config/xmlui.xconf
+    - assetstore:/dspace/assetstore
+  dspacedb:
+    container_name: dspacedb
+    environment:
+      PGDATA: /pgdata
+      POSTGRES_DB: drum
+      POSTGRES_USER: drum
+      POSTGRES_PASSWORD: drum
+    image: docker.lib.umd.edu/dspace-postgres:6.3-drum-4.0
+    networks:
+      dspacenet:
+    stdin_open: true
+    tty: true
+    volumes:
+    - pgdata:/pgdata
+    # - ./postgres-init/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    - ./postgres-init:/docker-entrypoint-initdb.d
+  solr:
+    container_name: solr
+    image: docker.lib.umd.edu/drum-solr:6.3-drum-4.0
+    networks:
+      dspacenet:
+    command:
+      - bash
+      - -c
+      - |-
+        precreate-or-update-core search /opt/solr/server/solr/configsets/search; \
+        precreate-or-update-core statistics /opt/solr/server/solr/configsets/statistics; \
+        precreate-or-update-core oai /opt/solr/server/solr/configsets/oai; \
+        exec solr -f -s /opt/solr/server/solr -m 2g
+    ports:
+    - published: 8983
+      target: 8983
+    volumes:
+    - solr:/opt/solr/server/solr/mycores
+volumes:
+  assetstore:
+  pgdata:
+  solr:
