@@ -286,51 +286,54 @@ public class RDFConsumer implements Consumer {
     @Override
     public void end(Context ctx) throws Exception {
         log.debug("Started processing of queued events.");
-        // create a new context, to be sure to work as anonymous user
-        // we don't want to store private data in a triplestore with public
-        // SPARQL endpoint.
-        ctx = new Context(Context.Mode.READ_ONLY);
-        if (toDelete == null) {
-            log.debug("Deletion queue does not exists, creating empty queue.");
-            this.toDelete = new LinkedList<>();
-        }
-        if (toConvert != null) {
-            log.debug("Starting conversion of DSpaceObjects.");
+        // store the context mode, set context read only for performance reasons, and restore the old mode
+        Context.Mode oldMode = ctx.getCurrentMode();
+        try {
+            ctx.setMode(Context.Mode.READ_ONLY);
+            if (toDelete == null) {
+                log.debug("Deletion queue does not exists, creating empty queue.");
+                this.toDelete = new LinkedList<>();
+            }
+            if (toConvert != null) {
+                log.debug("Starting conversion of DSpaceObjects.");
+                while (true) {
+                    DSOIdentifier id;
+                    try {
+                        id = toConvert.removeFirst();
+                    } catch (NoSuchElementException ex) {
+                        break;
+                    }
+
+                    if (toDelete.contains(id)) {
+                        log.debug("Skipping " + Constants.typeText[id.type] + " "
+                                      + id.id.toString() + " as it is marked for "
+                                      + "deletion as well.");
+                        continue;
+                    }
+                    log.debug("Converting " + Constants.typeText[id.type] + " "
+                                  + id.id.toString() + ".");
+                    convert(ctx, id);
+                }
+                log.debug("Conversion ended.");
+            }
+            log.debug("Starting to delete data from the triple store...");
             while (true) {
                 DSOIdentifier id;
                 try {
-                    id = toConvert.removeFirst();
+                    id = toDelete.removeFirst();
                 } catch (NoSuchElementException ex) {
                     break;
                 }
 
-                if (toDelete.contains(id)) {
-                    log.debug("Skipping " + Constants.typeText[id.type] + " "
-                                  + id.id.toString() + " as it is marked for "
-                                  + "deletion as well.");
-                    continue;
-                }
-                log.debug("Converting " + Constants.typeText[id.type] + " "
+                log.debug("Going to delete data from " +
+                              Constants.typeText[id.type] + " "
                               + id.id.toString() + ".");
-                convert(ctx, id);
+                delete(ctx, id);
             }
-            log.debug("Conversion ended.");
+        } finally {
+            // restore context mode
+            ctx.setMode(oldMode);
         }
-        log.debug("Starting to delete data from the triple store...");
-        while (true) {
-            DSOIdentifier id;
-            try {
-                id = toDelete.removeFirst();
-            } catch (NoSuchElementException ex) {
-                break;
-            }
-
-            log.debug("Going to delete data from " +
-                          Constants.typeText[id.type] + " "
-                          + id.id.toString() + ".");
-            delete(ctx, id);
-        }
-        ctx.abort();
         log.debug("Deletion finished.");
     }
 

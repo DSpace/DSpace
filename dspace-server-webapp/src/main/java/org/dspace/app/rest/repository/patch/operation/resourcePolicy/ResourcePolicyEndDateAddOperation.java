@@ -43,7 +43,6 @@ public class ResourcePolicyEndDateAddOperation<R> extends PatchOperation<R> {
         checkOperationValue(operation.getValue());
         if (this.supports(resource, operation)) {
             ResourcePolicy resourcePolicy = (ResourcePolicy) resource;
-            resourcePolicyUtils.checkResourcePolicyForExistingEndDateValue(resourcePolicy, operation);
             resourcePolicyUtils.checkResourcePolicyForConsistentEndDateValue(resourcePolicy, operation);
             this.add(resourcePolicy, operation);
             return resource;

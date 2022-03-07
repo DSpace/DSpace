@@ -85,6 +85,7 @@ public class VersionBuilder extends AbstractBuilder<Version, VersioningService> 
     public void delete(Version version) throws Exception {
         try (Context context = new Context()) {
             context.turnOffAuthorisationSystem();
+            context.setDispatcher("noindex");
             Version attachedTab = context.reloadEntity(version);
             if (attachedTab != null) {
                 getService().delete(context, attachedTab);
