@@ -1524,8 +1524,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("page.totalElements", is(0)));
         } finally {
-            RelationshipBuilder.deleteRelationship(idRef1.get());
-            RelationshipBuilder.deleteRelationship(idRef2.get());
+            if (idRef1.get() != null) {
+                RelationshipBuilder.deleteRelationship(idRef1.get());
+            }
+            if (idRef2.get() != null) {
+                RelationshipBuilder.deleteRelationship(idRef2.get());
+            }
         }
     }
 
