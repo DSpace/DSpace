@@ -37,7 +37,6 @@ import org.dspace.app.iiif.model.generator.SearchResultGenerator;
 import org.dspace.app.iiif.service.utils.IIIFUtils;
 import org.dspace.discovery.SolrSearchCore;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -72,6 +71,9 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
     @Autowired
     ManifestGenerator manifestGenerator;
 
+    @Autowired
+    ConfigurationService configurationService;
+
 
     @Override
     public boolean useSearchPlugin(String className) {
@@ -87,7 +89,6 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
     @Override
     public String getSearchResponse(UUID uuid, String query) {
         String json = "";
-        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         String solrService = configurationService.getProperty("iiif.search.url");
         boolean validationEnabled =  configurationService
                 .getBooleanProperty("discovery.solr.url.validation.enabled");
@@ -132,18 +133,26 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
      * @return solr query
      */
     private SolrQuery getSolrQuery(String query, String manifestId) {
+        String snippetCount = configurationService.getProperty("iiif.search.snippets");
+        String contextBlock = configurationService.getProperty("iiif.search.contextBlock");
+        String limitBlock = configurationService.getProperty("iiif.search.limitBlock");
+        String scorePassages = configurationService.getProperty("iiif.search.scorePassages");
+        String absoluteHighlights = configurationService.getProperty("iiif.search.absoluteHighlights");
+        String contextSize = configurationService.getProperty("iiif.search.contextSize");
+        String trackPages = configurationService.getProperty("iiif.search.trackPages");
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.set("q", "ocr_text:" + query + " AND manifest_url:\"" + manifestId + "\"");
         solrQuery.set(CommonParams.WT, "json");
+        solrQuery.set("fl", "manifest_url");
         solrQuery.set("hl", "true");
         solrQuery.set("hl.ocr.fl", "ocr_text");
-        solrQuery.set("hl.ocr.contextBlock", "line");
-        solrQuery.set("hl.ocr.contextSize", "2");
-        solrQuery.set("hl.snippets", "10");
-        solrQuery.set("hl.ocr.trackPages", "true");
-        solrQuery.set("hl.ocr.limitBlock","line");
-        solrQuery.set("hl.ocr.scorePassages", "off");
-        solrQuery.set("hl.ocr.absoluteHighlights", "true");
+        solrQuery.set("hl.ocr.contextBlock", contextBlock);
+        solrQuery.set("hl.ocr.contextSize", contextSize);
+        solrQuery.set("hl.snippets", snippetCount);
+        solrQuery.set("hl.ocr.trackPages", trackPages);
+        solrQuery.set("hl.ocr.limitBlock",limitBlock);
+        solrQuery.set("hl.ocr.scorePassages", scorePassages);
+        solrQuery.set("hl.ocr.absoluteHighlights", absoluteHighlights);
 
         return solrQuery;
     }
