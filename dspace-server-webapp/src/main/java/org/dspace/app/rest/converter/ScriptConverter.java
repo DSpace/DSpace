@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.ParameterRest;
 import org.dspace.app.rest.model.ScriptRest;
 import org.dspace.app.rest.projection.Projection;
@@ -39,13 +40,33 @@ public class ScriptConverter implements DSpaceConverter<ScriptConfiguration, Scr
             parameterRest.setDescription(option.getDescription());
             parameterRest.setName((option.getOpt() != null ? "-" + option.getOpt() : "--" + option.getLongOpt()));
             parameterRest.setNameLong(option.getLongOpt() != null ? "--" + option.getLongOpt() : null);
-            parameterRest.setType(((Class) option.getType()).getSimpleName());
+            parameterRest.setType(getType(option));
             parameterRest.setMandatory(option.isRequired());
             parameterRestList.add(parameterRest);
         }
         scriptRest.setParameterRestList(parameterRestList);
 
         return scriptRest;
+    }
+
+    /**
+     * Retrieve the type string for this option
+     *
+     * String is the default option class when no alternative is set. However, DSpace angular will force an argument
+     * when the type is set to string. Therefor, this method will return the boolean type when the option is of type
+     * string and does require an argument.
+     *
+     * @param option    Option to retrieve the type for
+     * @return the type of the option based on the aforementioned logic
+     */
+    private String getType(Option option) {
+        String simpleName = ((Class) option.getType()).getSimpleName();
+        if (StringUtils.equalsIgnoreCase(simpleName, "string")) {
+            if (!option.hasArg()) {
+                return boolean.class.getSimpleName();
+            }
+        }
+        return simpleName;
     }
 
     @Override

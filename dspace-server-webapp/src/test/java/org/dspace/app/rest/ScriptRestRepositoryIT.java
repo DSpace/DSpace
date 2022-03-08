@@ -8,6 +8,8 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
@@ -482,6 +484,47 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         } finally {
             ProcessBuilder.deleteProcess(idRef.get());
         }
+    }
+
+    @Test
+    public void scriptTypeConversionTest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/scripts/type-conversion-test"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", ScriptMatcher
+                                .matchScript("type-conversion-test",
+                                             "Test the type conversion different option types")))
+                        .andExpect(jsonPath("$.parameters", containsInAnyOrder(
+                                allOf(
+                                        hasJsonPath("$.name", is("-b")),
+                                        hasJsonPath("$.description", is("option set to the boolean class")),
+                                        hasJsonPath("$.type", is("boolean")),
+                                        hasJsonPath("$.mandatory", is(false)),
+                                        hasJsonPath("$.nameLong", is("--boolean"))
+                                ),
+                                allOf(
+                                        hasJsonPath("$.name", is("-s")),
+                                        hasJsonPath("$.description", is("string option with an argument")),
+                                        hasJsonPath("$.type", is("String")),
+                                        hasJsonPath("$.mandatory", is(false)),
+                                        hasJsonPath("$.nameLong", is("--string"))
+                                ),
+                                allOf(
+                                        hasJsonPath("$.name", is("-n")),
+                                        hasJsonPath("$.description", is("string option without an argument")),
+                                        hasJsonPath("$.type", is("boolean")),
+                                        hasJsonPath("$.mandatory", is(false)),
+                                        hasJsonPath("$.nameLong", is("--noargument"))
+                                ),
+                                allOf(
+                                        hasJsonPath("$.name", is("-f")),
+                                        hasJsonPath("$.description", is("file option with an argument")),
+                                        hasJsonPath("$.type", is("InputStream")),
+                                        hasJsonPath("$.mandatory", is(false)),
+                                        hasJsonPath("$.nameLong", is("--file"))
+                                )
+                        ) ));
     }
 
 
