@@ -69,7 +69,7 @@ public class HalExplorerRedirection {
 
         // Finally, append default params on the redirect URL. For DSpace, we set these params by default:
         // - "key0=Accept&hval0=application/hal+json" => Ensures we default all requests to "Accept" HAL format
-        //    (When not specified, the Hal Explorer sometimes defaults to HAL-FORMS, which we don't support)
+        //    (When not specified, the Hal Explorer includes an Accepts for HAL-FORMS, which we don't support)
         // - "uri=[server-path]/api" => Ensure we start at the "/api" endpoint (the root of our REST API)
         redirectPath.append(
             String.format("#hkey0=Accept&hval0=application/hal+json&uri=%s", serverPath + "/api"));
