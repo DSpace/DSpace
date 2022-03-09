@@ -75,13 +75,13 @@ public class LDNMetadataProcessor implements LDNProcessor {
         Iterator<Notification> iterator = repeater.iterator(notification);
 
         while (iterator.hasNext()) {
-            Notification next = iterator.next();
-            doProcess(next);
-            doRunActions(next);
+            Notification contextNotification = iterator.next();
+            Item item = doProcess(contextNotification);
+            runActions(contextNotification, item);
         }
     }
 
-    private void doProcess(Notification notification) throws Exception {
+    private Item doProcess(Notification notification) throws Exception {
         log.info("Processing notification {} {}", notification.getId(), notification.getType());
         Context context = ContextUtil.obtainCurrentRequestContext();
 
@@ -171,9 +171,11 @@ public class LDNMetadataProcessor implements LDNProcessor {
         } finally {
             context.restoreAuthSystemState();
         }
+
+        return item;
     }
 
-    private ActionStatus doRunActions(Notification notification) throws Exception {
+    private ActionStatus runActions(Notification notification, Item item) throws Exception {
         ActionStatus operation = ActionStatus.CONTINUE;
         for (LDNAction action : actions) {
             log.info("Running action {} for notification {} {}",
@@ -181,7 +183,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
                     notification.getId(),
                     notification.getType());
 
-            operation = action.execute(notification);
+            operation = action.execute(notification, item);
             if (operation == ActionStatus.ABORT) {
                 break;
             }

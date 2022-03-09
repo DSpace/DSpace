@@ -8,9 +8,10 @@
 package org.dspace.app.ldn.action;
 
 import org.dspace.app.ldn.model.Notification;
+import org.dspace.content.Item;
 
 public interface LDNAction {
 
-    public ActionStatus execute(Notification notification) throws Exception;
+    public ActionStatus execute(Notification notification, Item item) throws Exception;
 
 }

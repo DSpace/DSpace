@@ -16,31 +16,23 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
-import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.model.Notification;
-import org.dspace.app.ldn.utility.LDNUtils;
 import org.dspace.content.Item;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.services.ConfigurationService;
 import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 public class LDNEmailAction implements LDNAction {
 
     private static final Logger log = LogManager.getLogger(LDNEmailAction.class);
 
     private final static String DATE_PATTERN = "dd-MM-yyyy HH:mm:ss";
-
-    @Autowired
-    private ItemService itemService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -57,18 +49,10 @@ public class LDNEmailAction implements LDNAction {
     private String actionSendEmailTextFile;
 
     @Override
-    public ActionStatus execute(Notification notification) throws Exception {
+    public ActionStatus execute(Notification notification, Item item) throws Exception {
         Context context = ContextUtil.obtainCurrentRequestContext();
 
         try {
-            UUID uuid = LDNUtils.getUUIDFromURL(notification.getContext().getId());
-
-            Item item = itemService.find(context, uuid);
-
-            if (Objects.isNull(item)) {
-                throw new ResourceNotFoundException(format("Item with uuid %s not found", uuid));
-            }
-
             Locale supportedLocale = I18nUtil.getEPersonLocale(context.getCurrentUser());
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, actionSendEmailTextFile));
 
