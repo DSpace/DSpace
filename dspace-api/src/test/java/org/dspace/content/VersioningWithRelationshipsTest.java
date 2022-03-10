@@ -16,7 +16,9 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -29,6 +31,7 @@ import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.versioning.Version;
@@ -48,6 +51,8 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         ContentServiceFactory.getInstance().getWorkspaceItemService();
     private final InstallItemService installItemService =
         ContentServiceFactory.getInstance().getInstallItemService();
+    private final ItemService itemService =
+        ContentServiceFactory.getInstance().getItemService();
 
     protected Community community;
     protected Collection collection;
@@ -1024,6 +1029,89 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         for (Relationship relationship : relationships) {
             relationshipService.delete(context, relationship);
         }
+    }
+
+    @Test
+    public void test_createNewVersionOfItemAndVerifyMetadataOrder() throws Exception {
+        /////////////////////////////////////////
+        // create a publication with 6 authors //
+        /////////////////////////////////////////
+
+        Item originalPublication = ItemBuilder.createItem(context, collection)
+            .withTitle("original publication")
+            .withMetadata("dspace", "entity", "type", publicationEntityType.getLabel())
+            .build();
+
+        // author 1 (plain metadata)
+        itemService.addMetadata(context, originalPublication, "dc", "contributor", "author", null, "author 1 (plain)");
+
+        // author 2 (virtual)
+        Item author2 = ItemBuilder.createItem(context, collection)
+            .withTitle("author 2 (item)")
+            .withMetadata("dspace", "entity", "type", personEntityType.getLabel())
+            .withPersonIdentifierFirstName("2 (item)")
+            .withPersonIdentifierLastName("author")
+            .build();
+        RelationshipBuilder.createRelationshipBuilder(context, originalPublication, author2, isAuthorOfPublication)
+            .build();
+
+        // author 3 (plain metadata)
+        itemService.addMetadata(context, originalPublication, "dc", "contributor", "author", null, "author 3 (plain)");
+
+        // author 4 (virtual)
+        Item author4 = ItemBuilder.createItem(context, collection)
+            .withTitle("author 4 (item)")
+            .withMetadata("dspace", "entity", "type", personEntityType.getLabel())
+            .withPersonIdentifierFirstName("4 (item)")
+            .withPersonIdentifierLastName("author")
+            .build();
+        RelationshipBuilder.createRelationshipBuilder(context, originalPublication, author4, isAuthorOfPublication)
+            .build();
+
+        // author 5 (plain metadata)
+        itemService.addMetadata(context, originalPublication, "dc", "contributor", "author", null, "author 5 (plain)");
+
+        // author 6 (virtual)
+        Item author6 = ItemBuilder.createItem(context, collection)
+            .withTitle("author 6 (item)")
+            .withMetadata("dspace", "entity", "type", personEntityType.getLabel())
+            .withPersonIdentifierFirstName("6 (item)")
+            .withPersonIdentifierLastName("author")
+            .build();
+        RelationshipBuilder.createRelationshipBuilder(context, originalPublication, author6, isAuthorOfPublication)
+            .build();
+
+        itemService.update(context, originalPublication);
+
+        ////////////////////////////////
+        // test dc.contributor.author //
+        ////////////////////////////////
+
+        List<MetadataValue> mdvs = itemService.getMetadata(
+            originalPublication, "dc", "contributor", "author", Item.ANY
+        );
+
+        // TODO make sure test setup respects following order
+
+        assertFalse(mdvs.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("author 1 (plain)", mdvs.get(0).getValue());
+
+        assertTrue(mdvs.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("author, 2 (item)", mdvs.get(1).getValue());
+
+        assertFalse(mdvs.get(2) instanceof RelationshipMetadataValue);
+        assertEquals("author 3 (plain)", mdvs.get(2).getValue());
+
+        assertTrue(mdvs.get(3) instanceof RelationshipMetadataValue);
+        assertEquals("author, 4 (item)", mdvs.get(3).getValue());
+
+        assertFalse(mdvs.get(4) instanceof RelationshipMetadataValue);
+        assertEquals("author 5 (plain)", mdvs.get(4).getValue());
+
+        assertTrue(mdvs.get(5) instanceof RelationshipMetadataValue);
+        assertEquals("author, 6 (item)", mdvs.get(5).getValue());
+
+        // TODO finish rest of test
     }
 
 }
