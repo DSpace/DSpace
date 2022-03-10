@@ -8,6 +8,7 @@ pipeline {
     environment {
         VERSION = "${env.BRANCH_NAME}".replaceAll('/', '_').toLowerCase()
         CUSTOMZ = "customizations"
+        GITLAB_TOKEN = credentials('brage6-customizationrepo-gitlab-token')
 		SLACK_CHANNEL = '#sandbox_playground'
     }
 
