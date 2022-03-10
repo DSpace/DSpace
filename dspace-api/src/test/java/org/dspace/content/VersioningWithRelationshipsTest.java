@@ -11,9 +11,11 @@ import static org.dspace.content.Relationship.LatestVersionStatus;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 
 import java.util.List;
@@ -26,7 +28,9 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersioningService;
@@ -36,8 +40,14 @@ import org.junit.Test;
 
 public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWithDatabase {
 
-    private RelationshipService relationshipService;
-    private VersioningService versioningService;
+    private final RelationshipService relationshipService =
+        ContentServiceFactory.getInstance().getRelationshipService();
+    private final VersioningService versioningService =
+        VersionServiceFactory.getInstance().getVersionService();
+    private final WorkspaceItemService workspaceItemService =
+        ContentServiceFactory.getInstance().getWorkspaceItemService();
+    private final InstallItemService installItemService =
+        ContentServiceFactory.getInstance().getInstallItemService();
 
     protected Community community;
     protected Collection collection;
@@ -55,9 +65,6 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
     @Before
     public void setUp() throws Exception {
         super.setUp();
-
-        relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
-        versioningService = VersionServiceFactory.getInstance().getVersionService();
 
         context.turnOffAuthorisationSystem();
 
@@ -93,7 +100,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         isProjectOfPublication = RelationshipTypeBuilder.createRelationshipTypeBuilder(
                 context, publicationEntityType, projectEntityType,
                 "isProjectOfPublication", "isPublicationOfProject",
-                0, null, 0, null
+                null, null, null, null
             )
             .withCopyToLeft(false)
             .withCopyToRight(false)
@@ -102,7 +109,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         isOrgUnitOfPublication = RelationshipTypeBuilder.createRelationshipTypeBuilder(
                 context, publicationEntityType, orgUnitEntityType,
                 "isOrgUnitOfPublication", "isPublicationOfOrgUnit",
-                0, null, 0, null
+                null, null, null, null
             )
             .withCopyToLeft(false)
             .withCopyToRight(false)
@@ -307,18 +314,449 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
             ))
         );
 
+        ////////////////////////////////////////
+        // do item install on new publication //
+        ////////////////////////////////////////
+
+        WorkspaceItem newPublicationWSI = workspaceItemService.findByItem(context, newPublication);
+        installItemService.installItem(context, newPublicationWSI);
+        context.dispatchEvents();
+
+        ///////////////////////////////////////////////////////////////////////
+        // verify the relationships of all 5 items (excludeNonLatest = true) //
+        ///////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, person1, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, project1, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, newPublication, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH),
+                isRelationship(newPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH),
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        ////////////////////////////////////////////////////////////////////////
+        // verify the relationships of all 5 items (excludeNonLatest = false) //
+        ////////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, person1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(newPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, newPublication, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH),
+                isRelationship(newPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH),
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
+            ))
+        );
+
         //////////////
         // clean up //
         //////////////
 
-        versioningService.removeVersion(context, newPublication);
+        // need to manually delete all relationships to avoid SQL constraint violation exception
+        List<Relationship> relationships = relationshipService.findAll(context);
+        for (Relationship relationship : relationships) {
+            relationshipService.delete(context, relationship);
+        }
+    }
+
+    @Test
+    public void test_createNewVersionOfItemAndModifyRelationships() throws Exception {
+        ///////////////////////////////////////////////
+        // create a publication with 3 relationships //
+        ///////////////////////////////////////////////
+
+        Item person1 = ItemBuilder.createItem(context, collection)
+            .withTitle("person 1")
+            .withMetadata("dspace", "entity", "type", personEntityType.getLabel())
+            .build();
+
+        Item project1 = ItemBuilder.createItem(context, collection)
+            .withTitle("project 1")
+            .withMetadata("dspace", "entity", "type", projectEntityType.getLabel())
+            .build();
+
+        Item orgUnit1 = ItemBuilder.createItem(context, collection)
+            .withTitle("org unit 1")
+            .withMetadata("dspace", "entity", "type", orgUnitEntityType.getLabel())
+            .build();
+
+        Item originalPublication = ItemBuilder.createItem(context, collection)
+            .withTitle("original publication")
+            .withMetadata("dspace", "entity", "type", publicationEntityType.getLabel())
+            .build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, originalPublication, person1, isAuthorOfPublication)
+            .build();
+
+        RelationshipBuilder
+            .createRelationshipBuilder(context, originalPublication, project1, isProjectOfPublication)
+            .build();
+
+        RelationshipBuilder
+            .createRelationshipBuilder(context, originalPublication, orgUnit1, isOrgUnitOfPublication)
+            .build();
+
+        /////////////////////////////////////////////////////////
+        // verify that the relationships were properly created //
+        /////////////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH),
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH),
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, person1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        /////////////////////////////////////////////
+        // create a new version of the publication //
+        /////////////////////////////////////////////
+
+        Version newVersion = versioningService.createNewVersion(context, originalPublication);
+        Item newPublication = newVersion.getItem();
+        assertNotSame(originalPublication, newPublication);
+
+        ///////////////////////////////////////////////////////////////////////
+        // verify the relationships of all 5 items (excludeNonLatest = true) //
+        ///////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH),
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH),
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, person1, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, project1, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, newPublication, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(newPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY)
+            ))
+        );
+
+        ////////////////////////////////////////////////////////////////////////
+        // verify the relationships of all 5 items (excludeNonLatest = false) //
+        ////////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH),
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH),
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, person1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH),
+                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH),
+                isRelationship(newPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH),
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, newPublication, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(newPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY)
+            ))
+        );
+
+        /////////////////////////////////////////////
+        // modify relationships on new publication //
+        /////////////////////////////////////////////
+
+        Item person2 = ItemBuilder.createItem(context, collection)
+            .withTitle("person 2")
+            .withMetadata("dspace", "entity", "type", personEntityType.getLabel())
+            .build();
+
+        Item orgUnit2 = ItemBuilder.createItem(context, collection)
+            .withTitle("org unit 2")
+            .withMetadata("dspace", "entity", "type", orgUnitEntityType.getLabel())
+            .build();
+
+        // on new item, remove relationship with project 1
+        List<Relationship> newProjectRels = relationshipService
+            .findByItemAndRelationshipType(context, newPublication, isProjectOfPublication);
+        assertEquals(1, newProjectRels.size());
+        relationshipService.delete(context, newProjectRels.get(0));
+
+        // on new item remove relationship with org unit 1
+        List<Relationship> newOrgUnitRels = relationshipService
+            .findByItemAndRelationshipType(context, newPublication, isOrgUnitOfPublication);
+        assertEquals(1, newOrgUnitRels.size());
+        relationshipService.delete(context, newOrgUnitRels.get(0));
+
+        RelationshipBuilder.createRelationshipBuilder(context, newPublication, person2, isAuthorOfPublication)
+            .build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, newPublication, orgUnit2, isOrgUnitOfPublication)
+            .build();
+
+        ////////////////////////////////////////
+        // do item install on new publication //
+        ////////////////////////////////////////
+
+        WorkspaceItem newPublicationWSI = workspaceItemService.findByItem(context, newPublication);
+        installItemService.installItem(context, newPublicationWSI);
+        context.dispatchEvents();
+
+        ///////////////////////////////////////////////////////////////////////
+        // verify the relationships of all 7 items (excludeNonLatest = true) //
+        ///////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, person1, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, person2, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, project1, -1, -1, false, true),
+            empty()
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
+            empty()
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit2, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, newPublication, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH),
+                isRelationship(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH),
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        ////////////////////////////////////////////////////////////////////////
+        // verify the relationships of all 7 items (excludeNonLatest = false) //
+        ////////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, person1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY),
+                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, person2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, newPublication, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH),
+                isRelationship(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH),
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        //////////////
+        // clean up //
+        //////////////
+
+        // need to manually delete all relationships to avoid SQL constraint violation exception
+        List<Relationship> relationships = relationshipService.findAll(context);
+        for (Relationship relationship : relationships) {
+            relationshipService.delete(context, relationship);
+        }
     }
 
     @Test
     public void test_createNewVersionOfItemOnRightSideOfRelationships() throws Exception {
-        ///////////////////////////////////////////////
-        // create a publication with 3 relationships //
-        ///////////////////////////////////////////////
+        //////////////////////////////////////////
+        // create a person with 3 relationships //
+        //////////////////////////////////////////
 
         Item publication1 = ItemBuilder.createItem(context, collection)
             .withTitle("publication 1")
@@ -480,11 +918,112 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
             ))
         );
 
+        ///////////////////////////////////
+        // do item install on new person //
+        ///////////////////////////////////
+
+        WorkspaceItem newPersonWSI = workspaceItemService.findByItem(context, newPerson);
+        installItemService.installItem(context, newPersonWSI);
+        context.dispatchEvents();
+
+        ///////////////////////////////////////////////////////////////////////
+        // verify the relationships of all 5 items (excludeNonLatest = true) //
+        ///////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, originalPerson, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(publication1, isAuthorOfPublication, originalPerson, LatestVersionStatus.LEFT_ONLY),
+                isRelationship(project1, isMemberOfProject, originalPerson, LatestVersionStatus.LEFT_ONLY),
+                isRelationship(orgUnit1, isMemberOfOrgUnit, originalPerson, LatestVersionStatus.LEFT_ONLY)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, publication1, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(publication1, isAuthorOfPublication, newPerson, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, project1, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(project1, isMemberOfProject, newPerson, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(orgUnit1, isMemberOfOrgUnit, newPerson, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, newPerson, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(publication1, isAuthorOfPublication, newPerson, LatestVersionStatus.BOTH),
+                isRelationship(project1, isMemberOfProject, newPerson, LatestVersionStatus.BOTH),
+                isRelationship(orgUnit1, isMemberOfOrgUnit, newPerson, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        ////////////////////////////////////////////////////////////////////////
+        // verify the relationships of all 5 items (excludeNonLatest = false) //
+        ////////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, originalPerson, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(publication1, isAuthorOfPublication, originalPerson, LatestVersionStatus.LEFT_ONLY),
+                isRelationship(project1, isMemberOfProject, originalPerson, LatestVersionStatus.LEFT_ONLY),
+                isRelationship(orgUnit1, isMemberOfOrgUnit, originalPerson, LatestVersionStatus.LEFT_ONLY)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, publication1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(publication1, isAuthorOfPublication, originalPerson, LatestVersionStatus.LEFT_ONLY),
+                isRelationship(publication1, isAuthorOfPublication, newPerson, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(project1, isMemberOfProject, originalPerson, LatestVersionStatus.LEFT_ONLY),
+                isRelationship(project1, isMemberOfProject, newPerson, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(orgUnit1, isMemberOfOrgUnit, originalPerson, LatestVersionStatus.LEFT_ONLY),
+                isRelationship(orgUnit1, isMemberOfOrgUnit, newPerson, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, newPerson, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(publication1, isAuthorOfPublication, newPerson, LatestVersionStatus.BOTH),
+                isRelationship(project1, isMemberOfProject, newPerson, LatestVersionStatus.BOTH),
+                isRelationship(orgUnit1, isMemberOfOrgUnit, newPerson, LatestVersionStatus.BOTH)
+            ))
+        );
+
         //////////////
         // clean up //
         //////////////
 
-        versioningService.removeVersion(context, newPerson);
+        // need to manually delete all relationships to avoid SQL constraint violation exception
+        List<Relationship> relationships = relationshipService.findAll(context);
+        for (Relationship relationship : relationships) {
+            relationshipService.delete(context, relationship);
+        }
     }
 
 }

@@ -383,7 +383,7 @@ public class VersioningConsumer implements Consumer {
 
         List<Relationship> matchingRelationships = relationships.stream()
             .filter(relationship -> {
-                int relationshipTypeId = relationship.getID();
+                int relationshipTypeId = relationship.getRelationshipType().getID();
 
                 boolean leftItemMatches = expectedLeftItem.equals(relationship.getLeftItem());
                 boolean relationshipTypeMatches = expectedRelationshipTypeId == relationshipTypeId;
