@@ -105,3 +105,15 @@ docker push dspace/dspace-postgres-pgcrypto:loadsql
 ## local.cfg and test/ folder
 
 These resources are bundled into the _dspace/dspace_ image at build time.
+
+## SFTP Docker Image
+
+The [atmoz/sftp](https://hub.docker.com/r/atmoz/sftp) docker image used for running the sftp
+container. The `atmoz/sftp` docker repsitory is not maintaining release versions anymore, and
+the updates are pushed to the `latest` tag. In order to avoid using the `latest` tag on the
+k8s deployment, we are pulling the `latest` docker image and tagging it with the current date,
+and pushing it to our internal docker registry.
+
+```bash
+docker tag atmoz/sftp:latest docker.lib.umd.edu/atmoz_sftp_latest:20210715    
+```
