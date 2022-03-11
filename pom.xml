@@ -46,8 +46,6 @@
         <bouncycastle.version>1.70</bouncycastle.version>
 
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
-        <!-- Spring Data REST HAL Browser (used by Server webapp) -->
-        <spring-hal-browser.version>3.3.9.RELEASE</spring-hal-browser.version>
         <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath (used by Server webapp) -->
         <json-path.version>2.6.0</json-path.version>
         <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home
@@ -1753,12 +1751,13 @@
                 <version>1.2.5</version>
             </dependency>
 
+            <!-- json-path is needed by Spring HATEOAS -->
             <dependency>
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
                 <version>${json-path.version}</version>
-                <scope>test</scope>
             </dependency>
+            <!-- json-path-assert is just needed by tests -->
             <dependency>
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path-assert</artifactId>

@@ -238,24 +238,7 @@
 
     <dependencies>
 
-        <!-- These next two dependencies build a WAR that is BOTH executable
-             AND deployable into an external container (Tomcat).
-             See: http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging -->
-        <!-- NOTE: For rapid development (if you don't need Solr or other webapps),
-             you can temporarily comment these out, and switch <packaging> to "jar".
-             This lets you develop in a standalone, runnable JAR application. -->
-        <!--<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>-->
-        <!-- Ensure embedded servlet container doesn't interfere when this
-             WAR is deployed to an external Tomcat (i.e. provided). -->
-        <!--<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
-        </dependency>-->
-
+        <!-- Spring Boot dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -293,17 +276,15 @@
             <version>0.4.6</version>
         </dependency>
 
-        <!-- The HAL Browser -->
+        <!-- HAL Browser (via WebJars) : https://github.com/mikekelly/hal-browser -->
+        <!-- This is primarily used to pull in the HAL Browser core Javascript code ('js' folder), as we've overridden
+             many dependencies below and the HTML pages in src/main/webapp/ -->
+        <!-- NOTE: Eventually this should be replaced by the HAL Explorer included in Spring Data REST,
+             see https://github.com/DSpace/DSpace/issues/3017 -->
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-rest-hal-browser</artifactId>
-            <version>${spring-hal-browser.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.data</groupId>
-                    <artifactId>spring-data-rest-webmvc</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.webjars</groupId>
+            <artifactId>hal-browser</artifactId>
+            <version>ad9b865</version>
         </dependency>
 
         <!-- WebJars dependencies used to update/enhance the default HAL Browser -->
