@@ -62,9 +62,18 @@ public abstract class AbstractVersionProvider {
                 continue;
             }
 
-            itemService
-                .addMetadata(context, itemNew, metadataField, aMd.getLanguage(), aMd.getValue(), aMd.getAuthority(),
-                             aMd.getConfidence());
+            itemService.addMetadata(
+                context,
+                itemNew,
+                metadataField.getMetadataSchema().getName(),
+                metadataField.getElement(),
+                metadataField.getQualifier(),
+                aMd.getLanguage(),
+                aMd.getValue(),
+                aMd.getAuthority(),
+                aMd.getConfidence(),
+                aMd.getPlace()
+            );
         }
     }
 

@@ -1081,37 +1081,67 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         RelationshipBuilder.createRelationshipBuilder(context, originalPublication, author6, isAuthorOfPublication)
             .build();
 
-        itemService.update(context, originalPublication);
+        ////////////////////////////////
+        // test dc.contributor.author //
+        ////////////////////////////////
+
+        List<MetadataValue> oldMdvs = itemService.getMetadata(
+            originalPublication, "dc", "contributor", "author", Item.ANY
+        );
+
+        assertFalse(oldMdvs.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("author 1 (plain)", oldMdvs.get(0).getValue());
+
+        assertTrue(oldMdvs.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("author, 2 (item)", oldMdvs.get(1).getValue());
+
+        assertFalse(oldMdvs.get(2) instanceof RelationshipMetadataValue);
+        assertEquals("author 3 (plain)", oldMdvs.get(2).getValue());
+
+        assertTrue(oldMdvs.get(3) instanceof RelationshipMetadataValue);
+        assertEquals("author, 4 (item)", oldMdvs.get(3).getValue());
+
+        assertFalse(oldMdvs.get(4) instanceof RelationshipMetadataValue);
+        assertEquals("author 5 (plain)", oldMdvs.get(4).getValue());
+
+        assertTrue(oldMdvs.get(5) instanceof RelationshipMetadataValue);
+        assertEquals("author, 6 (item)", oldMdvs.get(5).getValue());
+
+        ///////////////////////////////////////
+        // create new version of publication //
+        ///////////////////////////////////////
+
+        Version newVersion = versioningService.createNewVersion(context, originalPublication);
+        Item newPublication = newVersion.getItem();
+        assertNotSame(originalPublication, newPublication);
 
         ////////////////////////////////
         // test dc.contributor.author //
         ////////////////////////////////
 
-        List<MetadataValue> mdvs = itemService.getMetadata(
-            originalPublication, "dc", "contributor", "author", Item.ANY
+        List<MetadataValue> newMdvs = itemService.getMetadata(
+            newPublication, "dc", "contributor", "author", Item.ANY
         );
 
-        // TODO make sure test setup respects following order
+        assertFalse(newMdvs.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("author 1 (plain)", newMdvs.get(0).getValue());
 
-        assertFalse(mdvs.get(0) instanceof RelationshipMetadataValue);
-        assertEquals("author 1 (plain)", mdvs.get(0).getValue());
+        assertTrue(newMdvs.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("author, 2 (item)", newMdvs.get(1).getValue());
 
-        assertTrue(mdvs.get(1) instanceof RelationshipMetadataValue);
-        assertEquals("author, 2 (item)", mdvs.get(1).getValue());
+        assertFalse(newMdvs.get(2) instanceof RelationshipMetadataValue);
+        assertEquals("author 3 (plain)", newMdvs.get(2).getValue());
 
-        assertFalse(mdvs.get(2) instanceof RelationshipMetadataValue);
-        assertEquals("author 3 (plain)", mdvs.get(2).getValue());
+        assertTrue(newMdvs.get(3) instanceof RelationshipMetadataValue);
+        assertEquals("author, 4 (item)", newMdvs.get(3).getValue());
 
-        assertTrue(mdvs.get(3) instanceof RelationshipMetadataValue);
-        assertEquals("author, 4 (item)", mdvs.get(3).getValue());
+        assertFalse(newMdvs.get(4) instanceof RelationshipMetadataValue);
+        assertEquals("author 5 (plain)", newMdvs.get(4).getValue());
 
-        assertFalse(mdvs.get(4) instanceof RelationshipMetadataValue);
-        assertEquals("author 5 (plain)", mdvs.get(4).getValue());
+        assertTrue(newMdvs.get(5) instanceof RelationshipMetadataValue);
+        assertEquals("author, 6 (item)", newMdvs.get(5).getValue());
 
-        assertTrue(mdvs.get(5) instanceof RelationshipMetadataValue);
-        assertEquals("author, 6 (item)", mdvs.get(5).getValue());
-
-        // TODO finish rest of test
+        // TODO also test place after removing/adding relationships and metadata
     }
 
 }
