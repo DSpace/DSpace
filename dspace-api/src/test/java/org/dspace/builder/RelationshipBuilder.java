@@ -117,7 +117,7 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
         this.context = context;
 
         try {
-            relationship = relationshipService.create(context, leftItem, rightItem, relationshipType, 0, 0);
+            relationship = relationshipService.create(context, leftItem, rightItem, relationshipType, -1, -1);
         } catch (SQLException | AuthorizeException e) {
             log.warn("Failed to create relationship", e);
         }
