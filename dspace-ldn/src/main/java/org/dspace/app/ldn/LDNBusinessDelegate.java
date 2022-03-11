@@ -36,6 +36,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * Linked Data Notification business delegate to facilitate sending
+ * notification.
+ */
 public class LDNBusinessDelegate {
 
     private final static Logger log = LogManager.getLogger(LDNBusinessDelegate.class);
@@ -48,12 +52,21 @@ public class LDNBusinessDelegate {
 
     private final RestTemplate restTemplate;
 
+    /**
+     * Initialize rest template with appropriate message converters.
+     */
     public LDNBusinessDelegate() {
         restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new JsonLdHttpMessageConverter());
     }
 
-    public void announceRelease(Item item) throws SQLException {
+    /**
+     * Announce item release notification.
+     *
+     * @param item item released (deposited or updated)
+     * @throws SQLException
+     */
+    public void announceRelease(Item item) {
         String serviceIds = configurationService.getProperty("service.service-id.ldn");
 
         for (String serviceId : serviceIds.split(",")) {
@@ -61,7 +74,14 @@ public class LDNBusinessDelegate {
         }
     }
 
-    public void doAnnounceRelease(Item item, String serviceId) throws SQLException {
+    /**
+     * Build and POST announce release notification to configured service LDN
+     * inboxes.
+     *
+     * @param item      associated item
+     * @param serviceId service id for targer inbox
+     */
+    public void doAnnounceRelease(Item item, String serviceId) {
         log.info("Announcing release of item {}", item.getID());
 
         String dspaceServerUrl = configurationService.getProperty("dspace.server.url");
@@ -154,9 +174,6 @@ public class LDNBusinessDelegate {
         String serviceKey = configurationService.getProperty(join(".", "service", serviceId, "key"));
         String serviceKeyHeader = configurationService.getProperty(join(".", "service", serviceId, "key.header"));
 
-        log.info("Service key {}", serviceKey);
-        log.info("Service key header {}", serviceKeyHeader);
-
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", APPLICATION_JSON_LD.toString());
         if (serviceKey != null && serviceKeyHeader != null) {
@@ -167,9 +184,7 @@ public class LDNBusinessDelegate {
 
         log.info("Announcing notification {}", request);
 
-        URI location = restTemplate.postForLocation(URI.create(target.getInbox()), request);
-
-        log.info("Notification sent {}", location);
+        restTemplate.postForLocation(URI.create(target.getInbox()), request);
     }
 
 }

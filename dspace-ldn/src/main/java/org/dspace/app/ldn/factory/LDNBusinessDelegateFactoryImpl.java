@@ -10,11 +10,18 @@ package org.dspace.app.ldn.factory;
 import org.dspace.app.ldn.LDNBusinessDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Business delegate factory implementation that autowires business delegate for
+ * static retrieval.
+ */
 public class LDNBusinessDelegateFactoryImpl extends LDNBusinessDelegateFactory {
 
     @Autowired(required = true)
     private LDNBusinessDelegate ldnBusinessDelegate;
 
+    /**
+     * @return LDNBusinessDelegate
+     */
     @Override
     public LDNBusinessDelegate getLDNBusinessDelegate() {
         return ldnBusinessDelegate;

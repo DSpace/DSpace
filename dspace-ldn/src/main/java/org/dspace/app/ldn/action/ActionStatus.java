@@ -7,6 +7,9 @@
  */
 package org.dspace.app.ldn.action;
 
+/**
+ * Resulting status of an execution of an action.
+ */
 public enum ActionStatus {
     CONTINUE, ABORT;
 }

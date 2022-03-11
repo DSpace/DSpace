@@ -11,6 +11,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ *
+ */
 public class Context extends Base {
 
     @JsonProperty("ietf:cite-as")
@@ -25,38 +28,65 @@ public class Context extends Base {
     @JsonProperty("IsSupplementTo")
     private List<Context> isSupplementTo;
 
+    /**
+     * 
+     */
     public Context() {
         super();
     }
 
+    /**
+     * @return String
+     */
     public String getIetfCiteAs() {
         return ietfCiteAs;
     }
 
+    /**
+     * @param ietfCiteAs
+     */
     public void setIetfCiteAs(String ietfCiteAs) {
         this.ietfCiteAs = ietfCiteAs;
     }
 
+    /**
+     * @return Url
+     */
     public Url getUrl() {
         return url;
     }
 
+    /**
+     * @param url
+     */
     public void setUrl(Url url) {
         this.url = url;
     }
 
+    /**
+     * @return List<Context>
+     */
     public List<Context> getIsSupplementedBy() {
         return isSupplementedBy;
     }
 
+    /**
+     * @param isSupplementedBy
+     */
     public void setIsSupplementedBy(List<Context> isSupplementedBy) {
         this.isSupplementedBy = isSupplementedBy;
     }
 
+    /**
+     * @return List<Context>
+     */
     public List<Context> getIsSupplementTo() {
         return isSupplementTo;
     }
 
+    /**
+     * @param isSupplementTo
+     */
     public void setIsSupplementTo(List<Context> isSupplementTo) {
         this.isSupplementTo = isSupplementTo;
     }

@@ -32,13 +32,17 @@ import org.dspace.event.Event;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
+/**
+ * Consumer listening for item deposit or update to announce release
+ * notification.
+ */
 public class LDNConsumer implements Consumer {
 
     private final static Logger log = LogManager.getLogger(LDNConsumer.class);
 
     private static Set<Item> itemsToRelease;
 
-    private WorkflowItemService workflowItemService;
+    private WorkflowItemService<?> workflowItemService;
 
     private WorkspaceItemService workspaceItemService;
 
@@ -46,6 +50,11 @@ public class LDNConsumer implements Consumer {
 
     private LDNBusinessDelegate ldnBusinessDelegate;
 
+    /**
+     * Initialize all dependencies.
+     *
+     * @throws Exception
+     */
     @Override
     public void initialize() throws Exception {
         workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
@@ -54,6 +63,14 @@ public class LDNConsumer implements Consumer {
         ldnBusinessDelegate = LDNBusinessDelegateFactory.getInstance().getLDNBusinessDelegate();
     }
 
+    /**
+     * Consume event and determine if release announce is required. Will populate
+     * itemsToRelease for those needing to be announced.
+     *
+     * @param context current context
+     * @param event   event consumed
+     * @throws Exception something went wrong
+     */
     @Override
     public void consume(Context context, Event event) throws Exception {
         if (itemsToRelease == null) {
@@ -123,6 +140,12 @@ public class LDNConsumer implements Consumer {
 
     }
 
+    /**
+     * At end of consumer activity, announce all items release.
+     *
+     * @param context current context
+     * @throws Exception failed to announce release
+     */
     @Override
     public void end(Context context) throws Exception {
         if (itemsToRelease != null) {
@@ -135,9 +158,13 @@ public class LDNConsumer implements Consumer {
         itemsToRelease = null;
     }
 
+    /**
+     * @param context
+     * @throws Exception
+     */
     @Override
     public void finish(Context context) throws Exception {
-
+        // nothing to do here
     }
 
 }

@@ -23,9 +23,15 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ *
+ */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    /**
+     * @param configurer
+     */
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         Map<String, MediaType> mediaTypes = new HashMap<>();
@@ -35,6 +41,9 @@ public class WebConfig implements WebMvcConfigurer {
         configurer.defaultContentType(TEXT_TURTLE).mediaTypes(mediaTypes);
     }
 
+    /**
+     * @param converters
+     */
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.add(0, new JsonLdHttpMessageConverter());

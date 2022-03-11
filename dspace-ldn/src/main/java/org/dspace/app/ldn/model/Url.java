@@ -9,19 +9,31 @@ package org.dspace.app.ldn.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ *
+ */
 public class Url extends Base {
 
     @JsonProperty("mediaType")
     private String mediaType;
 
+    /**
+     * 
+     */
     public Url() {
         super();
     }
 
+    /**
+     * @return String
+     */
     public String getMediaType() {
         return mediaType;
     }
 
+    /**
+     * @param mediaType
+     */
     public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
     }

@@ -9,19 +9,31 @@ package org.dspace.app.ldn.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ *
+ */
 public class Actor extends Base {
 
     @JsonProperty("name")
     private String name;
 
+    /**
+     * 
+     */
     public Actor() {
         super();
     }
 
+    /**
+     * @return String
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @param name
+     */
     public void setName(String name) {
         this.name = name;
     }
