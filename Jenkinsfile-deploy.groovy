@@ -8,8 +8,7 @@ pipeline {
     environment {
         VERSION = "${env.BRANCH_NAME}".replaceAll('/', '_').toLowerCase()
         CUSTOMZ = "customizations"
-        GITLAB_TOKEN = credentials('brage6-customizationrepo-gitlab-token')
-		SLACK_CHANNEL = '#sandbox_playground'
+        SLACK_CHANNEL = '#sandbox_playground'
     }
 
     options { buildDiscarder(logRotator(numToKeepStr: '2')) }
@@ -22,7 +21,10 @@ pipeline {
                     brageVars = checkout scm
                     dir("${CUSTOMZ}") {
                         //configVars = checkout scm
-                        git url: "https://user:${env.GITLAB_TOKEN}@gitlab.sikt.no/bibliotekstjenester/brage6-customizations.git"
+                        git(
+                        	url: "https://gitlab.sikt.no/bibliotekstjenester/brage6-customizations.git",
+                        	credentialsId: 'brage6-customizationrepo-gitlab-auth'
+                        	)
                     }
                 }
             }
