@@ -43,6 +43,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+/**
+ * Linked Data Notification metadata processor for consuming notifications. The
+ * storage of notification details are within item metadata.
+ */
 public class LDNMetadataProcessor implements LDNProcessor {
 
     private final static Logger log = LogManager.getLogger(LDNMetadataProcessor.class);
@@ -63,6 +67,9 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
     private List<LDNMetadataChange> changes = new ArrayList<>();
 
+    /**
+     * Initialize velocity engine for templating.
+     */
     private LDNMetadataProcessor() {
         velocityEngine = new VelocityEngine();
         velocityEngine.setProperty(Velocity.RESOURCE_LOADERS, "string");
@@ -70,6 +77,13 @@ public class LDNMetadataProcessor implements LDNProcessor {
         velocityEngine.init();
     }
 
+    /**
+     * Process notification by repeating over context, processing each context
+     * notification, and running actions post processing.
+     *
+     * @param notification received notification
+     * @throws Exception something went wrong processing the notification
+     */
     @Override
     public void process(Notification notification) throws Exception {
         Iterator<Notification> iterator = repeater.iterator(notification);
@@ -81,6 +95,14 @@ public class LDNMetadataProcessor implements LDNProcessor {
         }
     }
 
+    /**
+     * Perform the actual notification processing. Applies all defined metadata
+     * changes.
+     *
+     * @param notification current context notification
+     * @return Item associated item which persist notification details
+     * @throws Exception failed to process notification
+     */
     private Item doProcess(Notification notification) throws Exception {
         log.info("Processing notification {} {}", notification.getId(), notification.getType());
         Context context = ContextUtil.obtainCurrentRequestContext();
@@ -132,12 +154,6 @@ public class LDNMetadataProcessor implements LDNProcessor {
                             Item.ANY);
 
                     for (MetadataValue metadatum : itemMetadata) {
-                        log.info("From Item {}.{}.{} {} {}",
-                                remove.getSchema(),
-                                remove.getElement(),
-                                qualifier,
-                                remove.getLanguage(),
-                                metadatum.getValue());
                         boolean delete = true;
                         for (String valueTemplate : remove.getValueTemplates()) {
                             String value = renderTemplate(velocityContext, valueTemplate);
@@ -175,6 +191,16 @@ public class LDNMetadataProcessor implements LDNProcessor {
         return item;
     }
 
+    /**
+     * Run all actions defined for the processor.
+     *
+     * @param notification current context notification
+     * @param item         associated item
+     *
+     * @return ActionStatus result status of running the action
+     *
+     * @throws Exception failed execute the action
+     */
     private ActionStatus runActions(Notification notification, Item item) throws Exception {
         ActionStatus operation = ActionStatus.CONTINUE;
         for (LDNAction action : actions) {
@@ -192,30 +218,59 @@ public class LDNMetadataProcessor implements LDNProcessor {
         return operation;
     }
 
+    /**
+     * @return LDNContextRepeater
+     */
     public LDNContextRepeater getRepeater() {
         return repeater;
     }
 
+    /**
+     * @param repeater
+     */
     public void setRepeater(LDNContextRepeater repeater) {
         this.repeater = repeater;
     }
 
+    /**
+     * @return List<LDNAction>
+     */
     public List<LDNAction> getActions() {
         return actions;
     }
 
+    /**
+     * @param actions
+     */
     public void setActions(List<LDNAction> actions) {
         this.actions = actions;
     }
 
+    /**
+     * @return List<LDNMetadataChange>
+     */
     public List<LDNMetadataChange> getChanges() {
         return changes;
     }
 
+    /**
+     * @param changes
+     */
     public void setChanges(List<LDNMetadataChange> changes) {
         this.changes = changes;
     }
 
+    /**
+     * Lookup associated item to the notification context. If UUID in URL, lookup bu
+     * UUID, else lookup by handle.
+     *
+     * @param context      current context
+     * @param notification current context notification
+     *
+     * @return Item associated item
+     *
+     * @throws SQLException failed to lookup item
+     */
     private Item lookupItem(Context context, Notification notification) throws SQLException {
         Item item = null;
 
@@ -254,6 +309,13 @@ public class LDNMetadataProcessor implements LDNProcessor {
         return item;
     }
 
+    /**
+     * Prepare velocity template context with notification, timestamp and some
+     * static utilities.
+     *
+     * @param notification current context notification
+     * @return VelocityContext prepared velocity context
+     */
     private VelocityContext prepareTemplateContext(Notification notification) {
         VelocityContext velocityContext = new VelocityContext();
 
@@ -268,6 +330,13 @@ public class LDNMetadataProcessor implements LDNProcessor {
         return velocityContext;
     }
 
+    /**
+     * Render velocity template with provided context.
+     *
+     * @param context  velocity context
+     * @param template template to render
+     * @return String results of rendering
+     */
     private String renderTemplate(VelocityContext context, String template) {
         StringWriter writer = new StringWriter();
         StringResourceRepository repository = StringResourceLoader.getRepository();

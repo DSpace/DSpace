@@ -15,6 +15,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ *
+ */
 @JsonInclude(Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Base {
@@ -25,30 +28,51 @@ public class Base {
     @JsonProperty("type")
     private Set<String> type;
 
+    /**
+     * 
+     */
     public Base() {
         type = new HashSet<>();
     }
 
+    /**
+     * @return String
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * @param id
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * @return Set<String>
+     */
     public Set<String> getType() {
         return type;
     }
 
+    /**
+     * @param type
+     */
     public void setType(Set<String> type) {
         this.type = type;
     }
 
+    /**
+     * @param type
+     */
     public void addType(String type) {
         this.type.add(type);
     }
 
+    /**
+     * @return int
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -58,6 +82,10 @@ public class Base {
         return result;
     }
 
+    /**
+     * @param obj
+     * @return boolean
+     */
     @Override
     public boolean equals(java.lang.Object obj) {
         if (this == obj) {

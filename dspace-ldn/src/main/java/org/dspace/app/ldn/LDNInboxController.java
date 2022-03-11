@@ -23,7 +23,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Controller for LDN Inbox to support COAR Notify.
- *
  */
 @RestController
 @RequestMapping("/ldn")
@@ -31,16 +30,30 @@ import org.springframework.web.server.ResponseStatusException;
 @ConditionalOnProperty("ldn.enabled")
 public class LDNInboxController {
 
+    /**
+     * LDN DSpace inbox endpoint. Receives notificaiton and has processor
+     * automatically injected.
+     *
+     * @param notification received notification
+     * @param processor    routed processor
+     * @return Notification
+     * @throws Exception
+     */
     @ResponseStatus(value = CREATED)
     @PostMapping(value = "/inbox", consumes = "application/ld+json", produces = "application/ld+json")
     public Notification inbox(@RequestBody Notification notification, LDNProcessor processor) throws Exception {
 
         processor.process(notification);
 
-        // TODO: this should become either generic response body with location header or no content with location header
+        // TODO: response should include Location header
+        // TODO: this should become either generic response body no content
         return notification;
     }
 
+    /**
+     * @param e
+     * @return ResponseEntity<String>
+     */
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<String> handleResponseStatusException(ResponseStatusException e) {
         return ResponseEntity.status(e.getStatus().value())

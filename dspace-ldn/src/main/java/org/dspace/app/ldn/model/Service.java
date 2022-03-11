@@ -9,19 +9,31 @@ package org.dspace.app.ldn.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ *
+ */
 public class Service extends Base {
 
     @JsonProperty("inbox")
     private String inbox;
 
+    /**
+     * 
+     */
     public Service() {
         super();
     }
 
+    /**
+     * @return String
+     */
     public String getInbox() {
         return inbox;
     }
 
+    /**
+     * @param inbox
+     */
     public void setInbox(String inbox) {
         this.inbox = inbox;
     }

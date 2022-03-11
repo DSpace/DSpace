@@ -9,7 +9,6 @@ package org.dspace.app.ldn.action;
 
 import static java.lang.String.format;
 
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -28,6 +27,10 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Action to send email to receipients provided in actionSendFilter. The email
+ * body will be result of templating actionSendFilter.
+ */
 public class LDNEmailAction implements LDNAction {
 
     private static final Logger log = LogManager.getLogger(LDNEmailAction.class);
@@ -48,6 +51,25 @@ public class LDNEmailAction implements LDNAction {
     // The file name for the requested email
     private String actionSendEmailTextFile;
 
+    /**
+     * Execute sending an email.
+     *
+     * Template context parameters:
+     *
+     * {0} Service Name
+     * {1} Item Name
+     * {2} Service URL
+     * {3} Item URL
+     * {4} Submitter's Name
+     * {5} Date of the received LDN notification
+     * {6} LDN notification
+     * {7} Item
+     *
+     * @param notification
+     * @param item
+     * @return ActionStatus
+     * @throws Exception
+     */
     @Override
     public ActionStatus execute(Notification notification, Item item) throws Exception {
         Context context = ContextUtil.obtainCurrentRequestContext();
@@ -62,15 +84,6 @@ public class LDNEmailAction implements LDNAction {
             }
 
             String date = new SimpleDateFormat(DATE_PATTERN).format(Calendar.getInstance().getTime());
-
-            // # Parameters: {0} Service Name
-            // #             {1} Item Name
-            // #             {2} Service URL
-            // #             {3} Item URL
-            // #             {4} Submitter's Name
-            // #             {5} Date of the received LDN notification
-            // #             {6} LDN notification
-            // #             {7} Item
 
             email.addArgument(notification.getActor().getName());
             email.addArgument(item.getName());
@@ -89,23 +102,42 @@ public class LDNEmailAction implements LDNAction {
         return ActionStatus.CONTINUE;
     }
 
+    /**
+     * @return String
+     */
     public String getActionSendFilter() {
         return actionSendFilter;
     }
 
+    /**
+     * @param actionSendFilter
+     */
     public void setActionSendFilter(String actionSendFilter) {
         this.actionSendFilter = actionSendFilter;
     }
 
+    /**
+     * @return String
+     */
     public String getActionSendEmailTextFile() {
         return actionSendEmailTextFile;
     }
 
+    /**
+     * @param actionSendEmailTextFile
+     */
     public void setActionSendEmailTextFile(String actionSendEmailTextFile) {
         this.actionSendEmailTextFile = actionSendEmailTextFile;
     }
 
-    private List<String> retrieveRecipientsEmail(Item item) throws SQLException {
+    /**
+     * Parses actionSendFilter for reserved tokens and returns list of email
+     * recipients.
+     *
+     * @param item the item which to get submitter email
+     * @return List<String> list of email recipients
+     */
+    private List<String> retrieveRecipientsEmail(Item item) {
         List<String> recipients = new LinkedList<String>();
 
         if (actionSendFilter.startsWith("SUBMITTER")) {

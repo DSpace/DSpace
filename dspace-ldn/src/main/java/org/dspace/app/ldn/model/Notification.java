@@ -10,6 +10,9 @@ package org.dspace.app.ldn.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+/**
+ *
+ */
 @JsonPropertyOrder(value = {
     "@context",
     "id",
@@ -47,62 +50,107 @@ public class Notification extends Base {
     @JsonProperty("inReplyTo")
     private String inReplyTo;
 
+    /**
+     * 
+     */
     public Notification() {
         super();
     }
 
+    /**
+     * @return String[]
+     */
     public String[] getC() {
         return c;
     }
 
+    /**
+     * @param c
+     */
     public void setC(String[] c) {
         this.c = c;
     }
 
+    /**
+     * @return Actor
+     */
     public Actor getActor() {
         return actor;
     }
 
+    /**
+     * @param actor
+     */
     public void setActor(Actor actor) {
         this.actor = actor;
     }
 
+    /**
+     * @return Context
+     */
     public Context getContext() {
         return context;
     }
 
+    /**
+     * @param context
+     */
     public void setContext(Context context) {
         this.context = context;
     }
 
+    /**
+     * @return Object
+     */
     public Object getObject() {
         return object;
     }
 
+    /**
+     * @param object
+     */
     public void setObject(Object object) {
         this.object = object;
     }
 
+    /**
+     * @return Service
+     */
     public Service getOrigin() {
         return origin;
     }
 
+    /**
+     * @param origin
+     */
     public void setOrigin(Service origin) {
         this.origin = origin;
     }
 
+    /**
+     * @return Service
+     */
     public Service getTarget() {
         return target;
     }
 
+    /**
+     * @param target
+     */
     public void setTarget(Service target) {
         this.target = target;
     }
 
+    /**
+     * @return String
+     */
     public String getInReplyTo() {
         return inReplyTo;
     }
 
+    /**
+     * @param inReplyTo
+     */
     public void setInReplyTo(String inReplyTo) {
         this.inReplyTo = inReplyTo;
     }

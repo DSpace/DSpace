@@ -9,8 +9,17 @@ package org.dspace.app.ldn.processor;
 
 import org.dspace.app.ldn.model.Notification;
 
+/**
+ * Processor interface to allow for custom implementations of process.
+ */
 public interface LDNProcessor {
 
+    /**
+     * Process received notification.
+     *
+     * @param notification received notification
+     * @throws Exception something went wrong processing the notification
+     */
     public void process(Notification notification) throws Exception;
 
 }

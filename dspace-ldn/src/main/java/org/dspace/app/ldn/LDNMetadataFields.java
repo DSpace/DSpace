@@ -7,6 +7,9 @@
  */
 package org.dspace.app.ldn;
 
+/**
+ *
+ */
 public final class LDNMetadataFields {
 
     // schema and element are the same for each metadata of LDN coar-notify
@@ -23,6 +26,9 @@ public final class LDNMetadataFields {
     public static final String ENDORSMENT = "endorsement";
     public static final String RELEASE = "release";
 
+    /**
+     * 
+     */
     private LDNMetadataFields() {
 
     }
