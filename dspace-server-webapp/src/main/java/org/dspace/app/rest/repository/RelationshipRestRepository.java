@@ -168,25 +168,21 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         }
         List<DSpaceObject> dSpaceObjects = utils.constructDSpaceObjectList(context, stringList);
         if (dSpaceObjects.size() == 1 && dSpaceObjects.get(0).getType() == Constants.ITEM) {
-
             Item replacementItemInRelationship = (Item) dSpaceObjects.get(0);
-            Item leftItem;
-            Item rightItem;
+            Item newLeftItem;
+            Item newRightItem;
+
             if (itemToReplaceIsRight) {
-                leftItem = relationship.getLeftItem();
-                rightItem = replacementItemInRelationship;
+                newLeftItem = null;
+                newRightItem = replacementItemInRelationship;
             } else {
-                leftItem = replacementItemInRelationship;
-                rightItem = relationship.getRightItem();
+                newLeftItem = replacementItemInRelationship;
+                newRightItem = null;
             }
 
-            if (isAllowedToModifyRelationship(context, relationship, leftItem, rightItem)) {
-                relationship.setLeftItem(leftItem);
-                relationship.setRightItem(rightItem);
-
+            if (isAllowedToModifyRelationship(context, relationship, newLeftItem, newRightItem)) {
                 try {
-                    relationshipService.updatePlaceInRelationship(context, relationship);
-                    relationshipService.update(context, relationship);
+                    relationshipService.move(context, relationship, newLeftItem, newRightItem);
                     context.commit();
                     context.reloadEntity(relationship);
                 } catch (AuthorizeException e) {
@@ -245,15 +241,17 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             relationship.setLeftwardValue(relationshipRest.getLeftwardValue());
             relationship.setRightwardValue(relationshipRest.getRightwardValue());
 
+            Integer newRightPlace = null;
+            Integer newLeftPlace = null;
             if (jsonNode.hasNonNull("rightPlace")) {
-                relationship.setRightPlace(relationshipRest.getRightPlace());
+                newRightPlace = relationshipRest.getRightPlace();
             }
 
             if (jsonNode.hasNonNull("leftPlace")) {
-                relationship.setLeftPlace(relationshipRest.getLeftPlace());
+                newLeftPlace = relationshipRest.getLeftPlace();
             }
 
-            relationshipService.update(context, relationship);
+            relationshipService.move(context, relationship, newLeftPlace, newRightPlace);
             context.commit();
             context.reloadEntity(relationship);
 
@@ -275,10 +273,13 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
      */
     private boolean isAllowedToModifyRelationship(Context context, Relationship relationship, Item leftItem,
                                                   Item rightItem) throws SQLException {
-        return (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
-            authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) &&
-            (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
-                authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)
+        return (
+            // Authorized to write new Items (if specified)
+            (leftItem == null || authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE))
+                || (rightItem == null || authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE))
+            // Authorized to write old Items
+            && (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE)
+                || authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE))
             );
     }
 

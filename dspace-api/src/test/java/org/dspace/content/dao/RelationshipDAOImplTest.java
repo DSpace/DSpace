@@ -139,28 +139,6 @@ public class RelationshipDAOImplTest extends AbstractIntegrationTest {
     }
 
     /**
-     * Test findNextLeftPlaceByLeftItem should return 0 given our test left Item itemOne.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testFindNextLeftPlaceByLeftItem() throws Exception {
-        assertEquals("TestNextLeftPlaceByLeftItem 0", 1, relationshipService.findNextLeftPlaceByLeftItem(context,
-                itemOne));
-    }
-
-    /**
-     * Test findNextRightPlaceByRightItem should return 0 given our test right Item itemTwo.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testFindNextRightPlaceByRightItem() throws Exception {
-        assertEquals("TestNextRightPlaceByRightItem 0", 1, relationshipService.findNextRightPlaceByRightItem(context,
-                itemTwo));
-    }
-
-    /**
      * Test findByRelationshipType should return our defined relationshipsList given our test RelationshipType
      * relationshipType
      *

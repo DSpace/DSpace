@@ -925,11 +925,10 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             rightItem = item;
         }
 
-        // Create the relationship
-        int leftPlace = relationshipService.findNextLeftPlaceByLeftItem(c, leftItem);
-        int rightPlace = relationshipService.findNextRightPlaceByRightItem(c, rightItem);
-        Relationship persistedRelationship = relationshipService.create(c, leftItem, rightItem,
-                                                                        foundRelationshipType, leftPlace, rightPlace);
+        // Create the relationship, appending to the end
+        Relationship persistedRelationship = relationshipService.create(
+            c, leftItem, rightItem, foundRelationshipType, -1, -1
+        );
         relationshipService.update(c, persistedRelationship);
     }
 

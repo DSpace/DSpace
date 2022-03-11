@@ -62,28 +62,6 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
     ) throws SQLException;
 
     /**
-     * This method returns the next leftplace integer to use for a relationship with this item as the leftItem
-     *
-     * @param context   The relevant DSpace context
-     * @param item      The item to be matched on leftItem
-     * @return          The next integer to be used for the leftplace of a relationship with the given item
-     *                  as a left item
-     * @throws SQLException If something goes wrong
-     */
-    int findNextLeftPlaceByLeftItem(Context context, Item item) throws SQLException;
-
-    /**
-     * This method returns the next rightplace integer to use for a relationship with this item as the rightItem
-     *
-     * @param context   The relevant DSpace context
-     * @param item      The item to be matched on rightItem
-     * @return          The next integer to be used for the rightplace of a relationship with the given item
-     *                  as a right item
-     * @throws SQLException If something goes wrong
-     */
-    int findNextRightPlaceByRightItem(Context context, Item item) throws SQLException;
-
-    /**
      * This method returns a list of Relationship objects for the given RelationshipType object.
      * It will construct a list of all Relationship objects that have the given RelationshipType object
      * as the relationshipType property
