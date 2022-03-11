@@ -22,7 +22,7 @@ pipeline {
                     brageVars = checkout scm
                     dir("${CUSTOMZ}") {
                         //configVars = checkout scm
-                        git url: 'https://user:${env.GITLAB_TOKEN}@gitlab.sikt.no/bibliotekstjenester/brage6-customizations.git'
+                        git url: "https://user:${env.GITLAB_TOKEN}@gitlab.sikt.no/bibliotekstjenester/brage6-customizations.git"
                     }
                 }
             }
