@@ -1141,7 +1141,15 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertTrue(newMdvs.get(5) instanceof RelationshipMetadataValue);
         assertEquals("author, 6 (item)", newMdvs.get(5).getValue());
 
-        // TODO also test place after removing/adding relationships and metadata
+        //////////////
+        // clean up //
+        //////////////
+
+        // need to manually delete all relationships to avoid SQL constraint violation exception
+        List<Relationship> relationships = relationshipService.findAll(context);
+        for (Relationship relationship : relationships) {
+            relationshipService.delete(context, relationship);
+        }
     }
 
 }
