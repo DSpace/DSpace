@@ -202,7 +202,7 @@ public class BrowseEngine {
             // get the table name that we are going to be getting our data from
             dao.setTable(browseIndex.getTableName());
 
-            dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
+            dao.setStartsWith(normalizeJumpToValue(scope.getStartsWith()));
 
             // tell the browse query whether we are ascending or descending on the value
             dao.setAscending(scope.isAscending());
