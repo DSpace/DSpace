@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -202,7 +203,7 @@ public class BrowseEngine {
             // get the table name that we are going to be getting our data from
             dao.setTable(browseIndex.getTableName());
 
-            dao.setStartsWith(normalizeJumpToValue(scope.getStartsWith()));
+            dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
 
             // tell the browse query whether we are ascending or descending on the value
             dao.setAscending(scope.isAscending());
