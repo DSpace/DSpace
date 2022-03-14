@@ -1055,8 +1055,15 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         RelationshipBuilder.createRelationshipBuilder(context, originalPublication, author2, isAuthorOfPublication)
             .build();
 
-        // author 3 (plain metadata)
-        itemService.addMetadata(context, originalPublication, "dc", "contributor", "author", null, "author 3 (plain)");
+        // author 3 (virtual)
+        Item author3 = ItemBuilder.createItem(context, collection)
+            .withTitle("author 3 (item)")
+            .withMetadata("dspace", "entity", "type", personEntityType.getLabel())
+            .withPersonIdentifierFirstName("3 (item)")
+            .withPersonIdentifierLastName("author")
+            .build();
+        RelationshipBuilder.createRelationshipBuilder(context, originalPublication, author3, isAuthorOfPublication)
+            .build();
 
         // author 4 (virtual)
         Item author4 = ItemBuilder.createItem(context, collection)
@@ -1068,17 +1075,40 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         RelationshipBuilder.createRelationshipBuilder(context, originalPublication, author4, isAuthorOfPublication)
             .build();
 
-        // author 5 (plain metadata)
-        itemService.addMetadata(context, originalPublication, "dc", "contributor", "author", null, "author 5 (plain)");
-
-        // author 6 (virtual)
-        Item author6 = ItemBuilder.createItem(context, collection)
-            .withTitle("author 6 (item)")
+        // author 5 (virtual)
+        Item author5 = ItemBuilder.createItem(context, collection)
+            .withTitle("author 5 (item)")
             .withMetadata("dspace", "entity", "type", personEntityType.getLabel())
-            .withPersonIdentifierFirstName("6 (item)")
+            .withPersonIdentifierFirstName("5 (item)")
             .withPersonIdentifierLastName("author")
             .build();
-        RelationshipBuilder.createRelationshipBuilder(context, originalPublication, author6, isAuthorOfPublication)
+        RelationshipBuilder.createRelationshipBuilder(context, originalPublication, author5, isAuthorOfPublication)
+            .build();
+
+        // author 6 (plain metadata)
+        itemService.addMetadata(context, originalPublication, "dc", "contributor", "author", null, "author 6 (plain)");
+
+        // author 7 (virtual)
+        Item author7 = ItemBuilder.createItem(context, collection)
+            .withTitle("author 7 (item)")
+            .withMetadata("dspace", "entity", "type", personEntityType.getLabel())
+            .withPersonIdentifierFirstName("7 (item)")
+            .withPersonIdentifierLastName("author")
+            .build();
+        RelationshipBuilder.createRelationshipBuilder(context, originalPublication, author7, isAuthorOfPublication)
+            .build();
+
+        // author 8 (plain metadata)
+        itemService.addMetadata(context, originalPublication, "dc", "contributor", "author", null, "author 8 (plain)");
+
+        // author 9 (virtual)
+        Item author9 = ItemBuilder.createItem(context, collection)
+            .withTitle("author 9 (item)")
+            .withMetadata("dspace", "entity", "type", personEntityType.getLabel())
+            .withPersonIdentifierFirstName("9 (item)")
+            .withPersonIdentifierLastName("author")
+            .build();
+        RelationshipBuilder.createRelationshipBuilder(context, originalPublication, author9, isAuthorOfPublication)
             .build();
 
         ////////////////////////////////
@@ -1095,17 +1125,26 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertTrue(oldMdvs.get(1) instanceof RelationshipMetadataValue);
         assertEquals("author, 2 (item)", oldMdvs.get(1).getValue());
 
-        assertFalse(oldMdvs.get(2) instanceof RelationshipMetadataValue);
-        assertEquals("author 3 (plain)", oldMdvs.get(2).getValue());
+        assertTrue(oldMdvs.get(2) instanceof RelationshipMetadataValue);
+        assertEquals("author, 3 (item)", oldMdvs.get(2).getValue());
 
         assertTrue(oldMdvs.get(3) instanceof RelationshipMetadataValue);
         assertEquals("author, 4 (item)", oldMdvs.get(3).getValue());
 
-        assertFalse(oldMdvs.get(4) instanceof RelationshipMetadataValue);
-        assertEquals("author 5 (plain)", oldMdvs.get(4).getValue());
+        assertTrue(oldMdvs.get(4) instanceof RelationshipMetadataValue);
+        assertEquals("author, 5 (item)", oldMdvs.get(4).getValue());
 
-        assertTrue(oldMdvs.get(5) instanceof RelationshipMetadataValue);
-        assertEquals("author, 6 (item)", oldMdvs.get(5).getValue());
+        assertFalse(oldMdvs.get(5) instanceof RelationshipMetadataValue);
+        assertEquals("author 6 (plain)", oldMdvs.get(5).getValue());
+
+        assertTrue(oldMdvs.get(6) instanceof RelationshipMetadataValue);
+        assertEquals("author, 7 (item)", oldMdvs.get(6).getValue());
+
+        assertFalse(oldMdvs.get(7) instanceof RelationshipMetadataValue);
+        assertEquals("author 8 (plain)", oldMdvs.get(7).getValue());
+
+        assertTrue(oldMdvs.get(8) instanceof RelationshipMetadataValue);
+        assertEquals("author, 9 (item)", oldMdvs.get(8).getValue());
 
         ///////////////////////////////////////
         // create new version of publication //
@@ -1129,17 +1168,26 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertTrue(newMdvs.get(1) instanceof RelationshipMetadataValue);
         assertEquals("author, 2 (item)", newMdvs.get(1).getValue());
 
-        assertFalse(newMdvs.get(2) instanceof RelationshipMetadataValue);
-        assertEquals("author 3 (plain)", newMdvs.get(2).getValue());
+        assertTrue(newMdvs.get(2) instanceof RelationshipMetadataValue);
+        assertEquals("author, 3 (item)", newMdvs.get(2).getValue());
 
         assertTrue(newMdvs.get(3) instanceof RelationshipMetadataValue);
         assertEquals("author, 4 (item)", newMdvs.get(3).getValue());
 
-        assertFalse(newMdvs.get(4) instanceof RelationshipMetadataValue);
-        assertEquals("author 5 (plain)", newMdvs.get(4).getValue());
+        assertTrue(newMdvs.get(4) instanceof RelationshipMetadataValue);
+        assertEquals("author, 5 (item)", newMdvs.get(4).getValue());
 
-        assertTrue(newMdvs.get(5) instanceof RelationshipMetadataValue);
-        assertEquals("author, 6 (item)", newMdvs.get(5).getValue());
+        assertFalse(newMdvs.get(5) instanceof RelationshipMetadataValue);
+        assertEquals("author 6 (plain)", newMdvs.get(5).getValue());
+
+        assertTrue(newMdvs.get(6) instanceof RelationshipMetadataValue);
+        assertEquals("author, 7 (item)", newMdvs.get(6).getValue());
+
+        assertFalse(newMdvs.get(7) instanceof RelationshipMetadataValue);
+        assertEquals("author 8 (plain)", newMdvs.get(7).getValue());
+
+        assertTrue(newMdvs.get(8) instanceof RelationshipMetadataValue);
+        assertEquals("author, 9 (item)", newMdvs.get(8).getValue());
 
         //////////////
         // clean up //
