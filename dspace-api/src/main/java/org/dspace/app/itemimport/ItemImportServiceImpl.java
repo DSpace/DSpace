@@ -7,6 +7,13 @@
  */
 package org.dspace.app.itemimport;
 
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_HEIGHT_QUALIFIER;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE_ELEMENT;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_LABEL_ELEMENT;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_SCHEMA;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_TOC_ELEMENT;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_WIDTH_QUALIFIER;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -55,6 +62,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.app.util.LocalSchemaFilenameFilter;
+import org.dspace.app.util.RelationshipUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -68,6 +76,9 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataSchemaEnum;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -77,12 +88,15 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
@@ -151,6 +165,12 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected WorkflowService workflowService;
     @Autowired(required = true)
     protected ConfigurationService configurationService;
+    @Autowired(required = true)
+    protected RelationshipService relationshipService;
+    @Autowired(required = true)
+    protected RelationshipTypeService relationshipTypeService;
+    @Autowired(required = true)
+    protected MetadataValueService metadataValueService;
 
     protected String tempWorkDir;
 
@@ -159,6 +179,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected boolean useWorkflow = false;
     protected boolean useWorkflowSendEmail = false;
     protected boolean isQuiet = false;
+
+    //remember which folder item was imported from
+    Map<String, Item> itemFolderMap = null;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -211,9 +234,12 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         // create the mapfile
         File outFile = null;
         PrintWriter mapOut = null;
+
         try {
             Map<String, String> skipItems = new HashMap<>(); // set of items to skip if in 'resume'
             // mode
+
+            itemFolderMap = new HashMap<>();
 
             System.out.println("Adding items from directory: " + sourceDir);
             log.debug("Adding items from directory: " + sourceDir);
@@ -255,6 +281,12 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             for (int i = 0; i < dircontents.length; i++) {
                 if (skipItems.containsKey(dircontents[i])) {
                     System.out.println("Skipping import of " + dircontents[i]);
+
+                    //we still need the item in the map for relationship linking
+                    String skippedHandle = skipItems.get(dircontents[i]);
+                    Item skippedItem = (Item) handleService.resolveToObject(c, skippedHandle);
+                    itemFolderMap.put(dircontents[i], skippedItem);
+
                 } else {
                     List<Collection> clist;
                     if (directoryFileCollections) {
@@ -274,11 +306,18 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     } else {
                         clist = mycollections;
                     }
+
                     Item item = addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
+
+                    itemFolderMap.put(dircontents[i], item);
+
                     c.uncacheEntity(item);
                     System.out.println(i + " " + dircontents[i]);
                 }
             }
+
+            //now that all items are imported, iterate again to link relationships
+            addRelationships(c, sourceDir);
 
         } finally {
             if (mapOut != null) {
@@ -286,6 +325,276 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 mapOut.close();
             }
         }
+    }
+
+     /**
+      * Add relationships from a 'relationships' manifest file.
+      * 
+      * @param c Context
+      * @param sourceDir The parent import source directory
+      * @throws Exception
+      */
+    protected void addRelationships(Context c, String sourceDir) throws Exception {
+
+        for (Map.Entry<String, Item> itemEntry : itemFolderMap.entrySet()) {
+
+            String folderName = itemEntry.getKey();
+            String path = sourceDir + File.separatorChar + folderName;
+            Item item = itemEntry.getValue();
+
+            //look for a 'relationship' manifest
+            Map<String, List<String>> relationships = processRelationshipFile(path, "relationships");
+            if (!relationships.isEmpty()) {
+
+                for (Map.Entry<String, List<String>> relEntry : relationships.entrySet()) {
+
+                    String relationshipType = relEntry.getKey();
+                    List<String> identifierList = relEntry.getValue();
+
+                    for (String itemIdentifier : identifierList) {
+
+                        if (isTest) {
+                            System.out.println("\tAdding relationship (type: " + relationshipType +
+                                ") from " + folderName + " to " + itemIdentifier);
+                            continue;
+                        }
+
+                        //find referenced item
+                        Item relationItem = resolveRelatedItem(c, itemIdentifier);
+                        if (null == relationItem) {
+                            throw new Exception("Could not find item for " + itemIdentifier);
+                        }
+
+                        //get entity type of entity and item
+                        String itemEntityType = getEntityType(item);
+                        String relatedEntityType = getEntityType(relationItem);
+
+                        //find matching relationship type
+                        List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(
+                            c, relationshipType);
+                        RelationshipType foundRelationshipType = RelationshipUtils.matchRelationshipType(
+                            relTypes, relatedEntityType, itemEntityType, relationshipType);
+
+                        if (foundRelationshipType == null) {
+                            throw new Exception("No Relationship type found for:\n" +
+                                "Target type: " + relatedEntityType + "\n" +
+                                "Origin referer type: " + itemEntityType + "\n" +
+                                "with typeName: " + relationshipType
+                            );
+                        }
+
+                        boolean left = false;
+                        if (foundRelationshipType.getLeftwardType().equalsIgnoreCase(relationshipType)) {
+                            left = true;
+                        }
+
+                        // Placeholder items for relation placing
+                        Item leftItem = null;
+                        Item rightItem = null;
+                        if (left) {
+                            leftItem = item;
+                            rightItem = relationItem;
+                        } else {
+                            leftItem = relationItem;
+                            rightItem = item;
+                        }
+
+                        // Create the relationship
+                        int leftPlace = relationshipService.findNextLeftPlaceByLeftItem(c, leftItem);
+                        int rightPlace = relationshipService.findNextRightPlaceByRightItem(c, rightItem);
+                        Relationship persistedRelationship = relationshipService.create(
+                            c, leftItem, rightItem, foundRelationshipType, leftPlace, rightPlace);
+                        // relationshipService.update(c, persistedRelationship);
+
+                        System.out.println("\tAdded relationship (type: " + relationshipType + ") from " +
+                            leftItem.getHandle() + " to " + rightItem.getHandle());
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    /**
+     * Get the item's entity type from meta.
+     * 
+     * @param item
+     * @return
+     */
+    protected String getEntityType(Item item) throws Exception {
+        return itemService.getMetadata(item, "dspace", "entity", "type", Item.ANY).get(0).getValue();
+    }
+
+    /**
+     * Read the relationship manifest file.
+     * 
+     * Each line in the file contains a relationship type id and an item identifier in the following format:
+     * 
+     * relation.<relation_key> <handle|uuid|folderName:import_item_folder|schema.element[.qualifier]:value>
+     * 
+     * The input_item_folder should refer the folder name of another item in this import batch.
+     * 
+     * @param path The main import folder path.
+     * @param filename The name of the manifest file to check ('relationships')
+     * @return Map of found relationships
+     * @throws Exception
+     */
+    protected Map<String, List<String>> processRelationshipFile(String path, String filename) throws Exception {
+
+        File file = new File(path + File.separatorChar + filename);
+        Map<String, List<String>> result = new HashMap<>();
+
+        if (file.exists()) {
+
+            System.out.println("\tProcessing relationships file: " + filename);
+
+            BufferedReader br = null;
+            try {
+                br = new BufferedReader(new FileReader(file));
+                String line = null;
+                while ((line = br.readLine()) != null) {
+                    line = line.trim();
+                    if ("".equals(line)) {
+                        continue;
+                    }
+
+                    String relationshipType = null;
+                    String itemIdentifier = null;
+
+                    StringTokenizer st = new StringTokenizer(line);
+
+                    if (st.hasMoreTokens()) {
+                        relationshipType = st.nextToken();
+                        if (relationshipType.split("\\.").length > 1) {
+                            relationshipType = relationshipType.split("\\.")[1];
+                        }
+                    } else {
+                        throw new Exception("Bad mapfile line:\n" + line);
+                    }
+
+                    if (st.hasMoreTokens()) {
+                        itemIdentifier = st.nextToken("").trim();
+                    } else {
+                        throw new Exception("Bad mapfile line:\n" + line);
+                    }
+
+                    if (!result.containsKey(relationshipType)) {
+                        result.put(relationshipType, new ArrayList<>());
+                    }
+
+                    result.get(relationshipType).add(itemIdentifier);
+
+                }
+
+            } catch (FileNotFoundException e) {
+                System.out.println("\tNo relationships file found.");
+            } finally {
+                if (br != null) {
+                    try {
+                        br.close();
+                    } catch (IOException e) {
+                        System.out.println("Non-critical problem releasing resources.");
+                    }
+                }
+            }
+
+        }
+
+        return result;
+    }
+
+     /**
+      * Resolve an item identifier referred to in the relationships manifest file.
+      *
+      * The import item map will be checked first to see if the identifier refers to an item folder
+      * that was just imported. Next it will try to find the item by handle or UUID, or by a unique
+      * meta value.
+      * 
+      * @param c Context
+      * @param itemIdentifier The identifier string found in the import manifest (handle, uuid, or import subfolder)
+      * @return Item if found, or null.
+      * @throws Exception
+      */
+    protected Item resolveRelatedItem(Context c, String itemIdentifier) throws Exception {
+
+        if (itemIdentifier.contains(":")) {
+
+            if (itemIdentifier.startsWith("folderName:") || itemIdentifier.startsWith("rowName:")) {
+                //identifier refers to a folder name in this import
+                int i = itemIdentifier.indexOf(":");
+                String folderName = itemIdentifier.substring(i + 1);
+                if (itemFolderMap.containsKey(folderName)) {
+                    return itemFolderMap.get(folderName);
+                }
+
+            } else {
+
+                //lookup by meta value
+                int i = itemIdentifier.indexOf(":");
+                String metaKey = itemIdentifier.substring(0, i);
+                String metaValue = itemIdentifier.substring(i + 1);
+                return findItemByMetaValue(c, metaKey, metaValue);
+
+            }
+
+        } else if (itemIdentifier.indexOf('/') != -1) {
+            //resolve by handle
+            return (Item) handleService.resolveToObject(c, itemIdentifier);
+
+        } else {
+            //try to resolve by UUID
+            return itemService.findByIdOrLegacyId(c, itemIdentifier);
+        }
+
+        return null;
+
+    }
+
+    /**
+     * Lookup an item by a (unique) meta value.
+     * 
+     * @param metaKey
+     * @param metaValue
+     * @return Item
+     * @throws Exception if single item not found.
+     */
+    protected Item findItemByMetaValue(Context c, String metaKey, String metaValue) throws Exception {
+
+        Item item = null;
+
+        String mf[] = metaKey.split("\\.");
+        if (mf.length < 2) {
+            throw new Exception("Bad metadata field in reference: '" + metaKey +
+                "' (expected syntax is schema.element[.qualifier])");
+        }
+        String schema = mf[0];
+        String element = mf[1];
+        String qualifier = mf.length == 2 ? null : mf[2];
+        try {
+            MetadataField mfo = metadataFieldService.findByElement(c, schema, element, qualifier);
+            Iterator<MetadataValue> mdv = metadataValueService.findByFieldAndValue(c, mfo, metaValue);
+            if (mdv.hasNext()) {
+                MetadataValue mdvVal = mdv.next();
+                UUID uuid = mdvVal.getDSpaceObject().getID();
+                if (mdv.hasNext()) {
+                    throw new Exception("Ambiguous reference; multiple matches in db: " + metaKey);
+                }
+                item = itemService.find(c, uuid);
+            }
+        } catch (SQLException e) {
+            throw new Exception("Error looking up item by metadata reference: " + metaKey, e);
+        }
+
+        if (item == null) {
+            throw new Exception("Item not found by metadata reference: " + metaKey);
+        }
+
+        return item;
+
     }
 
     @Override
@@ -827,7 +1136,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         if (iAssetstore == -1 || sFilePath == null) {
                             System.out.println("\tERROR: invalid contents file line");
                             System.out.println("\t\tSkipping line: "
-                                                   + sRegistrationLine);
+                                + sRegistrationLine);
                             continue;
                         }
 
@@ -851,9 +1160,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
                         registerBitstream(c, i, iAssetstore, sFilePath, sBundle, sDescription);
                         System.out.println("\tRegistering Bitstream: " + sFilePath
-                                               + "\tAssetstore: " + iAssetstore
-                                               + "\tBundle: " + sBundle
-                                               + "\tDescription: " + sDescription);
+                            + "\tAssetstore: " + iAssetstore
+                            + "\tBundle: " + sBundle
+                            + "\tDescription: " + sDescription);
                         continue;                // process next line in contents file
                     }
 
@@ -870,6 +1179,59 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         boolean bundleExists = false;
                         boolean permissionsExist = false;
                         boolean descriptionExists = false;
+                        boolean labelExists = false;
+                        boolean heightExists = false;
+                        boolean widthExists = false;
+                        boolean tocExists = false;
+
+                        // look for label
+                        String labelMarker = "\tiiif-label";
+                        int lMarkerIndex = line.indexOf(labelMarker);
+                        int lEndIndex = 0;
+                        if (lMarkerIndex > 0) {
+                            lEndIndex = line.indexOf("\t", lMarkerIndex + 1);
+                            if (lEndIndex == -1) {
+                                lEndIndex = line.length();
+                            }
+                            labelExists = true;
+                        }
+
+                        // look for height
+                        String heightMarker = "\tiiif-height";
+                        int hMarkerIndex = line.indexOf(heightMarker);
+                        int hEndIndex = 0;
+                        if (hMarkerIndex > 0) {
+                            hEndIndex = line.indexOf("\t", hMarkerIndex + 1);
+                            if (hEndIndex == -1) {
+                                hEndIndex = line.length();
+                            }
+                            heightExists = true;
+                        }
+
+                        // look for width
+                        String widthMarker = "\tiiif-width";
+                        int wMarkerIndex = line.indexOf(widthMarker);
+                        int wEndIndex = 0;
+                        if (wMarkerIndex > 0) {
+                            wEndIndex = line.indexOf("\t", wMarkerIndex + 1);
+                            if (wEndIndex == -1) {
+                                wEndIndex = line.length();
+                            }
+                            widthExists = true;
+                        }
+
+                        // look for toc
+                        String tocMarker = "\tiiif-toc";
+                        int tMarkerIndex = line.indexOf(tocMarker);
+                        int tEndIndex = 0;
+                        if (tMarkerIndex > 0) {
+                            tEndIndex = line.indexOf("\t", tMarkerIndex + 1);
+                            if (tEndIndex == -1) {
+                                tEndIndex = line.length();
+                            }
+                            tocExists = true;
+                        }
+
 
                         // look for a bundle name
                         String bundleMarker = "\tbundle:";
@@ -918,18 +1280,20 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
                         if (bundleExists) {
                             String bundleName = line.substring(bMarkerIndex
-                                                                   + bundleMarker.length(), bEndIndex).trim();
+                                + bundleMarker.length(), bEndIndex).trim();
 
                             processContentFileEntry(c, i, path, bitstreamName, bundleName, primary);
                             System.out.println("\tBitstream: " + bitstreamName +
-                                                   "\tBundle: " + bundleName +
-                                                   primaryStr);
+                                "\tBundle: " + bundleName +
+                                primaryStr);
                         } else {
                             processContentFileEntry(c, i, path, bitstreamName, null, primary);
                             System.out.println("\tBitstream: " + bitstreamName + primaryStr);
                         }
 
-                        if (permissionsExist || descriptionExists) {
+                        if (permissionsExist || descriptionExists || labelExists || heightExists
+                            || widthExists || tocExists) {
+                            System.out.println("Gathering options.");
                             String extraInfo = bitstreamName;
 
                             if (permissionsExist) {
@@ -940,6 +1304,26 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                             if (descriptionExists) {
                                 extraInfo = extraInfo
                                     + line.substring(dMarkerIndex, dEndIndex);
+                            }
+
+                            if (labelExists) {
+                                extraInfo = extraInfo
+                                    + line.substring(lMarkerIndex, lEndIndex);
+                            }
+
+                            if (heightExists) {
+                                extraInfo = extraInfo
+                                    + line.substring(hMarkerIndex, hEndIndex);
+                            }
+
+                            if (widthExists) {
+                                extraInfo = extraInfo
+                                    + line.substring(wMarkerIndex, wEndIndex);
+                            }
+
+                            if (tocExists) {
+                                extraInfo = extraInfo
+                                    + line.substring(tMarkerIndex, tEndIndex);
                             }
 
                             options.add(extraInfo);
@@ -1123,11 +1507,16 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      */
     protected void processOptions(Context c, Item myItem, List<String> options)
         throws SQLException, AuthorizeException {
+        System.out.println("Processing options.");
         for (String line : options) {
             System.out.println("\tprocessing " + line);
 
             boolean permissionsExist = false;
             boolean descriptionExists = false;
+            boolean labelExists = false;
+            boolean heightExists = false;
+            boolean widthExists = false;
+            boolean tocExists = false;
 
             String permissionsMarker = "\tpermissions:";
             int pMarkerIndex = line.indexOf(permissionsMarker);
@@ -1151,6 +1540,56 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 descriptionExists = true;
             }
 
+
+            // look for label
+            String labelMarker = "\tiiif-label:";
+            int lMarkerIndex = line.indexOf(labelMarker);
+            int lEndIndex = 0;
+            if (lMarkerIndex > 0) {
+                lEndIndex = line.indexOf("\t", lMarkerIndex + 1);
+                if (lEndIndex == -1) {
+                    lEndIndex = line.length();
+                }
+                labelExists = true;
+            }
+
+            // look for height
+            String heightMarker = "\tiiif-height:";
+            int hMarkerIndex = line.indexOf(heightMarker);
+            int hEndIndex = 0;
+            if (hMarkerIndex > 0) {
+                hEndIndex = line.indexOf("\t", hMarkerIndex + 1);
+                if (hEndIndex == -1) {
+                    hEndIndex = line.length();
+                }
+                heightExists = true;
+            }
+
+            // look for width
+            String widthMarker = "\tiiif-width:";
+            int wMarkerIndex = line.indexOf(widthMarker);
+            int wEndIndex = 0;
+            if (wMarkerIndex > 0) {
+                wEndIndex = line.indexOf("\t", wMarkerIndex + 1);
+                if (wEndIndex == -1) {
+                    wEndIndex = line.length();
+                }
+                widthExists = true;
+            }
+
+            // look for toc
+            String tocMarker = "\tiiif-toc:";
+            int tMarkerIndex = line.indexOf(tocMarker);
+            int tEndIndex = 0;
+            if (tMarkerIndex > 0) {
+                tEndIndex = line.indexOf("\t", tMarkerIndex + 1);
+                if (tEndIndex == -1) {
+                    tEndIndex = line.length();
+                }
+                tocExists = true;
+            }
+
+
             int bsEndIndex = line.indexOf("\t");
             String bitstreamName = line.substring(0, bsEndIndex);
 
@@ -1159,7 +1598,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             Group myGroup = null;
             if (permissionsExist) {
                 String thisPermission = line.substring(pMarkerIndex
-                                                           + permissionsMarker.length(), pEndIndex);
+                    + permissionsMarker.length(), pEndIndex);
 
                 // get permission type ("read" or "write")
                 int pTypeIndex = thisPermission.indexOf('-');
@@ -1176,7 +1615,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 }
 
                 groupName = thisPermission.substring(groupIndex + 1,
-                                                     groupEndIndex);
+                    groupEndIndex);
 
                 if (thisPermission.toLowerCase().charAt(pTypeIndex + 1) == 'r') {
                     actionID = Constants.READ;
@@ -1188,7 +1627,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     myGroup = groupService.findByName(c, groupName);
                 } catch (SQLException sqle) {
                     System.out.println("SQL Exception finding group name: "
-                                           + groupName);
+                        + groupName);
                     // do nothing, will check for null group later
                 }
             }
@@ -1196,12 +1635,42 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             String thisDescription = "";
             if (descriptionExists) {
                 thisDescription = line.substring(
-                    dMarkerIndex + descriptionMarker.length(), dEndIndex)
+                                          dMarkerIndex + descriptionMarker.length(), dEndIndex)
                                       .trim();
+            }
+
+            String thisLabel = "";
+            if (labelExists) {
+                thisLabel = line.substring(
+                                    lMarkerIndex + labelMarker.length(), lEndIndex)
+                                .trim();
+            }
+
+            String thisHeight = "";
+            if (heightExists) {
+                thisHeight = line.substring(
+                                     hMarkerIndex + heightMarker.length(), hEndIndex)
+                                 .trim();
+            }
+
+            String thisWidth = "";
+            if (widthExists) {
+                thisWidth = line.substring(
+                                    wMarkerIndex + widthMarker.length(), wEndIndex)
+                                .trim();
+            }
+
+            String thisToc = "";
+            if (tocExists) {
+                thisToc = line.substring(
+                                  tMarkerIndex + tocMarker.length(), tEndIndex)
+                              .trim();
             }
 
             Bitstream bs = null;
             boolean notfound = true;
+            boolean updateRequired = false;
+
             if (!isTest) {
                 // find bitstream
                 List<Bitstream> bitstreams = itemService.getNonInternalBitstreams(c, myItem);
@@ -1216,26 +1685,65 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             if (notfound && !isTest) {
                 // this should never happen
                 System.out.println("\tdefault permissions set for "
-                                       + bitstreamName);
+                    + bitstreamName);
             } else if (!isTest) {
                 if (permissionsExist) {
                     if (myGroup == null) {
                         System.out.println("\t" + groupName
-                                               + " not found, permissions set to default");
+                            + " not found, permissions set to default");
                     } else if (actionID == -1) {
                         System.out
                             .println("\tinvalid permissions flag, permissions set to default");
                     } else {
                         System.out.println("\tSetting special permissions for "
-                                               + bitstreamName);
+                            + bitstreamName);
                         setPermission(c, myGroup, actionID, bs);
                     }
                 }
 
                 if (descriptionExists) {
                     System.out.println("\tSetting description for "
-                                           + bitstreamName);
+                        + bitstreamName);
                     bs.setDescription(c, thisDescription);
+                    updateRequired = true;
+                }
+
+                if (labelExists) {
+                    MetadataField metadataField = metadataFieldService
+                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_LABEL_ELEMENT, null);
+                    System.out.println("\tSetting label to " + thisLabel + " in element "
+                        + metadataField.getElement() + " on " + bitstreamName);
+                    bitstreamService.addMetadata(c, bs, metadataField, null, thisLabel);
+                    updateRequired = true;
+                }
+
+                if (heightExists) {
+                    MetadataField metadataField = metadataFieldService
+                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_IMAGE_ELEMENT,
+                            METADATA_IIIF_HEIGHT_QUALIFIER);
+                    System.out.println("\tSetting height to " + thisHeight + " in element "
+                        + metadataField.getElement() + " on " + bitstreamName);
+                    bitstreamService.addMetadata(c, bs, metadataField, null, thisHeight);
+                    updateRequired = true;
+                }
+                if (widthExists) {
+                    MetadataField metadataField = metadataFieldService
+                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_IMAGE_ELEMENT,
+                            METADATA_IIIF_WIDTH_QUALIFIER);
+                    System.out.println("\tSetting width to " + thisWidth + " in element "
+                        + metadataField.getElement() + " on " + bitstreamName);
+                    bitstreamService.addMetadata(c, bs, metadataField, null, thisWidth);
+                    updateRequired = true;
+                }
+                if (tocExists) {
+                    MetadataField metadataField = metadataFieldService
+                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_TOC_ELEMENT, null);
+                    System.out.println("\tSetting toc to " + thisToc + " in element "
+                        + metadataField.getElement() + " on " + bitstreamName);
+                    bitstreamService.addMetadata(c, bs, metadataField, null, thisToc);
+                    updateRequired = true;
+                }
+                if (updateRequired) {
                     bitstreamService.update(c, bs);
                 }
             }
@@ -1689,7 +2197,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             email.send();
         } catch (Exception e) {
-            log.warn(LogManager.getHeader(context, "emailSuccessMessage", "cannot notify user of import"), e);
+            log.warn(LogHelper.getHeader(context, "emailSuccessMessage", "cannot notify user of import"), e);
         }
     }
 
@@ -1823,4 +2331,5 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     public void setQuiet(boolean isQuiet) {
         this.isQuiet = isQuiet;
     }
+
 }

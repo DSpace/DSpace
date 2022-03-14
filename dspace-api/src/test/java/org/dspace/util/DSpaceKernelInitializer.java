@@ -115,7 +115,7 @@ public class DSpaceKernelInitializer
     /**
      * Utility class that will destroy the DSpace Kernel on Spring shutdown.
      */
-    private class DSpaceKernelDestroyer
+    private static class DSpaceKernelDestroyer
             implements ApplicationListener<ContextClosedEvent> {
         private DSpaceKernel kernel;
 

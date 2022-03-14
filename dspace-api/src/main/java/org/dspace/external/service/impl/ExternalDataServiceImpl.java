@@ -10,10 +10,10 @@ package org.dspace.external.service.impl;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -21,7 +21,7 @@ import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.external.service.ExternalDataService;
@@ -43,9 +43,6 @@ public class ExternalDataServiceImpl implements ExternalDataService {
 
     @Autowired
     private WorkspaceItemService workspaceItemService;
-
-    @Autowired
-    private AuthorizeService authorizeService;
 
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String source, String id) {
@@ -105,9 +102,17 @@ public class ExternalDataServiceImpl implements ExternalDataService {
                                     metadataValueDTO.getConfidence());
         }
 
-        log.info(LogManager.getHeader(context, "create_item_from_externalDataObject", "Created item" +
+        log.info(LogHelper.getHeader(context, "create_item_from_externalDataObject", "Created item" +
             "with id: " + item.getID() + " from source: " + externalDataObject.getSource() + " with identifier: " +
             externalDataObject.getId()));
         return workspaceItem;
     }
+
+    @Override
+    public List<ExternalDataProvider> getExternalDataProvidersForEntityType(String entityType) {
+        return externalDataProviders.stream()
+                                    .filter(edp -> edp.supportsEntityType(entityType))
+                                    .collect(Collectors.toList());
+    }
+
 }

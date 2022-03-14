@@ -47,9 +47,9 @@ CREATE TABLE relationship_type
 CREATE TABLE relationship
 (
     id                      INTEGER NOT NULL PRIMARY KEY,
-    left_id                 uuid NOT NULL REFERENCES item(uuid),
+    left_id                 raw(16) NOT NULL REFERENCES item(uuid),
     type_id                 INTEGER NOT NULL REFERENCES relationship_type(id),
-    right_id                uuid NOT NULL REFERENCES item(uuid),
+    right_id                raw(16) NOT NULL REFERENCES item(uuid),
     left_place              INTEGER,
     right_place             INTEGER,
     CONSTRAINT u_constraint UNIQUE (left_id, type_id, right_id)
@@ -57,9 +57,9 @@ CREATE TABLE relationship
 );
 
 CREATE INDEX entity_type_label_idx ON entity_type(label);
-CREATE INDEX relationship_type_by_left_type_idx ON relationship_type(left_type);
-CREATE INDEX relationship_type_by_right_type_idx ON relationship_type(right_type);
-CREATE INDEX relationship_type_by_left_label_idx ON relationship_type(left_label);
-CREATE INDEX relationship_type_by_right_label_idx ON relationship_type(right_label);
+CREATE INDEX rl_ty_by_left_type_idx ON relationship_type(left_type);
+CREATE INDEX rl_ty_by_right_type_idx ON relationship_type(right_type);
+CREATE INDEX rl_ty_by_left_label_idx ON relationship_type(left_label);
+CREATE INDEX rl_ty_by_right_label_idx ON relationship_type(right_label);
 CREATE INDEX relationship_by_left_id_idx ON relationship(left_id);
 CREATE INDEX relationship_by_right_id_idx ON relationship(right_id);

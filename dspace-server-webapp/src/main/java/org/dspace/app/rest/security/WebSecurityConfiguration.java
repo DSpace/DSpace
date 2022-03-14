@@ -79,8 +79,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // Configure authentication requirements for ${dspace.server.url}/api/ URL only
-        // NOTE: REST API is hardcoded to respond on /api/. Other modules (OAI, SWORD, etc) use other root paths.
-        http.antMatcher("/api/**")
+        // NOTE: REST API is hardcoded to respond on /api/. Other modules (OAI, SWORD, IIIF, etc) use other root paths.
+        http.requestMatchers()
+            .antMatchers("/api/**", "/iiif/**")
+            .and()
             // Enable Spring Security authorization on these paths
             .authorizeRequests()
                 // Allow POST by anyone on the login endpoint
@@ -132,7 +134,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                              LogoutFilter.class)
             // Add a filter before our shibboleth endpoints to do the authentication based on the data in the
             // HTTP request
-            .addFilterBefore(new ShibbolethAuthenticationFilter("/api/authn/shibboleth", authenticationManager(),
+            .addFilterBefore(new ShibbolethLoginFilter("/api/authn/shibboleth", authenticationManager(),
+                                                       restAuthenticationService),
+                             LogoutFilter.class)
+            //Add a filter before our OIDC endpoints to do the authentication based on the data in the
+            // HTTP request
+            .addFilterBefore(new OidcLoginFilter("/api/authn/oidc", authenticationManager(),
                                                       restAuthenticationService),
                              LogoutFilter.class)
             // Add a custom Token based authentication filter based on the token previously given to the client

@@ -20,6 +20,11 @@
                 <property name="timeout" value="5000"/>
             </bean>
         </property>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Journal</value>
+            </list>
+        </property>
     </bean>
     <bean class="org.dspace.external.provider.impl.SHERPAv2JournalDataProvider" init-method="init">
         <property name="sourceIdentifier" value="sherpaJournal"/>
@@ -29,6 +34,11 @@
                 <property name="sleepBetweenTimeouts" value="2000"/>
                 <property name="timeout" value="5000"/>
             </bean>
+        </property>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Journal</value>
+            </list>
         </property>
     </bean>
     <bean class="org.dspace.external.provider.impl.SHERPAv2PublisherDataProvider" init-method="init">
@@ -40,6 +50,11 @@
                 <property name="timeout" value="5000"/>
             </bean>
         </property>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>OrgUnit</value>
+            </list>
+        </property>
     </bean>
     <bean class="org.dspace.external.provider.impl.OrcidV3AuthorDataProvider" init-method="init">
         <property name="sourceIdentifier" value="orcid"/>
@@ -48,6 +63,11 @@
         <property name="clientSecret" value="${orcid.clientsecret}" />
         <property name="OAUTHUrl" value="${orcid.oauth.url}" />
         <property name="orcidRestConnector" ref="orcidRestConnector"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Person</value>
+            </list>
+        </property>
     </bean>
 
     <bean id="orcidRestConnector" class="org.dspace.external.OrcidRestConnector">

@@ -59,6 +59,11 @@ dspace.name = DSpace at My University
 # Since DSpace 7, SOLR must be installed as a stand-alone service
 #solr.server = http://localhost:8983/solr
 
+# Solr core name prefix.
+# If you connect multiple instances of DSpace to a single Solr instance, you
+# can organize them with a common core name prefix.
+#solr.multicorePrefix =
+
 ##########################
 # DATABASE CONFIGURATION #
 ##########################
@@ -95,8 +100,8 @@ db.schema = public
 #db.maxconnections = 30
 
 # Maximum time to wait before giving up if all connections in pool are busy (milliseconds)
-# (default = 5000ms or 5 seconds)
-#db.maxwait = 5000
+# (default = 10000ms or 10 seconds)
+#db.maxwait = 10000
 
 # Maximum number of idle connections in pool (-1 = unlimited)
 # (default = 10)
@@ -144,20 +149,19 @@ db.schema = public
 # Items in DSpace receive a unique URL, stored in dc.identifier.uri
 # after it is generated during the submission process.
 #
-# If you register with CNRI's handle service at http://www.handle.net/,
-# these links can be generated as permalinks using http://hdl.handle.net/
+# If you register with CNRI's handle service at https://www.handle.net/,
+# these links can be generated as permalinks using https://hdl.handle.net/
 # as canonical prefix. Please make sure to change handle.canonical.prefix
 # after registering with handle.net by uncommenting one of the following
-# lines, depending if you prefer to use http or https:
-# handle.canonical.prefix = http://hdl.handle.net/
+# lines, depending if you prefer to use https or http:
 # handle.canonical.prefix = https://hdl.handle.net/
+# handle.canonical.prefix = http://hdl.handle.net/
 #
-# Note that this will not alter dc.identifer.uri metadata for existing
-# items (only for subsequent submissions), but it will alter the URL
-# in JSPUI's 'identifier' message on item record pages for existing items.
+# Note that this will not alter dc.identifier.uri metadata for existing
+# items (only for subsequent submissions).
 
 # CNRI Handle prefix
-# (Defaults to a dummy/fake prefix of 123456789)
+# (Defaults to the reserved dummy/fake prefix of 123456789)
 #handle.prefix = 123456789
 
 #######################
@@ -190,6 +194,9 @@ db.schema = public
 
 # LDAP authentication/authorization. See authentication-ldap.cfg for default configuration.
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.LDAPAuthentication
+
+# OIDC authentication/authorization. See authenication-oidc.cfg for default configuration.
+#plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.OidcAuthentication
 
 # Shibboleth authentication/authorization. See authentication-shibboleth.cfg for default configuration.
 # Check also the cors settings below

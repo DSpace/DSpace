@@ -41,6 +41,7 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
+            c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             resourcePolicy = c.reloadEntity(resourcePolicy);
@@ -81,6 +82,7 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
     public void delete(ResourcePolicy rp) throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+            c.setDispatcher("noindex");
             ResourcePolicy attachedDso = c.reloadEntity(rp);
             if (attachedDso != null) {
                 getService().delete(c, attachedDso);

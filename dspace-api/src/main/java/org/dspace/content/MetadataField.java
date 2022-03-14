@@ -32,7 +32,6 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * metadata element belongs in a field.
  *
  * @author Martin Hald
- * @version $Revision$
  * @see org.dspace.content.MetadataValue
  * @see org.dspace.content.MetadataSchema
  */
@@ -77,6 +76,7 @@ public class MetadataField implements ReloadableEntity<Integer> {
      *
      * @return metadata field id
      */
+    @Override
     public Integer getID() {
         return id;
     }
@@ -164,7 +164,7 @@ public class MetadataField implements ReloadableEntity<Integer> {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (!(obj instanceof MetadataField)) {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
@@ -175,10 +175,7 @@ public class MetadataField implements ReloadableEntity<Integer> {
         if (!this.getID().equals(other.getID())) {
             return false;
         }
-        if (!getMetadataSchema().equals(other.getMetadataSchema())) {
-            return false;
-        }
-        return true;
+        return getMetadataSchema().equals(other.getMetadataSchema());
     }
 
     @Override
