@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -125,6 +126,20 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
         return query;
     }
 
+    private String toXMLEncoded(String s) {
+        Formatter formatter = new Formatter();
+        int len = s.length();
+        for (int i = 0; i < len; i = s.offsetByCodePoints(i, 1)) {
+            int c = s.codePointAt(i);
+            if (c < 32 || c > 126 || c == '&' || c == '<' || c == '>') {
+                formatter.format("&#%d;", c);
+            } else {
+                formatter.format("%c", c);
+            }
+        }
+        return formatter.toString();
+    }
+
     /**
      * Constructs a solr search URL.
      *
@@ -133,6 +148,10 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
      * @return solr query
      */
     private SolrQuery getSolrQuery(String query, String manifestId) {
+        boolean encode = configurationService.getBooleanProperty("iiif.search.index.xml.encode");
+        if (encode) {
+            query = toXMLEncoded(query);
+        }
         String snippetCount = configurationService.getProperty("iiif.search.snippets");
         String contextBlock = configurationService.getProperty("iiif.search.contextBlock");
         String limitBlock = configurationService.getProperty("iiif.search.limitBlock");
@@ -141,7 +160,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
         String contextSize = configurationService.getProperty("iiif.search.contextSize");
         String trackPages = configurationService.getProperty("iiif.search.trackPages");
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.set("q", "ocr_text:" + query + " AND manifest_url:\"" + manifestId + "\"");
+        solrQuery.set("q", "ocr_text:\"" + query + "\" AND manifest_url:\"" + manifestId + "\"");
         solrQuery.set(CommonParams.WT, "json");
         solrQuery.set("fl", "manifest_url");
         solrQuery.set("hl", "true");
@@ -193,11 +212,16 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
             // snippets array
             if (ocrObj != null) {
                 for (JsonElement snippetArray : ocrObj.getAsJsonObject().get("snippets").getAsJsonArray()) {
-                    String pageId = getCanvasId(snippetArray.getAsJsonObject().get("pages"));
-                    for (JsonElement highlights : snippetArray.getAsJsonObject().getAsJsonArray("highlights")) {
-                        for (JsonElement highlight : highlights.getAsJsonArray()) {
-                            searchResult.addResource(getAnnotation(highlight, pageId, uuid));
+                    JsonElement pages = snippetArray.getAsJsonObject().get("pages");
+                    if (pages != null && pages.isJsonArray()) {
+                        String pageId = getCanvasId(pages);
+                        for (JsonElement highlights : snippetArray.getAsJsonObject().getAsJsonArray("highlights")) {
+                            for (JsonElement highlight : highlights.getAsJsonArray()) {
+                                searchResult.addResource(getAnnotation(highlight, pageId, uuid));
+                            }
                         }
+                    } else {
+                        log.warn("Unable to read pages array.");
                     }
                 }
             }
