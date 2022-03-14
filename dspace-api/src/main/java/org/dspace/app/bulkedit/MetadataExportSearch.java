@@ -35,6 +35,10 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.utils.DSpace;
 
+/**
+ * Metadata exporter to allow the batch export of metadata from a discovery search into a file
+ *
+ */
 public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScriptConfiguration> {
     private static final String EXPORT_CSV = "exportCSV";
     private boolean help = false;

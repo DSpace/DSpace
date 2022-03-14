@@ -8,5 +8,8 @@
 
 package org.dspace.app.bulkedit;
 
+/**
+ * The cli version of the {@link MetadataExportSearch} script
+ */
 public class MetadataExportSearchCli extends MetadataExportSearch {
 }

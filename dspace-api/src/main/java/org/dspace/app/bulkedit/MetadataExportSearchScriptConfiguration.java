@@ -12,6 +12,9 @@ import org.apache.commons.cli.Options;
 import org.dspace.core.Context;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 
+/**
+ * The {@link ScriptConfiguration} for the {@link MetadataExportSearch} script
+ */
 public class MetadataExportSearchScriptConfiguration<T extends MetadataExportSearch> extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableclass;

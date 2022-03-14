@@ -730,6 +730,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
     }
 
+    /**
+     * This class implements an iterator over items that is specifically used to iterate over search results
+     */
     private class SearchIterator implements Iterator<Item> {
         private Context context;
         private DiscoverQuery discoverQuery;

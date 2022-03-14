@@ -8,6 +8,10 @@
 
 package org.dspace.app.bulkedit;
 
+/**
+ * This is the CLI version of the {@link MetadataExportSearchScriptConfiguration} class that handles the
+ * configuration for the {@link MetadataExportSearchCli} script
+ */
 public class MetadataExportSearchCliScriptConfiguration
     extends MetadataExportSearchScriptConfiguration<MetadataExportSearchCli> {
 
