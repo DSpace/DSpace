@@ -655,62 +655,59 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         Item[] itemsSubject1 = new Item[numberItemsSubject1];
         Item[] itemsSubject2 = new Item[numberItemsSubject2];
         context.turnOffAuthorisationSystem();
-        try {
-            Community community = CommunityBuilder.createCommunity(context).build();
-            Collection collection = CollectionBuilder.createCollection(context, community).build();
-            for (int i = 0; i < numberItemsSubject1; i++) {
-                itemsSubject1[i] = ItemBuilder.createItem(context, collection)
-                    .withTitle("item subject 1 number" + i)
-                    .withSubject(subject1)
-                    .build();
-            }
-
-            for (int i = 0; i < numberItemsSubject2; i++) {
-                itemsSubject2[i] = ItemBuilder.createItem(context, collection)
-                    .withTitle("item subject 2 number " + i)
-                    .withSubject(subject2)
-                    .build();
-            }
-
-            Collection collection2 = CollectionBuilder.createCollection(context, community).build();
-            ItemBuilder.createItem(context, collection2)
-                .withTitle("item collection2")
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        for (int i = 0; i < numberItemsSubject1; i++) {
+            itemsSubject1[i] = ItemBuilder.createItem(context, collection)
+                .withTitle("item subject 1 number" + i)
                 .withSubject(subject1)
                 .build();
+        }
 
-            DiscoverQuery discoverQuery = new DiscoverQuery();
-            discoverQuery.addFilterQueries("subject:" + subject1);
+        for (int i = 0; i < numberItemsSubject2; i++) {
+            itemsSubject2[i] = ItemBuilder.createItem(context, collection)
+                .withTitle("item subject 2 number " + i)
+                .withSubject(subject2)
+                .build();
+        }
 
-            Iterator<Item> itemIterator =
-                searchService.iteratorSearch(context, new IndexableCollection(collection), discoverQuery);
-            int counter = 0;
-            List<Item> foundItems = new ArrayList<>();
-            while (itemIterator.hasNext()) {
-                foundItems.add(itemIterator.next());
-                counter++;
-            }
-            for (Item item : itemsSubject1) {
-                assertTrue(foundItems.contains(item));
-            }
-            assertEquals(numberItemsSubject1, counter);
+        Collection collection2 = CollectionBuilder.createCollection(context, community).build();
+        ItemBuilder.createItem(context, collection2)
+            .withTitle("item collection2")
+            .withSubject(subject1)
+            .build();
+        context.restoreAuthSystemState();
 
-            discoverQuery = new DiscoverQuery();
-            discoverQuery.addFilterQueries("subject:" + subject2);
 
-            itemIterator = searchService.iteratorSearch(context, null, discoverQuery);
-            counter = 0;
-            foundItems = new ArrayList<>();
-            while (itemIterator.hasNext()) {
-                foundItems.add(itemIterator.next());
-                counter++;
-            }
-            assertEquals(numberItemsSubject2, counter);
-            for (Item item : itemsSubject2) {
-                assertTrue(foundItems.contains(item));
-            }
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.addFilterQueries("subject:" + subject1);
 
-        } finally {
-            context.restoreAuthSystemState();
+        Iterator<Item> itemIterator =
+            searchService.iteratorSearch(context, new IndexableCollection(collection), discoverQuery);
+        int counter = 0;
+        List<Item> foundItems = new ArrayList<>();
+        while (itemIterator.hasNext()) {
+            foundItems.add(itemIterator.next());
+            counter++;
+        }
+        for (Item item : itemsSubject1) {
+            assertTrue(foundItems.contains(item));
+        }
+        assertEquals(numberItemsSubject1, counter);
+
+        discoverQuery = new DiscoverQuery();
+        discoverQuery.addFilterQueries("subject:" + subject2);
+
+        itemIterator = searchService.iteratorSearch(context, null, discoverQuery);
+        counter = 0;
+        foundItems = new ArrayList<>();
+        while (itemIterator.hasNext()) {
+            foundItems.add(itemIterator.next());
+            counter++;
+        }
+        assertEquals(numberItemsSubject2, counter);
+        for (Item item : itemsSubject2) {
+            assertTrue(foundItems.contains(item));
         }
     }
 
