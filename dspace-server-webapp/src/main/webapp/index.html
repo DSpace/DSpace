@@ -6,7 +6,7 @@
 * This DSpace version has be customized to include:
 *     * Download file functionality (see new downloadFile() method)
 *     * Improved AuthorizationHeader parsing (see new getAuthorizationHeader() method)
-*     * Upgraded third party dependencies (JQuery)
+*     * Upgraded third party dependencies via WebJars
 *     * Updated to use Bootstrap 4, based loosely on this PR to HAL Browser:
         https://github.com/mikekelly/hal-browser/pull/102
 -->
@@ -283,12 +283,12 @@ Content-Type: application/json
     </div>
 </script>
 
-<!-- Customized (to use WebJars) for DSpace -->
+<!-- Pull in updated versions of "vendor" libraries using WebJars -->
 <script src="webjars/jquery/dist/jquery.min.js"></script>
-<script src="browser/vendor/js/underscore.js"></script>
-<script src="browser/vendor/js/backbone.js"></script>
+<script src="webjars/underscore/underscore-min.js"></script>
+<script src="webjars/backbone/backbone-min.js"></script>
 <script src="browser/vendor/js/uritemplates.js"></script>
-<script src="browser/vendor/js/URI.min.js"></script>
+<script src="webjars/urijs/src/URI.min.js"></script>
 <script src="webjars/bootstrap/dist/js/bootstrap.min.js"></script>
 
 <script src="browser/js/hal.js"></script>

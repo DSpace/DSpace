@@ -289,13 +289,13 @@
             <version>ad9b865</version>
         </dependency>
 
-        <!-- WebJars dependencies used to update/enhance the default HAL Browser -->
+        <!-- Pull in several WebJars dependencies used to update/enhance the default HAL Browser -->
         <!-- Pull in current version of JQuery via WebJars
              Made available at: webjars/jquery/dist/jquery.min.js -->
         <dependency>
             <groupId>org.webjars.bowergithub.jquery</groupId>
             <artifactId>jquery-dist</artifactId>
-            <version>3.5.1</version>
+            <version>3.6.0</version>
         </dependency>
         <!-- Pull in current version of Toastr (toastrjs.com) via WebJars
              Made available at: webjars/toastr/build/toastr.min.js -->
@@ -304,6 +304,27 @@
             <artifactId>toastr</artifactId>
             <version>2.1.4</version>
         </dependency>
+        <!-- Pull in current version of URI.js (https://medialize.github.io/URI.js/) via WebJars
+             Made available at: webjars/urijs/src/URI.min.js -->
+        <dependency>
+            <groupId>org.webjars.bowergithub.medialize</groupId>
+            <artifactId>uri.js</artifactId>
+            <version>1.19.10</version>
+        </dependency>
+        <!-- Pull in current version of Underscore.js (https://underscorejs.org/) via WebJars
+             Made available at: webjars/underscore/underscore-min.js -->
+        <dependency>
+            <groupId>org.webjars.bowergithub.jashkenas</groupId>
+            <artifactId>underscore</artifactId>
+            <version>1.13.2</version>
+        </dependency>
+        <!-- Pull in current version of Backbone.js (http://backbonejs.org/) via WebJars
+             Made available at: webjars/backbone/backbone-min.js -->
+        <dependency>
+            <groupId>org.webjars.bowergithub.jashkenas</groupId>
+            <artifactId>backbone</artifactId>
+            <version>1.4.1</version>
+        </dependency>
         <!-- Also pull in current version of Bootstrap via WebJars.
              This is used by BOTH our HAL Browser and our OAI-PMH interface.
              Made available at: webjars/bootstrap/dist/js/bootstrap.min.js and
@@ -311,7 +332,7 @@
         <dependency>
             <groupId>org.webjars.bowergithub.twbs</groupId>
             <artifactId>bootstrap</artifactId>
-            <version>4.5.2</version>
+            <version>4.6.1</version>
         </dependency>
 
         <!-- Add in Spring Security for AuthN and AuthZ -->
