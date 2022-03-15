@@ -128,6 +128,10 @@ db.schema = public
 # General site administration (Webmaster) e-mail
 #mail.admin = dspace-help@myu.edu
 
+# Helpdesk E-mail
+#mail.helpdesk = ${mail.admin}
+#mail.helpdesk.name = Help Desk
+
 # Recipient for server errors and alerts (defaults to mail.admin)
 #alert.recipient = ${mail.admin}
 
