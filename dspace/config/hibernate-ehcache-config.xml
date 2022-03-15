@@ -18,8 +18,6 @@
         <jsr107:defaults default-template="default"/>
     </service>
 
-    <persistence directory="${java.io.tmpdir}"/>
-
     <!--
     Mandatory Default Cache configuration. These settings will be applied to
     caches created programmatically using CacheManager.add(String cacheName).
@@ -30,7 +28,6 @@
       </expiry>
       <resources>
         <heap unit='entries'>3000</heap>
-        <!--<disk persistent='false' unit='MB'>1</disk>-->
       </resources>
     </cache-template>
 
@@ -131,7 +128,6 @@
       </expiry>
       <resources>
         <heap unit='entries'>4000</heap>
-        <!--<disk persistent='false' unit='MB'>10</disk>-->
       </resources>
     </cache>
 
@@ -144,7 +140,6 @@
       </expiry>
       <resources>
         <heap unit='entries'>2000</heap>
-        <!--<disk persistent='false' unit='MB'>1</disk>-->
       </resources>
     </cache>
 
