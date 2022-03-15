@@ -34,11 +34,11 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.jaxen.JaxenException;
 import org.jaxen.jdom.JDOMXPath;
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.InputSource;
@@ -141,7 +141,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
 
         try (StringReader stringReader = new StringReader(responseString)) {
             InputSource is = new InputSource(stringReader);
-            org.jdom.Document classDoc = this.parser.build(is);
+            org.jdom2.Document classDoc = this.parser.build(is);
 
             List<Element> elements = licenseClassXpath.selectNodes(classDoc);
             for (Element element : elements) {
@@ -179,7 +179,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
         try (StringReader stringReader = new StringReader(responseString)) {
             InputSource is = new InputSource(stringReader);
 
-            org.jdom.Document classDoc = this.parser.build(is);
+            org.jdom2.Document classDoc = this.parser.build(is);
 
             Object element = licenseClassXpath.selectSingleNode(classDoc);
             String licenseLabel = getSingleNodeValue(element, "label");
@@ -298,7 +298,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
 
         try (StringReader stringReader = new StringReader(responseString)) {
             InputSource is = new InputSource(stringReader);
-            org.jdom.Document classDoc = this.parser.build(is);
+            org.jdom2.Document classDoc = this.parser.build(is);
 
             Object node = licenseClassXpath.selectSingleNode(classDoc);
             String nodeValue = getNodeValue(node);
