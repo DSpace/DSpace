@@ -7,20 +7,14 @@
  */
 package org.dspace.services.events;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.dspace.services.CachingService;
 import org.dspace.services.EventService;
 import org.dspace.services.RequestService;
-import org.dspace.services.model.Cache;
-import org.dspace.services.model.CacheConfig;
-import org.dspace.services.model.CacheConfig.CacheScope;
 import org.dspace.services.model.Event;
 import org.dspace.services.model.Event.Scope;
 import org.dspace.services.model.EventListener;
@@ -40,24 +34,20 @@ public final class SystemEventService implements EventService {
 
     private final Logger log = LoggerFactory.getLogger(SystemEventService.class);
 
-    private static final String QUEUE_CACHE_NAME = "eventQueueCache";
-
     /**
      * Map for holding onto the listeners which is ClassLoader safe.
      */
     private final Map<String, EventListener> listenersMap = new ConcurrentHashMap<>();
 
     private final RequestService requestService;
-    private final CachingService cachingService;
     private EventRequestInterceptor requestInterceptor;
 
     @Autowired(required = true)
-    public SystemEventService(RequestService requestService, CachingService cachingService) {
-        if (requestService == null || cachingService == null) {
-            throw new IllegalArgumentException("requestService, cachingService, and all inputs must not be null");
+    public SystemEventService(RequestService requestService) {
+        if (requestService == null) {
+            throw new IllegalArgumentException("requestService and all inputs must not be null");
         }
         this.requestService = requestService;
-        this.cachingService = cachingService;
 
         // register interceptor
         this.requestInterceptor = new EventRequestInterceptor();
@@ -94,28 +84,6 @@ public final class SystemEventService implements EventService {
     }
 
     /* (non-Javadoc)
-     * @see org.dspace.services.EventService#queueEvent(org.dspace.services.model.Event)
-     */
-    @Override
-    public void queueEvent(Event event) {
-        validateEvent(event);
-
-        // get the cache
-        Cache queueCache = this.cachingService.getCache(QUEUE_CACHE_NAME, new CacheConfig(CacheScope.REQUEST));
-
-        // put the event in the queue if this is in a request
-        if (requestService.getCurrentRequestId() != null) {
-            // create a key which is orderable and unique
-            String key = System.currentTimeMillis() + ":" + queueCache.size() + ":" + event.getId();
-            queueCache.put(key, event);
-        } else {
-            // no request so fire the event immediately
-            log.info("No request to queue this event (" + event + ") so firing immediately");
-            fireEvent(event);
-        }
-    }
-
-    /* (non-Javadoc)
      * @see org.dspace.services.EventService#registerEventListener(org.dspace.services.model.EventListener)
      */
     @Override
@@ -143,10 +111,9 @@ public final class SystemEventService implements EventService {
                 try {
                     listener.receiveEvent(event);
                 } catch (Exception e) {
-                    log.warn("Listener (" + listener + ")[" + listener.getClass()
-                                                                      .getName() + "] failed to recieve event (" +
-                                 event + "): " + e
-                        .getMessage() + ":" + e.getCause());
+                    log.warn("Listener ({})[{}] failed to receive event ({}): {}:{}",
+                            listener, listener.getClass().getName(), event,
+                            e.getMessage(), e.getCause());
                 }
             }
         }
@@ -174,40 +141,6 @@ public final class SystemEventService implements EventService {
         log.debug(
             "fireExternalEvent is not implemented yet, no support for external events yet, could not fire event to " +
                 "external listeners: " + event);
-    }
-
-    /**
-     * Fires all queued events for the current request.
-     *
-     * @return the number of events which were fired
-     */
-    protected int fireQueuedEvents() {
-        int fired = 0;
-        Cache queueCache = this.cachingService.getCache(QUEUE_CACHE_NAME, new CacheConfig(CacheScope.REQUEST));
-
-        List<String> eventIds = queueCache.getKeys();
-        Collections.sort(eventIds); // put it in the order they were added (hopefully)
-        if (eventIds.size() > 0) {
-            for (String eventId : eventIds) {
-                Event event = (Event) queueCache.get(eventId);
-                fireEvent(event);
-                fired++;
-            }
-        }
-        queueCache.clear();
-        return fired;
-    }
-
-    /**
-     * Clears all events for the current request.
-     *
-     * @return the number of events that were cleared
-     */
-    protected int clearQueuedEvents() {
-        Cache queueCache = this.cachingService.getCache(QUEUE_CACHE_NAME, new CacheConfig(CacheScope.REQUEST));
-        int cleared = queueCache.size();
-        queueCache.clear();
-        return cleared;
     }
 
     /**
@@ -265,10 +198,8 @@ public final class SystemEventService implements EventService {
                 }
             }
         } catch (Exception e1) {
-            log.warn("Listener (" + listener + ")[" + listener.getClass()
-                                                              .getName() + "] failure calling getEventNamePrefixes: "
-                         + e1
-                .getMessage() + ":" + e1.getCause());
+            log.warn("Listener ({})[{}] failure calling getEventNamePrefixes: {}:{}",
+                    listener, listener.getClass().getName(), e1.getMessage(), e1.getCause());
         }
         boolean allowResource = true;
         try {
@@ -286,9 +217,8 @@ public final class SystemEventService implements EventService {
                 }
             }
         } catch (Exception e1) {
-            log.warn("Listener (" + listener + ")[" + listener.getClass()
-                                                              .getName() + "] failure calling getResourcePrefix: " + e1
-                .getMessage() + ":" + e1.getCause());
+            log.warn("Listener ({})[{}] failure calling getResourcePrefix: {}:{}",
+                    listener, listener.getClass().getName(), e1.getMessage(), e1.getCause());
         }
 
         return allowName && allowResource;
@@ -328,14 +258,6 @@ public final class SystemEventService implements EventService {
          */
         @Override
         public void onEnd(String requestId, boolean succeeded, Exception failure) {
-            if (succeeded) {
-                int fired = fireQueuedEvents();
-                log.debug("Fired " + fired + " events at the end of the request (" + requestId + ")");
-            } else {
-                int cleared = clearQueuedEvents();
-                log.debug(
-                    "Cleared/cancelled " + cleared + " events at the end of the failed request (" + requestId + ")");
-            }
         }
 
         /* (non-Javadoc)

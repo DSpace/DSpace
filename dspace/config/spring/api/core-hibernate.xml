@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-lazy-init="true">
 
     <!-- Hibernate 4 Configuration -->
     <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean" lazy-init="true">
@@ -17,7 +18,7 @@
             <props>
                 <prop key="hibernate.dialect">${db.dialect}</prop>
                 <prop key="hibernate.default_schema">${db.schema}</prop>
-                <prop key='net.sf.ehcache.configurationResourceName'>
+                <prop key='hibernate.javax.cache.uri'>
                     file:${dspace.dir}/config/hibernate-ehcache-config.xml
                 </prop>
             </props>
