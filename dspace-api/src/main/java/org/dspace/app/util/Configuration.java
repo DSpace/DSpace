@@ -8,7 +8,6 @@
 
 package org.dspace.app.util;
 
-import java.lang.reflect.Array;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -33,6 +32,7 @@ public class Configuration
      * <li>{@code --property name} prints the value of the DSpace configuration
      * property {@code name} to the standard output.</li>
      * <li>{@code --raw} suppresses parameter substitution in the output.</li>
+     * <li>{@code --first} print only the first of multiple values.</li>
      * <li>{@code --help} describes these options.</li>
      * </ul>
      * If the property does not exist, nothing is written.
@@ -51,8 +51,9 @@ public class Configuration
         options.addOption("m", "module", true,
                 "optional name of the module in which 'property' exists");
         options.addOption("r", "raw", false,
-                "do not do property substitution on the value");
-        options.addOption("a", "all", false, "display all values of an array property");
+                          "do not do property substitution on the value");
+        options.addOption("f", "first", false,
+                          "display only the first value of an array property");
         options.addOption("?", "Get help");
         options.addOption("h", "help", false, "Get help");
 
@@ -108,8 +109,8 @@ public class Configuration
                 if (rawValue.getClass().isArray()) {
                     for (Object value : (Object[]) rawValue) {
                         System.out.println(value.toString());
-                        if (!cmd.hasOption('a')) {
-                            break; // Unless --all print only one value
+                        if (cmd.hasOption('f')) {
+                            break; // If --first print only one value
                         }
                     }
                 } else { // Not an array
@@ -120,8 +121,8 @@ public class Configuration
                 String[] values = cfg.getArrayProperty(propName);
                 for (String value : values) {
                     System.out.println(value);
-                    if (!cmd.hasOption('a')) {
-                        break; // Unless --all print only one value
+                    if (cmd.hasOption('f')) {
+                        break; // If --first print only one value
                     }
                 }
             }
