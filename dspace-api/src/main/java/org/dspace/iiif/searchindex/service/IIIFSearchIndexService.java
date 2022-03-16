@@ -20,19 +20,19 @@ public interface IIIFSearchIndexService {
      * Set dso identifiers to skip.
      * @param skipList
      */
-     void setSkipList(List<String> skipList);
+    void setSkipList(List<String> skipList);
 
     /**
      * Set the maximum number of items to process.
      * @param max
      */
-     void setMax2Process(int max);
+    void setMax2Process(int max);
 
     /**
      * Set whether to output messages during processing.
      * @param quiet
      */
-     void setIsQuiet(boolean quiet);
+    void setIsQuiet(boolean quiet);
 
 
     /**Indexing task for all items in a community and its sub-communities.

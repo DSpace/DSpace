@@ -116,7 +116,7 @@ public class IIIFSearchIndexServiceImpl implements IIIFSearchIndexService {
             HttpResponse response = httpclient.execute(httpGet);
             if (response.getStatusLine().getStatusCode() == 200) {
                 return true;
-            } else if (response.getStatusLine().getStatusCode() == 404){
+            } else if (response.getStatusLine().getStatusCode() == 404) {
                 return false;
             }
         } catch (IOException e) {
