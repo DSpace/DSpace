@@ -506,95 +506,6 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         Item newPublication = newVersion.getItem();
         assertNotSame(originalPublication, newPublication);
 
-        ///////////////////////////////////////////////////////////////////////
-        // verify the relationships of all 5 items (excludeNonLatest = true) //
-        ///////////////////////////////////////////////////////////////////////
-
-        assertThat(
-            relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
-            containsInAnyOrder(List.of(
-                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH),
-                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH),
-                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
-            ))
-        );
-
-        assertThat(
-            relationshipService.findByItem(context, person1, -1, -1, false, true),
-            containsInAnyOrder(List.of(
-                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH)
-            ))
-        );
-
-        assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, true),
-            containsInAnyOrder(List.of(
-                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH)
-            ))
-        );
-
-        assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
-            containsInAnyOrder(List.of(
-                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
-            ))
-        );
-
-        assertThat(
-            relationshipService.findByItem(context, newPublication, -1, -1, false, true),
-            containsInAnyOrder(List.of(
-                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY),
-                isRelationship(newPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY),
-                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY)
-            ))
-        );
-
-        ////////////////////////////////////////////////////////////////////////
-        // verify the relationships of all 5 items (excludeNonLatest = false) //
-        ////////////////////////////////////////////////////////////////////////
-
-        assertThat(
-            relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
-            containsInAnyOrder(List.of(
-                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH),
-                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH),
-                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
-            ))
-        );
-
-        assertThat(
-            relationshipService.findByItem(context, person1, -1, -1, false, false),
-            containsInAnyOrder(List.of(
-                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH),
-                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY)
-            ))
-        );
-
-        assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, false),
-            containsInAnyOrder(List.of(
-                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH),
-                isRelationship(newPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY)
-            ))
-        );
-
-        assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
-            containsInAnyOrder(List.of(
-                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH),
-                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY)
-            ))
-        );
-
-        assertThat(
-            relationshipService.findByItem(context, newPublication, -1, -1, false, false),
-            containsInAnyOrder(List.of(
-                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY),
-                isRelationship(newPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY),
-                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY)
-            ))
-        );
-
         /////////////////////////////////////////////
         // modify relationships on new publication //
         /////////////////////////////////////////////
@@ -626,6 +537,127 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
 
         RelationshipBuilder.createRelationshipBuilder(context, newPublication, orgUnit2, isOrgUnitOfPublication)
             .build();
+
+        ///////////////////////////////////////////////////////////////////////
+        // verify the relationships of all 7 items (excludeNonLatest = true) //
+        ///////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH),
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH),
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, person1, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, person2, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                // NOTE: BOTH because new relationship
+                isRelationship(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, project1, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit2, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                // NOTE: BOTH because new relationship
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, newPublication, -1, -1, false, true),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY),
+                // NOTE: BOTH because new relationship
+                isRelationship(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH),
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        ////////////////////////////////////////////////////////////////////////
+        // verify the relationships of all 7 items (excludeNonLatest = false) //
+        ////////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH),
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH),
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, person1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH),
+                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, person2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                // NOTE: BOTH because new relationship
+                isRelationship(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, orgUnit2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                // NOTE: BOTH because new relationship
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH)
+            ))
+        );
+
+        assertThat(
+            relationshipService.findByItem(context, newPublication, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRelationship(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY),
+                // NOTE: BOTH because new relationship
+                isRelationship(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH),
+                isRelationship(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH)
+            ))
+        );
 
         ////////////////////////////////////////
         // do item install on new publication //
