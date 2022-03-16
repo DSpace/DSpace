@@ -143,6 +143,31 @@ public class VersioningConsumer implements Consumer {
         ));
     }
 
+    /**
+     * Update {@link Relationship#latestVersionStatus} of the relationships of both the old version and the new version
+     * of the item.
+     *
+     * This method will first locate all relationships that are eligible for an update,
+     * then it will try to match each of those relationships on the old version of given item
+     * with a relationship on the new version.
+     *
+     * One of the following scenarios will happen:
+     * - if a match is found, then the "latest" status on the side of given item is transferred from
+     *   the old relationship to the new relationship. This implies that on the page of the third-party item,
+     *   the old version of given item will NOT be shown anymore and the new version of given item will appear.
+     *   Both versions of the given item still show the third-party item on their pages.
+     * - if a relationship only exists on the new version of given item, then this method does nothing.
+     *   The status of those relationships should already have been set to "latest" on both sides during relationship
+     *   creation.
+     * - if a relationship only exists on the old version of given item, then we assume that the relationship is no
+     *   longer relevant to / has been removed from the new version of the item. The "latest" status is removed from
+     *   the side of the given item. This implies that on the page of the third-party item,
+     *   the relationship with given item will no longer be listed. The old version of given item still lists
+     *   the third-party item and the new version doesn't.
+     * @param ctx the DSpace context.
+     * @param latestItem the new version of the item.
+     * @param previousItem the old version of the item.
+     */
     protected void updateRelationships(Context ctx, Item latestItem, Item previousItem) {
         // check that the entity types of both items match
         if (!doEntityTypesMatch(latestItem, previousItem)) {
@@ -172,6 +197,9 @@ public class VersioningConsumer implements Consumer {
                 continue;
             }
 
+            // NOTE: no need to loop through latestItemRelationships, because if no match can be found
+            //       (meaning a relationship is only present on the new version of the item), then it's
+            //       a newly added relationship and its status should have been set to BOTH during creation.
             for (Relationship previousItemRelationship : previousItemRelationships) {
                 // determine on which side of the relationship the latest and previous item should be
                 boolean isLeft = previousItem.equals(previousItemRelationship.getLeftItem());
@@ -195,12 +223,16 @@ public class VersioningConsumer implements Consumer {
                 Relationship latestItemRelationship =
                     getMatchingRelationship(latestItem, isLeft, previousItemRelationship, latestItemRelationships);
 
-                // for sure set the previous item to non-latest
-                // NOTE: if no matching relationship exists, this relationship will be considered deleted
-                //       when viewed from the other item
+                // Set the previous version of the item to non-latest. This implies that the previous version
+                // of the item will not be shown anymore on the page of the third-party item. That makes sense,
+                // because either the relationship has been deleted from the new version of the item (no match),
+                // or the matching relationship (linked to new version) will receive "latest" status in the next step.
                 updateLatestVersionStatus(previousItemRelationship, isLeft, false);
 
-                // set the new item to latest if the relevant relationship exists
+                // Set the new version of the item to latest if the relevant relationship exists (match found).
+                // This implies that the new version of the item will appear on the page of the third-party item.
+                // The old version of the item will not appear anymore on the page of the third-party item,
+                // see previous step.
                 if (latestItemRelationship != null) {
                     updateLatestVersionStatus(latestItemRelationship, isLeft, true);
                 }
