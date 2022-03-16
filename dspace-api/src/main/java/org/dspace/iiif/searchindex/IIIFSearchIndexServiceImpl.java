@@ -17,6 +17,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -32,6 +33,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * solr index. The processing is done by a service running on the solr host.
  */
 public class IIIFSearchIndexServiceImpl implements IIIFSearchIndexService {
+
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(IIIFSearchIndexServiceImpl.class);
+
 
     @Autowired
     ItemService itemService;
@@ -94,13 +98,14 @@ public class IIIFSearchIndexServiceImpl implements IIIFSearchIndexService {
         if (isIIIFSearchable && isIIIFItem && !inSkipList(dso.getHandle())) {
             if (action == "add") {
                 if (!checkIndex(url)) {
-                    post(url);
+                    post(url, dso.getID().toString());
                 } else {
                     System.out.println("An index entry already exists. Skipping: " + dso.getID());
                 }
             } else if (action == "delete") {
-                delete(url);
+                delete(url, dso.getID().toString());
             }
+            ++processed;
         }
     }
 
@@ -115,29 +120,39 @@ public class IIIFSearchIndexServiceImpl implements IIIFSearchIndexService {
                 return false;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn(e.getMessage(), e);
         }
         // Should not reach this point
         return false;
     }
 
-    private void post(String url)  {
+    private void post(String url, String id)  {
         HttpClient httpclient = HttpClients.createDefault();
         HttpPost httppost = new HttpPost(url);
         try {
             HttpResponse response = httpclient.execute(httppost);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                log.warn("Post to Solr preprocessor failed with status code: "
+                        + response.getStatusLine().getStatusCode());
+                System.out.println("Indexing failed for: " + id);
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn(e.getMessage(), e);
         }
     }
 
-    private void delete(String url) {
+    private void delete(String url, String id) {
         HttpClient httpclient = HttpClients.createDefault();
         HttpDelete httpDelete = new HttpDelete(url);
         try {
             HttpResponse response = httpclient.execute(httpDelete);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                log.warn("Solr deletion failed with status code: "
+                        + response.getStatusLine().getStatusCode());
+                System.out.println("Deletion failed for: " + id);
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn(e.getMessage(), e);
         }
     }
 
