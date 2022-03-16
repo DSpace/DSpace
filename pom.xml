@@ -1468,6 +1468,7 @@
                 <version>3.1.0</version>
             </dependency>
 
+            <!-- Jaxen is needed by xoai and sword2-server, but they disagree on the versions -->
             <dependency>
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
