@@ -94,7 +94,6 @@ public class ConfigurationIT
     public void testMainAllSingle() {
         String[] argv;
         argv = new String[] {
-            "--all",
             "--property", SINGLE_PROPERTY
         };
         expectedSystemExit.expectSystemExitWithStatus(0);
@@ -123,7 +122,6 @@ public class ConfigurationIT
     public void testMainAllArray() {
         String[] argv;
         argv = new String[] {
-            "--all",
             "--property", ARRAY_PROPERTY
         };
         expectedSystemExit.expectSystemExitWithStatus(0);
@@ -153,7 +151,6 @@ public class ConfigurationIT
     public void testMainAllSubstitution() {
         String[] argv;
         argv = new String[] {
-            "--all",
             "--property", PLACEHOLDER_PROPERTY
         };
         expectedSystemExit.expectSystemExitWithStatus(0);
@@ -184,7 +181,6 @@ public class ConfigurationIT
         // Can it handle a raw property (with substitution placeholders)?
         String[] argv;
         argv = new String[] {
-            "--all",
             "--property", PLACEHOLDER_PROPERTY,
             "--raw"
         };
@@ -215,7 +211,6 @@ public class ConfigurationIT
         // Can it handle an undefined property?
         String[] argv;
         argv = new String[] {
-            "--all",
             "--property", MISSING_PROPERTY
         };
         expectedSystemExit.expectSystemExitWithStatus(0);
