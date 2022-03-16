@@ -13,16 +13,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.dspace.services.CachingService;
-import org.dspace.services.model.Cache;
-import org.dspace.services.model.CacheConfig;
-import org.dspace.services.model.CacheConfig.CacheScope;
 import org.dspace.services.sessions.StatelessRequestServiceImpl;
 import org.dspace.test.DSpaceAbstractKernelTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 
 /**
  * Testing the request and session services
@@ -32,20 +27,16 @@ import org.junit.Test;
 public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
 
     private StatelessRequestServiceImpl statelessRequestService;
-    private CachingService cachingService;
 
     @Before
     public void before() {
         statelessRequestService = getService(StatelessRequestServiceImpl.class);
-        cachingService = getService(CachingService.class);
     }
 
     @After
     public void after() {
         statelessRequestService.clear();
-        cachingService.resetCaches();
         statelessRequestService = null;
-        cachingService = null;
     }
 
     /**
@@ -68,7 +59,6 @@ public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
         assertNotNull(requestId);
 
         statelessRequestService.endRequest(null);
-        assertNull(getRequestCache());
     }
 
     /**
@@ -140,13 +130,4 @@ public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
         requestId = statelessRequestService.getCurrentRequestId();
         assertNull(requestId); // no request yet
     }
-
-
-    /**
-     * @return the request storage cache
-     */
-    private Cache getRequestCache() {
-        return cachingService.getCache(CachingService.REQUEST_CACHE, new CacheConfig(CacheScope.REQUEST));
-    }
-
 }
