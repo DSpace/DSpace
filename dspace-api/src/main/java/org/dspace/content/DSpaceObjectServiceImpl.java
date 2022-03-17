@@ -243,67 +243,64 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
         boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
-        List<MetadataValue> newMetadata = new ArrayList<>(values.size());
+        List<MetadataValue> newMetadata = new ArrayList<>();
         // We will not verify that they are valid entries in the registry
         // until update() is called.
         for (int i = 0; i < values.size(); i++) {
-
-            if (authorities != null && authorities.size() >= i) {
-                if (StringUtils.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
-                    continue;
-                }
-            }
-            MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
-            newMetadata.add(metadataValue);
-
-            metadataValue.setPlace(placeSupplier.get());
-
-            metadataValue.setLanguage(lang == null ? null : lang.trim());
-
-            // Logic to set Authority and Confidence:
-            //  - normalize an empty string for authority to NULL.
-            //  - if authority key is present, use given confidence or NOVALUE if not given
-            //  - otherwise, preserve confidence if meaningful value was given since it may document a failed
-            // authority lookup
-            //  - CF_UNSET signifies no authority nor meaningful confidence.
-            //  - it's possible to have empty authority & CF_ACCEPTED if e.g. user deletes authority key
-            if (authorityControlled) {
-                if (authorities != null && authorities.get(i) != null && authorities.get(i).length() > 0) {
-                    metadataValue.setAuthority(authorities.get(i));
-                    metadataValue.setConfidence(confidences == null ? Choices.CF_NOVALUE : confidences.get(i));
-                } else {
-                    metadataValue.setAuthority(null);
-                    metadataValue.setConfidence(confidences == null ? Choices.CF_UNSET : confidences.get(i));
-                }
-                // authority sanity check: if authority is required, was it supplied?
-                // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so
-                // use a runtime exception
-                if (authorityRequired && (metadataValue.getAuthority() == null || metadataValue.getAuthority()
-                                                                                               .length() == 0)) {
-                    throw new IllegalArgumentException("The metadata field \"" + metadataField
-                        .toString() + "\" requires an authority key but none was provided. Value=\"" + values
-                        .get(i) + "\"");
-                }
-            }
             if (values.get(i) != null) {
+                if (authorities != null && authorities.size() >= i) {
+                    if (StringUtils.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+                        continue;
+                    }
+                }
+                MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
+                newMetadata.add(metadataValue);
+
+                metadataValue.setPlace(placeSupplier.get());
+
+                metadataValue.setLanguage(lang == null ? null : lang.trim());
+
+                // Logic to set Authority and Confidence:
+                //  - normalize an empty string for authority to NULL.
+                //  - if authority key is present, use given confidence or NOVALUE if not given
+                //  - otherwise, preserve confidence if meaningful value was given since it may document a failed
+                // authority lookup
+                //  - CF_UNSET signifies no authority nor meaningful confidence.
+                //  - it's possible to have empty authority & CF_ACCEPTED if e.g. user deletes authority key
+                if (authorityControlled) {
+                    if (authorities != null && authorities.get(i) != null && authorities.get(i).length() > 0) {
+                        metadataValue.setAuthority(authorities.get(i));
+                        metadataValue.setConfidence(confidences == null ? Choices.CF_NOVALUE : confidences.get(i));
+                    } else {
+                        metadataValue.setAuthority(null);
+                        metadataValue.setConfidence(confidences == null ? Choices.CF_UNSET : confidences.get(i));
+                    }
+                    // authority sanity check: if authority is required, was it supplied?
+                    // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so
+                    // use a runtime exception
+                    if (authorityRequired && (metadataValue.getAuthority() == null || metadataValue.getAuthority()
+                                                                                                   .length() == 0)) {
+                        throw new IllegalArgumentException("The metadata field \"" + metadataField
+                                .toString() + "\" requires an authority key but none was provided. Value=\"" + values
+                                .get(i) + "\"");
+                    }
+                }
                 // remove control unicode char
                 String temp = values.get(i).trim();
                 char[] dcvalue = temp.toCharArray();
                 for (int charPos = 0; charPos < dcvalue.length; charPos++) {
                     if (Character.isISOControl(dcvalue[charPos]) &&
-                        !String.valueOf(dcvalue[charPos]).equals("\u0009") &&
-                        !String.valueOf(dcvalue[charPos]).equals("\n") &&
-                        !String.valueOf(dcvalue[charPos]).equals("\r")) {
+                            !String.valueOf(dcvalue[charPos]).equals("\u0009") &&
+                            !String.valueOf(dcvalue[charPos]).equals("\n") &&
+                            !String.valueOf(dcvalue[charPos]).equals("\r")) {
                         dcvalue[charPos] = ' ';
                     }
                 }
                 metadataValue.setValue(String.valueOf(dcvalue));
-            } else {
-                metadataValue.setValue(null);
-            }
-            //An update here isn't needed, this is persited upon the merge of the owning object
+                //An update here isn't needed, this is persited upon the merge of the owning object
 //            metadataValueService.update(context, metadataValue);
-            dso.addDetails(metadataField.toString());
+                dso.addDetails(metadataField.toString());
+            }
         }
         setMetadataModified(dso);
         return newMetadata;
