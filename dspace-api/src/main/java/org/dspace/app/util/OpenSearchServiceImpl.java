@@ -16,10 +16,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.syndication.feed.module.opensearch.OpenSearchModule;
-import com.sun.syndication.feed.module.opensearch.entity.OSQuery;
-import com.sun.syndication.feed.module.opensearch.impl.OpenSearchModuleImpl;
-import com.sun.syndication.io.FeedException;
+import com.rometools.modules.opensearch.OpenSearchModule;
+import com.rometools.modules.opensearch.entity.OSQuery;
+import com.rometools.modules.opensearch.impl.OpenSearchModuleImpl;
+import com.rometools.rome.io.FeedException;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.content.DSpaceObject;

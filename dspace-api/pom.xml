@@ -581,9 +581,12 @@
         </dependency>
         <!-- Used for RSS / ATOM syndication feeds -->
         <dependency>
-            <groupId>org.rometools</groupId>
+            <groupId>com.rometools</groupId>
+            <artifactId>rome</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.rometools</groupId>
             <artifactId>rome-modules</artifactId>
-            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.jbibtex</groupId>

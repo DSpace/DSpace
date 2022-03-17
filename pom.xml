@@ -41,6 +41,7 @@
         <log4j.version>2.17.1</log4j.version>
         <pdfbox-version>2.0.24</pdfbox-version>
         <poi-version>3.17</poi-version>
+        <rome.version>1.18.0</rome.version>
         <slf4j.version>1.7.25</slf4j.version>
 
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
@@ -1159,6 +1160,23 @@
                 <artifactId>hibernate-validator</artifactId>
                 <!-- This artifact doesn't track the main Hibernate version. -->
                 <version>${hibernate-validator.version}</version>
+            </dependency>
+
+            <!-- Rome is used for RSS / ATOM syndication feeds -->
+            <dependency>
+                <groupId>com.rometools</groupId>
+                <artifactId>rome</artifactId>
+                <version>${rome.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.rometools</groupId>
+                <artifactId>rome-modules</artifactId>
+                <version>${rome.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.rometools</groupId>
+                <artifactId>rome-utils</artifactId>
+                <version>${rome.version}</version>
             </dependency>
 
             <dependency>
