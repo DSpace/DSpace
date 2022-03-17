@@ -325,6 +325,15 @@
             <artifactId>backbone</artifactId>
             <version>1.4.1</version>
         </dependency>
+        <!-- Pull in current version of json-editor.js (https://github.com/json-editor/json-editor) via WebJars
+             Made available at: webjars/json-editor__json-editor/2.6.1/dist/jsoneditor.js
+             (Required by js/vendor/CustomPostForm.js)
+             NOTE: Because the path contains the version, you MUST update index.html when updating this dependency -->
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>json-editor__json-editor</artifactId>
+            <version>2.6.1</version>
+        </dependency>
         <!-- Also pull in current version of Bootstrap via WebJars.
              This is used by BOTH our HAL Browser and our OAI-PMH interface.
              Made available at: webjars/bootstrap/dist/js/bootstrap.min.js and

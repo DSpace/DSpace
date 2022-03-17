@@ -13,6 +13,7 @@
  * This code was copied/borrowed from Spring Data REST version 3.3.x:
  * https://github.com/spring-projects/spring-data-rest/blob/3.3.x/spring-data-rest-hal-browser/src/main/resources/META-INF/spring-data-rest/hal-browser/js/CustomPostForm.js
  * NOTE: For DSpace, we made minor style/theme updates to align with Bootstrap 4.
+ * This script requires json-editor (https://github.com/json-editor/json-editor) which we pull in via WebJars
  */
 /* jshint strict: true */
 /* globals HAL, Backbone, _, $, window, jqxhr */
