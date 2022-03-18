@@ -14,9 +14,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
-public interface
-
-IIIFCanvasDimensionService {
+public interface IIIFCanvasDimensionService {
 
     /**
      * Set IIIF canvas dimensions on all IIIF items in a community and its
