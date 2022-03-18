@@ -14,13 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  *
  */
-public class Context extends Base {
-
-    @JsonProperty("ietf:cite-as")
-    private String ietfCiteAs;
-
-    @JsonProperty("url")
-    private Url url;
+public class Context extends Citation {
 
     @JsonProperty("IsSupplementedBy")
     private List<Context> isSupplementedBy;
@@ -33,34 +27,6 @@ public class Context extends Base {
      */
     public Context() {
         super();
-    }
-
-    /**
-     * @return String
-     */
-    public String getIetfCiteAs() {
-        return ietfCiteAs;
-    }
-
-    /**
-     * @param ietfCiteAs
-     */
-    public void setIetfCiteAs(String ietfCiteAs) {
-        this.ietfCiteAs = ietfCiteAs;
-    }
-
-    /**
-     * @return Url
-     */
-    public Url getUrl() {
-        return url;
-    }
-
-    /**
-     * @param url
-     */
-    public void setUrl(Url url) {
-        this.url = url;
     }
 
     /**

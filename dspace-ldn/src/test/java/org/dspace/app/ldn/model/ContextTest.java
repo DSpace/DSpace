@@ -7,9 +7,21 @@
  */
 package org.dspace.app.ldn.model;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 /**
  *
  */
 public class ContextTest {
+
+  @Test
+  public void testContext() {
+    Context context = new Context();
+
+    context.setIetfCiteAs("Test");
+    assertEquals("Test", context.getIetfCiteAs());
+  }
 
 }

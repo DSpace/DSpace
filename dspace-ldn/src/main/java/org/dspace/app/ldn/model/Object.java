@@ -12,36 +12,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  *
  */
-public class Object extends Base {
-
-    @JsonProperty("ietf:cite-as")
-    private String ietfCiteAs;
+public class Object extends Citation {
 
     @JsonProperty("sorg:name")
     private String title;
-
-    @JsonProperty("url")
-    private Url url;
 
     /**
      * 
      */
     public Object() {
         super();
-    }
-
-    /**
-     * @return String
-     */
-    public String getIetfCiteAs() {
-        return ietfCiteAs;
-    }
-
-    /**
-     * @param ietfCiteAs
-     */
-    public void setIetfCiteAs(String ietfCiteAs) {
-        this.ietfCiteAs = ietfCiteAs;
     }
 
     /**
@@ -56,20 +36,6 @@ public class Object extends Base {
      */
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    /**
-     * @return Url
-     */
-    public Url getUrl() {
-        return url;
-    }
-
-    /**
-     * @param url
-     */
-    public void setUrl(Url url) {
-        this.url = url;
     }
 
 }

@@ -7,9 +7,21 @@
  */
 package org.dspace.app.ldn.model;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 /**
  *
  */
 public class ActorTest {
+
+  @Test
+  public void testActor() {
+    Actor actor = new Actor();
+
+    actor.setName("Test");
+    assertEquals("Test", actor.getName());
+  }
 
 }

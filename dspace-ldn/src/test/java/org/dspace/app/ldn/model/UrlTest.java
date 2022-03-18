@@ -7,9 +7,21 @@
  */
 package org.dspace.app.ldn.model;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 /**
  *
  */
 public class UrlTest {
+
+  @Test
+  public void testUrl() {
+    Url url = new Url();
+
+    url.setMediaType("Test");
+    assertEquals("Test", url.getMediaType());
+  }
 
 }

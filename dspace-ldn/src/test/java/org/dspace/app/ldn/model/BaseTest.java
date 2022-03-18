@@ -77,7 +77,7 @@ public class BaseTest {
     assertEquals(2, uniqueBases.size());
 
     // hmmm... nice to have a set that reevaluated its uniqueness if any two entries
-    // become unique through their own mutators
+    // become duplicate through their own mutation
     anotherBase.setId("urn:uuid:a56881ef-b0ee-4ebb-ab08-04c0a1ee9ada");
 
     assertTrue("Base should equal another base with same id", base.equals(anotherBase));

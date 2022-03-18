@@ -14,14 +14,19 @@ import org.junit.Test;
 /**
  *
  */
-public class NotificationTest {
+public class CitationTest {
 
   @Test
-  public void testActor() {
-    Actor actor = new Actor();
+  public void testCitation() {
+    Citation citation = new Citation();
 
-    actor.setName("Test");
-    assertEquals("Test", actor.getName());
+    citation.setIetfCiteAs("Test");
+    assertEquals("Test", citation.getIetfCiteAs());
+
+    Url url = new Url();
+    url.setId("4af4d9d5-c5c4-464a-b310-f0124c191928");
+    citation.setUrl(url);
+    assertEquals(url, citation.getUrl());
   }
 
 }
