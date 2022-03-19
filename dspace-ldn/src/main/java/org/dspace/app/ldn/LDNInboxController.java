@@ -9,8 +9,13 @@ package org.dspace.app.ldn;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
+import java.net.URI;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.processor.LDNProcessor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,24 +35,45 @@ import org.springframework.web.server.ResponseStatusException;
 @ConditionalOnProperty("ldn.enabled")
 public class LDNInboxController {
 
+    private static final Logger log = LogManager.getLogger(LDNInboxController.class);
+
+    @Autowired
+    private LDNRouter router;
+
     /**
-     * LDN DSpace inbox endpoint. Receives notificaiton and has processor
-     * automatically injected.
+     * LDN DSpace inbox endpoint.
      *
      * @param notification received notification
-     * @param processor    routed processor
-     * @return Notification
+     * @return ResponseEntity 400 not routable, 201 routed
      * @throws Exception
      */
     @ResponseStatus(value = CREATED)
-    @PostMapping(value = "/inbox", consumes = "application/ld+json", produces = "application/ld+json")
-    public Notification inbox(@RequestBody Notification notification, LDNProcessor processor) throws Exception {
+    @PostMapping(value = "/inbox", consumes = "application/ld+json", produces = "text/plain,application/ld+json")
+    public ResponseEntity<Object> inbox(@RequestBody Notification notification) throws Exception {
+
+        LDNProcessor processor = router.route(notification);
+
+        if (processor == null) {
+            return ResponseEntity.badRequest()
+                .body(
+                    String.format("No processor found for type (%s)", notification.getType())
+                );
+        }
+
+        log.info("Routed notification {} {} to {}",
+                notification.getId(),
+                notification.getType(),
+                processor.getClass().getSimpleName());
 
         processor.process(notification);
 
-        // TODO: response should include Location header
-        // TODO: this should become either generic response body no content
-        return notification;
+        URI target = new URI(notification.getTarget().getInbox());
+
+        return ResponseEntity.created(target)
+            .body(
+                String.format("Successfully routed notification %s (%s)", notification.getId(), notification.getType())
+            );
+
     }
 
     /**
