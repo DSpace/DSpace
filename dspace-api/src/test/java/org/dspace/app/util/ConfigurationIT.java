@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
+import static org.junit.Assert.assertEquals;
 
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
@@ -220,6 +221,46 @@ public class ConfigurationIT
                 String[] output = outputs.split("\n");
                 assertThat(output, arrayWithSize(0)); // Huh?  Shouldn't split() return { "" } ?
             }
+        });
+        systemOutRule.enableLog();
+        Configuration.main(argv);
+    }
+
+    /**
+     * Test fetching only the first value of an array property.
+     */
+    @Test
+    public void testMainFirstArray() {
+        String[] argv = new String[] {
+            "--property", ARRAY_PROPERTY,
+            "--first"
+        };
+        expectedSystemExit.expectSystemExitWithStatus(0);
+        expectedSystemExit.checkAssertionAfterwards(() -> {
+            String outputs = systemOutRule.getLogWithNormalizedLineSeparator();
+            String[] output = outputs.split("\n");
+            assertThat(output, arrayWithSize(1));
+            assertEquals("--first should return first value", output[0], ARRAY_VALUE[0]);
+        });
+        systemOutRule.enableLog();
+        Configuration.main(argv);
+    }
+
+    /**
+     * Test fetching a single-valued property using {@code --first}
+     */
+    @Test
+    public void testMainFirstSingle() {
+        String[] argv = new String[] {
+            "--property", SINGLE_PROPERTY,
+            "--first"
+        };
+        expectedSystemExit.expectSystemExitWithStatus(0);
+        expectedSystemExit.checkAssertionAfterwards(() -> {
+            String outputs = systemOutRule.getLogWithNormalizedLineSeparator();
+            String[] output = outputs.split("\n");
+            assertThat(output, arrayWithSize(1));
+            assertEquals("--first should return only value", output[0], SINGLE_VALUE);
         });
         systemOutRule.enableLog();
         Configuration.main(argv);
