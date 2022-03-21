@@ -1150,33 +1150,86 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         List<MetadataValue> oldMdvs = itemService.getMetadata(
             originalPublication, "dc", "contributor", "author", Item.ANY
         );
+        assertEquals(9, oldMdvs.size());
 
         assertFalse(oldMdvs.get(0) instanceof RelationshipMetadataValue);
         assertEquals("author 1 (plain)", oldMdvs.get(0).getValue());
+        assertEquals(0, oldMdvs.get(0).getPlace());
 
         assertTrue(oldMdvs.get(1) instanceof RelationshipMetadataValue);
         assertEquals("author, 2 (item)", oldMdvs.get(1).getValue());
+        assertEquals(1, oldMdvs.get(1).getPlace());
 
         assertTrue(oldMdvs.get(2) instanceof RelationshipMetadataValue);
         assertEquals("author, 3 (item)", oldMdvs.get(2).getValue());
+        assertEquals(2, oldMdvs.get(2).getPlace());
 
         assertTrue(oldMdvs.get(3) instanceof RelationshipMetadataValue);
         assertEquals("author, 4 (item)", oldMdvs.get(3).getValue());
+        assertEquals(3, oldMdvs.get(3).getPlace());
 
         assertTrue(oldMdvs.get(4) instanceof RelationshipMetadataValue);
         assertEquals("author, 5 (item)", oldMdvs.get(4).getValue());
+        assertEquals(4, oldMdvs.get(4).getPlace());
 
         assertFalse(oldMdvs.get(5) instanceof RelationshipMetadataValue);
         assertEquals("author 6 (plain)", oldMdvs.get(5).getValue());
+        assertEquals(5, oldMdvs.get(5).getPlace());
 
         assertTrue(oldMdvs.get(6) instanceof RelationshipMetadataValue);
         assertEquals("author, 7 (item)", oldMdvs.get(6).getValue());
+        assertEquals(6, oldMdvs.get(6).getPlace());
 
         assertFalse(oldMdvs.get(7) instanceof RelationshipMetadataValue);
         assertEquals("author 8 (plain)", oldMdvs.get(7).getValue());
+        assertEquals(7, oldMdvs.get(7).getPlace());
 
         assertTrue(oldMdvs.get(8) instanceof RelationshipMetadataValue);
         assertEquals("author, 9 (item)", oldMdvs.get(8).getValue());
+        assertEquals(8, oldMdvs.get(8).getPlace());
+
+        /////////////////////////////////////////////
+        // test relationship isAuthorOfPublication //
+        /////////////////////////////////////////////
+
+        List<Relationship> oldRelationships = relationshipService.findByItem(context, originalPublication);
+        assertEquals(6, oldRelationships.size());
+
+        assertEquals(originalPublication, oldRelationships.get(0).getLeftItem());
+        assertEquals(isAuthorOfPublication, oldRelationships.get(0).getRelationshipType());
+        assertEquals(author2, oldRelationships.get(0).getRightItem());
+        assertEquals(1, oldRelationships.get(0).getLeftPlace());
+        assertEquals(0, oldRelationships.get(0).getRightPlace());
+
+        assertEquals(originalPublication, oldRelationships.get(1).getLeftItem());
+        assertEquals(isAuthorOfPublication, oldRelationships.get(1).getRelationshipType());
+        assertEquals(author3, oldRelationships.get(1).getRightItem());
+        assertEquals(2, oldRelationships.get(1).getLeftPlace());
+        assertEquals(0, oldRelationships.get(1).getRightPlace());
+
+        assertEquals(originalPublication, oldRelationships.get(2).getLeftItem());
+        assertEquals(isAuthorOfPublication, oldRelationships.get(2).getRelationshipType());
+        assertEquals(author4, oldRelationships.get(2).getRightItem());
+        assertEquals(3, oldRelationships.get(2).getLeftPlace());
+        assertEquals(0, oldRelationships.get(2).getRightPlace());
+
+        assertEquals(originalPublication, oldRelationships.get(3).getLeftItem());
+        assertEquals(isAuthorOfPublication, oldRelationships.get(3).getRelationshipType());
+        assertEquals(author5, oldRelationships.get(3).getRightItem());
+        assertEquals(4, oldRelationships.get(3).getLeftPlace());
+        assertEquals(0, oldRelationships.get(3).getRightPlace());
+
+        assertEquals(originalPublication, oldRelationships.get(4).getLeftItem());
+        assertEquals(isAuthorOfPublication, oldRelationships.get(4).getRelationshipType());
+        assertEquals(author7, oldRelationships.get(4).getRightItem());
+        assertEquals(6, oldRelationships.get(4).getLeftPlace());
+        assertEquals(0, oldRelationships.get(4).getRightPlace());
+
+        assertEquals(originalPublication, oldRelationships.get(5).getLeftItem());
+        assertEquals(isAuthorOfPublication, oldRelationships.get(5).getRelationshipType());
+        assertEquals(author9, oldRelationships.get(5).getRightItem());
+        assertEquals(8, oldRelationships.get(5).getLeftPlace());
+        assertEquals(0, oldRelationships.get(5).getRightPlace());
 
         ///////////////////////////////////////
         // create new version of publication //
@@ -1193,33 +1246,86 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         List<MetadataValue> newMdvs = itemService.getMetadata(
             newPublication, "dc", "contributor", "author", Item.ANY
         );
+        assertEquals(9, newMdvs.size());
 
         assertFalse(newMdvs.get(0) instanceof RelationshipMetadataValue);
         assertEquals("author 1 (plain)", newMdvs.get(0).getValue());
+        assertEquals(0, newMdvs.get(0).getPlace());
 
         assertTrue(newMdvs.get(1) instanceof RelationshipMetadataValue);
         assertEquals("author, 2 (item)", newMdvs.get(1).getValue());
+        assertEquals(1, newMdvs.get(1).getPlace());
 
         assertTrue(newMdvs.get(2) instanceof RelationshipMetadataValue);
         assertEquals("author, 3 (item)", newMdvs.get(2).getValue());
+        assertEquals(2, newMdvs.get(2).getPlace());
 
         assertTrue(newMdvs.get(3) instanceof RelationshipMetadataValue);
         assertEquals("author, 4 (item)", newMdvs.get(3).getValue());
+        assertEquals(3, newMdvs.get(3).getPlace());
 
         assertTrue(newMdvs.get(4) instanceof RelationshipMetadataValue);
         assertEquals("author, 5 (item)", newMdvs.get(4).getValue());
+        assertEquals(4, newMdvs.get(4).getPlace());
 
         assertFalse(newMdvs.get(5) instanceof RelationshipMetadataValue);
         assertEquals("author 6 (plain)", newMdvs.get(5).getValue());
+        assertEquals(5, newMdvs.get(5).getPlace());
 
         assertTrue(newMdvs.get(6) instanceof RelationshipMetadataValue);
         assertEquals("author, 7 (item)", newMdvs.get(6).getValue());
+        assertEquals(6, newMdvs.get(6).getPlace());
 
         assertFalse(newMdvs.get(7) instanceof RelationshipMetadataValue);
         assertEquals("author 8 (plain)", newMdvs.get(7).getValue());
+        assertEquals(7, newMdvs.get(7).getPlace());
 
         assertTrue(newMdvs.get(8) instanceof RelationshipMetadataValue);
         assertEquals("author, 9 (item)", newMdvs.get(8).getValue());
+        assertEquals(8, newMdvs.get(8).getPlace());
+
+        /////////////////////////////////////////////
+        // test relationship isAuthorOfPublication //
+        /////////////////////////////////////////////
+
+        List<Relationship> newRelationships = relationshipService.findByItem(context, newPublication);
+        assertEquals(6, newRelationships.size());
+
+        assertEquals(newPublication, newRelationships.get(0).getLeftItem());
+        assertEquals(isAuthorOfPublication, newRelationships.get(0).getRelationshipType());
+        assertEquals(author2, newRelationships.get(0).getRightItem());
+        assertEquals(1, newRelationships.get(0).getLeftPlace());
+        assertEquals(0, newRelationships.get(0).getRightPlace());
+
+        assertEquals(newPublication, newRelationships.get(1).getLeftItem());
+        assertEquals(isAuthorOfPublication, newRelationships.get(1).getRelationshipType());
+        assertEquals(author3, newRelationships.get(1).getRightItem());
+        assertEquals(2, newRelationships.get(1).getLeftPlace());
+        assertEquals(0, newRelationships.get(1).getRightPlace());
+
+        assertEquals(newPublication, newRelationships.get(2).getLeftItem());
+        assertEquals(isAuthorOfPublication, newRelationships.get(2).getRelationshipType());
+        assertEquals(author4, newRelationships.get(2).getRightItem());
+        assertEquals(3, newRelationships.get(2).getLeftPlace());
+        assertEquals(0, newRelationships.get(2).getRightPlace());
+
+        assertEquals(newPublication, newRelationships.get(3).getLeftItem());
+        assertEquals(isAuthorOfPublication, newRelationships.get(3).getRelationshipType());
+        assertEquals(author5, newRelationships.get(3).getRightItem());
+        assertEquals(4, newRelationships.get(3).getLeftPlace());
+        assertEquals(0, newRelationships.get(3).getRightPlace());
+
+        assertEquals(newPublication, newRelationships.get(4).getLeftItem());
+        assertEquals(isAuthorOfPublication, newRelationships.get(4).getRelationshipType());
+        assertEquals(author7, newRelationships.get(4).getRightItem());
+        assertEquals(6, newRelationships.get(4).getLeftPlace());
+        assertEquals(0, newRelationships.get(4).getRightPlace());
+
+        assertEquals(newPublication, newRelationships.get(5).getLeftItem());
+        assertEquals(isAuthorOfPublication, newRelationships.get(5).getRelationshipType());
+        assertEquals(author9, newRelationships.get(5).getRightItem());
+        assertEquals(8, newRelationships.get(5).getLeftPlace());
+        assertEquals(0, newRelationships.get(5).getRightPlace());
 
         //////////////
         // clean up //
