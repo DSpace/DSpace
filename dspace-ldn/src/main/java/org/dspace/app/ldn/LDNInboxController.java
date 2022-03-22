@@ -58,7 +58,7 @@ public class LDNInboxController {
 
         if (processor == null) {
             return ResponseEntity.badRequest()
-                .body(format("No processor found for type (%s)", notification.getType()));
+                .body(format("No processor found for type %s", notification.getType()));
         }
 
         log.info("Routed notification {} {} to {}",
@@ -71,7 +71,7 @@ public class LDNInboxController {
         URI target = new URI(notification.getTarget().getInbox());
 
         return ResponseEntity.created(target)
-            .body(format("Successfully routed notification %s (%s)", notification.getId(), notification.getType()));
+            .body(format("Successfully routed notification %s %s", notification.getId(), notification.getType()));
 
     }
 
