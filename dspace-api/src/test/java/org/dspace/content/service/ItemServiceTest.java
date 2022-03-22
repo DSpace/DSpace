@@ -9,6 +9,7 @@ package org.dspace.content.service;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
@@ -17,18 +18,28 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.AbstractUnitTest;
+import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.EntityTypeBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RelationshipBuilder;
+import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersioningService;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ItemServiceTest extends AbstractUnitTest {
+public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemServiceTest.class);
 
     protected RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
@@ -41,6 +52,7 @@ public class ItemServiceTest extends AbstractUnitTest {
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
     protected MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
+    protected VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
 
     Community community;
     Collection col;
@@ -57,8 +69,8 @@ public class ItemServiceTest extends AbstractUnitTest {
      */
     @Before
     @Override
-    public void init() {
-        super.init();
+    public void setUp() throws Exception {
+        super.setUp();
         try {
             context.turnOffAuthorisationSystem();
             community = communityService.create(null, context);
@@ -188,6 +200,54 @@ public class ItemServiceTest extends AbstractUnitTest {
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, two", null, 1, list.get(1));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, four", null, 2, list.get(2));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 3, list.get(3));
+    }
+
+    @Test
+    public void testDeleteItemWithMultipleVersions() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication")
+            .build();
+
+        EntityType personEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person")
+            .build();
+
+        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder.createRelationshipTypeBuilder(
+                context, publicationEntityType, personEntityType, "isAuthorOfPublication", "isPublicationOfAuthor",
+                null, null, null, null
+            )
+            .withCopyToLeft(false)
+            .withCopyToRight(false)
+            .build();
+
+        Item publication1 = ItemBuilder.createItem(context, col)
+            .withTitle("publication 1")
+            .withEntityType("Publication")
+            .build();
+
+        Item person1 = ItemBuilder.createItem(context, col)
+            .withTitle("person 2")
+            .withEntityType("Person")
+            .build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, publication1, person1, isAuthorOfPublication);
+
+        // create a new version, which results in a non-latest relationship attached person 1.
+        Version newVersion = versioningService.createNewVersion(context, publication1);
+        Item newPublication1 = newVersion.getItem();
+        WorkspaceItem newPublication1WSI = workspaceItemService.findByItem(context, newPublication1);
+        installItemService.installItem(context, newPublication1WSI);
+        context.dispatchEvents();
+
+        // verify person1 has a non-latest relationship, which should also be removed
+        List<Relationship> relationships1 = relationshipService.findByItem(context, person1, -1, -1, false, true);
+        assertEquals(1, relationships1.size());
+        List<Relationship> relationships2 = relationshipService.findByItem(context, person1, -1, -1, false, false);
+        assertEquals(2, relationships2.size());
+
+        itemService.delete(context, person1);
+
+        context.restoreAuthSystemState();
     }
 
     private void assertMetadataValue(String authorQualifier, String contributorElement, String dcSchema, String value,
