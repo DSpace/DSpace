@@ -252,6 +252,11 @@
             <artifactId>dspace-oai</artifactId>
     	</dependency>
 
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-ldn</artifactId>
+        </dependency>
+
         <!-- The Servlet API is also needed by the 'dspace oai' launcher.xml
              command. -->
     	<dependency>
