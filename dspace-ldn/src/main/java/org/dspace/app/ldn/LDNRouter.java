@@ -11,50 +11,29 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.processor.LDNProcessor;
+import org.springframework.stereotype.Component;
 
 /**
- * Linked Data Notification router aspect with point cut around inbox endpoint.
- * Provides routing notification to appropriate processor and injexting
- * processor as argument to inbox.
+ * Linked Data Notification router.
  */
-@Aspect
+@Component
 public class LDNRouter {
-
-    private static final Logger log = LogManager.getLogger(LDNRouter.class);
 
     private Map<Set<String>, LDNProcessor> processors = new HashMap<>();
 
     /**
-     * Around pointcut to route notificaiton and inject argument to inbox endpoint
-     * handler method.
-     *
-     * @param joinPoint    proceeding join point, extract arguments and proceed to
-     *                     method
-     * @param notification received notification being passed into inbox endpoint
-     *                     handler method
-     * @return Object result of the inbox endpoint handler method
-     * @throws Throwable failed to pointcut
+     * Route notification to processor
+     * @return LDNProcessor processor to process notification, can be null
      */
-    @Around("execution(* org.dspace.app.ldn.LDNInboxController.inbox(..)) && args(notification, ..)")
-    public Object routeNotification(ProceedingJoinPoint joinPoint, Notification notification) throws Throwable {
-        LDNProcessor processor = processors.get(notification.getType());
-
-        log.info("Routed notification {} {} to {}",
-                notification.getId(),
-                notification.getType(),
-                processor.getClass().getSimpleName());
-
-        return joinPoint.proceed(new Object[] { notification, processor });
+    public LDNProcessor route(Notification notification) {
+        return processors.get(notification.getType());
     }
 
     /**
+     * Get all routes.
+     *
      * @return Map<Set<String>, LDNProcessor>
      */
     public Map<Set<String>, LDNProcessor> getProcessors() {
@@ -62,6 +41,8 @@ public class LDNRouter {
     }
 
     /**
+     * Set all routes.
+     *
      * @param processors
      */
     public void setProcessors(Map<Set<String>, LDNProcessor> processors) {
