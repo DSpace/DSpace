@@ -18,6 +18,7 @@ import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.processor.LDNProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,6 +39,7 @@ public class LDNInboxController {
 
     private static final Logger log = LogManager.getLogger(LDNInboxController.class);
 
+    @Lazy
     @Autowired
     private LDNRouter router;
 

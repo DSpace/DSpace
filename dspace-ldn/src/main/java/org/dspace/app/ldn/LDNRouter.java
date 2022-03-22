@@ -13,12 +13,10 @@ import java.util.Set;
 
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.processor.LDNProcessor;
-import org.springframework.stereotype.Component;
 
 /**
  * Linked Data Notification router.
  */
-@Component
 public class LDNRouter {
 
     private Map<Set<String>, LDNProcessor> processors = new HashMap<>();
