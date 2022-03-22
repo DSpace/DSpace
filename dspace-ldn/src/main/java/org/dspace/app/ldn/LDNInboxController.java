@@ -7,6 +7,7 @@
  */
 package org.dspace.app.ldn;
 
+import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.CREATED;
 
 import java.net.URI;
@@ -48,16 +49,14 @@ public class LDNInboxController {
      * @throws Exception
      */
     @ResponseStatus(value = CREATED)
-    @PostMapping(value = "/inbox", consumes = "application/ld+json", produces = "text/plain,application/ld+json")
+    @PostMapping(value = "/inbox", consumes = "application/ld+json")
     public ResponseEntity<Object> inbox(@RequestBody Notification notification) throws Exception {
 
         LDNProcessor processor = router.route(notification);
 
         if (processor == null) {
             return ResponseEntity.badRequest()
-                .body(
-                    String.format("No processor found for type (%s)", notification.getType())
-                );
+                .body(format("No processor found for type (%s)", notification.getType()));
         }
 
         log.info("Routed notification {} {} to {}",
@@ -70,9 +69,7 @@ public class LDNInboxController {
         URI target = new URI(notification.getTarget().getInbox());
 
         return ResponseEntity.created(target)
-            .body(
-                String.format("Successfully routed notification %s (%s)", notification.getId(), notification.getType())
-            );
+            .body(format("Successfully routed notification %s (%s)", notification.getId(), notification.getType()));
 
     }
 
