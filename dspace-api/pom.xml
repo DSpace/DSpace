@@ -818,44 +818,6 @@
             <artifactId>jaxb-runtime</artifactId>
         </dependency>
 
-        <!-- Apache Axiom -->
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-impl</artifactId>
-            <version>${axiom.version}</version>
-            <exclusions>
-                <!-- Exclude Geronimo as it is NOT necessary when using javax.activation (which we use)
-                     See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <!-- Exclude Woodstox, as later version provided by Solr dependencies -->
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>woodstox-core-asl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-api</artifactId>
-            <version>${axiom.version}</version>
-            <exclusions>
-                <!-- Exclude Geronimo as it is NOT necessary when using javax.activation (which we use)
-                     See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <!-- Exclude Woodstox, as later version provided by Solr dependencies -->
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>woodstox-core-asl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!-- Jersey / JAX-RS client (javax.ws.rs.*) dependencies needed to integrate with external sources/services -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>

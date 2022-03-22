@@ -27,7 +27,6 @@
         <postgresql.driver.version>42.3.3</postgresql.driver.version>
         <solr.client.version>8.8.1</solr.client.version>
 
-        <axiom.version>1.2.22</axiom.version>
         <ehcache.version>3.4.0</ehcache.version>
         <errorprone.version>2.10.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
@@ -1117,7 +1116,7 @@
                 <version>3.4.14</version>
             </dependency>
 
-            <!-- solr-cell and axiom-api disagree on versions -->
+            <!-- solr-cell and axiom-api (in dspace-swordv2) disagree on versions -->
             <dependency>
                 <groupId>org.apache.james</groupId>
                 <artifactId>apache-mime4j-core</artifactId>
