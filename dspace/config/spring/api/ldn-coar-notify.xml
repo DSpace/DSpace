@@ -228,20 +228,6 @@
         <property name="changes">
             <list value-type="org.dspace.app.ldn.processor.LDNMetadataChange">
                 <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
-                    <property name="schema" value="dc" />
-                    <property name="element" value="data" />
-                    <property name="qualifiers">
-                        <list value-type="java.lang.String">
-                            <value>uri</value>
-                        </list>
-                    </property>
-                    <property name="valueTemplates">
-                        <list value-type="java.lang.String">
-                            <value>$notification.object.ietfCiteAs</value>
-                        </list>
-                    </property>
-                </bean>
-                <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
                     <property name="qualifiers">
                         <list value-type="java.lang.String">
                             <value>release</value>
@@ -253,12 +239,6 @@
                             <value>$LDNUtils.removedProtocol($notification.object.id)</value>
                         </list>
                     </property>
-                </bean>
-                <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
-                    <property name="schema" value="dc" />
-                    <property name="element" value="data" />
-                    <property name="qualifier" value="uri" />
-                    <property name="valueTemplate" value="$notification.object.ietfCiteAs" />
                 </bean>
                 <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
                     <property name="qualifier" value="release" />

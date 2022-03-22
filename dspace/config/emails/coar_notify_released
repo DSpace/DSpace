@@ -20,6 +20,7 @@ Item URL: ${params[3]}
 Submitted by: ${params[4]}
 Linked Resource: ${params[6].object.title}
 Linked Resource URL: ${params[6].object.id}
+Linked Resource DOI: ${params[6].object.ietfCiteAs}
 
 Has a new status: RELEASED
 
