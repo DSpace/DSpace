@@ -8,7 +8,6 @@
 package org.dspace.app.ldn;
 
 import static java.lang.String.format;
-import static org.springframework.http.HttpStatus.CREATED;
 
 import java.net.URI;
 
@@ -19,12 +18,13 @@ import org.dspace.app.ldn.processor.LDNProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -44,13 +44,12 @@ public class LDNInboxController {
     private LDNRouter router;
 
     /**
-     * LDN DSpace inbox endpoint.
+     * LDN DSpace inbox.
      *
      * @param notification received notification
      * @return ResponseEntity 400 not routable, 201 routed
      * @throws Exception
      */
-    @ResponseStatus(value = CREATED)
     @PostMapping(value = "/inbox", consumes = "application/ld+json")
     public ResponseEntity<Object> inbox(@RequestBody Notification notification) throws Exception {
 
@@ -72,7 +71,19 @@ public class LDNInboxController {
 
         return ResponseEntity.created(target)
             .body(format("Successfully routed notification %s %s", notification.getId(), notification.getType()));
+    }
 
+    /**
+     * LDN DSpace inbox options.
+     *
+     * @return ResponseEntity 200 with allow and accept-post headers
+     */
+    @RequestMapping(value = "/inbox", method = RequestMethod.OPTIONS)
+    public ResponseEntity<Void> options() {
+        return ResponseEntity.ok()
+            .allow(HttpMethod.OPTIONS, HttpMethod.POST)
+            .header("Accept-Post", "application/ld+json")
+            .build();
     }
 
     /**
