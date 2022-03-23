@@ -1340,4 +1340,150 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         }
     }
 
+    @Test
+    public void test_virtualMetadataPreserved() throws Exception {
+        //////////////////////////////////////////////
+        // create a publication and link two people //
+        //////////////////////////////////////////////
+
+        Item publication1V1 = ItemBuilder.createItem(context, collection)
+            .withTitle("publication 1V1")
+            .withMetadata("dspace", "entity", "type", publicationEntityType.getLabel())
+            .build();
+
+        Item person1V1 = ItemBuilder.createItem(context, collection)
+            .withTitle("person 1V1")
+            .withMetadata("dspace", "entity", "type", personEntityType.getLabel())
+            .withPersonIdentifierFirstName("Donald")
+            .withPersonIdentifierLastName("Smith")
+            .build();
+
+        Item person2V1 = ItemBuilder.createItem(context, collection)
+            .withTitle("person 2V1")
+            .withMetadata("dspace", "entity", "type", personEntityType.getLabel())
+            .withPersonIdentifierFirstName("Jane")
+            .withPersonIdentifierLastName("Doe")
+            .build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, publication1V1, person1V1, isAuthorOfPublication)
+            .build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, publication1V1, person2V1, isAuthorOfPublication)
+            .withRightwardValue("Doe, J.")
+            .build();
+
+        ///////////////////////////////////////////////
+        // test dc.contributor.author of publication //
+        ///////////////////////////////////////////////
+
+        List<MetadataValue> mdvs1 = itemService.getMetadata(
+            publication1V1, "dc", "contributor", "author", Item.ANY
+        );
+        assertEquals(2, mdvs1.size());
+
+        assertTrue(mdvs1.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("Smith, Donald", mdvs1.get(0).getValue());
+        assertEquals(0, mdvs1.get(0).getPlace());
+
+        assertTrue(mdvs1.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("Doe, J.", mdvs1.get(1).getValue());
+        assertEquals(1, mdvs1.get(1).getPlace());
+
+        ///////////////////////////////////////////////////////
+        // create a new version of publication 1 and archive //
+        ///////////////////////////////////////////////////////
+
+        Item publication1V2 = versioningService.createNewVersion(context, publication1V1).getItem();
+        installItemService.installItem(context, workspaceItemService.findByItem(context, publication1V2));
+        context.dispatchEvents();
+
+        ////////////////////////////////////
+        // create new version of person 1 //
+        ////////////////////////////////////
+
+        Item person1V2 = versioningService.createNewVersion(context, person1V1).getItem();
+        // update "Smith, Donald" to "Smith, D."
+        itemService.replaceMetadata(
+            context, person1V2, "person", "givenName", null, null, "D.",
+            null, -1, 0
+        );
+        itemService.update(context, person1V2);
+
+        ///////////////////////////////////////////////////
+        // test dc.contributor.author of old publication //
+        ///////////////////////////////////////////////////
+
+        List<MetadataValue> mdvs2 = itemService.getMetadata(
+            publication1V1, "dc", "contributor", "author", Item.ANY
+        );
+        assertEquals(2, mdvs2.size());
+
+        assertTrue(mdvs2.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("Smith, Donald", mdvs2.get(0).getValue());
+        assertEquals(0, mdvs2.get(0).getPlace());
+
+        assertTrue(mdvs2.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("Doe, J.", mdvs2.get(1).getValue());
+        assertEquals(1, mdvs2.get(1).getPlace());
+
+        ///////////////////////////////////////////////////
+        // test dc.contributor.author of new publication //
+        ///////////////////////////////////////////////////
+
+        List<MetadataValue> mdvs3 = itemService.getMetadata(
+            publication1V2, "dc", "contributor", "author", Item.ANY
+        );
+        assertEquals(2, mdvs3.size());
+
+        assertTrue(mdvs3.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("Smith, Donald", mdvs3.get(0).getValue());
+        assertEquals(0, mdvs3.get(0).getPlace());
+
+        assertTrue(mdvs3.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("Doe, J.", mdvs3.get(1).getValue());
+        assertEquals(1, mdvs3.get(1).getPlace());
+
+        /////////////////////////////////////
+        // archive new version of person 1 //
+        /////////////////////////////////////
+
+        installItemService.installItem(context, workspaceItemService.findByItem(context, person1V2));
+        context.dispatchEvents();
+
+        ///////////////////////////////////////////////////
+        // test dc.contributor.author of old publication //
+        ///////////////////////////////////////////////////
+
+        List<MetadataValue> mdvs4 = itemService.getMetadata(
+            publication1V1, "dc", "contributor", "author", Item.ANY
+        );
+        assertEquals(2, mdvs4.size());
+
+        assertTrue(mdvs4.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("Smith, Donald", mdvs4.get(0).getValue());
+        assertEquals(0, mdvs4.get(0).getPlace());
+
+        assertTrue(mdvs4.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("Doe, J.", mdvs4.get(1).getValue());
+        assertEquals(1, mdvs4.get(1).getPlace());
+
+        ///////////////////////////////////////////////////
+        // test dc.contributor.author of new publication //
+        ///////////////////////////////////////////////////
+
+        List<MetadataValue> mdvs5 = itemService.getMetadata(
+            publication1V2, "dc", "contributor", "author", Item.ANY
+        );
+        assertEquals(2, mdvs5.size());
+
+        assertTrue(mdvs5.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("Smith, D.", mdvs5.get(0).getValue());
+        assertEquals(0, mdvs5.get(0).getPlace());
+
+        assertTrue(mdvs5.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("Doe, J.", mdvs5.get(1).getValue());
+        assertEquals(1, mdvs5.get(1).getPlace());
+    }
+
+    // TODO
 }
