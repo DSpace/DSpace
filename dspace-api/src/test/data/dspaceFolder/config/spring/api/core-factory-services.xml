@@ -50,7 +50,7 @@
 
     <bean id="openURLTrackerLoggerServiceFactory" class="org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactoryImpl"/>
 
+    <!-- LDN COAR Notify services -->
     <!-- Exclude LDN COAR Notify services from dspace-api tests -->
-    <!-- <bean id="ldnBusinessDelegateFactory" class="org.dspace.app.ldn.factory.LDNBusinessDelegateFactoryImpl"/> -->
 
 </beans>
