@@ -32,28 +32,6 @@
     </bean>
     <!-- end PROPERTY PLACEHOLDER SETUP-->
 
-    <!-- CACHING service beans -->
-    <bean id="org.dspace.services.CachingService" class="org.dspace.services.caching.CachingServiceImpl"/>
-
-    <!-- This is the main cache manager -->
-    <bean id="org.dspace.caching.ehcache.CacheManager"
-          class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
-        <property name="configLocation">
-            <bean class="org.dspace.servicemanager.spring.ResourceFinder"
-                  factory-method="getResourceFromPaths">
-                <constructor-arg>
-                    <list>
-                        <value>ehcache-config.xml</value>
-                        <value>caching/ehcache-config.xml</value>
-                    </list>
-                </constructor-arg>
-            </bean>
-        </property>
-        <property name='acceptExisting' value='true'/>
-        <property name='cacheManagerName' value='org.dspace.services'/>
-    </bean>
-    <!-- CACHING end beans -->
-
     <!-- REQUEST - request service (implemented as a single bean) -->
     <bean id="org.dspace.services.RequestService" class="org.dspace.services.sessions.StatelessRequestServiceImpl"/>
     <!-- REQUEST end beans -->
