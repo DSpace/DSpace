@@ -12,13 +12,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import org.dspace.app.ldn.LDNWebConfig;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.junit.Test;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ImportResource;
 
+@Import(LDNWebConfig.class)
+@ImportResource("classpath:config/spring/api/ldn-coar-notify.xml")
 public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
 
     @Test
@@ -52,6 +63,47 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
             .andExpect(status().is(200))
             .andExpect(header().string("Accept-Post", "application/ld+json"))
             .andExpect(header().string("Allow", "OPTIONS,POST"));
+    }
+
+    @Test
+    public void unsupportedMediaTypeTest() throws Exception {
+        String notification = dataverseNotificationWithHandle();
+        getClient()
+            .perform(post("/ldn/inbox").content(notification))
+            .andExpect(status().is(415));
+    }
+
+    @Test
+    public void handleNotFoundBadRequestTest() throws Exception {
+        String notification = dataverseNotificationWithHandle();
+        getClient()
+            .perform(post("/ldn/inbox").content(notification).contentType("application/ld+json"))
+            .andExpect(status().is(400));
+    }
+
+    @Test
+    public void uuidNotFoundTest() throws Exception {
+        String notification = dataverseNotificationWithUUID();
+        getClient()
+            .perform(post("/ldn/inbox").content(notification).contentType("application/ld+json"))
+            .andExpect(status().is(404));
+    }
+
+    @Test
+    public void unknownTypeBadRequestTest() throws Exception {
+        String notification = "{\"type\": [\"Unknown\"]}";
+        getClient()
+            .perform(post("/ldn/inbox").content(notification).contentType("application/ld+json"))
+            .andExpect(status().is(400))
+            .andExpect(content().string("No processor found for type [Unknown]"));
+    }
+
+    private String dataverseNotificationWithHandle() throws IOException {
+        return Files.readString(Path.of("src/test/resources/mocks/dataverseNotificationWithHandle.json"));
+    }
+
+    private String dataverseNotificationWithUUID() throws IOException {
+        return Files.readString(Path.of("src/test/resources/mocks/dataverseNotificationWithUUID.json"));
     }
 
 }
