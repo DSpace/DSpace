@@ -16,34 +16,34 @@ import org.junit.Test;
  */
 public class ContextTest {
 
-  @Test
-  public void testFromDataverseContext() {
-    Context fromDataverse = new Context();
+    @Test
+    public void testFromDataverseContext() {
+        Context fromDataverse = new Context();
 
-    fromDataverse.setIetfCiteAs("Test");
-    assertEquals("Test", fromDataverse.getIetfCiteAs());
+        fromDataverse.setIetfCiteAs("Test");
+        assertEquals("Test", fromDataverse.getIetfCiteAs());
 
-    Context dataset = new Context();
-    Context anotherDataset = new Context();
+        Context dataset = new Context();
+        Context anotherDataset = new Context();
 
-    // fromDataverse.getIsSupplementTo().add(dataset);
-    // fromDataverse.getIsSupplementTo().add(anotherDataset);
+        // fromDataverse.getIsSupplementTo().add(dataset);
+        // fromDataverse.getIsSupplementTo().add(anotherDataset);
 
-  }
+    }
 
-  @Test
-  public void testToDataverseContext() {
-    Context toDataverse = new Context();
+    @Test
+    public void testToDataverseContext() {
+        Context toDataverse = new Context();
 
-    toDataverse.setIetfCiteAs("Test");
-    assertEquals("Test", toDataverse.getIetfCiteAs());
+        toDataverse.setIetfCiteAs("Test");
+        assertEquals("Test", toDataverse.getIetfCiteAs());
 
-    Context item = new Context();
-    Context anotherItem = new Context();
+        Context item = new Context();
+        Context anotherItem = new Context();
 
-    // toDataverse.getIsSupplementedBy().add(item);
-    // toDataverse.getIsSupplementedBy().add(anotherItem);
+        // toDataverse.getIsSupplementedBy().add(item);
+        // toDataverse.getIsSupplementedBy().add(anotherItem);
 
-  }
+    }
 
 }

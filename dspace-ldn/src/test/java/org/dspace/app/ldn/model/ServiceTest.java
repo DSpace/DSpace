@@ -16,12 +16,12 @@ import org.junit.Test;
  */
 public class ServiceTest {
 
-  @Test
-  public void testService() {
-    Service service = new Service();
+    @Test
+    public void testService() {
+        Service service = new Service();
 
-    service.setInbox("Test");
-    assertEquals("Test", service. getInbox());
-  }
+        service.setInbox("Test");
+        assertEquals("Test", service.getInbox());
+    }
 
 }

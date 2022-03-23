@@ -25,78 +25,78 @@ import org.junit.Test;
  */
 public class BaseTest {
 
-  @Test
-  public void testBase() {
-    // test constructor
-    Base base = new Base();
-    assertNotNull(base.getType());
-    assertEquals(0, base.getType().size());
+    @Test
+    public void testBase() {
+        // test constructor
+        Base base = new Base();
+        assertNotNull(base.getType());
+        assertEquals(0, base.getType().size());
 
-    // test id setter and getter
-    base.setId("urn:uuid:a56881ef-b0ee-4ebb-ab08-04c0a1ee9ada");
-    assertEquals("urn:uuid:a56881ef-b0ee-4ebb-ab08-04c0a1ee9ada", base.getId());
+        // test id setter and getter
+        base.setId("urn:uuid:a56881ef-b0ee-4ebb-ab08-04c0a1ee9ada");
+        assertEquals("urn:uuid:a56881ef-b0ee-4ebb-ab08-04c0a1ee9ada", base.getId());
 
-    // test type setter and getter and synthetic add
-    Set<String> type = new HashSet<>();
-    type.add("Announce");
-    type.add("coar-notify:ReleaseAction");
+        // test type setter and getter and synthetic add
+        Set<String> type = new HashSet<>();
+        type.add("Announce");
+        type.add("coar-notify:ReleaseAction");
 
-    base.setType(type);
+        base.setType(type);
 
-    assertEquals(2, base.getType().size());
+        assertEquals(2, base.getType().size());
 
-    base.addType("Test");
+        base.addType("Test");
 
-    assertEquals(3, base.getType().size());
+        assertEquals(3, base.getType().size());
 
-    List<String> types = base.getType().stream().collect(Collectors.toList());
+        List<String> types = base.getType().stream().collect(Collectors.toList());
 
-    assertTrue(types.contains("Test"));
-    assertTrue(types.contains("Announce"));
-    assertTrue(types.contains("coar-notify:ReleaseAction"));
+        assertTrue(types.contains("Test"));
+        assertTrue(types.contains("Announce"));
+        assertTrue(types.contains("coar-notify:ReleaseAction"));
 
-    // test base uniqueness
-    Base anotherBase = new Base();
-    anotherBase.setId("urn:uuid:f86a3c26-68fa-4ddd-ad59-5138f5d583fa");
-    anotherBase.setType(type);
+        // test base uniqueness
+        Base anotherBase = new Base();
+        anotherBase.setId("urn:uuid:f86a3c26-68fa-4ddd-ad59-5138f5d583fa");
+        anotherBase.setType(type);
 
-    assertFalse("Base should not equal another base with different id", base.equals(anotherBase));
+        assertFalse("Base should not equal another base with different id", base.equals(anotherBase));
 
-    List<Base> nonUniqueBases = new ArrayList<>();
+        List<Base> nonUniqueBases = new ArrayList<>();
 
-    nonUniqueBases.add(base);
-    nonUniqueBases.add(anotherBase);
+        nonUniqueBases.add(base);
+        nonUniqueBases.add(anotherBase);
 
-    assertEquals(2, nonUniqueBases.size());
+        assertEquals(2, nonUniqueBases.size());
 
-    Set<Base> uniqueBases = new HashSet<>();
+        Set<Base> uniqueBases = new HashSet<>();
 
-    uniqueBases.add(base);
-    uniqueBases.add(anotherBase);
+        uniqueBases.add(base);
+        uniqueBases.add(anotherBase);
 
-    assertEquals(2, uniqueBases.size());
+        assertEquals(2, uniqueBases.size());
 
-    // hmmm... nice to have a set that reevaluated its uniqueness if any two entries
-    // become duplicate through their own mutation
-    anotherBase.setId("urn:uuid:a56881ef-b0ee-4ebb-ab08-04c0a1ee9ada");
+        // hmmm... nice to have a set that reevaluated its uniqueness if any two entries
+        // become duplicate through their own mutation
+        anotherBase.setId("urn:uuid:a56881ef-b0ee-4ebb-ab08-04c0a1ee9ada");
 
-    assertTrue("Base should equal another base with same id", base.equals(anotherBase));
+        assertTrue("Base should equal another base with same id", base.equals(anotherBase));
 
-    assertEquals(2, nonUniqueBases.size());
-    assertEquals(2, uniqueBases.size());
+        assertEquals(2, nonUniqueBases.size());
+        assertEquals(2, uniqueBases.size());
 
-    // clear and test uniqueness during insertion
-    nonUniqueBases.clear();
-    uniqueBases.clear();
+        // clear and test uniqueness during insertion
+        nonUniqueBases.clear();
+        uniqueBases.clear();
 
-    nonUniqueBases.add(base);
-    nonUniqueBases.add(anotherBase);
+        nonUniqueBases.add(base);
+        nonUniqueBases.add(anotherBase);
 
-    uniqueBases.add(base);
-    uniqueBases.add(anotherBase);
+        uniqueBases.add(base);
+        uniqueBases.add(anotherBase);
 
-    assertEquals(2, nonUniqueBases.size());
-    assertEquals(1, uniqueBases.size());
-  }
+        assertEquals(2, nonUniqueBases.size());
+        assertEquals(1, uniqueBases.size());
+    }
 
 }

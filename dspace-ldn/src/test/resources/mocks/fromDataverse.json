@@ -5,7 +5,7 @@
   ],
   "id": "urn:uuid:a301c520-f790-4f3d-87b1-a18b2b617683",
   "actor": {
-    "id": "http://ec2-35-170-82-7.compute-1.amazonaws.com",
+    "id": "http://dev-hdc3b.lib.harvard.edu",
     "name": "Dataverse Repository",
     "type": "Service"
   },
@@ -15,23 +15,18 @@
         "id": "http://dspace.swiftagiledev.com/handle/123456789/3",
         "ietf:cite-as": "http://dspace.swiftagiledev.com/handle/123456789/3",
         "type": "sorg:ScholarlyArticle"
-      },
-      {
-        "id": "http://dspace.swiftagiledev.com/handle/123456789/4",
-        "ietf:cite-as": "http://dspace.swiftagiledev.com/handle/123456789/4",
-        "type": "sorg:ScholarlyArticle"
       }
     ]
   },
   "object": {
-    "id": "http://ec2-35-170-82-7.compute-1.amazonaws.com/dataset.xhtml?persistentId=doi:10.5072/FK2/OMSPHN",
-    "ietf:cite-as": "https://doi.org/10.5072/FK2/OMSPHN",
-    "sorg:name": "An Interesting Dataset",
+    "id": "http://dev-hdc3b.lib.harvard.edu/dataset.xhtml?persistentId=doi:10.5072/FK2/NUB975",
+    "ietf:cite-as": "https://doi.org/10.5072/FK2/NUB975",
+    "sorg:name": "Not Really Replication Data for: The Future of the Internet and How to Stop It",
     "type": "sorg:Dataset"
   },
   "origin": {
-    "id": "http://ec2-35-170-82-7.compute-1.amazonaws.com",
-    "inbox": "http://ec2-35-170-82-7.compute-1.amazonaws.com/api/inbox",
+    "id": "http://dev-hdc3b.lib.harvard.edu/",
+    "inbox": "http://dev-hdc3b.lib.harvard.edu/api/inbox",
     "type": "Service"
   },
   "target": {

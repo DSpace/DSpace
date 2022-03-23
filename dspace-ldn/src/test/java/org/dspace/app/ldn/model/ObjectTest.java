@@ -16,12 +16,12 @@ import org.junit.Test;
  */
 public class ObjectTest {
 
-  @Test
-  public void testObject() {
-    Object object = new Object();
+    @Test
+    public void testObject() {
+        Object object = new Object();
 
-    object.setTitle("Test");
-    assertEquals("Test", object.getTitle());
-  }
+        object.setTitle("Test");
+        assertEquals("Test", object.getTitle());
+    }
 
 }

@@ -16,12 +16,12 @@ import org.junit.Test;
  */
 public class ActorTest {
 
-  @Test
-  public void testActor() {
-    Actor actor = new Actor();
+    @Test
+    public void testActor() {
+        Actor actor = new Actor();
 
-    actor.setName("Test");
-    assertEquals("Test", actor.getName());
-  }
+        actor.setName("Test");
+        assertEquals("Test", actor.getName());
+    }
 
 }
