@@ -13,7 +13,7 @@ services:
     image: dspace/dspace-postgres-pgcrypto:loadsql
     environment:
       # This SQL is available from https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
-      - LOADSQL=https://github.com/DSpace-Labs/AIP-Files/releases/download/demo-entities-data/dspace7-entities-2021-04-14.sql
+      - LOADSQL=https://github.com/DSpace-Labs/AIP-Files/releases/download/demo-entities-data/dspace7-entities-data.sql
   dspace:
     ### OVERRIDE default 'entrypoint' in 'docker-compose.yml ####
     # Ensure that the database is ready BEFORE starting tomcat
