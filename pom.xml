@@ -25,7 +25,7 @@
         <hibernate.version>5.6.5.Final</hibernate.version>
         <hibernate-validator.version>6.0.23.Final</hibernate-validator.version>
         <postgresql.driver.version>42.3.3</postgresql.driver.version>
-        <solr.client.version>8.8.1</solr.client.version>
+        <solr.client.version>8.11.1</solr.client.version>
 
         <ehcache.version>3.4.0</ehcache.version>
         <errorprone.version>2.10.0</errorprone.version>
@@ -57,7 +57,7 @@
              https://jena.apache.org/documentation/migrate_jena2_jena3.html -->
         <jena.version>2.13.0</jena.version>
         <!-- Used by (now obsolete) 'dspace-rest' WAR -->
-        <jersey.version>2.30.1</jersey.version>
+        <jersey.version>2.35</jersey.version>
 
         <!--=== MAVEN SETTINGS ===-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -1106,6 +1106,13 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.driver.version}</version>
+                <exclusions>
+                    <!-- Use version provided by Solr -->
+                    <exclusion>
+                        <groupId>org.checkerframework</groupId>
+                        <artifactId>checker-qual</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Solr introduces multiple versions of zookeeper. So,
@@ -1298,28 +1305,62 @@
             <dependency>
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-parsers</artifactId>
-                <version>1.24.1</version>
+                <version>1.27</version>
                 <!-- Exclude a few tika-parsers dependencies that we already use, with slightly different versions -->
                 <exclusions>
+                    <!-- Use versions provided by Solr -->
+                    <exclusion>
+                        <groupId>com.rometools</groupId>
+                        <artifactId>rome</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.tukaani</groupId>
+                        <artifactId>xz</artifactId>
+                    </exclusion>
                     <exclusion>
                         <groupId>com.google.protobuf</groupId>
                         <artifactId>protobuf-java</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>net.sf.ehcache</groupId>
-                        <artifactId>ehcache-core</artifactId>
+                        <groupId>com.healthmarketscience.jackcess</groupId>
+                        <artifactId>jackcess</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>jakarta.ws.rs</groupId>
-                        <artifactId>jakarta.ws.rs-api</artifactId>
+                        <groupId>com.healthmarketscience.jackcess</groupId>
+                        <artifactId>jackcess-encrypt</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>javax.xml.soap</groupId>
-                        <artifactId>javax.xml.soap-api</artifactId>
+                        <groupId>com.fasterxml.woodstox</groupId>
+                        <artifactId>woodstox-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.james</groupId>
+                        <artifactId>apache-mime4j-dom</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-compress</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.tallison</groupId>
+                        <artifactId>isoparser</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.tallison</groupId>
+                        <artifactId>metadata-extractor</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.epam</groupId>
+                        <artifactId>parso</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.jvnet.staxex</groupId>
                         <artifactId>stax-ex</artifactId>
+                    </exclusion>
+                    <!-- Use version provided by Jersey -->
+                    <exclusion>
+                        <groupId>com.sun.activation</groupId>
+                        <artifactId>jakarta.activation</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -1782,7 +1823,14 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>30.0-jre</version>
+                <version>30.1.1-jre</version>
+                <exclusions>
+                    <!-- Use version provided by Solr -->
+                    <exclusion>
+                        <groupId>org.checkerframework</groupId>
+                        <artifactId>checker-qual</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>xom</groupId>
