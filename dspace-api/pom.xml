@@ -927,7 +927,6 @@
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
-            <type>jar</type>
         </dependency>
 
         <dependency>
