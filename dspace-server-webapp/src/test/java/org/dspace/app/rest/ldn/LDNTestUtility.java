@@ -5,9 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.ldn.model;
-
-import static org.junit.Assert.assertEquals;
+package org.dspace.app.rest.ldn;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,12 +15,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.jsonldjava.utils.JsonUtils;
-import org.junit.Test;
+import org.dspace.app.ldn.model.Notification;
 
-/**
- *
- */
-public class NotificationTest {
+public class LDNTestUtility {
 
     public static ObjectMapper objectMapper = new ObjectMapper();
 
@@ -33,25 +28,20 @@ public class NotificationTest {
         objectMapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
     }
 
-    @Test
-    public void testNotificationFromDataverse() throws IllegalArgumentException, IOException {
-        Notification notification = read("src/test/resources/mocks/fromDataverse.json");
-        String[] context = notification.getC();
-        assertEquals(2, context.length);
-        assertEquals("https://purl.org/coar/notify", context[0]);
-        assertEquals("https://www.w3.org/ns/activitystreams", context[1]);
+    private LDNTestUtility() {
+
     }
 
-    @Test
-    public void testNotificationToDataverse() throws IllegalArgumentException, IOException {
-        Notification notification = read("src/test/resources/mocks/toDataverse.json");
-        String[] context = notification.getC();
-        assertEquals(2, context.length);
-        assertEquals("https://purl.org/coar/notify", context[0]);
-        assertEquals("https://www.w3.org/ns/activitystreams", context[1]);
+    public static String toJson(Notification notification) throws IOException {
+        return JsonUtils.toString(notification);
     }
 
-    private Notification read(String relativeToRootFilepath) throws IllegalArgumentException, IOException {
+    public static String loadJson(String relativeToRootFilepath) throws IllegalArgumentException, IOException {
+        Notification notification = load(relativeToRootFilepath);
+        return JsonUtils.toString(notification);
+    }
+
+    public static Notification load(String relativeToRootFilepath) throws IllegalArgumentException, IOException {
         try (FileInputStream fis = new FileInputStream(new File(relativeToRootFilepath))) {
             return objectMapper.convertValue(JsonUtils.fromInputStream(fis), Notification.class);
         }

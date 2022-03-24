@@ -90,6 +90,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // Everyone can call GET on the status endpoint (used to check your authentication status)
                 .antMatchers(HttpMethod.GET, "/api/authn/status").permitAll()
 
+                .antMatchers(HttpMethod.OPTIONS, "/ldn/inbox").permitAll()
                 .antMatchers(HttpMethod.POST, "/ldn/inbox").permitAll()
             .and()
             // Tell Spring to not create Sessions

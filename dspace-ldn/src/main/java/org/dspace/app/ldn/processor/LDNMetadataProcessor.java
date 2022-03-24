@@ -291,6 +291,11 @@ public class LDNMetadataProcessor implements LDNProcessor {
         } else {
             String handle = handleService.resolveUrlToHandle(context, url);
 
+            if (Objects.isNull(handle)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        format("Handle not found for %s", url));
+            }
+
             DSpaceObject object = handleService.resolveToObject(context, handle);
 
             if (Objects.isNull(object)) {

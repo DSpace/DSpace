@@ -12,8 +12,8 @@
   "context": {
     "IsSupplementedBy": [
       {
-        "id": "http://ec2-35-170-82-7.compute-1.amazonaws.com/dataset.xhtml?persistentId=doi:10.5072/FK2/OMSPHN",
-        "ietf:cite-as": "https://doi.org/10.5072/FK2/OMSPHN",
+        "id": "http://dev-hdc3b.lib.harvard.edu/dataset.xhtml?persistentId=doi:10.5072/FK2/OMSPHN",
+        "ietf:cite-as": "https://doi.org/10.5072/FK2/NUB975",
         "type": "sorg:Dataset"
       }
     ]
@@ -30,8 +30,8 @@
     "type": "Service"
   },
   "target": {
-    "id": "http://ec2-35-170-82-7.compute-1.amazonaws.com",
-    "inbox": "http://ec2-35-170-82-7.compute-1.amazonaws.com/api/inbox",
+    "id": "http://dev-hdc3b.lib.harvard.edu",
+    "inbox": "http://dev-hdc3b.lib.harvard.edu/api/inbox",
     "type": "Service"
   },
   "type": [

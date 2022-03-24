@@ -16,17 +16,17 @@ import org.junit.Test;
  */
 public class CitationTest {
 
-  @Test
-  public void testCitation() {
-    Citation citation = new Citation();
+    @Test
+    public void testCitation() {
+        Citation citation = new Citation();
 
-    citation.setIetfCiteAs("Test");
-    assertEquals("Test", citation.getIetfCiteAs());
+        citation.setIetfCiteAs("Test");
+        assertEquals("Test", citation.getIetfCiteAs());
 
-    Url url = new Url();
-    url.setId("4af4d9d5-c5c4-464a-b310-f0124c191928");
-    citation.setUrl(url);
-    assertEquals(url, citation.getUrl());
-  }
+        Url url = new Url();
+        url.setId("4af4d9d5-c5c4-464a-b310-f0124c191928");
+        citation.setUrl(url);
+        assertEquals(url, citation.getUrl());
+    }
 
 }

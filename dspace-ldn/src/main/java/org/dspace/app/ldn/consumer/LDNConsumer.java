@@ -7,6 +7,7 @@
  */
 package org.dspace.app.ldn.consumer;
 
+import static java.lang.String.format;
 import static org.dspace.app.ldn.LDNMetadataFields.ELEMENT;
 import static org.dspace.app.ldn.LDNMetadataFields.RELEASE;
 import static org.dspace.app.ldn.LDNMetadataFields.SCHEMA;
@@ -151,7 +152,15 @@ public class LDNConsumer implements Consumer {
         if (itemsToRelease != null) {
             for (Item item : itemsToRelease) {
                 log.info("Item for release {} {}", item.getID(), item.getName());
-                ldnBusinessDelegate.announceRelease(item);
+                try {
+                    ldnBusinessDelegate.announceRelease(item);
+                } catch (Exception e) {
+                    log.error(format(
+                        "Failed to announce item %s %s for release",
+                        item.getID(),
+                        item.getName()
+                    ), e);
+                }
             }
         }
 
