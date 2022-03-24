@@ -511,7 +511,7 @@
         <dependency>
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>3.4.0</version>
+            <version>${ehcache.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
