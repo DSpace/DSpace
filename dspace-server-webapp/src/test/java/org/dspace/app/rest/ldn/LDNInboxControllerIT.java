@@ -19,18 +19,92 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import org.dspace.app.ldn.LDNWebConfig;
+import org.dspace.app.ldn.model.Context;
+import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
+import org.dspace.handle.service.HandleService;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 
 @Import(LDNWebConfig.class)
 @ImportResource("classpath:config/spring/api/ldn-coar-notify.xml")
 public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
+
+    private Collection testCollection;
+
+    @Autowired
+    private HandleService handleService;
+
+    @Before
+    public void setup() {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        testCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Test Collection").build();
+
+        context.restoreAuthSystemState();
+    }
+
+    @Test
+    public void receiveDataverseNotificationWithHandleTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = createItem();
+
+        String url = handleService.resolveToURL(context, item.getHandle());
+        context.restoreAuthSystemState();
+
+        Notification notification = LDNTestUtility.load(
+            "src/test/resources/mocks/dataverseNotificationWithHandle.json"
+        );
+
+        Context context = notification.getContext().getIsSupplementTo().get(0);
+
+        context.setId(url);
+        context.setIetfCiteAs(url);
+
+        String content = LDNTestUtility.toJson(notification);
+
+        getClient()
+            .perform(post("/ldn/inbox").content(content).contentType("application/ld+json"))
+            .andExpect(status().is(201))
+            .andExpect(header().string("Location", notification.getTarget().getInbox()));
+    }
+
+    @Test
+    public void receiveDataverseNotificationWithUUIDTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = createItem();
+        context.restoreAuthSystemState();
+
+        Notification notification = LDNTestUtility.load(
+            "src/test/resources/mocks/dataverseNotificationWithUUID.json"
+        );
+
+        Context context = notification.getContext().getIsSupplementTo().get(0);
+
+        String url = String.format("%s/item/%s", BASE_REST_SERVER_URL, item.getID());
+        context.setId(url);
+        context.setIetfCiteAs(url);
+
+        String content = LDNTestUtility.toJson(notification);
+
+        getClient()
+            .perform(post("/ldn/inbox").content(content).contentType("application/ld+json"))
+            .andExpect(status().is(201))
+            .andExpect(header().string("Location", notification.getTarget().getInbox()));
+    }
 
     @Test
     public void methodNotAllowedTest() throws Exception {
@@ -74,11 +148,11 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void handleNotFoundBadRequestTest() throws Exception {
+    public void handleNotFoundTest() throws Exception {
         String notification = dataverseNotificationWithHandle();
         getClient()
             .perform(post("/ldn/inbox").content(notification).contentType("application/ld+json"))
-            .andExpect(status().is(400));
+            .andExpect(status().is(404));
     }
 
     @Test
@@ -98,12 +172,20 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
             .andExpect(content().string("No processor found for type [Unknown]"));
     }
 
+    private Item createItem() {
+        return ItemBuilder.createItem(context, testCollection)
+            .withTitle("Test item")
+            .withIssueDate("2022-03-24")
+            .withAuthor("Boring, Bob")
+            .build();
+    }
+
     private String dataverseNotificationWithHandle() throws IOException {
-        return Files.readString(Path.of("src/test/resources/mocks/dataverseNotificationWithHandle.json"));
+        return LDNTestUtility.loadJson("src/test/resources/mocks/dataverseNotificationWithHandle.json");
     }
 
     private String dataverseNotificationWithUUID() throws IOException {
-        return Files.readString(Path.of("src/test/resources/mocks/dataverseNotificationWithUUID.json"));
+        return LDNTestUtility.loadJson("src/test/resources/mocks/dataverseNotificationWithUUID.json");
     }
 
 }
