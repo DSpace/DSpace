@@ -28,7 +28,7 @@ public final class HealthIndicatorMatcher {
 
     }
 
-    public static Matcher<? super Object> matchDb(Status status) {
+    public static Matcher<? super Object> matchDatabase(Status status) {
         return allOf(
             hasJsonPath("$.db"),
             hasJsonPath("$.db.status", is(status.getCode())),

@@ -50,7 +50,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
      */
     protected SolrClient solr = null;
 
-    protected SolrClient getSolr()
+    public SolrClient getSolr()
             throws MalformedURLException, SolrServerException, IOException {
         if (solr == null) {
 

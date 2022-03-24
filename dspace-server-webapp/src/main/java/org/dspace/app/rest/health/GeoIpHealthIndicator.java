@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.health;
 
+import static org.dspace.app.rest.configuration.ActuatorConfiguration.UP_WITH_ISSUES_STATUS;
+
 import org.dspace.statistics.GeoIpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
@@ -32,7 +34,7 @@ public class GeoIpHealthIndicator extends AbstractHealthIndicator {
             geoIpService.getDatabaseReader();
             builder.up();
         } catch (IllegalStateException ex) {
-            builder.outOfService().withDetail("reason", ex.getMessage());
+            builder.status(UP_WITH_ISSUES_STATUS).withDetail("reason", ex.getMessage());
         }
 
     }

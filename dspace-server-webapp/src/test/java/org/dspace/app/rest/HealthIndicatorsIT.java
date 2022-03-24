@@ -7,8 +7,9 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.configuration.ActuatorConfiguration.UP_WITH_ISSUES_STATUS;
 import static org.dspace.app.rest.link.search.HealthIndicatorMatcher.match;
-import static org.dspace.app.rest.link.search.HealthIndicatorMatcher.matchDb;
+import static org.dspace.app.rest.link.search.HealthIndicatorMatcher.matchDatabase;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,8 +36,8 @@ public class HealthIndicatorsIT extends AbstractControllerIntegrationTest {
     public void testWithAnonymousUser() throws Exception {
 
         getClient().perform(get(HEALTH_PATH))
-            .andExpect(status().isServiceUnavailable())
-            .andExpect(jsonPath("$.status", is(Status.OUT_OF_SERVICE.getCode())))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(UP_WITH_ISSUES_STATUS.getCode())))
             .andExpect(jsonPath("$.components").doesNotExist());
 
     }
@@ -47,8 +48,8 @@ public class HealthIndicatorsIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get(HEALTH_PATH))
-            .andExpect(status().isServiceUnavailable())
-            .andExpect(jsonPath("$.status", is(Status.OUT_OF_SERVICE.getCode())))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(UP_WITH_ISSUES_STATUS.getCode())))
             .andExpect(jsonPath("$.components").doesNotExist());
 
     }
@@ -59,12 +60,14 @@ public class HealthIndicatorsIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get(HEALTH_PATH))
-            .andExpect(status().isServiceUnavailable())
-            .andExpect(jsonPath("$.status", is(Status.OUT_OF_SERVICE.getCode())))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(UP_WITH_ISSUES_STATUS.getCode())))
             .andExpect(jsonPath("$.components", allOf(
-                matchDb(Status.UP),
-                match("solr", Status.UP, Map.of("status", 0, "detectedPathType", "root")),
-                match("geoIp", Status.OUT_OF_SERVICE,
+                matchDatabase(Status.UP),
+                match("solrSearchCore", Status.UP, Map.of("status", 0, "detectedPathType", "root")),
+                match("solrOaiCore", Status.UP, Map.of("status", 0, "detectedPathType", "particular core")),
+                match("solrStatisticsCore", Status.UP, Map.of("status", 0, "detectedPathType", "root")),
+                match("geoIp", UP_WITH_ISSUES_STATUS,
                     Map.of("reason", "The required 'dbfile' configuration is missing in solr-statistics.cfg!"))
                 )));
 
