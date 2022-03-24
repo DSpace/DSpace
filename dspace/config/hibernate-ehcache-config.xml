@@ -31,20 +31,22 @@
       </resources>
     </cache-template>
 
-   <!-- this cache tracks the timestamps of the most recent updates to particular
-        tables.  It is important that the cache timeout of the underlying cache
-        implementation be set to a higher value than the timeouts of any of the
-        query caches. In fact, it is recommended that the the underlying cache
-        not be configured for expiry at all. -->
-    <cache alias="org.hibernate.cache.spi.UpdateTimestampsCache">
+   <!-- This cache tracks the timestamps of the most recent updates to
+        particular tables.  It is important that the cache timeout of
+        the underlying cache implementation be set to a higher value
+        than the timeouts of any of the query caches.  In fact, it is
+        recommended that the the underlying cache not be configured
+        for expiry at all. -->
+    <cache alias='default-update-timestamps-region'>
       <expiry>
         <none/>
       </expiry>
       <heap unit='entries'>6000</heap>
     </cache>
 
-    <!-- this cache stores the actual objects pulled out of the DB by hibernate -->
-    <cache alias="org.hibernate.cache.internal.StandardQueryCache">
+    <!-- This cache stores the actual objects pulled out of the DB by
+         Hibernate. -->
+    <cache alias='default-query-results-region'>
       <expiry>
         <ttl>600</ttl>
       </expiry>
