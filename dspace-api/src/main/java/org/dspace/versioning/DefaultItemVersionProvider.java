@@ -148,12 +148,8 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
                     newItem,  // new item
                     oldRelationship.getRightItem(),
                     oldRelationship.getRelationshipType(),
-                    // NOTE: on the side of the new version, we start with an empty list of relationships
-                    //       => insert at the same position as the ancestral relationship
                     oldRelationship.getLeftPlace(),
-                    // NOTE: on the opposite side of the new version, the ancestral relationship already takes our
-                    //       desired place => insert AFTER the ancestral relationship
-                    oldRelationship.getRightPlace() + 1,
+                    oldRelationship.getRightPlace(),
                     oldRelationship.getLeftwardValue(),
                     oldRelationship.getRightwardValue(),
                     Relationship.LatestVersionStatus.RIGHT_ONLY // only mark the opposite side as "latest" for now
@@ -165,11 +161,7 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
                     oldRelationship.getLeftItem(),
                     newItem, // new item
                     oldRelationship.getRelationshipType(),
-                    // NOTE: on the opposite side of the new version, the ancestral relationship already takes our
-                    //       desired place => insert AFTER the ancestral relationship
-                    oldRelationship.getLeftPlace() + 1,
-                    // NOTE: on the side of the new version, we start with an empty list of relationships
-                    //       => insert at the same position as the ancestral relationship
+                    oldRelationship.getLeftPlace(),
                     oldRelationship.getRightPlace(),
                     oldRelationship.getLeftwardValue(),
                     oldRelationship.getRightwardValue(),

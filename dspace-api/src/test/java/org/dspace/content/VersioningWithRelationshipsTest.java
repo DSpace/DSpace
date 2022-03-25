@@ -156,7 +156,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
     }
 
     @Test
-    public void test_createNewVersionOfItemOnLeftSideOfRelationships() throws Exception {
+    public void test_createNewVersionOfItemOnLeftSideOfRelationships() throws Exception { // TODO
         ///////////////////////////////////////////////
         // create a publication with 3 relationships //
         ///////////////////////////////////////////////
@@ -430,7 +430,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
     }
 
     @Test
-    public void test_createNewVersionOfItemAndModifyRelationships() throws Exception {
+    public void test_createNewVersionOfItemAndModifyRelationships() throws Exception { // TODO
         ///////////////////////////////////////////////
         // create a publication with 3 relationships //
         ///////////////////////////////////////////////
@@ -792,7 +792,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
     }
 
     @Test
-    public void test_createNewVersionOfItemOnRightSideOfRelationships() throws Exception {
+    public void test_createNewVersionOfItemOnRightSideOfRelationships() throws Exception { // TODO
         //////////////////////////////////////////
         // create a person with 3 relationships //
         //////////////////////////////////////////
@@ -1066,7 +1066,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
     }
 
     @Test
-    public void test_createNewVersionOfItemAndVerifyMetadataOrder() throws Exception {
+    public void test_createNewVersionOfItemAndVerifyMetadataOrder() throws Exception { // TODO
         /////////////////////////////////////////
         // create a publication with 6 authors //
         /////////////////////////////////////////
@@ -1341,7 +1341,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
     }
 
     @Test
-    public void test_virtualMetadataPreserved() throws Exception {
+    public void test_virtualMetadataPreserved() throws Exception { // TODO
         //////////////////////////////////////////////
         // create a publication and link two people //
         //////////////////////////////////////////////
@@ -1477,7 +1477,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals(2, mdvs5.size());
 
         assertTrue(mdvs5.get(0) instanceof RelationshipMetadataValue);
-        assertEquals("Smith, D.", mdvs5.get(0).getValue());
+        assertEquals("Smith, D.", mdvs5.get(0).getValue());// TODO fix
         assertEquals(0, mdvs5.get(0).getPlace());
 
         assertTrue(mdvs5.get(1) instanceof RelationshipMetadataValue);

@@ -227,10 +227,10 @@ public class RelationshipServiceImpl implements RelationshipService {
         Item rightItem = relationship.getRightItem();
 
         List<Relationship> leftRelationships = findByItemAndRelationshipType(
-            context, leftItem, relationship.getRelationshipType(), true
+            context, leftItem, relationship.getRelationshipType(), true, -1, -1, false
         );
         List<Relationship> rightRelationships = findByItemAndRelationshipType(
-            context, rightItem, relationship.getRelationshipType(), false
+            context, rightItem, relationship.getRelationshipType(), false, -1, -1, false
         );
 
         // These relationships are only deleted from the temporary lists in case they're present in them so that we can
@@ -250,6 +250,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         int oldLeftPlace = relationship.getLeftPlace();
         int oldRightPlace = relationship.getRightPlace();
 
+
         boolean movedUpLeft = resolveRelationshipPlace(
             relationship, true, leftRelationships, leftMetadata, oldLeftPlace, newLeftPlace
         );
@@ -259,14 +260,18 @@ public class RelationshipServiceImpl implements RelationshipService {
 
         context.turnOffAuthorisationSystem();
 
-        shiftSiblings(
-            relationship, true, oldLeftPlace, movedUpLeft, insertLeft, deletedFromLeft,
-            leftRelationships, leftMetadata
-        );
-        shiftSiblings(
-            relationship, false, oldRightPlace, movedUpRight, insertRight, deletedFromRight,
-            rightRelationships, rightMetadata
-        );
+        if (otherSideIsLatest(true, relationship.getLatestVersionStatus())) {
+            shiftSiblings(
+                relationship, true, oldLeftPlace, movedUpLeft, insertLeft, deletedFromLeft,
+                leftRelationships, leftMetadata
+            );
+        }
+        if (otherSideIsLatest(false, relationship.getLatestVersionStatus())) {
+            shiftSiblings(
+                relationship, false, oldRightPlace, movedUpRight, insertRight, deletedFromRight,
+                rightRelationships, rightMetadata
+            );
+        }
 
         updateItem(context, leftItem);
         updateItem(context, rightItem);
@@ -472,6 +477,22 @@ public class RelationshipServiceImpl implements RelationshipService {
                 mdv.setPlace(mdvPlace + 1);
             }
         }
+    }
+
+    /**
+     * Given a latest version status, check if the other side is "latest".
+     * If we look from the left, this implies BOTH and RIGHT_ONLY return true.
+     * If we look from the right, this implies BOTH and LEFT_ONLY return true.
+     * @param isLeft whether we should look from the left or right side.
+     * @param latestVersionStatus the latest version status.
+     * @return true if the other side has "latest" status, false otherwise.
+     */
+    private boolean otherSideIsLatest(boolean isLeft, LatestVersionStatus latestVersionStatus) {
+        if (latestVersionStatus == LatestVersionStatus.BOTH) {
+            return true;
+        }
+
+        return latestVersionStatus == (isLeft ? LatestVersionStatus.RIGHT_ONLY : LatestVersionStatus.LEFT_ONLY);
     }
 
     private int getPlace(Relationship relationship, boolean isLeft) {
