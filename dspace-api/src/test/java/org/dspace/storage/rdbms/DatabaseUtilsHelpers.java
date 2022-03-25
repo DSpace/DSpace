@@ -17,8 +17,9 @@ import javax.sql.DataSource;
  *
  * @author mwood
  */
-public class DatabaseUtilsHelpers
-{
+public class DatabaseUtilsHelpers {
+    private DatabaseUtilsHelpers() { }
+
     /**
      * Get Flyway to set up the database with tables and such.
      *
@@ -27,8 +28,7 @@ public class DatabaseUtilsHelpers
      * @throws SQLException passed through.
      */
     static public void updateDatabase(DataSource ds, Connection cnx)
-            throws SQLException
-    {
+            throws SQLException {
         DatabaseUtils.updateDatabase(ds, cnx);
     }
 }

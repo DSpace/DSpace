@@ -8,7 +8,6 @@
 package org.dspace.identifier;
 
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Context;
 import org.dspace.identifier.service.IdentifierService;

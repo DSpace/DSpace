@@ -19,8 +19,9 @@ import java.sql.Statement;
  *
  * @author mwood
  */
-public class DatabaseDebug
-{
+public class DatabaseDebug {
+    private DatabaseDebug() { }
+
     /**
      * Dump the entire content of a database table.  Long values are truncated
      * to avoid seeing 2GB underlines and the like.
@@ -30,19 +31,16 @@ public class DatabaseDebug
      * @throws SQLException if the DBMS returns badness.
      */
     public static void dumpATable(Connection cnx, String name)
-            throws SQLException
-    {
+            throws SQLException {
         Statement stmt = cnx.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT * FROM " + name);
         ResultSetMetaData rsm = rs.getMetaData();
         int columns = rsm.getColumnCount();
         int[] widths = new int[columns];
         // Print column names
-        for (int column = 0; column < columns; column++)
-        {
+        for (int column = 0; column < columns; column++) {
             String colName = rsm.getColumnName(column + 1);
-            if (column > 0)
-            {
+            if (column > 0) {
                 System.out.print("  ");
             }
             System.out.print(colName);
@@ -51,25 +49,19 @@ public class DatabaseDebug
         }
         System.out.println();
         // Underline names
-        for (int column = 0; column < columns; column++)
-        {
-            if (column > 0)
-            {
+        for (int column = 0; column < columns; column++) {
+            if (column > 0) {
                 System.out.print("  ");
             }
-            for (int pos = 0; pos < widths[column]; pos++)
-            {
+            for (int pos = 0; pos < widths[column]; pos++) {
                 System.out.print('-');
             }
         }
         System.out.println();
         // Print column data for each row
-        while (rs.next())
-        {
-            for (int column = 0; column < columns; column++)
-            {
-                if (column > 0)
-                {
+        while (rs.next()) {
+            for (int column = 0; column < columns; column++) {
+                if (column > 0) {
                     System.out.print("  ");
                 }
                 Object cell = rs.getObject(column + 1);

@@ -13,7 +13,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
-import org.dspace.content.MetadataSchema;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.identifier.DOI;
 import org.dspace.identifier.EZIDIdentifierProvider;
 import org.dspace.identifier.IdentifierProvider;
@@ -22,10 +25,8 @@ import org.dspace.identifier.service.DOIService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseUtils;
-import org.flywaydb.core.api.migration.MigrationChecksumProvider;
-import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
 
 /**
  * A Flyway migration to fix incorrect use of {@code dc.identifier} for holding
@@ -36,11 +37,10 @@ import org.slf4j.LoggerFactory;
  * @author mwood
  */
 public class V6_0_2016_04_01_0002__DS_2199_Move_Identifiers
-    implements JdbcMigration, MigrationChecksumProvider
-{
+        extends BaseJavaMigration {
     private static final String SCHEMA_TABLE = "MetadataSchemaRegistry";
 
-    static final String OLD_SCHEMA = MetadataSchema.DC_SCHEMA;
+    static final String OLD_SCHEMA = MetadataSchemaEnum.DC.getName();
     static final String OLD_ELEMENT = "identifier";
     static final String OLD_QUALIFIER = null;
     static final String OLD_LANG = null;
@@ -50,34 +50,31 @@ public class V6_0_2016_04_01_0002__DS_2199_Move_Identifiers
     static final String NEW_QUALIFIER = IdentifierProvider.URI_METADATA_QUALIFIER;
     static final String NEW_LANG = null;
 
-    private static final Logger LOG
-            = LoggerFactory.getLogger(V6_0_2016_04_01_0002__DS_2199_Move_Identifiers.class);
+    private static final Logger LOG = LogManager.getLogger();
 
     private final Checksum checksum = new CRC32();
 
     @Override
-    public void migrate(Connection cnctn)
-            throws Exception
-    {
+    public void migrate(Context context)
+            throws Exception {
         /*
          * Bail out if there is no metadata schema registry or it is empty.
          * If there are no registered schemae,
          * then we are doing a fresh install or in a test,
          * and there can be no data to migrate.
          */
-        if (!DatabaseUtils.tableExists(cnctn, SCHEMA_TABLE))
-        {
+        Connection connection = context.getConnection();
+        if (!DatabaseUtils.tableExists(connection, SCHEMA_TABLE)) {
             LOG.info("MetadataSchemaRegistry table does not exist, so there is nothing to migrate.");
             return;
         }
 
         // Find the field IDs for old and new fields
-        final int old_field_id = getMetadataFieldId(cnctn,
+        final int old_field_id = getMetadataFieldId(connection,
                 OLD_SCHEMA, OLD_ELEMENT, OLD_QUALIFIER);
-        final int new_field_id = getMetadataFieldId(cnctn,
+        final int new_field_id = getMetadataFieldId(connection,
                 NEW_SCHEMA, NEW_ELEMENT, NEW_QUALIFIER);
-        if (old_field_id < 0 || new_field_id < 0)
-        {
+        if (old_field_id < 0 || new_field_id < 0) {
             LOG.info("Skipping because old ({}) or new ({}) field ID is undefined",
                     old_field_id, new_field_id);
             return;
@@ -95,23 +92,25 @@ public class V6_0_2016_04_01_0002__DS_2199_Move_Identifiers
         LOG.debug("Prefix = {}", prefix);
 
         String sql;
-        if (null == OLD_LANG)
+        if (null == OLD_LANG) {
             sql = "SELECT * FROM metadatavalue"
                     + " WHERE metadata_field_id = ?"
                     + " AND text_value LIKE ?"
                     + " AND text_lang IS NULL";
-        else
+        } else {
             sql = "SELECT * FROM metadatavalue"
                     + " WHERE metadata_field_id = ?"
                     + " AND text_value LIKE ?"
                     + " AND text_lang = ?";
-        final PreparedStatement stmt = cnctn.prepareStatement(sql,
+        }
+        final PreparedStatement stmt = connection.prepareStatement(sql,
                 ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 
         stmt.setInt(1, old_field_id);
         stmt.setString(2, prefix);
-        if (null != OLD_LANG)
+        if (null != OLD_LANG) {
             stmt.setString(3, OLD_LANG);
+        }
 
         final ResultSet rs = stmt.executeQuery();
 
@@ -120,8 +119,7 @@ public class V6_0_2016_04_01_0002__DS_2199_Move_Identifiers
         final int pos_text_lang = rs.findColumn("text_lang");
 
         try {
-            while (rs.next())
-            {
+            while (rs.next()) {
                 String oldIdentifier = "unknown";
                 try {
                     oldIdentifier = rs.getString(pos_text_value);
@@ -144,25 +142,23 @@ public class V6_0_2016_04_01_0002__DS_2199_Move_Identifiers
     }
 
     @Override
-    public Integer getChecksum()
-    {
+    public Integer getChecksum() {
         return (int)(checksum.getValue() & 0Xffffffff);
     }
 
     /**
      * Look up a metadata field ID given schema, element and qualifier.
      *
-     * @param cnctn
+     * @param connection
      * @param schema
      * @param element
      * @param qualifier
      * @return the field ID, or -1 if not found.
      * @throws SQLException on a database error.
      */
-    private int getMetadataFieldId(Connection cnctn, String schema,
+    private int getMetadataFieldId(Connection connection, String schema,
             String element, String qualifier)
-            throws SQLException
-    {
+            throws SQLException {
         PreparedStatement stmt;
         final String SELECT_FIELD_ID_NULL_QUALIFIER
                 = "SELECT f.metadata_field_id"
@@ -174,26 +170,20 @@ public class V6_0_2016_04_01_0002__DS_2199_Move_Identifiers
                 + " FROM metadataschemaregistry s"
                 + " JOIN metadatafieldregistry f ON s.metadata_schema_id = f.metadata_schema_id"
                 + " WHERE s.short_id = ? AND f.element = ? AND f.qualifier = ?";
-        if (null == qualifier)
-        {
-            stmt = cnctn.prepareStatement(SELECT_FIELD_ID_NULL_QUALIFIER);
-        }
-        else
-        {
-            stmt = cnctn.prepareStatement(SELECT_FIELD_ID_NONNULL_QUALIFIER);
+        if (null == qualifier) {
+            stmt = connection.prepareStatement(SELECT_FIELD_ID_NULL_QUALIFIER);
+        } else {
+            stmt = connection.prepareStatement(SELECT_FIELD_ID_NONNULL_QUALIFIER);
             stmt.setString(3, qualifier);
         }
         stmt.setString(1, schema);
         stmt.setString(2, element);
         final ResultSet rs = stmt.executeQuery();
-        if (rs.next())
-        {
+        if (rs.next()) {
             int id = rs.getInt(1);
             stmt.close();
             return id;
-        }
-        else
-        {
+        } else {
             return -1;
         }
     }
