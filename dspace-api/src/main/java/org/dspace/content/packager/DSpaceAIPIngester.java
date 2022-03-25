@@ -20,7 +20,7 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * Subclass of the METS packager framework to ingest a DSpace
