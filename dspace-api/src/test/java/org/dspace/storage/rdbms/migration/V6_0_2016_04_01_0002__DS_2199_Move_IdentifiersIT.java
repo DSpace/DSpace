@@ -24,7 +24,7 @@ import org.dspace.identifier.EZIDIdentifierProvider;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseDebug;
-import org.dspace.storage.rdbms.DatabaseUtilsHelpers;
+import org.dspace.storage.rdbms.DatabaseUtils;
 import org.flywaydb.core.api.configuration.Configuration;
 import org.flywaydb.core.api.migration.Context;
 import org.junit.After;
@@ -66,7 +66,7 @@ public class V6_0_2016_04_01_0002__DS_2199_Move_IdentifiersIT
         connection = ds.getConnection();
 
         // Define the database.
-        DatabaseUtilsHelpers.updateDatabase(ds, connection);
+        DatabaseUtils.updateDatabase();
 
         // Look up schemas
         int oldSchema = -1;
