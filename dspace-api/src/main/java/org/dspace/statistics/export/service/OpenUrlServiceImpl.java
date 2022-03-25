@@ -9,14 +9,18 @@ package org.dspace.statistics.export.service;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.statistics.export.OpenURLTracker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OpenUrlServiceImpl implements OpenUrlService {
 
-    private Logger log = Logger.getLogger(OpenUrlService.class);
+    private final Logger log = LogManager.getLogger();
 
     @Autowired
     protected FailedOpenURLTrackerService failedOpenUrlTrackerService;
@@ -38,6 +42,7 @@ public class OpenUrlServiceImpl implements OpenUrlService {
      * @param urlStr - the url to be processed
      * @throws SQLException
      */
+    @Override
     public void processUrl(Context c, String urlStr) throws SQLException {
         log.debug("Prepared to send url to tracker URL: " + urlStr);
 
@@ -55,21 +60,23 @@ public class OpenUrlServiceImpl implements OpenUrlService {
     }
 
     /**
-     * Returns the response code from accessing the url
+     * Returns the response code from accessing the url. Returns a http status 408 when the external service doesn't
+     * reply in 10 seconds
+     *
      * @param urlStr
      * @return response code from the url
      * @throws IOException
      */
     protected int getResponseCodeFromUrl(final String urlStr) throws IOException {
-        URLConnection conn;
-        URL url = new URL(urlStr);
-        conn = url.openConnection();
+        HttpGet httpGet = new HttpGet(urlStr);
+        RequestConfig requestConfig = getRequestConfigBuilder().setConnectTimeout(10 * 1000).build();
+        HttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
+        HttpResponse httpResponse = httpClient.execute(httpGet);
+        return httpResponse.getStatusLine().getStatusCode();
+    }
 
-        HttpURLConnection httpURLConnection = (HttpURLConnection) conn;
-        int responseCode = httpURLConnection.getResponseCode();
-        httpURLConnection.disconnect();
-
-        return responseCode;
+    protected RequestConfig.Builder getRequestConfigBuilder() {
+        return RequestConfig.custom();
     }
 
     /**
@@ -107,6 +114,7 @@ public class OpenUrlServiceImpl implements OpenUrlService {
      * @param context
      * @throws SQLException
      */
+    @Override
     public void reprocessFailedQueue(Context context) throws SQLException {
         if (failedOpenUrlTrackerService == null) {
             log.error("Error retrieving the \"failedOpenUrlTrackerService\" instance, aborting the processing");
@@ -124,6 +132,7 @@ public class OpenUrlServiceImpl implements OpenUrlService {
      * @param url
      * @throws SQLException
      */
+    @Override
     public void logfailed(Context context, String url) throws SQLException {
         Date now = new Date();
         if (StringUtils.isBlank(url)) {

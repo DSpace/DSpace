@@ -10,6 +10,8 @@ package org.dspace.content.dao.impl;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -17,6 +19,7 @@ import javax.persistence.criteria.Root;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
+import org.dspace.content.RelationshipType_;
 import org.dspace.content.Relationship_;
 import org.dspace.content.dao.RelationshipDAO;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -27,22 +30,46 @@ import org.dspace.core.Context;
 public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> implements RelationshipDAO {
 
     @Override
-    public List<Relationship> findByItem(Context context, Item item) throws SQLException {
-
-        return findByItem(context, item, -1, -1);
+    public List<Relationship> findByItem(Context context, Item item, boolean excludeTilted) throws SQLException {
+        return findByItem(context, item, -1, -1, excludeTilted);
     }
 
     @Override
-    public List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset)
-            throws SQLException {
+    public List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset,
+                                         boolean excludeTilted) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
-        criteriaQuery
-            .where(criteriaBuilder.or(criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
-                                      criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item)));
+        if (excludeTilted) {
+            // If this item is the left item,
+            //    return relationships for types which are not tilted right (tilted is either left nor null)
+            // If this item is the right item,
+            //    return relationships for types which are not tilted left (tilted is either right nor null)
+            criteriaQuery
+                    .where(criteriaBuilder.or(
+                            criteriaBuilder.and(
+                                    criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
+                                    criteriaBuilder.or(
+                                            criteriaBuilder.isNull(relationshipRoot.get(Relationship_.relationshipType)
+                                                    .get(RelationshipType_.tilted)),
+                                            criteriaBuilder.notEqual(relationshipRoot
+                                                .get(Relationship_.relationshipType)
+                                                .get(RelationshipType_.tilted), RelationshipType.Tilted.RIGHT))),
+                            criteriaBuilder.and(
+                                    criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item),
+                                    criteriaBuilder.or(
+                                            criteriaBuilder.isNull(relationshipRoot.get(Relationship_.relationshipType)
+                                                    .get(RelationshipType_.tilted)),
+                                            criteriaBuilder.notEqual(relationshipRoot
+                                                    .get(Relationship_.relationshipType)
+                                                    .get(RelationshipType_.tilted), RelationshipType.Tilted.LEFT)))));
+        } else {
+            criteriaQuery
+                    .where(criteriaBuilder.or(criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
+                            criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item)));
+        }
         return list(context, criteriaQuery, false, Relationship.class, limit, offset);
     }
 
@@ -237,6 +264,39 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.where(relationshipRoot.get(Relationship_.relationshipType).in(ids));
         return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
+    }
+
+    @Override
+    public List<Relationship> findByItemAndRelationshipTypeAndList(Context context, UUID focusUUID,
+            RelationshipType relationshipType, List<UUID> items, boolean isLeft,
+            int offset, int limit) throws SQLException {
+        String side = isLeft ? "left_id" : "right_id";
+        String otherSide = !isLeft ? "left_id" : "right_id";
+        Query query = createQuery(context, "FROM " + Relationship.class.getSimpleName() +
+                                          " WHERE type_id = (:typeId) " +
+                                           "AND " + side + " = (:focusUUID) " +
+                                           "AND " + otherSide + " in (:list) " +
+                                           "ORDER BY id");
+        query.setParameter("typeId", relationshipType.getID());
+        query.setParameter("focusUUID", focusUUID);
+        query.setParameter("list", items);
+        return list(query, limit, offset);
+    }
+
+    @Override
+    public int countByItemAndRelationshipTypeAndList(Context context, UUID focusUUID, RelationshipType relationshipType,
+            List<UUID> items, boolean isLeft) throws SQLException {
+        String side = isLeft ? "left_id" : "right_id";
+        String otherSide = !isLeft ? "left_id" : "right_id";
+        Query query = createQuery(context, "SELECT count(*) " +
+                                           "FROM " + Relationship.class.getSimpleName() +
+                                          " WHERE type_id = (:typeId) " +
+                                           "AND " + side + " = (:focusUUID) " +
+                                           "AND " + otherSide + " in (:list)");
+        query.setParameter("typeId", relationshipType.getID());
+        query.setParameter("focusUUID", focusUUID);
+        query.setParameter("list", items);
+        return count(query);
     }
 
 }

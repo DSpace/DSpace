@@ -17,7 +17,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.dao.SubscriptionDAO;
 import org.dspace.eperson.service.SubscribeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +82,7 @@ public class SubscribeServiceImpl implements SubscribeService {
             } else {
                 subscriptionDAO.deleteByCollectionAndEPerson(context, collection, eperson);
 
-                log.info(LogManager.getHeader(context, "unsubscribe",
+                log.info(LogHelper.getHeader(context, "unsubscribe",
                                               "eperson_id=" + eperson.getID() + ",collection_id="
                                                   + collection.getID()));
             }

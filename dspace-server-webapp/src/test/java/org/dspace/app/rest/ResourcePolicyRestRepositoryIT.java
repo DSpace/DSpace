@@ -1354,6 +1354,65 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
+    public void patchAddEndDataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("eperson1@mail.com")
+                                         .withPassword("qwerty01")
+                                         .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                 .withAdminGroup(eperson1)
+                                                 .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item")
+                                      .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                                                             .withAction(Constants.READ)
+                                                             .withDspaceObject(publicItem1)
+                                                             .withGroup(
+                                                                 EPersonServiceFactory.getInstance().getGroupService()
+                                                                                      .findByName(context,
+                                                                                          Group.ANONYMOUS))
+                                                             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                                                             .build();
+
+        context.restoreAuthSystemState();
+
+        Calendar newCalendar = Calendar.getInstance();
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+        Date newDate = new Date();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation addOperation = new AddOperation("/endDate", formatDate.format(newDate));
+        ops.add(addOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.name", is(resourcePolicy.getRpName())),
+                                hasJsonPath("$.description", is(resourcePolicy.getRpDescription())),
+                                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                hasJsonPath("$.startDate", is(resourcePolicy.getStartDate())),
+                                hasJsonPath("$.endDate", is(formatDate.format(newDate))))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                hasJsonPath("$.endDate", is(formatDate.format(newDate))))));
+    }
+
+    @Test
     public void patchRemoveStartDataTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -2469,8 +2528,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$._links",Matchers.allOf(
                                 hasJsonPath("$.resourcepolicies.href",
                                          is("http://localhost/api/authz/resourcepolicies")),
-                                hasJsonPath("$.resourcepolicy-search.href",
-                                         is("http://localhost/api/authz/resourcepolicy/search"))
+                                hasJsonPath("$.resourcepolicies-search.href",
+                                         is("http://localhost/api/authz/resourcepolicies/search"))
                         )));
     }
 
@@ -2573,5 +2632,25 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.page.number", is(3)))
                 .andExpect(jsonPath("$.page.totalPages", is(4)))
                 .andExpect(jsonPath("$.page.totalElements", is(4)));
+    }
+
+    @Test
+    public void resourcepolicySerchMethodWithSingleModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicy/search"))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void resourcepolicySerchMethodWithPluralModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/search"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._links.eperson.href", Matchers.allOf(
+                                        Matchers.containsString("/api/authz/resourcepolicies/search/eperson"))))
+                             .andExpect(jsonPath("$._links.group.href", Matchers.allOf(
+                                        Matchers.containsString("/api/authz/resourcepolicies/search/group"))))
+                             .andExpect(jsonPath("$._links.resource.href", Matchers.allOf(
+                                        Matchers.containsString("/api/authz/resourcepolicies/search/resource"))));
     }
 }

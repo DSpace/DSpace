@@ -10,7 +10,7 @@
 
     <description>Strategies for determining who receives Request Copy emails.</description>
 
-    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+    <context:annotation-config /> <!-- allows us to use Spring annotations in beans -->
 
     <!-- Select the implementation to be used. -->
     <alias alias='org.dspace.app.requestitem.RequestItemAuthorExtractor'
@@ -18,12 +18,13 @@
 
     <!-- Get recipients from an item metadata field. -->
     <bean class="org.dspace.app.requestitem.RequestItemMetadataStrategy"
-		id="org.dspace.app.requestitem.RequestItemMetadataStrategy">
+          id="org.dspace.app.requestitem.RequestItemMetadataStrategy"
+          autowire-candidate="true">
 	<!-- 
 		Uncomment these properties if you want lookup in metadata the email and
         the name of the author to contact for request copy.
 		If you don't configure that or if the requested item doesn't have these
-        metadata the submitter data are used as fail over.
+        metadata, the submitter data are used as fail over.
 
 		<property name="emailMetadata"
                   value="schema.element.qualifier" />
@@ -34,7 +35,7 @@
 
     <!-- HelpDesk to instead get RequestItem emails-->
     <bean class="org.dspace.app.requestitem.RequestItemHelpdeskStrategy"
-        id="org.dspace.app.requestitem.RequestItemHelpdeskStrategy"/>
+          id="org.dspace.app.requestitem.RequestItemHelpdeskStrategy"/>
 
     <!-- List a Collection's administrators. -->
     <bean class='org.dspace.app.requestitem.CollectionAdministratorsRequestItemStrategy'

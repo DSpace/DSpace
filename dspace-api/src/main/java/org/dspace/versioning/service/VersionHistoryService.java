@@ -67,4 +67,16 @@ public interface VersionHistoryService extends DSpaceCRUDService<VersionHistory>
 
     public void remove(VersionHistory versionHistory, Version version);
 
+    /**
+     * This method has a scope to verify if the logged user has permission
+     * to see the attribute 'draftVersion' of the latest version.
+     * 
+     * @param context             DSpace context object
+     * @param versionHistory      Version history object
+     * @return                    return true if the logged user has permission to see
+     *                            the attribute 'draftVersion' of the latest version, otherwise false
+     * @throws SQLException       If database error
+     */
+    public boolean canSeeDraftVersion(Context context, VersionHistory versionHistory) throws SQLException;
+
 }

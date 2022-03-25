@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.matcher;
 
+import static com.google.common.net.UrlEscapers.urlPathSegmentEscaper;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
@@ -24,7 +25,38 @@ public class FacetValueMatcher {
             hasJsonPath("$.label", is(label)),
             hasJsonPath("$.type", is("discover")),
             hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
-            hasJsonPath("$._links.search.href", containsString("f.author=" + label + ",equals"))
+            hasJsonPath("$._links.search.href", containsString(
+                    "f.author=" + urlPathSegmentEscaper().escape(label) + ",equals"
+            ))
+        );
+    }
+
+    public static Matcher<? super Object> entryAuthorWithAuthority(String label, String authority, int count) {
+        return allOf(
+            hasJsonPath("$.authorityKey", is(authority)),
+            hasJsonPath("$.count", is(count)),
+            hasJsonPath("$.label", is(label)),
+            hasJsonPath("$.type", is("discover")),
+            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("f.author=" + authority + ",authority"))
+        );
+    }
+
+    public static Matcher<? super Object> entrySubject(String label, int count) {
+        return allOf(
+            hasJsonPath("$.label", is(label)),
+            hasJsonPath("$.type", is("discover")),
+            hasJsonPath("$.count", is(count)),
+            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("f.subject=" + label + ",equals"))
+        );
+    }
+
+
+    public static Matcher<? super Object> entrySubject(String label, String authority, int count) {
+        return allOf(
+            hasJsonPath("$.authorityKey", is(authority)),
+            entrySubject(label, count)
         );
     }
 

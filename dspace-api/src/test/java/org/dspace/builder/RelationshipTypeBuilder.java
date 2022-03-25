@@ -8,12 +8,11 @@
 package org.dspace.builder;
 
 import java.sql.SQLException;
-import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
-import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
@@ -22,7 +21,7 @@ import org.dspace.discovery.SearchServiceException;
 public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, RelationshipTypeService> {
 
     /* Log4j logger*/
-    private static final Logger log = Logger.getLogger(RelationshipTypeBuilder.class);
+    private static final Logger log = LogManager.getLogger();
 
     private RelationshipType relationshipType;
 
@@ -38,14 +37,10 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
+            c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             relationshipType = c.reloadEntity(relationshipType);
-            List<Relationship> byRelationshipType = relationshipService
-                .findByRelationshipType(c, relationshipType);
-            for (Relationship relationship : byRelationshipType) {
-                relationshipService.delete(c, relationship);
-            }
             if (relationshipType != null) {
                 delete(c, relationshipType);
             }

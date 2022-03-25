@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-api</artifactId>
@@ -12,7 +14,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.0-beta5-SNAPSHOT</version>
+        <version>7.3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -170,6 +172,29 @@
                 </configuration>
             </plugin>
 
+            <!-- Used to create/generate 'org.dspace.workflow' classes from our workflow-curation.xsd via JAXB -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>2.5.0</version>
+                <executions>
+                    <execution>
+                        <id>workflow-curation</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/resources/org/dspace/workflow</source>
+                            </sources>
+                            <packageName>org.dspace.workflow</packageName>
+                            <addGeneratedAnnotation>true</addGeneratedAnnotation>
+                            <noPackageLevelAnnotations>true</noPackageLevelAnnotations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
@@ -313,15 +338,28 @@
     <dependencies>
 
         <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-ehcache</artifactId>
-            <exclusions>
-                <!-- Newer version pulled in via Jersey below -->
-                <exclusion>
-                    <groupId>org.javassist</groupId>
-                    <artifactId>javassist</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>hibernate-core</artifactId>
+                <exclusions>
+                    <!-- Newer version pulled in via Jersey below -->
+                    <exclusion>
+                        <groupId>org.javassist</groupId>
+                        <artifactId>javassist</artifactId>
+                    </exclusion>
+                </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jcache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${ehcache.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -413,6 +451,12 @@
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
             <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -452,13 +496,17 @@
             <artifactId>commons-validator</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>
@@ -523,7 +571,7 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
+            <artifactId>mockito-inline</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -538,19 +586,21 @@
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>gr.ekt.bte</groupId>
-            <artifactId>bte-io</artifactId>
-            <version>0.9.3.5</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.bytebuddy</groupId>
-                    <artifactId>byte-buddy</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.jbibtex</groupId>
+            <artifactId>jbibtex</artifactId>
+            <version>1.0.10</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
         </dependency>
 
         <dependency>
@@ -632,7 +682,7 @@
         <!-- Used for full-text indexing with Solr -->
         <dependency>
             <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
+            <artifactId>tika-parsers</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -709,7 +759,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>6.5.5</version>
+            <version>6.5.7</version>
         </dependency>
 
         <!-- Google Analytics -->
@@ -821,7 +871,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.10.50</version>
+            <version>1.12.116</version>
         </dependency>
 
         <dependency>
@@ -845,6 +895,10 @@
                     <groupId>org.javassist</groupId>
                     <artifactId>javassist</artifactId>
                 </exclusion>
+                <exclusion>
+                	<groupId>io.swagger</groupId>
+                	<artifactId>swagger-jersey-jaxrs</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -852,6 +906,14 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20180130</version>
+        </dependency>
+
+        <!-- Useful for testing command-line tools -->
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <version>1.19.0</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Used for Solr core export/import -->
@@ -865,14 +927,11 @@
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
-            <version>2.0</version>
-            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
-            <version>2.6.3</version>
             <scope>test</scope>
         </dependency>
 
@@ -882,6 +941,95 @@
             <version>6.4.0</version>
         </dependency>
 
+        <!-- required for openaire api integration -->
+        <dependency>
+            <groupId>eu.openaire</groupId>
+            <artifactId>funders-model</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <version>1.19.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mock-server</groupId>
+            <artifactId>mockserver-junit-rule</artifactId>
+            <version>5.11.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+          <!-- for mockserver -->
+          <!-- Solve dependency convergence issues related to
+               'mockserver-junit-rule' by selecting the versions we want to use. -->
+          <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.9</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-engine-core</artifactId>
+            <version>2.3</version>
+          </dependency>
+          <dependency>
+              <groupId>org.xmlunit</groupId>
+              <artifactId>xmlunit-core</artifactId>
+              <version>2.8.0</version>
+              <scope>test</scope>
+          </dependency>
+          <dependency>
+            <groupId>com.github.java-json-tools</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>2.2.14</version>
+          </dependency>
+          <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>2.3.3</version>
+          </dependency>
+          <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>2.0.1.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-core</artifactId>
+            <version>1.6.2</version>
+          </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

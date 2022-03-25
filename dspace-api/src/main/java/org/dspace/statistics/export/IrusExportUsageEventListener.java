@@ -9,11 +9,11 @@ package org.dspace.statistics.export;
 
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.model.Event;
 import org.dspace.statistics.export.processor.BitstreamEventProcessor;
@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class IrusExportUsageEventListener extends AbstractUsageEventListener {
     /*  Log4j logger*/
-    private static Logger log = Logger.getLogger(IrusExportUsageEventListener.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired
     ConfigurationService configurationService;
@@ -37,6 +37,7 @@ public class IrusExportUsageEventListener extends AbstractUsageEventListener {
      *
      * @param event includes all the information related to the event that occurred
      */
+    @Override
     public void receiveEvent(Event event) {
         if (configurationService.getBooleanProperty("irus.statistics.tracker.enabled", false)) {
             if (event instanceof UsageEvent) {
@@ -65,7 +66,7 @@ public class IrusExportUsageEventListener extends AbstractUsageEventListener {
                     } catch (Exception e1) {
                         type = -1;
                     }
-                    log.error(LogManager.getHeader(ue.getContext(), "Error while processing export of use event",
+                    log.error(LogHelper.getHeader(ue.getContext(), "Error while processing export of use event",
                                                    "Id: " + id + " type: " + type), e);
                 }
             }

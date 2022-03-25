@@ -110,10 +110,10 @@ public class RelationshipServiceImplTest {
         relationshipTest.add(getRelationship(cindy, hank, hasFather,0,0));
         relationshipTest.add(getRelationship(fred, cindy, hasMother,0,0));
         relationshipTest.add(getRelationship(bob, cindy, hasMother,1,0));
-        when(relationshipService.findByItem(context, cindy, -1, -1)).thenReturn(relationshipTest);
+        when(relationshipService.findByItem(context, cindy, -1, -1, false)).thenReturn(relationshipTest);
 
         // Mock the state of objects utilized in findByItem() to meet the success criteria of the invocation
-        when(relationshipDAO.findByItem(context, cindy, -1, -1)).thenReturn(relationshipTest);
+        when(relationshipDAO.findByItem(context, cindy, -1, -1, false)).thenReturn(relationshipTest);
 
         List<Relationship> results = relationshipService.findByItem(context, cindy);
         assertEquals("TestFindByItem 0", relationshipTest, results);
@@ -227,8 +227,8 @@ public class RelationshipServiceImplTest {
         when(metsList.get(0).getValue()).thenReturn("Entitylabel");
         when(relationshipService
                 .findByItemAndRelationshipType(context, leftItem, testRel, true)).thenReturn(leftTypelist);
-        when(itemService.getMetadata(leftItem, "relationship", "type", null, Item.ANY, false)).thenReturn(metsList);
-        when(itemService.getMetadata(rightItem, "relationship", "type", null, Item.ANY, false)).thenReturn(metsList);
+        when(itemService.getMetadata(leftItem, "dspace", "entity", "type", Item.ANY, false)).thenReturn(metsList);
+        when(itemService.getMetadata(rightItem, "dspace", "entity", "type", Item.ANY, false)).thenReturn(metsList);
         when(relationshipDAO.create(any(), any())).thenReturn(relationship);
 
         // The reported Relationship should match our defined relationship
@@ -305,8 +305,8 @@ public class RelationshipServiceImplTest {
         relationship = getRelationship(leftItem, rightItem, testRel, 0,0);
 
         // Mock the state of objects utilized in update() to meet the success criteria of the invocation
-        when(itemService.getMetadata(leftItem, "relationship", "type", null, Item.ANY, false)).thenReturn(metsList);
-        when(itemService.getMetadata(rightItem, "relationship", "type", null, Item.ANY, false)).thenReturn(metsList);
+        when(itemService.getMetadata(leftItem, "dspace", "entity", "type", Item.ANY, false)).thenReturn(metsList);
+        when(itemService.getMetadata(rightItem, "dspace", "entity", "type", Item.ANY, false)).thenReturn(metsList);
         when(authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(),
                 Constants.WRITE)).thenReturn(true);
 

@@ -101,7 +101,8 @@ public class BitstreamMatcher {
     public static Matcher<? super Object> matchFullEmbeds() {
         return matchEmbeds(
                 "bundle",
-                "format"
+                "format",
+                "thumbnail"
         );
     }
 
@@ -113,7 +114,8 @@ public class BitstreamMatcher {
                 "bundle",
                 "content",
                 "format",
-                "self"
+                "self",
+                "thumbnail"
         );
     }
 

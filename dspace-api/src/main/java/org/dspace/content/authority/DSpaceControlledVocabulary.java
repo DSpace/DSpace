@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -29,7 +30,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 /**
- * ChoiceAuthority source that reads the JSPUI-style hierarchical vocabularies
+ * ChoiceAuthority source that reads the hierarchical vocabularies
  * from {@code ${dspace.dir}/config/controlled-vocabularies/*.xml} and turns
  * them into autocompleting authorities.
  *
@@ -315,6 +316,9 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     private String getNodeLabel(String key, boolean useHierarchy) {
         try {
             Node node = getNode(key);
+            if (Objects.isNull(node)) {
+                return null;
+            }
             if (useHierarchy) {
                 return this.buildString(node);
             } else {

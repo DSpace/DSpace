@@ -8,6 +8,7 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils;
 import org.dspace.content.Bitstream;
@@ -18,7 +19,6 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -40,8 +40,8 @@ public class BitstreamMetadataValueRemovePatchOperation extends MetadataValueRem
     BitstreamMetadataValuePathUtils bitstreamMetadataValuePathUtils;
 
     @Override
-    void remove(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-        throws Exception {
+    void remove(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
+            Object value) throws Exception {
         //"path": "/sections/upload/files/0/metadata/dc.title/2"
         //"abspath": "/files/0/metadata/dc.title/2"
         String absolutePath = getAbsolutePath(path);

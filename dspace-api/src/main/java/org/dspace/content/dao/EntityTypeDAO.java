@@ -8,6 +8,7 @@
 package org.dspace.content.dao;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.content.EntityType;
 import org.dspace.core.Context;
@@ -31,5 +32,26 @@ public interface EntityTypeDAO extends GenericDAO<EntityType> {
      * @throws SQLException If something goes wrong
      */
     public EntityType findByEntityType(Context context, String entityType) throws SQLException;
+
+    /**
+     * 
+     * @param context        DSpace context object
+     * @param names          List of Entity type names that you want to retrieve
+     * @param limit          paging limit
+     * @param offset         the position of the first result to return
+     * @return
+     * @throws SQLException  if database error
+     */
+    public List<EntityType> getEntityTypesByNames(Context context, List<String> names, Integer limit, Integer offset)
+           throws SQLException;
+
+    /**
+     * 
+     * @param context          DSpace context object
+     * @param names            List of Entity type names that you want to retrieve
+     * @return
+     * @throws SQLException    If database error
+     */
+    public int countEntityTypesByNames(Context context, List<String> names) throws SQLException;
 
 }

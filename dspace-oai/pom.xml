@@ -8,7 +8,7 @@
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.0-beta5-SNAPSHOT</version>
+        <version>7.3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -194,6 +194,10 @@
             <artifactId>log4j-slf4j-impl</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-1.2-api</artifactId>
+        </dependency>
 
         <!-- Testing -->
         <dependency>
@@ -210,7 +214,7 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
+            <artifactId>mockito-inline</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

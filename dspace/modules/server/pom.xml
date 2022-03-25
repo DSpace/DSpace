@@ -13,7 +13,7 @@ just adding new jar in the classloader</description>
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.0-beta5-SNAPSHOT</version>
+        <version>7.3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -321,15 +321,8 @@ just adding new jar in the classloader</description>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
+            <artifactId>mockito-inline</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <!-- Newer version is pulled in by hibernate-ehcache -->
-                <exclusion>
-                    <groupId>net.bytebuddy</groupId>
-                    <artifactId>byte-buddy</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>

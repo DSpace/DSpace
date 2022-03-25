@@ -77,4 +77,25 @@ public interface ExternalDataService {
     WorkspaceItem createWorkspaceItemFromExternalDataObject(Context context, ExternalDataObject externalDataObject,
                                                             Collection collection)
         throws AuthorizeException, SQLException;
+
+    /**
+     * Return the ExternalDataProvider that supports a specific entity type
+     * 
+     * @param entityType
+     * @return list of ExternalDataProviders that supports a specific entity type
+     */
+    public List<ExternalDataProvider> getExternalDataProvidersForEntityType(String entityType);
+
+    /**
+     * Override this method to limit the external data provider to specific entity
+     * types (Publication, OrgUnit, etc.)
+     * 
+     * @param entityType the entity type to check
+     * @return true if the external provider can be used to search for items of the
+     *         specified type
+     */
+    public default boolean supportsEntityType(String entityType) {
+        return true;
+    }
+
 }

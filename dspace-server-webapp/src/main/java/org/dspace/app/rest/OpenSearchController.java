@@ -21,9 +21,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.OpenSearchService;
@@ -33,7 +32,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
@@ -59,7 +58,7 @@ import org.w3c.dom.Document;
 @RequestMapping("/opensearch")
 public class OpenSearchController {
 
-    private static final Logger log = Logger.getLogger(ScopeResolver.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
     private static final String errorpath = "/error";
     private List<String> searchIndices = null;
 
@@ -126,8 +125,7 @@ public class OpenSearchController {
                 qResults = SearchUtils.getSearchService().search(context,
                     container, queryArgs);
             } catch (SearchServiceException e) {
-                log.error(
-                    LogManager.getHeader(context, "opensearch", "query="
+                log.error(LogHelper.getHeader(context, "opensearch", "query="
                             + queryArgs.getQuery()
                             + ",error=" + e.getMessage()), e);
                 throw new RuntimeException(e.getMessage(), e);

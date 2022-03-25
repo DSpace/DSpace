@@ -11,7 +11,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -44,6 +47,7 @@ import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
@@ -89,6 +93,8 @@ public abstract class AbstractBuilder<T, S> {
     static RelationshipTypeService relationshipTypeService;
     static EntityTypeService entityTypeService;
     static ProcessService processService;
+    static RequestItemService requestItemService;
+    static VersioningService versioningService;
 
     protected Context context;
 
@@ -101,7 +107,7 @@ public abstract class AbstractBuilder<T, S> {
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractDSpaceObjectBuilder.class);
+    private static final Logger log = LogManager.getLogger();
 
     protected AbstractBuilder(Context context) {
         this.context = context;
@@ -136,6 +142,9 @@ public abstract class AbstractBuilder<T, S> {
         relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
         entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
         processService = ScriptServiceFactory.getInstance().getProcessService();
+        requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
+        versioningService = DSpaceServicesFactory.getInstance().getServiceManager()
+                                 .getServiceByName(VersioningService.class.getName(), VersioningService.class);
 
         // Temporarily disabled
         claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
@@ -172,6 +181,8 @@ public abstract class AbstractBuilder<T, S> {
         relationshipTypeService = null;
         entityTypeService = null;
         processService = null;
+        requestItemService = null;
+        versioningService = null;
 
     }
 
@@ -208,12 +219,32 @@ public abstract class AbstractBuilder<T, S> {
      */
     public abstract void cleanup() throws Exception;
 
+    /**
+     * Create the object from the values that have been set on this builder.
+     * @return the initialized object.
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     */
     public abstract T build() throws SQLException, AuthorizeException;
 
+    /**
+     * Remove the object from the persistence store.
+     *
+     * @param c current DSpace session.
+     * @param dso the object to be removed.
+     * @throws Exception passed through.
+     */
     public abstract void delete(Context c, T dso) throws Exception;
 
     protected abstract S getService();
 
+    /**
+     * Log an exception.
+     *
+     * @param <B> type of Builder which caught the exception.
+     * @param e exception to be handled.
+     * @return {@code null} always.
+     */
     protected <B> B handleException(final Exception e) {
         log.error(e.getMessage(), e);
         return null;

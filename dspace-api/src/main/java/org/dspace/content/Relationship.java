@@ -164,6 +164,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      */
     public void setLeftPlace(int leftPlace) {
         this.leftPlace = leftPlace;
+        leftItem.setMetadataModified();
     }
 
     /**
@@ -180,6 +181,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      */
     public void setRightPlace(int rightPlace) {
         this.rightPlace = rightPlace;
+        rightItem.setMetadataModified();
     }
 
     /**
@@ -218,6 +220,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      * Standard getter for the ID for this Relationship
      * @return  The ID of this relationship
      */
+    @Override
     public Integer getID() {
         return id;
     }

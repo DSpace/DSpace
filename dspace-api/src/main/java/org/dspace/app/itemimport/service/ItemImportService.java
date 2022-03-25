@@ -105,7 +105,7 @@ public interface ItemImportService {
                                 String inputType, Context context, boolean template) throws Exception;
 
     /**
-     * Since the BTE batch import is done in a new thread we are unable to communicate
+     * If a batch import is done in a new thread we are unable to communicate
      * with calling method about success or failure. We accomplish this
      * communication with email instead. Send a success email once the batch
      * import is complete
@@ -119,7 +119,7 @@ public interface ItemImportService {
                                     String fileName) throws MessagingException;
 
     /**
-     * Since the BTE batch import is done in a new thread we are unable to communicate
+     * If a batch import is done in a new thread we are unable to communicate
      * with calling method about success or failure. We accomplis this
      * communication with email instead. Send an error email if the batch
      * import fails
@@ -182,21 +182,6 @@ public interface ItemImportService {
      * @throws Exception if error
      */
     public void deleteItems(Context c, String mapfile) throws Exception;
-
-    /**
-     * Add items
-     *
-     * @param c             DSpace Context
-     * @param mycollections List of Collections
-     * @param sourcedir     source directory
-     * @param mapfile       map file
-     * @param template      whether to use template item
-     * @param bteInputType  The input type of the data (bibtex, csv, etc.), in case of local file
-     * @param workingDir    working directory
-     * @throws Exception if error
-     */
-    public void addBTEItems(Context c, List<Collection> mycollections, String sourcedir, String mapfile,
-                            boolean template, String bteInputType, String workingDir) throws Exception;
 
     /**
      * Get temporary work directory
