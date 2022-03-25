@@ -65,7 +65,6 @@ public class HealthIndicatorsIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.components", allOf(
                 matchDatabase(Status.UP),
                 match("solrSearchCore", Status.UP, Map.of("status", 0, "detectedPathType", "root")),
-                match("solrOaiCore", Status.UP, Map.of("status", 0, "detectedPathType", "particular core")),
                 match("solrStatisticsCore", Status.UP, Map.of("status", 0, "detectedPathType", "root")),
                 match("geoIp", UP_WITH_ISSUES_STATUS,
                     Map.of("reason", "The required 'dbfile' configuration is missing in solr-statistics.cfg!"))
