@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -34,8 +36,6 @@ import org.dspace.identifier.ezid.EZIDResponse;
 import org.dspace.identifier.ezid.Transform;
 import org.dspace.identifier.factory.IdentifierServiceFactory;
 import org.dspace.identifier.service.DOIService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -85,7 +85,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class EZIDIdentifierProvider
     extends IdentifierProvider {
-    private static final Logger log = LoggerFactory.getLogger(EZIDIdentifierProvider.class);
+    private static final Logger log = LogManager.getLogger();
 
     // Configuration property names
     public static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
@@ -272,11 +272,10 @@ public class EZIDIdentifierProvider
         // Good response?
         if (HttpURLConnection.HTTP_CREATED != response.getHttpStatusCode()) {
             log.error("EZID server responded:  {} {}: {}",
-                      new String[] {
-                          String.valueOf(response.getHttpStatusCode()),
-                          response.getHttpReasonPhrase(),
-                          response.getEZIDStatusValue()
-                      });
+                    String.valueOf(response.getHttpStatusCode()),
+                    response.getHttpReasonPhrase(),
+                    response.getEZIDStatusValue()
+            );
             throw new IdentifierException("DOI not created:  "
                                               + response.getHttpReasonPhrase()
                                               + ":  "
@@ -564,12 +563,11 @@ public class EZIDIdentifierProvider
                             mappedValue = xfrm.transform(value.getValue());
                         } catch (Exception ex) {
                             log.error("Unable to transform '{}' from {} to {}:  {}",
-                                      new String[] {
-                                          value.getValue(),
-                                          value.toString(),
-                                          key,
-                                          ex.getMessage()
-                                      });
+                                    value.getValue(),
+                                    value.toString(),
+                                    key,
+                                    ex.getMessage()
+                            );
                             continue;
                         }
                     } else {
