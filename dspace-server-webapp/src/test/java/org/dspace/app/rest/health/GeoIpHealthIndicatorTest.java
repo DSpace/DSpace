@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import java.util.Map;
 
 import com.maxmind.geoip2.DatabaseReader;
+import org.dspace.app.rest.configuration.ActuatorConfiguration;
 import org.dspace.statistics.GeoIpService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,7 +59,7 @@ public class GeoIpHealthIndicatorTest {
 
         Health health = geoIpHealthIndicator.health();
 
-        assertThat(health.getStatus(), is(Status.OUT_OF_SERVICE));
+        assertThat(health.getStatus(), is(ActuatorConfiguration.UP_WITH_ISSUES_STATUS));
         assertThat(health.getDetails(), is(Map.of("reason", "Missing db file")));
     }
 
