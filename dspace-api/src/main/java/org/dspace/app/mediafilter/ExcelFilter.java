@@ -12,8 +12,8 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.Logger;
-import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
+import org.apache.poi.extractor.POITextExtractor;
 import org.apache.poi.hssf.extractor.ExcelExtractor;
 import org.apache.poi.xssf.extractor.XSSFExcelExtractor;
 import org.dspace.content.Item;

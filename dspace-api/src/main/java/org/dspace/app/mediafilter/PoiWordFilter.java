@@ -12,10 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.xmlbeans.XmlException;
+import org.apache.poi.extractor.POITextExtractor;
 import org.dspace.content.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +53,7 @@ public class PoiWordFilter
             // get input stream from bitstream, pass to filter, get string back
             POITextExtractor extractor = ExtractorFactory.createExtractor(source);
             text = extractor.getText();
-        } catch (IOException | OpenXML4JException | XmlException e) {
+        } catch (IOException e) {
             System.err.format("Invalid File Format:  %s%n", e.getMessage());
             LOG.error("Unable to parse the bitstream:  ", e);
             throw e;

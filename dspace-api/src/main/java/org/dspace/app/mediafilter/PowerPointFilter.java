@@ -11,10 +11,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.apache.logging.log4j.Logger;
-import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
-import org.apache.poi.hslf.extractor.PowerPointExtractor;
-import org.apache.poi.xslf.extractor.XSLFPowerPointExtractor;
+import org.apache.poi.extractor.POITextExtractor;
+import org.apache.poi.sl.extractor.SlideShowExtractor;
+import org.apache.poi.xslf.extractor.XSLFExtractor;
 import org.dspace.content.Item;
 
 /*
@@ -70,7 +70,6 @@ public class PowerPointFilter extends MediaFilter {
         try {
 
             String extractedText = null;
-            new ExtractorFactory();
             POITextExtractor pptExtractor = ExtractorFactory
                 .createExtractor(source);
 
@@ -78,17 +77,16 @@ public class PowerPointFilter extends MediaFilter {
             // require different classes and APIs for text extraction
 
             // If this is a PowerPoint XML file, extract accordingly
-            if (pptExtractor instanceof XSLFPowerPointExtractor) {
-
-                // The true method arguments indicate that text from
-                // the slides and the notes is desired
-                extractedText = ((XSLFPowerPointExtractor) pptExtractor)
-                    .getText(true, true);
-            } else if (pptExtractor instanceof PowerPointExtractor) { // Legacy PowerPoint files
-
-                extractedText = ((PowerPointExtractor) pptExtractor).getText()
-                    + " " + ((PowerPointExtractor) pptExtractor).getNotes();
-
+            if (pptExtractor instanceof XSLFExtractor) {
+                // Extract text from both slides and notes
+                ((XSLFExtractor) pptExtractor).setNotesByDefault(true);
+                ((XSLFExtractor) pptExtractor).setSlidesByDefault(true);
+                extractedText = ((XSLFExtractor) pptExtractor).getText();
+            } else if (pptExtractor instanceof SlideShowExtractor) { // Legacy PowerPoint files
+                // Extract text from both slides and notes
+                ((SlideShowExtractor) pptExtractor).setNotesByDefault(true);
+                ((SlideShowExtractor) pptExtractor).setSlidesByDefault(true);
+                extractedText = ((SlideShowExtractor) pptExtractor).getText();
             }
             if (extractedText != null) {
                 // if verbose flag is set, print out extracted text

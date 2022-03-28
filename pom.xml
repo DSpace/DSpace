@@ -39,7 +39,7 @@
         <jetty.version>9.4.41.v20210516</jetty.version>
         <log4j.version>2.17.1</log4j.version>
         <pdfbox-version>2.0.24</pdfbox-version>
-        <poi-version>3.17</poi-version>
+        <poi-version>5.2.2</poi-version>
         <rome.version>1.18.0</rome.version>
         <slf4j.version>1.7.25</slf4j.version>
 
@@ -1611,25 +1611,11 @@
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi-version}</version>
-                <exclusions>
-                    <!-- Newer version brought in by solr-cell -->
-                    <exclusion>
-                        <groupId>com.github.virtuald</groupId>
-                        <artifactId>curvesapi</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml-schemas</artifactId>
+                <artifactId>poi-ooxml-full</artifactId>
                 <version>${poi-version}</version>
-                <exclusions>
-                    <!-- Newer version pulled in below -->
-                    <exclusion>
-                        <groupId>org.apache.xmlbeans</groupId>
-                        <artifactId>xmlbeans</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.xmlbeans</groupId>
