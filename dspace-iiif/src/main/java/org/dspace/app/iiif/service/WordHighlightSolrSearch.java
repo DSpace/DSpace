@@ -131,7 +131,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
         int len = s.length();
         for (int i = 0; i < len; i = s.offsetByCodePoints(i, 1)) {
             int c = s.codePointAt(i);
-            if (c < 32 || c > 126 || c == '&' || c == '<' || c == '>') {
+            if (c < 32 || c > 126) {
                 formatter.format("&#%d;", c);
             } else {
                 formatter.format("%c", c);
@@ -159,12 +159,14 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
         String absoluteHighlights = configurationService.getProperty("iiif.search.absoluteHighlights");
         String contextSize = configurationService.getProperty("iiif.search.contextSize");
         String trackPages = configurationService.getProperty("iiif.search.trackPages");
+        String rows = configurationService.getProperty("iiif.search.rows");
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.set("q", "ocr_text:\"" + query + "\" AND manifest_url:\"" + manifestId + "\"");
         solrQuery.set(CommonParams.WT, "json");
-        solrQuery.set("fl", "manifest_url");
+        solrQuery.set("fl", "id");
         solrQuery.set("hl", "true");
         solrQuery.set("hl.ocr.fl", "ocr_text");
+        solrQuery.set("rows", rows);
         solrQuery.set("hl.ocr.contextBlock", contextBlock);
         solrQuery.set("hl.ocr.contextSize", contextSize);
         solrQuery.set("hl.snippets", snippetCount);
