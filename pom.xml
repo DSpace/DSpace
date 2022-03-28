@@ -39,7 +39,6 @@
         <jetty.version>9.4.44.v20210927</jetty.version>
         <log4j.version>2.17.1</log4j.version>
         <pdfbox-version>2.0.24</pdfbox-version>
-        <poi-version>5.2.2</poi-version>
         <rome.version>1.18.0</rome.version>
         <slf4j.version>1.7.25</slf4j.version>
         <tika.version>2.3.0</tika.version>
@@ -1551,26 +1550,6 @@
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>fontbox</artifactId>
                 <version>${pdfbox-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi</artifactId>
-                <version>${poi-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-scratchpad</artifactId>
-                <version>${poi-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-                <version>${poi-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml-full</artifactId>
-                <version>${poi-version}</version>
             </dependency>
             <dependency>
                 <groupId>xalan</groupId>
