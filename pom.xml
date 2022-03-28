@@ -36,12 +36,15 @@
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
         <jcache-version>1.1.0</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
-        <jetty.version>9.4.41.v20210516</jetty.version>
+        <jetty.version>9.4.44.v20210927</jetty.version>
         <log4j.version>2.17.1</log4j.version>
         <pdfbox-version>2.0.24</pdfbox-version>
         <poi-version>5.2.2</poi-version>
         <rome.version>1.18.0</rome.version>
         <slf4j.version>1.7.25</slf4j.version>
+        <tika.version>2.3.0</tika.version>
+        <!-- Sync with whatever version Tika uses -->
+        <bouncycastle.version>1.70</bouncycastle.version>
 
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
         <!-- Spring Data REST HAL Browser (used by Server webapp) -->
@@ -1115,28 +1118,6 @@
                 </exclusions>
             </dependency>
 
-            <!-- Solr introduces multiple versions of zookeeper. So,
-                 we specify the version we want -->
-            <dependency>
-                <groupId>org.apache.zookeeper</groupId>
-                <artifactId>zookeeper</artifactId>
-                <version>3.4.14</version>
-            </dependency>
-
-            <!-- solr-cell and axiom-api (in dspace-swordv2) disagree on versions -->
-            <dependency>
-                <groupId>org.apache.james</groupId>
-                <artifactId>apache-mime4j-core</artifactId>
-                <version>0.8.3</version>
-            </dependency>
-
-            <!-- solr-core, solr-cell disagree with nimbus-jose-jwt -->
-            <dependency>
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm</artifactId>
-                <version>8.0.1</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
@@ -1293,7 +1274,7 @@
 
             <dependency>
                 <groupId>org.apache.solr</groupId>
-                <artifactId>solr-cell</artifactId>
+                <artifactId>solr-solrj</artifactId>
                 <version>${solr.client.version}</version>
             </dependency>
             <dependency>
@@ -1301,69 +1282,43 @@
                 <artifactId>lucene-core</artifactId>
                 <version>${solr.client.version}</version>
             </dependency>
-            <!-- Used for full-text indexing with Solr. Should be synced with version of Tika in solr-cell -->
+
+            <!-- Tika is used to extract full text from documents in order to index in Solr -->
             <dependency>
                 <groupId>org.apache.tika</groupId>
-                <artifactId>tika-parsers</artifactId>
-                <version>1.27</version>
-                <!-- Exclude a few tika-parsers dependencies that we already use, with slightly different versions -->
-                <exclusions>
-                    <!-- Use versions provided by Solr -->
-                    <exclusion>
-                        <groupId>com.rometools</groupId>
-                        <artifactId>rome</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.tukaani</groupId>
-                        <artifactId>xz</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.google.protobuf</groupId>
-                        <artifactId>protobuf-java</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.healthmarketscience.jackcess</groupId>
-                        <artifactId>jackcess</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.healthmarketscience.jackcess</groupId>
-                        <artifactId>jackcess-encrypt</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.fasterxml.woodstox</groupId>
-                        <artifactId>woodstox-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.james</groupId>
-                        <artifactId>apache-mime4j-dom</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.commons</groupId>
-                        <artifactId>commons-compress</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.tallison</groupId>
-                        <artifactId>isoparser</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.tallison</groupId>
-                        <artifactId>metadata-extractor</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.epam</groupId>
-                        <artifactId>parso</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jvnet.staxex</groupId>
-                        <artifactId>stax-ex</artifactId>
-                    </exclusion>
-                    <!-- Use version provided by Jersey -->
-                    <exclusion>
-                        <groupId>com.sun.activation</groupId>
-                        <artifactId>jakarta.activation</artifactId>
-                    </exclusion>
-                </exclusions>
+                <artifactId>tika-core</artifactId>
+                <version>${tika.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-parsers-standard-package</artifactId>
+                <version>${tika.version}</version>
+            </dependency>
+            <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk15on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <!-- Tika and axiom-api (in dspace-swordv2) disagree on versions -->
+            <dependency>
+                <groupId>org.apache.james</groupId>
+                <artifactId>apache-mime4j-core</artifactId>
+                <version>0.8.4</version>
+            </dependency>
+            <!-- Tika and solr-core disagree on versions of ASM -->
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>8.0.1</version>
+            </dependency>
+
             <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
              otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
             <dependency>
@@ -1401,7 +1356,7 @@
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
-                    <!-- Newer version brought in by solr-cell -->
+                    <!-- Newer version brought in by Tika -->
                     <exclusion>
                         <groupId>org.apache.commons</groupId>
                         <artifactId>commons-csv</artifactId>
