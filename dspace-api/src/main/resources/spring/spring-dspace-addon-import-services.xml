@@ -115,10 +115,18 @@
           </property>
     </bean>
 
-
-    <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
-    <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.other"/>
+    <bean id="openaireImportServiceByAuthor"
+          class="org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="openairePublicationMetadataFieldMapping"/>
+        <property name="queryParam" value="author"/>
+    </bean>
+    <bean id="openaireImportServiceByTitle"
+          class="org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="openairePublicationMetadataFieldMapping"/>
+        <property name="queryParam" value="title"/>
+    </bean>
+    <bean id="openairePublicationMetadataFieldMapping"
+          class="org.dspace.importer.external.openaire.metadatamapping.OpenAIREPublicationFieldMapping">
     </bean>
 
 </beans>

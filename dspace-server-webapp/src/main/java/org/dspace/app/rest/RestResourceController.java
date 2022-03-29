@@ -1067,6 +1067,13 @@ public class RestResourceController implements InitializingBean {
         return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
     }
 
+    @RequestMapping(method = RequestMethod.DELETE, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG)
+    public ResponseEntity<RepresentationModel<?>> delete(HttpServletRequest request, @PathVariable String apiCategory,
+                                                         @PathVariable String model, @PathVariable String id)
+        throws HttpRequestMethodNotSupportedException {
+        return deleteInternal(apiCategory, model, id);
+    }
+
     /**
      * Execute a PUT request for an entity with id of type UUID;
      *
