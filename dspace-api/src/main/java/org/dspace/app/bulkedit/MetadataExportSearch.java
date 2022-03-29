@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataDSpaceCsvExportServiceImpl;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -24,6 +25,7 @@ import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.discovery.indexobject.IndexableCollection;
@@ -44,17 +46,15 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     private boolean exportAllItems = true;
     private String query;
 
-    private SearchService searchService =
-        new DSpace().getServiceManager().getServicesByType(SearchService.class).get(0);
-    private MetadataDSpaceCsvExportService metadataDSpaceCsvExportService = new DSpace().getServiceManager()
-        .getServicesByType(MetadataDSpaceCsvExportService.class).get(0);
+    private SearchService searchService = SearchUtils.getSearchService();
+    private MetadataDSpaceCsvExportService metadataDSpaceCsvExportService =
+        new DSpace().getServiceManager().getServiceByName(
+            MetadataDSpaceCsvExportServiceImpl.class.getCanonicalName(), MetadataDSpaceCsvExportService.class);
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    private DiscoveryConfigurationService discoveryConfigurationService =
-        new DSpace().getServiceManager().getServicesByType(DiscoveryConfigurationService.class).get(0);
+    private DiscoveryConfigurationService discoveryConfigurationService = SearchUtils.getConfigurationService();
     private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    private DiscoverQueryBuilder queryBuilder =
-        new DSpace().getServiceManager().getServicesByType(DiscoverQueryBuilder.class).get(0);
+    private DiscoverQueryBuilder queryBuilder = SearchUtils.getQueryBuilder();
 
     @Override
     public MetadataExportSearchScriptConfiguration getScriptConfiguration() {
@@ -98,7 +98,6 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
 
         IndexableObject dso = null;
         Context context = new Context();
-        context.turnOffAuthorisationSystem();
         context.setCurrentUser(ePersonService.find(context, this.getEpersonIdentifier()));
 
         if (! exportAllItems) {

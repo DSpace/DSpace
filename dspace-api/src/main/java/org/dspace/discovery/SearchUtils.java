@@ -20,6 +20,7 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.dspace.discovery.utils.DiscoverQueryBuilder;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowItem;
@@ -169,5 +170,11 @@ public class SearchUtils {
     private static void addConfigurationIfExists(Set<DiscoveryConfiguration> result, String confName) {
         DiscoveryConfiguration configurationExtra = getDiscoveryConfigurationByName(confName);
         result.add(configurationExtra);
+    }
+
+    public static DiscoverQueryBuilder getQueryBuilder() {
+        ServiceManager manager = DSpaceServicesFactory.getInstance().getServiceManager();
+        return manager
+            .getServiceByName(DiscoverQueryBuilder.class.getName(), DiscoverQueryBuilder.class);
     }
 }

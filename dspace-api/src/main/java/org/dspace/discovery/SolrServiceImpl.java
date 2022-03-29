@@ -772,8 +772,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         @Override
         public Item next() {
+            //paginate getting results from the discoverquery.
             if (relativeCursor == pagesize) {
+                //  get a new page of results when the last element of the previous page has been read
                 int offset = absoluteCursor;
+                // reset the position counter for getting element relativecursor on a page
                 relativeCursor = 0;
                 discoverQuery.setStart(offset);
                 try {
@@ -782,6 +785,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     log.error("error while getting search results", e);
                 }
             }
+            // get the element at position relativecursor on a page
             IndexableObject res = discoverResult.getIndexableObjects().get(relativeCursor);
             relativeCursor++;
             absoluteCursor++;
