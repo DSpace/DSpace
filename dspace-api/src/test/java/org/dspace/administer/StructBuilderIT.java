@@ -8,6 +8,7 @@
 package org.dspace.administer;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,9 +19,10 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -29,13 +31,12 @@ import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.handle.Handle;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -53,7 +54,7 @@ import org.xmlunit.diff.Difference;
  */
 public class StructBuilderIT
         extends AbstractIntegrationTest {
-    private static final Logger log = LoggerFactory.getLogger(StructBuilderIT.class);
+    private static final Logger log = LogManager.getLogger();
 
     private static final CommunityService communityService
             = ContentServiceFactory.getInstance().getCommunityService();
@@ -93,23 +94,24 @@ public class StructBuilderIT
     public void tearDown() {
     }
 
+    private static final String COMMUNITY_1_HANDLE = "https://hdl.handle.net/1/1";
     /** Test structure document. */
     private static final String IMPORT_DOCUMENT =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
             "<import_structure>\n" +
-            "  <community>\n" +
+            "  <community identifier='" + COMMUNITY_1_HANDLE + "'>\n" +
             "    <name>Top Community 0</name>\n" +
             "    <description>A top level community</description>\n" +
             "    <intro>Testing 1 2 3</intro>\n" +
             "    <copyright>1969</copyright>\n" +
             "    <sidebar>A sidebar</sidebar>\n" +
-            "    <community>\n" +
+            "    <community identifier='https://hdl.handle.net/1/1.1'>\n" +
             "      <name>Sub Community 0.0</name>\n" +
             "      <description>A sub community</description>\n" +
             "      <intro>Live from New York....</intro>\n" +
             "      <copyright>1957</copyright>\n" +
             "      <sidebar>Another sidebar</sidebar>\n" +
-            "      <collection>\n" +
+            "      <collection identifier='https://hdl.handle.net/1/1.1.1'>\n" +
             "        <name>Collection 0.0.0</name>\n" +
             "        <description>A collection</description>\n" +
             "        <intro>Our next guest needs no introduction</intro>\n" +
@@ -119,7 +121,7 @@ public class StructBuilderIT
             "        <provenance>Testing</provenance>\n" +
             "      </collection>\n" +
             "    </community>\n" +
-            "    <collection>\n" +
+            "    <collection identifier='https://hdl.handle.net/1/1.2'>\n" +
             "      <name>Collection 0.1</name>\n" +
             "      <description>Another collection</description>\n" +
             "      <intro>Fourscore and seven years ago</intro>\n" +
@@ -160,14 +162,75 @@ public class StructBuilderIT
         byte[] inputBytes = IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8);
         context.turnOffAuthorisationSystem();
         try (InputStream input = new ByteArrayInputStream(inputBytes);) {
-            StructBuilder.importStructure(context, input, outputDocument);
-        } catch (IOException | SQLException
-                | ParserConfigurationException | TransformerException ex) {
-            System.err.println(ex.getMessage());
-            System.exit(1);
+            StructBuilder.importStructure(context, input, outputDocument, false);
         } finally {
             context.restoreAuthSystemState();
         }
+
+        // Compare import's output with its input.
+        // N.B. here we rely on StructBuilder to emit communities and
+        // collections in the same order as the input document.  If that changes,
+        // we will need a smarter NodeMatcher, probably based on <name> children.
+        Source output = new StreamSource(
+                new ByteArrayInputStream(outputDocument.toByteArray()));
+        Source reference = new StreamSource(
+                new ByteArrayInputStream(
+                        IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8)));
+        Diff myDiff = DiffBuilder.compare(reference).withTest(output)
+                .normalizeWhitespace()
+//                .withNodeFilter(new MyNodeFilter())
+                .withAttributeFilter((Attr attr) ->
+                        !attr.getName().equals("identifier"))
+                .checkForIdentical()
+                .build();
+
+        // Was there a difference?
+        // Always output differences -- one is expected.
+        ComparisonFormatter formatter = new DefaultComparisonFormatter();
+        for (Difference difference : myDiff.getDifferences()) {
+            System.err.println(difference.toString(formatter));
+        }
+        // Test for *significant* differences.
+        assertFalse("Output does not match input.", isDifferent(myDiff));
+
+        // TODO spot-check some objects.
+    }
+
+    /**
+     * Test of importStructure method, with given Handles.
+     *
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testImportStructureWithHandles()
+            throws Exception {
+        System.out.println("importStructure");
+
+        // Run the method under test and collect its output.
+        ByteArrayOutputStream outputDocument
+                = new ByteArrayOutputStream(IMPORT_DOCUMENT.length() * 2 * 2);
+        byte[] inputBytes = IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8);
+        context.turnOffAuthorisationSystem();
+        try (InputStream input = new ByteArrayInputStream(inputBytes);) {
+            StructBuilder.importStructure(context, input, outputDocument, true);
+        } finally {
+            context.restoreAuthSystemState();
+        }
+
+        // Check a chosen object for the right Handle.
+        boolean found = false;
+        for (Community community : communityService.findAllTop(context)) {
+            for (Handle handle : community.getHandles()) {
+                if (handle.getHandle().equals(COMMUNITY_1_HANDLE)) {
+                    found = true;
+                    break;
+                }
+                if (found) {
+                    break;
+                }
+            }
+        }
+        assertTrue("A community should have its specified handle", found);
 
         // Compare import's output with its input.
         // N.B. here we rely on StructBuilder to emit communities and
