@@ -61,10 +61,9 @@ public class GroupRestPermissionEvaluatorPlugin extends RestObjectPermissionEval
         }
 
         Request request = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext(request.getServletRequest());
-        EPerson ePerson = null;
+        Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
+        EPerson ePerson = context.getCurrentUser();
         try {
-            ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
             UUID dsoId = UUID.fromString(targetId.toString());
 
             Group group = groupService.find(context, dsoId);
@@ -74,10 +73,10 @@ public class GroupRestPermissionEvaluatorPlugin extends RestObjectPermissionEval
                 return false;
             } else if (groupService.isMember(context, ePerson, group)) {
                 return true;
-            } else if (authorizeService.isCommunityAdmin(context, ePerson)
+            } else if (authorizeService.isCommunityAdmin(context)
                        && AuthorizeUtil.canCommunityAdminManageAccounts()) {
                 return true;
-            } else if (authorizeService.isCollectionAdmin(context, ePerson)
+            } else if (authorizeService.isCollectionAdmin(context)
                     && AuthorizeUtil.canCollectionAdminManageAccounts()) {
                 return true;
             }

@@ -9,7 +9,8 @@ package org.dspace.app.rest.authorization.impl;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.authorization.AuthorizeServiceRestUtil;
@@ -38,7 +39,7 @@ import org.springframework.stereotype.Component;
     description = "It can be used to verify if an item can be moved to a different collection")
 public class MoveFeature implements AuthorizationFeature {
 
-    Logger log = Logger.getLogger(MoveFeature.class);
+    Logger log = LogManager.getLogger();
 
     public final static String NAME = "canMove";
 

@@ -9,6 +9,7 @@ package org.dspace.versioning;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,10 +21,11 @@ import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.apache.logging.log4j.Logger;
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.hibernate.proxy.HibernateProxyHelper;
+
 
 /**
  * @author Fabio Bolognesi (fabio at atmire dot com)
@@ -34,8 +36,6 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Entity
 @Table(name = "versionhistory")
 public class VersionHistory implements ReloadableEntity<Integer> {
-
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(VersionHistory.class);
 
     @Id
     @Column(name = "versionhistory_id")
@@ -56,6 +56,7 @@ public class VersionHistory implements ReloadableEntity<Integer> {
 
     }
 
+    @Override
     public Integer getID() {
         return id;
     }
@@ -87,6 +88,18 @@ public class VersionHistory implements ReloadableEntity<Integer> {
         this.versions.remove(version);
     }
 
+    /**
+     * Verify if there is a version's item in submission.
+     * 
+     * @return true if the last version in submission, otherwise false.
+     */
+    public boolean hasDraftVersion() {
+        if (CollectionUtils.isNotEmpty(versions) && Objects.nonNull(versions.get(0).getItem())) {
+            return !versions.get(0).getItem().isArchived();
+        }
+        return false;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -98,11 +111,7 @@ public class VersionHistory implements ReloadableEntity<Integer> {
         }
 
         final VersionHistory that = (VersionHistory) o;
-        if (!this.getID().equals(that.getID())) {
-            return false;
-        }
-
-        return true;
+        return this.getID().equals(that.getID());
     }
 
     @Override

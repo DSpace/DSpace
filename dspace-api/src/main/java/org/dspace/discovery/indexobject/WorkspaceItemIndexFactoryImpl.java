@@ -19,8 +19,6 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchUtils;
-import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.indexobject.factory.WorkspaceItemIndexFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,12 +69,6 @@ public class WorkspaceItemIndexFactoryImpl
             acvalue = indexableObject.getTypeText();
         }
         addNamedResourceTypeIndex(doc, acvalue);
-        final WorkspaceItem inProgressSubmission = indexableObject.getIndexedObject();
-
-        // Add the item metadata as configured
-        List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils
-                .getAllDiscoveryConfigurations(inProgressSubmission);
-        indexableItemService.addDiscoveryFields(doc, context, inProgressSubmission.getItem(), discoveryConfigurations);
 
         return doc;
     }

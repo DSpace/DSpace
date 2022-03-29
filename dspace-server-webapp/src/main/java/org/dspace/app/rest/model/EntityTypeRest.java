@@ -14,11 +14,20 @@ import org.dspace.app.rest.RestResourceController;
  * for the EntityTypeResource class.
  * Refer to {@link org.dspace.content.EntityType} for explanation of the properties
  */
+@LinksRest(links = {
+        @LinkRest(
+                name = EntityTypeRest.RELATION_SHIP_TYPES,
+                method = "getEntityTypeRelationship"
+        )
+})
 public class EntityTypeRest extends BaseObjectRest<Integer> {
+
+    private static final long serialVersionUID = 8166078961459192770L;
 
     public static final String NAME = "entitytype";
     public static final String NAME_PLURAL = "entitytypes";
     public static final String CATEGORY = "core";
+    public static final String RELATION_SHIP_TYPES = "relationshiptypes";
 
     public String getCategory() {
         return CATEGORY;

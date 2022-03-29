@@ -8,8 +8,9 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.model.UploadBitstreamAccessConditionDTO;
+import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
@@ -20,7 +21,6 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class BitstreamResourcePolicyRemovePatchOperation
-             extends RemovePatchOperation<UploadBitstreamAccessConditionDTO> {
+             extends RemovePatchOperation<AccessConditionDTO> {
 
     @Autowired
     ItemService itemService;
@@ -41,8 +41,8 @@ public class BitstreamResourcePolicyRemovePatchOperation
     BitstreamService bitstreamService;
 
     @Override
-    void remove(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-        throws Exception {
+    void remove(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
+            Object value) throws Exception {
         // "path" : "/sections/upload/files/0/accessConditions/0"
         // "abspath" : "/files/0/accessConditions/0"
         String[] split = getAbsolutePath(path).split("/");
@@ -84,12 +84,12 @@ public class BitstreamResourcePolicyRemovePatchOperation
     }
 
     @Override
-    protected Class<UploadBitstreamAccessConditionDTO[]> getArrayClassForEvaluation() {
-        return UploadBitstreamAccessConditionDTO[].class;
+    protected Class<AccessConditionDTO[]> getArrayClassForEvaluation() {
+        return AccessConditionDTO[].class;
     }
 
     @Override
-    protected Class<UploadBitstreamAccessConditionDTO> getClassForEvaluation() {
-        return UploadBitstreamAccessConditionDTO.class;
+    protected Class<AccessConditionDTO> getClassForEvaluation() {
+        return AccessConditionDTO.class;
     }
 }

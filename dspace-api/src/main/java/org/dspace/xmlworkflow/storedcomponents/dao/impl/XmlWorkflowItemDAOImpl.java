@@ -26,7 +26,7 @@ import org.dspace.xmlworkflow.storedcomponents.dao.XmlWorkflowItemDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the XmlWorkflowItem object.
- * This class is responsible for all database calls for the XmlWorkflowItem object and is autowired by spring
+ * This class is responsible for all database calls for the XmlWorkflowItem object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -132,6 +132,6 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
         criteriaQuery.select(xmlWorkflowItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(xmlWorkflowItemRoot.get(XmlWorkflowItem_.item), item));
-        return uniqueResult(context, criteriaQuery, false, XmlWorkflowItem.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, XmlWorkflowItem.class);
     }
 }

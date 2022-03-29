@@ -32,6 +32,7 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
+            c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             ePerson = c.reloadEntity(ePerson);
@@ -83,6 +84,12 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         return this;
     }
 
+    /**
+     * Set the user's preferred language.
+     * @param lang POSIX locale such as "en" or "en_US".
+     * @return this
+     * @throws SQLException passed through.
+     */
     public EPersonBuilder withLanguage(String lang) throws SQLException {
         ePerson.setLanguage(context, lang);
         return this;

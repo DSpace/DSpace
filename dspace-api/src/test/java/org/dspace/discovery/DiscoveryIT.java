@@ -27,15 +27,21 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.discovery.indexobject.IndexableClaimedTask;
+import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.IndexablePoolTask;
 import org.dspace.discovery.indexobject.IndexableWorkflowItem;
 import org.dspace.discovery.indexobject.IndexableWorkspaceItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
@@ -67,12 +73,18 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
 
     ClaimedTaskService claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
 
+    CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+
     ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager()
                                                    .getServiceByName(IndexingService.class.getName(),
                                                                      IndexingService.class);
 
+    ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance()
+                                                                                      .getMetadataAuthorityService();
 
     @Test
     public void solrRecordsAfterDepositOrDeletionOfWorkspaceItemTest() throws Exception {
@@ -273,14 +285,379 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
 
     }
 
+    @Test
+    public void solrRecordFromMessyItemTest() throws Exception {
+        configurationService.setProperty("authority.controlled.dc.subject", "true");
+        metadataAuthorityService.clearCache();
+        try {
+            context.turnOffAuthorisationSystem();
+
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community").build();
+
+            Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                               .withName("Collection 1").build();
+
+            context.restoreAuthSystemState();
+
+            assertSearchQuery(IndexableItem.TYPE, 0);
+
+            context.turnOffAuthorisationSystem();
+
+           ItemBuilder.createItem(context, col1)
+                      .withTitle("Public item 1")
+                      .withIssueDate("2021-01-21")
+                      .withAuthor("Smith, Donald")
+                      .withSubject("Test Value", "NOT-EXISTING", Choices.CF_ACCEPTED)
+                      .build();
+
+            context.restoreAuthSystemState();
+            assertSearchQuery(IndexableItem.TYPE, 1);
+        } finally {
+            configurationService.setProperty("authority.controlled.dc.subject", "false");
+            metadataAuthorityService.clearCache();
+        }
+
+    }
+
+    @Test
+    public void verifySolrRecordsOfDeletedObjectsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2").build();
+        CollectionBuilder.createCollection(context, child2)
+                         .withName("Collection 3").build();
+
+        ItemBuilder.createItem(context, col1)
+                   .withTitle("Public item 1")
+                   .withIssueDate("2017-10-17")
+                   .withAuthor("Smith, Donald")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        ItemBuilder.createItem(context, col2)
+                   .withTitle("Public item 2")
+                   .withIssueDate("2016-02-13")
+                   .withAuthor("Smith, Maria")
+                   .withSubject("TestingForMore")
+                   .build();
+
+        ItemBuilder.createItem(context, col2)
+                   .withTitle("Public item 3")
+                   .withIssueDate("2016-02-13")
+                   .withAuthor("Doe, Jane")
+                   .withSubject("AnotherTest")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        context.setDispatcher("noindex");
+
+        assertSearchQuery(IndexableCollection.TYPE, 3);
+        assertSearchQuery(IndexableItem.TYPE, 3);
+        collectionService.delete(context, col1);
+        context.restoreAuthSystemState();
+        assertSearchQuery(IndexableCollection.TYPE, 2);
+        assertSearchQuery(IndexableItem.TYPE, 2);
+    }
+
+    @Test
+    public void verifySolrRecordsOfDeletedObjectsPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child2)
+                                           .withName("Collection 3").build();
+
+        ItemBuilder.createItem(context, col1)
+                   .withTitle("Public item 1")
+                   .withIssueDate("2010-10-17")
+                   .withAuthor("Smith, Donald")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        ItemBuilder.createItem(context, col2)
+                   .withTitle("Public item 2")
+                   .withIssueDate("2011-08-13")
+                   .withAuthor("Smith, Maria")
+                   .withSubject("TestingForMore")
+                   .build();
+
+        ItemBuilder.createItem(context, col2)
+                   .withTitle("Public item 3")
+                   .withIssueDate("2012-02-19")
+                   .withAuthor("Doe, Jane")
+                   .withSubject("AnotherTest")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        ItemBuilder.createItem(context, col3)
+                   .withTitle("Public item 4")
+                   .withIssueDate("2013-05-16")
+                   .withAuthor("Vova, Jane")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        ItemBuilder.createItem(context, col3)
+                   .withTitle("Public item 5")
+                    .withIssueDate("2015-04-13")
+                    .withAuthor("Marco, Bruni")
+                    .withSubject("ExtraEntry")
+                    .build();
+
+        ItemBuilder.createItem(context, col3)
+                   .withTitle("Public item 6")
+                   .withIssueDate("2016-01-21")
+                   .withAuthor("Andriy, Beket")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        context.setDispatcher("noindex");
+
+        // check Collection type with start=0 and limit=default, we expect: indexableObjects=3, totalFound=3
+        assertSearchQuery(IndexableCollection.TYPE, 3, 3, 0, -1);
+        // check Item type with page=0 and limit=default, we expect: indexableObjects=6, totalFound=6
+        assertSearchQuery(IndexableItem.TYPE, 6, 6, 0, -1);
+        // delete col3 and all items that it contained
+        collectionService.delete(context, col3);
+        context.restoreAuthSystemState();
+
+        // check Collection type with start=0 and limit=default, we expect: indexableObjects=2, totalFound=2
+        assertSearchQuery(IndexableCollection.TYPE, 2, 2, 0, -1);
+        // check Item type with start=0 and limit=2, we expect: indexableObjects=2, totalFound=6
+        assertSearchQuery(IndexableItem.TYPE, 2, 6, 0, 2);
+        // check Item type with start=2 and limit=4, we expect: indexableObjects=1, totalFound=3
+        assertSearchQuery(IndexableItem.TYPE, 1, 3, 2, 4);
+        // check Item type with start=0 and limit=default, we expect: indexableObjects=3, totalFound=3
+        // totalFound now is 3 because stale objects deleted
+        assertSearchQuery(IndexableItem.TYPE, 3, 3, 0, -1);
+    }
+
+    @Test
+    public void disabledSolrToRemoveStaleObjectsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // disable removal of solr documents related to items not on database anymore (Stale)
+        configurationService.setProperty("discovery.removestale.attempts", -1);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child2)
+                                           .withName("Collection 3").build();
+
+        ItemBuilder.createItem(context, col1)
+                   .withTitle("Public item 1")
+                   .withIssueDate("2010-10-17")
+                   .withAuthor("Smith, Donald")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        ItemBuilder.createItem(context, col2)
+                   .withTitle("Public item 2")
+                   .withIssueDate("2011-08-13")
+                   .withAuthor("Smith, Maria")
+                   .withSubject("TestingForMore")
+                   .build();
+
+        ItemBuilder.createItem(context, col2)
+                   .withTitle("Public item 3")
+                   .withIssueDate("2012-02-19")
+                   .withAuthor("Doe, Jane")
+                   .withSubject("AnotherTest")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        ItemBuilder.createItem(context, col3)
+                   .withTitle("Public item 4")
+                   .withIssueDate("2013-05-16")
+                   .withAuthor("Vova, Jane")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        ItemBuilder.createItem(context, col3)
+                   .withTitle("Public item 5")
+                    .withIssueDate("2015-04-13")
+                    .withAuthor("Marco, Bruni")
+                    .withSubject("ExtraEntry")
+                    .build();
+
+        ItemBuilder.createItem(context, col3)
+                   .withTitle("Public item 6")
+                   .withIssueDate("2016-01-21")
+                   .withAuthor("Andriy, Beket")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        context.setDispatcher("noindex");
+
+        // check Collection type with start=0 and limit=default, we expect: indexableObjects=3, totalFound=3
+        assertSearchQuery(IndexableCollection.TYPE, 3, 3, 0, -1);
+        // check Item type with page=0 and limit=default, we expect: indexableObjects=6, totalFound=6
+        assertSearchQuery(IndexableItem.TYPE, 6, 6, 0, -1);
+        // delete col3 and all items that it contained
+        collectionService.delete(context, col3);
+        context.restoreAuthSystemState();
+
+        // check Collection type with start=0 and limit=default,
+        // we expect: indexableObjects=2, totalFound=should be 2 but we have 3 ->(1 stale object here)
+        assertSearchQuery(IndexableCollection.TYPE, 2, 3, 0, -1);
+        // check Item type with start=0 and limit=2, we expect: indexableObjects=2, totalFound=6
+        assertSearchQuery(IndexableItem.TYPE, 2, 6, 0, 2);
+        // check Item type with start=2 and limit=4,
+        // we expect: indexableObjects=1, totalFound=should be 3 but we have 6 ->(3 stale objects here)
+        assertSearchQuery(IndexableItem.TYPE, 1, 6, 2, 4);
+        // check Item type with start=0 and limit=default,
+        // we expect: indexableObjects=3, totalFound=should be 3 but we have 6 ->(3 stale objects here)
+        assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, -1);
+    }
+
+    @Test
+    public void disabledRerunOfSolrQueryDueToStaleObjectsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // disable re-run of the solr query when stale documents are found
+        configurationService.setProperty("discovery.removestale.attempts", 0);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community 2")
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child2)
+                                           .withName("Collection 3").build();
+
+        ItemBuilder.createItem(context, col1)
+                   .withTitle("Public item 1")
+                   .withIssueDate("2010-10-17")
+                   .withAuthor("Smith, Donald")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        ItemBuilder.createItem(context, col2)
+                   .withTitle("Public item 2")
+                   .withIssueDate("2011-08-13")
+                   .withAuthor("Smith, Maria")
+                   .withSubject("TestingForMore")
+                   .build();
+
+        ItemBuilder.createItem(context, col2)
+                   .withTitle("Public item 3")
+                   .withIssueDate("2012-02-19")
+                   .withAuthor("Doe, Jane")
+                   .withSubject("AnotherTest")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        ItemBuilder.createItem(context, col3)
+                   .withTitle("Public item 4")
+                   .withIssueDate("2013-05-16")
+                   .withAuthor("Vova, Jane")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        ItemBuilder.createItem(context, col3)
+                   .withTitle("Public item 5")
+                    .withIssueDate("2015-04-13")
+                    .withAuthor("Marco, Bruni")
+                    .withSubject("ExtraEntry")
+                    .build();
+
+        ItemBuilder.createItem(context, col3)
+                   .withTitle("Public item 6")
+                   .withIssueDate("2016-01-21")
+                   .withAuthor("Andriy, Beket")
+                   .withSubject("ExtraEntry")
+                   .build();
+
+        context.setDispatcher("noindex");
+
+        // check Collection type with start=0 and limit=default, we expect: indexableObjects=3, totalFound=3
+        assertSearchQuery(IndexableCollection.TYPE, 3, 3, 0, -1);
+        // check Item type with page=0 and limit=default, we expect: indexableObjects=6, totalFound=6
+        assertSearchQuery(IndexableItem.TYPE, 6, 6, 0, -1);
+        // delete col3 and all items that it contained
+        collectionService.delete(context, col3);
+        context.restoreAuthSystemState();
+
+        // check Collection type with start=0 and limit=default,
+        // we expect: indexableObjects=2, totalFound=should be 2 but we have 3 ->(1 stale object here)
+        assertSearchQuery(IndexableCollection.TYPE, 2, 3, 0, -1);
+        // as the previous query hit the stale object running a new query should lead to a clean situation
+        assertSearchQuery(IndexableCollection.TYPE, 2, 2, 0, -1);
+
+        // similar test over the items
+        // check Item type with start=0 and limit=default,
+        // we expect: indexableObjects=3, totalFound=6 (3 stale objects here)
+        assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, -1);
+        // as the previous query hit the stale objects running a new query should lead to a clean situation
+        assertSearchQuery(IndexableItem.TYPE, 3, 3, 0, -1);
+    }
+
     private void assertSearchQuery(String resourceType, int size) throws SearchServiceException {
+        assertSearchQuery(resourceType, size, size, 0, -1);
+    }
+
+    private void assertSearchQuery(String resourceType, int size, int totalFound, int start, int limit)
+            throws SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setQuery("*:*");
+        discoverQuery.setStart(start);
+        discoverQuery.setMaxResults(limit);
         discoverQuery.addFilterQueries("search.resourcetype:" + resourceType);
         DiscoverResult discoverResult = searchService.search(context, discoverQuery);
         List<IndexableObject> indexableObjects = discoverResult.getIndexableObjects();
         assertEquals(size, indexableObjects.size());
-        assertEquals(size, discoverResult.getTotalSearchResults());
+        assertEquals(totalFound, discoverResult.getTotalSearchResults());
     }
 
 
@@ -288,7 +665,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
             throws SQLException, AuthorizeException, IOException, WorkflowException, SearchServiceException {
         context.turnOffAuthorisationSystem();
         workspaceItem = context.reloadEntity(workspaceItem);
-        XmlWorkflowItem workflowItem = workflowService.startWithoutNotify(context, workspaceItem);
+        XmlWorkflowItem unusedWorkflowItem = workflowService.startWithoutNotify(context, workspaceItem);
         context.commit();
         indexer.commit();
         context.restoreAuthSystemState();

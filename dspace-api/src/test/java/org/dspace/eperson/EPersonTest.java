@@ -994,10 +994,7 @@ public class EPersonTest extends AbstractUnitTest {
         wfGroup.addMember(groupMember);
         groupService.update(context, wfGroup);
 
-        // DSpace currently contains two workflow systems. The newer XMLWorfklow needs additional tables that are not
-        // part of the test database yet. While it is expected that it becomes the default workflow system (DS-2059)
-        // one day, this won't happen before it its backported to JSPUI (DS-2121).
-        // TODO: add tests using the configurable workflowsystem
+        // Start workflow
         int wfiID = workflowService.startWithoutNotify(context, wsi).getID();
         context.restoreAuthSystemState();
         context.commit();

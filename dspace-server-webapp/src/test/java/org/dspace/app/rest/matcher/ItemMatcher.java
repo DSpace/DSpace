@@ -55,7 +55,8 @@ public class ItemMatcher {
                 "owningCollection",
                 "version",
                 "relationships[]",
-                "templateItemOf"
+                "templateItemOf",
+                "thumbnail"
         );
     }
 
@@ -70,7 +71,8 @@ public class ItemMatcher {
                 "relationships",
                 "self",
                 "version",
-                "templateItemOf"
+                "templateItemOf",
+                "thumbnail"
         );
     }
 

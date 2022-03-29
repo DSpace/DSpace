@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.RelationshipUtils;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
@@ -53,7 +54,7 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -640,7 +641,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             all += part + ",";
         }
         all = all.substring(0, all.length());
-        log.debug(LogManager.getHeader(c, "metadata_import",
+        log.debug(LogHelper.getHeader(c, "metadata_import",
                                        "item_id=" + item.getID() + ",fromCSV=" + all));
 
         // Don't compare collections or actions or rowNames
@@ -677,7 +678,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 qualifier = qualifier.substring(0, qualifier.indexOf('['));
             }
         }
-        log.debug(LogManager.getHeader(c, "metadata_import",
+        log.debug(LogHelper.getHeader(c, "metadata_import",
                                        "item_id=" + item.getID() + ",fromCSV=" + all +
                                            ",looking_for_schema=" + schema +
                                            ",looking_for_element=" + element +
@@ -697,7 +698,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                         .getConfidence() : Choices.CF_ACCEPTED);
                 }
                 i++;
-                log.debug(LogManager.getHeader(c, "metadata_import",
+                log.debug(LogHelper.getHeader(c, "metadata_import",
                                                "item_id=" + item.getID() + ",fromCSV=" + all +
                                                    ",found=" + dcv.getValue()));
             }
@@ -748,7 +749,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             // column "dc.contributor.author" so don't remove it
             if ((value != null) && (!"".equals(value)) && (!contains(value, fromCSV)) && fromAuthority == null) {
                 // Remove it
-                log.debug(LogManager.getHeader(c, "metadata_import",
+                log.debug(LogHelper.getHeader(c, "metadata_import",
                                                "item_id=" + item.getID() + ",fromCSV=" + all +
                                                    ",removing_schema=" + schema +
                                                    ",removing_element=" + element +
@@ -890,10 +891,10 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         Entity relationEntity = getEntity(c, value);
         // Get relationship type of entity and item
         String relationEntityRelationshipType = itemService.getMetadata(relationEntity.getItem(),
-                                                                        "relationship", "type",
-                                                                        null, Item.ANY).get(0).getValue();
-        String itemRelationshipType = itemService.getMetadata(item, "relationship", "type",
-                                                              null, Item.ANY).get(0).getValue();
+                                                                        "dspace", "entity",
+                                                                        "type", Item.ANY).get(0).getValue();
+        String itemRelationshipType = itemService.getMetadata(item, "dspace", "entity",
+                                                              "type", Item.ANY).get(0).getValue();
 
         // Get the correct RelationshipType based on typeName
         List<RelationshipType> relType = relationshipTypeService.findByLeftwardOrRightwardTypeName(c, typeName);
@@ -1487,7 +1488,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 }
             }
             //Populate entityTypeMap
-            if (key.equalsIgnoreCase("relationship.type") && line.get(key).size() > 0) {
+            if (key.equalsIgnoreCase("dspace.entity.type") && line.get(key).size() > 0) {
                 if (uuid == null) {
                     entityTypeMap.put(new UUID(0, rowCount), line.get(key).get(0));
                 } else {
@@ -1651,8 +1652,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                     if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
                         targetItem = itemService.find(c, UUID.fromString(targetUUID));
                         List<MetadataValue> relTypes = itemService.
-                                                                      getMetadata(targetItem, "relationship", "type",
-                                                                                  null, Item.ANY);
+                                                                      getMetadata(targetItem, "dspace", "entity",
+                                                                                  "type", Item.ANY);
                         String relTypeValue = null;
                         if (relTypes.size() > 0) {
                             relTypeValue = relTypes.get(0).getValue();
@@ -1696,9 +1697,9 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                             if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
                                 DSpaceCSVLine dSpaceCSVLine = this.csv.getCSVLines()
                                                                       .get(Integer.valueOf(originRow) - 1);
-                                List<String> relTypes = dSpaceCSVLine.get("relationship.type");
+                                List<String> relTypes = dSpaceCSVLine.get("dspace.entity.type");
                                 if (relTypes == null || relTypes.isEmpty()) {
-                                    dSpaceCSVLine.get("relationship.type[]");
+                                    dSpaceCSVLine.get("dspace.entity.type[]");
                                 }
 
                                 if (relTypes != null && relTypes.size() > 0) {
@@ -1710,8 +1711,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                     originItem = itemService.find(c, UUID.fromString(originRefererUUID));
                                     if (originItem != null) {
                                         List<MetadataValue> mdv = itemService.getMetadata(originItem,
-                                                                                          "relationship",
-                                                                                          "type", null,
+                                                                                          "dspace",
+                                                                                          "entity", "type",
                                                                                           Item.ANY);
                                         if (!mdv.isEmpty()) {
                                             String relTypeValue = mdv.get(0).getValue();
@@ -1793,36 +1794,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
      */
     private RelationshipType matchRelationshipType(List<RelationshipType> relTypes,
                                                    String targetType, String originType, String originTypeName) {
-        RelationshipType foundRelationshipType = null;
-        if (originTypeName.split("\\.").length > 1) {
-            originTypeName = originTypeName.split("\\.")[1];
-        }
-        for (RelationshipType relationshipType : relTypes) {
-            // Is origin type leftward or righward
-            boolean isLeft = false;
-            if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(originType)) {
-                isLeft = true;
-            }
-            if (isLeft) {
-                // Validate typeName reference
-                if (!relationshipType.getLeftwardType().equalsIgnoreCase(originTypeName)) {
-                    continue;
-                }
-                if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(originType) &&
-                    relationshipType.getRightType().getLabel().equalsIgnoreCase(targetType)) {
-                    foundRelationshipType = relationshipType;
-                }
-            } else {
-                if (!relationshipType.getRightwardType().equalsIgnoreCase(originTypeName)) {
-                    continue;
-                }
-                if (relationshipType.getLeftType().getLabel().equalsIgnoreCase(targetType) &&
-                    relationshipType.getRightType().getLabel().equalsIgnoreCase(originType)) {
-                    foundRelationshipType = relationshipType;
-                }
-            }
-        }
-        return foundRelationshipType;
+        return RelationshipUtils.matchRelationshipType(relTypes, targetType, originType, originTypeName);
     }
 
 }

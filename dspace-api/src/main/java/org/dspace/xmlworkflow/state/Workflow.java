@@ -21,8 +21,7 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Class that contains all the steps and roles involved in a certain
- * configured workflow
+ * Contains all the steps involved in a certain configured workflow.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -39,12 +38,20 @@ public class Workflow implements BeanNameAware {
         return firstStep;
     }
 
+    /**
+     * Get the name of this Workflow.
+     * @return the name.
+     * @see setBeanName
+     */
     public String getID() {
         return id;
     }
 
-    /*
-     * Return a step with a given id
+    /**
+     * Return a step with a given name.
+     * @param stepID name of the Step to find.
+     * @return the identified Step.
+     * @throws WorkflowConfigurationException if the named step is not found.
      */
     public Step getStep(String stepID) throws WorkflowConfigurationException {
         for (Step step : steps) {
@@ -55,6 +62,16 @@ public class Workflow implements BeanNameAware {
         throw new WorkflowConfigurationException("Step definition not found for: " + stepID);
     }
 
+    /**
+     * Find the Step that follows a given Step given an outcome.
+     * @param context
+     * @param wfi the item whose steps are consulted.
+     * @param currentStep the step being consulted.
+     * @param outcome the outcome of {@link currentStep}.
+     * @return the next step.
+     * @throws WorkflowConfigurationException if the next step is invalid.
+     * @throws SQLException passed through.
+     */
     public Step getNextStep(Context context, XmlWorkflowItem wfi, Step currentStep, int outcome)
         throws WorkflowConfigurationException, SQLException {
         Step nextStep = currentStep.getNextStep(outcome);

@@ -39,7 +39,8 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 /**
  * Custom Spring authentication filter for Stateless authentication, intercepts requests to check for valid
- * authentication
+ * authentication. This runs before *every* request in the DSpace backend to see if any authentication data
+ * is passed in that request. If so, it authenticates the EPerson in the current Context.
  *
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
@@ -94,9 +95,9 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
             log.error("Access is denied (status:{})", HttpServletResponse.SC_FORBIDDEN, e);
             return;
         }
+        // If we have a valid Authentication, save it to Spring Security
         if (authentication != null) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            restAuthenticationService.invalidateAuthenticationCookie(res);
         }
         chain.doFilter(req, res);
     }
@@ -119,17 +120,16 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
         throws AuthorizeException, SQLException {
 
         if (restAuthenticationService.hasAuthenticationData(request)) {
-            // parse the token.
-
             Context context = ContextUtil.obtainContext(request);
-
-            EPerson eperson = restAuthenticationService.getAuthenticatedEPerson(request, context);
+            // parse the token.
+            EPerson eperson = restAuthenticationService.getAuthenticatedEPerson(request, res, context);
             if (eperson != null) {
+                log.debug("Found authentication data in request for EPerson {}", eperson.getEmail());
                 //Pass the eperson ID to the request service
                 requestService.setCurrentUserId(eperson.getID());
 
                 //Get the Spring authorities for this eperson
-                List<GrantedAuthority> authorities = authenticationProvider.getGrantedAuthorities(context, eperson);
+                List<GrantedAuthority> authorities = authenticationProvider.getGrantedAuthorities(context);
                 String onBehalfOfParameterValue = request.getHeader(ON_BEHALF_OF_REQUEST_PARAM);
                 if (onBehalfOfParameterValue != null) {
                     if (configurationService.getBooleanProperty("webui.user.assumelogin")) {
@@ -141,7 +141,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                 }
 
                 //Return the Spring authentication object
-                return new DSpaceAuthentication(eperson.getEmail(), authorities);
+                return new DSpaceAuthentication(eperson, authorities);
             } else {
                 return null;
             }
@@ -173,8 +173,10 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
         if (!authorizeService.isAdmin(context, onBehalfOfEPerson)) {
             requestService.setCurrentUserId(epersonUuid);
             context.switchContextUser(onBehalfOfEPerson);
-            return new DSpaceAuthentication(onBehalfOfEPerson.getEmail(),
-                                            authenticationProvider.getGrantedAuthorities(context, onBehalfOfEPerson));
+            log.debug("Found 'on-behalf-of' authentication data in request for EPerson {}",
+                      onBehalfOfEPerson.getEmail());
+            return new DSpaceAuthentication(onBehalfOfEPerson,
+                                            authenticationProvider.getGrantedAuthorities(context));
         } else {
             throw new IllegalArgumentException("You're unable to use the login as feature to log " +
                                                    "in as another admin");

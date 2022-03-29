@@ -14,6 +14,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
@@ -33,12 +35,15 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -46,6 +51,7 @@ import org.springframework.test.util.ReflectionTestUtils;
  *
  * @author pvillega
  */
+@RunWith(MockitoJUnitRunner.class)
 public class WorkspaceItemTest extends AbstractUnitTest {
 
     /**
@@ -98,6 +104,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
             // "Wire" our spy to be used by the current loaded object services
             // (To ensure these services use the spy instead of the real service)
             ReflectionTestUtils.setField(workspaceItemService, "authorizeService", authorizeServiceSpy);
+            ReflectionTestUtils.setField(itemService, "authorizeService", authorizeServiceSpy);
             ReflectionTestUtils.setField(collectionService, "authorizeService", authorizeServiceSpy);
             ReflectionTestUtils.setField(communityService, "authorizeService", authorizeServiceSpy);
         } catch (AuthorizeException ex) {
@@ -158,7 +165,8 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     @Test
     public void testCreateAuth() throws Exception {
         // Allow Collection ADD perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
+        doNothing().when(authorizeServiceSpy).authorizeAction(any(Context.class),
+                                                              any(Collection.class), eq(Constants.ADD));
 
         boolean template;
         WorkspaceItem created;

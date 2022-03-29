@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -23,12 +24,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.sherpa.v2.SHERPAPublisherResponse;
 import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.app.sherpa.v2.SHERPAUtils;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -47,11 +48,11 @@ public class SHERPAService {
     private int maxNumberOfTries;
     private long sleepBetweenTimeouts;
     private int timeout = 5000;
-    private String endpoint = "https://v2.sherpa.ac.uk/cgi/retrieve";
+    private String endpoint = null;
     private String apiKey = null;
 
     /** log4j category */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SHERPAService.class);
+    private static final Logger log = LogManager.getLogger(SHERPAService.class);
 
     @Autowired
     ConfigurationService configurationService;
@@ -60,14 +61,6 @@ public class SHERPAService {
      * Create a new HTTP builder with sensible defaults in constructor
      */
     public SHERPAService() {
-        // Set configuration service
-        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-
-        // Get endoint and API key from configuration
-        endpoint = configurationService.getProperty("sherpa.romeo.url",
-            "https://v2.sherpa.ac.uk/cgi/retrieve");
-        apiKey = configurationService.getProperty("sherpa.romeo.apikey");
-
         HttpClientBuilder builder = HttpClientBuilder.create();
         // httpclient 4.3+ doesn't appear to have any sensible defaults any more. Setting conservative defaults as
         // not to hammer the SHERPA service too much.
@@ -75,6 +68,18 @@ public class SHERPAService {
             .disableAutomaticRetries()
             .setMaxConnTotal(5)
             .build();
+    }
+
+    /**
+     * Complete initialization of the Bean.
+     */
+    @SuppressWarnings("unused")
+    @PostConstruct
+    private void init() {
+        // Get endoint and API key from configuration
+        endpoint = configurationService.getProperty("sherpa.romeo.url",
+            "https://v2.sherpa.ac.uk/cgi/retrieve");
+        apiKey = configurationService.getProperty("sherpa.romeo.apikey");
     }
 
     /**

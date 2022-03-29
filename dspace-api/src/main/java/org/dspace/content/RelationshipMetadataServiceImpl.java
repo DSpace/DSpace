@@ -46,7 +46,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         try {
             String entityType = getEntityTypeStringFromMetadata(item);
             if (StringUtils.isNotBlank(entityType)) {
-                List<Relationship> relationships = relationshipService.findByItem(context, item);
+                List<Relationship> relationships = relationshipService.findByItem(context, item, -1, -1, true);
                 for (Relationship relationship : relationships) {
                     fullMetadataValueList
                         .addAll(findRelationshipMetadataValueForItemRelationship(context, item, entityType,
@@ -63,11 +63,9 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
     public String getEntityTypeStringFromMetadata(Item item) {
         List<MetadataValue> list = item.getMetadata();
         for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getMetadataField().getMetadataSchema().getName(),
-                "relationship")
-                && StringUtils.equals(mdv.getMetadataField().getElement(),
-                "type")) {
-
+            if (StringUtils.equals(mdv.getMetadataField().getMetadataSchema().getName(), "dspace")
+                && StringUtils.equals(mdv.getMetadataField().getElement(), "entity")
+                && StringUtils.equals(mdv.getMetadataField().getQualifier(), "type")) {
                 return mdv.getValue();
             }
         }

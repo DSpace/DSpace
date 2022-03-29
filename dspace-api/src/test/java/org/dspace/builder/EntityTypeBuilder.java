@@ -9,7 +9,8 @@ package org.dspace.builder;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
@@ -19,7 +20,7 @@ import org.dspace.discovery.SearchServiceException;
 public class EntityTypeBuilder extends AbstractBuilder<EntityType, EntityTypeService> {
 
     /* Log4j logger*/
-    private static final Logger log = Logger.getLogger(EntityTypeBuilder.class);
+    private static final Logger log = LogManager.getLogger();
 
     private EntityType entityType;
 
@@ -35,6 +36,7 @@ public class EntityTypeBuilder extends AbstractBuilder<EntityType, EntityTypeSer
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
+            c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             entityType = c.reloadEntity(entityType);

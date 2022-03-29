@@ -29,7 +29,6 @@ import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
-import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
 import org.dspace.app.rest.utils.Utils;
@@ -58,11 +57,9 @@ import org.dspace.importer.external.exception.FileMultipleOccurencesException;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.service.ImportService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.submit.AbstractProcessingStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.rest.webmvc.json.patch.PatchException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -176,45 +173,6 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     }
 
     @Override
-    protected WorkspaceItemRest save(Context context, WorkspaceItemRest wsi) {
-        SubmissionConfig submissionConfig = submissionConfigReader
-            .getSubmissionConfigByName(submissionConfigReader.getDefaultSubmissionConfigName());
-        WorkspaceItem source = workspaceItemConverter.toModel(wsi);
-        for (int stepNum = 0; stepNum < submissionConfig.getNumberOfSteps(); stepNum++) {
-
-            SubmissionStepConfig stepConfig = submissionConfig.getStep(stepNum);
-            /*
-             * First, load the step processing class (using the current
-             * class loader)
-             */
-            ClassLoader loader = this.getClass().getClassLoader();
-            Class stepClass;
-            try {
-                stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-
-                Object stepInstance = stepClass.newInstance();
-
-                if (stepInstance instanceof AbstractProcessingStep) {
-                    // load the JSPStep interface for this step
-                    AbstractProcessingStep stepProcessing = (AbstractProcessingStep) stepClass
-                        .newInstance();
-                    stepProcessing.doPreProcessing(context, source);
-                } else {
-                    throw new Exception("The submission step class specified by '"
-                                            + stepConfig.getProcessingClassName()
-                                            + "' does not extend the class org.dspace.submit.AbstractProcessingStep!"
-                                            + " Therefore it cannot be used by the Configurable Submission as the " +
-                                            "<processing-class>!");
-                }
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-        submissionService.saveWorkspaceItem(context, source);
-        return wsi;
-    }
-
-    @Override
     public Class<WorkspaceItemRest> getDomainClass() {
         return WorkspaceItemRest.class;
     }
@@ -227,38 +185,8 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         Context context = obtainContext();
         WorkspaceItemRest wsi = findOne(context, id);
         WorkspaceItem source = wis.find(context, id);
-        List<ErrorRest> errors = new ArrayList<ErrorRest>();
-        SubmissionConfig submissionConfig =
-            submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
-        for (int i = 0; i < submissionConfig.getNumberOfSteps(); i++) {
-            SubmissionStepConfig stepConfig = submissionConfig.getStep(i);
-
-            /*
-             * First, load the step processing class (using the current
-             * class loader)
-             */
-            ClassLoader loader = this.getClass().getClassLoader();
-            Class stepClass;
-            try {
-                stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-
-                Object stepInstance = stepClass.newInstance();
-                if (UploadableStep.class.isAssignableFrom(stepClass)) {
-                    UploadableStep uploadableStep = (UploadableStep) stepInstance;
-                    uploadableStep.doPreProcessing(context, source);
-                    ErrorRest err =
-                        uploadableStep.upload(context, submissionService, stepConfig, source, file);
-                    uploadableStep.doPostProcessing(context, source);
-                    if (err != null) {
-                        errors.add(err);
-                    }
-                }
-
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-
-        }
+        List<ErrorRest> errors = submissionService.uploadFileToInprogressSubmission(context, request, wsi, source,
+                file);
         wsi = converter.toRest(source, utils.obtainProjection());
 
         if (!errors.isEmpty()) {
@@ -281,64 +209,13 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             String[] path = op.getPath().substring(1).split("/", 3);
             if (OPERATION_PATH_SECTIONS.equals(path[0])) {
                 String section = path[1];
-                evaluatePatch(context, request, source, wsi, section, op);
+                submissionService.evaluatePatchToInprogressSubmission(context, request, source, wsi, section, op);
             } else {
                 throw new DSpaceBadRequestException(
                     "Patch path operation need to starts with '" + OPERATION_PATH_SECTIONS + "'");
             }
         }
         wis.update(context, source);
-    }
-
-    private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi,
-                               String section, Operation op) {
-        boolean sectionExist = false;
-        SubmissionConfig submissionConfig = submissionConfigReader
-            .getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
-        for (int stepNum = 0; stepNum < submissionConfig.getNumberOfSteps(); stepNum++) {
-
-            SubmissionStepConfig stepConfig = submissionConfig.getStep(stepNum);
-
-            if (section.equals(stepConfig.getId())) {
-                sectionExist = true;
-                /*
-                 * First, load the step processing class (using the current
-                 * class loader)
-                 */
-                ClassLoader loader = this.getClass().getClassLoader();
-                Class stepClass;
-                try {
-                    stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-
-                    Object stepInstance = stepClass.newInstance();
-
-                    if (stepInstance instanceof AbstractRestProcessingStep) {
-                        // load the JSPStep interface for this step
-                        AbstractRestProcessingStep stepProcessing =
-                            (AbstractRestProcessingStep) stepClass.newInstance();
-                        stepProcessing.doPreProcessing(context, source);
-                        stepProcessing.doPatchProcessing(context,
-                                       getRequestService().getCurrentRequest(), source, op, stepConfig);
-                        stepProcessing.doPostProcessing(context, source);
-                    } else {
-                        throw new DSpaceBadRequestException(
-                            "The submission step class specified by '" + stepConfig.getProcessingClassName() +
-                            "' does not extend the class org.dspace.submit.AbstractProcessingStep!" +
-                            " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
-                    }
-
-                } catch (UnprocessableEntityException e) {
-                    throw e;
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    throw new PatchException("Error processing the patch request", e);
-                }
-            }
-        }
-        if (!sectionExist) {
-            throw new UnprocessableEntityException("The section with name " + section +
-                                                   " does not exist in this submission!");
-        }
     }
 
     @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'DELETE')")

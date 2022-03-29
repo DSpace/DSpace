@@ -25,7 +25,7 @@ import org.dspace.eperson.dao.Group2GroupCacheDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Group2GroupCache object.
- * This class is responsible for all database calls for the Group2GroupCache object and is autowired by spring
+ * This class is responsible for all database calls for the Group2GroupCache object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -83,7 +83,7 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
                                 criteriaBuilder.equal(group2GroupCacheRoot.get(Group2GroupCache_.child), child)
             )
         );
-        return uniqueResult(context, criteriaQuery, true, Group2GroupCache.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, true, Group2GroupCache.class);
     }
 
     @Override

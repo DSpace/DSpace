@@ -90,7 +90,9 @@
             <!-- oaire:citation* -->
             <xsl:apply-templates
                 select="doc:metadata/doc:element[@name='oaire']/doc:element[@name='citation']" mode="oaire"/>
-
+            <!-- CREATIVE COMMON LICENSE -->
+            <xsl:apply-templates
+                select="doc:metadata/doc:element[@name='others']/doc:element[@name='cc']" mode="oaire" />
         </oaire:resource>
     </xsl:template>
 
@@ -641,9 +643,9 @@
                 <xsl:with-param name="value" select="$rightsValue"/>
             </xsl:call-template>
         </xsl:variable>
-		<!-- We are checking to ensure that only values ending in "access" can be used as datacite:rights. 
-		This is a valid solution as we pre-normalize dc.rights values in openaire4.xsl to end in the term 
-		"access" according to COAR Controlled Vocabulary -->
+        <!-- We are checking to ensure that only values ending in "access" can be used as datacite:rights. 
+        This is a valid solution as we pre-normalize dc.rights values in openaire4.xsl to end in the term 
+        "access" according to COAR Controlled Vocabulary -->
         <xsl:if test="ends-with($lc_rightsValue,'access')">
             <datacite:rights>
                 <xsl:if test="$rightsURI">
@@ -736,18 +738,22 @@
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_language.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']"
         mode="dc">
-        <dc:language>
-            <xsl:value-of select="./doc:element/doc:field[@name='value']"/>
-        </dc:language>
+        <xsl:for-each select="./doc:element/doc:field[@name='value']">
+	        <dc:language>
+	            <xsl:value-of select="./text()"/>
+	        </dc:language>
+        </xsl:for-each>
     </xsl:template>
 
 
     <!-- dc:publisher -->
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publisher.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='publisher']" mode="dc">
-        <dc:publisher>
-            <xsl:value-of select="./doc:element/doc:field[@name='value']"/>
-        </dc:publisher>
+    	<xsl:for-each select="./doc:element/doc:field[@name='value']">
+	       <dc:publisher>
+	           <xsl:value-of select="./text()"/>
+	       </dc:publisher>
+        </xsl:for-each>
     </xsl:template>
 
 
@@ -1642,7 +1648,25 @@
         </xsl:if>
     </xsl:template>
 
-
+    <!-- Prepare data for CC License -->
+    <xsl:variable name="ccstart">
+        <xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']/doc:element/doc:field[@name='value']/text()"/>
+    </xsl:variable>
+    
+    <xsl:template
+        match="doc:element[@name='others']/doc:element[@name='cc']"
+        mode="oaire">
+        <oaire:licenseCondition>
+            <xsl:attribute name="startDate">
+                <xsl:value-of
+                    select="$ccstart"/>
+            </xsl:attribute>
+            <xsl:attribute name="uri">
+                <xsl:value-of select="./doc:field[@name='uri']/text()" />
+            </xsl:attribute>
+            <xsl:value-of select="./doc:field[@name='name']/text()" />
+        </oaire:licenseCondition>
+    </xsl:template>
 
     <!-- ignore all non specified text values or attributes -->
     <xsl:template match="text()|@*"/>

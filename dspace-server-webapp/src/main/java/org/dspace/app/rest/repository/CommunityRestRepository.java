@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -191,14 +192,42 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         }
     }
 
-    // TODO: Add methods in dspace api to support pagination of top level
-    // communities
     @SearchRestMethod(name = "top")
     public Page<CommunityRest> findAllTop(Pageable pageable) {
         try {
-            List<Community> communities = cs.findAllTop(obtainContext());
-            return converter.toRestPage(communities, pageable, utils.obtainProjection());
-        } catch (SQLException e) {
+            Context context = obtainContext();
+            List<Community> topLevelCommunities = new LinkedList<Community>();
+            DiscoverQuery discoverQuery = new DiscoverQuery();
+            discoverQuery.setQuery("*:*");
+            discoverQuery.setDSpaceObjectFilter(IndexableCommunity.TYPE);
+            discoverQuery.addFilterQueries("-location.parent:*");
+            discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
+            discoverQuery.setSortField("dc.title_sort", DiscoverQuery.SORT_ORDER.asc);
+            discoverQuery.setMaxResults(pageable.getPageSize());
+            DiscoverResult resp = searchService.search(context, discoverQuery);
+            long tot = resp.getTotalSearchResults();
+            for (IndexableObject solrCommunities : resp.getIndexableObjects()) {
+                Community c = ((IndexableCommunity) solrCommunities).getIndexedObject();
+                topLevelCommunities.add(c);
+            }
+            return converter.toRestPage(topLevelCommunities, pageable, tot, utils.obtainProjection());
+        } catch (SearchServiceException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "findAdminAuthorized")
+    public Page<CommunityRest> findAdminAuthorized (
+        Pageable pageable, @Parameter(value = "query") String query) {
+        try {
+            Context context = obtainContext();
+            List<Community> communities = authorizeService.findAdminAuthorizedCommunity(context, query,
+                Math.toIntExact(pageable.getOffset()),
+                Math.toIntExact(pageable.getPageSize()));
+            long tot = authorizeService.countAdminAuthorizedCommunity(context, query);
+            return converter.toRestPage(communities, pageable, tot , utils.obtainProjection());
+        } catch (SearchServiceException | SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

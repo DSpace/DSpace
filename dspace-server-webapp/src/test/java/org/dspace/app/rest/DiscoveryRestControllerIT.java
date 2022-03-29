@@ -7,11 +7,15 @@
  */
 package org.dspace.app.rest;
 
+import static com.google.common.net.UrlEscapers.urlPathSegmentEscaper;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -43,6 +47,7 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.PoolTaskBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
@@ -50,16 +55,27 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest {
+    @Autowired
+    ConfigurationService configurationService;
+
+    @Autowired
+    MetadataAuthorityService metadataAuthorityService;
 
 
     @Test
@@ -176,6 +192,96 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         FacetValueMatcher.entryAuthor("Smith, Maria")
                 )))
         ;
+    }
+
+    @Test
+    public void discoverFacetsAuthorWithAuthorityWithSizeParameter() throws Exception {
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "SolrAuthorAuthority");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+
+        metadataAuthorityService.clearCache();
+
+        //Turn off the authorization system, otherwise we can't make the objects
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects and authors
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald", "test_authority", Choices.CF_ACCEPTED)
+                                      .withAuthor("Doe, John", "test_authority_2", Choices.CF_ACCEPTED)
+                                      .withSubject("History of religion")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Smith, Maria", "test_authority_3", Choices.CF_ACCEPTED)
+                                      .withAuthor("Doe, Jane", "test_authority_4", Choices.CF_ACCEPTED)
+                                      .withSubject("Church studies")
+                                      .withSubject("History of religion")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Smith, Maria", "test_authority_3", Choices.CF_ACCEPTED)
+                                      .withAuthor("Doe, Jane", "test_authority_4", Choices.CF_ACCEPTED)
+                                      .withAuthor("test, test", "test_authority_5", Choices.CF_ACCEPTED)
+                                      .withAuthor("test2, test2", "test_authority_6", Choices.CF_ACCEPTED)
+                                      .withAuthor("Maybe, Maybe", "test_authority_7", Choices.CF_ACCEPTED)
+                                      .withSubject("Missionary studies")
+                                      .withSubject("Church studies")
+                                      .withSubject("History of religion")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the objects in the system and enters a size of 2
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("size", "2"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //The type needs to be 'discover'
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   //The name of the facet needs to be seubject, because that's what we called
+                   .andExpect(jsonPath("$.name", is("author")))
+                   //Because we've constructed such a structure so that we have more than 2 (size) subjects, there
+                   // needs to be a next link
+                   .andExpect(jsonPath("$._links.next.href", containsString("api/discover/facets/author?page")))
+                   //There always needs to be a self link
+                   .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author")))
+                   //Because there are more subjects than is represented (because of the size param), hasMore has to
+                   // be true
+                   //The page object needs to be present and just like specified in the matcher
+                   .andExpect(jsonPath("$.page",
+                                       is(PageMatcher.pageEntry(0, 2))))
+                   //These subjecs need to be in the response because it's sorted on how many times the author comes
+                   // up in different items
+                   //These subjects are the most used ones. Only two show up because of the size.
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entryAuthorWithAuthority("Doe, Jane", "test_authority_4", 2),
+                       FacetValueMatcher.entryAuthorWithAuthority("Smith, Maria", "test_authority_3", 2)
+                   )));
+
+        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
+
+        metadataAuthorityService.clearCache();
+
     }
 
     @Test
@@ -612,7 +718,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //The scope has to be the same as the one that we've given in the parameters
                 .andExpect(jsonPath("$.scope", is("testScope")))
                 //There always needs to be a self link available
-                .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author")))
+                .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author?scope=testScope")))
                 //These are all the authors for the items that were created and thus they have to be present in
                 // the embedded values section
                 .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
@@ -640,7 +746,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //The scope has to be same as the param that we've entered
                 .andExpect(jsonPath("$.scope", is("testScope")))
                 //There always needs to be a self link available
-                .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author")))
+                .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author?scope=testScope")))
+                .andExpect(jsonPath("$._links.next.href",
+                     containsString("api/discover/facets/author?scope=testScope&page=1&size=2")))
                 //These are the values that need to be present as it's ordered by count and these authors are the
                 // most common ones in the items that we've created
                 .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
@@ -876,12 +984,72 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                        SearchFilterMatcher.isJournalOfPublicationRelation()
                    )))
                    //These sortOptions need to be present as it's the default in the configuration
-                   .andExpect(jsonPath("$.sortOptions", containsInAnyOrder(
-                       SortOptionMatcher.titleSortOption(),
-                       SortOptionMatcher.dateIssuedSortOption(),
-                       SortOptionMatcher.dateAccessionedSortOption(),
-                       SortOptionMatcher.scoreSortOption()
+                   .andExpect(jsonPath("$.sortOptions", contains(
+                       SortOptionMatcher.sortOptionMatcher(
+                                         "score", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
+                       SortOptionMatcher.sortOptionMatcher(
+                                         "dc.title", DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
+                       SortOptionMatcher.sortOptionMatcher(
+                                         "dc.date.issued", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
+                       SortOptionMatcher.sortOptionMatcher(
+                                         "dc.date.accessioned", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name())
                    )));
+    }
+
+    @Test
+    public void checkSortOrderInPersonOrOrgunitConfigurationTest() throws Exception {
+        getClient().perform(get("/api/discover/search")
+                   .param("configuration", "personOrOrgunit"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   .andExpect(jsonPath("$._links.objects.href", containsString("api/discover/search/objects")))
+                   .andExpect(jsonPath("$._links.self.href", containsString("api/discover/search")))
+                   .andExpect(jsonPath("$.sortOptions", contains(
+                       SortOptionMatcher.sortOptionMatcher("dspace.entity.type",
+                                         DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
+                       SortOptionMatcher.sortOptionMatcher("organization.legalName",
+                                         DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
+                       SortOptionMatcher.sortOptionMatcher("organisation.address.addressCountry",
+                                         DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
+                       SortOptionMatcher.sortOptionMatcher("organisation.address.addressLocality",
+                                         DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
+                       SortOptionMatcher.sortOptionMatcher("organisation.foundingDate",
+                                         DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
+                       SortOptionMatcher.sortOptionMatcher("dc.date.accessioned",
+                                         DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
+                       SortOptionMatcher.sortOptionMatcher("person.familyName",
+                                         DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
+                       SortOptionMatcher.sortOptionMatcher("person.givenName",
+                                         DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
+                       SortOptionMatcher.sortOptionMatcher("person.birthDate",
+                                         DiscoverySortFieldConfiguration.SORT_ORDER.desc.name())
+                    )));
+    }
+
+    @Test
+    public void discoverSearchByFieldNotConfiguredTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        ItemBuilder.createItem(context, col1)
+                   .withTitle("Test")
+                   .withIssueDate("2010-10-17")
+                   .withAuthor("Testing, Works")
+                   .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/search/objects")
+                   .param("sort", "dc.date.accessioned, ASC")
+                   .param("configuration", "workspace"))
+                   .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -965,6 +1133,58 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
+    }
+
+    @Test
+    public void discoverSearchObjectsWithSpecialCharacterTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity).build();
+        ItemBuilder.createItem(context, collection)
+                .withAuthor("DSpace & friends")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(
+                get("/api/discover/search/objects")
+                        .param("sort", "score,DESC")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.facets", hasItem(allOf(
+                        hasJsonPath("$.name", is("author")),
+                        hasJsonPath("$._embedded.values", hasItem(
+                                hasJsonPath("$._links.search.href", containsString("DSpace%20%26%20friends"))
+                        ))
+                ))));
+    }
+
+    @Test
+    public void discoverSearchBrowsesWithSpecialCharacterTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity).build();
+        ItemBuilder.createItem(context, collection)
+                .withAuthor("DSpace & friends")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(
+                get("/api/discover/browses/author/entries")
+                        .param("sort", "default,ASC")
+                        .param("page", "0")
+                        .param("size", "20"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.entries", hasItem(allOf(
+                        hasJsonPath("$.value", is("DSpace & friends")),
+                        hasJsonPath("$._links.items.href", containsString("DSpace%20%26%20friends"))
+                ))));
     }
 
     @Test
@@ -1222,6 +1442,29 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
+
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", "test"))
+                .andExpect(status().isOk());
+
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", "test:"))
+                .andExpect(status().isUnprocessableEntity());
+
+    }
+
+
+    @Test
+    public void discoverSearchObjectsTestWithInvalidSolrQuery() throws Exception {
+
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", "test"))
+                .andExpect(status().isOk());
+
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", "test:"))
+                .andExpect(status().isUnprocessableEntity());
+
     }
 
 
@@ -2226,6 +2469,110 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
+    }
+
+    /**
+     * This test verifies that
+     * {@link org.dspace.discovery.indexobject.InprogressSubmissionIndexFactoryImpl#storeInprogressItemFields}
+     * indexes the owning collection of workspace items
+     */
+    @Test
+    public void discoverSearchObjectsTestForWorkspaceItemInCollectionScope() throws Exception {
+        // in-progress submissions are only visible to the person who created them
+        context.setCurrentUser(eperson);
+
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Community")
+                .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, community)
+                .withName("Collection 1")
+                .build();
+
+        Collection collection2 = CollectionBuilder.createCollection(context, community)
+                .withName("Collection 2")
+                .build();
+
+        WorkspaceItem wsi1 = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
+                .withTitle("Workspace Item 1")
+                .build();
+
+        WorkspaceItem wsi2 = WorkspaceItemBuilder.createWorkspaceItem(context, collection2)
+                .withTitle("Workspace Item 2")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(ePersonToken).perform(
+            get("/api/discover/search/objects")
+                // The workspace configuration returns all items (workspace, workflow, archived) of the current user
+                // see: https://github.com/DSpace/RestContract/blob/main/search-endpoint.md#workspace
+                .param("configuration", "workspace")
+                .param("scope", collection1.getID().toString())
+        )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.scope", is(collection1.getID().toString())))
+            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", allOf(
+                hasSize(1),
+                hasJsonPath("$[0]._embedded.indexableObject", WorkspaceItemMatcher.matchProperties(wsi1))
+            )));
+    }
+
+    /**
+     * This test verifies that
+     * {@link org.dspace.discovery.indexobject.InprogressSubmissionIndexFactoryImpl#storeInprogressItemFields}
+     * indexes the owning collection of workflow items
+     */
+    @Test
+    public void discoverSearchObjectsTestForWorkflowItemInCollectionScope() throws Exception {
+        // in-progress submissions are only visible to the person who created them
+        context.setCurrentUser(eperson);
+
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("Community")
+            .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, community)
+            .withName("Collection 1")
+            .withWorkflowGroup(1, admin) // enable the workflow, otherwise the item would be archived immediately
+            .build();
+
+        Collection collection2 = CollectionBuilder.createCollection(context, community)
+            .withName("Collection 2")
+            .withWorkflowGroup(1, admin) // enable the workflow, otherwise the item would be archived immediately
+            .build();
+
+        XmlWorkflowItem wfi1 = WorkflowItemBuilder.createWorkflowItem(context, collection1)
+            .withTitle("Workflow Item 1")
+            .build();
+
+        XmlWorkflowItem wfi2 = WorkflowItemBuilder.createWorkflowItem(context, collection2)
+            .withTitle("Workflow Item 2")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(ePersonToken).perform(
+            get("/api/discover/search/objects")
+                // The workspace configuration returns all items (workspace, workflow, archived) of the current user
+                // see: https://github.com/DSpace/RestContract/blob/main/search-endpoint.md#workspace
+                .param("configuration", "workspace")
+                .param("scope", collection1.getID().toString())
+        )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.scope", is(collection1.getID().toString())))
+            .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", allOf(
+                hasSize(1),
+                hasJsonPath("$[0]._embedded.indexableObject", WorkflowItemMatcher.matchProperties(wfi1))
+            )));
     }
 
     @Test
@@ -3586,7 +3933,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/discover/search/objects")
                                 .param("query", "OR"))
 
-                   .andExpect(status().isBadRequest())
+                   .andExpect(status().isUnprocessableEntity())
         ;
 
     }
@@ -4959,5 +5306,540 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         )
                 ))
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
+    }
+
+    @Test
+    public void discoverSearchObjectsTestForAdministrativeViewWithFiltersEquals() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder
+                .createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder
+                .createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder
+                .createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+        Collection col2 = CollectionBuilder
+                .createCollection(context, child1)
+                .withName("Collection 2")
+                .build();
+
+        ItemBuilder.createItem(context, col1)
+                .withTitle("Public Test Item")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        ItemBuilder.createItem(context, col2)
+                .withTitle("Withdrawn Test Item")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria")
+                .withAuthor("Doe, Jane")
+                .withSubject("ExtraEntry")
+                .withdrawn()
+                .build();
+
+        ItemBuilder.createItem(context, col2)
+                .withTitle("Private Test Item")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria")
+                .withAuthor("Doe, Jane")
+                .withSubject("AnotherTest")
+                .withSubject("ExtraEntry")
+                .makeUnDiscoverable()
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken)
+                .perform(get("/api/discover/search/objects")
+                        .param("configuration", "administrativeView")
+                        .param("query", "Test")
+                        .param("f.withdrawn", "true,equals")
+                )
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type", is("discover")))
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
+                )))
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+                        Matchers.contains(
+                                SearchResultMatcher.matchOnItemName("item", "items", "Withdrawn Test Item")
+                        )
+                ))
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
+
+        getClient(adminToken)
+                .perform(get("/api/discover/search/objects")
+                        .param("configuration", "administrativeView")
+                        .param("query", "Test")
+                        .param("f.withdrawn", "false,equals")
+                )
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type", is("discover")))
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
+                )))
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+                        Matchers.containsInAnyOrder(
+                                SearchResultMatcher.matchOnItemName("item", "items", "Public Test Item"),
+                                SearchResultMatcher.matchOnItemName("item", "items", "Private Test Item")
+                        )
+                ))
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
+
+        getClient(adminToken)
+                .perform(get("/api/discover/search/objects")
+                        .param("configuration", "administrativeView")
+                        .param("query", "Test")
+                        .param("f.discoverable", "true,equals")
+                )
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type", is("discover")))
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
+                )))
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+                        Matchers.containsInAnyOrder(
+                                SearchResultMatcher.matchOnItemName("item", "items", "Public Test Item"),
+                                SearchResultMatcher.matchOnItemName("item", "items", "Withdrawn Test Item")
+                        )
+                ))
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
+
+        getClient(adminToken)
+                .perform(get("/api/discover/search/objects")
+                        .param("configuration", "administrativeView")
+                        .param("query", "Test")
+                        .param("f.discoverable", "false,equals")
+                )
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type", is("discover")))
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
+                )))
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+                        Matchers.contains(
+                                SearchResultMatcher.matchOnItemName("item", "items", "Private Test Item")
+                        )
+                ))
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
+    }
+
+    @Test
+    public void discoverSearchPoolTaskObjectsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password).build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer, admin).build();
+
+        ItemBuilder.createItem(context, col)
+                   .withTitle("Punnett square")
+                   .withIssueDate("2016-02-13")
+                   .withAuthor("Bandola, Roman")
+                   .withSubject("ExtraEntry").build();
+
+        // create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password).build();
+
+        context.setCurrentUser(submitter);
+
+        PoolTaskBuilder.createPoolTask(context, col, reviewer)
+                       .withTitle("Metaphysics")
+                       .withIssueDate("2017-10-17")
+                       .withAuthor("Smith, Donald")
+                       .withSubject("ExtraEntry").build();
+
+        PoolTaskBuilder.createPoolTask(context, col, reviewer)
+                       .withTitle("Mathematical Theory")
+                       .withIssueDate("2020-01-19")
+                       .withAuthor("Tommaso, Gattari")
+                       .withSubject("ExtraEntry").build();
+
+        PoolTaskBuilder.createPoolTask(context, col, reviewer)
+                       .withTitle("Test Metaphysics")
+                       .withIssueDate("2017-10-17")
+                       .withAuthor("Smith, Donald")
+                       .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(get("/api/discover/search/objects")
+                             .param("configuration", "workflow")
+                             .param("sort", "dc.date.issued,DESC")
+                             .param("query", "Mathematical Theory"))
+                         .andExpect(status().isOk())
+                         .andExpect(jsonPath("$.query", is("Mathematical Theory")))
+                         .andExpect(jsonPath("$.configuration", is("workflow")))
+                         .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+                                             SearchResultMatcher.match("workflow", "pooltask", "pooltasks")
+                          )))
+                         .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",Matchers.contains(
+                              allOf(hasJsonPath("$._embedded.indexableObject._embedded.workflowitem._embedded.item",
+                                 is(SearchResultMatcher.matchEmbeddedObjectOnItemName("item", "Mathematical Theory"))))
+                          )))
+                         .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(1)));
+
+        getClient(adminToken).perform(get("/api/discover/search/objects")
+                             .param("configuration", "workflow")
+                             .param("sort", "dc.date.issued,DESC")
+                             .param("query", "Metaphysics"))
+                         .andExpect(status().isOk())
+                         .andExpect(jsonPath("$.query", is("Metaphysics")))
+                         .andExpect(jsonPath("$.configuration", is("workflow")))
+                         .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                                             SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
+                                             SearchResultMatcher.match("workflow", "pooltask", "pooltasks")
+                                             )))
+                         .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",Matchers.containsInAnyOrder(
+                              allOf(hasJsonPath("$._embedded.indexableObject._embedded.workflowitem._embedded.item",
+                                 is(SearchResultMatcher.matchEmbeddedObjectOnItemName("item", "Metaphysics")))),
+                              allOf(hasJsonPath("$._embedded.indexableObject._embedded.workflowitem._embedded.item",
+                                 is(SearchResultMatcher.matchEmbeddedObjectOnItemName("item", "Test Metaphysics"))))
+                          )))
+                         .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void discoverSearchPoolTaskObjectsEmptyQueryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        EPerson reviewer = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password).build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer, admin).build();
+
+        ItemBuilder.createItem(context, col)
+                   .withTitle("Punnett square")
+                   .withIssueDate("2016-02-13")
+                   .withAuthor("Bandola, Roman")
+                   .withSubject("ExtraEntry").build();
+
+        // create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password).build();
+
+        context.setCurrentUser(submitter);
+
+        PoolTaskBuilder.createPoolTask(context, col, reviewer)
+                       .withTitle("Metaphysics")
+                       .withIssueDate("2017-10-17")
+                       .withAuthor("Smith, Donald")
+                       .withSubject("ExtraEntry").build();
+
+        PoolTaskBuilder.createPoolTask(context, col, reviewer)
+                       .withTitle("Mathematical Theory")
+                       .withIssueDate("2020-01-19")
+                       .withAuthor("Tommaso, Gattari")
+                       .withSubject("ExtraEntry").build();
+
+        PoolTaskBuilder.createPoolTask(context, col, reviewer)
+                       .withTitle("Test Metaphysics")
+                       .withIssueDate("2017-10-17")
+                       .withAuthor("Smith, Donald")
+                       .withSubject("ExtraEntry").build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(get("/api/discover/search/objects")
+                             .param("configuration", "workflow")
+                             .param("sort", "dc.date.issued,DESC")
+                             .param("query", ""))
+                         .andExpect(status().isOk())
+                         .andExpect(jsonPath("$.configuration", is("workflow")))
+                         .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                                             SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
+                                             SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
+                                             SearchResultMatcher.match("workflow", "pooltask", "pooltasks")
+                                             )))
+                         .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",Matchers.containsInAnyOrder(
+                              allOf(hasJsonPath("$._embedded.indexableObject._embedded.workflowitem._embedded.item",
+                                 is(SearchResultMatcher.matchEmbeddedObjectOnItemName("item", "Mathematical Theory")))),
+                              allOf(hasJsonPath("$._embedded.indexableObject._embedded.workflowitem._embedded.item",
+                                 is(SearchResultMatcher.matchEmbeddedObjectOnItemName("item", "Metaphysics")))),
+                              allOf(hasJsonPath("$._embedded.indexableObject._embedded.workflowitem._embedded.item",
+                                 is(SearchResultMatcher.matchEmbeddedObjectOnItemName("item", "Test Metaphysics"))))
+                          )))
+                         .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(3)));
+    }
+
+
+    @Test
+    public void discoverSearchFacetValuesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2").build();
+
+        ItemBuilder.createItem(context, col1)
+                   .withTitle("Public Test Item")
+                   .withIssueDate("2010-10-17")
+                   .withAuthor("Smith, Donald")
+                   .withSubject("ExtraEntry").build();
+
+        ItemBuilder.createItem(context, col2)
+                   .withTitle("Withdrawn Test Item")
+                   .withIssueDate("1990-02-13")
+                   .withAuthor("Smith, Maria")
+                   .withAuthor("Doe, Jane")
+                   .withSubject("ExtraEntry")
+                   .withdrawn().build();
+
+        ItemBuilder.createItem(context, col2)
+                   .withTitle("Private Test Item")
+                   .withIssueDate("2010-02-13")
+                   .withAuthor("Smith, Maria")
+                   .withAuthor("Doe, Jane")
+                   .withSubject("AnotherTest")
+                   .withSubject("ExtraEntry")
+                   .makeUnDiscoverable().build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(get("/api/discover/facets/discoverable")
+                 .param("configuration", "administrativeView")
+                 .param("sort", "score,DESC")
+                 .param("page", "0")
+                 .param("size", "10"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._links.self.href",containsString(
+                  "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC")))
+                 .andExpect(jsonPath("$._embedded.values", Matchers.containsInAnyOrder(
+                            SearchResultMatcher.matchEmbeddedFacetValues("true", 2, "discover",
+                            "/api/discover/search/objects?configuration=administrativeView&f.discoverable=true,equals"),
+                            SearchResultMatcher.matchEmbeddedFacetValues("false", 1, "discover",
+                            "/api/discover/search/objects?configuration=administrativeView&f.discoverable=false,equals")
+                            )));
+
+    }
+
+    @Test
+    public void discoverSearchFacetValuesPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2").build();
+
+        ItemBuilder.createItem(context, col1)
+                   .withTitle("Public Test Item")
+                   .withIssueDate("2010-10-17")
+                   .withAuthor("Smith, Donald")
+                   .withSubject("ExtraEntry").build();
+
+        ItemBuilder.createItem(context, col2)
+                   .withTitle("Withdrawn Test Item")
+                   .withIssueDate("1990-02-13")
+                   .withAuthor("Smith, Maria")
+                   .withAuthor("Doe, Jane")
+                   .withSubject("ExtraEntry")
+                   .withdrawn().build();
+
+        ItemBuilder.createItem(context, col2)
+                   .withTitle("Private Test Item")
+                   .withIssueDate("2010-02-13")
+                   .withAuthor("Smith, Maria")
+                   .withAuthor("Doe, Jane")
+                   .withSubject("AnotherTest")
+                   .withSubject("ExtraEntry")
+                   .makeUnDiscoverable().build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(get("/api/discover/facets/discoverable")
+                 .param("configuration", "administrativeView")
+                 .param("sort", "score,DESC")
+                 .param("page", "0")
+                 .param("size", "1"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._links.self.href",containsString(
+                  "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC")))
+                 .andExpect(jsonPath("$._links.next.href",containsString(
+                  "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC&page=1&size=1")))
+                 .andExpect(jsonPath("$._embedded.values", Matchers.contains(
+                            SearchResultMatcher.matchEmbeddedFacetValues("true", 2, "discover",
+                            "/api/discover/search/objects?configuration=administrativeView&f.discoverable=true,equals")
+                            )));
+
+        getClient(adminToken).perform(get("/api/discover/facets/discoverable")
+                .param("configuration", "administrativeView")
+                .param("sort", "score,DESC")
+                .param("page", "1")
+                .param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._links.first.href",containsString(
+                 "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC&page=0&size=1")))
+                .andExpect(jsonPath("$._links.prev.href",containsString(
+                 "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC&page=0&size=1")))
+                .andExpect(jsonPath("$._links.self.href",containsString(
+                 "/api/discover/facets/discoverable?configuration=administrativeView&sort=score,DESC&page=1&size=1")))
+                .andExpect(jsonPath("$._embedded.values", Matchers.contains(
+                           SearchResultMatcher.matchEmbeddedFacetValues("false", 1, "discover",
+                           "/api/discover/search/objects?configuration=administrativeView&f.discoverable=false,equals")
+                           )));
+    }
+
+    @Test
+    public void discoverFacetsTestWithQueryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 2").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2019-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2020-02-13")
+                .withAuthor("Doe, Jane")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2020-02-13")
+                .withAuthor("Anton, Senek")
+                .withSubject("AnotherTest").withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/facets/author")
+                   .param("query", "Donald"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   .andExpect(jsonPath("$.name", is("author")))
+                   .andExpect(jsonPath("$.facetType", is("text")))
+                   .andExpect(jsonPath("$.scope", is(emptyOrNullString())))
+                   .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author?query=Donald")))
+                   .andExpect(jsonPath("$._embedded.values[0].label", is("Smith, Donald")))
+                   .andExpect(jsonPath("$._embedded.values[0].count", is(1)))
+                   .andExpect(jsonPath("$._embedded.values[0]._links.search.href",
+                        containsString("api/discover/search/objects?query=Donald&f.author=" +
+                                urlPathSegmentEscaper().escape("Smith, Donald,equals")
+                        )))
+                   .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
+
+    }
+
+    @Test
+    public void discoverFacetsTestWithDsoTypeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 2").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2020-02-13")
+                .withAuthor("Doe, Jane")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2020-02-13")
+                .withAuthor("Anton, Senek")
+                .withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/facets/dateIssued")
+                   .param("dsoType", "Item"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   .andExpect(jsonPath("$.name", is("dateIssued")))
+                   .andExpect(jsonPath("$.facetType", is("date")))
+                   .andExpect(jsonPath("$.scope", is(emptyOrNullString())))
+                   .andExpect(jsonPath("$._links.self.href",
+                        containsString("api/discover/facets/dateIssued?dsoType=Item")))
+                   .andExpect(jsonPath("$._embedded.values[0].label", is("2017 - 2020")))
+                   .andExpect(jsonPath("$._embedded.values[0].count", is(3)))
+                   .andExpect(jsonPath("$._embedded.values[0]._links.search.href",
+                        containsString("api/discover/search/objects?dsoType=Item&f.dateIssued=" +
+                                urlPathSegmentEscaper().escape("[2017 TO 2020],equals")
+                        )))
+                   .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
+
     }
 }

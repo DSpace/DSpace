@@ -10,6 +10,10 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
+import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -47,6 +51,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
@@ -70,7 +77,6 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private XmlWorkflowFactory xmlWorkflowFactory;
-
 
     @Test
     /**
@@ -1823,7 +1829,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer3Token = getAuthToken(reviewer3.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         Step step = xmlWorkflowFactory.getStepByName("reviewstep");
         // step 1
@@ -1997,7 +2003,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 1
         getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2094,7 +2100,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 1
         getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2181,7 +2187,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 2
         getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2279,8 +2285,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
-        AtomicReference<Integer> idRefClaimedTask = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        AtomicReference<Integer> idRefClaimedTask = new AtomicReference<>();
 
         // step 2
         getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2373,7 +2379,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer3Token = getAuthToken(reviewer3.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 3
         getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2466,7 +2472,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer3Token = getAuthToken(reviewer3.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 3
         getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2549,7 +2555,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer3Token = getAuthToken(reviewer3.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 3
         getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2696,7 +2702,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 2
         getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2719,8 +2725,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String authToken = getAuthToken(eperson.getEmail(), password);
 
         // a simple patch to update an existent metadata
-        List<Operation> updateTitle = new ArrayList<Operation>();
-        Map<String, String> value = new HashMap<String, String>();
+        List<Operation> updateTitle = new ArrayList<>();
+        Map<String, String> value = new HashMap<>();
         value.put("value", "New Title");
         updateTitle.add(new ReplaceOperation("/sections/traditionalpageone/dc.title/0", value));
 
@@ -2843,7 +2849,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
         // step 1
         getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -2873,8 +2879,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String authToken = getAuthToken(eperson.getEmail(), password);
 
         // a simple patch to update an existent metadata
-        List<Operation> updateTitle = new ArrayList<Operation>();
-        Map<String, String> value = new HashMap<String, String>();
+        List<Operation> updateTitle = new ArrayList<>();
+        Map<String, String> value = new HashMap<>();
         value.put("value", "New Title");
         updateTitle.add(new ReplaceOperation("/sections/traditionalpageone/dc.title/0", value));
 
@@ -4133,4 +4139,194 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                .param("uuid", witem.getItem().getID().toString()))
                                .andExpect(status().isNoContent());
     }
+    @Test
+    public void poolTaskSerchMethodWithSingleModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/workflow/pooltask/search"))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void claimedtaskSerchMethodWithSingleModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/workflow/claimedtask/search"))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void poolTaskSerchMethodWithPluralModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/workflow/pooltasks/search"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._links.findByUser.href", Matchers.allOf(
+                                        Matchers.containsString("/api/workflow/pooltasks/search/findByUser"))));
+    }
+
+    @Test
+    public void claimedtaskSerchMethodWithPluralModelTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/workflow/claimedtasks/search"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._links.findByUser.href", Matchers.allOf(
+                                        Matchers.containsString("/api/workflow/claimedtasks/search/findByUser"))));
+    }
+
+
+    @Test
+    public void addReviewerToRunningWorkflowTest() throws Exception {
+
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer1@example.com")
+                .withPassword(password).build();
+
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer2@example.com")
+                .withPassword(password).build();
+
+        EPerson reviewerOther = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewerOther@example.com")
+                .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer1)
+                                           .withWorkflowGroup(2, reviewer2)
+                                           .build();
+
+        Group firstWorkflowGroup = col1.getWorkflowStep1(context);
+
+        // create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        // create a workflowitem (so a pool task in step1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                        .withTitle("Test title")
+                        .withIssueDate("2021-02-11")
+                        .withSubject("ExtraEntry").build();
+
+        Item item = witem.getItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+        String reviewerOtherToken = getAuthToken(reviewerOther.getEmail(), password);
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+
+        Step step = xmlWorkflowFactory.getStepByName("reviewstep");
+
+        // step 1
+        getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+                                 .param("uuid", reviewer1.getID().toString())
+                                 .param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                    Matchers.allOf(
+                            Matchers.is(PoolTaskMatcher.matchPoolTask(null, "reviewstep")),
+                            hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
+                            hasJsonPath("$._embedded.workflowitem",
+                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                            witem, "Test title", "2021-02-11", "ExtraEntry")))
+                            ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+                .andDo((result -> idRef
+                        .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        assertFalse(groupService.isMember(context, reviewerOther, firstWorkflowGroup));
+
+        getClient(adminToken).perform(post("/api/eperson/groups/" + firstWorkflowGroup.getID() + "/epersons")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content(REST_SERVER_URL + "eperson/groups/" + reviewerOther.getID()))
+                             .andExpect(status().isNoContent());
+
+        assertTrue(groupService.isMember(context, reviewerOther, firstWorkflowGroup));
+
+        getClient(reviewerOtherToken).perform(get("/api/workflow/pooltasks/search/findByUser")
+                                     .param("uuid", reviewerOther.getID().toString())
+                                     .param("projection", "full"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.pooltasks",
+                        Matchers.contains(Matchers.allOf(Matchers.is(PoolTaskMatcher.matchPoolTask(null, "reviewstep")),
+                                hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
+                                hasJsonPath("$._embedded.workflowitem",
+                                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                                                "Test title", "2021-02-11", "ExtraEntry")))))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+                .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)))
+                .andDo((result -> idRef
+                        .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        // claim the task
+        getClient(reviewerOtherToken).perform(post("/api/workflow/claimedtasks")
+                                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                     .content("/api/workflow/pooltasks/" + idRef.get()))
+                                 .andExpect(status().isCreated())
+                                 .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
+                                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+        getClient(reviewerOtherToken).perform(get("/api/workflow/claimedtasks/search/findByUser")
+                                     .param("uuid", reviewerOther.getID().toString()))
+                                     .andExpect(status().isOk())
+                                     .andExpect(jsonPath("$._embedded.claimedtasks[0]._embedded.workflowitem",
+                                         Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                                             witem, "Test title", "2021-02-11", "ExtraEntry"))))
+                                     .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        WorkflowActionConfig workflowAction = xmlWorkflowFactory.getActionByName("reviewaction");
+
+        // approve the claimedTask, wf step 1
+        getClient(reviewerOtherToken).perform(post("/api/workflow/claimedtasks/" + idRef.get())
+                                     .param("submit_approve", "true")
+                                     .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                                     .andExpect(status().isNoContent());
+
+        step = xmlWorkflowFactory.getStepByName("editstep");
+
+        // step 2
+        getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+                .param("uuid", reviewer2.getID().toString()).param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                    Matchers.allOf(
+                            Matchers.is(PoolTaskMatcher.matchPoolTask(null, "editstep")),
+                            hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
+                            hasJsonPath("$._embedded.workflowitem",
+                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                            witem, "Test title", "2021-02-11", "ExtraEntry")))
+                            ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+                .andDo((result -> idRef
+                        .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        // claim the task
+        getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks")
+                .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                .content("/api/workflow/pooltasks/" + idRef.get()))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+    }
+
 }

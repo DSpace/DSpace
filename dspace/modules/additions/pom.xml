@@ -17,7 +17,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>7.0-beta5-SNAPSHOT</version>
+      <version>7.3-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -295,7 +295,7 @@
       </dependency>
       <dependency>
          <groupId>org.mockito</groupId>
-         <artifactId>mockito-core</artifactId>
+         <artifactId>mockito-inline</artifactId>
          <scope>test</scope>
       </dependency>
 

@@ -36,7 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
@@ -99,12 +98,6 @@ public abstract class JWTTokenHandler {
     protected abstract String getTokenExpirationConfigurationKey();
 
     /**
-     * Get the configuration property key for the include ip.
-     * @return the configuration property key
-     */
-    protected abstract String getTokenIncludeIPConfigurationKey();
-
-    /**
      * Get the configuration property key for the encryption enable setting.
      * @return the configuration property key
      */
@@ -161,12 +154,11 @@ public abstract class JWTTokenHandler {
      * @param context current Context
      * @param request current Request
      * @param previousLoginDate date of last login (before this one)
-     * @param groups List of user Groups
      * @return string version of signed JWT
      * @throws JOSEException
      */
-    public String createTokenForEPerson(Context context, HttpServletRequest request, Date previousLoginDate,
-                                        List<Group> groups) throws JOSEException, SQLException {
+    public String createTokenForEPerson(Context context, HttpServletRequest request, Date previousLoginDate)
+        throws JOSEException, SQLException {
 
         // Verify that the user isn't trying to use a short lived token to generate another token
         if (StringUtils.isNotBlank(request.getParameter(AUTHORIZATION_TOKEN_PARAMETER))) {
@@ -227,10 +219,6 @@ public abstract class JWTTokenHandler {
         return secret;
     }
 
-    public boolean getIncludeIP() {
-        return configurationService.getBooleanProperty(getTokenIncludeIPConfigurationKey(), true);
-    }
-
     public long getExpirationPeriod() {
         return configurationService.getLongProperty(getTokenExpirationConfigurationKey(), 1800000);
     }
@@ -288,7 +276,7 @@ public abstract class JWTTokenHandler {
         if (ePerson == null || StringUtils.isBlank(ePerson.getSessionSalt())) {
             return false;
         } else {
-            JWSVerifier verifier = new MACVerifier(buildSigningKey(request, ePerson));
+            JWSVerifier verifier = new MACVerifier(buildSigningKey(ePerson));
 
             //If token is valid and not expired return eperson in token
             Date expirationTime = jwtClaimsSet.getExpirationTime();
@@ -347,7 +335,7 @@ public abstract class JWTTokenHandler {
         SignedJWT signedJWT = new SignedJWT(
             new JWSHeader(JWSAlgorithm.HS256), claimsSet);
 
-        JWSSigner signer = new MACSigner(buildSigningKey(request, ePerson));
+        JWSSigner signer = new MACSigner(buildSigningKey(ePerson));
         signedJWT.sign(signer);
         return signedJWT;
     }
@@ -385,18 +373,18 @@ public abstract class JWTTokenHandler {
      * this way the key is always long enough for the HMAC using SHA-256 algorithm.
      * More information: https://tools.ietf.org/html/rfc7518#section-3.2
      *
-     * @param request
-     * @param ePerson
-     * @return
+     * @param ePerson currently authenticated EPerson
+     * @return signing key for token
      */
-    protected String buildSigningKey(HttpServletRequest request, EPerson ePerson) {
-        String ipAddress = "";
-        if (getIncludeIP()) {
-            ipAddress = getIpAddress(request);
-        }
-        return getJwtKey() + ePerson.getSessionSalt() + ipAddress;
+    protected String buildSigningKey(EPerson ePerson) {
+        return getJwtKey() + ePerson.getSessionSalt();
     }
 
+    /**
+     * Get IP Address of client. Only used for logging purposes at this time
+     * @param request current request
+     * @return IP address of client
+     */
     private String getIpAddress(HttpServletRequest request) {
         return clientInfoService.getClientIp(request);
     }
@@ -422,7 +410,7 @@ public abstract class JWTTokenHandler {
             if (StringUtils.isBlank(ePerson.getSessionSalt())
                 || previousLoginDate == null
                 || (ePerson.getLastActive().getTime() - previousLoginDate.getTime() > getExpirationPeriod())) {
-
+                log.debug("Regenerating auth token as session salt was either empty or expired..");
                 ePerson.setSessionSalt(generateRandomKey());
                 ePersonService.update(context, ePerson);
             }

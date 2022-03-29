@@ -10,8 +10,6 @@ package org.dspace.app.util;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,7 +28,6 @@ import org.dspace.content.EntityType;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.EntityTypeService;
-import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
 import org.w3c.dom.Document;
@@ -40,22 +37,20 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * This script is used to initialize the database with a set of relationshiptypes that are written
+ * This script is used to initialize the database with a set of relationship types that are written
  * in an xml file that is given to this script.
- * This XML file needs to have a proper XML structure and needs to define the variables of the RelationshipType object
+ * This XML file needs to have a proper XML structure and needs to define the variables of the RelationshipType object.
  */
 public class InitializeEntities {
 
     private final static Logger log = LogManager.getLogger();
 
     private final RelationshipTypeService relationshipTypeService;
-    private final RelationshipService relationshipService;
     private final EntityTypeService entityTypeService;
 
 
     private InitializeEntities() {
         relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
-        relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
         entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
     }
 
@@ -111,14 +106,12 @@ public class InitializeEntities {
         try {
             File fXmlFile = new File(fileLocation);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = null;
-            dBuilder = dbFactory.newDocumentBuilder();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
 
             doc.getDocumentElement().normalize();
 
             NodeList nList = doc.getElementsByTagName("type");
-            List<RelationshipType> relationshipTypes = new LinkedList<>();
             for (int i = 0; i < nList.getLength(); i++) {
                 Node nNode = nList.item(i);
 
@@ -146,6 +139,14 @@ public class InitializeEntities {
                         copyToRight = Boolean.valueOf(copyToRightNode.getTextContent());
                     }
 
+                    Node tiltedNode = eElement.getElementsByTagName("tilted").item(0);
+                    RelationshipType.Tilted tilted;
+                    if (tiltedNode == null) {
+                        tilted = RelationshipType.Tilted.NONE;
+                    } else {
+                        tilted = RelationshipType.Tilted.valueOf(tiltedNode.getTextContent().toUpperCase());
+                    }
+
                     NodeList leftCardinalityList = eElement.getElementsByTagName("leftCardinality");
                     NodeList rightCardinalityList = eElement.getElementsByTagName("rightCardinality");
 
@@ -170,7 +171,8 @@ public class InitializeEntities {
                     }
                     populateRelationshipType(context, leftType, rightType, leftwardType, rightwardType,
                                              leftCardinalityMin, leftCardinalityMax,
-                                             rightCardinalityMin, rightCardinalityMax, copyToLeft, copyToRight);
+                                             rightCardinalityMin, rightCardinalityMax, copyToLeft, copyToRight,
+                                             tilted);
 
 
                 }
@@ -190,7 +192,7 @@ public class InitializeEntities {
     private void populateRelationshipType(Context context, String leftType, String rightType, String leftwardType,
                                           String rightwardType, String leftCardinalityMin, String leftCardinalityMax,
                                           String rightCardinalityMin, String rightCardinalityMax,
-                                          Boolean copyToLeft, Boolean copyToRight)
+                                          Boolean copyToLeft, Boolean copyToRight, RelationshipType.Tilted tilted)
         throws SQLException, AuthorizeException {
 
         EntityType leftEntityType = entityTypeService.findByEntityType(context,leftType);
@@ -231,10 +233,11 @@ public class InitializeEntities {
             relationshipTypeService.create(context, leftEntityType, rightEntityType, leftwardType, rightwardType,
                                            leftCardinalityMinInteger, leftCardinalityMaxInteger,
                                            rightCardinalityMinInteger, rightCardinalityMaxInteger,
-                                           copyToLeft, copyToRight);
+                                           copyToLeft, copyToRight, tilted);
         } else {
             relationshipType.setCopyToLeft(copyToLeft);
             relationshipType.setCopyToRight(copyToRight);
+            relationshipType.setTilted(tilted);
             relationshipType.setLeftMinCardinality(leftCardinalityMinInteger);
             relationshipType.setLeftMaxCardinality(leftCardinalityMaxInteger);
             relationshipType.setRightMinCardinality(rightCardinalityMinInteger);

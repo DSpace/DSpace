@@ -15,14 +15,13 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.sherpa.SHERPAService;
 import org.dspace.app.sherpa.v2.SHERPAPublisher;
 import org.dspace.app.sherpa.v2.SHERPAPublisherResponse;
 import org.dspace.app.sherpa.v2.SHERPAUtils;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
-import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.provider.AbstractExternalDataProvider;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with SHERPAPublisher External
@@ -33,11 +32,7 @@ import org.dspace.external.provider.ExternalDataProvider;
  *
  * @author Kim Shepherd
  */
-public class SHERPAv2PublisherDataProvider implements ExternalDataProvider {
-
-    // Logger
-    private static final Logger log =
-        org.apache.logging.log4j.LogManager.getLogger(SHERPAv2PublisherDataProvider.class);
+public class SHERPAv2PublisherDataProvider extends AbstractExternalDataProvider {
 
     // Source identifier (eg 'sherpaPublisher') configured in spring configuration
     private String sourceIdentifier;
@@ -90,7 +85,7 @@ public class SHERPAv2PublisherDataProvider implements ExternalDataProvider {
     public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
         // Search SHERPA for publishers with the query term in the title (name)
         SHERPAPublisherResponse sherpaResponse = sherpaService.performPublisherRequest(
-            "publication", "title", "contains word", query, start, limit);
+            "publisher", "name", "contains word", query, start, limit);
 
         // If at least one publisher was found, convert to a list of ExternalDataObjects and return
         if (CollectionUtils.isNotEmpty(sherpaResponse.getPublishers())) {

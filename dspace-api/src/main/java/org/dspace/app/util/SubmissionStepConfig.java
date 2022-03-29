@@ -30,6 +30,7 @@ public class SubmissionStepConfig implements Serializable {
 
     public static final String INPUT_FORM_STEP_NAME = "submission-form";
     public static final String UPLOAD_STEP_NAME = "upload";
+    public static final String ACCESS_CONDITION_STEP_NAME = "accessCondition";
 
     /*
      * The identifier for the Select Collection step
