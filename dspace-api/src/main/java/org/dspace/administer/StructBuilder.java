@@ -117,8 +117,6 @@ public class StructBuilder {
     protected static final HandleService handleService
             = HandleServiceFactory.getInstance().getHandleService();
 
-    private static boolean keepHandles;
-
     /**
      * Default constructor
      */
@@ -229,8 +227,8 @@ public class StructBuilder {
                 inputStream = new FileInputStream(input);
             }
 
-            keepHandles = options.hasOption("k");
-            importStructure(context, inputStream, outputStream);
+            boolean keepHandles = options.hasOption("k");
+            importStructure(context, inputStream, outputStream, keepHandles);
             // save changes from import
             context.complete();
         }
@@ -243,6 +241,7 @@ public class StructBuilder {
      * @param context
      * @param input XML which describes the new communities and collections.
      * @param output input, annotated with the new objects' identifiers.
+     * @param keepHandles true if Handles should be set from input.
      * @throws IOException
      * @throws ParserConfigurationException
      * @throws SAXException
@@ -250,7 +249,7 @@ public class StructBuilder {
      * @throws SQLException
      */
     static void importStructure(Context context, InputStream input,
-            OutputStream output)
+            OutputStream output, boolean keepHandles)
             throws IOException, ParserConfigurationException, SQLException,
             TransformerException {
 
@@ -314,7 +313,7 @@ public class StructBuilder {
             NodeList first = XPathAPI.selectNodeList(document, "/import_structure/community");
 
             // run the import starting with the top level communities
-            elements = handleCommunities(context, first, null);
+            elements = handleCommunities(context, first, null, keepHandles);
         } catch (TransformerException ex) {
             System.err.format("Input content not understood:  %s%n", ex.getMessage());
             System.exit(1);
@@ -633,10 +632,12 @@ public class StructBuilder {
      * @param context     the context of the request
      * @param communities a nodelist of communities to create along with their sub-structures
      * @param parent      the parent community of the nodelist of communities to create
+     * @param keepHandles use Handles from input.
      * @return an element array containing additional information regarding the
      * created communities (e.g. the handles they have been assigned)
      */
-    private static Element[] handleCommunities(Context context, NodeList communities, Community parent)
+    private static Element[] handleCommunities(Context context, NodeList communities,
+            Community parent, boolean keepHandles)
         throws TransformerException, SQLException, AuthorizeException {
         Element[] elements = new Element[communities.getLength()];
 
@@ -728,11 +729,13 @@ public class StructBuilder {
 
             // handle sub communities
             NodeList subCommunities = XPathAPI.selectNodeList(tn, "community");
-            Element[] subCommunityElements = handleCommunities(context, subCommunities, community);
+            Element[] subCommunityElements = handleCommunities(context,
+                    subCommunities, community, keepHandles);
 
             // handle collections
             NodeList collections = XPathAPI.selectNodeList(tn, "collection");
-            Element[] collectionElements = handleCollections(context, collections, community);
+            Element[] collectionElements = handleCollections(context,
+                    collections, community, keepHandles);
 
             int j;
             for (j = 0; j < subCommunityElements.length; j++) {
@@ -757,7 +760,8 @@ public class StructBuilder {
      * @return an Element array containing additional information about the
      * created collections (e.g. the handle)
      */
-    private static Element[] handleCollections(Context context, NodeList collections, Community parent)
+    private static Element[] handleCollections(Context context,
+            NodeList collections, Community parent, boolean keepHandles)
         throws TransformerException, SQLException, AuthorizeException {
         Element[] elements = new Element[collections.getLength()];
 
