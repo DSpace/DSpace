@@ -659,10 +659,6 @@
             <artifactId>lucene-analyzers-stempel</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.xmlbeans</groupId>
-            <artifactId>xmlbeans</artifactId>
-        </dependency>
 
         <!-- Tika is used to extract full text from documents in order to index in Solr -->
         <dependency>
