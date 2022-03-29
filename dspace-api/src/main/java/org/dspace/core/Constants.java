@@ -227,6 +227,12 @@ public class Constants {
 
     public static final String VIRTUAL_AUTHORITY_PREFIX = "virtual::";
 
+    /**
+     * The value stored in nested metadata that were left empty to keep them in the
+     * same number than the parent leading metadata
+     */
+    public static final String PLACEHOLDER_PARENT_METADATA_VALUE = "#PLACEHOLDER_PARENT_METADATA_VALUE#";
+
     /*
      * Label used by the special entity type assigned when no explicit assignment is defined
      */

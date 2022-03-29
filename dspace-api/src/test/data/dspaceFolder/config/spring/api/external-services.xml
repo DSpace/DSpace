@@ -6,6 +6,8 @@
 
     <bean class="org.dspace.external.service.impl.ExternalDataServiceImpl"/>
 
+    <bean class="org.dspace.importer.external.scopus.service.LiveImportClientImpl"/>
+
     <bean class="org.dspace.external.provider.impl.MockDataProvider" init-method="init">
         <property name="sourceIdentifier" value="mock"/>
     </bean>
@@ -87,6 +89,17 @@
         <property name="supportedExtensions">
             <list>
                  <value>xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="scopusLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="ScopusImportService"/>
+        <property name="sourceIdentifier" value="scopus"/>
+        <property name="recordIdMetadata" value="dc.identifier.scopus"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
             </list>
         </property>
     </bean>

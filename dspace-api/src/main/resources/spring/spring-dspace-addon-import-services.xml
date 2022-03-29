@@ -115,6 +115,14 @@
           </property>
     </bean>
 
+    <bean id="ScopusImportService" class="org.dspace.importer.external.scopus.service.ScopusImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="scopusMetadataFieldMapping"/>
+        <property name="apiKey" value="${scopus.apiKey}"/>
+        <property name="instKey" value="${scopus.instToken}"/>
+        <property name="viewMode" value="${scopus.search-api.viewMode}"/>
+    </bean>
+
+    <bean id="scopusMetadataFieldMapping" class="org.dspace.importer.external.scopus.service.ScopusFieldMapping"/>
 
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
     <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
