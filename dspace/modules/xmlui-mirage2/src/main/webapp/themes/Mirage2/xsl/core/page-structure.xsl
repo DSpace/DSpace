@@ -785,22 +785,22 @@
                     <div class="hero-unit">
                         <xsl:choose>
                             <xsl:when test="$request-uri='page/about'">
-                                <xsl:copy-of select="document('file://apps/drum/config/pages/about')/div"  />
+                                <xsl:copy-of select="document('file://dspace/config/pages/about')/div"  />
                             </xsl:when>
                             <xsl:when test="$request-uri='page/about-submitting'">
-                                <xsl:copy-of select="document('file://apps/drum/config/pages/about-submitting')/div"  />
+                                <xsl:copy-of select="document('file://dspace/config/pages/about-submitting')/div"  />
                             </xsl:when>
                             <xsl:when test="$request-uri='page/statistics'">
-                                <xsl:copy-of select="document('file://apps/drum/config/pages/statistics')/div"  />
+                                <xsl:copy-of select="document('file://dspace/config/pages/statistics')/div"  />
                             </xsl:when>
                             <xsl:when test="$request-uri='page/permission-letter'">
-                                <xsl:copy-of select="document('file://apps/drum/config/pages/permission-letter')/div"  />
+                                <xsl:copy-of select="document('file://dspace/config/pages/permission-letter')/div"  />
                             </xsl:when>
                             <xsl:when test="$request-uri='page/scope-of-drum-content'">
-                                <xsl:copy-of select="document('file://apps/drum/config/pages/scope-of-drum-content')/div"  />
+                                <xsl:copy-of select="document('file://dspace/config/pages/scope-of-drum-content')/div"  />
                             </xsl:when>
                             <xsl:when test="$request-uri='page/license-text'">
-                                <xsl:copy-of select="document('file://apps/drum/config/pages/license-text')/div"  />
+                                <xsl:copy-of select="document('file://dspace/config/pages/license-text')/div"  />
                             </xsl:when>
                         </xsl:choose>        
                     </div>
