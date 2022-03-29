@@ -30,23 +30,8 @@
   <uniqueKey>id</uniqueKey>
 
   <types>
+
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
-    <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
-    <fieldType name="int" class="solr.IntPointField" omitNorms="true" positionIncrementGap="0" docValues="true"/>
-    <fieldType name="float" class="solr.FloatPointField" omitNorms="true" positionIncrementGap="0" docValues="true"/>
-    <fieldType name="long" class="solr.LongPointField" omitNorms="true" positionIncrementGap="0" docValues="true"/>
-    <fieldType name="double" class="solr.DoublePointField" omitNorms="true" positionIncrementGap="0" docValues="true"/>
-    <fieldType name="date" class="solr.DatePointField" omitNorms="true" positionIncrementGap="0" docValues="true"/>
-    <fieldType name="pint" class="solr.IntPointField" omitNorms="true" docValues="true"/>
-    <fieldType name="plong" class="solr.LongPointField" omitNorms="true" docValues="true"/>
-    <fieldType name="pfloat" class="solr.FloatPointField" omitNorms="true" docValues="true"/>
-    <fieldType name="pdouble" class="solr.DoublePointField" omitNorms="true" docValues="true"/>
-    <fieldType name="pdate" class="solr.DatePointField" sortMissingLast="true" omitNorms="true" docValues="true"/>
-    <fieldType name="sint" class="solr.IntPointField" sortMissingLast="true" omitNorms="true" docValues="true"/>
-    <fieldType name="slong" class="solr.LongPointField" sortMissingLast="true" omitNorms="true" docValues="true"/>
-    <fieldType name="sfloat" class="solr.FloatPointField" sortMissingLast="true" omitNorms="true" docValues="true"/>
-    <fieldType name="sdouble" class="solr.DoublePointField" sortMissingLast="true" omitNorms="true" docValues="true"/>
-    <fieldType name="random" class="solr.RandomSortField" indexed="true" />
 
     <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100" multiValued="true">
       <analyzer type="index">
@@ -62,7 +47,8 @@
     <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true"
                termVectors="true">
       <analyzer type="index">
-        <!-- For loading external files as field values during indexing -->
+        <!-- For loading external files as field values during indexing. If not
+             loading OCR files from disk, you must comment out this filter. -->
         <charFilter class="de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory" />  
         <!-- For converting OCR to plaintext -->
         <charFilter class="de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory" />
@@ -74,7 +60,7 @@
       </analyzer>
 
       <analyzer type="query">
-        <!-- your query analysis chain, should not include the character filters -->
+        <!-- Your query analysis chain, should not include the character filters -->
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
