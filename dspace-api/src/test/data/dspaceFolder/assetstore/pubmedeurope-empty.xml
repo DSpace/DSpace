@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<responseWrapper xmlns:slx="http://www.scholix.org" xmlns:epmc="https://www.europepmc.org/data">
+    <version>6.7</version>
+    <hitCount>0</hitCount>
+    <request>
+        <queryString>chortkiv&amp;cursorMar</queryString>
+        <resultType>core</resultType>
+        <cursorMark>*</cursorMark>
+        <pageSize>25</pageSize>
+        <sort></sort>
+        <synonym>false</synonym>
+    </request>
+    <resultList/>
+</responseWrapper>
