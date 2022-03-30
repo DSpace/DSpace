@@ -14,7 +14,7 @@ import java.util.Map;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * Translate DSpace native metadata into an external XML format, with parameters.

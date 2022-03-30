@@ -40,8 +40,8 @@ import org.dspace.core.Utils;
 import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Document;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Document;
+import org.jdom2.transform.JDOMSource;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
