@@ -79,14 +79,13 @@ public class TikaTextExtractionFilter
             tika.setMaxStringLength(maxChars); // Tell Tika the maximum number of characters to extract
             extractedText = tika.parseToString(source);
         } catch (IOException e) {
-            System.err.println("Unable to extract text from bitstream in Item " + currentItem.getID().toString());
+            System.err.format("Unable to extract text from bitstream in Item %s%n", currentItem.getID().toString());
             e.printStackTrace();
             log.error("Unable to extract text from bitstream in Item {}", currentItem.getID().toString(), e);
             throw e;
         } catch (OutOfMemoryError oe) {
-            System.err.println("OutOfMemoryError occurred when extracting text from bitstream in Item " +
-                                   currentItem.getID().toString() +
-                                   "You may wish to enable 'textextractor.use-temp-file'.");
+            System.err.format("OutOfMemoryError occurred when extracting text from bitstream in Item %s. " +
+                "You may wish to enable 'textextractor.use-temp-file'.%n", currentItem.getID().toString());
             oe.printStackTrace();
             log.error("OutOfMemoryError occurred when extracting text from bitstream in Item {}. " +
                           "You may wish to enable 'textextractor.use-temp-file'.", currentItem.getID().toString(), oe);
