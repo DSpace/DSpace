@@ -959,4 +959,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             return query + " AND ";
         }
     }
+    @Override
+    public boolean isPartOfTheGroup(Context c, String egroup) throws SQLException {
+        return false;
+    }
 }
