@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.Filter;
 
-import org.dspace.app.rest.configuration.ActuatorConfiguration;
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
 import org.dspace.app.rest.model.hateoas.DSpaceLinkRelationProvider;
 import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
@@ -65,9 +64,6 @@ public class Application extends SpringBootServletInitializer {
 
     @Autowired
     private ApplicationConfig configuration;
-
-    @Autowired
-    private ActuatorConfiguration actuatorConfiguration;
 
     @Scheduled(cron = "${sitemap.cron:-}")
     public void generateSitemap() throws IOException, SQLException {
@@ -164,6 +160,7 @@ public class Application extends SpringBootServletInitializer {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 // Get allowed origins for api and iiif endpoints.
+                // The actuator endpoints are configured using management.endpoints.web.cors.* properties
                 String[] corsAllowedOrigins = configuration
                     .getCorsAllowedOrigins(configuration.getCorsAllowedOriginsConfig());
                 String[] iiifAllowedOrigins = configuration
@@ -171,31 +168,29 @@ public class Application extends SpringBootServletInitializer {
 
                 boolean corsAllowCredentials = configuration.getCorsAllowCredentials();
                 boolean iiifAllowCredentials = configuration.getIiifAllowCredentials();
-
                 if (corsAllowedOrigins != null) {
-                    addCorsMapping(registry, "/api/**", corsAllowedOrigins, corsAllowCredentials);
-                    addCorsMapping(registry, actuatorConfiguration.getActuatorBasePath() + "/**",
-                        corsAllowedOrigins, corsAllowCredentials);
+                    registry.addMapping("/api/**").allowedMethods(CorsConfiguration.ALL)
+                            // Set Access-Control-Allow-Credentials to "true" and specify which origins are valid
+                            // for our Access-Control-Allow-Origin header
+                            // for our Access-Control-Allow-Origin header
+                            .allowCredentials(corsAllowCredentials).allowedOrigins(corsAllowedOrigins)
+                            // Allow list of request preflight headers allowed to be sent to us from the client
+                            .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
+                                "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER")
+                            // Allow list of response headers allowed to be sent by us (the server) to the client
+                            .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
                 }
-
                 if (iiifAllowedOrigins != null) {
-                    addCorsMapping(registry, "/iiif/**", iiifAllowedOrigins, iiifAllowCredentials);
+                    registry.addMapping("/iiif/**").allowedMethods(CorsConfiguration.ALL)
+                            // Set Access-Control-Allow-Credentials to "true" and specify which origins are valid
+                            // for our Access-Control-Allow-Origin header
+                            .allowCredentials(iiifAllowCredentials).allowedOrigins(iiifAllowedOrigins)
+                            // Allow list of request preflight headers allowed to be sent to us from the client
+                            .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
+                                "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER")
+                            // Allow list of response headers allowed to be sent by us (the server) to the client
+                            .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
                 }
-
-            }
-
-            private void addCorsMapping(CorsRegistry registry, String pathPattern,
-                String[] allowedOrigins, boolean allowCredentials) {
-
-                registry.addMapping(pathPattern).allowedMethods(CorsConfiguration.ALL)
-                        // Set Access-Control-Allow-Credentials to "true" and specify which origins are valid
-                        // for our Access-Control-Allow-Origin header
-                        .allowCredentials(allowCredentials).allowedOrigins(allowedOrigins)
-                        // Allow list of request preflight headers allowed to be sent to us from the client
-                        .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
-                            "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER")
-                        // Allow list of response headers allowed to be sent by us (the server) to the client
-                        .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
             }
 
             /**
