@@ -22,9 +22,11 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Test;
 
 /**
- * Drive the POI-based MS Word filter.
+ * Test the TikaTextExtractionFilter using test files for all major formats.
+ * The test files used below are all located at [dspace-api]/src/main/resources/org/dspace/app/mediafilter/
  *
  * @author mwood
+ * @author Tim Donohue
  */
 public class TikaTextExtractionFilterTest extends AbstractUnitTest {
 
@@ -94,7 +96,7 @@ public class TikaTextExtractionFilterTest extends AbstractUnitTest {
         throws Exception {
         TikaTextExtractionFilter instance = new TikaTextExtractionFilter();
 
-        InputStream source = getClass().getResourceAsStream("wordtest.doc");
+        InputStream source = getClass().getResourceAsStream("test.doc");
         InputStream result = instance.getDestinationStream(null, source, false);
         assertTrue("Known content was not found in .doc", readAll(result).contains("quick brown fox"));
     }
@@ -110,9 +112,41 @@ public class TikaTextExtractionFilterTest extends AbstractUnitTest {
         throws Exception {
         TikaTextExtractionFilter instance = new TikaTextExtractionFilter();
 
-        InputStream source = getClass().getResourceAsStream("wordtest.docx");
+        InputStream source = getClass().getResourceAsStream("test.docx");
         InputStream result = instance.getDestinationStream(null, source, false);
         assertTrue("Known content was not found in .docx", readAll(result).contains("quick brown fox"));
+    }
+
+    /**
+     * Test of getDestinationStream method using an ODT document
+     * Read a constant .odt document and examine the extracted text.
+     *
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testGetDestinationStreamWithODT()
+        throws Exception {
+        TikaTextExtractionFilter instance = new TikaTextExtractionFilter();
+
+        InputStream source = getClass().getResourceAsStream("test.odt");
+        InputStream result = instance.getDestinationStream(null, source, false);
+        assertTrue("Known content was not found in .odt", readAll(result).contains("quick brown fox"));
+    }
+
+    /**
+     * Test of getDestinationStream method using an RTF document
+     * Read a constant .rtf document and examine the extracted text.
+     *
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testGetDestinationStreamWithRTF()
+        throws Exception {
+        TikaTextExtractionFilter instance = new TikaTextExtractionFilter();
+
+        InputStream source = getClass().getResourceAsStream("test.rtf");
+        InputStream result = instance.getDestinationStream(null, source, false);
+        assertTrue("Known content was not found in .rtf", readAll(result).contains("quick brown fox"));
     }
 
     /**
@@ -161,6 +195,118 @@ public class TikaTextExtractionFilterTest extends AbstractUnitTest {
         InputStream source = getClass().getResourceAsStream("test.txt");
         InputStream result = instance.getDestinationStream(null, source, false);
         assertTrue("Known content was not found in .txt", readAll(result).contains("quick brown fox"));
+    }
+
+    /**
+     * Test of getDestinationStream method using a CSV document
+     * Read a constant .csv document and examine the extracted text.
+     *
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testGetDestinationStreamWithCsv()
+        throws Exception {
+        TikaTextExtractionFilter instance = new TikaTextExtractionFilter();
+
+        InputStream source = getClass().getResourceAsStream("test.csv");
+        InputStream result = instance.getDestinationStream(null, source, false);
+        assertTrue("Known content was not found in .csv", readAll(result).contains("data3,3"));
+    }
+
+    /**
+     * Test of getDestinationStream method using an XLS document
+     * Read a constant .xls document and examine the extracted text.
+     *
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testGetDestinationStreamWithXLS()
+        throws Exception {
+        TikaTextExtractionFilter instance = new TikaTextExtractionFilter();
+
+        InputStream source = getClass().getResourceAsStream("test.xls");
+        InputStream result = instance.getDestinationStream(null, source, false);
+        assertTrue("Known content was not found in .xls", readAll(result).contains("data3,3"));
+    }
+
+    /**
+     * Test of getDestinationStream method using an XLSX document
+     * Read a constant .xlsx document and examine the extracted text.
+     *
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testGetDestinationStreamWithXLSX()
+        throws Exception {
+        TikaTextExtractionFilter instance = new TikaTextExtractionFilter();
+
+        InputStream source = getClass().getResourceAsStream("test.xlsx");
+        InputStream result = instance.getDestinationStream(null, source, false);
+        assertTrue("Known content was not found in .xlsx", readAll(result).contains("data3,3"));
+    }
+
+    /**
+     * Test of getDestinationStream method using an ODS document
+     * Read a constant .ods document and examine the extracted text.
+     *
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testGetDestinationStreamWithODS()
+        throws Exception {
+        TikaTextExtractionFilter instance = new TikaTextExtractionFilter();
+
+        InputStream source = getClass().getResourceAsStream("test.ods");
+        InputStream result = instance.getDestinationStream(null, source, false);
+        assertTrue("Known content was not found in .ods", readAll(result).contains("Data on the second sheet"));
+    }
+
+    /**
+     * Test of getDestinationStream method using an PPT document
+     * Read a constant .ppt document and examine the extracted text.
+     *
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testGetDestinationStreamWithPPT()
+        throws Exception {
+        TikaTextExtractionFilter instance = new TikaTextExtractionFilter();
+
+        InputStream source = getClass().getResourceAsStream("test.ppt");
+        InputStream result = instance.getDestinationStream(null, source, false);
+        assertTrue("Known content was not found in .ppt", readAll(result).contains("quick brown fox"));
+    }
+
+    /**
+     * Test of getDestinationStream method using an PPTX document
+     * Read a constant .pptx document and examine the extracted text.
+     *
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testGetDestinationStreamWithPPTX()
+        throws Exception {
+        TikaTextExtractionFilter instance = new TikaTextExtractionFilter();
+
+        InputStream source = getClass().getResourceAsStream("test.pptx");
+        InputStream result = instance.getDestinationStream(null, source, false);
+        assertTrue("Known content was not found in .pptx", readAll(result).contains("quick brown fox"));
+    }
+
+    /**
+     * Test of getDestinationStream method using an ODP document
+     * Read a constant .odp document and examine the extracted text.
+     *
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testGetDestinationStreamWithODP()
+        throws Exception {
+        TikaTextExtractionFilter instance = new TikaTextExtractionFilter();
+
+        InputStream source = getClass().getResourceAsStream("test.odp");
+        InputStream result = instance.getDestinationStream(null, source, false);
+        assertTrue("Known content was not found in .odp", readAll(result).contains("quick brown fox"));
     }
 
     /**
