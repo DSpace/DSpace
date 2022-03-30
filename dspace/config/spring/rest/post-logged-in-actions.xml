@@ -9,7 +9,4 @@
 		<constructor-arg name="ePersonField" value="email" />
 		<constructor-arg name="profileField" value="person.email" />
 	</bean>
-
-    <bean id="loginEventFireAction" class="org.dspace.app.rest.login.impl.LoginEventFireAction"/>
-           
 </beans>

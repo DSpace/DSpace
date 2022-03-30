@@ -27,7 +27,6 @@ import java.util.UUID;
 public class ResearcherProfileRest extends BaseObjectRest<UUID> {
 
     private static final long serialVersionUID = 1L;
-    // changed from RestModel.CRIS to RestModel.EPERSON
     public static final String CATEGORY = RestModel.EPERSON;
     public static final String NAME = "profile";
 
@@ -36,12 +35,6 @@ public class ResearcherProfileRest extends BaseObjectRest<UUID> {
 
     private boolean visible;
 
-//    @JsonInclude(Include.NON_NULL)
-//    private String orcid;
-
-//    @JsonInclude(Include.NON_NULL)
-//    private OrcidSynchronizationRest orcidSynchronization;
-
     public boolean isVisible() {
         return visible;
     }
@@ -49,22 +42,6 @@ public class ResearcherProfileRest extends BaseObjectRest<UUID> {
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
-
-//    public OrcidSynchronizationRest getOrcidSynchronization() {
-//        return orcidSynchronization;
-//    }
-
-//    public void setOrcidSynchronization(OrcidSynchronizationRest orcidSynchronization) {
-//        this.orcidSynchronization = orcidSynchronization;
-//    }
-
-//    public String getOrcid() {
-//        return orcid;
-//    }
-//
-//    public void setOrcid(String orcid) {
-//        this.orcid = orcid;
-//    }
 
     @Override
     public String getType() {
@@ -80,55 +57,4 @@ public class ResearcherProfileRest extends BaseObjectRest<UUID> {
     public Class<?> getController() {
         return RestResourceController.class;
     }
-
-    /**
-     * Inner class to model ORCID synchronization preferences and mode.
-     *
-     * @author Luca Giamminonni (luca.giamminonni at 4science.it)
-     *
-     */
-//    public static class OrcidSynchronizationRest {
-//
-//        private String mode;
-//
-//        private String publicationsPreference;
-//
-//        private String fundingsPreference;
-//
-//        private List<String> profilePreferences;
-//
-//        public String getMode() {
-//            return mode;
-//        }
-//
-//        public void setMode(String mode) {
-//            this.mode = mode;
-//        }
-//
-//        public List<String> getProfilePreferences() {
-//            return profilePreferences;
-//        }
-//
-//        public void setProfilePreferences(List<String> profilePreferences) {
-//            this.profilePreferences = profilePreferences;
-//        }
-//
-//        public String getPublicationsPreference() {
-//            return publicationsPreference;
-//        }
-//
-//        public void setPublicationsPreference(String publicationsPreference) {
-//            this.publicationsPreference = publicationsPreference;
-//        }
-//
-//        public String getFundingsPreference() {
-//            return fundingsPreference;
-//        }
-//
-//        public void setFundingsPreference(String fundingsPreference) {
-//            this.fundingsPreference = fundingsPreference;
-//        }
-//
-//    }
-
 }
