@@ -47,7 +47,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<Elem
         return prefixToNamespaceMapping;
     }
 
-    private MetadataFieldMapping<Element, MetadataContributor<Element>> metadataFieldMapping;
+    protected MetadataFieldMapping<Element, MetadataContributor<Element>> metadataFieldMapping;
 
     /**
      * Return metadataFieldMapping

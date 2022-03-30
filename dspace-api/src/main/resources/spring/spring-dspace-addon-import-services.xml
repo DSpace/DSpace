@@ -121,8 +121,18 @@
         <property name="instKey" value="${scopus.instToken}"/>
         <property name="viewMode" value="${scopus.search-api.viewMode}"/>
     </bean>
-
     <bean id="scopusMetadataFieldMapping" class="org.dspace.importer.external.scopus.service.ScopusFieldMapping"/>
+
+    <bean id="WosImportService" class="org.dspace.importer.external.wos.service.WOSImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="wosMetadataFieldMapping"/>
+        <property name="apiKey" value="${wos.apiKey}"/>
+    </bean>
+    <bean id="wosMetadataFieldMapping" class="org.dspace.importer.external.wos.service.WOSFieldMapping"/>
+
+    <bean id="PubmedEuropeImportService" class="org.dspace.importer.external.pubmedeurope.PubmedEuropeMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="PubmedEuropeMetadataFieldMapping"/>
+    </bean>
+    <bean id="PubmedEuropeMetadataFieldMapping" class="org.dspace.importer.external.pubmedeurope.PubmedEuropeFieldMapping"/>
 
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
     <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
