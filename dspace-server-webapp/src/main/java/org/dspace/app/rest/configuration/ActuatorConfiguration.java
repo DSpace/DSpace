@@ -88,4 +88,8 @@ public class ActuatorConfiguration {
         return new GeoIpHealthIndicator();
     }
 
+    public String getActuatorBasePath() {
+        return actuatorBasePath;
+    }
+
 }
