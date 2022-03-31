@@ -37,13 +37,9 @@ env:
   PLATFORMS: linux/amd64${{ github.event_name != 'pull_request' && ', linux/arm64' || '' }}
 
 jobs:
-  ####################################################
-  # Build/Push the 'dspace/dspace-dependencies' image.
-  # This image is used by all other jobs.
-  ####################################################
-  dspace-dependencies:
-    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
-    if: github.repository == 'dspace/dspace'
+  docker:
+    # Ensure this job never runs on forked repos. It's only executed for our repo
+    if: github.repository == 'dataquest-dev/dspace'
     runs-on: ubuntu-latest
 
     steps:
