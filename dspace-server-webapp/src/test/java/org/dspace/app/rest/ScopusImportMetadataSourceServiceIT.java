@@ -9,11 +9,9 @@ package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.FileInputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,13 +20,8 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.tools.ant.filters.StringInputStream;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.scopus.service.LiveImportClientImpl;
@@ -43,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
-public class ScopusImportMetadataSourceServiceIT extends AbstractControllerIntegrationTest {
+public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportIntegrationTest {
 
     @Autowired
     private ScopusImportMetadataSourceServiceImpl scopusServiceImpl;
@@ -62,12 +55,10 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractControllerInteg
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         String path = testProps.get("test.scopus").toString();
         try (FileInputStream file = new FileInputStream(path)) {
-            String xmlMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
+            String scopusXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
-
-            CloseableHttpResponse response = mockResponse(xmlMetricsExample, 200, "OK");
-
+            CloseableHttpResponse response = mockResponse(scopusXmlResp, 200, "OK");
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
@@ -92,12 +83,10 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractControllerInteg
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         String path = testProps.get("test.scopus").toString();
         try (FileInputStream file = new FileInputStream(path)) {
-            String xmlMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
+            String scopusXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
-
-            CloseableHttpResponse response = mockResponse(xmlMetricsExample, 200, "OK");
-
+            CloseableHttpResponse response = mockResponse(scopusXmlResp, 200, "OK");
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
@@ -120,12 +109,10 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractControllerInteg
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         String path = testProps.get("test.scopus-empty").toString();
         try (FileInputStream file = new FileInputStream(path)) {
-            String xmlMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
+            String scopusXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
-
-            CloseableHttpResponse response = mockResponse(xmlMetricsExample, 200, "OK");
-
+            CloseableHttpResponse response = mockResponse(scopusXmlResp, 200, "OK");
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
@@ -138,37 +125,40 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractControllerInteg
         }
     }
 
-    private boolean matchRecords(Collection<ImportRecord> recordsImported, Collection<ImportRecord> records2match) {
-        ImportRecord  firstImported = recordsImported.iterator().next();
-        ImportRecord  secondImported = recordsImported.iterator().next();
-        ImportRecord  first2match = recordsImported.iterator().next();
-        ImportRecord  second2match = recordsImported.iterator().next();
-        boolean checkFirstRecord = firstImported.getValueList().containsAll(first2match.getValueList());
-        boolean checkSecondRecord = secondImported.getValueList().containsAll(second2match.getValueList());
-        return checkFirstRecord && checkSecondRecord;
-    }
-
     private Collection<ImportRecord> getRecords() {
         Collection<ImportRecord> records = new LinkedList<ImportRecord>();
-        List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
         //define first record
+        List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
+        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", "doi", "10.3934/mine.2023004");
         MetadatumDTO title = createMetadatumDTO("dc","title", null,
                 "Hardy potential versus lower order terms in Dirichlet problems: regularizing effects<sup>†</sup>");
-        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", "doi", "10.3934/mine.2023004");
-        MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2023-01-01");
         MetadatumDTO type = createMetadatumDTO("dc", "type", null, "Journal");
+        MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2023-01-01");
         MetadatumDTO citationVolume = createMetadatumDTO("oaire", "citation", "volume", "5");
         MetadatumDTO citationIssue = createMetadatumDTO("oaire", "citation", "issue", "1");
         MetadatumDTO scopusId = createMetadatumDTO("dc", "identifier", "scopus", "2-s2.0-85124241875");
         MetadatumDTO funding = createMetadatumDTO("dc", "relation", "funding", "Junta de Andalucía");
         MetadatumDTO grantno = createMetadatumDTO("dc", "relation", "grantno", "PGC2018-096422-B-I00");
         MetadatumDTO subject = createMetadatumDTO("dc", "subject", null,
-                "Hardy potentials | Laplace equation | Summability of solutions");
+                                                  "Hardy potentials | Laplace equation | Summability of solutions");
+        MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "Arcoya D.");
+        MetadatumDTO scopusAuthorId = createMetadatumDTO("person", "identifier", "scopus-author-id", "6602330574");
+        MetadatumDTO orcid = createMetadatumDTO("person", "identifier", "orcid", "#PLACEHOLDER_PARENT_METADATA_VALUE#");
+        MetadatumDTO orgunit = createMetadatumDTO("oairecerif", "affiliation", "orgunit", "Universidad de Granada");
+        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "Boccardo L.");
+        MetadatumDTO scopusAuthorId2 = createMetadatumDTO("person", "identifier", "scopus-author-id", "7003612261");
+        MetadatumDTO orcid2 = createMetadatumDTO("person", "identifier", "orcid","#PLACEHOLDER_PARENT_METADATA_VALUE#");
+        MetadatumDTO orgunit2 = createMetadatumDTO("oairecerif", "affiliation","orgunit","Sapienza Università di Roma");
+        MetadatumDTO author3 = createMetadatumDTO("dc", "contributor", "author", "Orsina L.");
+        MetadatumDTO scopusAuthorId3 = createMetadatumDTO("person", "identifier", "scopus-author-id", "6602595438");
+        MetadatumDTO orcid3 = createMetadatumDTO("person", "identifier", "orcid","#PLACEHOLDER_PARENT_METADATA_VALUE#");
+        MetadatumDTO orgunit3 = createMetadatumDTO("oairecerif", "affiliation","orgunit","Sapienza Università di Roma");
         MetadatumDTO rights = createMetadatumDTO("dc", "rights", null, "open access");
-        MetadatumDTO ispartof = createMetadatumDTO("dc", "relation", "ispartof",
-                "Mathematics In Engineering");
-        metadatums.add(title);
+        MetadatumDTO ispartof = createMetadatumDTO("dc", "relation", "ispartof", "Mathematics In Engineering");
+        MetadatumDTO ispartofseries = createMetadatumDTO("dc","relation","ispartofseries","Mathematics In Engineering");
+
         metadatums.add(doi);
+        metadatums.add(title);
         metadatums.add(date);
         metadatums.add(type);
         metadatums.add(citationVolume);
@@ -177,13 +167,28 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractControllerInteg
         metadatums.add(funding);
         metadatums.add(grantno);
         metadatums.add(subject);
+        metadatums.add(author);
+        metadatums.add(scopusAuthorId);
+        metadatums.add(orcid);
+        metadatums.add(orgunit);
+        metadatums.add(author2);
+        metadatums.add(scopusAuthorId2);
+        metadatums.add(orcid2);
+        metadatums.add(orgunit2);
+        metadatums.add(author3);
+        metadatums.add(scopusAuthorId3);
+        metadatums.add(orcid3);
+        metadatums.add(orgunit3);
         metadatums.add(rights);
         metadatums.add(ispartof);
+        metadatums.add(ispartofseries);
         ImportRecord firstrRecord = new ImportRecord(metadatums);
+
         //define second record
+        List<MetadatumDTO> metadatums2  = new ArrayList<MetadatumDTO>();
+        MetadatumDTO doi2 = createMetadatumDTO("dc", "identifier", "doi", "10.3934/mine.2023001");
         MetadatumDTO title2 = createMetadatumDTO("dc","title", null,
                 "Large deviations for a binary collision model: energy evaporation<sup>†</sup>");
-        MetadatumDTO doi2 = createMetadatumDTO("dc", "identifier", "doi", "10.3934/mine.2023001");
         MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2023-01-01");
         MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "Journal");
         MetadatumDTO citationVolume2 = createMetadatumDTO("oaire", "citation", "volume", "5");
@@ -192,64 +197,59 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractControllerInteg
         MetadatumDTO grantno2 = createMetadatumDTO("dc", "relation", "grantno", "undefined");
         MetadatumDTO subject2 = createMetadatumDTO("dc", "subject", null,
         "Boltzmann equation | Discrete energy model | Kac model | Large deviations | Violation of energy conservation");
+
+        MetadatumDTO author4 = createMetadatumDTO("dc", "contributor", "author", "Basile G.");
+        MetadatumDTO scopusAuthorId4 = createMetadatumDTO("person", "identifier", "scopus-author-id", "55613229065");
+        MetadatumDTO orcid4 = createMetadatumDTO("person", "identifier", "orcid","#PLACEHOLDER_PARENT_METADATA_VALUE#");
+        MetadatumDTO orgunit4 = createMetadatumDTO("oairecerif", "affiliation","orgunit","Sapienza Università di Roma");
+        MetadatumDTO author5 = createMetadatumDTO("dc", "contributor", "author", "Benedetto D.");
+        MetadatumDTO scopusAuthorId5 = createMetadatumDTO("person", "identifier", "scopus-author-id", "55893665100");
+        MetadatumDTO orcid5 = createMetadatumDTO("person", "identifier", "orcid","#PLACEHOLDER_PARENT_METADATA_VALUE#");
+        MetadatumDTO orgunit5 = createMetadatumDTO("oairecerif", "affiliation","orgunit","Sapienza Università di Roma");
+        MetadatumDTO author6 = createMetadatumDTO("dc", "contributor", "author", "Caglioti E.");
+        MetadatumDTO scopusAuthorId6 = createMetadatumDTO("person", "identifier", "scopus-author-id", "7004588675");
+        MetadatumDTO orcid6 = createMetadatumDTO("person", "identifier", "orcid","#PLACEHOLDER_PARENT_METADATA_VALUE#");
+        MetadatumDTO orgunit6 = createMetadatumDTO("oairecerif", "affiliation","orgunit","Sapienza Università di Roma");
+        MetadatumDTO author7 = createMetadatumDTO("dc", "contributor", "author", "Bertini L.");
+        MetadatumDTO scopusAuthorId7 = createMetadatumDTO("person", "identifier", "scopus-author-id", "7005555198");
+        MetadatumDTO orcid7 = createMetadatumDTO("person", "identifier", "orcid","#PLACEHOLDER_PARENT_METADATA_VALUE#");
+        MetadatumDTO orgunit7 = createMetadatumDTO("oairecerif", "affiliation","orgunit","Sapienza Università di Roma");
         MetadatumDTO rights2 = createMetadatumDTO("dc", "rights", null, "open access");
-        MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof",
-                "Mathematics In Engineering");
-        metadatums.add(title2);
-        metadatums.add(doi2);
-        metadatums.add(date2);
-        metadatums.add(type2);
-        metadatums.add(citationVolume2);
-        metadatums.add(citationIssue2);
-        metadatums.add(scopusId2);
-        metadatums.add(grantno2);
-        metadatums.add(subject2);
-        metadatums.add(rights2);
-        metadatums.add(ispartof2);
-        ImportRecord secondRecord = new ImportRecord(metadatums);
+        MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof", "Mathematics In Engineering");
+        MetadatumDTO ispartofseries2 = createMetadatumDTO("dc", "relation", "ispartofseries",
+                                                          "Mathematics In Engineering");
+        metadatums2.add(title2);
+        metadatums2.add(doi2);
+        metadatums2.add(date2);
+        metadatums2.add(type2);
+        metadatums2.add(citationVolume2);
+        metadatums2.add(citationIssue2);
+        metadatums2.add(scopusId2);
+        metadatums2.add(grantno2);
+        metadatums2.add(subject2);
+        metadatums2.add(author4);
+        metadatums2.add(scopusAuthorId4);
+        metadatums2.add(orcid4);
+        metadatums2.add(orgunit4);
+        metadatums2.add(author5);
+        metadatums2.add(scopusAuthorId5);
+        metadatums2.add(orcid5);
+        metadatums2.add(orgunit5);
+        metadatums2.add(author6);
+        metadatums2.add(scopusAuthorId6);
+        metadatums2.add(orcid6);
+        metadatums2.add(orgunit6);
+        metadatums2.add(author7);
+        metadatums2.add(scopusAuthorId7);
+        metadatums2.add(orcid7);
+        metadatums2.add(orgunit7);
+        metadatums2.add(rights2);
+        metadatums2.add(ispartof2);
+        metadatums2.add(ispartofseries2);
+        ImportRecord secondRecord = new ImportRecord(metadatums2);
         records.add(firstrRecord);
         records.add(secondRecord);
         return records;
-    }
-
-    private MetadatumDTO createMetadatumDTO(String schema, String element, String qualifier, String value) {
-        MetadatumDTO metadatumDTO = new MetadatumDTO();
-        metadatumDTO.setSchema(schema);
-        metadatumDTO.setElement(element);
-        metadatumDTO.setQualifier(qualifier);
-        metadatumDTO.setValue(value);
-        return metadatumDTO;
-    }
-
-    private CloseableHttpResponse mockResponse(String xmlExample, int statusCode, String reason)
-            throws UnsupportedEncodingException {
-        BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
-        basicHttpEntity.setChunked(true);
-        basicHttpEntity.setContent(new StringInputStream(xmlExample));
-
-        CloseableHttpResponse response = mock(CloseableHttpResponse.class);
-        when(response.getStatusLine()).thenReturn(statusLine(statusCode, reason));
-        when(response.getEntity()).thenReturn(basicHttpEntity);
-        return response;
-    }
-
-    private StatusLine statusLine(int statusCode, String reason) {
-        return new StatusLine() {
-            @Override
-            public ProtocolVersion getProtocolVersion() {
-                return new ProtocolVersion("http", 1, 1);
-            }
-
-            @Override
-            public int getStatusCode() {
-                return statusCode;
-            }
-
-            @Override
-            public String getReasonPhrase() {
-                return reason;
-            }
-        };
     }
 
 }

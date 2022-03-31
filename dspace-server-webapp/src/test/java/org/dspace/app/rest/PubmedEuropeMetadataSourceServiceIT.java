@@ -9,11 +9,9 @@ package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.FileInputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,13 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.tools.ant.filters.StringInputStream;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.pubmedeurope.PubmedEuropeMetadataSourceServiceImpl;
@@ -42,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
-public class PubmedEuropeMetadataSourceServiceIT extends AbstractControllerIntegrationTest {
+public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportIntegrationTest {
 
     @Autowired
     private PubmedEuropeMetadataSourceServiceImpl pubmedEuropeMetadataServiceImpl;
@@ -60,13 +53,13 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractControllerInteg
         String path2file = testProps.get("test.pubmedeurope-empty").toString();
         try (FileInputStream file = new FileInputStream(path)) {
         try (FileInputStream file2 = new FileInputStream(path2file)) {
-            String xmlMetricsExample = IOUtils.toString(file, Charset.defaultCharset());
-            String xmlMetricsExample2 = IOUtils.toString(file2, Charset.defaultCharset());
+            String pubmedEuropeXmlResp = IOUtils.toString(file, Charset.defaultCharset());
+            String pubmedEuropeXmlResp2 = IOUtils.toString(file2, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
 
-            CloseableHttpResponse response = mockResponse(xmlMetricsExample, 200, "OK");
-            CloseableHttpResponse response2 = mockResponse(xmlMetricsExample2, 200, "OK");
+            CloseableHttpResponse response = mockResponse(pubmedEuropeXmlResp, 200, "OK");
+            CloseableHttpResponse response2 = mockResponse(pubmedEuropeXmlResp2, 200, "OK");
 
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response, response2);
 
@@ -81,26 +74,26 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractControllerInteg
         }
     }
 
-    private boolean matchRecords(Collection<ImportRecord> recordsImported, Collection<ImportRecord> records2match) {
-        ImportRecord  firstImported = recordsImported.iterator().next();
-        ImportRecord  secondImported = recordsImported.iterator().next();
-        ImportRecord  first2match = recordsImported.iterator().next();
-        ImportRecord  second2match = recordsImported.iterator().next();
-        boolean checkFirstRecord = firstImported.getValueList().containsAll(first2match.getValueList());
-        boolean checkSecondRecord = secondImported.getValueList().containsAll(second2match.getValueList());
-        return checkFirstRecord && checkSecondRecord;
-    }
+    @Test
+    public void pubmedEuropeImportMetadataGetRecordsCountTest() throws Exception {
+        context.turnOffAuthorisationSystem();
 
-    private CloseableHttpResponse mockResponse(String xmlExample, int statusCode, String reason)
-            throws UnsupportedEncodingException {
-        BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
-        basicHttpEntity.setChunked(true);
-        basicHttpEntity.setContent(new StringInputStream(xmlExample));
+        CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        String path = testProps.get("test.pubmedeurope").toString();
+        try (FileInputStream file = new FileInputStream(path)) {
+            String pubmedEuropeXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
-        CloseableHttpResponse response = mock(CloseableHttpResponse.class);
-        when(response.getStatusLine()).thenReturn(statusLine(statusCode, reason));
-        when(response.getEntity()).thenReturn(basicHttpEntity);
-        return response;
+            liveImportClientImpl.setHttpClient(httpClient);
+            CloseableHttpResponse response = mockResponse(pubmedEuropeXmlResp, 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
+
+            context.restoreAuthSystemState();
+            int tot = pubmedEuropeMetadataServiceImpl.getRecordsCount("test query");
+            assertEquals(3, tot);
+        } finally {
+            liveImportClientImpl.setHttpClient(originalHttpClient);
+        }
     }
 
     private Collection<ImportRecord> getRecords() {
@@ -215,34 +208,6 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractControllerInteg
         records.add(secondRecord);
         records.add(thirdRecord);
         return records;
-    }
-
-    private MetadatumDTO createMetadatumDTO(String schema, String element, String qualifier, String value) {
-        MetadatumDTO metadatumDTO = new MetadatumDTO();
-        metadatumDTO.setSchema(schema);
-        metadatumDTO.setElement(element);
-        metadatumDTO.setQualifier(qualifier);
-        metadatumDTO.setValue(value);
-        return metadatumDTO;
-    }
-
-    private StatusLine statusLine(int statusCode, String reason) {
-        return new StatusLine() {
-            @Override
-            public ProtocolVersion getProtocolVersion() {
-                return new ProtocolVersion("http", 1, 1);
-            }
-
-            @Override
-            public int getStatusCode() {
-                return statusCode;
-            }
-
-            @Override
-            public String getReasonPhrase() {
-                return reason;
-            }
-        };
     }
 
 }
