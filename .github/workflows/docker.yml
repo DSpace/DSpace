@@ -6,8 +6,8 @@ name: Docker images
 on:
   push:
     branches:
-      - main
-      - 'dspace-**'
+      - testtest
+      - dtq-dev
     tags:
       - 'dspace-**'
   pull_request:
