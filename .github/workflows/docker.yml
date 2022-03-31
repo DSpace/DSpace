@@ -6,7 +6,7 @@ name: Docker images
 on:
   push:
     branches:
-      - testtest
+      - testtests
       - dtq-dev
     tags:
       - 'dspace-**'
