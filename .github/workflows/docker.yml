@@ -70,7 +70,7 @@ jobs:
         id: meta_build_deps
         uses: docker/metadata-action@v4
         with:
-          images: regreb01/dspace-dependencies
+          images: dataquest/dspace-dependencies
           tags: ${{ env.IMAGE_TAGS }}
           flavor: ${{ env.TAGS_FLAVOR }}
 
@@ -126,7 +126,7 @@ jobs:
         id: meta_build
         uses: docker/metadata-action@v4
         with:
-          images: regreb01/dspace
+          images: dataquest/dspace
           tags: ${{ env.IMAGE_TAGS }}
           flavor: ${{ env.TAGS_FLAVOR }}
 
@@ -181,7 +181,7 @@ jobs:
         id: meta_build_test
         uses: docker/metadata-action@v4
         with:
-          images: regreb01/dspace
+          images: dataquest/dspace
           tags: ${{ env.IMAGE_TAGS }}
           # As this is a test/development image, its tags are all suffixed with "-test". Otherwise, it uses the same
           # tagging logic as the primary 'dspace/dspace' image above.
@@ -239,7 +239,7 @@ jobs:
         id: meta_build_cli
         uses: docker/metadata-action@v4
         with:
-          images: regreb01/dspace-cli
+          images: dataquest/dspace-cli
           tags: ${{ env.IMAGE_TAGS }}
           flavor: ${{ env.TAGS_FLAVOR }}
 
