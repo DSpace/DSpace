@@ -7,55 +7,48 @@
  */
 package org.dspace.app.rest;
 
-import com.jayway.jsonpath.JsonPath;
-import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.model.patch.AddOperation;
-import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.app.rest.model.patch.RemoveOperation;
-import org.dspace.app.rest.model.patch.ReplaceOperation;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.builder.*;
-import org.dspace.content.Collection;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
-import org.dspace.content.service.ItemService;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-import org.dspace.eperson.service.GroupService;
-import org.dspace.services.ConfigurationService;
-import org.dspace.util.UUIDUtils;
-import org.junit.After;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
-
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Predicate;
-
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static java.util.Arrays.asList;
 import static java.util.UUID.fromString;
-import static org.dspace.app.matcher.LambdaMatcher.has;
-import static org.dspace.app.matcher.MetadataValueMatcher.with;
 import static org.dspace.app.rest.matcher.HalMatcher.matchLinks;
-import static org.dspace.app.rest.matcher.MetadataMatcher.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataNotEmpty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+
+import com.jayway.jsonpath.JsonPath;
+import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.patch.AddOperation;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
+import org.dspace.app.rest.repository.ResearcherProfileRestRepository;
+import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
+import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * Integration tests for {@link ResearcherProfileRestRepository}.
@@ -68,19 +61,11 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     @Autowired
     private ConfigurationService configurationService;
 
-    @Autowired
-    private ItemService itemService;
-
-    @Autowired
-    private GroupService groupService;
-
     private EPerson user;
 
     private EPerson anotherUser;
 
     private Collection personCollection;
-
-    private Group administrators;
 
     /**
      * Tests setup.
@@ -111,8 +96,6 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .withSubmitterGroup(user)
             .withTemplateItem()
             .build();
-
-        administrators = groupService.findByName(context, Group.ADMIN);
 
         configurationService.setProperty("researcher-profile.collection.uuid", personCollection.getID().toString());
         configurationService.setProperty("claimable.entityType", "Person");
@@ -254,7 +237,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         getClient(authToken).perform(post("/api/eperson/profiles/")
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id", is(id.toString())))
+            .andExpect(jsonPath("$.id", is(id)))
             .andExpect(jsonPath("$.visible", is(false)))
             .andExpect(jsonPath("$.type", is("profile")))
             .andExpect(jsonPath("$", matchLinks("http://localhost/api/eperson/profiles/" + id, "item", "eperson")));
@@ -265,7 +248,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         getClient(authToken).perform(get("/api/eperson/profiles/{id}/item", id))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("item")))
-            .andExpect(jsonPath("$.metadata", matchMetadata("dspace.object.owner", name, id.toString(), 0)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("dspace.object.owner", name, id, 0)))
             .andExpect(jsonPath("$.metadata", matchMetadata("dspace.entity.type", "Person", 0)));
 
         getClient(authToken).perform(get("/api/eperson/profiles/{id}/eperson", id))
@@ -294,7 +277,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .param("eperson", id)
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id", is(id.toString())))
+            .andExpect(jsonPath("$.id", is(id)))
             .andExpect(jsonPath("$.visible", is(false)))
             .andExpect(jsonPath("$.type", is("profile")))
             .andExpect(jsonPath("$", matchLinks("http://localhost/api/eperson/profiles/" + id, "item", "eperson")));
@@ -305,7 +288,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         getClient(authToken).perform(get("/api/eperson/profiles/{id}/item", id))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("item")))
-            .andExpect(jsonPath("$.metadata", matchMetadata("dspace.object.owner", name, id.toString(), 0)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("dspace.object.owner", name, id, 0)))
             .andExpect(jsonPath("$.metadata", matchMetadata("dspace.entity.type", "Person", 0)));
 
         getClient(authToken).perform(get("/api/eperson/profiles/{id}/eperson", id))
@@ -317,7 +300,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         getClient(authToken).perform(get("/api/eperson/profiles/{id}", id))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id", is(id.toString())))
+            .andExpect(jsonPath("$.id", is(id)))
             .andExpect(jsonPath("$.visible", is(false)))
             .andExpect(jsonPath("$.type", is("profile")))
             .andExpect(jsonPath("$", matchLinks("http://localhost/api/eperson/profiles/" + id, "item", "eperson")));
@@ -356,14 +339,14 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         getClient(authToken).perform(post("/api/eperson/profiles/")
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id", is(id.toString())))
+            .andExpect(jsonPath("$.id", is(id)))
             .andExpect(jsonPath("$.visible", is(false)))
             .andExpect(jsonPath("$.type", is("profile")));
 
         getClient(authToken).perform(post("/api/eperson/profiles/")
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isConflict())
-            .andExpect(jsonPath("$.id", is(id.toString())))
+            .andExpect(jsonPath("$.id", is(id)))
             .andExpect(jsonPath("$.visible", is(false)))
             .andExpect(jsonPath("$.type", is("profile")));
 
@@ -399,7 +382,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         String id = user.getID().toString();
         String authToken = getAuthToken(user.getEmail(), password);
-        AtomicReference<UUID> itemIdRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> itemIdRef = new AtomicReference<>();
 
         getClient(authToken).perform(post("/api/eperson/profiles/")
             .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -437,7 +420,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         String id = user.getID().toString();
         String authToken = getAuthToken(user.getEmail(), password);
-        AtomicReference<UUID> itemIdRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> itemIdRef = new AtomicReference<>();
 
         getClient(authToken).perform(post("/api/eperson/profiles/")
             .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -710,6 +693,28 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(jsonPath("$.visible", is(true)));
     }
 
+    @Test
+    public void testPatchToChangeVisibleAttributeOfNotExistProfile() throws Exception {
+
+        String id = user.getID().toString();
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isCreated())
+                            .andExpect(jsonPath("$.visible", is(false)));
+
+        getClient(authToken).perform(delete("/api/eperson/profiles/{id}", id))
+                            .andExpect(status().isNoContent());
+
+        List<Operation> operations = asList(new ReplaceOperation("/visible", true));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", id)
+                                         .content(getPatchContent(operations))
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isNotFound());
+    }
+
     /**
      * Verify that after an user login an automatic claim between the logged eperson
      * and possible profiles without eperson is done.
@@ -866,11 +871,11 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         context.turnOffAuthorisationSystem();
 
         final Item person = ItemBuilder.createItem(context, personCollection)
-                                      .withTitle("dc.title")
+                                      .withTitle("Test User 1")
                                       .build();
 
         final Item otherPerson = ItemBuilder.createItem(context, personCollection)
-                                       .withTitle("dc.title")
+                                       .withTitle("Test User 2")
                                        .build();
 
         context.restoreAuthSystemState();
@@ -883,8 +888,8 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
                             .andExpect(status().isCreated())
                             .andExpect(jsonPath("$.id", is(id)))
                             .andExpect(jsonPath("$.type", is("profile")))
-                            .andExpect(jsonPath("$",
-                                                matchLinks("http://localhost/api/eperson/profiles/" + user.getID(), "item", "eperson")));
+                            .andExpect(jsonPath("$", matchLinks("http://localhost/api/eperson/profiles/" + user.getID(),
+                                                                "item", "eperson")));
 
         getClient(authToken).perform(get("/api/eperson/profiles/{id}", id))
                             .andExpect(status().isOk());
@@ -929,10 +934,71 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     }
 
     @Test
-    public void claimForNotAllowedEntityType() throws Exception {
-        String id = user.getID().toString();
-        String name = user.getName();
+    public void testNotAdminUserClaimProfileOfAnotherUser() throws Exception {
 
+        context.turnOffAuthorisationSystem();
+
+        final Item person = ItemBuilder.createItem(context, personCollection)
+                                       .withTitle("Test User 1")
+                                       .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+                                         .param("eperson" , anotherUser.getID().toString())
+                                         .contentType(TEXT_URI_LIST)
+                                         .content("http://localhost:8080/server/api/core/items/" + person.getID().toString()))
+                            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testAdminUserClaimProfileOfNotExistingPersonId() throws Exception {
+
+        String id = "bef23ba3-9aeb-4f7b-b153-77b0f1fc3612";
+
+        context.turnOffAuthorisationSystem();
+
+        final Item person = ItemBuilder.createItem(context, personCollection)
+                                       .withTitle("Test User 1")
+                                       .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+                                         .param("eperson" , id)
+                                         .contentType(TEXT_URI_LIST)
+                                         .content("http://localhost:8080/server/api/core/items/" + person.getID().toString()))
+                            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testAdminUserClaimProfileOfWrongPersonId() throws Exception {
+
+        String id = "invalid_id";
+
+        context.turnOffAuthorisationSystem();
+
+        final Item person = ItemBuilder.createItem(context, personCollection)
+                                       .withTitle("Test User 1")
+                                       .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+                                         .param("eperson" , id)
+                                         .contentType(TEXT_URI_LIST)
+                                         .content("http://localhost:8080/server/api/core/items/" + person.getID().toString()))
+                            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void claimForNotAllowedEntityType() throws Exception {
         context.turnOffAuthorisationSystem();
 
         final Collection publications = CollectionBuilder.createCollection(context, parentCommunity)
@@ -954,64 +1020,22 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     }
 
     @Test
-    public void testCloneFromExternalSourceRecordNotFound() throws Exception {
-
-        String authToken = getAuthToken(user.getEmail(), password);
-
-        getClient(authToken)
-            .perform(post("/api/eperson/profiles/").contentType(TEXT_URI_LIST)
-                                                .content("http://localhost:8080/server/api/integration/externalsources/orcid/entryValues/FAKE"))
-            .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void testCloneFromExternalSourceMultipleUri() throws Exception {
-
-        String authToken = getAuthToken(user.getEmail(), password);
-
-        getClient(authToken)
-            .perform(post("/api/eperson/profiles/").contentType(TEXT_URI_LIST)
-                                                .content("http://localhost:8080/server/api/integration/externalsources/orcid/entryValues/id \n "
-                                                             + "http://localhost:8080/server/api/integration/externalsources/dspace/entryValues/id"))
-            .andExpect(status().isBadRequest());
-
-    }
-
-    @Test
     public void testCloneFromExternalProfileAlreadyAssociated() throws Exception {
 
         String id = user.getID().toString();
         String authToken = getAuthToken(user.getEmail(), password);
 
         getClient(authToken).perform(post("/api/eperson/profiles/").contentType(MediaType.APPLICATION_JSON_VALUE))
-                            .andExpect(status().isCreated()).andExpect(jsonPath("$.id", is(id.toString())))
+                            .andExpect(status().isCreated()).andExpect(jsonPath("$.id", is(id)))
                             .andExpect(jsonPath("$.visible", is(false))).andExpect(jsonPath("$.type", is("profile")));
 
         getClient(authToken)
             .perform(post("/api/eperson/profiles/").contentType(TEXT_URI_LIST)
-                                                .content("http://localhost:8080/server/api/integration/externalsources/orcid/entryValues/id"))
+                                                .content("http://localhost:8080/server/api/core/items/" + id))
             .andExpect(status().isConflict());
     }
 
-    @Test
-    public void testCloneFromExternalCollectionNotSet() throws Exception {
-
-        configurationService.setProperty("researcher-profile.collection.uuid", "not-existing");
-        String id = user.getID().toString();
-        String authToken = getAuthToken(user.getEmail(), password);
-
-        getClient(authToken).perform(post("/api/eperson/profiles/").contentType(MediaType.APPLICATION_JSON_VALUE))
-                            .andExpect(status().isCreated()).andExpect(jsonPath("$.id", is(id.toString())))
-                            .andExpect(jsonPath("$.visible", is(false))).andExpect(jsonPath("$.type", is("profile")));
-
-        getClient(authToken)
-            .perform(post("/api/eperson/profiles/").contentType(TEXT_URI_LIST)
-                                                .content("http://localhost:8080/server/api/integration/externalsources/orcid/entryValues/id \n "
-                                                             + "http://localhost:8080/server/api/integration/externalsources/dspace/entryValues/id"))
-            .andExpect(status().isBadRequest());
-    }
-
-    private String getItemIdByProfileId(String token, String id) throws SQLException, Exception {
+    private String getItemIdByProfileId(String token, String id) throws Exception {
         MvcResult result = getClient(token).perform(get("/api/eperson/profiles/{id}/item", id))
             .andExpect(status().isOk())
             .andReturn();

@@ -7,6 +7,9 @@
  */
 package org.dspace.builder;
 
+import static org.dspace.content.MetadataSchemaEnum.DC;
+import static org.dspace.content.authority.Choices.CF_ACCEPTED;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -21,9 +24,6 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-
-import static org.dspace.content.MetadataSchemaEnum.DC;
-import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 
 /**
  * Builder to construct Item objects
@@ -156,9 +156,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dspace", "object", "owner", null, value, authority, CF_ACCEPTED);
     }
 
-    public ItemBuilder withDspaceObjectOwner(EPerson ePerson) {
-        return withDspaceObjectOwner(ePerson.getFullName(), ePerson.getID().toString());
-    }
     public ItemBuilder makeUnDiscoverable() {
         item.setDiscoverable(false);
         return this;
@@ -187,7 +184,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     /**
      * Create an admin group for the collection with the specified members
      *
-     * @param members epersons to add to the admin group
+     * @param ePerson epersons to add to the admin group
      * @return this builder
      * @throws SQLException
      * @throws AuthorizeException

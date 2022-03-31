@@ -15,12 +15,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -187,8 +185,8 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         }
 
         context.turnOffAuthorisationSystem();
-        itemService.addMetadata(context, item, "dspace", "object", "owner", null, ePerson.getName(),
-                ePerson.getID().toString(), CF_ACCEPTED);
+        itemService.addMetadata(context, item, "dspace", "object", "owner", null,
+                                ePerson.getName(), ePerson.getID().toString(), CF_ACCEPTED);
 
         context.restoreAuthSystemState();
         return new ResearcherProfile(item);
@@ -249,8 +247,10 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
         Item item = workspaceItem.getItem();
-        itemService.addMetadata(context, item, "dc", "title", null, null, ePerson.getFullName());
-        itemService.addMetadata(context, item, "dspace", "object", "owner", null, ePerson.getFullName(), id, CF_ACCEPTED);
+        itemService.addMetadata(context, item, "dc", "title", null, null,
+                                ePerson.getFullName());
+        itemService.addMetadata(context, item, "dspace", "object", "owner", null,
+                                ePerson.getFullName(), id, CF_ACCEPTED);
 
         item = installItemService.installItem(context, workspaceItem);
 

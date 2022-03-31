@@ -7,6 +7,14 @@
  */
 package org.dspace.app.rest.login.impl;
 
+import static org.apache.commons.collections4.IteratorUtils.toList;
+import static org.dspace.content.authority.Choices.CF_ACCEPTED;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.profile.service.ResearcherProfileService;
@@ -22,14 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import static org.apache.commons.collections4.IteratorUtils.toList;
-import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 
 /**
  * Implementation of {@link PostLoggedInAction} that perform an automatic claim
@@ -91,7 +91,8 @@ public class ResearcherProfileAutomaticClaim implements PostLoggedInAction {
 
         Item item = findClaimableItem(context, currentUser);
         if (item != null) {
-            itemService.addMetadata(context, item, "dspace", "object", "owner", null, fullName, id.toString(), CF_ACCEPTED);
+            itemService.addMetadata(context, item, "dspace", "object", "owner",
+                                    null, fullName, id.toString(), CF_ACCEPTED);
         }
 
     }

@@ -7,17 +7,17 @@
  */
 package org.dspace.app.profile;
 
-import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
-import org.dspace.util.UUIDUtils;
-import org.springframework.util.Assert;
+import static org.dspace.core.Constants.READ;
+import static org.dspace.eperson.Group.ANONYMOUS;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static org.dspace.core.Constants.READ;
-import static org.dspace.eperson.Group.ANONYMOUS;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.util.UUIDUtils;
+import org.springframework.util.Assert;
 
 /**
  * Object representing a Researcher Profile.
@@ -65,7 +65,9 @@ public class ResearcherProfile {
     private MetadataValue getDspaceObjectOwnerMetadata(Item item) {
         return getMetadataValue(item, "dspace.object.owner")
             .filter(metadata -> UUIDUtils.fromString(metadata.getAuthority()) != null)
-            .orElseThrow(() -> new IllegalArgumentException("A profile item must have a valid dspace.object.owner metadata"));
+            .orElseThrow(
+                () -> new IllegalArgumentException("A profile item must have a valid dspace.object.owner metadata")
+            );
     }
 
     private Optional<MetadataValue> getMetadataValue(Item item, String metadataField) {

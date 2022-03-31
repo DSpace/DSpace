@@ -7,12 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import org.dspace.app.rest.RestResourceController;
-
-import java.util.List;
 import java.util.UUID;
+
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * The Researcher Profile REST resource.

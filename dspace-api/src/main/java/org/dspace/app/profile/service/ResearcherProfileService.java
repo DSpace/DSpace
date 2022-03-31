@@ -7,15 +7,15 @@
  */
 package org.dspace.app.profile.service;
 
+import java.net.URI;
+import java.sql.SQLException;
+import java.util.UUID;
+
 import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
-
-import java.net.URI;
-import java.sql.SQLException;
-import java.util.UUID;
 
 /**
  * Service interface class for the {@link ResearcherProfile} object. The

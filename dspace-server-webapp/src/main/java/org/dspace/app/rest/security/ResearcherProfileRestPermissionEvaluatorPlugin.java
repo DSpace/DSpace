@@ -7,6 +7,14 @@
  */
 package org.dspace.app.rest.security;
 
+import static org.dspace.app.rest.security.DSpaceRestPermission.DELETE;
+import static org.dspace.app.rest.security.DSpaceRestPermission.READ;
+import static org.dspace.app.rest.security.DSpaceRestPermission.WRITE;
+
+import java.io.Serializable;
+import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.ResearcherProfileRest;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -18,12 +26,6 @@ import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.Serializable;
-import java.util.UUID;
-
-import static org.dspace.app.rest.security.DSpaceRestPermission.*;
 
 /**
  *

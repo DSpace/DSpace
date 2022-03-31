@@ -7,6 +7,12 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.net.URI;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.app.profile.service.ResearcherProfileService;
@@ -25,7 +31,6 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -33,12 +38,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * This is the repository responsible of exposing researcher profiles.
@@ -48,7 +47,7 @@ import java.util.UUID;
  */
 @Component(ResearcherProfileRest.CATEGORY + "." + ResearcherProfileRest.NAME)
 @ConditionalOnProperty(
-        value="researcher-profile.type"
+        value = "researcher-profile.type"
 )
 public class ResearcherProfileRestRepository extends DSpaceRestRepository<ResearcherProfileRest, UUID> {
 
