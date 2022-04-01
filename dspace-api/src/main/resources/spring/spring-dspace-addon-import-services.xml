@@ -134,6 +134,11 @@
     </bean>
     <bean id="PubmedEuropeMetadataFieldMapping" class="org.dspace.importer.external.pubmedeurope.PubmedEuropeFieldMapping"/>
 
+    <bean id="CiniiImportService" class="org.dspace.importer.external.cinii.CiniiImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="CiniiMetadataFieldMapping"/>
+    </bean>
+    <bean id="CiniiMetadataFieldMapping" class="org.dspace.importer.external.cinii.CiniiFieldMapping"/>
+
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
     <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.other"/>
