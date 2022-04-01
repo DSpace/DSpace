@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/" xmlns:con="http://www.w3.org/2000/10/swap/pim/contact#" xmlns:cinii="https://ci.nii.ac.jp/ns/1.0/" xmlns:bibo="http://purl.org/ontology/bibo/">
+    <rdf:Description rdf:about="https://ci.nii.ac.jp/naid/130008141851#article">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/Article"/>
+        <foaf:isPrimaryTopicOf rdf:resource="https://ci.nii.ac.jp/naid/130008141851.rdf" />
+        <dc:title>A Review of the Chinese Government Support and Sustainability Assessment for Ecovillage Development with a Global Perspective</dc:title>
+        <dc:creator>Gao Xihong</dc:creator>
+        <dc:creator>Wang Fan</dc:creator>
+        <dc:creator>Liu Chenxi</dc:creator>
+        <dc:creator>Luo Tao</dc:creator>
+        <dc:creator>Zhang Yukun</dc:creator>
+        <dc:creator>Nuti Camillo</dc:creator>
+        <dc:publisher>空間計画と持続可能な開発国際学会</dc:publisher>
+        <prism:publicationName>International Review for Spatial Planning and Sustainable Development</prism:publicationName>
+        <prism:volume>10</prism:volume>
+        <prism:number>1</prism:number>
+        <prism:startingPage>43</prism:startingPage>
+        <prism:endingPage>73</prism:endingPage>
+        <prism:publicationDate>2022</prism:publicationDate>
+        <dc:description>&lt;p&gt;Having achieved substantial progress in urban development over the past three decades, the Chinese government has turned to ecovillage development as one of the more effective ways to solve increasingly serious rural issues, such as poverty, rural hollowing, a deteriorating natural environment, and farmland abandonment. However, in spite of various promotional policies and substantial financial investment, there are very few studies assessing the impact of governmental support on ecovillage development. This paper presents a study applying both qualitative research and quantitative analysis to compare the effects of the support, especially in funding and policies, on their development. A comparison was made of three cases, one in China and two elsewhere. To provide a common basis for comparison, three quantification based assessments were examined with a view to applying them in this study.&lt;b&gt; &lt;/b&gt;These were the Evaluation for Construction of Beautiful Village (ECBV) from China, and the BREEAM Community and LEED-ND, two well-established international examples. The following analyses using the three methods reveal the strengths and weaknesses of the Chinese government support in ecovillage development, and limitations of the quantification-based assessment methods. Proposals are made for improving the nature of government support and the use of the ECBV. These research outcomes can help formulate the rural development policies in the critical time of socio-economic transition in China, and the research process could be a reference to review quantification based assessment methods in other developing countries with similar levels of development. &lt;/p&gt;</dc:description>
+        <foaf:topic rdf:resource="https://ci.nii.ac.jp/keyword/Ecovillage" dc:title="Ecovillage" />
+        <foaf:topic rdf:resource="https://ci.nii.ac.jp/keyword/Government+support" dc:title="Government support" />
+        <foaf:topic rdf:resource="https://ci.nii.ac.jp/keyword/Ecovillage+assessment" dc:title="Ecovillage assessment" />
+        <foaf:topic rdf:resource="https://ci.nii.ac.jp/keyword/Sustainability" dc:title="Sustainability" />
+        <foaf:topic rdf:resource="https://ci.nii.ac.jp/keyword/Rural+Development" dc:title="Rural Development" />
+        <dc:date>2022</dc:date>
+        <cinii:naid>130008141851</cinii:naid>
+        <dc:language>ENG</dc:language>
+        <dc:source>J-STAGE</dc:source>
+        <rdfs:seeAlso rdf:resource="https://doi.org/10.14246/irspsd.10.1_43" dc:title="J-STAGE" />
+        <prism:doi>10.14246/irspsd.10.1_43</prism:doi>
+    </rdf:Description>
+    <rdf:Description rdf:about="https://ci.nii.ac.jp/naid/130008141851#article" xml:lang="en">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/Article"/>
+        <dc:title>A Review of the Chinese Government Support and Sustainability Assessment for Ecovillage Development with a Global Perspective</dc:title>
+        <dc:creator>Gao Xihong</dc:creator>
+        <dc:creator>Wang Fan</dc:creator>
+        <dc:creator>Liu Chenxi</dc:creator>
+        <dc:creator>Luo Tao</dc:creator>
+        <dc:creator>Zhang Yukun</dc:creator>
+        <dc:creator>Nuti Camillo</dc:creator>
+        <dc:publisher>International Community of Spatial Planning and Sustainable Development</dc:publisher>
+        <prism:publicationName>International Review for Spatial Planning and Sustainable Development</prism:publicationName>
+        <dc:description>&lt;p&gt;Having achieved substantial progress in urban development over the past three decades, the Chinese government has turned to ecovillage development as one of the more effective ways to solve increasingly serious rural issues, such as poverty, rural hollowing, a deteriorating natural environment, and farmland abandonment. However, in spite of various promotional policies and substantial financial investment, there are very few studies assessing the impact of governmental support on ecovillage development. This paper presents a study applying both qualitative research and quantitative analysis to compare the effects of the support, especially in funding and policies, on their development. A comparison was made of three cases, one in China and two elsewhere. To provide a common basis for comparison, three quantification based assessments were examined with a view to applying them in this study.&lt;b&gt; &lt;/b&gt;These were the Evaluation for Construction of Beautiful Village (ECBV) from China, and the BREEAM Community and LEED-ND, two well-established international examples. The following analyses using the three methods reveal the strengths and weaknesses of the Chinese government support in ecovillage development, and limitations of the quantification-based assessment methods. Proposals are made for improving the nature of government support and the use of the ECBV. These research outcomes can help formulate the rural development policies in the critical time of socio-economic transition in China, and the research process could be a reference to review quantification based assessment methods in other developing countries with similar levels of development. &lt;/p&gt;</dc:description>
+        <foaf:topic rdf:resource="https://ci.nii.ac.jp/keyword/Ecovillage" dc:title="Ecovillage" />
+        <foaf:topic rdf:resource="https://ci.nii.ac.jp/keyword/Government+support" dc:title="Government support" />
+        <foaf:topic rdf:resource="https://ci.nii.ac.jp/keyword/Ecovillage+assessment" dc:title="Ecovillage assessment" />
+        <foaf:topic rdf:resource="https://ci.nii.ac.jp/keyword/Sustainability" dc:title="Sustainability" />
+        <foaf:topic rdf:resource="https://ci.nii.ac.jp/keyword/Rural+Development" dc:title="Rural Development" />
+    </rdf:Description>
+    <rdf:Description rdf:about="https://ci.nii.ac.jp/naid/130008141851#article">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/Article"/>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000414928093#me">
+                <foaf:name xml:lang="en">Gao Xihong</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/School_of_Architecture_and_Urban_Planning%252C_Fuzhou_University%7CDepartment_of_Architecture%252C_Roma_Tre_University">
+                        <foaf:name xml:lang="en">School of Architecture and Urban Planning, Fuzhou University|Department of Architecture, Roma Tre University</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000414928094#me">
+                <foaf:name xml:lang="en">Wang Fan</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/School_of_Architecture_and_Urban_Planning%252C_Fuzhou_University%7CInstitute_of_Sustainable_Building_Design%252C_School_of_Energy%252C_Geoscience%252C_Infrastructure_and_Society%252C_Heriot-Watt_University">
+                        <foaf:name xml:lang="en">School of Architecture and Urban Planning, Fuzhou University|Institute of Sustainable Building Design, School of Energy, Geoscience, Infrastructure and Society, Heriot-Watt University</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000414928095#me">
+                <foaf:name xml:lang="en">Liu Chenxi</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/Institute_of_Sustainable_Building_Design%252C_School_of_Energy%252C_Geoscience%252C_Infrastructure_and_Society%252C_Heriot-Watt_University">
+                        <foaf:name xml:lang="en">Institute of Sustainable Building Design, School of Energy, Geoscience, Infrastructure and Society, Heriot-Watt University</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000414928096#me">
+                <foaf:name xml:lang="en">Luo Tao</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/School_of_Architecture_and_Urban_Planning%252C_Fuzhou_University">
+                        <foaf:name xml:lang="en">School of Architecture and Urban Planning, Fuzhou University</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000414928097#me">
+                <foaf:name xml:lang="en">Zhang Yukun</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/School_of_Architecture%252C_Tianjin_University">
+                        <foaf:name xml:lang="en">School of Architecture, Tianjin University</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000414928098#me">
+                <foaf:name xml:lang="en">Nuti Camillo</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/Department_of_Architecture%252C_Roma_Tre_University">
+                        <foaf:name xml:lang="en">Department of Architecture, Roma Tre University</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+    </rdf:Description>
+</rdf:RDF>

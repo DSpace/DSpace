@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/" xmlns:con="http://www.w3.org/2000/10/swap/pim/contact#" xmlns:cinii="https://ci.nii.ac.jp/ns/1.0/" xmlns:bibo="http://purl.org/ontology/bibo/">
+    <rdf:Description rdf:about="https://ci.nii.ac.jp/naid/210000159181#article">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/Article"/>
+        <foaf:isPrimaryTopicOf rdf:resource="https://ci.nii.ac.jp/naid/210000159181.rdf" />
+        <dc:title>Surface Electronic States and Inclining Surfaces in MoTe2 Probed by Photoemission Spectromicroscopy</dc:title>
+        <dc:creator>Matsumoto Ryoya</dc:creator>
+        <dc:creator>Saini Naurang L.</dc:creator>
+        <dc:creator>Giampietri Alessio</dc:creator>
+        <dc:creator>Kandyba Viktor</dc:creator>
+        <dc:creator>Barinov Alexey</dc:creator>
+        <dc:creator>Jha Rajveer</dc:creator>
+        <dc:creator>Higashinaka Ryuji</dc:creator>
+        <dc:creator>Matsuda Tatsuma D.</dc:creator>
+        <dc:creator>Aoki Yuji</dc:creator>
+        <dc:creator>Mizokawa Takashi</dc:creator>
+        <dc:publisher>Physical Society of Japan</dc:publisher>
+        <prism:publicationName>Journal of the Physical Society of Japan</prism:publicationName>
+        <prism:issn>0031-9015</prism:issn>
+        <prism:volume>90</prism:volume>
+        <prism:number>8</prism:number>
+        <prism:startingPage>84704</prism:startingPage>
+        <prism:endingPage>84704</prism:endingPage>
+        <prism:publicationDate>2021-08-15</prism:publicationDate>
+        <foaf:topic rdf:resource="https://ci.nii.ac.jp/keyword/General+Physics+and+Astronomy" dc:title="General Physics and Astronomy" />
+        <dc:date>2021-08-15</dc:date>
+        <cinii:naid>210000159181</cinii:naid>
+        <dc:source>Crossref</dc:source>
+        <rdfs:seeAlso rdf:resource="http://dx.doi.org/10.7566/jpsj.90.084704" dc:title="DOI" />
+    </rdf:Description>
+    <rdf:Description rdf:about="https://ci.nii.ac.jp/naid/210000159181#article" xml:lang="en">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/Article"/>
+        <dc:title>Surface Electronic States and Inclining Surfaces in MoTe2 Probed by Photoemission Spectromicroscopy</dc:title>
+        <dc:creator>Matsumoto Ryoya</dc:creator>
+        <dc:creator>Saini Naurang L.</dc:creator>
+        <dc:creator>Giampietri Alessio</dc:creator>
+        <dc:creator>Kandyba Viktor</dc:creator>
+        <dc:creator>Barinov Alexey</dc:creator>
+        <dc:creator>Jha Rajveer</dc:creator>
+        <dc:creator>Higashinaka Ryuji</dc:creator>
+        <dc:creator>Matsuda Tatsuma D.</dc:creator>
+        <dc:creator>Aoki Yuji</dc:creator>
+        <dc:creator>Mizokawa Takashi</dc:creator>
+        <dc:publisher>Physical Society of Japan</dc:publisher>
+        <prism:publicationName>Journal of the Physical Society of Japan</prism:publicationName>
+        <foaf:topic rdf:resource="https://ci.nii.ac.jp/keyword/General+Physics+and+Astronomy" dc:title="General Physics and Astronomy" />
+    </rdf:Description>
+    <rdf:Description rdf:about="https://ci.nii.ac.jp/naid/210000159181#article">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/Article"/>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000412588969#me">
+                <foaf:name xml:lang="en">Matsumoto Ryoya</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/Department_of_Applied_Physics%252C_Waseda_University%252C_Shinjuku%252C_Tokyo_169-8555%252C_Japan">
+                        <foaf:name xml:lang="en">Department of Applied Physics, Waseda University, Shinjuku, Tokyo 169-8555, Japan</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000412588970#me">
+                <foaf:name xml:lang="en">Saini Naurang L.</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/Dipartimento_di_Fisica%252C_Universit%C3%A1_di_Roma_%22La_Sapienza%22_-_Piazzale_Aldo_Moro_2%252C_00185_Roma%252C_Italy">
+                        <foaf:name>Dipartimento di Fisica, Universitá di Roma &quot;La Sapienza&quot; - Piazzale Aldo Moro 2, 00185 Roma, Italy</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000412588971#me">
+                <foaf:name xml:lang="en">Giampietri Alessio</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/Sincrotrone_Trieste_S.C.p.A.%252C_Area_Science_Park%252C_34012_Basovizza%252C_Trieste%252C_Italy">
+                        <foaf:name xml:lang="en">Sincrotrone Trieste S.C.p.A., Area Science Park, 34012 Basovizza, Trieste, Italy</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000412588972#me">
+                <foaf:name xml:lang="en">Kandyba Viktor</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/Sincrotrone_Trieste_S.C.p.A.%252C_Area_Science_Park%252C_34012_Basovizza%252C_Trieste%252C_Italy">
+                        <foaf:name xml:lang="en">Sincrotrone Trieste S.C.p.A., Area Science Park, 34012 Basovizza, Trieste, Italy</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000412588973#me">
+                <foaf:name xml:lang="en">Barinov Alexey</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/Sincrotrone_Trieste_S.C.p.A.%252C_Area_Science_Park%252C_34012_Basovizza%252C_Trieste%252C_Italy">
+                        <foaf:name xml:lang="en">Sincrotrone Trieste S.C.p.A., Area Science Park, 34012 Basovizza, Trieste, Italy</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000412588974#me">
+                <foaf:name xml:lang="en">Jha Rajveer</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/Department_of_Physics%252C_Tokyo_Metropolitan_University%252C_Hachioji%252C_Tokyo_192-0397%252C_Japan">
+                        <foaf:name xml:lang="en">Department of Physics, Tokyo Metropolitan University, Hachioji, Tokyo 192-0397, Japan</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000412588975#me">
+                <foaf:name xml:lang="en">Higashinaka Ryuji</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/Department_of_Physics%252C_Tokyo_Metropolitan_University%252C_Hachioji%252C_Tokyo_192-0397%252C_Japan">
+                        <foaf:name xml:lang="en">Department of Physics, Tokyo Metropolitan University, Hachioji, Tokyo 192-0397, Japan</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000412588976#me">
+                <foaf:name xml:lang="en">Matsuda Tatsuma D.</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/Department_of_Physics%252C_Tokyo_Metropolitan_University%252C_Hachioji%252C_Tokyo_192-0397%252C_Japan">
+                        <foaf:name xml:lang="en">Department of Physics, Tokyo Metropolitan University, Hachioji, Tokyo 192-0397, Japan</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000412588977#me">
+                <foaf:name xml:lang="en">Aoki Yuji</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/Department_of_Physics%252C_Tokyo_Metropolitan_University%252C_Hachioji%252C_Tokyo_192-0397%252C_Japan">
+                        <foaf:name xml:lang="en">Department of Physics, Tokyo Metropolitan University, Hachioji, Tokyo 192-0397, Japan</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+        <foaf:maker>
+            <foaf:Person rdf:about="https://ci.nii.ac.jp/nrid/9000412588978#me">
+                <foaf:name xml:lang="en">Mizokawa Takashi</foaf:name>
+                <con:organization>
+                    <foaf:Organization rdf:about="https://ci.nii.ac.jp/org/Department_of_Applied_Physics%252C_Waseda_University%252C_Shinjuku%252C_Tokyo_169-8555%252C_Japan">
+                        <foaf:name xml:lang="en">Department of Applied Physics, Waseda University, Shinjuku, Tokyo 169-8555, Japan</foaf:name>
+                    </foaf:Organization>
+                </con:organization>
+            </foaf:Person>
+        </foaf:maker>
+    </rdf:Description>
+</rdf:RDF>
