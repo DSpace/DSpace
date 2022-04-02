@@ -7,7 +7,6 @@
  */
 package org.dspace.importer.external.scopus.service;
 
-import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -17,6 +16,6 @@ import java.util.Map;
  */
 public interface LiveImportClient {
 
-    public InputStream executeHttpGetRequest(int timeout, String URL, Map<String, String> requestParams);
+    public String executeHttpGetRequest(int timeout, String URL, Map<String, String> requestParams);
 
 }
