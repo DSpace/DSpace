@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - dtq-dev
-      - fix/6-cicd-pipeline
   pull_request:
 
 permissions:
