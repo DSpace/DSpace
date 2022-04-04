@@ -1,0 +1,24 @@
+TY  - JOUR
+AU  - Torres Marzo, Ricardo
+TI  - Requena Jiménez, Miguel, Los espacios de la muerte en Roma, Madrid, Síntesis, 2021, 365 págs. más bibliografía en línea, ISBN 978-84-135759-6-4.
+JO  - Nova tellus
+J2  - Nova tellus
+SN  - 0185-3058
+VL  - 39
+IS  - 2
+DO  - 10.19130/iifl.nt.2021.39.2.901
+DB  - SciELO México
+DP  - http://www.scielo.org/
+ID  - S0185-30582021000200231-mex
+LA  - es
+SP  - 231
+EP  - 236
+DA  - 2021-12
+PY  - 2021
+UR  - http://www.scielo.org.mx/scielo.php?script=sci_arttext&pid=S0185-30582021000200231&lang=pt
+KW  - Roma
+KW  - Historia
+KW  - ritos funerarios
+KW  - inframundo
+KW  - epitafios
+ER  -
