@@ -51,7 +51,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * Base class for package ingester of METS (Metadata Encoding and Transmission
