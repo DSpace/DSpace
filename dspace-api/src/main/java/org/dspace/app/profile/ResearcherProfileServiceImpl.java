@@ -7,6 +7,9 @@
  */
 package org.dspace.app.profile;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.ArrayUtils.contains;
 import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 import static org.dspace.core.Constants.READ;
 import static org.dspace.eperson.Group.ANONYMOUS;
@@ -14,10 +17,9 @@ import static org.dspace.eperson.Group.ANONYMOUS;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -107,18 +109,19 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
             throw new ResourceConflictException("A profile is already linked to the provided User", profile);
         }
 
-        Collection collection = findProfileCollection(context);
-        if (collection == null) {
-            throw new IllegalStateException("No collection found for researcher profiles");
-        }
+        Collection collection = findProfileCollection(context)
+            .orElseThrow(() -> new IllegalStateException("No collection found for researcher profiles"));
 
         context.turnOffAuthorisationSystem();
-        Item item = createProfileItem(context, ePerson, collection);
-        context.restoreAuthSystemState();
+        try {
 
-        ResearcherProfile researcherProfile = new ResearcherProfile(item);
+            Item item = createProfileItem(context, ePerson, collection);
+            return new ResearcherProfile(item);
 
-        return researcherProfile;
+        } finally {
+            context.restoreAuthSystemState();
+        }
+
     }
 
     @Override
@@ -160,25 +163,21 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
     @Override
     public ResearcherProfile claim(final Context context, final EPerson ePerson, final URI uri)
             throws SQLException, AuthorizeException, SearchServiceException {
+
         Item profileItem = findResearcherProfileItemById(context, ePerson.getID());
         if (profileItem != null) {
             ResearcherProfile profile = new ResearcherProfile(profileItem);
             throw new ResourceConflictException("A profile is already linked to the provided User", profile);
         }
 
-        Collection collection = findProfileCollection(context);
-        if (collection == null) {
-            throw new IllegalStateException("No collection found for researcher profiles");
-        }
+        Item item = findItemByURI(context, uri)
+            .orElseThrow(() -> new IllegalArgumentException("No item found by URI " + uri));
 
-        final String path = uri.getPath();
-        final UUID uuid = UUIDUtils.fromString(path.substring(path.lastIndexOf("/") + 1 ));
-        Item item = itemService.find(context, uuid);
-        if (Objects.isNull(item) || !item.isArchived() || item.isWithdrawn() || notClaimableEntityType(item)) {
+        if (!item.isArchived() || item.isWithdrawn() || notClaimableEntityType(item)) {
             throw new IllegalArgumentException("Provided uri does not represent a valid Item to be claimed");
         }
-        final String existingOwner = itemService.getMetadataFirstValue(item, "dspace", "object",
-                "owner", null);
+
+        String existingOwner = itemService.getMetadataFirstValue(item, "dspace", "object", "owner", Item.ANY);
 
         if (StringUtils.isNotBlank(existingOwner)) {
             throw new IllegalArgumentException("Item with provided uri has already an owner");
@@ -192,10 +191,15 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         return new ResearcherProfile(item);
     }
 
+    private Optional<Item> findItemByURI(final Context context, final URI uri) throws SQLException {
+        String path = uri.getPath();
+        UUID uuid = UUIDUtils.fromString(path.substring(path.lastIndexOf("/") + 1));
+        return ofNullable(itemService.find(context, uuid));
+    }
+
     private boolean notClaimableEntityType(final Item item) {
-        final String entityType = itemService.getEntityType(item);
-        return Arrays.stream(configurationService.getArrayProperty("claimable.entityType"))
-                .noneMatch(entityType::equals);
+        String entityType = itemService.getEntityType(item);
+        return !contains(configurationService.getArrayProperty("claimable.entityType"), entityType);
     }
 
     private Item findResearcherProfileItemById(Context context, UUID id) throws SQLException, AuthorizeException {
@@ -205,18 +209,20 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         Iterator<Item> items = itemService.findByAuthorityValue(context, "dspace", "object", "owner", id.toString());
         while (items.hasNext()) {
             Item item = items.next();
-            if (hasEntityTypeMetadataEqualsTo(item, profileType)) {
+            String entityType = itemService.getEntityType(item);
+            if (profileType.equals(entityType)) {
                 return item;
             }
         }
+
         return null;
     }
 
     @SuppressWarnings("rawtypes")
-    private Collection findProfileCollection(Context context) throws SQLException, SearchServiceException {
+    private Optional<Collection> findProfileCollection(Context context) throws SQLException, SearchServiceException {
         UUID uuid = UUIDUtils.fromString(configurationService.getProperty("researcher-profile.collection.uuid"));
         if (uuid != null) {
-            return collectionService.find(context, uuid);
+            return ofNullable(collectionService.find(context, uuid));
         }
 
         String profileType = getProfileType();
@@ -229,28 +235,27 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         List<IndexableObject> indexableObjects = discoverResult.getIndexableObjects();
 
         if (CollectionUtils.isEmpty(indexableObjects)) {
-            return null;
+            return empty();
         }
 
         if (indexableObjects.size() > 1) {
             log.warn("Multiple " + profileType + " type collections were found during profile creation");
-            return null;
+            return empty();
         }
 
-        return (Collection) indexableObjects.get(0).getIndexedObject();
+        return ofNullable((Collection) indexableObjects.get(0).getIndexedObject());
     }
 
     private Item createProfileItem(Context context, EPerson ePerson, Collection collection)
             throws AuthorizeException, SQLException {
 
         String id = ePerson.getID().toString();
+        String fullName = ePerson.getFullName();
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
         Item item = workspaceItem.getItem();
-        itemService.addMetadata(context, item, "dc", "title", null, null,
-                                ePerson.getFullName());
-        itemService.addMetadata(context, item, "dspace", "object", "owner", null,
-                                ePerson.getFullName(), id, CF_ACCEPTED);
+        itemService.addMetadata(context, item, "dc", "title", null, null, fullName);
+        itemService.addMetadata(context, item, "dspace", "object", "owner", null, fullName, id, CF_ACCEPTED);
 
         item = installItemService.installItem(context, workspaceItem);
 
@@ -259,13 +264,6 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         authorizeService.addPolicy(context, item, READ, ePerson);
 
         return item;
-    }
-
-    private boolean hasEntityTypeMetadataEqualsTo(Item item, String entityType) {
-        return item.getMetadata().stream().anyMatch(metadataValue -> {
-            return "dspace.entity.type".equals(metadataValue.getMetadataField().toString('.')) &&
-                    entityType.equals(metadataValue.getValue());
-        });
     }
 
     private boolean isHardDeleteEnabled() {
