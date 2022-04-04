@@ -371,13 +371,12 @@
             <artifactId>dspace-services</artifactId>
         </dependency>
 
+        <!-- DSpace modules to deploy (these modules are all optional, but add features/endpoints to webapp) -->
+        <!-- You may choose to comment out any of these modules if you do not want/need its features -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-iiif</artifactId>
         </dependency>
-
-        <!-- DSpace modules to deploy (this modules are all optional, but add features/endpoints to webapp) -->
-        <!-- You may choose to comment out any of these modules if you do not want/need its features -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
@@ -421,6 +420,32 @@
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
             <version>${nimbus-jose-jwt.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj</artifactId>
+            <version>${solr.client.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
+             Caching dependencies for iiif endpoint. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/javax.cache/cache-api -->
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.ehcache/ehcache -->
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${ehcache.version}</version>
         </dependency>
 
         <!-- TEST DEPENDENCIES -->
@@ -473,50 +498,6 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
             <version>${solr.client.version}</version>
-            <scope>test</scope>
-            <exclusions>
-                <!-- Newer version brought in by opencsv -->
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-text</artifactId>
-                </exclusion>
-                <!-- Newer Jetty version brought in via Parent POM -->
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-http</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-io</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-util</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
-             Caching dependencies for iiif endpoint. -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
-            <version>${spring-boot.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/javax.cache/cache-api -->
-        <dependency>
-            <groupId>javax.cache</groupId>
-            <artifactId>cache-api</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.ehcache/ehcache -->
-        <dependency>
-            <groupId>org.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-            <version>${ehcache.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-cell</artifactId>
             <scope>test</scope>
             <exclusions>
                 <!-- Newer version brought in by opencsv -->
