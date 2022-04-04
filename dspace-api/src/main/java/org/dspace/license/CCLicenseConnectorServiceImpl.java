@@ -32,13 +32,14 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
-import org.jaxen.JaxenException;
-import org.jaxen.jdom.JDOMXPath;
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.InputSource;
@@ -96,7 +97,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
         List<String> licenses;
         try (CloseableHttpResponse response = client.execute(httpGet)) {
             licenses = retrieveLicenses(response);
-        } catch (JDOMException | JaxenException | IOException e) {
+        } catch (JDOMException | IOException e) {
             log.error("Error while retrieving the license details using url: " + uri, e);
             licenses = Collections.emptyList();
         }
@@ -110,7 +111,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
             try (CloseableHttpResponse response = client.execute(licenseHttpGet)) {
                 CCLicense ccLicense = retrieveLicenseObject(license, response);
                 ccLicenses.put(ccLicense.getLicenseId(), ccLicense);
-            } catch (JaxenException | JDOMException | IOException e) {
+            } catch (JDOMException | IOException e) {
                 log.error("Error while retrieving the license details using url: " + licenseUri, e);
             }
         }
@@ -125,25 +126,23 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      * @param response The response from the API
      * @return a list of license identifiers for which details need to be retrieved
      * @throws IOException
-     * @throws JaxenException
      * @throws JDOMException
      */
     private List<String> retrieveLicenses(CloseableHttpResponse response)
-            throws IOException, JaxenException, JDOMException {
+            throws IOException, JDOMException {
 
         List<String> domains = new LinkedList<>();
         String[] excludedLicenses = configurationService.getArrayProperty("cc.license.classfilter");
 
-
         String responseString = EntityUtils.toString(response.getEntity());
-        JDOMXPath licenseClassXpath = new JDOMXPath("//licenses/license");
-
+        XPathExpression<Element> licenseClassXpath =
+            XPathFactory.instance().compile("//licenses/license", Filters.element());
 
         try (StringReader stringReader = new StringReader(responseString)) {
             InputSource is = new InputSource(stringReader);
-            org.jdom.Document classDoc = this.parser.build(is);
+            org.jdom2.Document classDoc = this.parser.build(is);
 
-            List<Element> elements = licenseClassXpath.selectNodes(classDoc);
+            List<Element> elements = licenseClassXpath.evaluate(classDoc);
             for (Element element : elements) {
                 String licenseId = getSingleNodeValue(element, "@id");
                 if (StringUtils.isNotBlank(licenseId) && !ArrayUtils.contains(excludedLicenses, licenseId)) {
@@ -163,30 +162,29 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      * @param response  for a specific CC License response
      * @return the corresponding CC License Object
      * @throws IOException
-     * @throws JaxenException
      * @throws JDOMException
      */
     private CCLicense retrieveLicenseObject(final String licenseId, CloseableHttpResponse response)
-            throws IOException, JaxenException, JDOMException {
+            throws IOException, JDOMException {
 
         String responseString = EntityUtils.toString(response.getEntity());
 
-
-        JDOMXPath licenseClassXpath = new JDOMXPath("//licenseclass");
-        JDOMXPath licenseFieldXpath = new JDOMXPath("field");
-
+        XPathExpression<Object> licenseClassXpath =
+            XPathFactory.instance().compile("//licenseclass", Filters.fpassthrough());
+        XPathExpression<Element> licenseFieldXpath =
+            XPathFactory.instance().compile("field", Filters.element());
 
         try (StringReader stringReader = new StringReader(responseString)) {
             InputSource is = new InputSource(stringReader);
 
-            org.jdom.Document classDoc = this.parser.build(is);
+            org.jdom2.Document classDoc = this.parser.build(is);
 
-            Object element = licenseClassXpath.selectSingleNode(classDoc);
+            Object element = licenseClassXpath.evaluateFirst(classDoc);
             String licenseLabel = getSingleNodeValue(element, "label");
 
             List<CCLicenseField> ccLicenseFields = new LinkedList<>();
 
-            List<Element> licenseFields = licenseFieldXpath.selectNodes(element);
+            List<Element> licenseFields = licenseFieldXpath.evaluate(element);
             for (Element licenseField : licenseFields) {
                 CCLicenseField ccLicenseField = parseLicenseField(licenseField);
                 ccLicenseFields.add(ccLicenseField);
@@ -196,13 +194,14 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
         }
     }
 
-    private CCLicenseField parseLicenseField(final Element licenseField) throws JaxenException {
+    private CCLicenseField parseLicenseField(final Element licenseField) {
         String id = getSingleNodeValue(licenseField, "@id");
         String label = getSingleNodeValue(licenseField, "label");
         String description = getSingleNodeValue(licenseField, "description");
 
-        JDOMXPath enumXpath = new JDOMXPath("enum");
-        List<Element> enums = enumXpath.selectNodes(licenseField);
+        XPathExpression<Element> enumXpath =
+            XPathFactory.instance().compile("enum", Filters.element());
+        List<Element> enums = enumXpath.evaluate(licenseField);
 
         List<CCLicenseFieldEnum> ccLicenseFieldEnumList = new LinkedList<>();
 
@@ -215,7 +214,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
 
     }
 
-    private CCLicenseFieldEnum parseEnum(final Element enumElement) throws JaxenException {
+    private CCLicenseFieldEnum parseEnum(final Element enumElement) {
         String id = getSingleNodeValue(enumElement, "@id");
         String label = getSingleNodeValue(enumElement, "label");
         String description = getSingleNodeValue(enumElement, "description");
@@ -236,9 +235,10 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
         }
     }
 
-    private String getSingleNodeValue(final Object t, String query) throws JaxenException {
-        JDOMXPath xpath = new JDOMXPath(query);
-        Object singleNode = xpath.selectSingleNode(t);
+    private String getSingleNodeValue(final Object t, String query) {
+        XPathExpression xpath =
+            XPathFactory.instance().compile(query, Filters.fpassthrough());
+        Object singleNode = xpath.evaluateFirst(t);
 
         return getNodeValue(singleNode);
     }
@@ -273,7 +273,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
 
         try (CloseableHttpResponse response = client.execute(httpPost)) {
             return retrieveLicenseUri(response);
-        } catch (JDOMException | JaxenException | IOException e) {
+        } catch (JDOMException | IOException e) {
             log.error("Error while retrieving the license uri for license : " + licenseId + " with answers "
                               + answerMap.toString(), e);
         }
@@ -286,21 +286,20 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      * @param response for a specific CC License URI response
      * @return the corresponding CC License URI as a string
      * @throws IOException
-     * @throws JaxenException
      * @throws JDOMException
      */
     private String retrieveLicenseUri(final CloseableHttpResponse response)
-            throws IOException, JaxenException, JDOMException {
+            throws IOException, JDOMException {
 
         String responseString = EntityUtils.toString(response.getEntity());
-        JDOMXPath licenseClassXpath = new JDOMXPath("//result/license-uri");
-
+        XPathExpression<Object> licenseClassXpath =
+            XPathFactory.instance().compile("//result/license-uri", Filters.fpassthrough());
 
         try (StringReader stringReader = new StringReader(responseString)) {
             InputSource is = new InputSource(stringReader);
-            org.jdom.Document classDoc = this.parser.build(is);
+            org.jdom2.Document classDoc = this.parser.build(is);
 
-            Object node = licenseClassXpath.selectSingleNode(classDoc);
+            Object node = licenseClassXpath.evaluateFirst(classDoc);
             String nodeValue = getNodeValue(node);
 
             if (StringUtils.isNotBlank(nodeValue)) {
@@ -364,12 +363,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      * @return the license name
      */
     public String retrieveLicenseName(final Document doc) {
-        try {
-            return getSingleNodeValue(doc, "//result/license-name");
-        } catch (JaxenException e) {
-            log.error("Error while retrieving the license name from the license document", e);
-        }
-        return null;
+        return getSingleNodeValue(doc, "//result/license-name");
     }
 
 }

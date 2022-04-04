@@ -520,7 +520,7 @@
         </dependency>
         <dependency>
             <groupId>org.jdom</groupId>
-            <artifactId>jdom</artifactId>
+            <artifactId>jdom2</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
@@ -581,9 +581,12 @@
         </dependency>
         <!-- Used for RSS / ATOM syndication feeds -->
         <dependency>
-            <groupId>org.rometools</groupId>
+            <groupId>com.rometools</groupId>
+            <artifactId>rome</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.rometools</groupId>
             <artifactId>rome-modules</artifactId>
-            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.jbibtex</groupId>
@@ -815,44 +818,6 @@
             <artifactId>jaxb-runtime</artifactId>
         </dependency>
 
-        <!-- Apache Axiom -->
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-impl</artifactId>
-            <version>${axiom.version}</version>
-            <exclusions>
-                <!-- Exclude Geronimo as it is NOT necessary when using javax.activation (which we use)
-                     See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <!-- Exclude Woodstox, as later version provided by Solr dependencies -->
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>woodstox-core-asl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-api</artifactId>
-            <version>${axiom.version}</version>
-            <exclusions>
-                <!-- Exclude Geronimo as it is NOT necessary when using javax.activation (which we use)
-                     See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <!-- Exclude Woodstox, as later version provided by Solr dependencies -->
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>woodstox-core-asl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!-- Jersey / JAX-RS client (javax.ws.rs.*) dependencies needed to integrate with external sources/services -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -908,6 +873,14 @@
             <version>20180130</version>
         </dependency>
 
+        <!-- Useful for testing command-line tools -->
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <version>1.19.0</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Used for Solr core export/import -->
         <dependency>
             <groupId>com.opencsv</groupId>
@@ -919,7 +892,6 @@
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
-            <type>jar</type>
         </dependency>
 
         <dependency>
@@ -994,7 +966,7 @@
           <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
-            <version>2.2</version>
+            <version>2.3</version>
           </dependency>
           <dependency>
               <groupId>org.xmlunit</groupId>

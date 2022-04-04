@@ -27,7 +27,6 @@
         <postgresql.driver.version>42.3.3</postgresql.driver.version>
         <solr.client.version>8.8.1</solr.client.version>
 
-        <axiom.version>1.2.22</axiom.version>
         <ehcache.version>3.4.0</ehcache.version>
         <errorprone.version>2.10.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
@@ -41,6 +40,7 @@
         <log4j.version>2.17.1</log4j.version>
         <pdfbox-version>2.0.24</pdfbox-version>
         <poi-version>3.17</poi-version>
+        <rome.version>1.18.0</rome.version>
         <slf4j.version>1.7.25</slf4j.version>
 
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
@@ -1116,7 +1116,7 @@
                 <version>3.4.14</version>
             </dependency>
 
-            <!-- solr-cell and axiom-api disagree on versions -->
+            <!-- solr-cell and axiom-api (in dspace-swordv2) disagree on versions -->
             <dependency>
                 <groupId>org.apache.james</groupId>
                 <artifactId>apache-mime4j-core</artifactId>
@@ -1159,6 +1159,23 @@
                 <artifactId>hibernate-validator</artifactId>
                 <!-- This artifact doesn't track the main Hibernate version. -->
                 <version>${hibernate-validator.version}</version>
+            </dependency>
+
+            <!-- Rome is used for RSS / ATOM syndication feeds -->
+            <dependency>
+                <groupId>com.rometools</groupId>
+                <artifactId>rome</artifactId>
+                <version>${rome.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.rometools</groupId>
+                <artifactId>rome-modules</artifactId>
+                <version>${rome.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.rometools</groupId>
+                <artifactId>rome-utils</artifactId>
+                <version>${rome.version}</version>
             </dependency>
 
             <dependency>
@@ -1468,6 +1485,7 @@
                 <version>3.1.0</version>
             </dependency>
 
+            <!-- Jaxen is needed by xoai and sword2-server, but they disagree on the versions -->
             <dependency>
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
@@ -1481,8 +1499,8 @@
             </dependency>
             <dependency>
                 <groupId>org.jdom</groupId>
-                <artifactId>jdom</artifactId>
-                <version>1.1.3</version>
+                <artifactId>jdom2</artifactId>
+                <version>2.0.6.1</version>
             </dependency>
 
             <dependency>

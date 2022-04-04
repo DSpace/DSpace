@@ -32,7 +32,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.MockSolrLoggerServiceImpl;
 import org.dspace.statistics.MockSolrStatisticsCore;
 import org.dspace.storage.rdbms.DatabaseUtils;
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;

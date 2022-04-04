@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static java.util.UUID.randomUUID;
+import static javax.mail.internet.MimeUtility.encodeText;
 import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.io.IOUtils.toInputStream;
@@ -291,6 +292,53 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
             //Check that NO statistics record was logged for the Range requests
             checkNumberOfStatsRecords(bitstream, 0);
+    }
+
+    @Test
+    public void testBitstreamName() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community and one collection
+
+        parentCommunity = CommunityBuilder
+            .createCommunity(context)
+            .build();
+
+        Collection collection = CollectionBuilder
+            .createCollection(context, parentCommunity)
+            .build();
+
+        //2. A public item with a bitstream
+
+        String bitstreamContent = "0123456789";
+        String bitstreamName = "ภาษาไทย";
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+
+            Item item = ItemBuilder
+                .createItem(context, collection)
+                .build();
+
+            bitstream = BitstreamBuilder
+                .createBitstream(context, item, is)
+                .withName(bitstreamName)
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //We download the bitstream
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+            //** THEN **
+            .andExpect(status().isOk())
+            //We expect the content disposition to have the encoded bitstream name
+            .andExpect(header().string(
+                "Content-Disposition",
+                "attachment;filename=\"" + encodeText(bitstreamName) + "\""
+            ));
     }
 
     @Test
