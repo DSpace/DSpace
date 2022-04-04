@@ -373,7 +373,7 @@
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.1-api</artifactId>
-            <version>1.0.0.Final</version>
+            <version>1.0.2.Final</version>
         </dependency>
 
         <dependency>
@@ -762,7 +762,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>6.5.7</version>
+            <version>8.4.4</version>
         </dependency>
 
         <!-- Google Analytics -->
