@@ -115,11 +115,17 @@
           </property>
     </bean>
 
-
     <bean id="CrossRefImportService" class="org.dspace.importer.external.crossref.CrossRefImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="CrossRefMetadataFieldMapping"/>
     </bean>
     <bean id="CrossRefMetadataFieldMapping" class="org.dspace.importer.external.crossref.CrossRefFieldMapping"/>
+
+    <bean id="vufindImportService" class="org.dspace.importer.external.vufind.VuFindImportMetadataSourceServiceImpl" scope="singleton">
+          <!-- Set to empty to use the default set of fields  -->
+          <constructor-arg type="java.lang.String" value=""/>
+          <property name="metadataFieldMapping" ref="vufindMetadataFieldMapping"/>
+    </bean>
+    <bean id="vufindMetadataFieldMapping" class="org.dspace.importer.external.vufind.metadatamapping.VuFindFieldMapping"/>
 
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
     <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
