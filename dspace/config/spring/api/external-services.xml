@@ -94,5 +94,15 @@
         </property>
     </bean>
 
-</beans>
+    <bean id="scieloLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="ScieloImportService"/>
+        <property name="sourceIdentifier" value="scielo"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+            </list>
+        </property>
+    </bean>
 
+</beans>
