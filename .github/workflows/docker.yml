@@ -1,21 +1,18 @@
 # DSpace Docker image build for hub.docker.com
 name: Docker images
 
-# Run this Build for all pushes to 'main' or maintenance branches, or tagged releases.
+# Run this Build for all pushes to dtq-dev branch
 # Also run for PRs to ensure PR doesn't break Docker build process
 on:
   push:
     branches:
-      - main
-      - 'dspace-**'
-    tags:
-      - 'dspace-**'
+      - dtq-dev
   pull_request:
 
 jobs:
   docker:
-    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
-    if: github.repository == 'dspace/dspace'
+    # Ensure this job never runs on forked repos. It's only executed for our repo
+    if: github.repository == 'dataquest-dev/dspace'
     runs-on: ubuntu-latest
     env:
       # Define tags to use for Docker images based on Git tags/branches (for docker/metadata-action)
@@ -51,7 +48,7 @@ jobs:
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
       ####################################################
-      # Build/Push the 'dspace/dspace-dependencies' image
+      # Build/Push the 'dataquest/dspace-dependencies' image
       ####################################################
       # https://github.com/docker/metadata-action
       # Get Metadata for docker_build_deps step below
@@ -59,7 +56,7 @@ jobs:
         id: meta_build_deps
         uses: docker/metadata-action@v3
         with:
-          images: dspace/dspace-dependencies
+          images: dataquest/dspace-dependencies
           tags: ${{ env.IMAGE_TAGS }}
           flavor: ${{ env.TAGS_FLAVOR }}
 
@@ -78,14 +75,14 @@ jobs:
           labels: ${{ steps.meta_build_deps.outputs.labels }}
 
       #######################################
-      # Build/Push the 'dspace/dspace' image
+      # Build/Push the 'dataquest/dspace' image
       #######################################
       # Get Metadata for docker_build step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace' image
         id: meta_build
         uses: docker/metadata-action@v3
         with:
-          images: dspace/dspace
+          images: dataquest/dspace
           tags: ${{ env.IMAGE_TAGS }}
           flavor: ${{ env.TAGS_FLAVOR }}
 
@@ -103,17 +100,17 @@ jobs:
           labels: ${{ steps.meta_build.outputs.labels }}
 
       #####################################################
-      # Build/Push the 'dspace/dspace' image ('-test' tag)
+      # Build/Push the 'dataquest/dspace' image ('-test' tag)
       #####################################################
       # Get Metadata for docker_build_test step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-test' image
         id: meta_build_test
         uses: docker/metadata-action@v3
         with:
-          images: dspace/dspace
+          images: dataquest/dspace
           tags: ${{ env.IMAGE_TAGS }}
           # As this is a test/development image, its tags are all suffixed with "-test". Otherwise, it uses the same
-          # tagging logic as the primary 'dspace/dspace' image above.
+          # tagging logic as the primary 'dataquest/dspace' image above.
           flavor: ${{ env.TAGS_FLAVOR }}
             suffix=-test
 
@@ -131,14 +128,14 @@ jobs:
           labels: ${{ steps.meta_build_test.outputs.labels }}
 
       ###########################################
-      # Build/Push the 'dspace/dspace-cli' image
+      # Build/Push the 'dataquest/dspace-cli' image
       ###########################################
       # Get Metadata for docker_build_test step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-cli' image
         id: meta_build_cli
         uses: docker/metadata-action@v3
         with:
-          images: dspace/dspace-cli
+          images: dataquest/dspace-cli
           tags: ${{ env.IMAGE_TAGS }}
           flavor: ${{ env.TAGS_FLAVOR }}
 
