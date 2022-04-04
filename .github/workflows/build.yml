@@ -108,10 +108,6 @@ jobs:
       # Retry action: https://github.com/marketplace/actions/retry-action
       # Codecov action: https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
-        uses: Wandalen/wretry.action@v1.0.36
+        uses: codecov/codecov-action@v2
         with:
-          action: codecov/codecov-action@v3
-          # Try upload 5 times max
-          attempt_limit: 5
-          # Run again in 30 seconds
-          attempt_delay: 30000
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
