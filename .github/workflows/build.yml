@@ -81,3 +81,5 @@ jobs:
       # https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
         uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
