@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<search-results xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/" xmlns:atom="http://www.w3.org/2005/Atom">
+    <opensearch:totalResults>0</opensearch:totalResults>
+    <opensearch:startIndex>0</opensearch:startIndex>
+    <opensearch:itemsPerPage>0</opensearch:itemsPerPage>
+    <opensearch:Query role="request" searchTerms="(probizna)" startPage="0"/>
+    <link ref="self" href="https://api.elsevier.com/content/search/scopus?start=0&amp;count=2&amp;query=%28testemptyresp%29&amp;view=COMPLETE" type="application/xml"/>
+    <entry>
+        <error>Result set was empty</error>
+    </entry>
+</search-results>
