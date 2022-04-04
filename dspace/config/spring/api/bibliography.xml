@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id='org.dspace.disseminate.CSLBibliographyGenerator'
+          class='org.dspace.disseminate.CSLBibliographyGenerator'
+          scope='prototype'>
+        <description>Accumulates DSpace Item IDs and formats a bibliography.</description>
+        <constructor-arg index='0'> <!-- name='documentTypes' -->
+            <description>
+                Values of the 'type' field mapped to CSL document types.
+                Differing types may have different entry formats in some styles.
+                https://bitbucket.org/bdarcus/csl-schema/src/855dcc00cba7/csl-types.rnc
+            </description>
+            <map>
+                <entry key='JournalArticle' value='article-journal'/>
+                <entry key='BookMonograph' value='book'/>
+                <entry key='BookChapter' value='chapter'/>
+                <entry key='ConferenceItem' value='paper-conference'/>
+                <entry key='Lecture' value='speech'/>
+                <entry key='Patent' value='patent'/>
+                <entry key='Event' value='speech'/>
+                <entry key='OtherMaterial' value='article-journal'/>
+                <entry key='Dataset' value='article-journal'/>
+                <entry key='Unknown' value='article-journal'/>
+                <entry key='Other' value='article-journal'/>
+            </map>
+        </constructor-arg>
+        <constructor-arg index='1'> <!-- name='metadataFields' -->
+            <description>
+                Map DSpace metadata fields to CSL fields.
+                https://bitbucket.org/bdarcus/csl-schema/src/855dcc00cba7/csl-variables.rnc
+            </description>
+            <map>
+                <entry key='dc.creator' value='author'/>
+                <entry key='dc.contributor.editor' value='editor'/>
+                <entry key='dc.date' value='issued'/>
+                <entry key='dc.date.accessioned' value='accessed'/>
+                <entry key='dc.date.submitted' value='submitted'/>
+                <entry key='dc.identifier.isbn' value='ISBN'/>
+                <entry key='dc.description.abstract' value='abstract'/>
+                <entry key='dc.format.medium' value='medium'/>
+                <entry key='dc.Publisher' value='original-publisher'/>
+                <entry key='dc.title' value='title'/>
+                <entry key='dc.title.alternative' value='container-title'/>
+                <entry key='dc.type' value='type'/>
+                <entry key='ekt.journal.name' value='container-title'/>
+                <entry key='ekt.journal.volume' value='volume'/>
+                <entry key='ekt.journal.issue' value='issue'/>
+                <entry key='ekt.journal.pages' value='page'/>
+                <entry key='ekt.journal.editor' value='editor'/>
+            </map>
+        </constructor-arg>
+        <constructor-arg index='2'
+                         value='article'/> <!-- name='defaultType' -->
+    </bean>
+
+</beans>
