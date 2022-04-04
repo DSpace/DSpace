@@ -136,12 +136,15 @@ public class TikaTextExtractionFilter
                  * Write all extracted characters directly to the temp file.
                  */
                 @Override
-                public void characters(char[] ch, int start, int length) {
+                public void characters(char[] ch, int start, int length) throws SAXException {
                     try {
                         writer.append(new String(ch), start, length);
                     } catch (IOException e) {
-                        log.error("Could not append to temporary file at {} when performing text extraction",
-                                  tempExtractedTextFile.getAbsolutePath(), e);
+                        String errorMsg = String.format("Could not append to temporary file at %s " +
+                                                            "when performing text extraction",
+                                                        tempExtractedTextFile.getAbsolutePath());
+                        log.error(errorMsg, e);
+                        throw new SAXException(errorMsg, e);
                     }
                 }
 
@@ -151,12 +154,15 @@ public class TikaTextExtractionFilter
                  * (like blank lines, indentations, etc.), so that we get the same extracted text either way.
                  */
                 @Override
-                public void ignorableWhitespace(char[] ch, int start, int length) {
+                public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
                     try {
                         writer.append(new String(ch), start, length);
                     } catch (IOException e) {
-                        log.error("Could not append to temporary file at {} when performing text extraction",
-                                  tempExtractedTextFile.getAbsolutePath(), e);
+                        String errorMsg = String.format("Could not append to temporary file at %s " +
+                                                            "when performing text extraction",
+                                                        tempExtractedTextFile.getAbsolutePath());
+                        log.error(errorMsg, e);
+                        throw new SAXException(errorMsg, e);
                     }
                 }
             });

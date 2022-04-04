@@ -23,7 +23,7 @@ import org.junit.Test;
 
 /**
  * Test the TikaTextExtractionFilter using test files for all major formats.
- * The test files used below are all located at [dspace-api]/src/main/resources/org/dspace/app/mediafilter/
+ * The test files used below are all located at [dspace-api]/src/test/resources/org/dspace/app/mediafilter/
  *
  * @author mwood
  * @author Tim Donohue
