@@ -1,8 +1,6 @@
 
 # DSpace
 
-[![Build Status](https://github.com/DSpace/DSpace/workflows/Build/badge.svg)](https://github.com/DSpace/DSpace/actions?query=workflow%3ABuild)
-
 [DSpace Documentation](https://wiki.lyrasis.org/display/DSDOC/) |
 [DSpace Releases](https://github.com/DSpace/DSpace/releases) |
 [DSpace Wiki](https://wiki.lyrasis.org/display/DSPACE/Home) |
