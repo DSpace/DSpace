@@ -93,7 +93,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     private String rptype;
 
     @Lob
-    @Type(type = "org.hibernate.type.MaterializedClobType")
+    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
     @Column(name = "rpdescription")
     private String rpdescription;
 
