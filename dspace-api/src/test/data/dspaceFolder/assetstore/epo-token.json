@@ -1,0 +1,18 @@
+{
+    "refresh_token_expires_in": "0",
+    "api_product_list": "[ops-prod]",
+    "api_product_list_json": [
+        "ops-prod"
+    ],
+    "organization_name": "epo",
+    "developer.email": "4science.it@gmail.com",
+    "token_type": "BearerToken",
+    "issued_at": "1649175500838",
+    "client_id": "7TzQLOPAbpDS5xwYhPwj22gbgNw0xHp2",
+    "access_token": "ek8VKPuuSwHmfGrjPM79iWVHcUea",
+    "application_name": "5aad89cd-a53b-417c-a585-7a7aa060c92e",
+    "scope": "core",
+    "expires_in": "1199",
+    "refresh_count": "0",
+    "status": "approved"
+}

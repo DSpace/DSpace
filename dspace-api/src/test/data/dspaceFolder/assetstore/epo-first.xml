@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="/3.2/style/exchange.xsl"?>
+<ops:world-patent-data xmlns="http://www.epo.org/exchange" xmlns:ops="http://ops.epo.org" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <exchange-documents>
+        <exchange-document system="ops.epo.org" family-id="58098534" country="ES" doc-number="2902749" kind="T3">
+            <bibliographic-data>
+                <publication-reference>
+                    <document-id document-id-type="docdb">
+                        <country>ES</country>
+                        <doc-number>2902749</doc-number>
+                        <kind>T3</kind>
+                        <date>20220329</date>
+                    </document-id>
+                    <document-id document-id-type="epodoc">
+                        <doc-number>ES2902749T</doc-number>
+                        <date>20220329</date>
+                    </document-id>
+                </publication-reference>
+                <classifications-ipcr>
+                    <classification-ipcr sequence="1">
+                        <text>G01N  33/   574            A I                    </text>
+                    </classification-ipcr>
+                </classifications-ipcr>
+                <patent-classifications>
+                    <patent-classification sequence="1">
+                        <classification-scheme office="EP" scheme="CPCI"/>
+                        <section>G</section>
+                        <class>01</class>
+                        <subclass>N</subclass>
+                        <main-group>33</main-group>
+                        <subgroup>57415</subgroup>
+                        <classification-value>I</classification-value>
+                        <generating-office>US</generating-office>
+                    </patent-classification>
+                    <patent-classification sequence="2">
+                        <classification-scheme office="EP" scheme="CPCI"/>
+                        <section>G</section>
+                        <class>01</class>
+                        <subclass>N</subclass>
+                        <main-group>33</main-group>
+                        <subgroup>57415</subgroup>
+                        <classification-value>I</classification-value>
+                        <generating-office>EP</generating-office>
+                    </patent-classification>
+                    <patent-classification sequence="3">
+                        <classification-scheme office="EP" scheme="CPCI"/>
+                        <section>G</section>
+                        <class>01</class>
+                        <subclass>N</subclass>
+                        <main-group>33</main-group>
+                        <subgroup>57484</subgroup>
+                        <classification-value>I</classification-value>
+                        <generating-office>US</generating-office>
+                    </patent-classification>
+                    <patent-classification sequence="4">
+                        <classification-scheme office="EP" scheme="CPCI"/>
+                        <section>G</section>
+                        <class>01</class>
+                        <subclass>N</subclass>
+                        <main-group>2800</main-group>
+                        <subgroup>54</subgroup>
+                        <classification-value>A</classification-value>
+                        <generating-office>EP</generating-office>
+                    </patent-classification>
+                </patent-classifications>
+                <application-reference doc-id="569851931">
+                    <document-id document-id-type="docdb">
+                        <country>ES</country>
+                        <doc-number>18705153</doc-number>
+                        <kind>T</kind>
+                    </document-id>
+                    <document-id document-id-type="epodoc">
+                        <doc-number>ES20180705153T</doc-number>
+                        <date>20180219</date>
+                    </document-id>
+                    <document-id document-id-type="original">
+                        <doc-number>18705153</doc-number>
+                    </document-id>
+                </application-reference>
+                <priority-claims>
+                    <priority-claim sequence="1" kind="regional">
+                        <document-id document-id-type="epodoc">
+                            <doc-number>EP20170157020</doc-number>
+                            <date>20170220</date>
+                        </document-id>
+                        <document-id document-id-type="original">
+                            <doc-number>17157020</doc-number>
+                        </document-id>
+                    </priority-claim>
+                    <priority-claim sequence="2" kind="national">
+                        <document-id document-id-type="epodoc">
+                            <doc-number>WO2018EP54052</doc-number>
+                            <date>20180219</date>
+                        </document-id>
+                        <document-id document-id-type="original">
+                            <doc-number>PCT/EP2018/054052</doc-number>
+                        </document-id>
+                    </priority-claim>
+                </priority-claims>
+                <parties>
+                    <applicants>
+                        <applicant sequence="1" data-format="epodoc">
+                            <applicant-name>
+                                <name>PANKA BLOOD TEST GMBH</name>
+                            </applicant-name>
+                        </applicant>
+                        <applicant sequence="1" data-format="original">
+                            <applicant-name>
+                                <name>Panka Blood Test GmbH</name>
+                            </applicant-name>
+                        </applicant>
+                    </applicants>
+                    <inventors>
+                        <inventor sequence="1" data-format="epodoc">
+                            <inventor-name>
+                                <name>PANTEL KLAUS</name>
+                            </inventor-name>
+                        </inventor>
+                        <inventor sequence="2" data-format="epodoc">
+                            <inventor-name>
+                                <name> BARTKOWIAK KAI</name>
+                            </inventor-name>
+                        </inventor>
+                        <inventor sequence="1" data-format="original">
+                            <inventor-name>
+                                <name>PANTEL, Klaus, </name>
+                            </inventor-name>
+                        </inventor>
+                        <inventor sequence="2" data-format="original">
+                            <inventor-name>
+                                <name>BARTKOWIAK, Kai</name>
+                            </inventor-name>
+                        </inventor>
+                    </inventors>
+                </parties>
+                <invention-title lang="ol">Método para el diagnóstico del cáncer de mama</invention-title>
+            </bibliographic-data>
+        </exchange-document>
+    </exchange-documents>
+</ops:world-patent-data>

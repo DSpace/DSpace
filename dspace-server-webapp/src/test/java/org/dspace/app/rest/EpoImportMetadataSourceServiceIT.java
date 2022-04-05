@@ -1,0 +1,216 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.app.rest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+
+import java.io.FileInputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.dspace.importer.external.datamodel.ImportRecord;
+import org.dspace.importer.external.epo.service.EpoImportMetadataSourceServiceImpl;
+import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import org.dspace.importer.external.scopus.service.LiveImportClientImpl;
+import org.junit.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+
+/**
+ * Integration tests for {@link EpoImportMetadataSourceServiceImpl}
+ * 
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
+ */
+public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrationTest {
+
+    @Autowired
+    private LiveImportClientImpl liveImportClient;
+
+    @Autowired
+    private EpoImportMetadataSourceServiceImpl epoServiceImpl;
+
+    @Test
+    public void epoImportMetadataGetRecordsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        FileInputStream file2token = null;
+        FileInputStream file = null;
+        FileInputStream file2 = null;
+        FileInputStream file3 = null;
+        CloseableHttpClient originalHttpClient = liveImportClient.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        String path2token = testProps.get("test.epo-token").toString();
+        String path = testProps.get("test.epo-resp").toString();
+        String path1 = testProps.get("test.epo-first").toString();
+        String path2 = testProps.get("test.epo-second").toString();
+
+        try {
+            file2token = new FileInputStream(path2token);
+            file = new FileInputStream(path);
+            file2 = new FileInputStream(path1);
+            file3 = new FileInputStream(path2);
+
+            String tokenResp = IOUtils.toString(file2token, Charset.defaultCharset());
+            String epoResp = IOUtils.toString(file, Charset.defaultCharset());
+            String epoResp2 = IOUtils.toString(file2, Charset.defaultCharset());
+            String epoResp3 = IOUtils.toString(file3, Charset.defaultCharset());
+
+            liveImportClient.setHttpClient(httpClient);
+            CloseableHttpResponse responseWithToken = mockResponse(tokenResp, 200, "OK");
+            CloseableHttpResponse response1 = mockResponse(epoResp, 200, "OK");
+            CloseableHttpResponse response2 = mockResponse(epoResp2, 200, "OK");
+            CloseableHttpResponse response3 = mockResponse(epoResp3, 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any()))
+                           .thenReturn(responseWithToken, response1, response2, response3);
+
+            context.restoreAuthSystemState();
+            Collection<ImportRecord> collection2match = getRecords();
+            Collection<ImportRecord> recordsImported = epoServiceImpl.getRecords("test query", 0, 2);
+            assertEquals(2, recordsImported.size());
+            assertTrue(matchRecords(recordsImported, collection2match));
+        } finally {
+            if (Objects.nonNull(file2token)) {
+                file2token.close();
+            }
+            if (Objects.nonNull(file)) {
+                file.close();
+            }
+            if (Objects.nonNull(file2)) {
+                file2.close();
+            }
+            if (Objects.nonNull(file3)) {
+                file3.close();
+            }
+            liveImportClient.setHttpClient(originalHttpClient);
+        }
+    }
+
+    @Test
+    public void epoImportMetadataGetRecordsCountTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        FileInputStream file = null;
+        FileInputStream file2 = null;
+        CloseableHttpClient originalHttpClient = liveImportClient.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        String path2token = testProps.get("test.epo-token").toString();
+        String path = testProps.get("test.epo-resp").toString();
+        try {
+            file = new FileInputStream(path2token);
+            file2 = new FileInputStream(path);
+            String token = IOUtils.toString(file, Charset.defaultCharset());
+            String epoResp = IOUtils.toString(file2, Charset.defaultCharset());
+
+            liveImportClient.setHttpClient(httpClient);
+            CloseableHttpResponse responseWithToken = mockResponse(token, 200, "OK");
+            CloseableHttpResponse response1 = mockResponse(epoResp, 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(responseWithToken, response1);
+
+            context.restoreAuthSystemState();
+            int tot = epoServiceImpl.getRecordsCount("test query");
+            assertEquals(10000, tot);
+        } finally {
+            if (Objects.nonNull(file)) {
+                file.close();
+            }
+            if (Objects.nonNull(file2)) {
+                file2.close();
+            }
+            liveImportClient.setHttpClient(originalHttpClient);
+        }
+    }
+
+    private Collection<ImportRecord> getRecords() {
+        Collection<ImportRecord> records = new LinkedList<ImportRecord>();
+        //define first record
+        List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
+        MetadatumDTO identifierOther = createMetadatumDTO("dc", "identifier", "other", "epodoc:ES2902749T");
+        MetadatumDTO patentno = createMetadatumDTO("dc", "identifier", "patentno", "ES2902749T");
+        MetadatumDTO applicationnumber = createMetadatumDTO("dc", "identifier", "applicationnumber", "18705153");
+        MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2022-01-29");
+        MetadatumDTO dateSubmitted = createMetadatumDTO("dcterms", "dateSubmitted", null, "2018-01-19");
+        MetadatumDTO applicant = createMetadatumDTO("dc", "contributor", "applicant", "PANKA BLOOD TEST GMBH");
+        MetadatumDTO applicant2 = createMetadatumDTO("dc", "contributor", "applicant", "Panka Blood Test GmbH");
+        MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "PANTEL KLAUS");
+        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "BARTKOWIAK KAI");
+        MetadatumDTO author3 = createMetadatumDTO("dc", "contributor", "author", "PANTEL, Klaus, ");
+        MetadatumDTO author4 = createMetadatumDTO("dc", "contributor", "author", "BARTKOWIAK, Kai");
+        MetadatumDTO title = createMetadatumDTO("dc", "title", null, "Método para el diagnóstico del cáncer de mama");
+        MetadatumDTO ipc = createMetadatumDTO("dc", "subject", "ipc",
+                                              "G01N  33/   574            A I                    ");
+
+        metadatums.add(identifierOther);
+        metadatums.add(patentno);
+        metadatums.add(applicationnumber);
+        metadatums.add(date);
+        metadatums.add(dateSubmitted);
+        metadatums.add(applicant);
+        metadatums.add(applicant2);
+        metadatums.add(author);
+        metadatums.add(author2);
+        metadatums.add(author3);
+        metadatums.add(author4);
+        metadatums.add(title);
+        metadatums.add(ipc);
+
+        ImportRecord firstrRecord = new ImportRecord(metadatums);
+
+        //define second record
+        List<MetadatumDTO> metadatums2  = new ArrayList<MetadatumDTO>();
+        MetadatumDTO identifierOther2 = createMetadatumDTO("dc", "identifier", "other", "epodoc:TW202202864");
+        MetadatumDTO patentno2 = createMetadatumDTO("dc", "identifier", "patentno", "TW202202864");
+        MetadatumDTO applicationnumber2 = createMetadatumDTO("dc", "identifier", "applicationnumber", "109122801");
+        MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2022-01-16");
+        MetadatumDTO dateSubmitted2 = createMetadatumDTO("dcterms", "dateSubmitted", null, "2020-01-06");
+        MetadatumDTO applicant3 = createMetadatumDTO("dc", "contributor", "applicant", "ADVANTEST CORP [JP]");
+        MetadatumDTO applicant4 = createMetadatumDTO("dc", "contributor", "applicant", "ADVANTEST CORPORATION");
+        MetadatumDTO author5 = createMetadatumDTO("dc", "contributor", "author", "POEPPE OLAF [DE]");
+        MetadatumDTO author6 = createMetadatumDTO("dc", "contributor", "author", "HILLIGES KLAUS-DIETER [DE]");
+        MetadatumDTO author7 = createMetadatumDTO("dc", "contributor", "author", "KRECH ALAN [US]");
+        MetadatumDTO author8 = createMetadatumDTO("dc", "contributor", "author", "POEPPE, OLAF, ");
+        MetadatumDTO author9 = createMetadatumDTO("dc", "contributor", "author", "HILLIGES, KLAUS-DIETER, ");
+        MetadatumDTO author10 = createMetadatumDTO("dc", "contributor", "author", "KRECH, ALAN");
+        MetadatumDTO title2 = createMetadatumDTO("dc", "title", null,
+                "Automated test equipment for testing one or more devices under test, method for automated"
+              + " testing of one or more devices under test, and computer program using a buffer memory");
+        MetadatumDTO ipc2 = createMetadatumDTO("dc", "subject", "ipc",
+                "KG01R  31/   319            A I                    ");
+        MetadatumDTO ipc3 = createMetadatumDTO("dc", "subject", "ipc",
+                "G01R  31/  3193            A I                    ");
+        metadatums2.add(identifierOther2);
+        metadatums2.add(patentno2);
+        metadatums2.add(applicationnumber2);
+        metadatums2.add(date2);
+        metadatums2.add(dateSubmitted2);
+        metadatums2.add(applicant3);
+        metadatums2.add(applicant4);
+        metadatums2.add(author5);
+        metadatums2.add(author6);
+        metadatums2.add(author7);
+        metadatums2.add(author8);
+        metadatums2.add(author9);
+        metadatums2.add(author10);
+        metadatums2.add(title2);
+        metadatums2.add(ipc2);
+        metadatums2.add(ipc3);
+
+        ImportRecord secondRecord = new ImportRecord(metadatums2);
+        records.add(firstrRecord);
+        records.add(secondRecord);
+        return records;
+    }
+
+}

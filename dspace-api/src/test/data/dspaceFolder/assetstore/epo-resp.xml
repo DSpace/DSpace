@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="/3.2/style/exchange.xsl"?>
+<ops:world-patent-data xmlns="http://www.epo.org/exchange" xmlns:ops="http://ops.epo.org" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <ops:biblio-search total-result-count="10000">
+        <ops:query syntax="CQL">txt = test</ops:query>
+        <ops:range begin="1" end="25"/>
+        <ops:search-result>
+            <ops:publication-reference system="ops.epo.org" family-id="58098534">
+                <document-id document-id-type="docdb">
+                    <country>ES</country>
+                    <doc-number>2902749</doc-number>
+                    <kind>T3</kind>
+                </document-id>
+            </ops:publication-reference>
+            <ops:publication-reference system="ops.epo.org" family-id="69192062">
+                <document-id document-id-type="docdb">
+                    <country>TW</country>
+                    <doc-number>202202864</doc-number>
+                    <kind>A</kind>
+                </document-id>
+            </ops:publication-reference>
+        </ops:search-result>
+    </ops:biblio-search>
+</ops:world-patent-data>
