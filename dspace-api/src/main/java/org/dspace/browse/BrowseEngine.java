@@ -272,9 +272,6 @@ public class BrowseEngine {
                 String focusValue = normalizeJumpToValue(rawFocusValue);
 
                 log.debug("browsing using focus: " + focusValue);
-
-                // Convert the focus value into an offset
-                // offset = getOffsetForValue(focusValue);
             }
 
             dao.setOffset(offset);
@@ -687,13 +684,11 @@ public class BrowseEngine {
         // our count, storing them locally to reinstate later
         String focusField = dao.getJumpToField();
         String focusValue = dao.getJumpToValue();
-        // String orderField = dao.getOrderField();
         int limit = dao.getLimit();
         int offset = dao.getOffset();
 
         dao.setJumpToField(null);
         dao.setJumpToValue(null);
-        // dao.setOrderField(null);
         dao.setLimit(-1);
         dao.setOffset(-1);
 
