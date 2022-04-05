@@ -115,6 +115,21 @@
           </property>
     </bean>
 
+    <bean id="EpoImportService" class="org.dspace.importer.external.epo.service.EpoImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="epoMetadataFieldMapping"/>
+        <property name="consumerKey" value="${epo.consumerKey}" />
+        <property name="consumerSecret" value="${epo.consumerSecretKey}" />
+        <!-- date filed mapped metadata, see epo-integration.xml -->
+        <property name="dateFiled" ref="epo.dc.date.filed" />
+        <property name="applicationNumber" ref="epo.dc.identifier.applicationnumber" />
+    </bean>
+    <bean id="epoMetadataFieldMapping" class="org.dspace.importer.external.epo.service.EpoFieldMapping"/>
+
+    <bean id="ADSImportService" class="org.dspace.importer.external.ads.ADSImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="apiKey" value="${submission.lookup.ads.key}" />
+        <property name="metadataFieldMapping" ref="ADSMetadataFieldMapping"/>
+    </bean>
+    <bean id="ADSMetadataFieldMapping" class="org.dspace.importer.external.ads.ADSFieldMapping"/>
 
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
     <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">

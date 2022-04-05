@@ -16,6 +16,8 @@ import java.util.Map;
  */
 public interface LiveImportClient {
 
-    public String executeHttpGetRequest(int timeout, String URL, Map<String, String> requestParams);
+    public String executeHttpGetRequest(int timeout, String URL, Map<String, Map<String, String>> params);
+
+    public String executeHttpPostRequest(String URL, Map<String, Map<String, String>> params, String entry);
 
 }
