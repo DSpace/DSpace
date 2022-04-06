@@ -52,6 +52,16 @@ public class GroupServiceInitializer implements Callback {
     }
 
     /**
+     * The callback name, Flyway will use this to sort the callbacks alphabetically before executing them
+     * @return The callback name
+     */
+    @Override
+    public String getCallbackName() {
+        // Return class name only (not prepended by package)
+        return GroupServiceInitializer.class.getSimpleName();
+    }
+
+    /**
      * Events supported by this callback.
      * @param event Flyway event
      * @param context Flyway context
