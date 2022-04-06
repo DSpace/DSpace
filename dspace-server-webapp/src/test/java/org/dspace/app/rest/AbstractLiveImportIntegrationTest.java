@@ -32,8 +32,8 @@ public class AbstractLiveImportIntegrationTest extends AbstractControllerIntegra
         ImportRecord  secondImported = recordsImported.iterator().next();
         ImportRecord  first2match = recordsImported.iterator().next();
         ImportRecord  second2match = recordsImported.iterator().next();
-        boolean checkFirstRecord = firstImported.getValueList().containsAll(first2match.getValueList());
-        boolean checkSecondRecord = secondImported.getValueList().containsAll(second2match.getValueList());
+        boolean checkFirstRecord = first2match.getValueList().containsAll(firstImported.getValueList());
+        boolean checkSecondRecord = second2match.getValueList().containsAll(secondImported.getValueList());
         return checkFirstRecord && checkSecondRecord;
     }
 

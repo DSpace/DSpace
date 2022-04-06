@@ -7,13 +7,19 @@
  */
 package org.dspace.importer.external.metadatamapping.contributor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 
 /**
  * This contributor can perform research on multi-paths
@@ -21,6 +27,8 @@ import org.jdom2.Namespace;
  * @author Boychuk Mykhaylo (boychuk.mykhaylo at 4Science dot it)
  */
 public class SimpleMultiplePathContributor extends SimpleXpathMetadatumContributor {
+
+    private final static Logger log = LogManager.getLogger();
 
     private List<String> paths;
 
@@ -31,13 +39,21 @@ public class SimpleMultiplePathContributor extends SimpleXpathMetadatumContribut
     }
 
     @Override
-    public Collection<MetadatumDTO> contributeMetadata(Element element) {
+    public Collection<MetadatumDTO> contributeMetadata(Element t) {
         List<MetadatumDTO> values = new LinkedList<>();
         for (String path : this.paths) {
+            List<Namespace> namespaces = new ArrayList<Namespace>();
             for (String ns : prefixToNamespaceMapping.keySet()) {
-                List<Element> nodes = element.getChildren(path, Namespace.getNamespace(ns));
-                for (Element el : nodes) {
-                    values.add(metadataFieldMapping.toDCValue(field, el.getValue()));
+                namespaces.add(Namespace.getNamespace(prefixToNamespaceMapping.get(ns), ns));
+            }
+            XPathExpression<Object> xpath = XPathFactory.instance().compile(path, Filters.fpassthrough(), null,
+                    namespaces);
+            List<Object> nodes = xpath.evaluate(t);
+            for (Object el : nodes) {
+                if (el instanceof Element) {
+                    values.add(metadataFieldMapping.toDCValue(field, ((Element) el).getText()));
+                } else {
+                    log.warn("node of type: " + el.getClass());
                 }
             }
         }

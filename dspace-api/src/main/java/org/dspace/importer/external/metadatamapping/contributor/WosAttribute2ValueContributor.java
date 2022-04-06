@@ -7,6 +7,7 @@
  */
 package org.dspace.importer.external.metadatamapping.contributor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,14 +15,16 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 
 /**
  * This contributor checks for each node returned for the given path if the node contains "this.attribute"
@@ -33,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class WosAttribute2ValueContributor implements MetadataContributor<Element> {
 
-    private static final Logger log = LoggerFactory.getLogger(WosAttribute2ValueContributor.class);
+    private final static Logger log = LogManager.getLogger();
 
     private String query;
 
@@ -60,24 +63,28 @@ public class WosAttribute2ValueContributor implements MetadataContributor<Elemen
     }
 
     @Override
-    public Collection<MetadatumDTO> contributeMetadata(Element element) {
+    public Collection<MetadatumDTO> contributeMetadata(Element t) {
         List<MetadatumDTO> values = new LinkedList<>();
-        try {
-            for (String ns : prefixToNamespaceMapping.keySet()) {
-                List<Element> nodes = element.getChildren(query, Namespace.getNamespace(ns));
-                for (Element el : nodes) {
-                    String attributeValue = el.getAttributeValue(this.attribute);
-                    setField(attributeValue, element, values);
-                }
-            }
-            return values;
-        } catch (JaxenException e) {
-            log.warn(query, e);
-            throw new RuntimeException(e);
+        List<Namespace> namespaces = new ArrayList<Namespace>();
+        for (String ns : prefixToNamespaceMapping.keySet()) {
+            namespaces.add(Namespace.getNamespace(prefixToNamespaceMapping.get(ns), ns));
         }
+        XPathExpression<Object> xpath = XPathFactory.instance().compile(query, Filters.fpassthrough(), null,
+                namespaces);
+        List<Object> nodes = xpath.evaluate(t);
+        for (Object el : nodes) {
+            if (el instanceof Element) {
+                Element element = (Element) el;
+                String attributeValue = element.getAttributeValue(this.attribute);
+                setField(attributeValue, element, values);
+            } else {
+                log.warn("node of type: " + el.getClass());
+            }
+        }
+        return values;
     }
 
-    private void setField(String attributeValue, Element el, List<MetadatumDTO> values) throws JaxenException {
+    private void setField(String attributeValue, Element el, List<MetadatumDTO> values) {
         for (String id : attributeValue2metadata.keySet()) {
             if (StringUtils.equals(id, attributeValue)) {
                 if (this.firstChild) {

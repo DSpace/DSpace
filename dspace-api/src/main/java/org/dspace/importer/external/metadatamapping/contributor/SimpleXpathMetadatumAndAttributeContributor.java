@@ -7,15 +7,21 @@
  */
 package org.dspace.importer.external.metadatamapping.contributor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Constants;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 
 /**
  * This contributor checks for each node returned for the supplied path
@@ -26,20 +32,32 @@ import org.jdom2.Namespace;
  */
 public class SimpleXpathMetadatumAndAttributeContributor extends SimpleXpathMetadatumContributor {
 
+    private final static Logger log = LogManager.getLogger();
+
     private String attribute;
 
     @Override
-    public Collection<MetadatumDTO> contributeMetadata(Element element) {
+    public Collection<MetadatumDTO> contributeMetadata(Element t) {
         List<MetadatumDTO> values = new LinkedList<>();
+        List<Namespace> namespaces = new ArrayList<Namespace>();
         for (String ns : prefixToNamespaceMapping.keySet()) {
-            List<Element> nodes = element.getChildren(query, Namespace.getNamespace(ns));
-            for (Element el : nodes) {
-                String attributeValue = el.getAttributeValue(this.attribute);
+            namespaces.add(Namespace.getNamespace(prefixToNamespaceMapping.get(ns), ns));
+        }
+        XPathExpression<Object> xpath = XPathFactory.instance().compile(query, Filters.fpassthrough(), null,
+                namespaces);
+        List<Object> nodes = xpath.evaluate(t);
+        for (Object el : nodes) {
+            if (el instanceof Element) {
+                Element element = (Element) el;
+                String attributeValue = element.getAttributeValue(this.attribute);
                 if (StringUtils.isNotBlank(attributeValue)) {
                     values.add(metadataFieldMapping.toDCValue(this.field, attributeValue));
                 } else {
-                    values.add(metadataFieldMapping.toDCValue(this.field, Constants.PLACEHOLDER_PARENT_METADATA_VALUE));
+                    values.add(metadataFieldMapping.toDCValue(this.field,
+                            Constants.PLACEHOLDER_PARENT_METADATA_VALUE));
                 }
+            } else {
+                log.warn("node of type: " + el.getClass());
             }
         }
         return values;
