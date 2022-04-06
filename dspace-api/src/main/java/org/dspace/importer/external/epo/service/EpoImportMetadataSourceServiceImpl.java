@@ -29,7 +29,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
@@ -67,7 +68,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     private MetadataFieldConfig dateFiled;
     private MetadataFieldConfig applicationNumber;
 
-    private static final Logger log = Logger.getLogger(EpoImportMetadataSourceServiceImpl.class);
+    private final static Logger log = LogManager.getLogger();
 
     private static final String endPointAuthService =
             "https://ops.epo.org/3.2/auth/accesstoken";
