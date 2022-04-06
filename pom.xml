@@ -1422,6 +1422,11 @@
                 <artifactId>commons-collections4</artifactId>
                 <version>4.1</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>1.9</version>
+            </dependency>
             <!-- commons-collections v3 is still required by commons-beanutils,
                  which is required by commons-configuration. Once those are
                  upgraded, we should remove this dependency -->

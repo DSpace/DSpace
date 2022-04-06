@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,8 +21,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import de.undercouch.citeproc.CSL;
-import de.undercouch.citeproc.CSLDateParser;
 import de.undercouch.citeproc.csl.CSLDate;
+import de.undercouch.citeproc.csl.CSLDateBuilder;
 import de.undercouch.citeproc.csl.CSLItemData;
 import de.undercouch.citeproc.csl.CSLItemDataBuilder;
 import de.undercouch.citeproc.csl.CSLName;
@@ -36,6 +38,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
+import org.dspace.util.MultiFormatDateParser;
 
 /**
  * Generate bibliographic descriptions for DSpace objects in various formats.
@@ -580,12 +583,17 @@ public class CSLBibliographyGenerator {
     private static class CSLDateFactory {
         /**
          * Feed a date into the CSL date parser.
-         * TODO check that this handles all DSpace date formats.
          * @param date a date to be parsed.
          * @return same date in CSL form.
          */
         static CSLDate getInstance(String date) {
-            CSLDate result = new CSLDateParser().parse(date);
+            Calendar parsedDate = new GregorianCalendar();
+            parsedDate.setTime(MultiFormatDateParser.parse(date));
+            CSLDate result = new CSLDateBuilder()
+                    .dateParts(parsedDate.get(Calendar.YEAR),
+                            parsedDate.get(Calendar.MONTH),
+                            parsedDate.get(Calendar.DAY_OF_MONTH))
+                    .build();
             return result;
         }
     }
