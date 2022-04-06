@@ -698,7 +698,6 @@ public class BrowseEngine {
         // now put back the values we removed for this method
         dao.setJumpToField(focusField);
         dao.setJumpToValue(focusValue);
-        // dao.setOrderField(orderField);
         dao.setLimit(limit);
         dao.setOffset(offset);
         dao.setCountValues(null);
