@@ -104,12 +104,20 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         this.consumerKey = consumerKey;
     }
 
+    public String getConsumerKey() {
+        return consumerKey;
+    }
+
     /**
      * Set the costumer epo secret
      * @param consumerSecret the customer epo secret
      */
     public void setConsumerSecret(String consumerSecret) {
         this.consumerSecret = consumerSecret;
+    }
+
+    public String getConsumerSecret() {
+        return consumerSecret;
     }
 
     public void setDateFiled(MetadataFieldConfig dateFiled) {

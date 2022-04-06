@@ -51,14 +51,17 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         FileInputStream file = null;
         FileInputStream file2 = null;
         FileInputStream file3 = null;
+        String originKey = epoServiceImpl.getConsumerKey();
+        String originSecret = epoServiceImpl.getConsumerSecret();
         CloseableHttpClient originalHttpClient = liveImportClient.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         String path2token = testProps.get("test.epo-token").toString();
         String path = testProps.get("test.epo-resp").toString();
         String path1 = testProps.get("test.epo-first").toString();
         String path2 = testProps.get("test.epo-second").toString();
-
         try {
+            epoServiceImpl.setConsumerKey("test-key");
+            epoServiceImpl.setConsumerSecret("test-secret");
             file2token = new FileInputStream(path2token);
             file = new FileInputStream(path);
             file2 = new FileInputStream(path1);
@@ -95,6 +98,8 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
             if (Objects.nonNull(file3)) {
                 file3.close();
             }
+            epoServiceImpl.setConsumerKey(originKey);
+            epoServiceImpl.setConsumerSecret(originSecret);
             liveImportClient.setHttpClient(originalHttpClient);
         }
     }
@@ -104,6 +109,8 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         context.turnOffAuthorisationSystem();
         FileInputStream file = null;
         FileInputStream file2 = null;
+        String originKey = epoServiceImpl.getConsumerKey();
+        String originSecret = epoServiceImpl.getConsumerSecret();
         CloseableHttpClient originalHttpClient = liveImportClient.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         String path2token = testProps.get("test.epo-token").toString();
@@ -114,6 +121,8 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
             String token = IOUtils.toString(file, Charset.defaultCharset());
             String epoResp = IOUtils.toString(file2, Charset.defaultCharset());
 
+            epoServiceImpl.setConsumerKey("test-key");
+            epoServiceImpl.setConsumerSecret("test-secret");
             liveImportClient.setHttpClient(httpClient);
             CloseableHttpResponse responseWithToken = mockResponse(token, 200, "OK");
             CloseableHttpResponse response1 = mockResponse(epoResp, 200, "OK");
@@ -129,6 +138,8 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
             if (Objects.nonNull(file2)) {
                 file2.close();
             }
+            epoServiceImpl.setConsumerKey(originKey);
+            epoServiceImpl.setConsumerSecret(originSecret);
             liveImportClient.setHttpClient(originalHttpClient);
         }
     }
