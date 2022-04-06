@@ -21,7 +21,8 @@ import com.jayway.jsonpath.ReadContext;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -39,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<String>
         implements QuerySource {
 
-    private static final Logger log = Logger.getLogger(VuFindImportMetadataSourceServiceImpl.class);
+    private final static Logger log = LogManager.getLogger();
 
     private static final String ENDPOINT_SEARCH = "https://vufind.org/advanced_demo/api/v1/search";
     private static final String ENDPOINT_RECORD = "https://vufind.org/advanced_demo/api/v1/record";
