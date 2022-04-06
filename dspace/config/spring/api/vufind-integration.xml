@@ -106,7 +106,7 @@
 
     <bean id="vufindTitle" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="vufind.dc.title"/>
-        <property name="query" value="$.dcTitle[*]"/>
+        <property name="query" value="$.title"/>
     </bean>
     <bean id="vufind.dc.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.title"/>

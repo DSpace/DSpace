@@ -41,8 +41,8 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private static final Logger log = Logger.getLogger(VuFindImportMetadataSourceServiceImpl.class);
 
-    private static final String ENDPOINT_SEARCH = "https://vufind.org/demo/api/v1/search";
-    private static final String ENDPOINT_RECORD = "https://vufind.org/demo/api/v1/record";
+    private static final String ENDPOINT_SEARCH = "https://vufind.org/advanced_demo/api/v1/search";
+    private static final String ENDPOINT_RECORD = "https://vufind.org/advanced_demo/api/v1/record";
 
     private String fields;
 
