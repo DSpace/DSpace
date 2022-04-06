@@ -50,20 +50,17 @@ import org.dspace.util.MultiFormatDateParser;
  */
 @Named
 public class CSLBibliographyGenerator {
-    @Inject
     private MetadataSchemaService metadataSchemaService;
 
-    @Inject
     private MetadataFieldService metadataFieldService;
 
-    @Inject
     private ItemService itemService;
 
     /** Map DSpace item types to CSL types. */
-    private final Map<String, String> documentTypes;
+    private final Map<String, String> documentTypeMap;
 
     /** Map DSpace metadata fields to CSL fields. */
-    private final Map<String, String> metadataFields;
+    private final Map<String, String> metadataFieldMap;
 
     /** CSL type of any work with an unmapped DSpace type. */
     private final String defaultType;
@@ -95,14 +92,40 @@ public class CSLBibliographyGenerator {
     public CSLBibliographyGenerator(Map<String, String> documentTypes,
             Map<String, String> metadataFields,
             String defaultType) {
-        this.documentTypes = documentTypes;
-        this.metadataFields = metadataFields;
+        this.documentTypeMap = documentTypes;
+        this.metadataFieldMap = metadataFields;
         this.defaultType = defaultType.toUpperCase();
+    }
+
+    /**
+     * @param metadataSchemaService the metadataSchemaService to set
+     */
+    @Inject
+    public void setMetadataSchemaService(
+            MetadataSchemaService metadataSchemaService) {
+        this.metadataSchemaService = metadataSchemaService;
+    }
+
+    /**
+     * @param metadataFieldService the metadataFieldService to set
+     */
+    @Inject
+    public void setMetadataFieldService(
+            MetadataFieldService metadataFieldService) {
+        this.metadataFieldService = metadataFieldService;
+    }
+
+    /**
+     * @param itemService the itemService to set
+     */
+    @Inject
+    public void setItemService(ItemService itemService) {
+        this.itemService = itemService;
     }
 
     /** Do not use. */
     private CSLBibliographyGenerator() {
-        documentTypes = metadataFields = null;
+        documentTypeMap = metadataFieldMap = null;
         defaultType = null;
     }
 
@@ -203,15 +226,15 @@ public class CSLBibliographyGenerator {
             // Fill the holder with field values.
             for (MetadataSchema schema : metadataSchemaService.findAll(context)) {
                 String schemaName = schema.getName();
-                for (MetadataField field : metadataFieldService.findAllInSchema(context,
-                        schema)) {
+                for (MetadataField field :
+                        metadataFieldService.findAllInSchema(context, schema)) {
                     // What field is this?
                     String fieldElement = field.getElement();
                     String fieldQualifier = field.getQualifier();
                     String dsFieldName = mdFieldName(schemaName, fieldElement, fieldQualifier);
 
                     // Map to CSL field
-                    String cslFieldName = metadataFields.get(dsFieldName);
+                    String cslFieldName = metadataFieldMap.get(dsFieldName);
                     LOG.debug("Map DSpace {} to CSL {}", dsFieldName, cslFieldName);
 
                     // Skip this field if not mapped.
@@ -230,8 +253,8 @@ public class CSLBibliographyGenerator {
                         // Figure out the CSL work type.
                         if ("type".equals(cslFieldName)) {
                             String key = value.replaceAll(" ", "_");
-                            if (documentTypes.containsKey(key)) {
-                                value = documentTypes.get(key)
+                            if (documentTypeMap.containsKey(key)) {
+                                value = documentTypeMap.get(key)
                                         .replaceAll("[ -]", "_")
                                         .toUpperCase();
                             } else {
