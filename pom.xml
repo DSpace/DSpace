@@ -22,10 +22,10 @@
         <spring.version>5.2.5.RELEASE</spring.version>
         <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
         <spring-security.version>5.2.2.RELEASE</spring-security.version> <!-- sync with version used by spring-boot-->
-        <hibernate.version>5.4.10.Final</hibernate.version>
-        <hibernate-validator.version>6.0.18.Final</hibernate-validator.version>
+        <hibernate.version>5.6.5.Final</hibernate.version>
+        <hibernate-validator.version>6.0.23.Final</hibernate-validator.version>
         <postgresql.driver.version>42.3.3</postgresql.driver.version>
-        <solr.client.version>8.8.1</solr.client.version>
+        <solr.client.version>8.11.1</solr.client.version>
 
         <ehcache.version>3.4.0</ehcache.version>
         <errorprone.version>2.10.0</errorprone.version>
@@ -36,12 +36,14 @@
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
         <jcache-version>1.1.0</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
-        <jetty.version>9.4.41.v20210516</jetty.version>
+        <jetty.version>9.4.44.v20210927</jetty.version>
         <log4j.version>2.17.1</log4j.version>
         <pdfbox-version>2.0.24</pdfbox-version>
-        <poi-version>3.17</poi-version>
         <rome.version>1.18.0</rome.version>
         <slf4j.version>1.7.25</slf4j.version>
+        <tika.version>2.3.0</tika.version>
+        <!-- Sync with whatever version Tika uses -->
+        <bouncycastle.version>1.70</bouncycastle.version>
 
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
         <!-- Spring Data REST HAL Browser (used by Server webapp) -->
@@ -57,7 +59,7 @@
              https://jena.apache.org/documentation/migrate_jena2_jena3.html -->
         <jena.version>2.13.0</jena.version>
         <!-- Used by (now obsolete) 'dspace-rest' WAR -->
-        <jersey.version>2.30.1</jersey.version>
+        <jersey.version>2.35</jersey.version>
 
         <!--=== MAVEN SETTINGS ===-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -1106,28 +1108,13 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.driver.version}</version>
-            </dependency>
-
-            <!-- Solr introduces multiple versions of zookeeper. So,
-                 we specify the version we want -->
-            <dependency>
-                <groupId>org.apache.zookeeper</groupId>
-                <artifactId>zookeeper</artifactId>
-                <version>3.4.14</version>
-            </dependency>
-
-            <!-- solr-cell and axiom-api (in dspace-swordv2) disagree on versions -->
-            <dependency>
-                <groupId>org.apache.james</groupId>
-                <artifactId>apache-mime4j-core</artifactId>
-                <version>0.8.3</version>
-            </dependency>
-
-            <!-- solr-core, solr-cell disagree with nimbus-jose-jwt -->
-            <dependency>
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm</artifactId>
-                <version>8.0.1</version>
+                <exclusions>
+                    <!-- Use version provided by Solr -->
+                    <exclusion>
+                        <groupId>org.checkerframework</groupId>
+                        <artifactId>checker-qual</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -1159,6 +1146,13 @@
                 <artifactId>hibernate-validator</artifactId>
                 <!-- This artifact doesn't track the main Hibernate version. -->
                 <version>${hibernate-validator.version}</version>
+            </dependency>
+
+            <!-- Hibernate introduces multiple versions of jboss-logging. So, specify version we want -->
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>3.4.3.Final</version>
             </dependency>
 
             <!-- Rome is used for RSS / ATOM syndication feeds -->
@@ -1279,7 +1273,7 @@
 
             <dependency>
                 <groupId>org.apache.solr</groupId>
-                <artifactId>solr-cell</artifactId>
+                <artifactId>solr-solrj</artifactId>
                 <version>${solr.client.version}</version>
             </dependency>
             <dependency>
@@ -1287,35 +1281,43 @@
                 <artifactId>lucene-core</artifactId>
                 <version>${solr.client.version}</version>
             </dependency>
-            <!-- Used for full-text indexing with Solr. Should be synced with version of Tika in solr-cell -->
+
+            <!-- Tika is used to extract full text from documents in order to index in Solr -->
             <dependency>
                 <groupId>org.apache.tika</groupId>
-                <artifactId>tika-parsers</artifactId>
-                <version>1.24.1</version>
-                <!-- Exclude a few tika-parsers dependencies that we already use, with slightly different versions -->
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.protobuf</groupId>
-                        <artifactId>protobuf-java</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>net.sf.ehcache</groupId>
-                        <artifactId>ehcache-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>jakarta.ws.rs</groupId>
-                        <artifactId>jakarta.ws.rs-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.xml.soap</groupId>
-                        <artifactId>javax.xml.soap-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jvnet.staxex</groupId>
-                        <artifactId>stax-ex</artifactId>
-                    </exclusion>
-                </exclusions>
+                <artifactId>tika-core</artifactId>
+                <version>${tika.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-parsers-standard-package</artifactId>
+                <version>${tika.version}</version>
+            </dependency>
+            <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk15on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <!-- Tika and axiom-api (in dspace-swordv2) disagree on versions -->
+            <dependency>
+                <groupId>org.apache.james</groupId>
+                <artifactId>apache-mime4j-core</artifactId>
+                <version>0.8.4</version>
+            </dependency>
+            <!-- Tika and solr-core disagree on versions of ASM -->
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>8.0.1</version>
+            </dependency>
+
             <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
              otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
             <dependency>
@@ -1353,7 +1355,7 @@
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
-                    <!-- Newer version brought in by solr-cell -->
+                    <!-- Newer version brought in by Tika -->
                     <exclusion>
                         <groupId>org.apache.commons</groupId>
                         <artifactId>commons-csv</artifactId>
@@ -1550,45 +1552,6 @@
                 <version>${pdfbox-version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi</artifactId>
-                <version>${poi-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-scratchpad</artifactId>
-                <version>${poi-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-                <version>${poi-version}</version>
-                <exclusions>
-                    <!-- Newer version brought in by solr-cell -->
-                    <exclusion>
-                        <groupId>com.github.virtuald</groupId>
-                        <artifactId>curvesapi</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml-schemas</artifactId>
-                <version>${poi-version}</version>
-                <exclusions>
-                    <!-- Newer version pulled in below -->
-                    <exclusion>
-                        <groupId>org.apache.xmlbeans</groupId>
-                        <artifactId>xmlbeans</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlbeans</groupId>
-                <artifactId>xmlbeans</artifactId>
-                <version>3.1.0</version>
-            </dependency>
-            <dependency>
                 <groupId>xalan</groupId>
                 <artifactId>xalan</artifactId>
                 <version>2.7.0</version>
@@ -1691,7 +1654,7 @@
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>1.4.187</version>
+                <version>2.1.210</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -1775,7 +1738,14 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>30.0-jre</version>
+                <version>30.1.1-jre</version>
+                <exclusions>
+                    <!-- Use version provided by Solr -->
+                    <exclusion>
+                        <groupId>org.checkerframework</groupId>
+                        <artifactId>checker-qual</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>xom</groupId>
