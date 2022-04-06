@@ -22,7 +22,8 @@ import javax.el.MethodNotFoundException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -51,7 +52,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Element>
         implements QuerySource {
 
-    private static final Logger log = Logger.getLogger(CiniiImportMetadataSourceServiceImpl.class);
+    private final static Logger log = LogManager.getLogger();
 
     private static final String ENDPOINT_SEARCH = "https://ci.nii.ac.jp/naid/";
 

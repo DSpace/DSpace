@@ -22,7 +22,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -48,7 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Element>
         implements QuerySource {
 
-    private static final Logger log = Logger.getLogger(PubmedEuropeMetadataSourceServiceImpl.class);
+    private final static Logger log = LogManager.getLogger();
 
     private static final String ENDPOINT_SEARCH = "https://www.ebi.ac.uk/europepmc/webservices/rest/search";
 
