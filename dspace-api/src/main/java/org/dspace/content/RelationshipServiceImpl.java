@@ -226,6 +226,9 @@ public class RelationshipServiceImpl implements RelationshipService {
         Item leftItem = relationship.getLeftItem();
         Item rightItem = relationship.getRightItem();
 
+        // These list also include the non-latest. This is relevant to determine whether it's deleted.
+        // This can also imply there may be overlapping places, and/or the given relationship will overlap
+        // But the shift will allow this, and only happen when needed based on the latest status
         List<Relationship> leftRelationships = findByItemAndRelationshipType(
             context, leftItem, relationship.getRelationshipType(), true, -1, -1, false
         );
@@ -260,6 +263,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
         context.turnOffAuthorisationSystem();
 
+        //only shift if the place is relevant for the latest relationships
         if (otherSideIsLatest(true, relationship.getLatestVersionStatus())) {
             shiftSiblings(
                 relationship, true, oldLeftPlace, movedUpLeft, insertLeft, deletedFromLeft,

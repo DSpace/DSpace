@@ -17,14 +17,19 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EntityTypeBuilder;
@@ -1378,6 +1383,224 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         for (Relationship relationship : relationships) {
             relationshipService.delete(context, relationship);
         }
+    }
+
+    /**
+     * This test will
+     * - create a publication with 10 projects
+     * - Remove, move, add projects
+     * - Verify the order remains correct
+     * @throws Exception
+     */
+    @Test
+    public void test_createNewVersionOfItemWithAddRemoveMove() throws Exception {
+        ///////////////////////////////////////////
+        // create a publication with 10 projects //
+        ///////////////////////////////////////////
+
+        Item originalPublication = ItemBuilder.createItem(context, collection)
+            .withTitle("original publication")
+            .withMetadata("dspace", "entity", "type", publicationEntityType.getLabel())
+            .build();
+
+        List<Item> projects = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            Item project = ItemBuilder.createItem(context, collection)
+                    .withTitle("project " + i)
+                    .withMetadata("dspace", "entity", "type", projectEntityType.getLabel())
+                    .build();
+            projects.add(project);
+
+            RelationshipBuilder
+                    .createRelationshipBuilder(context, originalPublication, project, isProjectOfPublication)
+                    .build();
+        }
+
+        AtomicInteger counterOriginalPublication = new AtomicInteger();
+        List<Matcher<Object>> listOriginalPublication = projects.stream().map(
+                project -> isRel(originalPublication, isProjectOfPublication, project, LatestVersionStatus.BOTH,
+                        counterOriginalPublication.getAndIncrement(), 0)
+        ).collect(Collectors.toCollection(ArrayList::new));
+
+        /////////////////////////////////////////////////////////////////////
+        // verify the relationships of all items (excludeNonLatest = true) //
+        /////////////////////////////////////////////////////////////////////
+
+        assertThat(
+                relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
+                containsInAnyOrder(listOriginalPublication)
+        );
+
+        //////////////////////////////////////////////////////////////////////
+        // verify the relationships of all items (excludeNonLatest = false) //
+        //////////////////////////////////////////////////////////////////////
+
+        assertThat(
+                relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+                containsInAnyOrder(listOriginalPublication)
+        );
+
+        /////////////////////////////////////////////
+        // create a new version of the publication //
+        /////////////////////////////////////////////
+
+        Version newVersion = versioningService.createNewVersion(context, originalPublication);
+        Item newPublication = newVersion.getItem();
+        assertNotSame(originalPublication, newPublication);
+
+        verifyProjectsMatch(originalPublication, projects, newPublication, projects, false);//
+
+        /////////////////////////////////////////////
+        // modify relationships on new publication //
+        /////////////////////////////////////////////
+
+        List<Item> newProjects = new ArrayList<>(projects);
+        assertEquals(newProjects.size(), 10);
+
+        removeProject(newPublication, 5, newProjects);
+
+        assertEquals(projects.size(), 10);
+        assertEquals(newProjects.size(), 9);
+        verifyProjectsMatch(originalPublication, projects, newPublication, newProjects, false);
+
+        Item project6 = newProjects.get(6);
+        moveProject(newPublication, 6, 2, newProjects);
+        assertEquals(newProjects.size(), 9);
+        assertEquals(newProjects.get(2), project6);
+        assertNotEquals(projects.get(2), project6);
+        verifyProjectsMatch(originalPublication, projects, newPublication, newProjects, false);
+
+        Item project1 = newProjects.get(1);
+        moveProject(newPublication, 1, 5, newProjects);
+        assertEquals(newProjects.size(), 9);
+        assertEquals(newProjects.get(5), project1);
+        assertNotEquals(projects.get(5), project1);
+        verifyProjectsMatch(originalPublication, projects, newPublication, newProjects, false);
+
+        Item project = ItemBuilder.createItem(context, collection)
+                .withTitle("project 10")
+                .withMetadata("dspace", "entity", "type", projectEntityType.getLabel())
+                .build();
+        newProjects.add(4, project);
+
+        RelationshipBuilder
+                .createRelationshipBuilder(context, newPublication, project, isProjectOfPublication, 4, -1)
+                .build();
+
+        verifyProjectsMatch(originalPublication, projects, newPublication, newProjects, false);
+
+        ////////////////////////////////////////
+        // do item install on new publication //
+        ////////////////////////////////////////
+
+        WorkspaceItem newPublicationWSI = workspaceItemService.findByItem(context, newPublication);
+        installItemService.installItem(context, newPublicationWSI);
+        context.dispatchEvents();
+
+        verifyProjectsMatch(originalPublication, projects, newPublication, newProjects, true);
+
+        //////////////
+        // clean up //
+        //////////////
+
+        // need to manually delete all relationships to avoid SQL constraint violation exception
+        List<Relationship> relationships = relationshipService.findAll(context);
+        for (Relationship relationship : relationships) {
+            relationshipService.delete(context, relationship);
+        }
+    }
+
+    public void removeProject(Item newPublication, int place, List<Item> newProjects)
+            throws SQLException, AuthorizeException {
+        List<Relationship> projectRels = relationshipService
+                .findByItemAndRelationshipType(context, newProjects.get(place), isProjectOfPublication, -1, -1, false)
+                .stream()
+                .filter(
+                        relationship -> relationship.getLeftItem().equals(newPublication)
+                )
+                .collect(Collectors.toCollection(ArrayList::new));
+        assertEquals(1, projectRels.size());
+        relationshipService.delete(context, projectRels.get(0));
+        newProjects.remove(newProjects.get(place));
+    }
+
+    public void moveProject(Item newPublication, int oldPlace, int newPlace, List<Item> newProjects)
+            throws SQLException, AuthorizeException {
+        Item project = newProjects.get(oldPlace);
+        List<Relationship> projectRels = relationshipService
+                .findByItemAndRelationshipType(context, project, isProjectOfPublication, -1, -1, false)
+                .stream()
+                .filter(
+                        relationship -> relationship.getLeftItem().equals(newPublication)
+                )
+                .collect(Collectors.toCollection(ArrayList::new));
+        assertEquals(1, projectRels.size());
+        relationshipService.move(context, projectRels.get(0), newPlace, null);
+        newProjects.remove(project);
+        newProjects.add(newPlace, project);
+    }
+
+    private void verifyProjectsMatch(Item originalPublication, List<Item> originalProjects,
+                                     Item newPublication, List<Item> newProjects, boolean newPublicationArchived)
+            throws SQLException {
+
+        /////////////////////////////////////////////////////////
+        // verify that the relationships were properly created //
+        /////////////////////////////////////////////////////////
+
+        AtomicInteger counterOriginalPublication = new AtomicInteger();
+        List<Matcher<Object>> listOriginalPublication = originalProjects.stream().map(
+                project -> isRel(originalPublication, isProjectOfPublication, project,
+                        newPublicationArchived ? LatestVersionStatus.RIGHT_ONLY : LatestVersionStatus.BOTH,
+                        counterOriginalPublication.getAndIncrement(), 0)
+        ).collect(Collectors.toCollection(ArrayList::new));
+
+        AtomicInteger counterNewPublication = new AtomicInteger();
+        List<Matcher<Object>> listNewPublication = newProjects.stream().map(
+                project -> isRel(newPublication, isProjectOfPublication, project,
+                        newPublicationArchived || !originalProjects.contains(project) ?
+                                LatestVersionStatus.BOTH : LatestVersionStatus.RIGHT_ONLY,
+                        counterNewPublication.getAndIncrement(), 0)
+        ).collect(Collectors.toCollection(ArrayList::new));
+
+        /////////////////////////////////////////////////////////////////////
+        // verify the relationships of all items (excludeNonLatest = true) //
+        /////////////////////////////////////////////////////////////////////
+
+        assertEquals(
+                relationshipService.countByItem(context, originalPublication, false, true),
+                originalProjects.size()
+        );
+
+        assertThat(
+                relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
+                containsInAnyOrder(listOriginalPublication)
+        );
+
+        assertEquals(
+                relationshipService.countByItem(context, newPublication, false, true),
+                newProjects.size()
+        );
+
+        assertThat(
+                relationshipService.findByItem(context, newPublication, -1, -1, false, true),
+                containsInAnyOrder(listNewPublication)
+        );
+
+        //////////////////////////////////////////////////////////////////////
+        // verify the relationships of all items (excludeNonLatest = false) //
+        //////////////////////////////////////////////////////////////////////
+
+        assertThat(
+                relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+                containsInAnyOrder(listOriginalPublication)
+        );
+
+        assertThat(
+                relationshipService.findByItem(context, newPublication, -1, -1, false, false),
+                containsInAnyOrder(listNewPublication)
+        );
     }
 
     @Test

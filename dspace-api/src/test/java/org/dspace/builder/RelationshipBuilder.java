@@ -106,19 +106,26 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
     }
 
     public static RelationshipBuilder createRelationshipBuilder(Context context, Item leftItem, Item rightItem,
-                                                                RelationshipType relationshipType) {
+                                                RelationshipType relationshipType, int leftPlace, int rightPlace) {
 
         RelationshipBuilder relationshipBuilder = new RelationshipBuilder(context);
-        return relationshipBuilder.create(context, leftItem, rightItem, relationshipType);
+        return relationshipBuilder.create(context, leftItem, rightItem, relationshipType, leftPlace, rightPlace);
+    }
+
+    public static RelationshipBuilder createRelationshipBuilder(Context context, Item leftItem, Item rightItem,
+                                                                RelationshipType relationshipType) {
+
+        return createRelationshipBuilder(context, leftItem, rightItem, relationshipType, -1, -1);
     }
 
     private RelationshipBuilder create(Context context, Item leftItem, Item rightItem,
-                                       RelationshipType relationshipType) {
+                                       RelationshipType relationshipType, int leftPlace, int rightPlace) {
         this.context = context;
 
         try {
             //place -1 will add it to the end
-            relationship = relationshipService.create(context, leftItem, rightItem, relationshipType, -1, -1);
+            relationship = relationshipService.create(context, leftItem, rightItem, relationshipType,
+                    leftPlace, rightPlace);
         } catch (SQLException | AuthorizeException e) {
             log.warn("Failed to create relationship", e);
         }
