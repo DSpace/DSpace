@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
@@ -408,7 +409,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
 
         execCanvasScriptWithMaxRecs(id);
         // check System.out for number of items processed.
-        assertEquals("2 IIIF items were processed.\n", outContent.toString());
+        assertEquals("2 IIIF items were processed.", StringUtils.chomp(outContent.toString()));
     }
 
     @Test
