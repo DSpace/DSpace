@@ -595,11 +595,9 @@ public class DCInput {
     }
 
     /**
-     * Verify whether the current field contains an entity relationship.
-     * This also implies a relationship type is defined for this field.
-     * The field can contain both an entity relationship and a metadata field
-     * simultaneously.
-     * @return true if the field contains a relationship.
+     * Verify whether the current field contains an entity relationship
+     * This also implies a relationship type is defined for this field
+     * The field can contain both an entity relationship and a metadata field simultaneously
      */
     public boolean isRelationshipField() {
         return isRelationshipField;

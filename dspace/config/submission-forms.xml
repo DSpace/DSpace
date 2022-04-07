@@ -95,8 +95,9 @@
                     <repeatable>false</repeatable>
                     <label>Date of Issue</label>
                     <style>col-sm-4</style>
+                    <type-bind>example</type-bind>
                     <input-type>date</input-type>
-                    <hint>Please give the date of previous publication or public distribution.
+                    <hint>Please give something date of previous publication or public distribution.
                         You can leave out the day and/or month if they aren't applicable.
                     </hint>
                     <required>You must enter at least the year.</required>
