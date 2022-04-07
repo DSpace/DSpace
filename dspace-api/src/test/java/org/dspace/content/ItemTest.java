@@ -187,6 +187,22 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     }
 
     /**
+     * Test of find method, of class Item.
+     */
+    @Test
+    public void dtqExampleTest() throws Exception {
+        assertThat("dtqExampleTest 0", this.it, notNullValue());
+
+        context.turnOffAuthorisationSystem();
+        itemService.update(context, it);
+        context.restoreAuthSystemState();
+        MetadataSchema dspaceSchema = metadataSchemaService.find(context, "local");
+        MetadataField field = metadataFieldService.findByString(context, "local.approximateDate", '.');
+
+        assertThat("dtqExampleTest 1", field, nullValue());
+    }
+
+    /**
      * Test of create method, of class Item.
      */
     @Test
