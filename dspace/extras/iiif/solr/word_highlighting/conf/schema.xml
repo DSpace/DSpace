@@ -53,18 +53,19 @@
         <!-- For converting OCR to plaintext -->
         <charFilter class="de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory" />
         <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>
         <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.StopFilterFactory"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>
         <filter class="solr.PorterStemFilterFactory"/>
         <filter class="solr.SnowballPorterFilterFactory" language="English" protected="protwords.txt"/>
       </analyzer>
 
       <analyzer type="query">
         <!-- Your query analysis chain, should not include the character filters -->
-        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>
         <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.StopFilterFactory"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>
         <filter class="solr.PorterStemFilterFactory"/>
         <filter class="solr.SnowballPorterFilterFactory" language="English" protected="protwords.txt"/>
       </analyzer>
