@@ -226,17 +226,23 @@ public class VersioningConsumer implements Consumer {
                 Relationship latestItemRelationship =
                     getMatchingRelationship(latestItem, isLeft, previousItemRelationship, latestItemRelationships);
 
-                // Set the previous version of the item to non-latest. This implies that the previous version
-                // of the item will not be shown anymore on the page of the third-party item. That makes sense,
-                // because either the relationship has been deleted from the new version of the item (no match),
-                // or the matching relationship (linked to new version) will receive "latest" status in the next step.
-                relationshipVersioningUtils.updateLatestVersionStatus(previousItemRelationship, isLeft, false);
+                // the other side of the relationship should be "latest", otherwise the relationship could not have been
+                // copied to the new item in the first place (by DefaultVersionProvider#copyRelationships)
+                if (relationshipVersioningUtils.otherSideIsLatest(
+                    isLeft, previousItemRelationship.getLatestVersionStatus())
+                ) {
+                    // Set the previous version of the item to non-latest. This implies that the previous version
+                    // of the item will not be shown anymore on the page of the third-party item. That makes sense,
+                    // because either the relationship has been deleted from the new version of the item (no match),
+                    // or the matching relationship (linked to new version) will receive "latest" status in the next step.
+                    relationshipVersioningUtils.updateLatestVersionStatus(previousItemRelationship, isLeft, false);
+                }
 
-                // Set the new version of the item to latest if the relevant relationship exists (match found).
-                // This implies that the new version of the item will appear on the page of the third-party item.
-                // The old version of the item will not appear anymore on the page of the third-party item,
-                // see previous step.
                 if (latestItemRelationship != null) {
+                    // Set the new version of the item to latest if the relevant relationship exists (match found).
+                    // This implies that the new version of the item will appear on the page of the third-party item.
+                    // The old version of the item will not appear anymore on the page of the third-party item,
+                    // see previous step.
                     relationshipVersioningUtils.updateLatestVersionStatus(latestItemRelationship, isLeft, true);
                 }
             }
