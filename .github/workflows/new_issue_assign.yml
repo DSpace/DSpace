@@ -11,8 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Assign to One Project
     steps:
-    - name: Assign NEW issues and NEW pull requests to project 2
-      uses: srggrs/assign-one-project-github-action@1.2.1
+    - uses: actions/checkout@v3
+    - name: Assign NEW issues to dspace-project
+      uses: ./.github/actions/project-management-action
       if: github.event.action == 'opened'
       with:
         project: 'https://github.com/orgs/dataquest-dev/projects/6'
