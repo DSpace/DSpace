@@ -168,16 +168,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         Item leftItem, RelationshipType relationshipType, Item rightItem, LatestVersionStatus latestVersionStatus,
         int leftPlace, int rightPlace
     ) {
-        return allOf(
-            hasProperty("leftItem", is(leftItem)),
-            hasProperty("relationshipType", is(relationshipType)),
-            hasProperty("rightItem", is(rightItem)),
-            hasProperty("leftPlace", is(leftPlace)),
-            hasProperty("rightPlace", is(rightPlace)),
-            hasProperty("leftwardValue", nullValue()),
-            hasProperty("rightwardValue", nullValue()),
-            hasProperty("latestVersionStatus", is(latestVersionStatus))
-        );
+        return isRel(leftItem, relationshipType, rightItem, latestVersionStatus, null, null, leftPlace, rightPlace);
     }
 
     protected Matcher<Object> isRel(
@@ -186,7 +177,10 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
     ) {
         return allOf(
             hasProperty("leftItem", is(leftItem)),
-            hasProperty("relationshipType", is(relationshipType)),
+            // NOTE: this is a painful one... class RelationshipType does not implement the equals method, so we cannot
+            //       rely on object equality and have to compare ids instead. It has to be in capital letters,
+            //       because the getter has been implemented inconsistently (#id vs #setId() vs #getID()).
+            hasProperty("relationshipType", hasProperty("ID", is(relationshipType.getID()))),
             hasProperty("rightItem", is(rightItem)),
             hasProperty("leftPlace", is(leftPlace)),
             hasProperty("rightPlace", is(rightPlace)),
