@@ -180,6 +180,22 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         );
     }
 
+    protected Matcher<Object> isRel(
+        Item leftItem, RelationshipType relationshipType, Item rightItem, LatestVersionStatus latestVersionStatus,
+        String leftwardValue, String rightwardValue, int leftPlace, int rightPlace
+    ) {
+        return allOf(
+            hasProperty("leftItem", is(leftItem)),
+            hasProperty("relationshipType", is(relationshipType)),
+            hasProperty("rightItem", is(rightItem)),
+            hasProperty("leftPlace", is(leftPlace)),
+            hasProperty("rightPlace", is(rightPlace)),
+            hasProperty("leftwardValue", leftwardValue == null ? nullValue() : is(leftwardValue)),
+            hasProperty("rightwardValue", rightwardValue == null ? nullValue() : is(rightwardValue)),
+            hasProperty("latestVersionStatus", is(latestVersionStatus))
+        );
+    }
+
     protected Relationship getRelationship(
         Item leftItem, RelationshipType relationshipType, Item rightItem
     ) throws Exception {
@@ -2215,6 +2231,8 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         );
         itemService.update(context, person1V2);
 
+        itemService.setMetadataModified(publication1V2);
+
         ///////////////////////////////////////////////////
         // test dc.contributor.author of old publication //
         ///////////////////////////////////////////////////
@@ -2223,6 +2241,15 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
             publication1V1, "dc", "contributor", "author", Item.ANY
         );
         assertEquals(2, mdvs2.size());
+
+        assertThat(
+                relationshipService.findByItem(context, publication1V1, -1, -1, false, false),
+                containsInAnyOrder(List.of(
+                        isRel(publication1V1, isAuthorOfPublication, person1V1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
+                        isRel(publication1V1, isAuthorOfPublication, person2V1, LatestVersionStatus.RIGHT_ONLY,
+                                null, "Doe, J.", 1, 0)
+                ))
+        );
 
         assertTrue(mdvs2.get(0) instanceof RelationshipMetadataValue);
         assertEquals("Smith, Donald", mdvs2.get(0).getValue());
@@ -2241,6 +2268,16 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         );
         assertEquals(2, mdvs3.size());
 
+        assertThat(
+                relationshipService.findByItem(context, publication1V2, -1, -1, false, false),
+                containsInAnyOrder(List.of(
+                        isRel(publication1V2, isAuthorOfPublication, person1V1, LatestVersionStatus.BOTH, 0, 0),
+                        isRel(publication1V2, isAuthorOfPublication, person1V2, LatestVersionStatus.LEFT_ONLY, 0, 0),
+                        isRel(publication1V2, isAuthorOfPublication, person2V1, LatestVersionStatus.BOTH,
+                                null, "Doe, J.", 1, 0)
+                ))
+        );
+
         assertTrue(mdvs3.get(0) instanceof RelationshipMetadataValue);
         assertEquals("Smith, Donald", mdvs3.get(0).getValue());
         assertEquals(0, mdvs3.get(0).getPlace());
@@ -2255,6 +2292,15 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
 
         installItemService.installItem(context, workspaceItemService.findByItem(context, person1V2));
         context.dispatchEvents();
+
+        assertThat(
+                relationshipService.findByItem(context, publication1V1, -1, -1, false, false),
+                containsInAnyOrder(List.of(
+                        isRel(publication1V1, isAuthorOfPublication, person1V1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
+                        isRel(publication1V1, isAuthorOfPublication, person2V1, LatestVersionStatus.RIGHT_ONLY,
+                                null, "Doe, J.", 1, 0)
+                ))
+        );
 
         ///////////////////////////////////////////////////
         // test dc.contributor.author of old publication //
@@ -2276,6 +2322,17 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         ///////////////////////////////////////////////////
         // test dc.contributor.author of new publication //
         ///////////////////////////////////////////////////
+
+        publication1V2 = context.reloadEntity(publication1V2);
+        assertThat(
+                relationshipService.findByItem(context, publication1V2, -1, -1, false, false),
+                containsInAnyOrder(List.of(
+                        isRel(publication1V2, isAuthorOfPublication, person1V1, LatestVersionStatus.LEFT_ONLY, 0, 0),
+                        isRel(publication1V2, isAuthorOfPublication, person1V2, LatestVersionStatus.BOTH, 0, 0),
+                        isRel(publication1V2, isAuthorOfPublication, person2V1, LatestVersionStatus.BOTH,
+                                null, "Doe, J.", 1, 0)
+                ))
+        );
 
         List<MetadataValue> mdvs5 = itemService.getMetadata(
             publication1V2, "dc", "contributor", "author", Item.ANY
