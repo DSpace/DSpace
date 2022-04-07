@@ -33,6 +33,7 @@ import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
+import org.dspace.versioning.utils.RelationshipVersioningUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class RelationshipServiceImpl implements RelationshipService {
@@ -59,6 +60,10 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Autowired
     private RelationshipMetadataService relationshipMetadataService;
+
+    @Autowired
+    private RelationshipVersioningUtils relationshipVersioningUtils;
+
     @Autowired
     private VirtualMetadataPopulator virtualMetadataPopulator;
 
@@ -264,13 +269,13 @@ public class RelationshipServiceImpl implements RelationshipService {
         context.turnOffAuthorisationSystem();
 
         //only shift if the place is relevant for the latest relationships
-        if (otherSideIsLatest(true, relationship.getLatestVersionStatus())) {
+        if (relationshipVersioningUtils.otherSideIsLatest(true, relationship.getLatestVersionStatus())) {
             shiftSiblings(
                 relationship, true, oldLeftPlace, movedUpLeft, insertLeft, deletedFromLeft,
                 leftRelationships, leftMetadata
             );
         }
-        if (otherSideIsLatest(false, relationship.getLatestVersionStatus())) {
+        if (relationshipVersioningUtils.otherSideIsLatest(false, relationship.getLatestVersionStatus())) {
             shiftSiblings(
                 relationship, false, oldRightPlace, movedUpRight, insertRight, deletedFromRight,
                 rightRelationships, rightMetadata
@@ -481,22 +486,6 @@ public class RelationshipServiceImpl implements RelationshipService {
                 mdv.setPlace(mdvPlace + 1);
             }
         }
-    }
-
-    /**
-     * Given a latest version status, check if the other side is "latest".
-     * If we look from the left, this implies BOTH and RIGHT_ONLY return true.
-     * If we look from the right, this implies BOTH and LEFT_ONLY return true.
-     * @param isLeft whether we should look from the left or right side.
-     * @param latestVersionStatus the latest version status.
-     * @return true if the other side has "latest" status, false otherwise.
-     */
-    private boolean otherSideIsLatest(boolean isLeft, LatestVersionStatus latestVersionStatus) {
-        if (latestVersionStatus == LatestVersionStatus.BOTH) {
-            return true;
-        }
-
-        return latestVersionStatus == (isLeft ? LatestVersionStatus.RIGHT_ONLY : LatestVersionStatus.LEFT_ONLY);
     }
 
     private int getPlace(Relationship relationship, boolean isLeft) {

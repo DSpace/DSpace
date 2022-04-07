@@ -9,6 +9,7 @@ package org.dspace.versioning.factory;
 
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.dspace.versioning.utils.RelationshipVersioningUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -25,6 +26,9 @@ public class VersionServiceFactoryImpl extends VersionServiceFactory {
     @Autowired(required = true)
     protected VersioningService versionService;
 
+    @Autowired(required = true)
+    protected RelationshipVersioningUtils relationshipVersioningUtils;
+
     @Override
     public VersionHistoryService getVersionHistoryService() {
         return versionHistoryService;
@@ -34,4 +38,10 @@ public class VersionServiceFactoryImpl extends VersionServiceFactory {
     public VersioningService getVersionService() {
         return versionService;
     }
+
+    @Override
+    public RelationshipVersioningUtils getRelationshipVersioningUtils() {
+        return relationshipVersioningUtils;
+    }
+
 }

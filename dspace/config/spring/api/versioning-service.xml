@@ -30,4 +30,6 @@
 
     </bean>
 
+    <bean class="org.dspace.versioning.utils.RelationshipVersioningUtils"/>
+
 </beans>
