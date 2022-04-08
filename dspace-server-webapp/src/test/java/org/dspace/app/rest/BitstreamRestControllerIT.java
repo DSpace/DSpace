@@ -203,7 +203,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
                        .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
                        //We expect the content type to match the bitstream mime type
-                       .andExpect(content().contentType("text/plain"))
+                       .andExpect(content().contentType("text/plain;charset=UTF-8"))
                        //THe bytes of the content must match the original content
                        .andExpect(content().bytes(bitstreamContent.getBytes()));
 
@@ -265,7 +265,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                        //The response should give us details about the range
                        .andExpect(header().string("Content-Range", "bytes 1-3/10"))
                        //We expect the content type to match the bitstream mime type
-                       .andExpect(content().contentType("text/plain"))
+                       .andExpect(content().contentType("text/plain;charset=UTF-8"))
                        //We only expect the bytes 1, 2 and 3
                        .andExpect(content().bytes("123".getBytes()));
 
@@ -286,7 +286,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                        //The response should give us details about the range
                        .andExpect(header().string("Content-Range", "bytes 4-9/10"))
                        //We expect the content type to match the bitstream mime type
-                       .andExpect(content().contentType("text/plain"))
+                       .andExpect(content().contentType("text/plain;charset=UTF-8"))
                        //We all remaining bytes, starting at byte 4
                        .andExpect(content().bytes("456789".getBytes()));
 
@@ -827,7 +827,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                     //The ETag has to be based on the checksum
                     .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
                     //We expect the content type to match the bitstream mime type
-                    .andExpect(content().contentType("application/pdf"))
+                    .andExpect(content().contentType("application/pdf;charset=UTF-8"))
                     //THe bytes of the content must match the original content
                     .andReturn().getResponse().getContentAsByteArray();
 
