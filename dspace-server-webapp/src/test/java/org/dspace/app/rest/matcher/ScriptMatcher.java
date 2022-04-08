@@ -32,7 +32,7 @@ public class ScriptMatcher {
         // Set the to be compared option to the expected boolean type
         Option i = options.getOption("i");
         i.setType(boolean.class);
-        
+
         return allOf(
             matchScript("mock-script", "Mocking a script for testing purposes"),
             hasJsonPath("$.parameters", Matchers.containsInAnyOrder(
