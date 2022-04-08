@@ -50,13 +50,16 @@ public class ScriptConverter implements DSpaceConverter<ScriptConfiguration, Scr
     }
 
     /**
-     * Retrieve the type string for this option
+     * Retrieve the type for this Option. In Apache Commons CLI, Option objects default to a "String" type.
      *
-     * String is the default option class when no alternative is set. However, DSpace angular will force an argument
-     * when the type is set to string. Therefor, this method will return the boolean type when the option is of type
-     * string and does require an argument.
+     * In most situations, the Option type will correspond to the Java Class name (e.g. "String", "boolean", etc.).
+     * However, when the Option type is "String" (the default) and the Option is configured to not allow for
+     * additional arguments (hasArg=false), we switch the type to be "boolean". This behavior is necessary to ensure
+     * our REST API differentiates between an Option that requires an additional argument (which our REST API returns
+     * as a "String" type), and an Option which does not accept additional arguments (which is just a boolean flag
+     * used to trigger different behavior, hence a "boolean" type is more appropriate).
      *
-     * @param option    Option to retrieve the type for
+     * @param option Option to retrieve the type for
      * @return the type of the option based on the aforementioned logic
      */
     private String getType(Option option) {

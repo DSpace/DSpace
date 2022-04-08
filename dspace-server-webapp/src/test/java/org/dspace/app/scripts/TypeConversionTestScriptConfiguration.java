@@ -37,7 +37,6 @@ public class TypeConversionTestScriptConfiguration<T extends TypeConversionTestS
         Options options = new Options();
 
         options.addOption("b", "boolean", false, "option set to the boolean class");
-        options.getOption("b").setType(boolean.class);
         options.addOption("s", "string", true, "string option with an argument");
         options.addOption("n", "noargument", false, "string option without an argument");
         options.addOption("f", "file", true, "file option with an argument");
