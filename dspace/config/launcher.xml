@@ -366,4 +366,11 @@
             <class>org.dspace.iiif.canvasdimension.CanvasDimensionCLI</class>
         </step>
     </command>
+    <command>
+        <name>iiif-search-index</name>
+        <description>Index OCR files using the solr service.</description>
+        <step>
+            <class>org.dspace.iiif.searchindex.IIIFSearchIndexCLI</class>
+        </step>
+    </command>
 </commands>

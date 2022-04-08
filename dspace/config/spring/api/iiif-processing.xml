@@ -5,6 +5,8 @@
 
     <bean id="iiifCanvasDimensionServiceFactory" class="org.dspace.iiif.canvasdimension.factory.IIIFCanvasDimensionServiceFactoryImpl"/>
     <bean class="org.dspace.iiif.canvasdimension.IIIFCanvasDimensionServiceImpl" scope="prototype"/>
+    <bean id="iiifSearchIndexServiceFactory" class="org.dspace.iiif.searchindex.factory.IIIFSearchIndexServiceFactoryImpl"/>
+    <bean class="org.dspace.iiif.searchindex.IIIFSearchIndexServiceImpl" scope="prototype"/>
     <bean class="org.dspace.iiif.IIIFApiQueryServiceImpl"/>
 
 </beans>
