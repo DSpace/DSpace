@@ -51,4 +51,32 @@
         <scope_note>Stores the reference to the eperson that own the item </scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
+        <qualifier>access-token</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
+        <qualifier>refresh-token</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
+        <qualifier>scope</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
+        <qualifier>authenticated</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
 </dspace-dc-types>
