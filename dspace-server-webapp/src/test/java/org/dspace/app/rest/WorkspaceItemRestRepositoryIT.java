@@ -19,8 +19,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -934,7 +934,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(eperson.getEmail(), password);
         try {
             // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(bibtexFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -962,7 +962,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the col2
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(bibtexFile)
                     .param("owningCollection", col2.getID().toString()))
                 .andExpect(status().isOk())
@@ -1026,7 +1026,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // create workspaceitems in the default collection (col1)
         AtomicReference<List<Integer>> idRef = new AtomicReference<>();
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(csvFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1065,7 +1065,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create workspaceitems explicitly in the col2
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(csvFile)
                     .param("owningCollection", col2.getID().toString()))
                     .andExpect(status().isOk())
@@ -1143,7 +1143,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // create workspaceitems in the default collection (col1)
 
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                 .file(csvFile))
             // create should return 200, 201 (created) is better for single resource
             .andExpect(status().isOk())
@@ -1221,7 +1221,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create workspaceitems in the default collection (col1)
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(tsvFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1297,7 +1297,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create workspaceitems in the default collection (col1)
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(tsvFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1374,7 +1374,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         AtomicReference<List<Integer>> idRef = new AtomicReference<>();
         // create workspaceitems in the default collection (col1)
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(endnoteFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1453,7 +1453,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create workspaceitems in the default collection (col1)
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                 .file(csvFile))
             // create should return 200, 201 (created) is better for single resource
             .andExpect(status().isOk())
@@ -1534,7 +1534,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(bibtexFile).file(pubmedFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1568,7 +1568,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the col2
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(bibtexFile).file(pubmedFile)
                     .param("owningCollection", col2.getID().toString()))
                 .andExpect(status().isOk())
@@ -1640,7 +1640,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(eperson.getEmail(), password);
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(bibtexFile))
                   // create should return return a 422 because we don't allow/support bibliographic files
                  // that have multiple metadata records
@@ -1685,7 +1685,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(pubmedFile))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
@@ -1716,7 +1716,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the col2
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(pubmedFile)
                     .param("owningCollection", col2.getID().toString()))
             .andExpect(status().isOk())
@@ -1776,7 +1776,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         // create a workspaceitem
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(pdfFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -3491,7 +3491,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         // upload the file in our workspaceitem
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
+        getClient(authToken).perform(multipart("/api/submission/workspaceitems/" + witem.getID())
                 .file(pdfFile))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
@@ -3534,7 +3534,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         // upload the file in our workspaceitem
-        getClient().perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
+        getClient().perform(multipart("/api/submission/workspaceitems/" + witem.getID())
                 .file(pdfFile))
                 .andExpect(status().isUnauthorized());
 
@@ -3580,7 +3580,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // upload the file in our workspaceitem
         String authToken = getAuthToken(eperson2.getEmail(), "qwerty02");
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
+        getClient(authToken).perform(multipart("/api/submission/workspaceitems/" + witem.getID())
                 .file(pdfFile))
                 .andExpect(status().isForbidden());
 
@@ -3617,7 +3617,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
         // upload the file in our workspaceitem
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
+        getClient(authToken).perform(multipart("/api/submission/workspaceitems/" + witem.getID())
             .file(pdfFile))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
@@ -4386,7 +4386,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         try {
             // adding a bibtex file with a single entry should automatically put the metadata in the bibtex file into
             // the item
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems/" + witem.getID())
                         .file(bibtexFile))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
@@ -4403,7 +4403,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             is("bibtex-test.bib")));
 
             // do again over a submission that already has a title, the manual input should be preserved
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem2.getID())
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems/" + witem2.getID())
                         .file(bibtexFile))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
@@ -4944,7 +4944,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // upload file and verify response
         getClient(authToken)
-            .perform(fileUpload("/api/submission/workspaceitems/" + wItem.getID()).file(pdfFile))
+            .perform(multipart("/api/submission/workspaceitems/" + wItem.getID()).file(pdfFile))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
 
@@ -5415,7 +5415,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                                 .file(pdfFile))
                                 .andExpect(status().is(500));
         } finally {
@@ -6976,7 +6976,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                      .andExpect(status().isOk())
                                      .andExpect(header().string("Accept-Ranges", "bytes"))
                                      .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
-                                     .andExpect(content().contentType("text/plain"))
+                                     .andExpect(content().contentType("text/plain;charset=UTF-8"))
                                      .andExpect(content().bytes(bitstreamContent.getBytes()));
 
             // others can't download the bitstream
@@ -7014,7 +7014,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                      .andExpect(status().isOk())
                                      .andExpect(header().string("Accept-Ranges", "bytes"))
                                      .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
-                                     .andExpect(content().contentType("text/plain"))
+                                     .andExpect(content().contentType("text/plain;charset=UTF-8"))
                                      .andExpect(content().bytes(bitstreamContent.getBytes()));
 
             // others can't download the bitstream
@@ -7171,7 +7171,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                .andExpect(jsonPath("$.sections.upload.files[1]").doesNotExist());
 
         // upload second file
-        getClient(tokenEPerson).perform(fileUpload("/api/submission/workspaceitems/" + wItem.getID())
+        getClient(tokenEPerson).perform(multipart("/api/submission/workspaceitems/" + wItem.getID())
                                .file(xmlFile))
                                .andExpect(status().isCreated());
 

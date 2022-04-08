@@ -13,7 +13,9 @@ import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -106,7 +108,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             // While we primarily use JWT in headers, CSRF protection is needed because we also support JWT via Cookies
             .csrf()
                 .ignoringAntMatchers("/ldn/inbox")
-                .csrfTokenRepository(this.getCsrfTokenRepository())
                 .sessionAuthenticationStrategy(this.sessionAuthenticationStrategy())
             .and()
             .exceptionHandling()
@@ -172,7 +173,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
      *
      * @return CsrfTokenRepository as described above
      */
-    public CsrfTokenRepository getCsrfTokenRepository() {
+    @Lazy
+    @Bean
+    public CsrfTokenRepository csrfTokenRepository() {
         return new DSpaceCsrfTokenRepository();
     }
 
@@ -181,7 +184,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
      * is only refreshed when it is used (or attempted to be used) by the client.
      */
     private SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-        return new DSpaceCsrfAuthenticationStrategy(getCsrfTokenRepository());
+        return new DSpaceCsrfAuthenticationStrategy(csrfTokenRepository());
     }
 
 }

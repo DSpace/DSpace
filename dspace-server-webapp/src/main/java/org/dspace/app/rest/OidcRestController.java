@@ -45,7 +45,7 @@ public class OidcRestController {
 
     @PostConstruct
     public void afterPropertiesSet() {
-        discoverableEndpointsService.register(this, List.of(new Link("/api/" + AuthnRest.CATEGORY, "oidc")));
+        discoverableEndpointsService.register(this, List.of(Link.of("/api/" + AuthnRest.CATEGORY, "oidc")));
     }
 
     @RequestMapping(method = RequestMethod.GET)
