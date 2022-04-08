@@ -13,15 +13,15 @@
 
     <organization>
         <name>LYRASIS</name>
-        <url>http://www.dspace.org</url>
+        <url>https://dspace.org</url>
     </organization>
 
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>11</java.version>
-        <spring.version>5.2.5.RELEASE</spring.version>
-        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
-        <spring-security.version>5.2.2.RELEASE</spring-security.version> <!-- sync with version used by spring-boot-->
+        <spring.version>5.3.18</spring.version>
+        <spring-boot.version>2.6.6</spring-boot.version>
+        <spring-security.version>5.6.2</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>5.6.5.Final</hibernate.version>
         <hibernate-validator.version>6.0.23.Final</hibernate-validator.version>
         <postgresql.driver.version>42.3.3</postgresql.driver.version>
@@ -46,10 +46,8 @@
         <bouncycastle.version>1.70</bouncycastle.version>
 
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
-        <!-- Spring Data REST HAL Browser (used by Server webapp) -->
-        <spring-hal-browser.version>3.2.6.RELEASE</spring-hal-browser.version>
         <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath (used by Server webapp) -->
-        <json-path.version>2.4.0</json-path.version>
+        <json-path.version>2.6.0</json-path.version>
         <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home
              (used by Server webapp) -->
         <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
@@ -1108,13 +1106,6 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.driver.version}</version>
-                <exclusions>
-                    <!-- Use version provided by Solr -->
-                    <exclusion>
-                        <groupId>org.checkerframework</groupId>
-                        <artifactId>checker-qual</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
@@ -1738,9 +1729,9 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>30.1.1-jre</version>
+                <version>31.0.1-jre</version>
                 <exclusions>
-                    <!-- Use version provided by Solr -->
+                    <!-- Use version provided by Solr / Postgres -->
                     <exclusion>
                         <groupId>org.checkerframework</groupId>
                         <artifactId>checker-qual</artifactId>
@@ -1752,6 +1743,21 @@
                 <artifactId>xom</artifactId>
                 <version>1.2.5</version>
             </dependency>
+
+            <!-- json-path is needed by Spring HATEOAS -->
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path</artifactId>
+                <version>${json-path.version}</version>
+            </dependency>
+            <!-- json-path-assert is just needed by tests -->
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path-assert</artifactId>
+                <version>${json-path.version}</version>
+                <scope>test</scope>
+            </dependency>
+
             <!-- JAXB API and implementation (no longer bundled as of Java 11) -->
             <dependency>
                 <groupId>javax.xml.bind</groupId>

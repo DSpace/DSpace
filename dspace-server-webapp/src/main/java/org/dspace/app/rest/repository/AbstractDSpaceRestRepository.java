@@ -14,6 +14,7 @@ import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * This is the base class for any Rest Repository. It provides utility method to
@@ -26,6 +27,7 @@ public abstract class AbstractDSpaceRestRepository {
     @Autowired
     protected Utils utils;
 
+    @Lazy
     @Autowired
     protected ConverterService converter;
 
