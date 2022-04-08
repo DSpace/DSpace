@@ -42,6 +42,9 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.content.virtual.Collected;
+import org.dspace.kernel.ServiceManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersioningService;
@@ -1620,7 +1623,24 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
     public void test_placeRecalculationAfterDelete() throws Exception {
         // NOTE: this test uses relationship isIssueOfJournalVolume, because it adds virtual metadata
         //       on both sides of the relationship
-        // TODO: make sure useForPlace = true, otherwise test fails
+
+        /////////////////////////////////////////
+        // properly configure virtual metadata //
+        /////////////////////////////////////////
+
+        ServiceManager serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
+
+        // virtual metadata field publicationvolume.volumeNumber needs to be used in place calculations
+        Collected volumeVmd = serviceManager.getServiceByName("issueVolume_volume", Collected.class);
+        assertNotNull(volumeVmd);
+        boolean ogVolumeVmdUseForPlace = volumeVmd.getUseForPlace();
+        volumeVmd.setUseForPlace(true);
+
+        // virtual metadata field publicationissue.issueNumber needs to be used in place calculations
+        Collected issueVmd = serviceManager.getServiceByName("journalIssue_number", Collected.class);
+        assertNotNull(issueVmd);
+        boolean ogIssueVmdUseForPlace = issueVmd.getUseForPlace();
+        issueVmd.setUseForPlace(true);
 
         //////////////////
         // create items //
@@ -2475,6 +2495,13 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         // TODO
         // delete mdv from older
         // delete rel from older
+
+        /////////////////////////////
+        // clean up config changes //
+        /////////////////////////////
+
+        volumeVmd.setUseForPlace(ogVolumeVmdUseForPlace);
+        issueVmd.setUseForPlace(ogIssueVmdUseForPlace);
     }
 
     @Test
