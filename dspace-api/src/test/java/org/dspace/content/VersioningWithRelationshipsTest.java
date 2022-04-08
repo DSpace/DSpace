@@ -39,6 +39,7 @@ import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.versioning.Version;
@@ -60,6 +61,8 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         ContentServiceFactory.getInstance().getInstallItemService();
     private final ItemService itemService =
         ContentServiceFactory.getInstance().getItemService();
+    private final MetadataValueService metadataValueService =
+        ContentServiceFactory.getInstance().getMetadataValueService();
 
     protected Community community;
     protected Collection collection;
@@ -1844,6 +1847,15 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         // after version creation - verify volume 3.1 //
         ////////////////////////////////////////////////
 
+        assertThat(
+            relationshipService.findByItem(context, v3_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v3_1, isIssueOfJournalVolume, i1_1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
+                isRel(v3_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.RIGHT_ONLY, 2, 2),
+                isRel(v3_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.RIGHT_ONLY, 4, 2)
+            ))
+        );
+
         List<MetadataValue> mdvs4 = itemService.getMetadata(
             v3_1, "publicationissue", "issueNumber", null, Item.ANY
         );
@@ -1876,6 +1888,16 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         ///////////////////////////////////////////////
         // after version creation - verify issue 3.1 //
         ///////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, i3_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v1_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 0, 0),
+                isRel(v3_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.RIGHT_ONLY, 2, 2),
+                isRel(v5_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 0, 4),
+                isRel(v3_2, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 2, 2)
+            ))
+        );
 
         List<MetadataValue> mdvs5 = itemService.getMetadata(
             i3_1, "publicationvolume", "volumeNumber", null, Item.ANY
@@ -1910,6 +1932,15 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         // after version creation - verify issue 5.1 //
         ///////////////////////////////////////////////
 
+        assertThat(
+            relationshipService.findByItem(context, i5_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v5_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 1, 1),
+                isRel(v3_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.RIGHT_ONLY, 4, 2),
+                isRel(v3_2, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 4, 2)
+            ))
+        );
+
         List<MetadataValue> mdvs6 = itemService.getMetadata(
             i5_1, "publicationvolume", "volumeNumber", null, Item.ANY
         );
@@ -1930,6 +1961,16 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         ////////////////////////////////////////////////
         // after version creation - verify volume 3.2 //
         ////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, v3_2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v3_2, isIssueOfJournalVolume, i1_1, LatestVersionStatus.BOTH, 0, 0),
+                isRel(v3_2, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 2, 2),
+                isRel(v3_2, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 4, 2),
+                isRel(v3_2, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 2, 2)
+            ))
+        );
 
         List<MetadataValue> mdvs7 = itemService.getMetadata(
             v3_2, "publicationissue", "issueNumber", null, Item.ANY
@@ -1963,6 +2004,15 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         ///////////////////////////////////////////////
         // after version creation - verify issue 3.2 //
         ///////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, i3_2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v1_1, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 0, 0),
+                isRel(v5_1, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 0, 4),
+                isRel(v3_2, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 2, 2)
+            ))
+        );
 
         List<MetadataValue> mdvs8 = itemService.getMetadata(
             i3_2, "publicationvolume", "volumeNumber", null, Item.ANY
@@ -2003,9 +2053,28 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         relationshipService.delete(context, rel1, false, false);
         context.commit();
 
+        ////////////////////////////////////
+        // after remove 1 - cache busting //
+        ////////////////////////////////////
+
+        v3_2.setMetadataModified();
+        v3_2 = context.reloadEntity(v3_2);
+
+        i3_2.setMetadataModified();
+        i3_2 = context.reloadEntity(i3_2);
+
         ////////////////////////////////////////
         // after remove 1 - verify volume 3.1 //
         ////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, v3_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v3_1, isIssueOfJournalVolume, i1_1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
+                isRel(v3_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.RIGHT_ONLY, 2, 2),
+                isRel(v3_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.RIGHT_ONLY, 4, 2)
+            ))
+        );
 
         List<MetadataValue> mdvs9 = itemService.getMetadata(
             v3_1, "publicationissue", "issueNumber", null, Item.ANY
@@ -2040,6 +2109,16 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         // after remove 1 - verify issue 3.1 //
         ///////////////////////////////////////
 
+        assertThat(
+            relationshipService.findByItem(context, i3_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v1_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 0, 0),
+                isRel(v3_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.RIGHT_ONLY, 2, 2),
+                isRel(v5_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 0, 4),
+                isRel(v3_2, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 2, 2)
+            ))
+        );
+
         List<MetadataValue> mdvs10 = itemService.getMetadata(
             i3_1, "publicationvolume", "volumeNumber", null, Item.ANY
         );
@@ -2073,6 +2152,16 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         // after remove 1 - verify issue 5.1 //
         ///////////////////////////////////////
 
+        assertThat(
+            relationshipService.findByItem(context, i5_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v5_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 1, 1),
+                isRel(v3_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.RIGHT_ONLY, 4, 2),
+                // NOTE: left place was reduced by one
+                isRel(v3_2, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 3, 2)
+            ))
+        );
+
         List<MetadataValue> mdvs11 = itemService.getMetadata(
             i5_1, "publicationvolume", "volumeNumber", null, Item.ANY
         );
@@ -2094,6 +2183,16 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         // after remove 1 - verify volume 3.2 //
         ////////////////////////////////////////
 
+        assertThat(
+            relationshipService.findByItem(context, v3_2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v3_2, isIssueOfJournalVolume, i1_1, LatestVersionStatus.BOTH, 0, 0),
+                isRel(v3_2, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 2, 2),
+                // NOTE: left place was reduced by one
+                isRel(v3_2, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 3, 2)
+            ))
+        );
+
         List<MetadataValue> mdvs12 = itemService.getMetadata(
             v3_2, "publicationissue", "issueNumber", null, Item.ANY
         );
@@ -2107,9 +2206,9 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("issue nr 2 (plain)", mdvs12.get(1).getValue());
         assertEquals(1, mdvs12.get(1).getPlace());
 
-        assertFalse(mdvs12.get(32) instanceof RelationshipMetadataValue);
-        assertEquals("issue nr 4 (plain)", mdvs12.get(32).getValue());
-        assertEquals(32, mdvs12.get(2).getPlace());
+        assertFalse(mdvs12.get(2) instanceof RelationshipMetadataValue);
+        assertEquals("issue nr 4 (plain)", mdvs12.get(2).getValue());
+        assertEquals(2, mdvs12.get(2).getPlace());
 
         assertTrue(mdvs12.get(3) instanceof RelationshipMetadataValue);
         assertEquals("issue nr 5 (rel)", mdvs12.get(3).getValue());
@@ -2122,6 +2221,15 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         ///////////////////////////////////////
         // after remove 1 - verify issue 3.2 //
         ///////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, i3_2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v1_1, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 0, 0),
+                // NOTE: right place was reduced by one
+                isRel(v5_1, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 0, 3)
+            ))
+        );
 
         List<MetadataValue> mdvs13 = itemService.getMetadata(
             i3_2, "publicationvolume", "volumeNumber", null, Item.ANY
@@ -2148,8 +2256,221 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("volume nr 6 (plain)", mdvs13.get(4).getValue());
         assertEquals(4, mdvs13.get(4).getPlace());
 
-        // delete mdv from latest
-        // delete rel from latest
+        ////////////////////////////////////////
+        // remove metadata value - volume 3.2 //
+        ////////////////////////////////////////
+
+        MetadataValue removeMdv1 = mdvs12.get(2);
+
+        // let's make sure we have the metadata value that we intended to remove
+        assertFalse(removeMdv1 instanceof RelationshipMetadataValue);
+        assertEquals("issue nr 4 (plain)", removeMdv1.getValue());
+        assertEquals(2, removeMdv1.getPlace());
+        assertEquals(v3_2, removeMdv1.getDSpaceObject());
+
+        metadataValueService.delete(context, removeMdv1);
+        // NOTE: needed to avoid Hibernate Exception: javax.persistence.EntityNotFoundException:
+        //       "deleted object would be re-saved by cascade (remove deleted object from associations)"
+        if (v3_2.getMetadata().removeIf(removeMdv1::equals)) {
+            v3_2.setMetadataModified();
+        }
+        context.commit();
+
+        // TODO cache busting?
+
+        ////////////////////////////////////////
+        // after remove 2 - verify volume 3.1 //
+        ////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, v3_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v3_1, isIssueOfJournalVolume, i1_1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
+                isRel(v3_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.RIGHT_ONLY, 2, 2),
+                isRel(v3_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.RIGHT_ONLY, 4, 2)
+            ))
+        );
+
+        List<MetadataValue> mdvs14 = itemService.getMetadata(
+            v3_1, "publicationissue", "issueNumber", null, Item.ANY
+        );
+        assertEquals(6, mdvs14.size());
+
+        assertTrue(mdvs14.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("issue nr 1 (rel)", mdvs14.get(0).getValue());
+        assertEquals(0, mdvs14.get(0).getPlace());
+
+        assertFalse(mdvs14.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("issue nr 2 (plain)", mdvs14.get(1).getValue());
+        assertEquals(1, mdvs14.get(1).getPlace());
+
+        assertTrue(mdvs14.get(2) instanceof RelationshipMetadataValue);
+        assertEquals("issue nr 3 (rel)", mdvs14.get(2).getValue());
+        assertEquals(2, mdvs14.get(2).getPlace());
+
+        assertFalse(mdvs14.get(3) instanceof RelationshipMetadataValue);
+        assertEquals("issue nr 4 (plain)", mdvs14.get(3).getValue());
+        assertEquals(3, mdvs14.get(3).getPlace());
+
+        assertTrue(mdvs14.get(4) instanceof RelationshipMetadataValue);
+        assertEquals("issue nr 5 (rel)", mdvs14.get(4).getValue());
+        assertEquals(4, mdvs14.get(4).getPlace());
+
+        assertFalse(mdvs14.get(5) instanceof RelationshipMetadataValue);
+        assertEquals("issue nr 6 (plain)", mdvs14.get(5).getValue());
+        assertEquals(5, mdvs14.get(5).getPlace());
+
+        ///////////////////////////////////////
+        // after remove 2 - verify issue 3.1 //
+        ///////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, i3_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v1_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 0, 0),
+                isRel(v3_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.RIGHT_ONLY, 2, 2),
+                isRel(v5_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 0, 4),
+                isRel(v3_2, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 2, 2)
+            ))
+        );
+
+        List<MetadataValue> mdvs15 = itemService.getMetadata(
+            i3_1, "publicationvolume", "volumeNumber", null, Item.ANY
+        );
+        assertEquals(6, mdvs15.size());
+
+        assertTrue(mdvs15.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("volume nr 1 (rel)", mdvs15.get(0).getValue());
+        assertEquals(0, mdvs15.get(0).getPlace());
+
+        assertFalse(mdvs15.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("volume nr 2 (plain)", mdvs15.get(1).getValue());
+        assertEquals(1, mdvs15.get(1).getPlace());
+
+        assertTrue(mdvs15.get(2) instanceof RelationshipMetadataValue);
+        assertEquals("volume nr 3 (rel)", mdvs15.get(2).getValue());
+        assertEquals(2, mdvs15.get(2).getPlace());
+
+        assertFalse(mdvs15.get(3) instanceof RelationshipMetadataValue);
+        assertEquals("volume nr 4 (plain)", mdvs15.get(3).getValue());
+        assertEquals(3, mdvs15.get(3).getPlace());
+
+        assertTrue(mdvs15.get(4) instanceof RelationshipMetadataValue);
+        assertEquals("volume nr 5 (rel)", mdvs15.get(4).getValue());
+        assertEquals(4, mdvs15.get(4).getPlace());
+
+        assertFalse(mdvs15.get(5) instanceof RelationshipMetadataValue);
+        assertEquals("volume nr 6 (plain)", mdvs15.get(5).getValue());
+        assertEquals(5, mdvs15.get(5).getPlace());
+
+        ///////////////////////////////////////
+        // after remove 2 - verify issue 5.1 //
+        ///////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, i5_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v5_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 1, 1),
+                isRel(v3_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.RIGHT_ONLY, 4, 2),
+                // NOTE: left place was reduced by one
+                // TODO left place is 3 but expected 2
+                isRel(v3_2, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 2, 2)
+            ))
+        );// TODO continue verify test cases below here
+
+        List<MetadataValue> mdvs16 = itemService.getMetadata(
+            i5_1, "publicationvolume", "volumeNumber", null, Item.ANY
+        );
+        assertEquals(3, mdvs16.size());
+
+        assertFalse(mdvs16.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("volume nr 7 (plain)", mdvs16.get(0).getValue());
+        assertEquals(0, mdvs16.get(0).getPlace());
+
+        assertTrue(mdvs16.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("volume nr 5 (rel)", mdvs16.get(1).getValue());
+        assertEquals(1, mdvs16.get(1).getPlace());
+
+        assertTrue(mdvs16.get(2) instanceof RelationshipMetadataValue);
+        assertEquals("volume nr 3 (rel)", mdvs16.get(2).getValue());
+        assertEquals(2, mdvs16.get(2).getPlace());
+
+        ////////////////////////////////////////
+        // after remove 2 - verify volume 3.2 //
+        ////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, v3_2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v3_2, isIssueOfJournalVolume, i1_1, LatestVersionStatus.BOTH, 0, 0),
+                isRel(v3_2, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 2, 2),
+                // NOTE: left place was reduced by one
+                isRel(v3_2, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 3, 2)
+            ))
+        );
+
+        List<MetadataValue> mdvs17 = itemService.getMetadata(
+            v3_2, "publicationissue", "issueNumber", null, Item.ANY
+        );
+        assertEquals(5, mdvs17.size());
+
+        assertTrue(mdvs17.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("issue nr 1 (rel)", mdvs17.get(0).getValue());
+        assertEquals(0, mdvs17.get(0).getPlace());
+
+        assertFalse(mdvs17.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("issue nr 2 (plain)", mdvs17.get(1).getValue());
+        assertEquals(1, mdvs17.get(1).getPlace());
+
+        assertFalse(mdvs17.get(2) instanceof RelationshipMetadataValue);
+        assertEquals("issue nr 4 (plain)", mdvs17.get(2).getValue());
+        assertEquals(2, mdvs17.get(2).getPlace());
+
+        assertTrue(mdvs17.get(3) instanceof RelationshipMetadataValue);
+        assertEquals("issue nr 5 (rel)", mdvs17.get(3).getValue());
+        assertEquals(3, mdvs17.get(3).getPlace());
+
+        assertFalse(mdvs17.get(4) instanceof RelationshipMetadataValue);
+        assertEquals("issue nr 6 (plain)", mdvs17.get(4).getValue());
+        assertEquals(4, mdvs17.get(4).getPlace());
+
+        ///////////////////////////////////////
+        // after remove 2 - verify issue 3.2 //
+        ///////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, i3_2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(v1_1, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 0, 0),
+                // NOTE: right place was reduced by one
+                isRel(v5_1, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 0, 3)
+            ))
+        );
+
+        List<MetadataValue> mdvs18 = itemService.getMetadata(
+            i3_2, "publicationvolume", "volumeNumber", null, Item.ANY
+        );
+        assertEquals(5, mdvs18.size());
+
+        assertTrue(mdvs18.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("volume nr 1 (rel)", mdvs18.get(0).getValue());
+        assertEquals(0, mdvs18.get(0).getPlace());
+
+        assertFalse(mdvs18.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("volume nr 2 (plain)", mdvs18.get(1).getValue());
+        assertEquals(1, mdvs18.get(1).getPlace());
+
+        assertFalse(mdvs18.get(2) instanceof RelationshipMetadataValue);
+        assertEquals("volume nr 4 (plain)", mdvs18.get(2).getValue());
+        assertEquals(2, mdvs18.get(2).getPlace());
+
+        assertTrue(mdvs18.get(3) instanceof RelationshipMetadataValue);
+        assertEquals("volume nr 5 (rel)", mdvs18.get(3).getValue());
+        assertEquals(3, mdvs18.get(3).getPlace());
+
+        assertFalse(mdvs18.get(4) instanceof RelationshipMetadataValue);
+        assertEquals("volume nr 6 (plain)", mdvs18.get(4).getValue());
+        assertEquals(4, mdvs18.get(4).getPlace());
 
         // TODO
         // delete mdv from older
