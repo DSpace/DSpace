@@ -169,6 +169,12 @@ public class IIIFSearchIndexCLI {
                 System.out.println("You must provide either an \"add\" or a \"delete\" option.");
                 System.exit(1);
             }
+            String s = System.console().readLine("\nThis action will delete all entries from the IIIF search " +
+                "index for this DSpace \nCommunity, Collection, or Item. \n\nAre you sure you want to do this? Y/n: ");
+            if (!"Y".equals(s)) {
+                System.out.println("Action stopped.");
+                System.exit(1);
+            }
             action = "delete";
         }
 
