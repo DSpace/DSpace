@@ -2576,25 +2576,32 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         );
         itemService.update(context, person1V2);
 
-        itemService.setMetadataModified(publication1V2);
+        ///////////////////
+        // cache busting //
+        ///////////////////
+
+        publication1V1.setMetadataModified();
+        publication1V1 = context.reloadEntity(publication1V1);
+
+        publication1V2.setMetadataModified();
+        publication1V2 = context.reloadEntity(publication1V2);
 
         ///////////////////////////////////////////////////
         // test dc.contributor.author of old publication //
         ///////////////////////////////////////////////////
 
+        assertThat(
+            relationshipService.findByItem(context, publication1V1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(publication1V1, isAuthorOfPublication, person1V1, RIGHT_ONLY, 0, 0),
+                isRel(publication1V1, isAuthorOfPublication, person2V1, RIGHT_ONLY, null, "Doe, J.", 1, 0)
+            ))
+        );
+
         List<MetadataValue> mdvs2 = itemService.getMetadata(
             publication1V1, "dc", "contributor", "author", Item.ANY
         );
         assertEquals(2, mdvs2.size());
-
-        assertThat(
-                relationshipService.findByItem(context, publication1V1, -1, -1, false, false),
-                containsInAnyOrder(List.of(
-                        isRel(publication1V1, isAuthorOfPublication, person1V1, RIGHT_ONLY, 0, 0),
-                        isRel(publication1V1, isAuthorOfPublication, person2V1, RIGHT_ONLY,
-                                null, "Doe, J.", 1, 0)
-                ))
-        );
 
         assertTrue(mdvs2.get(0) instanceof RelationshipMetadataValue);
         assertEquals("Smith, Donald", mdvs2.get(0).getValue());
@@ -2608,20 +2615,19 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         // test dc.contributor.author of new publication //
         ///////////////////////////////////////////////////
 
+        assertThat(
+            relationshipService.findByItem(context, publication1V2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(publication1V2, isAuthorOfPublication, person1V1, BOTH, 0, 0),
+                isRel(publication1V2, isAuthorOfPublication, person1V2, LEFT_ONLY, 0, 0),
+                isRel(publication1V2, isAuthorOfPublication, person2V1, BOTH, null, "Doe, J.", 1, 0)
+            ))
+        );
+
         List<MetadataValue> mdvs3 = itemService.getMetadata(
             publication1V2, "dc", "contributor", "author", Item.ANY
         );
         assertEquals(2, mdvs3.size());
-
-        assertThat(
-                relationshipService.findByItem(context, publication1V2, -1, -1, false, false),
-                containsInAnyOrder(List.of(
-                        isRel(publication1V2, isAuthorOfPublication, person1V1, BOTH, 0, 0),
-                        isRel(publication1V2, isAuthorOfPublication, person1V2, LEFT_ONLY, 0, 0),
-                        isRel(publication1V2, isAuthorOfPublication, person2V1, BOTH,
-                                null, "Doe, J.", 1, 0)
-                ))
-        );
 
         assertTrue(mdvs3.get(0) instanceof RelationshipMetadataValue);
         assertEquals("Smith, Donald", mdvs3.get(0).getValue());
@@ -2638,18 +2644,27 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         installItemService.installItem(context, workspaceItemService.findByItem(context, person1V2));
         context.dispatchEvents();
 
-        assertThat(
-                relationshipService.findByItem(context, publication1V1, -1, -1, false, false),
-                containsInAnyOrder(List.of(
-                        isRel(publication1V1, isAuthorOfPublication, person1V1, RIGHT_ONLY, 0, 0),
-                        isRel(publication1V1, isAuthorOfPublication, person2V1, RIGHT_ONLY,
-                                null, "Doe, J.", 1, 0)
-                ))
-        );
+        ///////////////////
+        // cache busting //
+        ///////////////////
+
+        publication1V1.setMetadataModified();
+        publication1V1 = context.reloadEntity(publication1V1);
+
+        publication1V2.setMetadataModified();
+        publication1V2 = context.reloadEntity(publication1V2);
 
         ///////////////////////////////////////////////////
         // test dc.contributor.author of old publication //
         ///////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, publication1V1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(publication1V1, isAuthorOfPublication, person1V1, RIGHT_ONLY, 0, 0),
+                isRel(publication1V1, isAuthorOfPublication, person2V1, RIGHT_ONLY, null, "Doe, J.", 1, 0)
+            ))
+        );
 
         List<MetadataValue> mdvs4 = itemService.getMetadata(
             publication1V1, "dc", "contributor", "author", Item.ANY
@@ -2668,15 +2683,13 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         // test dc.contributor.author of new publication //
         ///////////////////////////////////////////////////
 
-        publication1V2 = context.reloadEntity(publication1V2);
         assertThat(
-                relationshipService.findByItem(context, publication1V2, -1, -1, false, false),
-                containsInAnyOrder(List.of(
-                        isRel(publication1V2, isAuthorOfPublication, person1V1, LEFT_ONLY, 0, 0),
-                        isRel(publication1V2, isAuthorOfPublication, person1V2, BOTH, 0, 0),
-                        isRel(publication1V2, isAuthorOfPublication, person2V1, BOTH,
-                                null, "Doe, J.", 1, 0)
-                ))
+            relationshipService.findByItem(context, publication1V2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(publication1V2, isAuthorOfPublication, person1V1, LEFT_ONLY, 0, 0),
+                isRel(publication1V2, isAuthorOfPublication, person1V2, BOTH, 0, 0),
+                isRel(publication1V2, isAuthorOfPublication, person2V1, BOTH, null, "Doe, J.", 1, 0)
+            ))
         );
 
         List<MetadataValue> mdvs5 = itemService.getMetadata(
@@ -2685,12 +2698,153 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals(2, mdvs5.size());
 
         assertTrue(mdvs5.get(0) instanceof RelationshipMetadataValue);
-        assertEquals("Smith, D.", mdvs5.get(0).getValue());// TODO fix
+        assertEquals("Smith, D.", mdvs5.get(0).getValue());
         assertEquals(0, mdvs5.get(0).getPlace());
 
         assertTrue(mdvs5.get(1) instanceof RelationshipMetadataValue);
         assertEquals("Doe, J.", mdvs5.get(1).getValue());
         assertEquals(1, mdvs5.get(1).getPlace());
+
+        ////////////////////////////////////
+        // create new version of person 2 //
+        ////////////////////////////////////
+
+        Item person2V2 = versioningService.createNewVersion(context, person2V1).getItem();
+        Relationship rel1 = getRelationship(publication1V2, isAuthorOfPublication, person2V2);
+        assertNotNull(rel1);
+        rel1.setRightwardValue("Doe, Jane Jr");
+        relationshipService.update(context, rel1);
+
+        ///////////////////
+        // cache busting //
+        ///////////////////
+
+        publication1V1.setMetadataModified();
+        publication1V1 = context.reloadEntity(publication1V1);
+
+        publication1V2.setMetadataModified();
+        publication1V2 = context.reloadEntity(publication1V2);
+
+        ///////////////////////////////////////////////////
+        // test dc.contributor.author of old publication //
+        ///////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, publication1V1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(publication1V1, isAuthorOfPublication, person1V1, RIGHT_ONLY, 0, 0),
+                isRel(publication1V1, isAuthorOfPublication, person2V1, RIGHT_ONLY, null, "Doe, J.", 1, 0)
+            ))
+        );
+
+        List<MetadataValue> mdvs6 = itemService.getMetadata(
+            publication1V1, "dc", "contributor", "author", Item.ANY
+        );
+        assertEquals(2, mdvs6.size());
+
+        assertTrue(mdvs6.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("Smith, Donald", mdvs6.get(0).getValue());
+        assertEquals(0, mdvs6.get(0).getPlace());
+
+        assertTrue(mdvs6.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("Doe, J.", mdvs6.get(1).getValue());
+        assertEquals(1, mdvs6.get(1).getPlace());
+
+        ///////////////////////////////////////////////////
+        // test dc.contributor.author of new publication //
+        ///////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, publication1V2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(publication1V2, isAuthorOfPublication, person1V1, LEFT_ONLY, 0, 0),
+                isRel(publication1V2, isAuthorOfPublication, person1V2, BOTH, 0, 0),
+                isRel(publication1V2, isAuthorOfPublication, person2V1, BOTH, null, "Doe, J.", 1, 0),
+                isRel(publication1V2, isAuthorOfPublication, person2V2, LEFT_ONLY, null, "Doe, Jane Jr", 1, 0)
+            ))
+        );
+
+        List<MetadataValue> mdvs7 = itemService.getMetadata(
+            publication1V2, "dc", "contributor", "author", Item.ANY
+        );
+        assertEquals(2, mdvs7.size());
+
+        assertTrue(mdvs7.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("Smith, D.", mdvs7.get(0).getValue());
+        assertEquals(0, mdvs7.get(0).getPlace());
+
+        assertTrue(mdvs7.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("Doe, J.", mdvs7.get(1).getValue());
+        assertEquals(1, mdvs7.get(1).getPlace());
+
+        /////////////////////////////////////
+        // archive new version of person 2 //
+        /////////////////////////////////////
+
+        installItemService.installItem(context, workspaceItemService.findByItem(context, person2V2));
+        context.dispatchEvents();
+
+        ///////////////////
+        // cache busting //
+        ///////////////////
+
+        publication1V1.setMetadataModified();
+        publication1V1 = context.reloadEntity(publication1V1);
+
+        publication1V2.setMetadataModified();
+        publication1V2 = context.reloadEntity(publication1V2);
+
+        ///////////////////////////////////////////////////
+        // test dc.contributor.author of old publication //
+        ///////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, publication1V1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(publication1V1, isAuthorOfPublication, person1V1, RIGHT_ONLY, 0, 0),
+                isRel(publication1V1, isAuthorOfPublication, person2V1, RIGHT_ONLY, null, "Doe, J.", 1, 0)
+            ))
+        );
+
+        List<MetadataValue> mdvs8 = itemService.getMetadata(
+            publication1V1, "dc", "contributor", "author", Item.ANY
+        );
+        assertEquals(2, mdvs8.size());
+
+        assertTrue(mdvs8.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("Smith, Donald", mdvs8.get(0).getValue());
+        assertEquals(0, mdvs8.get(0).getPlace());
+
+        assertTrue(mdvs8.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("Doe, J.", mdvs8.get(1).getValue());
+        assertEquals(1, mdvs8.get(1).getPlace());
+
+        ///////////////////////////////////////////////////
+        // test dc.contributor.author of new publication //
+        ///////////////////////////////////////////////////
+
+        assertThat(
+            relationshipService.findByItem(context, publication1V2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(publication1V2, isAuthorOfPublication, person1V1, LEFT_ONLY, 0, 0),
+                isRel(publication1V2, isAuthorOfPublication, person1V2, BOTH, 0, 0),
+                isRel(publication1V2, isAuthorOfPublication, person2V1, LEFT_ONLY, null, "Doe, J.", 1, 0),
+                isRel(publication1V2, isAuthorOfPublication, person2V2, BOTH, null, "Doe, Jane Jr", 1, 0)
+            ))
+        );
+
+        List<MetadataValue> mdvs9 = itemService.getMetadata(
+            publication1V2, "dc", "contributor", "author", Item.ANY
+        );
+        assertEquals(2, mdvs9.size());
+
+        assertTrue(mdvs9.get(0) instanceof RelationshipMetadataValue);
+        assertEquals("Smith, D.", mdvs9.get(0).getValue());
+        assertEquals(0, mdvs9.get(0).getPlace());
+
+        assertTrue(mdvs9.get(1) instanceof RelationshipMetadataValue);
+        assertEquals("Doe, Jane Jr", mdvs9.get(1).getValue());
+        assertEquals(1, mdvs9.get(1).getPlace());
     }
 
     // TODO
