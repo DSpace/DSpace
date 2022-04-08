@@ -8,6 +8,9 @@
 package org.dspace.content;
 
 import static org.dspace.content.Relationship.LatestVersionStatus;
+import static org.dspace.content.Relationship.LatestVersionStatus.BOTH;
+import static org.dspace.content.Relationship.LatestVersionStatus.LEFT_ONLY;
+import static org.dspace.content.Relationship.LatestVersionStatus.RIGHT_ONLY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -258,30 +261,30 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
+                isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0),
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, person1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
@@ -300,39 +303,39 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
+                isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0),
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, person1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, project1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, newPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(newPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY, 0, 0)
+                isRel(newPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
+                isRel(newPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0),
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit1, RIGHT_ONLY, 0, 0)
             ))
         );
 
@@ -343,42 +346,42 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
+                isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0),
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, person1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
+                isRel(newPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(newPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY, 0, 0)
+                isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0),
+                isRel(newPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY, 0, 0)
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0),
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit1, RIGHT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, newPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(newPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY, 0, 0)
+                isRel(newPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
+                isRel(newPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0),
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit1, RIGHT_ONLY, 0, 0)
             ))
         );
 
@@ -397,39 +400,39 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
+                isRel(originalPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0),
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, RIGHT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, person1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, project1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(newPublication, isProjectOfPublication, project1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, newPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(newPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
+                isRel(newPublication, isProjectOfPublication, project1, BOTH, 0, 0),
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
@@ -440,42 +443,42 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
+                isRel(originalPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0),
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, RIGHT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, person1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
+                isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(newPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0),
+                isRel(newPublication, isProjectOfPublication, project1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, RIGHT_ONLY, 0, 0),
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, newPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(newPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
+                isRel(newPublication, isProjectOfPublication, project1, BOTH, 0, 0),
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
@@ -534,30 +537,30 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
+                isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0),
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, person1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
@@ -608,16 +611,16 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
+                isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0),
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, person1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
             ))
         );
 
@@ -625,21 +628,21 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
             relationshipService.findByItem(context, person2, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 // NOTE: BOTH because new relationship
-                isRel(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH, 1, 0)
+                isRel(newPublication, isAuthorOfPublication, person2, BOTH, 1, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, project1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
@@ -647,17 +650,17 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
             relationshipService.findByItem(context, orgUnit2, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 // NOTE: BOTH because new relationship
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH, 0, 0)
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, newPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
+                isRel(newPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
                 // NOTE: BOTH because new relationship
-                isRel(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH, 1, 0),
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH, 0, 0)
+                isRel(newPublication, isAuthorOfPublication, person2, BOTH, 1, 0),
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, BOTH, 0, 0)
             ))
         );
 
@@ -668,17 +671,17 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
+                isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0),
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, person1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
+                isRel(newPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0)
             ))
         );
 
@@ -686,21 +689,21 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
             relationshipService.findByItem(context, person2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 // NOTE: BOTH because new relationship
-                isRel(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH, 1, 0)
+                isRel(newPublication, isAuthorOfPublication, person2, BOTH, 1, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
@@ -708,17 +711,17 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
             relationshipService.findByItem(context, orgUnit2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 // NOTE: BOTH because new relationship
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH, 0, 0)
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, newPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
+                isRel(newPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
                 // NOTE: BOTH because new relationship
-                isRel(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH, 1, 0),
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH, 0, 0)
+                isRel(newPublication, isAuthorOfPublication, person2, BOTH, 1, 0),
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, BOTH, 0, 0)
             ))
         );
 
@@ -737,23 +740,23 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
+                isRel(originalPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0),
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, RIGHT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, person1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, person2, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH, 1, 0)
+                isRel(newPublication, isAuthorOfPublication, person2, BOTH, 1, 0)
             ))
         );
 
@@ -770,16 +773,16 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, orgUnit2, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH, 0, 0)
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, newPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH, 1, 0),
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH, 0, 0)
+                isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
+                isRel(newPublication, isAuthorOfPublication, person2, BOTH, 1, 0),
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, BOTH, 0, 0)
             ))
         );
 
@@ -790,54 +793,54 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
+                isRel(originalPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0),
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, RIGHT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, person1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isAuthorOfPublication, person1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0)
+                isRel(originalPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
+                isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, person2, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH, 1, 0)
+                isRel(newPublication, isAuthorOfPublication, person2, BOTH, 1, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isProjectOfPublication, project1, LatestVersionStatus.RIGHT_ONLY, 0, 0)
+                isRel(originalPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, LatestVersionStatus.RIGHT_ONLY, 0, 0)
+                isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, RIGHT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit2, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH, 0, 0)
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, newPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(newPublication, isAuthorOfPublication, person1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(newPublication, isAuthorOfPublication, person2, LatestVersionStatus.BOTH, 1, 0),
-                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, LatestVersionStatus.BOTH, 0, 0)
+                isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
+                isRel(newPublication, isAuthorOfPublication, person2, BOTH, 1, 0),
+                isRel(newPublication, isOrgUnitOfPublication, orgUnit2, BOTH, 0, 0)
             ))
         );
 
@@ -894,30 +897,30 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPerson, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(publication1, isAuthorOfPublication, originalPerson, LatestVersionStatus.BOTH, 0, 0),
-                isRel(project1, isMemberOfProject, originalPerson, LatestVersionStatus.BOTH, 0, 0),
-                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(publication1, isAuthorOfPublication, originalPerson, BOTH, 0, 0),
+                isRel(project1, isMemberOfProject, originalPerson, BOTH, 0, 0),
+                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, publication1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(publication1, isAuthorOfPublication, originalPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(publication1, isAuthorOfPublication, originalPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(project1, isMemberOfProject, originalPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(project1, isMemberOfProject, originalPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, BOTH, 0, 0)
             ))
         );
 
@@ -936,39 +939,39 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPerson, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(publication1, isAuthorOfPublication, originalPerson, LatestVersionStatus.BOTH, 0, 0),
-                isRel(project1, isMemberOfProject, originalPerson, LatestVersionStatus.BOTH, 0, 0),
-                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(publication1, isAuthorOfPublication, originalPerson, BOTH, 0, 0),
+                isRel(project1, isMemberOfProject, originalPerson, BOTH, 0, 0),
+                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, publication1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(publication1, isAuthorOfPublication, originalPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(publication1, isAuthorOfPublication, originalPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, project1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(project1, isMemberOfProject, originalPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(project1, isMemberOfProject, originalPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, newPerson, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(publication1, isAuthorOfPublication, newPerson, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                isRel(project1, isMemberOfProject, newPerson, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                isRel(orgUnit1, isMemberOfOrgUnit, newPerson, LatestVersionStatus.LEFT_ONLY, 0, 0)
+                isRel(publication1, isAuthorOfPublication, newPerson, LEFT_ONLY, 0, 0),
+                isRel(project1, isMemberOfProject, newPerson, LEFT_ONLY, 0, 0),
+                isRel(orgUnit1, isMemberOfOrgUnit, newPerson, LEFT_ONLY, 0, 0)
             ))
         );
 
@@ -979,42 +982,42 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPerson, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(publication1, isAuthorOfPublication, originalPerson, LatestVersionStatus.BOTH, 0, 0),
-                isRel(project1, isMemberOfProject, originalPerson, LatestVersionStatus.BOTH, 0, 0),
-                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(publication1, isAuthorOfPublication, originalPerson, BOTH, 0, 0),
+                isRel(project1, isMemberOfProject, originalPerson, BOTH, 0, 0),
+                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, publication1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(publication1, isAuthorOfPublication, originalPerson, LatestVersionStatus.BOTH, 0, 0),
-                isRel(publication1, isAuthorOfPublication, newPerson, LatestVersionStatus.LEFT_ONLY, 0, 0)
+                isRel(publication1, isAuthorOfPublication, originalPerson, BOTH, 0, 0),
+                isRel(publication1, isAuthorOfPublication, newPerson, LEFT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(project1, isMemberOfProject, originalPerson, LatestVersionStatus.BOTH, 0, 0),
-                isRel(project1, isMemberOfProject, newPerson, LatestVersionStatus.LEFT_ONLY, 0, 0)
+                isRel(project1, isMemberOfProject, originalPerson, BOTH, 0, 0),
+                isRel(project1, isMemberOfProject, newPerson, LEFT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, LatestVersionStatus.BOTH, 0, 0),
-                isRel(orgUnit1, isMemberOfOrgUnit, newPerson, LatestVersionStatus.LEFT_ONLY, 0, 0)
+                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, BOTH, 0, 0),
+                isRel(orgUnit1, isMemberOfOrgUnit, newPerson, LEFT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, newPerson, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(publication1, isAuthorOfPublication, newPerson, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                isRel(project1, isMemberOfProject, newPerson, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                isRel(orgUnit1, isMemberOfOrgUnit, newPerson, LatestVersionStatus.LEFT_ONLY, 0, 0)
+                isRel(publication1, isAuthorOfPublication, newPerson, LEFT_ONLY, 0, 0),
+                isRel(project1, isMemberOfProject, newPerson, LEFT_ONLY, 0, 0),
+                isRel(orgUnit1, isMemberOfOrgUnit, newPerson, LEFT_ONLY, 0, 0)
             ))
         );
 
@@ -1033,39 +1036,39 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPerson, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(publication1, isAuthorOfPublication, originalPerson, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                isRel(project1, isMemberOfProject, originalPerson, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, LatestVersionStatus.LEFT_ONLY, 0, 0)
+                isRel(publication1, isAuthorOfPublication, originalPerson, LEFT_ONLY, 0, 0),
+                isRel(project1, isMemberOfProject, originalPerson, LEFT_ONLY, 0, 0),
+                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, LEFT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, publication1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(publication1, isAuthorOfPublication, newPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(publication1, isAuthorOfPublication, newPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, project1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(project1, isMemberOfProject, newPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(project1, isMemberOfProject, newPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(orgUnit1, isMemberOfOrgUnit, newPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(orgUnit1, isMemberOfOrgUnit, newPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, newPerson, -1, -1, false, true),
             containsInAnyOrder(List.of(
-                isRel(publication1, isAuthorOfPublication, newPerson, LatestVersionStatus.BOTH, 0, 0),
-                isRel(project1, isMemberOfProject, newPerson, LatestVersionStatus.BOTH, 0, 0),
-                isRel(orgUnit1, isMemberOfOrgUnit, newPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(publication1, isAuthorOfPublication, newPerson, BOTH, 0, 0),
+                isRel(project1, isMemberOfProject, newPerson, BOTH, 0, 0),
+                isRel(orgUnit1, isMemberOfOrgUnit, newPerson, BOTH, 0, 0)
             ))
         );
 
@@ -1076,42 +1079,42 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, originalPerson, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(publication1, isAuthorOfPublication, originalPerson, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                isRel(project1, isMemberOfProject, originalPerson, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, LatestVersionStatus.LEFT_ONLY, 0, 0)
+                isRel(publication1, isAuthorOfPublication, originalPerson, LEFT_ONLY, 0, 0),
+                isRel(project1, isMemberOfProject, originalPerson, LEFT_ONLY, 0, 0),
+                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, LEFT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, publication1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(publication1, isAuthorOfPublication, originalPerson, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                isRel(publication1, isAuthorOfPublication, newPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(publication1, isAuthorOfPublication, originalPerson, LEFT_ONLY, 0, 0),
+                isRel(publication1, isAuthorOfPublication, newPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(project1, isMemberOfProject, originalPerson, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                isRel(project1, isMemberOfProject, newPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(project1, isMemberOfProject, originalPerson, LEFT_ONLY, 0, 0),
+                isRel(project1, isMemberOfProject, newPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                isRel(orgUnit1, isMemberOfOrgUnit, newPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, LEFT_ONLY, 0, 0),
+                isRel(orgUnit1, isMemberOfOrgUnit, newPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
             relationshipService.findByItem(context, newPerson, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(publication1, isAuthorOfPublication, newPerson, LatestVersionStatus.BOTH, 0, 0),
-                isRel(project1, isMemberOfProject, newPerson, LatestVersionStatus.BOTH, 0, 0),
-                isRel(orgUnit1, isMemberOfOrgUnit, newPerson, LatestVersionStatus.BOTH, 0, 0)
+                isRel(publication1, isAuthorOfPublication, newPerson, BOTH, 0, 0),
+                isRel(project1, isMemberOfProject, newPerson, BOTH, 0, 0),
+                isRel(orgUnit1, isMemberOfOrgUnit, newPerson, BOTH, 0, 0)
             ))
         );
 
@@ -1435,7 +1438,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
 
         AtomicInteger counterOriginalPublication = new AtomicInteger();
         List<Matcher<Object>> listOriginalPublication = projects.stream().map(
-                project -> isRel(originalPublication, isProjectOfPublication, project, LatestVersionStatus.BOTH,
+                project -> isRel(originalPublication, isProjectOfPublication, project, BOTH,
                         counterOriginalPublication.getAndIncrement(), 0)
         ).collect(Collectors.toCollection(ArrayList::new));
 
@@ -1568,7 +1571,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         AtomicInteger counterOriginalPublication = new AtomicInteger();
         List<Matcher<Object>> listOriginalPublication = originalProjects.stream().map(
                 project -> isRel(originalPublication, isProjectOfPublication, project,
-                        newPublicationArchived ? LatestVersionStatus.RIGHT_ONLY : LatestVersionStatus.BOTH,
+                        newPublicationArchived ? RIGHT_ONLY : BOTH,
                         counterOriginalPublication.getAndIncrement(), 0)
         ).collect(Collectors.toCollection(ArrayList::new));
 
@@ -1576,7 +1579,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         List<Matcher<Object>> listNewPublication = newProjects.stream().map(
                 project -> isRel(newPublication, isProjectOfPublication, project,
                         newPublicationArchived || !originalProjects.contains(project) ?
-                                LatestVersionStatus.BOTH : LatestVersionStatus.RIGHT_ONLY,
+                                BOTH : RIGHT_ONLY,
                         counterNewPublication.getAndIncrement(), 0)
         ).collect(Collectors.toCollection(ArrayList::new));
 
@@ -1870,9 +1873,9 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, v3_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v3_1, isIssueOfJournalVolume, i1_1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(v3_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.RIGHT_ONLY, 2, 2),
-                isRel(v3_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.RIGHT_ONLY, 4, 2)
+                isRel(v3_1, isIssueOfJournalVolume, i1_1, RIGHT_ONLY, 0, 0),
+                isRel(v3_1, isIssueOfJournalVolume, i3_1, RIGHT_ONLY, 2, 2),
+                isRel(v3_1, isIssueOfJournalVolume, i5_1, RIGHT_ONLY, 4, 2)
             ))
         );
 
@@ -1912,10 +1915,10 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, i3_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v1_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                isRel(v3_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.RIGHT_ONLY, 2, 2),
-                isRel(v5_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 0, 4),
-                isRel(v3_2, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 2, 2)
+                isRel(v1_1, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 0, 0),
+                isRel(v3_1, isIssueOfJournalVolume, i3_1, RIGHT_ONLY, 2, 2),
+                isRel(v5_1, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 0, 4),
+                isRel(v3_2, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 2, 2)
             ))
         );
 
@@ -1955,9 +1958,9 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, i5_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v5_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 1, 1),
-                isRel(v3_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.RIGHT_ONLY, 4, 2),
-                isRel(v3_2, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 4, 2)
+                isRel(v5_1, isIssueOfJournalVolume, i5_1, BOTH, 1, 1),
+                isRel(v3_1, isIssueOfJournalVolume, i5_1, RIGHT_ONLY, 4, 2),
+                isRel(v3_2, isIssueOfJournalVolume, i5_1, BOTH, 4, 2)
             ))
         );
 
@@ -1985,10 +1988,10 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, v3_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v3_2, isIssueOfJournalVolume, i1_1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(v3_2, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 2, 2),
-                isRel(v3_2, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 4, 2),
-                isRel(v3_2, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 2, 2)
+                isRel(v3_2, isIssueOfJournalVolume, i1_1, BOTH, 0, 0),
+                isRel(v3_2, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 2, 2),
+                isRel(v3_2, isIssueOfJournalVolume, i5_1, BOTH, 4, 2),
+                isRel(v3_2, isIssueOfJournalVolume, i3_2, BOTH, 2, 2)
             ))
         );
 
@@ -2028,9 +2031,9 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, i3_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v1_1, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 0, 0),
-                isRel(v5_1, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 0, 4),
-                isRel(v3_2, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 2, 2)
+                isRel(v1_1, isIssueOfJournalVolume, i3_2, BOTH, 0, 0),
+                isRel(v5_1, isIssueOfJournalVolume, i3_2, BOTH, 0, 4),
+                isRel(v3_2, isIssueOfJournalVolume, i3_2, BOTH, 2, 2)
             ))
         );
 
@@ -2090,9 +2093,9 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, v3_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v3_1, isIssueOfJournalVolume, i1_1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(v3_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.RIGHT_ONLY, 2, 2),
-                isRel(v3_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.RIGHT_ONLY, 4, 2)
+                isRel(v3_1, isIssueOfJournalVolume, i1_1, RIGHT_ONLY, 0, 0),
+                isRel(v3_1, isIssueOfJournalVolume, i3_1, RIGHT_ONLY, 2, 2),
+                isRel(v3_1, isIssueOfJournalVolume, i5_1, RIGHT_ONLY, 4, 2)
             ))
         );
 
@@ -2132,10 +2135,10 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, i3_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v1_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                isRel(v3_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.RIGHT_ONLY, 2, 2),
-                isRel(v5_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 0, 4),
-                isRel(v3_2, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 2, 2)
+                isRel(v1_1, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 0, 0),
+                isRel(v3_1, isIssueOfJournalVolume, i3_1, RIGHT_ONLY, 2, 2),
+                isRel(v5_1, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 0, 4),
+                isRel(v3_2, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 2, 2)
             ))
         );
 
@@ -2175,10 +2178,10 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, i5_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v5_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 1, 1),
-                isRel(v3_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.RIGHT_ONLY, 4, 2),
+                isRel(v5_1, isIssueOfJournalVolume, i5_1, BOTH, 1, 1),
+                isRel(v3_1, isIssueOfJournalVolume, i5_1, RIGHT_ONLY, 4, 2),
                 // NOTE: left place was reduced by one
-                isRel(v3_2, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 3, 2)
+                isRel(v3_2, isIssueOfJournalVolume, i5_1, BOTH, 3, 2)
             ))
         );
 
@@ -2206,10 +2209,10 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, v3_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v3_2, isIssueOfJournalVolume, i1_1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(v3_2, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 2, 2),
+                isRel(v3_2, isIssueOfJournalVolume, i1_1, BOTH, 0, 0),
+                isRel(v3_2, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 2, 2),
                 // NOTE: left place was reduced by one
-                isRel(v3_2, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 3, 2)
+                isRel(v3_2, isIssueOfJournalVolume, i5_1, BOTH, 3, 2)
             ))
         );
 
@@ -2245,9 +2248,9 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, i3_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v1_1, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 0, 0),
+                isRel(v1_1, isIssueOfJournalVolume, i3_2, BOTH, 0, 0),
                 // NOTE: right place was reduced by one
-                isRel(v5_1, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 0, 3)
+                isRel(v5_1, isIssueOfJournalVolume, i3_2, BOTH, 0, 3)
             ))
         );
 
@@ -2305,9 +2308,9 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, v3_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v3_1, isIssueOfJournalVolume, i1_1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                isRel(v3_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.RIGHT_ONLY, 2, 2),
-                isRel(v3_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.RIGHT_ONLY, 4, 2)
+                isRel(v3_1, isIssueOfJournalVolume, i1_1, RIGHT_ONLY, 0, 0),
+                isRel(v3_1, isIssueOfJournalVolume, i3_1, RIGHT_ONLY, 2, 2),
+                isRel(v3_1, isIssueOfJournalVolume, i5_1, RIGHT_ONLY, 4, 2)
             ))
         );
 
@@ -2347,10 +2350,10 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, i3_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v1_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                isRel(v3_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.RIGHT_ONLY, 2, 2),
-                isRel(v5_1, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 0, 4),
-                isRel(v3_2, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 2, 2)
+                isRel(v1_1, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 0, 0),
+                isRel(v3_1, isIssueOfJournalVolume, i3_1, RIGHT_ONLY, 2, 2),
+                isRel(v5_1, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 0, 4),
+                isRel(v3_2, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 2, 2)
             ))
         );
 
@@ -2390,11 +2393,11 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, i5_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v5_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 1, 1),
-                isRel(v3_1, isIssueOfJournalVolume, i5_1, LatestVersionStatus.RIGHT_ONLY, 4, 2),
+                isRel(v5_1, isIssueOfJournalVolume, i5_1, BOTH, 1, 1),
+                isRel(v3_1, isIssueOfJournalVolume, i5_1, RIGHT_ONLY, 4, 2),
                 // NOTE: left place was reduced by one
                 // TODO left place is 3 but expected 2
-                isRel(v3_2, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 2, 2)
+                isRel(v3_2, isIssueOfJournalVolume, i5_1, BOTH, 2, 2)
             ))
         );// TODO continue verify test cases below here
 
@@ -2422,10 +2425,10 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, v3_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v3_2, isIssueOfJournalVolume, i1_1, LatestVersionStatus.BOTH, 0, 0),
-                isRel(v3_2, isIssueOfJournalVolume, i3_1, LatestVersionStatus.LEFT_ONLY, 2, 2),
+                isRel(v3_2, isIssueOfJournalVolume, i1_1, BOTH, 0, 0),
+                isRel(v3_2, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 2, 2),
                 // NOTE: left place was reduced by one
-                isRel(v3_2, isIssueOfJournalVolume, i5_1, LatestVersionStatus.BOTH, 3, 2)
+                isRel(v3_2, isIssueOfJournalVolume, i5_1, BOTH, 3, 2)
             ))
         );
 
@@ -2461,9 +2464,9 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
             relationshipService.findByItem(context, i3_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
-                isRel(v1_1, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 0, 0),
+                isRel(v1_1, isIssueOfJournalVolume, i3_2, BOTH, 0, 0),
                 // NOTE: right place was reduced by one
-                isRel(v5_1, isIssueOfJournalVolume, i3_2, LatestVersionStatus.BOTH, 0, 3)
+                isRel(v5_1, isIssueOfJournalVolume, i3_2, BOTH, 0, 3)
             ))
         );
 
@@ -2505,7 +2508,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
     }
 
     @Test
-    public void test_virtualMetadataPreserved() throws Exception { // TODO
+    public void test_virtualMetadataPreserved() throws Exception {
         //////////////////////////////////////////////
         // create a publication and link two people //
         //////////////////////////////////////////////
@@ -2587,8 +2590,8 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
                 relationshipService.findByItem(context, publication1V1, -1, -1, false, false),
                 containsInAnyOrder(List.of(
-                        isRel(publication1V1, isAuthorOfPublication, person1V1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                        isRel(publication1V1, isAuthorOfPublication, person2V1, LatestVersionStatus.RIGHT_ONLY,
+                        isRel(publication1V1, isAuthorOfPublication, person1V1, RIGHT_ONLY, 0, 0),
+                        isRel(publication1V1, isAuthorOfPublication, person2V1, RIGHT_ONLY,
                                 null, "Doe, J.", 1, 0)
                 ))
         );
@@ -2613,9 +2616,9 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
                 relationshipService.findByItem(context, publication1V2, -1, -1, false, false),
                 containsInAnyOrder(List.of(
-                        isRel(publication1V2, isAuthorOfPublication, person1V1, LatestVersionStatus.BOTH, 0, 0),
-                        isRel(publication1V2, isAuthorOfPublication, person1V2, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                        isRel(publication1V2, isAuthorOfPublication, person2V1, LatestVersionStatus.BOTH,
+                        isRel(publication1V2, isAuthorOfPublication, person1V1, BOTH, 0, 0),
+                        isRel(publication1V2, isAuthorOfPublication, person1V2, LEFT_ONLY, 0, 0),
+                        isRel(publication1V2, isAuthorOfPublication, person2V1, BOTH,
                                 null, "Doe, J.", 1, 0)
                 ))
         );
@@ -2638,8 +2641,8 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
                 relationshipService.findByItem(context, publication1V1, -1, -1, false, false),
                 containsInAnyOrder(List.of(
-                        isRel(publication1V1, isAuthorOfPublication, person1V1, LatestVersionStatus.RIGHT_ONLY, 0, 0),
-                        isRel(publication1V1, isAuthorOfPublication, person2V1, LatestVersionStatus.RIGHT_ONLY,
+                        isRel(publication1V1, isAuthorOfPublication, person1V1, RIGHT_ONLY, 0, 0),
+                        isRel(publication1V1, isAuthorOfPublication, person2V1, RIGHT_ONLY,
                                 null, "Doe, J.", 1, 0)
                 ))
         );
@@ -2669,9 +2672,9 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertThat(
                 relationshipService.findByItem(context, publication1V2, -1, -1, false, false),
                 containsInAnyOrder(List.of(
-                        isRel(publication1V2, isAuthorOfPublication, person1V1, LatestVersionStatus.LEFT_ONLY, 0, 0),
-                        isRel(publication1V2, isAuthorOfPublication, person1V2, LatestVersionStatus.BOTH, 0, 0),
-                        isRel(publication1V2, isAuthorOfPublication, person2V1, LatestVersionStatus.BOTH,
+                        isRel(publication1V2, isAuthorOfPublication, person1V1, LEFT_ONLY, 0, 0),
+                        isRel(publication1V2, isAuthorOfPublication, person1V2, BOTH, 0, 0),
+                        isRel(publication1V2, isAuthorOfPublication, person2V1, BOTH,
                                 null, "Doe, J.", 1, 0)
                 ))
         );
