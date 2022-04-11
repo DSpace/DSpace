@@ -13,8 +13,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -284,8 +284,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             String token = getAuthToken(admin.getEmail(), password);
 
             getClient(token)
-                .perform(fileUpload("/api/system/scripts/metadata-import/processes").file(bitstreamFile)
-                                                                                    .param("properties",
+                .perform(multipart("/api/system/scripts/metadata-import/processes").file(bitstreamFile)
+                                                                                   .param("properties",
                                                                                            new Gson().toJson(list)))
                 .andExpect(status().isAccepted())
                 .andDo(result -> idRef
@@ -344,7 +344,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             String token = getAuthToken(admin.getEmail(), password);
 
             getClient(token)
-                .perform(fileUpload("/api/system/scripts/metadata-import/processes").file(bitstreamFile)
+                .perform(multipart("/api/system/scripts/metadata-import/processes").file(bitstreamFile)
                                                                                     .param("properties",
                                                                                            new Gson().toJson(list)))
                 .andExpect(status().isAccepted())

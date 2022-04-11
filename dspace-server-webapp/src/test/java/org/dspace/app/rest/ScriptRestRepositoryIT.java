@@ -12,8 +12,8 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -211,29 +211,26 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void postProcessNonAdminAuthorizeException() throws Exception {
-
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data"))
+        getClient(token).perform(multipart("/api/system/scripts/mock-script/processes"))
                         .andExpect(status().isForbidden());
     }
 
     @Test
     public void postProcessAnonymousAuthorizeException() throws Exception {
-        getClient().perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data"))
+        getClient().perform(multipart("/api/system/scripts/mock-script/processes"))
                    .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void postProcessAdminWrongOptionsException() throws Exception {
-
-
         String token = getAuthToken(admin.getEmail(), password);
         AtomicReference<Integer> idRef = new AtomicReference<>();
 
         try {
             getClient(token)
-                    .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data"))
+                    .perform(multipart("/api/system/scripts/mock-script/processes"))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -277,9 +274,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         try {
             getClient(token)
-                    .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data")
-                                                                              .param("properties",
-                                                                                     new Gson().toJson(list)))
+                    .perform(multipart("/api/system/scripts/mock-script/processes")
+                                 .param("properties", new Gson().toJson(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -296,8 +292,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void postProcessNonExistingScriptNameException() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(post("/api/system/scripts/mock-script-invalid/processes")
-                                         .contentType("multipart/form-data"))
+        getClient(token).perform(multipart("/api/system/scripts/mock-script-invalid/processes"))
                         .andExpect(status().isBadRequest());
     }
 
@@ -323,9 +318,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         try {
             getClient(token)
-                    .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data")
-                                                                              .param("properties",
-                                                                                     new Gson().toJson(list)))
+                    .perform(multipart("/api/system/scripts/mock-script/processes")
+                                 .param("properties", new Gson().toJson(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -361,9 +355,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         try {
             getClient(token)
-                    .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data")
-                                                                              .param("properties",
-                                                                                     new Gson().toJson(list)))
+                    .perform(multipart("/api/system/scripts/mock-script/processes")
+                                 .param("properties", new Gson().toJson(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -468,9 +461,10 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         try {
             getClient(token)
-                    .perform(fileUpload("/api/system/scripts/mock-script/processes").file(bitstreamFile)
-                                                                                    .param("properties",
-                                                                                           new Gson().toJson(list)))
+                    .perform(multipart("/api/system/scripts/mock-script/processes")
+                                 .file(bitstreamFile)
+                                 .characterEncoding("UTF-8")
+                                 .param("properties", new Gson().toJson(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
