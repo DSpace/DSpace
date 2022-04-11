@@ -26,7 +26,7 @@ public class ManifestsCacheEvictService {
     CacheManager cacheManager;
 
     public void evictSingleCacheValue(String cacheKey) {
-        Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).evict(cacheKey);
+        Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).evictIfPresent(cacheKey);
     }
 
     public void evictAllCacheValues() {
