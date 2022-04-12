@@ -21,7 +21,6 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
-import org.dspace.content.Relationship.LatestVersionStatus;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.EntityTypeService;
@@ -234,7 +233,8 @@ public class VersioningConsumer implements Consumer {
                     // Set the previous version of the item to non-latest. This implies that the previous version
                     // of the item will not be shown anymore on the page of the third-party item. That makes sense,
                     // because either the relationship has been deleted from the new version of the item (no match),
-                    // or the matching relationship (linked to new version) will receive "latest" status in the next step.
+                    // or the matching relationship (linked to new version) will receive "latest" status in
+                    // the next step.
                     relationshipVersioningUtils.updateLatestVersionStatus(previousItemRelationship, isLeft, false);
                 }
 
