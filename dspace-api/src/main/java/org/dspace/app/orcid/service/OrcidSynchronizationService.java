@@ -10,6 +10,7 @@ package org.dspace.app.orcid.service;
 import java.sql.SQLException;
 
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
+import org.dspace.app.profile.OrcidProfileDisconnectionMode;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -33,4 +34,20 @@ public interface OrcidSynchronizationService {
      */
     public void linkProfile(Context context, Item profile, OrcidTokenResponseDTO token) throws SQLException;
 
+    /**
+     * Disconnect the given profile from ORCID.
+     *
+     * @param  context      the relevant DSpace Context.
+     * @param  profile      the profile to disconnect
+     * @throws SQLException if a SQL error occurs during the profile update
+     */
+    public void unlinkProfile(Context context, Item profile) throws SQLException;
+
+    /**
+     * Returns the configuration ORCID profile's disconnection mode. If that mode is
+     * not configured or the configuration is wrong, the value DISABLED is returned.
+     *
+     * @return the disconnection mode
+     */
+    OrcidProfileDisconnectionMode getDisconnectionMode();
 }

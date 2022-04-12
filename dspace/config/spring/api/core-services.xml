@@ -65,6 +65,8 @@
 
     <bean class="org.dspace.app.profile.ResearcherProfileServiceImpl"/>
 
+    <bean class="org.dspace.app.profile.OrcidMetadataCopyingAction"/>
+
     <bean class='org.dspace.service.impl.HttpConnectionPoolService'
           id='solrHttpConnectionPoolService'
           scope='singleton'

@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.profile.OrcidProfileDisconnectionMode;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -73,6 +74,27 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
         updateItem(context, profile);
 
+    }
+
+    @Override
+    public void unlinkProfile(Context context, Item profile) throws SQLException {
+
+        itemService.clearMetadata(context, profile, "person", "identifier", "orcid", Item.ANY);
+        itemService.clearMetadata(context, profile, "dspace", "orcid", "access-token", Item.ANY);
+        itemService.clearMetadata(context, profile, "dspace", "orcid", "refresh-token", Item.ANY);
+        itemService.clearMetadata(context, profile, "dspace", "orcid", "scope", Item.ANY);
+        itemService.clearMetadata(context, profile, "dspace", "orcid", "authenticated", Item.ANY);
+        updateItem(context, profile);
+
+    }
+
+    @Override
+    public OrcidProfileDisconnectionMode getDisconnectionMode() {
+        String value = configurationService.getProperty("orcid.disconnection.allowed-users");
+        if (!OrcidProfileDisconnectionMode.isValid(value)) {
+            return OrcidProfileDisconnectionMode.DISABLED;
+        }
+        return OrcidProfileDisconnectionMode.fromString(value);
     }
 
     private Stream<MetadataValue> getMetadataValues(Item item, String metadataField) {
