@@ -2556,6 +2556,23 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("Doe, J.", mdvs1.get(1).getValue());
         assertEquals(1, mdvs1.get(1).getPlace());
 
+        ////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication of publication //
+        ////////////////////////////////////////////////////////
+
+        List<MetadataValue> mdvsR1 = itemService.getMetadata(
+            publication1V1, "relation", "isAuthorOfPublication", null, Item.ANY
+        );
+        assertEquals(2, mdvsR1.size());
+
+        assertTrue(mdvsR1.get(0) instanceof RelationshipMetadataValue);
+        assertEquals(person1V1.getID().toString(), mdvsR1.get(0).getValue());
+        assertEquals(0, mdvsR1.get(0).getPlace());
+
+        assertTrue(mdvsR1.get(1) instanceof RelationshipMetadataValue);
+        assertEquals(person2V1.getID().toString(), mdvsR1.get(1).getValue());
+        assertEquals(1, mdvsR1.get(1).getPlace());
+
         ///////////////////////////////////////////////////////
         // create a new version of publication 1 and archive //
         ///////////////////////////////////////////////////////
@@ -2611,6 +2628,23 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("Doe, J.", mdvs2.get(1).getValue());
         assertEquals(1, mdvs2.get(1).getPlace());
 
+        ////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication of old publication //
+        ////////////////////////////////////////////////////////////
+
+        List<MetadataValue> mdvsR2 = itemService.getMetadata(
+            publication1V1, "relation", "isAuthorOfPublication", null, Item.ANY
+        );
+        assertEquals(2, mdvsR2.size());
+
+        assertTrue(mdvsR2.get(0) instanceof RelationshipMetadataValue);
+        assertEquals(person1V1.getID().toString(), mdvsR2.get(0).getValue());
+        assertEquals(0, mdvsR2.get(0).getPlace());
+
+        assertTrue(mdvsR2.get(1) instanceof RelationshipMetadataValue);
+        assertEquals(person2V1.getID().toString(), mdvsR2.get(1).getValue());
+        assertEquals(1, mdvsR2.get(1).getPlace());
+
         ///////////////////////////////////////////////////
         // test dc.contributor.author of new publication //
         ///////////////////////////////////////////////////
@@ -2636,6 +2670,23 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertTrue(mdvs3.get(1) instanceof RelationshipMetadataValue);
         assertEquals("Doe, J.", mdvs3.get(1).getValue());
         assertEquals(1, mdvs3.get(1).getPlace());
+
+        ////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication of new publication //
+        ////////////////////////////////////////////////////////////
+
+        List<MetadataValue> mdvsR3 = itemService.getMetadata(
+            publication1V2, "relation", "isAuthorOfPublication", null, Item.ANY
+        );
+        assertEquals(2, mdvsR3.size());// TODO expect 3
+
+        assertTrue(mdvsR3.get(0) instanceof RelationshipMetadataValue);
+        assertEquals(person1V1.getID().toString(), mdvsR3.get(0).getValue());
+        assertEquals(0, mdvsR3.get(0).getPlace());
+
+        assertTrue(mdvsR3.get(1) instanceof RelationshipMetadataValue);
+        assertEquals(person2V1.getID().toString(), mdvsR3.get(1).getValue());
+        assertEquals(1, mdvsR3.get(1).getPlace());
 
         /////////////////////////////////////
         // archive new version of person 1 //
@@ -2679,6 +2730,12 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("Doe, J.", mdvs4.get(1).getValue());
         assertEquals(1, mdvs4.get(1).getPlace());
 
+        ////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication of old publication //
+        ////////////////////////////////////////////////////////////
+
+        // TODO
+
         ///////////////////////////////////////////////////
         // test dc.contributor.author of new publication //
         ///////////////////////////////////////////////////
@@ -2704,6 +2761,12 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertTrue(mdvs5.get(1) instanceof RelationshipMetadataValue);
         assertEquals("Doe, J.", mdvs5.get(1).getValue());
         assertEquals(1, mdvs5.get(1).getPlace());
+
+        ////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication of new publication //
+        ////////////////////////////////////////////////////////////
+
+        // TODO
 
         ////////////////////////////////////
         // create new version of person 2 //
@@ -2750,6 +2813,12 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("Doe, J.", mdvs6.get(1).getValue());
         assertEquals(1, mdvs6.get(1).getPlace());
 
+        ////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication of old publication //
+        ////////////////////////////////////////////////////////////
+
+        // TODO
+
         ///////////////////////////////////////////////////
         // test dc.contributor.author of new publication //
         ///////////////////////////////////////////////////
@@ -2776,6 +2845,12 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertTrue(mdvs7.get(1) instanceof RelationshipMetadataValue);
         assertEquals("Doe, J.", mdvs7.get(1).getValue());
         assertEquals(1, mdvs7.get(1).getPlace());
+
+        ////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication of new publication //
+        ////////////////////////////////////////////////////////////
+
+        // TODO
 
         /////////////////////////////////////
         // archive new version of person 2 //
@@ -2819,6 +2894,12 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("Doe, J.", mdvs8.get(1).getValue());
         assertEquals(1, mdvs8.get(1).getPlace());
 
+        ////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication of old publication //
+        ////////////////////////////////////////////////////////////
+
+        // TODO
+
         ///////////////////////////////////////////////////
         // test dc.contributor.author of new publication //
         ///////////////////////////////////////////////////
@@ -2845,6 +2926,12 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertTrue(mdvs9.get(1) instanceof RelationshipMetadataValue);
         assertEquals("Doe, Jane Jr", mdvs9.get(1).getValue());
         assertEquals(1, mdvs9.get(1).getPlace());
+
+        ////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication of new publication //
+        ////////////////////////////////////////////////////////////
+
+        // TODO
     }
 
     // TODO
