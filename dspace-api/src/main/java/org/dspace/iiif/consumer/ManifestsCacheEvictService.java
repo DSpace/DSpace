@@ -30,7 +30,7 @@ public class ManifestsCacheEvictService {
     }
 
     public void evictAllCacheValues() {
-        Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).clear();
+        Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).invalidate();
     }
 
 }
