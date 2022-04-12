@@ -24,12 +24,14 @@ import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
+import org.dspace.versioning.utils.RelationshipVersioningUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -70,6 +72,9 @@ public class RelationshipServiceImplTest {
 
     @Mock
     private ConfigurationService configurationService;
+
+    @Spy
+    private RelationshipVersioningUtils relationshipVersioningUtils;
 
     @Before
     public void init() {
