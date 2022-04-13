@@ -41,10 +41,8 @@ public class MetadataDeletionScriptConfiguration<T extends MetadataDeletion> ext
             Options options = new Options();
 
             options.addOption("m", "metadata", true, "metadata field name");
-            options.getOption("m").setType(String.class);
 
             options.addOption("l", "list", false, "lists the metadata fields that can be deleted");
-            options.getOption("l").setType(boolean.class);
 
             super.options = options;
         }
