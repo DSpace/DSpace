@@ -75,6 +75,34 @@
     <dc-type>
         <schema>dspace</schema>
         <element>orcid</element>
+        <qualifier>sync-mode</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
+        <qualifier>sync-publications</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
+        <qualifier>sync-fundings</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
+        <qualifier>sync-profile</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
         <qualifier>authenticated</qualifier>
         <scope_note></scope_note>
     </dc-type>

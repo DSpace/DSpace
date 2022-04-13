@@ -11,14 +11,19 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static java.util.Arrays.asList;
 import static java.util.UUID.fromString;
+import static org.dspace.app.matcher.MetadataValueMatcher.with;
+import static org.dspace.app.profile.OrcidEntitySyncPreference.ALL;
 import static org.dspace.app.rest.matcher.HalMatcher.matchLinks;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataNotEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -52,6 +57,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.UUIDUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -1030,19 +1036,318 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     }
 
     @Test
-    public void testCloneFromExternalProfileAlreadyAssociated() throws Exception {
+    public void testOrcidMetadataOfEpersonAreCopiedOnProfile() throws Exception {
 
-        String id = user.getID().toString();
-        String authToken = getAuthToken(user.getEmail(), password);
+        context.turnOffAuthorisationSystem();
 
-        getClient(authToken).perform(post("/api/eperson/profiles/").contentType(MediaType.APPLICATION_JSON_VALUE))
-                            .andExpect(status().isCreated()).andExpect(jsonPath("$.id", is(id)))
-                            .andExpect(jsonPath("$.visible", is(false))).andExpect(jsonPath("$.type", is("profile")));
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withCanLogin(true)
+                                        .withOrcid("0000-1111-2222-3333")
+                                        .withEmail("test@email.it")
+                                        .withPassword(password)
+                                        .withNameInMetadata("Test", "User")
+                                        .withOrcidAccessToken("af097328-ac1c-4a3e-9eb4-069897874910")
+                                        .withOrcidRefreshToken("32aadae0-829e-49c5-824f-ccaf4d1913e4")
+                                        .withOrcidScope("/first-scope")
+                                        .withOrcidScope("/second-scope")
+                                        .build();
 
-        getClient(authToken)
-            .perform(post("/api/eperson/profiles/").contentType(TEXT_URI_LIST)
-                                                .content("http://localhost:8080/server/api/core/items/" + id))
-            .andExpect(status().isConflict());
+        context.restoreAuthSystemState();
+
+        String ePersonId = ePerson.getID().toString();
+        String authToken = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isCreated())
+                            .andExpect(jsonPath("$.id", is(ePersonId.toString())))
+                            .andExpect(jsonPath("$.visible", is(false)))
+                            .andExpect(jsonPath("$.type", is("profile")));
+
+        getClient(authToken).perform(get("/api/eperson/profiles/{id}", ePersonId))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.orcid", is("0000-1111-2222-3333")))
+                            .andExpect(jsonPath("$.orcidSynchronization.mode", is("MANUAL")))
+                            .andExpect(jsonPath("$.orcidSynchronization.publicationsPreference", is("DISABLED")))
+                            .andExpect(jsonPath("$.orcidSynchronization.fundingsPreference", is("DISABLED")))
+                            .andExpect(jsonPath("$.orcidSynchronization.profilePreferences", empty()));
+
+        String itemId = getItemIdByProfileId(authToken, ePersonId);
+
+        Item profileItem = itemService.find(context, UUIDUtils.fromString(itemId));
+        assertThat(profileItem, notNullValue());
+
+        List<MetadataValue> metadata = profileItem.getMetadata();
+        assertThat(metadata, hasItem(with("person.identifier.orcid", "0000-1111-2222-3333")));
+        assertThat(metadata, hasItem(with("dspace.orcid.access-token", "af097328-ac1c-4a3e-9eb4-069897874910")));
+        assertThat(metadata, hasItem(with("dspace.orcid.refresh-token", "32aadae0-829e-49c5-824f-ccaf4d1913e4")));
+        assertThat(metadata, hasItem(with("dspace.orcid.scope", "/first-scope", 0)));
+        assertThat(metadata, hasItem(with("dspace.orcid.scope", "/second-scope", 1)));
+
+    }
+
+    @Test
+    public void testPatchToSetOrcidSynchronizationPreferenceForPublications() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withCanLogin(true)
+                                        .withOrcid("0000-1111-2222-3333")
+                                        .withEmail("test@email.it")
+                                        .withPassword(password)
+                                        .withNameInMetadata("Test", "User")
+                                        .withOrcidAccessToken("af097328-ac1c-4a3e-9eb4-069897874910")
+                                        .withOrcidRefreshToken("32aadae0-829e-49c5-824f-ccaf4d1913e4")
+                                        .withOrcidScope("/first-scope")
+                                        .withOrcidScope("/second-scope")
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonId = ePerson.getID().toString();
+        String authToken = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isCreated());
+
+        List<Operation> operations = asList(new ReplaceOperation("/orcid/publications", ALL.name()));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                                         .content(getPatchContent(operations))
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.orcidSynchronization.publicationsPreference", is(ALL.name())));
+
+        getClient(authToken).perform(get("/api/eperson/profiles/{id}", ePersonId))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.orcidSynchronization.publicationsPreference", is(ALL.name())));
+
+        operations = asList(new ReplaceOperation("/orcid/publications", "INVALID_VALUE"));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                                         .content(getPatchContent(operations))
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    @Test
+    public void testPatchToSetOrcidSynchronizationPreferenceForFundings() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withCanLogin(true)
+                                        .withOrcid("0000-1111-2222-3333")
+                                        .withEmail("test@email.it")
+                                        .withPassword(password)
+                                        .withNameInMetadata("Test", "User")
+                                        .withOrcidAccessToken("af097328-ac1c-4a3e-9eb4-069897874910")
+                                        .withOrcidRefreshToken("32aadae0-829e-49c5-824f-ccaf4d1913e4")
+                                        .withOrcidScope("/first-scope")
+                                        .withOrcidScope("/second-scope")
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonId = ePerson.getID().toString();
+        String authToken = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isCreated());
+
+        List<Operation> operations = asList(new ReplaceOperation("/orcid/fundings", ALL.name()));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                                         .content(getPatchContent(operations))
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.orcidSynchronization.fundingsPreference", is(ALL.name())));
+
+        getClient(authToken).perform(get("/api/eperson/profiles/{id}", ePersonId))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.orcidSynchronization.fundingsPreference", is(ALL.name())));
+
+        operations = asList(new ReplaceOperation("/orcid/fundings", "INVALID_VALUE"));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                                         .content(getPatchContent(operations))
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    @Test
+    public void testPatchToSetOrcidSynchronizationPreferenceForProfile() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withCanLogin(true)
+                                        .withOrcid("0000-1111-2222-3333")
+                                        .withEmail("test@email.it")
+                                        .withPassword(password)
+                                        .withNameInMetadata("Test", "User")
+                                        .withOrcidAccessToken("af097328-ac1c-4a3e-9eb4-069897874910")
+                                        .withOrcidRefreshToken("32aadae0-829e-49c5-824f-ccaf4d1913e4")
+                                        .withOrcidScope("/first-scope")
+                                        .withOrcidScope("/second-scope")
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonId = ePerson.getID().toString();
+        String authToken = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isCreated());
+
+        List<Operation> operations = asList(new ReplaceOperation("/orcid/profile", "IDENTIFIERS"));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                                         .content(getPatchContent(operations))
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.orcidSynchronization.profilePreferences",
+                                                containsInAnyOrder("IDENTIFIERS")));
+
+        getClient(authToken).perform(get("/api/eperson/profiles/{id}", ePersonId))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.orcidSynchronization.profilePreferences",
+                                                containsInAnyOrder("IDENTIFIERS")));
+
+        operations = asList(new ReplaceOperation("/orcid/profiles", "INVALID_VALUE"));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                                         .content(getPatchContent(operations))
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    @Test
+    public void testPatchToSetOrcidSynchronizationMode() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withCanLogin(true)
+                                        .withOrcid("0000-1111-2222-3333")
+                                        .withEmail("test@email.it")
+                                        .withPassword(password)
+                                        .withNameInMetadata("Test", "User")
+                                        .withOrcidAccessToken("af097328-ac1c-4a3e-9eb4-069897874910")
+                                        .withOrcidRefreshToken("32aadae0-829e-49c5-824f-ccaf4d1913e4")
+                                        .withOrcidScope("/first-scope")
+                                        .withOrcidScope("/second-scope")
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonId = ePerson.getID().toString();
+        String authToken = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isCreated());
+
+        List<Operation> operations = asList(new ReplaceOperation("/orcid/mode", "BATCH"));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                                         .content(getPatchContent(operations))
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.orcidSynchronization.mode", is("BATCH")));
+
+        getClient(authToken).perform(get("/api/eperson/profiles/{id}", ePersonId))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.orcidSynchronization.mode", is("BATCH")));
+
+        operations = asList(new ReplaceOperation("/orcid/mode", "MANUAL"));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                                         .content(getPatchContent(operations))
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.orcidSynchronization.mode", is("MANUAL")));
+
+        getClient(authToken).perform(get("/api/eperson/profiles/{id}", ePersonId))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.orcidSynchronization.mode", is("MANUAL")));
+
+        operations = asList(new ReplaceOperation("/orcid/mode", "INVALID_VALUE"));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                                         .content(getPatchContent(operations))
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    @Test
+    public void testPatchToSetOrcidSynchronizationPreferenceWithWrongPath() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withCanLogin(true)
+                                        .withOrcid("0000-1111-2222-3333")
+                                        .withEmail("test@email.it")
+                                        .withPassword(password)
+                                        .withNameInMetadata("Test", "User")
+                                        .withOrcidAccessToken("af097328-ac1c-4a3e-9eb4-069897874910")
+                                        .withOrcidRefreshToken("32aadae0-829e-49c5-824f-ccaf4d1913e4")
+                                        .withOrcidScope("/first-scope")
+                                        .withOrcidScope("/second-scope")
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonId = ePerson.getID().toString();
+        String authToken = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isCreated());
+
+        List<Operation> operations = asList(new ReplaceOperation("/orcid/wrong-path", "BATCH"));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                                         .content(getPatchContent(operations))
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testPatchToSetOrcidSynchronizationPreferenceWithProfileNotLinkedToOrcid() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withCanLogin(true)
+                                        .withOrcid("0000-1111-2222-3333")
+                                        .withEmail("test@email.it")
+                                        .withPassword(password)
+                                        .withNameInMetadata("Test", "User")
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonId = ePerson.getID().toString();
+        String authToken = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isCreated());
+
+        List<Operation> operations = asList(new ReplaceOperation("/orcid/mode", "BATCH"));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                                         .content(getPatchContent(operations))
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -1526,6 +1831,22 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         assertThat(getMetadataValues(profile, "dspace.orcid.refresh-token"), not(empty()));
         assertThat(getMetadataValues(profile, "dspace.orcid.scope"), not(empty()));
         assertThat(getMetadataValues(profile, "dspace.orcid.authenticated"), not(empty()));
+    }
+
+    @Test
+    public void testCloneFromExternalProfileAlreadyAssociated() throws Exception {
+
+        String id = user.getID().toString();
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/").contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isCreated()).andExpect(jsonPath("$.id", is(id)))
+                            .andExpect(jsonPath("$.visible", is(false))).andExpect(jsonPath("$.type", is("profile")));
+
+        getClient(authToken)
+            .perform(post("/api/eperson/profiles/").contentType(TEXT_URI_LIST)
+                                                   .content("http://localhost:8080/server/api/core/items/" + id))
+            .andExpect(status().isConflict());
     }
 
     private Item createProfile(EPerson ePerson) throws Exception {
