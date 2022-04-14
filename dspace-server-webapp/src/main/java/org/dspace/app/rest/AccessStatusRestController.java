@@ -92,7 +92,9 @@ public class AccessStatusRestController implements InitializingBean {
             }
             return accessStatusRest;
         } finally {
-            context.abort();
+            if (context != null) {
+                context.abort();
+            }
         }
     }
 }

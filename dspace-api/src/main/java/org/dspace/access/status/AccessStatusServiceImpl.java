@@ -45,7 +45,7 @@ public class AccessStatusServiceImpl implements AccessStatusService {
         if (builder == null) {
             builder = (AccessStatusBuilder) pluginService.getSinglePlugin(AccessStatusBuilder.class);
             if (builder == null) {
-                throw new IllegalStateException("The AccessStatusBuilder plugin was not defined in"
+                throw new IllegalStateException("The AccessStatusBuilder plugin was not defined in "
                         + "DSpace configuration.");
             }
 
