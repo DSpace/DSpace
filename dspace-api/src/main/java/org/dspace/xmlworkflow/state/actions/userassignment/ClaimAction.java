@@ -7,32 +7,40 @@
  */
 package org.dspace.xmlworkflow.state.actions.userassignment;
 
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.*;
-import org.dspace.eperson.EPerson;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
-import org.dspace.xmlworkflow.state.Step;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.*;
-import org.dspace.xmlworkflow.state.actions.ActionResult;
-
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
+import org.dspace.core.LogHelper;
+import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.xmlworkflow.Role;
+import org.dspace.xmlworkflow.RoleMembers;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
+import org.dspace.xmlworkflow.state.Step;
+import org.dspace.xmlworkflow.state.actions.ActionResult;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Processing class for an action where x number of users
  * have to accept a task from a designated pool
- * 
+ *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
 public class ClaimAction extends UserSelectionAction {
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     @Override
     public void activate(Context context, XmlWorkflowItem wfItem) throws SQLException, IOException, AuthorizeException {
@@ -40,62 +48,75 @@ public class ClaimAction extends UserSelectionAction {
 
         RoleMembers allroleMembers = getParent().getStep().getRole().getMembers(context, wfItem);
         // Create pooled tasks for each member of our group
-        if(allroleMembers != null && (allroleMembers.getGroups().size() > 0 || allroleMembers.getEPersons().size() > 0)){
-            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().createPoolTasks(context, wfItem, allroleMembers, owningStep, getParent());
+        if (allroleMembers != null && (allroleMembers.getGroups().size() > 0 || allroleMembers.getEPersons()
+                                                                                              .size() > 0)) {
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
+                                     .createPoolTasks(context, wfItem, allroleMembers, owningStep, getParent());
             alertUsersOnActivation(context, wfItem, allroleMembers);
+        } else {
+            log.info(LogHelper.getHeader(context, "warning while activating claim action",
+                                          "No group or person was found for the following roleid: " + getParent()
+                                              .getStep().getRole().getId()));
         }
-        else
-            log.info(LogManager.getHeader(context, "warning while activating claim action", "No group or person was found for the following roleid: " + getParent().getStep().getRole().getId()));
 
 
     }
 
     @Override
-    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
-        //Check if we are accept this task, or accepting multiple tasks
-        if(request.getParameter("submit_take_task") != null || request.getParameter("submit_take_tasks") != null){
-            //Add a claimed user to our task
-            XmlWorkflowServiceFactory.getInstance().getWorkflowRequirementsService().addClaimedUser(c, wfi, step, c.getCurrentUser());
-
-            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
-        }else{
-            return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
-        }
+    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
+            throws SQLException, AuthorizeException, IOException {
+        // accept task, or accepting multiple tasks
+        XmlWorkflowServiceFactory.getInstance().getWorkflowRequirementsService().addClaimedUser(c, wfi, step,
+                c.getCurrentUser());
+        return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
     }
 
     @Override
-    public void alertUsersOnActivation(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws IOException, SQLException {
-        try{
+    public List<String> getOptions() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void alertUsersOnActivation(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers)
+        throws IOException, SQLException {
+        try {
+            EPerson ep = wfi.getSubmitter();
+            String submitterName = null;
+            if (ep != null) {
+                submitterName = ep.getFullName();
+            }
             XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
             xmlWorkflowService.alertUsersOnTaskActivation(c, wfi, "submit_task", roleMembers.getAllUniqueMembers(c),
                     //The arguments
                     wfi.getItem().getName(),
                     wfi.getCollection().getName(),
-                    wfi.getSubmitter().getFullName(),
+                    submitterName,
                     //TODO: message
                     "New task available.",
                     xmlWorkflowService.getMyDSpaceLink()
             );
         } catch (MessagingException e) {
-            log.info(LogManager.getHeader(c, "error emailing user(s) for claimed task", "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
+            log.info(LogHelper.getHeader(c, "error emailing user(s) for claimed task",
+                    "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
         }
-
-
     }
 
     @Override
-    public void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws SQLException, AuthorizeException, IOException {
-        if(roleMembers != null && (roleMembers.getEPersons().size() > 0 || roleMembers.getGroups().size() >0)){
+    public void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers)
+        throws SQLException, AuthorizeException, IOException {
+        if (roleMembers != null && (roleMembers.getEPersons().size() > 0 || roleMembers.getGroups().size() > 0)) {
             //Create task for the users left
-            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().createPoolTasks(c, wfi, roleMembers, getParent().getStep(), getParent());
-            if(ConfigurationManager.getBooleanProperty("workflow", "notify.returned.tasks", true))
-            {
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
+                                     .createPoolTasks(c, wfi, roleMembers, getParent().getStep(), getParent());
+            if (configurationService.getBooleanProperty("workflow.notify.returned.tasks", true)) {
                 alertUsersOnActivation(c, wfi, roleMembers);
             }
 
+        } else {
+            log.info(LogHelper.getHeader(c, "warning while activating claim action",
+                                          "No group or person was found for the following roleid: " + getParent()
+                                              .getStep().getId()));
         }
-        else
-            log.info(LogManager.getHeader(c, "warning while activating claim action", "No group or person was found for the following roleid: " + getParent().getStep().getId()));
 
     }
 
@@ -105,24 +126,27 @@ public class ClaimAction extends UserSelectionAction {
     }
 
     @Override
-    public boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI) throws WorkflowConfigurationException, SQLException {
+    public boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI)
+        throws WorkflowConfigurationException, SQLException {
         //A user claim action always needs to have a UI, since somebody needs to be able to claim it
-        if(hasUI){
+        if (hasUI) {
             Step step = getParent().getStep();
             //First of all check if our step has a role
             Role role = step.getRole();
-            if(role != null){
+            if (role != null) {
                 //We have a role, check if we have a group to with that role
                 RoleMembers roleMembers = role.getMembers(context, wfi);
 
                 ArrayList<EPerson> epersons = roleMembers.getAllUniqueMembers(context);
-                return !(epersons.size() == 0 || step.getRequiredUsers() > epersons.size());
+                return !(epersons.isEmpty() || step.getRequiredUsers() > epersons.size());
             } else {
                 // We don't have a role and do have a UI so throw a workflow exception
-                throw new WorkflowConfigurationException("The next step is invalid, since it doesn't have a valid role");
+                throw new WorkflowConfigurationException(
+                    "The next step is invalid, since it doesn't have a valid role");
             }
-        }else
+        } else {
             return true;
+        }
 
     }
 

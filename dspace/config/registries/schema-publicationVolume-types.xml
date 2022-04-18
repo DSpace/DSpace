@@ -1,0 +1,36 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>Publication Volume Types</title>
+    </dspace-header>
+
+    <!-- NO EQUIVALENT FOUND:
+        - journalvolume.identifier.name
+            > NOT FOUND (not great options in direct parent creative work: creativework.about or creativework.mainEntity;
+                option non-direct parent thing.name)
+    -->
+
+    <dc-schema>
+        <name>publicationvolume</name>
+        <namespace>https://schema.org/PublicationVolume</namespace>
+    </dc-schema>
+
+    <dc-schema>
+        <name>creativework</name>
+        <namespace>https://schema.org/CreativeWork</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>datePublished</element>
+        <scope_note>Date of first broadcast/publication.</scope_note>
+    </dc-type>
+
+
+    <dc-type>
+        <schema>publicationvolume</schema>
+        <element>volumeNumber</element>
+        <scope_note>Identifies the volume of publication or multi-part work; for example, "iii" or "2".</scope_note>
+    </dc-type>
+
+</dspace-dc-types>

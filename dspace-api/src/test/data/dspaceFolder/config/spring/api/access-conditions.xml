@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+	<bean id="uploadConfigurationDefault" class="org.dspace.submit.model.UploadConfiguration">
+		<property name="name" value="upload"></property>
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+		<property name="metadata" value="bitstream-metadata" />
+        <property name="options">
+            <list>
+                <ref bean="openAccess"/>
+                <ref bean="lease"/>
+                <ref bean="embargoed" />
+                <ref bean="administrator"/>
+                <!-- <ref bean="networkAdministration"/> -->
+            </list>
+        </property>
+    </bean>
+  
+    <bean id="openAccess" class="org.dspace.submit.model.AccessConditionOption">
+        <property name="groupName" value="Anonymous"/>
+        <property name="name" value="openaccess"/>
+        <property name="hasStartDate" value="false"/>
+        <property name="hasEndDate" value="false"/>
+    </bean>
+    <bean id="lease" class="org.dspace.submit.model.AccessConditionOption">
+        <property name="groupName" value="Anonymous"/>
+        <property name="name" value="lease"/>
+        <property name="hasStartDate" value="false"/>
+        <property name="hasEndDate" value="true"/>
+        <property name="endDateLimit" value="+6MONTHS"/>
+    </bean> 
+    <bean id="embargoed" class="org.dspace.submit.model.AccessConditionOption">
+        <property name="groupName" value="Anonymous"/>
+        <property name="name" value="embargo"/>
+        <property name="hasStartDate" value="true"/>
+        <property name="startDateLimit" value="+36MONTHS"/>
+        <property name="hasEndDate" value="false"/>
+    </bean>
+    <bean id="administrator" class="org.dspace.submit.model.AccessConditionOption">
+        <property name="groupName" value="Administrator"/>
+        <property name="name" value="administrator"/>
+        <property name="hasStartDate" value="false"/>
+        <property name="hasEndDate" value="false"/>       
+    </bean>
+<!--     <bean id="networkAdministration" class="org.dspace.submit.model.AccessConditionOption">
+    	<property name="groupName" value="INSTITUTIONAL_NETWORK"/>
+        <property name="name" value="networkAdministration"/>
+        <property name="hasStartDate" value="false"/>
+        <property name="hasEndDate" value="false"/>                
+    </bean> -->
+
+    <bean id="uploadConfigurationService" class="org.dspace.submit.model.UploadConfigurationService">
+        <property name="map">
+            <map>
+                <entry key="upload" value-ref="uploadConfigurationDefault" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="accessConditionConfigurationService" class="org.dspace.submit.model.AccessConditionConfigurationService" />
+
+    <bean id="accessConditionConfigurationDefault" class="org.dspace.submit.model.AccessConditionConfiguration">
+        <!-- This name must match the id of the step as defined in the item-submission.xml -->
+        <property name="name" value="defaultAC"></property>
+        <property name="canChangeDiscoverable" value="true"></property>
+        <property name="options">
+            <list>
+                <ref bean="openAccess"/>
+                <ref bean="embargoed" />
+                <ref bean="administrator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="accessConditionConfigurationNotDiscoverable" class="org.dspace.submit.model.AccessConditionConfiguration">
+        <!-- This name must match the id of the step as defined in the item-submission.xml -->
+        <property name="name" value="notDiscoverable"></property>
+        <property name="canChangeDiscoverable" value="false"></property>
+        <property name="options">
+            <list>
+                <ref bean="embargoed" />
+                <ref bean="administrator"/>
+            </list>
+        </property>
+    </bean>
+
+</beans>

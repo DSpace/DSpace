@@ -7,13 +7,13 @@
  */
 package org.dspace.xoai.tests.support;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.AllOf;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 public class MatcherBuilder<M extends MatcherBuilder, T> extends BaseMatcher<T> {
     private final Collection<Matcher<? super T>> matchers = new ArrayList<>();
@@ -32,7 +32,7 @@ public class MatcherBuilder<M extends MatcherBuilder, T> extends BaseMatcher<T> 
         description.appendDescriptionOf(matcher());
     }
 
-    protected M with (Matcher<? super T> matcher) {
+    protected M with(Matcher<? super T> matcher) {
         matchers.add(matcher);
         return (M) this;
     }

@@ -7,13 +7,13 @@
  */
 package org.dspace.rest.authentication;
 
-import org.springframework.security.web.RedirectStrategy;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-
+import java.io.IOException;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.springframework.security.web.RedirectStrategy;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
 /**
  * @author kevinvandevelde at atmire.com
@@ -27,15 +27,15 @@ public class NoRedirectAuthenticationLoginSuccessHandler extends SimpleUrlAuthen
         setRedirectStrategy(new NoRedirectStrategy());
     }
 
-     protected class NoRedirectStrategy implements RedirectStrategy {
+    protected class NoRedirectStrategy implements RedirectStrategy {
 
-         @Override
-         public void sendRedirect(HttpServletRequest request,
-                                  HttpServletResponse response, String url) throws IOException {
-             // no redirect
+        @Override
+        public void sendRedirect(HttpServletRequest request,
+                                 HttpServletResponse response, String url) throws IOException {
+            // no redirect
 
-         }
+        }
 
-     }
+    }
 
 }

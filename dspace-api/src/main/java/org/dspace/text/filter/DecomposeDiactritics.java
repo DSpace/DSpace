@@ -7,24 +7,21 @@
  */
 package org.dspace.text.filter;
 
-import com.ibm.icu.text.Normalizer;
+import com.ibm.icu.text.Normalizer2;
 
 /**
  * Decompose diacritic characters to character + diacritic
- * 
+ *
  * @author Graham Triggs
  */
-public class DecomposeDiactritics implements TextFilter
-{
+public class DecomposeDiactritics implements TextFilter {
     @Override
-    public String filter(String str)
-    {
-        return Normalizer.normalize(str, Normalizer.NFD);
+    public String filter(String str) {
+        return Normalizer2.getNFDInstance().normalize(str);
     }
 
     @Override
-    public String filter(String str, String lang)
-    {
-        return Normalizer.normalize(str, Normalizer.NFD);
+    public String filter(String str, String lang) {
+        return Normalizer2.getNFDInstance().normalize(str);
     }
 }

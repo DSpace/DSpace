@@ -7,24 +7,26 @@
  */
 package org.dspace.curate;
 
+<<<<<<< HEAD
 import org.apache.commons.cli.*;
 import org.dspace.content.factory.ContentServiceFactory;
+=======
+import java.sql.SQLException;
+
+import org.apache.commons.cli.ParseException;
+>>>>>>> dspace-7.2.1
 import org.dspace.core.Context;
-import org.dspace.core.factory.CoreServiceFactory;
-import org.dspace.curate.factory.CurateServiceFactory;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.EPersonService;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Iterator;
 
 /**
- * CurationCli provides command-line access to Curation tools and processes.
- * 
- * @author richardrodgers
+ * This is the CLI version of the {@link Curation} script.
+ * This will only be called when the curate script is called from a commandline instance.
  */
+<<<<<<< HEAD
 public class CurationCli
 {    
     public static void main(String[] args) throws Exception
@@ -199,78 +201,34 @@ public class CurationCli
                 if (reader != null)
                 {
                   reader.close();  
+=======
+public class CurationCli extends Curation {
+
+    /**
+     * This is the overridden instance of the {@link Curation#assignCurrentUserInContext()} method in the parent class
+     * {@link Curation}.
+     * This is done so that the CLI version of the Script is able to retrieve its currentUser from the -e flag given
+     * with the parameters of the Script.
+     * @throws ParseException   If the e flag was not given to the parameters when calling the script
+     */
+    @Override
+    protected void assignCurrentUserInContext() throws ParseException {
+        if (this.commandLine.hasOption('e')) {
+            String ePersonEmail = this.commandLine.getOptionValue('e');
+            this.context = new Context(Context.Mode.BATCH_EDIT);
+            try {
+                EPerson ePerson = ePersonService.findByEmail(this.context, ePersonEmail);
+                if (ePerson == null) {
+                    super.handler.logError("EPerson not found: " + ePersonEmail);
+                    throw new IllegalArgumentException("Unable to find a user with email: " + ePersonEmail);
+>>>>>>> dspace-7.2.1
                 }
+                this.context.setCurrentUser(ePerson);
+            } catch (SQLException e) {
+                throw new IllegalArgumentException("SQLException trying to find user with email: " + ePersonEmail);
             }
-        }
-        // run tasks against object
-        long start = System.currentTimeMillis();
-        if (verbose)
-        {
-            System.out.println("Starting curation");
-        }
-        if (idName != null)
-        {
-            if (verbose)
-            {
-               System.out.println("Curating id: " + idName);
-            }
-            if ("all".equals(idName))
-            {
-            	// run on whole Site
-            	curator.curate(c, ContentServiceFactory.getInstance().getSiteService().findSite(c).getHandle());
-            }
-            else
-            {
-                curator.curate(c, idName);
-            }
-        }
-        else
-        {
-            // process the task queue
-            TaskQueue queue = (TaskQueue) CoreServiceFactory.getInstance().getPluginService().getSinglePlugin(TaskQueue.class);
-            if (queue == null)
-            {
-                System.out.println("No implementation configured for queue");
-                throw new UnsupportedOperationException("No queue service available");
-            }
-            // use current time as our reader 'ticket'
-            long ticket = System.currentTimeMillis();
-            Iterator<TaskQueueEntry> entryIter = queue.dequeue(taskQueueName, ticket).iterator();
-            while (entryIter.hasNext())
-            {
-                TaskQueueEntry entry = entryIter.next();
-                if (verbose)
-                {
-                    System.out.println("Curating id: " + entry.getObjectId());
-                }
-                curator.clear();
-                // does entry relate to a DSO or workflow object?
-                if (entry.getObjectId().indexOf("/") > 0)
-                {
-                    for (String task : entry.getTaskNames())
-                    {
-                        curator.addTask(task);
-                    }
-                    curator.curate(c, entry.getObjectId());
-                }
-                else
-                {
-                    // make eperson who queued task the effective user
-                    EPerson agent = ePersonService.findByEmail(c, entry.getEpersonId());
-                    if (agent != null)
-                    {
-                        c.setCurrentUser(agent);
-                    }
-                    CurateServiceFactory.getInstance().getWorkflowCuratorService().curate(curator, c, entry.getObjectId());
-                }
-            }
-            queue.release(taskQueueName, ticket, true);
-        }
-        c.complete();
-        if (verbose)
-        {
-            long elapsed = System.currentTimeMillis() - start;
-            System.out.println("Ending curation. Elapsed time: " + elapsed);
+        } else {
+            throw new ParseException("Required parameter -e missing!");
         }
     }
 }

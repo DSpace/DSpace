@@ -12,8 +12,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
@@ -24,53 +24,49 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- *
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)
  */
 public class LocalURIGenerator implements URIGenerator {
-    private static final Logger log = Logger.getLogger(LocalURIGenerator.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(LocalURIGenerator.class);
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     protected SiteService siteService;
 
     @Override
     public String generateIdentifier(Context context, int type, UUID id,
-            String handle, List<String> identifiers)
-            throws SQLException
-    {
+                                     String handle, List<String> identifiers)
+        throws SQLException {
         String urlPrefix = DSpaceServicesFactory.getInstance().getConfigurationService()
-                .getProperty(RDFUtil.CONTEXT_PATH_KEY) + "/resource/";
-        
-        if (type == Constants.SITE)
-        {
+                                                .getProperty(RDFUtil.CONTEXT_PATH_KEY) + "/resource/";
+
+        if (type == Constants.SITE) {
             return urlPrefix + siteService.findSite(context).getHandle();
         }
-        
-        if (type == Constants.COMMUNITY 
-                || type == Constants.COLLECTION 
-                || type == Constants.ITEM)
-        {
-            if (StringUtils.isEmpty(handle))
-            {
+
+        if (type == Constants.COMMUNITY
+            || type == Constants.COLLECTION
+            || type == Constants.ITEM) {
+            if (StringUtils.isEmpty(handle)) {
                 throw new IllegalArgumentException("Handle is null");
             }
             return urlPrefix + handle;
         }
-        
+
         return null;
     }
 
     @Override
     public String generateIdentifier(Context context, DSpaceObject dso) throws SQLException {
         if (dso.getType() != Constants.SITE
-                && dso.getType() != Constants.COMMUNITY
-                && dso.getType() != Constants.COLLECTION
-                && dso.getType() != Constants.ITEM)
-        {
+            && dso.getType() != Constants.COMMUNITY
+            && dso.getType() != Constants.COLLECTION
+            && dso.getType() != Constants.ITEM) {
             return null;
         }
-        
-        return generateIdentifier(context, dso.getType(), dso.getID(), dso.getHandle(), ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getIdentifiers(context, dso));
+
+        return generateIdentifier(context, dso.getType(), dso.getID(), dso.getHandle(),
+                                  ContentServiceFactory.getInstance().getDSpaceObjectService(dso)
+                                                       .getIdentifiers(context, dso));
     }
 
 }

@@ -7,23 +7,28 @@
  */
 package org.dspace.app.statistics;
 
-import org.apache.commons.lang.time.DateUtils;
-import org.dspace.core.ConfigurationManager;
-
-import java.text.DateFormat;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.time.DateUtils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Helper class for loading the analysis / report files from the reports directory
  */
-public class StatisticsLoader
-{
+public class StatisticsLoader {
     private static Map<String, StatsFile> monthlyAnalysis = null;
     private static Map<String, StatsFile> monthlyReports = null;
 
@@ -31,30 +36,29 @@ public class StatisticsLoader
     private static StatsFile generalReport = null;
 
     private static Date lastLoaded = null;
-    private static int fileCount   = 0;
+    private static int fileCount = 0;
 
     private static Pattern analysisMonthlyPattern;
     private static Pattern analysisGeneralPattern;
     private static Pattern reportMonthlyPattern;
     private static Pattern reportGeneralPattern;
 
-    private static ThreadLocal<DateFormat>  monthlySDF;
-    private static ThreadLocal<DateFormat>  generalSDF;
+    private static ThreadLocal<DateFormat> monthlySDF;
+    private static ThreadLocal<DateFormat> generalSDF;
 
     // one time initialisation of the regex patterns and formatters we will use
-    static
-    {
+    static {
         analysisMonthlyPattern = Pattern.compile("dspace-log-monthly-([0-9][0-9][0-9][0-9]-[0-9]+)\\.dat");
         analysisGeneralPattern = Pattern.compile("dspace-log-general-([0-9]+-[0-9]+-[0-9]+)\\.dat");
-        reportMonthlyPattern   = Pattern.compile("report-([0-9][0-9][0-9][0-9]-[0-9]+)\\.html");
-        reportGeneralPattern   = Pattern.compile("report-general-([0-9]+-[0-9]+-[0-9]+)\\.html");
+        reportMonthlyPattern = Pattern.compile("report-([0-9][0-9][0-9][0-9]-[0-9]+)\\.html");
+        reportGeneralPattern = Pattern.compile("report-general-([0-9]+-[0-9]+-[0-9]+)\\.html");
 
-        monthlySDF = new ThreadLocal<DateFormat>(){
+        monthlySDF = new ThreadLocal<DateFormat>() {
             @Override
             protected DateFormat initialValue() {
                 return new SimpleDateFormat("yyyy'-'M");
             }
-          };
+        };
 
         generalSDF = new ThreadLocal<DateFormat>() {
             @Override
@@ -65,41 +69,43 @@ public class StatisticsLoader
     }
 
     /**
+     * Default constructor
+     */
+    private StatisticsLoader() { }
+
+    /**
      * Get an array of the dates of the report files.
+     *
      * @return array of dates
      */
-    public static Date[] getMonthlyReportDates()
-    {
+    public static Date[] getMonthlyReportDates() {
         return sortDatesDescending(getDatesFromMap(monthlyReports));
     }
 
     /**
      * Get an array of the dates of the analysis files.
+     *
      * @return array of dates
      */
-    public static Date[] getMonthlyAnalysisDates()
-    {
+    public static Date[] getMonthlyAnalysisDates() {
         return sortDatesDescending(getDatesFromMap(monthlyAnalysis));
     }
 
     /**
      * Convert the formatted dates that are the keys of the map into a date array.
-     * @param monthlyMap map 
+     *
+     * @param monthlyMap map
      * @return array of dates
      */
-    protected static Date[] getDatesFromMap(Map<String, StatsFile> monthlyMap)
-    {
+    protected static Date[] getDatesFromMap(Map<String, StatsFile> monthlyMap) {
         Set<String> keys = monthlyMap.keySet();
         Date[] dates = new Date[keys.size()];
         int i = 0;
-        for (String date : keys)
-        {
-            try
-            {
+        for (String date : keys) {
+            try {
                 dates[i] = monthlySDF.get().parse(date);
-            }
-            catch (ParseException pe)
-            {
+            } catch (ParseException pe) {
+                // ignore
             }
 
             i++;
@@ -110,33 +116,23 @@ public class StatisticsLoader
 
     /**
      * Sort the date array in descending (reverse chronological) order.
+     *
      * @param dates array of dates
      * @return sorted dates.
      */
-    protected static Date[] sortDatesDescending(Date[] dates)
-    {
+    protected static Date[] sortDatesDescending(Date[] dates) {
         Arrays.sort(dates, new Comparator<Date>() {
             @Override
-            public int compare(Date d1, Date d2)
-            {
-                if (d1 == null && d2 == null)
-                {
+            public int compare(Date d1, Date d2) {
+                if (d1 == null && d2 == null) {
                     return 0;
-                }
-                else if (d1 == null)
-                {
+                } else if (d1 == null) {
                     return -1;
-                }
-                else if (d2 == null)
-                {
+                } else if (d2 == null) {
                     return 1;
-                }
-                else if (d1.before(d2))
-                {
+                } else if (d1.before(d2)) {
                     return 1;
-                }
-                else if (d2.before(d1))
-                {
+                } else if (d2.before(d1)) {
                     return -1;
                 }
 
@@ -148,11 +144,11 @@ public class StatisticsLoader
 
     /**
      * Get the analysis file for a given date.
+     *
      * @param date date
      * @return File
      */
-    public static File getAnalysisFor(String date)
-    {
+    public static File getAnalysisFor(String date) {
         StatisticsLoader.syncFileList();
         StatsFile sf = (monthlyAnalysis == null ? null : monthlyAnalysis.get(date));
         return sf == null ? null : sf.file;
@@ -160,11 +156,11 @@ public class StatisticsLoader
 
     /**
      * Get the report file for a given date.
+     *
      * @param date date
      * @return File
      */
-    public static File getReportFor(String date)
-    {
+    public static File getReportFor(String date) {
         StatisticsLoader.syncFileList();
         StatsFile sf = (monthlyReports == null ? null : monthlyReports.get(date));
         return sf == null ? null : sf.file;
@@ -172,20 +168,20 @@ public class StatisticsLoader
 
     /**
      * Get the current general analysis file.
+     *
      * @return File
      */
-    public static File getGeneralAnalysis()
-    {
+    public static File getGeneralAnalysis() {
         StatisticsLoader.syncFileList();
         return generalAnalysis == null ? null : generalAnalysis.file;
     }
 
     /**
      * Get the current general report file.
+     *
      * @return File
      */
-    public static File getGeneralReport()
-    {
+    public static File getGeneralReport() {
         StatisticsLoader.syncFileList();
         return generalReport == null ? null : generalReport.file;
     }
@@ -199,99 +195,80 @@ public class StatisticsLoader
      * 2) We haven't cached anything yet
      * 3) The cache was last generate over an hour ago
      */
-    private static void syncFileList()
-    {
+    private static void syncFileList() {
         // Get an array of all the analysis and report files present
         File[] fileList = StatisticsLoader.getAnalysisAndReportFileList();
 
-        if (fileList != null && fileList.length != fileCount)
-        {
+        if (fileList != null && fileList.length != fileCount) {
             StatisticsLoader.loadFileList(fileList);
-        }
-        else if (lastLoaded == null)
-        {
+        } else if (lastLoaded == null) {
             StatisticsLoader.loadFileList(fileList);
-        }
-        else if (DateUtils.addHours(lastLoaded, 1).before(new Date()))
-        {
+        } else if (DateUtils.addHours(lastLoaded, 1).before(new Date())) {
             StatisticsLoader.loadFileList(fileList);
         }
     }
 
     /**
      * Generate the cached file list from the array of files
+     *
      * @param fileList array of files
      */
-    private static synchronized void loadFileList(File[] fileList)
-    {
+    private static synchronized void loadFileList(File[] fileList) {
         // If we haven't been passed an array of files, get one now
-        if (fileList == null || fileList.length == 0)
-        {
+        if (fileList == null || fileList.length == 0) {
             fileList = StatisticsLoader.getAnalysisAndReportFileList();
         }
 
         // Create new maps for the monthly analysis / reports
-        Map<String, StatsFile> newMonthlyAnalysis = new HashMap<String, StatsFile>();
-        Map<String, StatsFile> newMonthlyReports  = new HashMap<String, StatsFile>();
+        Map<String, StatsFile> newMonthlyAnalysis = new HashMap<>();
+        Map<String, StatsFile> newMonthlyReports = new HashMap<>();
 
         StatsFile newGeneralAnalysis = null;
         StatsFile newGeneralReport = null;
 
-        if (fileList != null)
-        {
-            for (File thisFile : fileList)
-            {
+        if (fileList != null) {
+            for (File thisFile : fileList) {
                 StatsFile statsFile = null;
 
                 // If we haven't identified this file yet
-                if (statsFile == null)
-                {
+                if (statsFile == null) {
                     // See if it is a monthly analysis file
                     statsFile = makeStatsFile(thisFile, analysisMonthlyPattern, monthlySDF.get());
-                    if (statsFile != null)
-                    {
+                    if (statsFile != null) {
                         // If it is, add it to the map
                         newMonthlyAnalysis.put(statsFile.dateStr, statsFile);
                     }
                 }
 
                 // If we haven't identified this file yet
-                if (statsFile == null)
-                {
+                if (statsFile == null) {
                     // See if it is a monthly report file
                     statsFile = makeStatsFile(thisFile, reportMonthlyPattern, monthlySDF.get());
-                    if (statsFile != null)
-                    {
+                    if (statsFile != null) {
                         // If it is, add it to the map
                         newMonthlyReports.put(statsFile.dateStr, statsFile);
                     }
                 }
 
                 // If we haven't identified this file yet
-                if (statsFile == null)
-                {
+                if (statsFile == null) {
                     // See if it is a general analysis file
                     statsFile = makeStatsFile(thisFile, analysisGeneralPattern, generalSDF.get());
-                    if (statsFile != null)
-                    {
+                    if (statsFile != null) {
                         // If it is, ensure that we are pointing to the most recent file
-                        if (newGeneralAnalysis == null || statsFile.date.after(newGeneralAnalysis.date))
-                        {
+                        if (newGeneralAnalysis == null || statsFile.date.after(newGeneralAnalysis.date)) {
                             newGeneralAnalysis = statsFile;
                         }
                     }
                 }
 
                 // If we haven't identified this file yet
-                if (statsFile == null)
-                {
+                if (statsFile == null) {
                     // See if it is a general report file
                     statsFile = makeStatsFile(thisFile, reportGeneralPattern, generalSDF.get());
-                    if (statsFile != null)
-                    {
+                    if (statsFile != null) {
                         // If it is, ensure that we are pointing to the most recent file
-                        if (newGeneralReport == null || statsFile.date.after(newGeneralReport.date))
-                        {
+                        if (newGeneralReport == null || statsFile.date.after(newGeneralReport.date)) {
                             newGeneralReport = statsFile;
                         }
                     }
@@ -301,9 +278,9 @@ public class StatisticsLoader
 
         // Store the newly discovered values in the member cache
         monthlyAnalysis = newMonthlyAnalysis;
-        monthlyReports  = newMonthlyReports;
+        monthlyReports = newMonthlyReports;
         generalAnalysis = newGeneralAnalysis;
-        generalReport   = newGeneralReport;
+        generalReport = newGeneralReport;
         lastLoaded = new Date();
     }
 
@@ -312,45 +289,42 @@ public class StatisticsLoader
      * formatters are used to identify the file as a particular type,
      * and extract the relevant information.  If the file is not identified
      * by the formatter provided, then we return null.
-     * @param thisFile file
+     *
+     * @param thisFile    file
      * @param thisPattern patter
-     * @param sdf date format
+     * @param sdf         date format
      * @return StatsFile
      */
-    private static StatsFile makeStatsFile(File thisFile, Pattern thisPattern, DateFormat sdf)
-    {
+    private static StatsFile makeStatsFile(File thisFile, Pattern thisPattern, DateFormat sdf) {
         Matcher matcher = thisPattern.matcher(thisFile.getName());
-        if (matcher.matches())
-        {
+        if (matcher.matches()) {
             StatsFile sf = new StatsFile();
             sf.file = thisFile;
             sf.path = thisFile.getPath();
             sf.dateStr = matcher.group(1).trim();
 
-            try
-            {
+            try {
                 sf.date = sdf.parse(sf.dateStr);
-            }
-            catch (ParseException e)
-            {
-
+            } catch (ParseException e) {
+                // ignore
             }
 
             return sf;
         }
-        
+
         return null;
     }
 
     /**
      * Get an array of all the analysis and report files.
+     *
      * @return array of files
      */
-    private static File[] getAnalysisAndReportFileList()
-    {
-        File reportDir = new File(ConfigurationManager.getProperty("log.report.dir"));
-        if (reportDir != null)
-        {
+    private static File[] getAnalysisAndReportFileList() {
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        File reportDir = new File(configurationService.getProperty("log.report.dir"));
+        if (reportDir != null) {
             return reportDir.listFiles(new AnalysisAndReportFilter());
         }
 
@@ -360,8 +334,7 @@ public class StatisticsLoader
     /**
      * Simple class for holding information about an analysis/report file.
      */
-    private static class StatsFile
-    {
+    private static class StatsFile {
         File file;
         String path;
         Date date;
@@ -372,28 +345,22 @@ public class StatisticsLoader
      * Filter used to restrict files in the reports directory to just
      * analysis or report types.
      */
-    private static class AnalysisAndReportFilter implements FilenameFilter
-    {
+    private static class AnalysisAndReportFilter implements FilenameFilter {
         @Override
-        public boolean accept(File dir, String name)
-        {
-            if (analysisMonthlyPattern.matcher(name).matches())
-            {
+        public boolean accept(File dir, String name) {
+            if (analysisMonthlyPattern.matcher(name).matches()) {
                 return true;
             }
 
-            if (analysisGeneralPattern.matcher(name).matches())
-            {
+            if (analysisGeneralPattern.matcher(name).matches()) {
                 return true;
             }
 
-            if (reportMonthlyPattern.matcher(name).matches())
-            {
+            if (reportMonthlyPattern.matcher(name).matches()) {
                 return true;
             }
-            
-            if (reportGeneralPattern.matcher(name).matches())
-            {
+
+            if (reportGeneralPattern.matcher(name).matches()) {
                 return true;
             }
 

@@ -15,7 +15,8 @@ public interface Destroyable {
 
     /**
      * Destroy the object
-     * @throws Exception
+     *
+     * @throws Exception on generic exception
      */
     public void destroy() throws Exception;
 }

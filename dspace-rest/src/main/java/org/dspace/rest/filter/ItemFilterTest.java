@@ -13,14 +13,17 @@ import org.dspace.core.Context;
 /**
  * Item Filter Use Case Interface.
  * Items will be evaluated against a set of filters.
- * 
+ *
  * @author Terry Brady, Georgetown University
- * 
  */
 public interface ItemFilterTest {
     public String getName();
+
     public String getTitle();
+
     public String getDescription();
+
     public String getCategory();
+
     public boolean testItem(Context context, Item i);
 }

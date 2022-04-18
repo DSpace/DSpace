@@ -29,7 +29,33 @@ public class SpiderDetector {
     private static final Logger log = LoggerFactory.getLogger(SpiderDetector.class);
 
     //Service where all methods get delegated to, this is instantiated by a spring-bean defined in core-services.xml
+<<<<<<< HEAD
     private static SpiderDetectorService spiderDetectorService = StatisticsServiceFactory.getInstance().getSpiderDetectorService();
+
+    /**
+     * Get an immutable Set representing all the Spider Addresses here
+     *
+     * @return a set of IP addresses as strings
+     */
+    public static Set<String> getSpiderIpAddresses() {
+
+        spiderDetectorService.loadSpiderIpAddresses();
+        return spiderDetectorService.getTable().toSet();
+    }
+=======
+    private static SpiderDetectorService spiderDetectorService = StatisticsServiceFactory.getInstance()
+                                                                                         .getSpiderDetectorService();
+>>>>>>> dspace-7.2.1
+
+    /**
+     * Default constructor
+     */
+<<<<<<< HEAD
+    public static Set<String> readPatterns(File patternFile)
+            throws IOException
+    {
+=======
+    private SpiderDetector() { }
 
     /**
      * Get an immutable Set representing all the Spider Addresses here
@@ -50,8 +76,8 @@ public class SpiderDetector {
      * @throws IOException could not happen since we check the file be4 we use it
      */
     public static Set<String> readPatterns(File patternFile)
-            throws IOException
-    {
+        throws IOException {
+>>>>>>> dspace-7.2.1
         return spiderDetectorService.readPatterns(patternFile);
     }
 
@@ -64,12 +90,16 @@ public class SpiderDetector {
      * @param clientIP address of the client.
      * @param proxyIPs comma-list of X-Forwarded-For addresses, or null.
      * @param hostname domain name of host, or null.
-     * @param agent User-Agent header value, or null.
+     * @param agent    User-Agent header value, or null.
      * @return true if the client matches any spider characteristics list.
      */
     public static boolean isSpider(String clientIP, String proxyIPs,
+<<<<<<< HEAD
                                    String hostname, String agent)
     {
+=======
+                                   String hostname, String agent) {
+>>>>>>> dspace-7.2.1
         return spiderDetectorService.isSpider(clientIP, proxyIPs, hostname, agent);
     }
 
@@ -79,8 +109,12 @@ public class SpiderDetector {
      * @param request
      * @return true|false if the request was detected to be from a spider.
      */
+<<<<<<< HEAD
     public static boolean isSpider(HttpServletRequest request)
     {
+=======
+    public static boolean isSpider(HttpServletRequest request) {
+>>>>>>> dspace-7.2.1
         return spiderDetectorService.isSpider(request);
     }
 

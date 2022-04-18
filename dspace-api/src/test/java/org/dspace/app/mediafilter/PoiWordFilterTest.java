@@ -7,9 +7,18 @@
  */
 package org.dspace.app.mediafilter;
 
+<<<<<<< HEAD
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+=======
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+>>>>>>> dspace-7.2.1
 import org.dspace.content.Item;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -17,6 +26,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+<<<<<<< HEAD
 import static org.junit.Assert.*;
 
 /**
@@ -48,6 +58,32 @@ public class PoiWordFilterTest
     @After
     public void tearDown()
     {
+=======
+/**
+ * Drive the POI-based MS Word filter.
+ *
+ * @author mwood
+ */
+public class PoiWordFilterTest {
+
+    public PoiWordFilterTest() {
+    }
+
+    @BeforeClass
+    public static void setUpClass() {
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+    }
+
+    @Before
+    public void setUp() {
+    }
+
+    @After
+    public void tearDown() {
+>>>>>>> dspace-7.2.1
     }
 
     /**
@@ -127,8 +163,12 @@ public class PoiWordFilterTest
      */
     @Test
     public void testGetDestinationStreamDoc()
+<<<<<<< HEAD
             throws Exception
     {
+=======
+        throws Exception {
+>>>>>>> dspace-7.2.1
         System.out.println("getDestinationStream");
         Item currentItem = null;
         InputStream source;
@@ -149,8 +189,12 @@ public class PoiWordFilterTest
      */
     @Test
     public void testGetDestinationStreamDocx()
+<<<<<<< HEAD
             throws Exception
     {
+=======
+        throws Exception {
+>>>>>>> dspace-7.2.1
         System.out.println("getDestinationStream");
         Item currentItem = null;
         InputStream source;
@@ -171,6 +215,7 @@ public class PoiWordFilterTest
      * @throws IOException
      */
     private static String readAll(InputStream stream)
+<<<<<<< HEAD
             throws IOException
     {
         if (null == stream) return null;
@@ -180,6 +225,17 @@ public class PoiWordFilterTest
         int howmany;
         while((howmany = stream.read(bytes)) > 0)
         {
+=======
+        throws IOException {
+        if (null == stream) {
+            return null;
+        }
+
+        byte[] bytes = new byte[stream.available()];
+        StringBuilder resultSb = new StringBuilder(bytes.length / 2); // Guess:  average 2 bytes per character
+        int howmany;
+        while ((howmany = stream.read(bytes)) > 0) {
+>>>>>>> dspace-7.2.1
             resultSb.append(new String(bytes, 0, howmany, StandardCharsets.UTF_8));
         }
         return resultSb.toString();

@@ -28,14 +28,17 @@ public class DatabaseConfigVO {
 
     private int maxConnections;
 
-    public DatabaseConfigVO()
-    {
+    public DatabaseConfigVO() {
 
     }
 
     /**
      * Get the JDBC URL which identifies the DBMS instance and database.  This
      * is set in the DSpace configuration.
+<<<<<<< HEAD
+=======
+     *
+>>>>>>> dspace-7.2.1
      * @return URL pointing to the configured database.
      */
     public String getDatabaseUrl() {
@@ -45,6 +48,10 @@ public class DatabaseConfigVO {
     /**
      * DO NOT USE unless you are writing a DBConnection implementation.  This
      * method does not set the URL that will be used to connect to the database.
+<<<<<<< HEAD
+=======
+     *
+>>>>>>> dspace-7.2.1
      * @param databaseUrl JDBC URL being used by the DBConnection for creating connections.
      */
     public void setDatabaseUrl(String databaseUrl) {
@@ -53,6 +60,10 @@ public class DatabaseConfigVO {
 
     /**
      * Get the name of the DBMS driver, which should indicate what DBMS is in use.
+<<<<<<< HEAD
+=======
+     *
+>>>>>>> dspace-7.2.1
      * @return the driver's notion of its "name".
      */
     public String getDatabaseDriver() {
@@ -62,6 +73,10 @@ public class DatabaseConfigVO {
     /**
      * DO NOT USE unless you are writing an implementation of DBConnection.
      * This method does not select the DBMS driver.
+<<<<<<< HEAD
+=======
+     *
+>>>>>>> dspace-7.2.1
      * @param databaseDriver the driver's name.
      */
     public void setDatabaseDriver(String databaseDriver) {
@@ -70,6 +85,10 @@ public class DatabaseConfigVO {
 
     /**
      * Get the name of the database role used to authenticate connections to the DBMS.
+<<<<<<< HEAD
+=======
+     *
+>>>>>>> dspace-7.2.1
      * @return DBMS user name, from DSpace configuration.
      */
     public String getUserName() {
@@ -79,6 +98,10 @@ public class DatabaseConfigVO {
     /**
      * DO NOT USE unless you are writing an implementation of DBConnection.
      * This method does not alter the user name.
+<<<<<<< HEAD
+=======
+     *
+>>>>>>> dspace-7.2.1
      * @param userName the configured DBMS username.
      */
     public void setUserName(String userName) {
@@ -87,6 +110,10 @@ public class DatabaseConfigVO {
 
     /**
      * Get the name of the database schema.
+<<<<<<< HEAD
+=======
+     *
+>>>>>>> dspace-7.2.1
      * @return name of the schema.
      */
     public String getSchema() {
@@ -96,6 +123,10 @@ public class DatabaseConfigVO {
     /**
      * DO NOT USE unless you are writing an implementation of DBConnection.
      * This method does not set the schema that will be used.
+<<<<<<< HEAD
+=======
+     *
+>>>>>>> dspace-7.2.1
      * @param schema name of the database schema, from configuration.
      */
     public void setSchema(String schema) {
@@ -104,6 +135,10 @@ public class DatabaseConfigVO {
 
     /**
      * Get the maximum number of concurrent DBMS connections that will be opened (if possible).
+<<<<<<< HEAD
+=======
+     *
+>>>>>>> dspace-7.2.1
      * @return configured maximum DBMS connection count.
      */
     public int getMaxConnections() {
@@ -113,6 +148,10 @@ public class DatabaseConfigVO {
     /**
      * DO NOT USE unless you are writing an implementation of DBConnection.
      * This method does not set the connection maximum.
+<<<<<<< HEAD
+=======
+     *
+>>>>>>> dspace-7.2.1
      * @param maxConnections configured maximum number of concurrent DBMS connections.
      */
     public void setMaxConnections(int maxConnections) {

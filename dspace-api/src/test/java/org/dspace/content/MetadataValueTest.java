@@ -7,31 +7,42 @@
  */
 package org.dspace.content;
 
-import org.apache.log4j.Logger;
-import org.dspace.AbstractUnitTest;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import org.apache.logging.log4j.Logger;
+import org.dspace.AbstractUnitTest;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.WorkspaceItemService;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Unit Tests for class MetadataValue
+ *
  * @author pvillega
  */
-public class MetadataValueTest extends AbstractUnitTest
-{
+public class MetadataValueTest extends AbstractUnitTest {
 
-    /** log4j category */
-    private static final Logger log = Logger.getLogger(MetadataValueTest.class);
+    /**
+     * log4j category
+     */
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataValueTest.class);
 
     /**
      * MetadataValue instance for the tests
@@ -74,11 +85,9 @@ public class MetadataValueTest extends AbstractUnitTest
      */
     @Before
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
-        try
-        {
+        try {
             context.turnOffAuthorisationSystem();
             this.owningCommunity = communityService.create(null, context);
             this.collection = collectionService.create(context, owningCommunity);
@@ -86,17 +95,13 @@ public class MetadataValueTest extends AbstractUnitTest
             this.it = installItemService.installItem(context, workspaceItem);
 
             this.mf = metadataFieldService.findByElement(context,
-                    MetadataSchema.DC_SCHEMA, element, qualifier);
-            this.mv = metadataValueService.create(context, it , mf);
+                                                         MetadataSchemaEnum.DC.getName(), element, qualifier);
+            this.mv = metadataValueService.create(context, it, mf);
             context.restoreAuthSystemState();
-        }
-        catch (AuthorizeException ex)
-        {
+        } catch (AuthorizeException ex) {
             log.error("Authorize Error in init", ex);
             fail("Authorize Error in init: " + ex.getMessage());
-        }
-        catch (SQLException ex)
-        {
+        } catch (SQLException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
         }
@@ -111,15 +116,14 @@ public class MetadataValueTest extends AbstractUnitTest
      */
     @After
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         try {
             context.turnOffAuthorisationSystem();
             communityService.delete(context, owningCommunity);
         } catch (SQLException | AuthorizeException | IOException ex) {
             log.error("Error in destroy", ex);
             fail("Error in destroy: " + ex.getMessage());
-        }finally {
+        } finally {
             context.restoreAuthSystemState();
         }
 
@@ -132,8 +136,7 @@ public class MetadataValueTest extends AbstractUnitTest
      * Test of getFieldId method, of class MetadataValue.
      */
     @Test
-    public void testGetFieldId()
-    {
+    public void testGetFieldId() {
         MetadataValue instance = new MetadataValue();
         assertThat("testGetFieldId 0", instance.getID(), equalTo(0));
 
@@ -144,8 +147,7 @@ public class MetadataValueTest extends AbstractUnitTest
      * Test of getItemId method, of class MetadataValue.
      */
     @Test
-    public void testGetDSpaceObject()
-    {
+    public void testGetDSpaceObject() {
         assertTrue("testGetItemId 0", mv.getDSpaceObject().equals(it));
     }
 
@@ -153,8 +155,7 @@ public class MetadataValueTest extends AbstractUnitTest
      * Test of getLanguage method, of class MetadataValue.
      */
     @Test
-    public void testGetLanguage() 
-    {
+    public void testGetLanguage() {
         assertThat("testGetLanguage 0", mv.getLanguage(), nullValue());
     }
 
@@ -162,8 +163,7 @@ public class MetadataValueTest extends AbstractUnitTest
      * Test of setLanguage method, of class MetadataValue.
      */
     @Test
-    public void testSetLanguage()
-    {
+    public void testSetLanguage() {
         String language = "eng";
         mv.setLanguage(language);
         assertThat("testSetLanguage 0", mv.getLanguage(), equalTo(language));
@@ -173,97 +173,87 @@ public class MetadataValueTest extends AbstractUnitTest
      * Test of getPlace method, of class MetadataValue.
      */
     @Test
-    public void testGetPlace()
-    {
-        assertThat("testGetPlace 0",mv.getPlace(), equalTo(1));
+    public void testGetPlace() {
+        assertThat("testGetPlace 0", mv.getPlace(), equalTo(1));
     }
 
     /**
      * Test of setPlace method, of class MetadataValue.
      */
     @Test
-    public void testSetPlace()
-    {
+    public void testSetPlace() {
         int place = 5;
         mv.setPlace(place);
-        assertThat("testSetPlace 0",mv.getPlace(), equalTo(place));
+        assertThat("testSetPlace 0", mv.getPlace(), equalTo(place));
     }
 
     /**
      * Test of getValueId method, of class MetadataValue.
      */
     @Test
-    public void testGetValueId() 
-    {
-        assertThat("testGetValueId 0",mv.getID(), notNullValue());
+    public void testGetValueId() {
+        assertThat("testGetValueId 0", mv.getID(), notNullValue());
     }
 
     /**
      * Test of getValue method, of class MetadataValue.
      */
     @Test
-    public void testGetValue() 
-    {
-        assertThat("testGetValue 0",mv.getValue(), nullValue());
+    public void testGetValue() {
+        assertThat("testGetValue 0", mv.getValue(), nullValue());
     }
 
     /**
      * Test of setValue method, of class MetadataValue.
      */
     @Test
-    public void testSetValue()
-    {
+    public void testSetValue() {
         String value = "value";
         mv.setValue(value);
-        assertThat("testSetValue 0",mv.getValue(), equalTo(value));
+        assertThat("testSetValue 0", mv.getValue(), equalTo(value));
     }
 
     /**
      * Test of getAuthority method, of class MetadataValue.
      */
     @Test
-    public void testGetAuthority() 
-    {
-        assertThat("testGetAuthority 0",mv.getAuthority(), nullValue());
+    public void testGetAuthority() {
+        assertThat("testGetAuthority 0", mv.getAuthority(), nullValue());
     }
 
     /**
      * Test of setAuthority method, of class MetadataValue.
      */
     @Test
-    public void testSetAuthority()
-    {
+    public void testSetAuthority() {
         String value = "auth_val";
         mv.setAuthority(value);
-        assertThat("testSetAuthority 0",mv.getAuthority(), equalTo(value));
+        assertThat("testSetAuthority 0", mv.getAuthority(), equalTo(value));
     }
 
     /**
      * Test of getConfidence method, of class MetadataValue.
      */
     @Test
-    public void testGetConfidence() 
-    {
-        assertThat("testGetConfidence 0",mv.getConfidence(), equalTo(-1));
+    public void testGetConfidence() {
+        assertThat("testGetConfidence 0", mv.getConfidence(), equalTo(-1));
     }
 
     /**
      * Test of setConfidence method, of class MetadataValue.
      */
     @Test
-    public void testSetConfidence() 
-    {
+    public void testSetConfidence() {
         int value = 5;
         mv.setConfidence(value);
-        assertThat("testSetConfidence 0",mv.getConfidence(), equalTo(value));
+        assertThat("testSetConfidence 0", mv.getConfidence(), equalTo(value));
     }
 
     /**
      * Test of create method, of class MetadataValue.
      */
     @Test
-    public void testCreate() throws Exception
-    {
+    public void testCreate() throws Exception {
         metadataValueService.create(context, it, mf);
     }
 
@@ -271,33 +261,30 @@ public class MetadataValueTest extends AbstractUnitTest
      * Test of find method, of class MetadataValue.
      */
     @Test
-    public void testFind() throws Exception 
-    {
+    public void testFind() throws Exception {
         metadataValueService.create(context, it, mf);
         int id = mv.getID();
         MetadataValue found = metadataValueService.find(context, id);
-        assertThat("testFind 0",found, notNullValue());
-        assertThat("testFind 1",found.getID(), equalTo(id));
+        assertThat("testFind 0", found, notNullValue());
+        assertThat("testFind 1", found.getID(), equalTo(id));
     }
 
     /**
      * Test of findByField method, of class MetadataValue.
      */
     @Test
-    public void testFindByField() throws Exception
-    {
+    public void testFindByField() throws Exception {
         metadataValueService.create(context, it, mf);
         List<MetadataValue> found = metadataValueService.findByField(context, mf);
-        assertThat("testFind 0",found, notNullValue());
-        assertTrue("testFind 1",found.size() >= 1);        
+        assertThat("testFind 0", found, notNullValue());
+        assertTrue("testFind 1", found.size() >= 1);
     }
 
     /**
      * Test of update method, of class MetadataValue.
      */
     @Test
-    public void testUpdate() throws Exception
-    {
+    public void testUpdate() throws Exception {
         metadataValueService.create(context, it, mf);
         metadataValueService.update(context, mv);
     }

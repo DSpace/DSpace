@@ -10,15 +10,12 @@ package org.dspace.util;
 /**
  * @author Andrea Schweer schweer@waikato.ac.nz for the LCoNZ Institutional Research Repositories
  */
-public class SolrImportExportException extends Exception
-{
-	public SolrImportExportException(String message)
-	{
-		super(message);
-	}
+public class SolrImportExportException extends Exception {
+    public SolrImportExportException(String message) {
+        super(message);
+    }
 
-	public SolrImportExportException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
+    public SolrImportExportException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

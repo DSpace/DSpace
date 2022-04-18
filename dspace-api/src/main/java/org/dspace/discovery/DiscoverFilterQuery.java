@@ -14,7 +14,6 @@ package org.dspace.discovery;
  * The displayed value
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
- *
  */
 public class DiscoverFilterQuery {
 

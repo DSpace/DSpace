@@ -16,7 +16,9 @@ import java.util.UUID;
  * It offers up a lot of general methods so these don't need to be declared again in each DAO.
  * The default Hibernate implementation offers up a class that implements all these methods.
  *
+ * @param <T> type which is accessed by this DAO, for example Item.
  * @author kevinvandevelde at atmire.com
+<<<<<<< HEAD
  * @param <T> type which is accessed by this DAO, for example Item.
  */
 public interface GenericDAO<T>
@@ -25,6 +27,15 @@ public interface GenericDAO<T>
      * Create a new instance of this type in the database.
      * @param context current DSpace context.
      * @param t type to be created.
+=======
+ */
+public interface GenericDAO<T> {
+    /**
+     * Create a new instance of this type in the database.
+     *
+     * @param context current DSpace context.
+     * @param t       type to be created.
+>>>>>>> dspace-7.2.1
      * @return entity tracking the created instance.
      * @throws SQLException
      */
@@ -32,16 +43,28 @@ public interface GenericDAO<T>
 
     /**
      * Persist this instance in the database.
+<<<<<<< HEAD
      * @param context current DSpace context.
      * @param t type created here.
+=======
+     *
+     * @param context current DSpace context.
+     * @param t       type created here.
+>>>>>>> dspace-7.2.1
      * @throws SQLException passed through.
      */
     public void save(Context context, T t) throws SQLException;
 
     /**
      * Remove an instance from the database.
+<<<<<<< HEAD
      * @param context current DSpace context.
      * @param t type of the instance to be removed.
+=======
+     *
+     * @param context current DSpace context.
+     * @param t       type of the instance to be removed.
+>>>>>>> dspace-7.2.1
      * @throws SQLException passed through.
      */
     public void delete(Context context, T t) throws SQLException;
@@ -49,18 +72,30 @@ public interface GenericDAO<T>
     /**
      * Fetch all persisted instances of a given object type.
      *
-     * @param context
-     * @param clazz the desired type.
+     * @param context The relevant DSpace Context.
+     * @param clazz   the desired type.
      * @return list of DAOs of the same type as clazz
      * @throws SQLException if database error
      */
     public List<T> findAll(Context context, Class<T> clazz) throws SQLException;
 
     /**
+     * Fetch all persisted instances of a given object type.
+     *
+     * @param context The relevant DSpace Context.
+     * @param clazz   the desired type.
+     * @param limit   paging limit
+     * @param offset  paging offset
+     * @return list of DAOs of the same type as clazz
+     * @throws SQLException if database error
+     */
+    List<T> findAll(Context context, Class<T> clazz, Integer limit, Integer offset) throws SQLException;
+
+    /**
      * Execute a JPQL query returning a unique result.
      *
-     * @param context
-     * @param query JPQL query string
+     * @param context The relevant DSpace Context.
+     * @param query   JPQL query string
      * @return a DAO specified by the query string
      * @throws SQLException if database error
      */
@@ -68,9 +103,16 @@ public interface GenericDAO<T>
 
     /**
      * Fetch the entity identified by its legacy database identifier.
+<<<<<<< HEAD
      * @param context current DSpace context.
      * @param clazz class of entity to be found.
      * @param id legacy database record ID.
+=======
+     *
+     * @param context current DSpace context.
+     * @param clazz   class of entity to be found.
+     * @param id      legacy database record ID.
+>>>>>>> dspace-7.2.1
      * @return the found entity.
      * @throws SQLException passed through.
      */
@@ -78,9 +120,16 @@ public interface GenericDAO<T>
 
     /**
      * Fetch the entity identified by its UUID primary key.
+<<<<<<< HEAD
      * @param context current DSpace context.
      * @param clazz class of entity to be found.
      * @param id primary key of the database record.
+=======
+     *
+     * @param context current DSpace context.
+     * @param clazz   class of entity to be found.
+     * @param id      primary key of the database record.
+>>>>>>> dspace-7.2.1
      * @return the found entity.
      * @throws SQLException
      */
@@ -89,8 +138,8 @@ public interface GenericDAO<T>
     /**
      * Execute a JPQL query and return a collection of results.
      *
-     * @param context
-     * @param query JPQL query string
+     * @param context The relevant DSpace Context.
+     * @param query   JPQL query string
      * @return list of DAOs specified by the query string
      * @throws SQLException if database error
      */

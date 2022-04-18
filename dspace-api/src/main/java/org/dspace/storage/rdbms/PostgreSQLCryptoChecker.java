@@ -10,10 +10,12 @@ package org.dspace.storage.rdbms;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
 import org.flywaydb.core.api.FlywayException;
-import org.flywaydb.core.api.MigrationInfo;
-import org.flywaydb.core.api.callback.FlywayCallback;
+import org.flywaydb.core.api.callback.Callback;
+import org.flywaydb.core.api.callback.Context;
+import org.flywaydb.core.api.callback.Event;
 
 /**
  * This is a FlywayCallback class which automatically verifies that "pgcrypto"
@@ -27,38 +29,34 @@ import org.flywaydb.core.api.callback.FlywayCallback;
  *
  * @author Tim Donohue
  */
-public class PostgreSQLCryptoChecker implements FlywayCallback
-{
-    private Logger log = Logger.getLogger(PostgreSQLCryptoChecker.class);
+public class PostgreSQLCryptoChecker implements Callback {
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(PostgreSQLCryptoChecker.class);
 
     /**
      * Check for pgcrypto (if needed). Throws an exception if pgcrypto is
      * not installed or needs an upgrade.
+     *
      * @param connection database connection
      */
-    public void checkPgCrypto(Connection connection)
-    {
+    public void checkPgCrypto(Connection connection) {
         String dbType;
-        try
-        {
+        try {
             dbType = DatabaseUtils.getDbType(connection);
-        }
-        catch(SQLException se)
-        {
+        } catch (SQLException se) {
             throw new FlywayException("Unable to determine database type.", se);
         }
 
         // ONLY Check if this is a PostgreSQL database
-        if(dbType!=null && dbType.equals(DatabaseUtils.DBMS_POSTGRES))
-        {
+        if (dbType != null && dbType.equals(DatabaseUtils.DBMS_POSTGRES)) {
             // If this is a PostgreSQL database, then a supported version
             // of the 'pgcrypto' extension MUST be installed to continue.
-            
+
             // Check if pgcrypto is both installed & a supported version
-            if(!PostgresUtils.isPgcryptoUpToDate())
-            {
-                throw new FlywayException("This PostgreSQL Database is INCOMPATIBLE with DSpace. The upgrade will NOT proceed. " +
-                        "A supported version (>=" + PostgresUtils.PGCRYPTO_VERSION + ") of the '" + PostgresUtils.PGCRYPTO + "' extension must be installed! " +
+            if (!PostgresUtils.isPgcryptoUpToDate()) {
+                throw new FlywayException(
+                    "This PostgreSQL Database is INCOMPATIBLE with DSpace. The upgrade will NOT proceed. " +
+                        "A supported version (>=" + PostgresUtils.PGCRYPTO_VERSION + ") of the '" + PostgresUtils
+                        .PGCRYPTO + "' extension must be installed! " +
                         "Please run 'dspace database info' for additional info/tips.");
             }
         }
@@ -69,27 +67,23 @@ public class PostgreSQLCryptoChecker implements FlywayCallback
      * <P>
      * The pgcrypto extension MUST be removed before a clean or else errors occur.
      * This method checks if it needs to be removed and, if so, removes it.
+     *
      * @param connection database connection
      */
-    public void removePgCrypto(Connection connection)
-    {
-        try
-        {
+    public void removePgCrypto(Connection connection) {
+        try {
             String dbType = DatabaseUtils.getDbType(connection);
 
             // ONLY remove if this is a PostgreSQL database
-            if(dbType!=null && dbType.equals(DatabaseUtils.DBMS_POSTGRES))
-            {
+            if (dbType != null && dbType.equals(DatabaseUtils.DBMS_POSTGRES)) {
                 // Get current schema
                 String schema = DatabaseUtils.getSchemaName(connection);
 
                 // Check if pgcrypto is in this schema
                 // If so, it MUST be removed before a 'clean'
-                if(PostgresUtils.isPgcryptoInSchema(schema))
-                {
+                if (PostgresUtils.isPgcryptoInSchema(schema)) {
                     // remove the extension
-                    try(Statement statement = connection.createStatement())
-                    {
+                    try (Statement statement = connection.createStatement()) {
                         // WARNING: ONLY superusers can remove pgcrypto. However, at this point,
                         // we have already verified user acct permissions via PostgresUtils.checkCleanPermissions()
                         // (which is called prior to a 'clean' being triggered).
@@ -97,83 +91,49 @@ public class PostgreSQLCryptoChecker implements FlywayCallback
                     }
                 }
             }
+        } catch (SQLException e) {
+            throw new FlywayException("Failed to check for and/or remove '" + PostgresUtils.PGCRYPTO + "' extension",
+                                      e);
         }
-        catch(SQLException e)
-        {
-            throw new FlywayException("Failed to check for and/or remove '" + PostgresUtils.PGCRYPTO + "' extension", e);
+    }
+
+    /**
+     * Events supported by this callback.
+     * @param event Flyway event
+     * @param context Flyway context
+     * @return true if BEFORE_BASELINE, BEFORE_MIGRATE or BEFORE_CLEAN
+     */
+    @Override
+    public boolean supports(Event event, Context context) {
+        return event.equals(Event.BEFORE_BASELINE) || event.equals(Event.BEFORE_MIGRATE) ||
+            event.equals(Event.BEFORE_CLEAN);
+    }
+
+    /**
+     * Whether event can be handled in a transaction or whether it must be handle outside of transaction.
+     * @param event Flyway event
+     * @param context Flyway context
+     * @return true
+     */
+    @Override
+    public boolean canHandleInTransaction(Event event, Context context) {
+        return true;
+    }
+
+    /**
+     * What to run when the callback is triggered.
+     * @param event Flyway event
+     * @param context Flyway context
+     */
+    @Override
+    public void handle(Event event, Context context) {
+        // If, before initializing or migrating database, check for pgcrypto
+        // Else, before Cleaning database, remove pgcrypto (if exists)
+        if (event.equals(Event.BEFORE_BASELINE) || event.equals(Event.BEFORE_MIGRATE)) {
+            checkPgCrypto(context.getConnection());
+        } else if (event.equals(Event.BEFORE_CLEAN)) {
+            removePgCrypto(context.getConnection());
         }
-    }
-
-    @Override
-    public void beforeClean(Connection connection) {
-        // If pgcrypto is installed, remove it
-        removePgCrypto(connection);
-    }
-
-    @Override
-    public void afterClean(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeMigrate(Connection connection) {
-        // Before migrating database, check for pgcrypto
-        checkPgCrypto(connection);
-    }
-
-    @Override
-    public void afterMigrate(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeEachMigrate(Connection connection, MigrationInfo migrationInfo) {
-
-    }
-
-    @Override
-    public void afterEachMigrate(Connection connection, MigrationInfo migrationInfo) {
-
-    }
-
-    @Override
-    public void beforeValidate(Connection connection) {
-
-    }
-
-    @Override
-    public void afterValidate(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeBaseline(Connection connection) {
-        // Before initializing database, check for pgcrypto
-        checkPgCrypto(connection);
-    }
-
-    @Override
-    public void afterBaseline(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeRepair(Connection connection) {
-
-    }
-
-    @Override
-    public void afterRepair(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeInfo(Connection connection) {
-
-    }
-
-    @Override
-    public void afterInfo(Connection connection) {
 
     }
 }

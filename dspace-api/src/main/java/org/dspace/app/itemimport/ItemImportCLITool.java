@@ -7,7 +7,18 @@
  */
 package org.dspace.app.itemimport;
 
-import org.apache.commons.cli.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
 import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.content.Collection;
@@ -20,12 +31,6 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * Import items into DSpace. The conventional use is upload files by copying
@@ -47,43 +52,46 @@ public class ItemImportCLITool {
 
     private static boolean template = false;
 
-    private static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    private static final CollectionService collectionService = ContentServiceFactory.getInstance()
+                                                                                    .getCollectionService();
     private static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
-    public static void main(String[] argv) throws Exception
-    {
+    /**
+     * Default constructor
+     */
+    private ItemImportCLITool() { }
+
+    public static void main(String[] argv) throws Exception {
         Date startTime = new Date();
         int status = 0;
 
         try {
             // create an options object and populate it
-            CommandLineParser parser = new PosixParser();
+            CommandLineParser parser = new DefaultParser();
 
             Options options = new Options();
 
             options.addOption("a", "add", false, "add items to DSpace");
-            options.addOption("b", "add-bte", false, "add items to DSpace via Biblio-Transformation-Engine (BTE)");
             options.addOption("r", "replace", false, "replace items in mapfile");
             options.addOption("d", "delete", false,
-                    "delete items listed in mapfile");
-            options.addOption("i", "inputtype", true, "input type in case of BTE import");
+                              "delete items listed in mapfile");
             options.addOption("s", "source", true, "source of items (directory)");
             options.addOption("z", "zip", true, "name of zip file");
             options.addOption("c", "collection", true,
-                    "destination collection(s) Handle or database ID");
+                              "destination collection(s) Handle or database ID");
             options.addOption("m", "mapfile", true, "mapfile items in mapfile");
             options.addOption("e", "eperson", true,
-                    "email of eperson doing importing");
+                              "email of eperson doing importing");
             options.addOption("w", "workflow", false,
-                    "send submission through collection's workflow");
+                              "send submission through collection's workflow");
             options.addOption("n", "notify", false,
-                    "if sending submissions through the workflow, send notification emails");
+                              "if sending submissions through the workflow, send notification emails");
             options.addOption("t", "test", false,
-                    "test run - do not actually import items");
+                              "test run - do not actually import items");
             options.addOption("p", "template", false, "apply template");
             options.addOption("R", "resume", false,
-                    "resume a failed import (add only)");
+                              "resume a failed import (add only)");
             options.addOption("q", "quiet", false, "don't display metadata");
 
             options.addOption("h", "help", false, "help");
@@ -91,7 +99,6 @@ public class ItemImportCLITool {
             CommandLine line = parser.parse(options, argv);
 
             String command = null; // add replace remove, etc
-            String bteInputType = null; //ris, endnote, tsv, csv, bibtex
             String sourcedir = null;
             String mapfile = null;
             String eperson = null; // db ID or email
@@ -106,15 +113,19 @@ public class ItemImportCLITool {
                 HelpFormatter myhelp = new HelpFormatter();
                 myhelp.printHelp("ItemImport\n", options);
                 System.out
-                        .println("\nadding items:    ItemImport -a -e eperson -c collection -s sourcedir -m mapfile");
+                    .println("\nadding items:    ItemImport -a -e eperson -c collection -s sourcedir -m mapfile");
                 System.out
-                        .println("\nadding items from zip file:    ItemImport -a -e eperson -c collection -s sourcedir -z filename.zip -m mapfile");
+                    .println(
+                        "\nadding items from zip file:    ItemImport -a -e eperson -c collection -s sourcedir -z " +
+                            "filename.zip -m mapfile");
                 System.out
-                        .println("replacing items: ItemImport -r -e eperson -c collection -s sourcedir -m mapfile");
+                    .println("replacing items: ItemImport -r -e eperson -c collection -s sourcedir -m mapfile");
                 System.out
-                        .println("deleting items:  ItemImport -d -e eperson -m mapfile");
+                    .println("deleting items:  ItemImport -d -e eperson -m mapfile");
                 System.out
-                        .println("If multiple collections are specified, the first collection will be the one that owns the item.");
+                    .println(
+                        "If multiple collections are specified, the first collection will be the one that owns the " +
+                            "item.");
 
                 System.exit(0);
             }
@@ -129,14 +140,6 @@ public class ItemImportCLITool {
 
             if (line.hasOption('d')) {
                 command = "delete";
-            }
-
-            if (line.hasOption('b')) {
-                command = "add-bte";
-            }
-
-            if (line.hasOption('i')) {
-                bteInputType = line.getOptionValue('i');
             }
 
             if (line.hasOption('w')) {
@@ -155,30 +158,26 @@ public class ItemImportCLITool {
                 template = true;
             }
 
-            if (line.hasOption('s')) // source
-            {
+            if (line.hasOption('s')) { // source
                 sourcedir = line.getOptionValue('s');
             }
 
-            if (line.hasOption('m')) // mapfile
-            {
+            if (line.hasOption('m')) { // mapfile
                 mapfile = line.getOptionValue('m');
             }
 
-            if (line.hasOption('e')) // eperson
-            {
+            if (line.hasOption('e')) { // eperson
                 eperson = line.getOptionValue('e');
             }
 
-            if (line.hasOption('c')) // collections
-            {
+            if (line.hasOption('c')) { // collections
                 collections = line.getOptionValues('c');
             }
 
             if (line.hasOption('R')) {
                 isResume = true;
                 System.out
-                        .println("**Resume import** - attempting to import items not already imported");
+                    .println("**Resume import** - attempting to import items not already imported");
             }
 
             if (line.hasOption('q')) {
@@ -198,26 +197,26 @@ public class ItemImportCLITool {
             // must have a command set
             if (command == null) {
                 System.out
-                        .println("Error - must run with either add, replace, or remove (run with -h flag for details)");
+                    .println("Error - must run with either add, replace, or remove (run with -h flag for details)");
                 System.exit(1);
             } else if ("add".equals(command) || "replace".equals(command)) {
                 if (sourcedir == null) {
                     System.out
-                            .println("Error - a source directory containing items must be set");
+                        .println("Error - a source directory containing items must be set");
                     System.out.println(" (run with -h flag for details)");
                     System.exit(1);
                 }
 
                 if (mapfile == null) {
                     System.out
-                            .println("Error - a map file to hold importing results must be specified");
+                        .println("Error - a map file to hold importing results must be specified");
                     System.out.println(" (run with -h flag for details)");
                     System.exit(1);
                 }
 
                 if (eperson == null) {
                     System.out
-                            .println("Error - an eperson to do the importing must be specified");
+                        .println("Error - an eperson to do the importing must be specified");
                     System.out.println(" (run with -h flag for details)");
                     System.exit(1);
                 }
@@ -225,39 +224,11 @@ public class ItemImportCLITool {
                 if (collections == null) {
                     System.out.println("No collections given. Assuming 'collections' file inside item directory");
                     commandLineCollections = false;
-                }
-            } else if ("add-bte".equals(command)) {
-                //Source dir can be null, the user can specify the parameters for his loader in the Spring XML configuration file
-
-                if (mapfile == null) {
-                    System.out
-                            .println("Error - a map file to hold importing results must be specified");
-                    System.out.println(" (run with -h flag for details)");
-                    System.exit(1);
-                }
-
-                if (eperson == null) {
-                    System.out
-                            .println("Error - an eperson to do the importing must be specified");
-                    System.out.println(" (run with -h flag for details)");
-                    System.exit(1);
-                }
-
-                if (collections == null) {
-                    System.out.println("No collections given. Assuming 'collections' file inside item directory");
-                    commandLineCollections = false;
-                }
-
-                if (bteInputType == null) {
-                    System.out
-                            .println("Error - an input type (tsv, csv, ris, endnote, bibtex or any other type you have specified in BTE Spring XML configuration file) must be specified");
-                    System.out.println(" (run with -h flag for details)");
-                    System.exit(1);
                 }
             } else if ("delete".equals(command)) {
                 if (eperson == null) {
                     System.out
-                            .println("Error - an eperson to do the importing must be specified");
+                        .println("Error - an eperson to do the importing must be specified");
                     System.exit(1);
                 }
 
@@ -268,9 +239,9 @@ public class ItemImportCLITool {
             }
 
             // can only resume for adds
-            if (isResume && !"add".equals(command) && !"add-bte".equals(command)) {
+            if (isResume && !"add".equals(command)) {
                 System.out
-                        .println("Error - resume option only works with the --add or the --add-bte commands");
+                    .println("Error - resume option only works with the --add command");
                 System.exit(1);
             }
 
@@ -280,9 +251,9 @@ public class ItemImportCLITool {
 
             if (!isResume && "add".equals(command) && myFile.exists()) {
                 System.out.println("Error - the mapfile " + mapfile
-                        + " already exists.");
+                                       + " already exists.");
                 System.out
-                        .println("Either delete it or use --resume if attempting to resume an aborted import.");
+                    .println("Either delete it or use --resume if attempting to resume an aborted import.");
                 System.exit(1);
             }
 
@@ -325,30 +296,35 @@ public class ItemImportCLITool {
 
                 // validate each collection arg to see if it's a real collection
                 for (int i = 0; i < collections.length; i++) {
-                    // is the ID a handle?
-                    if (collections[i].indexOf('/') != -1) {
-                        // string has a / so it must be a handle - try and resolve
-                        // it
-                        mycollections.add((Collection) handleService
+
+                    Collection resolved = null;
+
+                    if (collections[i] != null) {
+
+                        // is the ID a handle?
+                        if (collections[i].indexOf('/') != -1) {
+                            // string has a / so it must be a handle - try and resolve
+                            // it
+                            resolved = ((Collection) handleService
                                 .resolveToObject(c, collections[i]));
 
-                        // resolved, now make sure it's a collection
-                        if ((mycollections.get(i) == null)
-                                || (mycollections.get(i).getType() != Constants.COLLECTION)) {
-                            mycollections.set(i, null);
+                        } else {
+                            // not a handle, try and treat it as an integer collection database ID
+                            resolved = collectionService.find(c, UUID.fromString(collections[i]));
+
                         }
-                    }
-                    // not a handle, try and treat it as an integer collection
-                    // database ID
-                    else if (collections[i] != null) {
-                        mycollections.set(i, collectionService.find(c, UUID.fromString(collections[i])));
+
                     }
 
                     // was the collection valid?
-                    if (mycollections.get(i) == null) {
+                    if ((resolved == null)
+                            || (resolved.getType() != Constants.COLLECTION)) {
                         throw new IllegalArgumentException("Cannot resolve "
-                                + collections[i] + " to collection");
+                                                               + collections[i] + " to collection");
                     }
+
+                    // add resolved collection to list
+                    mycollections.add(resolved);
 
                     // print progress info
                     String owningPrefix = "";
@@ -358,7 +334,7 @@ public class ItemImportCLITool {
                     }
 
                     System.out.println(owningPrefix + " Collection: "
-                            + mycollections.get(i).getName());
+                                           + resolved.getName());
                 }
             } // end of validating collections
 
@@ -377,8 +353,6 @@ public class ItemImportCLITool {
                     myloader.replaceItems(c, mycollections, sourcedir, mapfile, template);
                 } else if ("delete".equals(command)) {
                     myloader.deleteItems(c, mapfile);
-                } else if ("add-bte".equals(command)) {
-                    myloader.addBTEItems(c, mycollections, sourcedir, mapfile, template, bteInputType, null);
                 }
 
                 // complete all transactions
@@ -394,11 +368,13 @@ public class ItemImportCLITool {
             try {
                 if (zip) {
                     System.gc();
-                    System.out.println("Deleting temporary zip directory: " + myloader.getTempWorkDirFile().getAbsolutePath());
+                    System.out.println(
+                        "Deleting temporary zip directory: " + myloader.getTempWorkDirFile().getAbsolutePath());
                     myloader.cleanupZipTemp();
                 }
-            } catch (Exception ex) {
-                System.out.println("Unable to delete temporary zip archive location: " + myloader.getTempWorkDirFile().getAbsolutePath());
+            } catch (IOException ex) {
+                System.out.println("Unable to delete temporary zip archive location: " + myloader.getTempWorkDirFile()
+                                                                                                 .getAbsolutePath());
             }
 
 
@@ -409,7 +385,9 @@ public class ItemImportCLITool {
             Date endTime = new Date();
             System.out.println("Started: " + startTime.getTime());
             System.out.println("Ended: " + endTime.getTime());
-            System.out.println("Elapsed time: " + ((endTime.getTime() - startTime.getTime()) / 1000) + " secs (" + (endTime.getTime() - startTime.getTime()) + " msecs)");
+            System.out.println(
+                "Elapsed time: " + ((endTime.getTime() - startTime.getTime()) / 1000) + " secs (" + (endTime
+                    .getTime() - startTime.getTime()) + " msecs)");
         }
 
         System.exit(status);

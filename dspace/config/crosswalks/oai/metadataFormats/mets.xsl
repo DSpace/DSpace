@@ -1,21 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- 
-
-
-    The contents of this file are subject to the license and copyright
-    detailed in the LICENSE and NOTICE files at the root of the source
-    tree and available online at
-
-    http://www.dspace.org/license/
-    
-	Developed by DSpace @ Lyncode <dspace@lyncode.com>
-	
-	>  http://www.loc.gov/standards/mets/mets.xsd
--->
+<!-- http://www.loc.gov/standards/mets/mets.xsd -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	xmlns:doc="http://www.lyncode.com/xoai" 
-    xmlns:date="http://exslt.org/dates-and-times" 
-    extension-element-prefixes="date" version="1.0">
+				xmlns:doc="http://www.lyncode.com/xoai" version="2.0">
     
 	<xsl:output omit-xml-declaration="yes" method="xml" indent="yes" />
 
@@ -32,7 +18,7 @@
 			</xsl:attribute>
 			<metsHdr>
 				<xsl:attribute name="CREATEDATE">
-					<xsl:value-of select="concat(date:format-date(date:date(), 'yyyy-MM-dd'), 'T' , date:format-date(date:time(), 'HH:mm:ss'), 'Z')"/>
+					<xsl:value-of select="concat(format-date(current-date(), '[Y0001]-[M02]-[D02]'), 'T' , format-time(current-time(), '[H01]:[m01]:[s01]'), 'Z')"/>
 				</xsl:attribute>
 				<agent ROLE="CUSTODIAN" TYPE="ORGANIZATION">
 					<name><xsl:value-of select="doc:metadata/doc:element[@name='repository']/doc:field[@name='name']/text()" /></name>

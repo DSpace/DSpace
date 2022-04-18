@@ -31,8 +31,7 @@ import org.jdom.Element;
  * @author Larry Stone
  * @version $Revision$
  */
-public interface IngestionCrosswalk
-{
+public interface IngestionCrosswalk {
     /**
      * Crosswalk metadata from external XML representation to DSpace
      * internal representations.  This version accepts metadata as a
@@ -60,19 +59,22 @@ public interface IngestionCrosswalk
      * capable of) choosing whether the list or element version should
      * be called.
      * <p>
-     * @param context  DSpace context.
-     * @param dso DSpace Object (Item, Bitstream, etc) to which new metadata gets attached.
-     * @param metadata  List of XML Elements of metadata
-     * @param createMissingMetadataFields whether to create missing fields
      *
-     * @throws CrosswalkInternalException (<code>CrosswalkException</code>) failure of the crosswalk itself.
-     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk into this kind of DSpace object.
-     * @throws MetadataValidationException (<code>CrosswalkException</code>)  metadata format was not acceptable or missing required elements.
-     * @throws IOException  I/O failure in services this calls
-     * @throws SQLException  Database failure in services this calls
-     * @throws AuthorizeException current user not authorized for this operation.
+     * @param context                     DSpace context.
+     * @param dso                         DSpace Object (Item, Bitstream, etc) to which new metadata gets attached.
+     * @param metadata                    List of XML Elements of metadata
+     * @param createMissingMetadataFields whether to create missing fields
+     * @throws CrosswalkInternalException  (<code>CrosswalkException</code>) failure of the crosswalk itself.
+     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk into this kind of
+     *                                     DSpace object.
+     * @throws MetadataValidationException (<code>CrosswalkException</code>)  metadata format was not acceptable or
+     *                                     missing required elements.
+     * @throws IOException                 I/O failure in services this calls
+     * @throws SQLException                Database failure in services this calls
+     * @throws AuthorizeException          current user not authorized for this operation.
      */
-    public abstract void ingest(Context context, DSpaceObject dso, List<Element> metadata, boolean createMissingMetadataFields)
+    public abstract void ingest(Context context, DSpaceObject dso, List<Element> metadata,
+                                boolean createMissingMetadataFields)
         throws CrosswalkException, IOException, SQLException, AuthorizeException;
 
     /**
@@ -83,17 +85,19 @@ public interface IngestionCrosswalk
      * It is otherwise just like the <code>List</code> form of
      * <code>ingest()</code> above.
      * <p>
-     * @param context  DSpace context.
-     * @param dso DSpace Object (usually an Item) to which new metadata gets attached.
-     * @param root root Element of metadata document.
-     * @param createMissingMetadataFields whether to create missing fields
      *
-     * @throws CrosswalkInternalException (<code>CrosswalkException</code>) failure of the crosswalk itself.
-     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk into this kind of DSpace object.
-     * @throws MetadataValidationException (<code>CrosswalkException</code>)  metadata format was not acceptable or missing required elements.
-     * @throws IOException  I/O failure in services this calls
-     * @throws SQLException  Database failure in services this calls
-     * @throws AuthorizeException current user not authorized for this operation.
+     * @param context                     DSpace context.
+     * @param dso                         DSpace Object (usually an Item) to which new metadata gets attached.
+     * @param root                        root Element of metadata document.
+     * @param createMissingMetadataFields whether to create missing fields
+     * @throws CrosswalkInternalException  (<code>CrosswalkException</code>) failure of the crosswalk itself.
+     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk into this kind of
+     *                                     DSpace object.
+     * @throws MetadataValidationException (<code>CrosswalkException</code>)  metadata format was not acceptable or
+     *                                     missing required elements.
+     * @throws IOException                 I/O failure in services this calls
+     * @throws SQLException                Database failure in services this calls
+     * @throws AuthorizeException          current user not authorized for this operation.
      */
     public abstract void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
         throws CrosswalkException, IOException, SQLException, AuthorizeException;

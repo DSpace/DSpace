@@ -8,27 +8,22 @@
 package org.purl.sword.base;
 
 /**
- *
  * @author Neil Taylor (nst@aber.ac.uk)
  */
-public class SwordService extends BasicStringContentElement
-{
+public class SwordService extends BasicStringContentElement {
     private static final XmlName XML_NAME =
-            new XmlName(Namespaces.PREFIX_SWORD, "service", Namespaces.NS_SWORD);
+        new XmlName(Namespaces.PREFIX_SWORD, "service", Namespaces.NS_SWORD);
 
-    public SwordService()
-    {
+    public SwordService() {
         super(XML_NAME);
     }
 
-    public SwordService(String version)
-    {
+    public SwordService(String version) {
         this();
-        setContent(version); 
+        setContent(version);
     }
 
-    public static XmlName elementName()
-    {
+    public static XmlName elementName() {
         return XML_NAME;
     }
 

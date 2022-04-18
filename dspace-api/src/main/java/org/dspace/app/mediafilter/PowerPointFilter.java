@@ -10,47 +10,41 @@ package org.dspace.app.mediafilter;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.apache.poi.extractor.ExtractorFactory;
-import org.apache.poi.xslf.extractor.XSLFPowerPointExtractor;
-import org.apache.poi.hslf.extractor.PowerPointExtractor;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.POITextExtractor;
-
-import org.apache.log4j.Logger;
+import org.apache.poi.extractor.ExtractorFactory;
+import org.apache.poi.hslf.extractor.PowerPointExtractor;
+import org.apache.poi.xslf.extractor.XSLFPowerPointExtractor;
 import org.dspace.content.Item;
 
 /*
  * TODO: Allow user to configure extraction of only text or only notes
- * 
+ *
  */
-public class PowerPointFilter extends MediaFilter
-{
+public class PowerPointFilter extends MediaFilter {
 
-    private static Logger log = Logger.getLogger(PowerPointFilter.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(PowerPointFilter.class);
 
     @Override
-    public String getFilteredName(String oldFilename)
-    {
+    public String getFilteredName(String oldFilename) {
         return oldFilename + ".txt";
     }
 
     /**
      * @return String bundle name
-     * 
      */
     @Override
-    public String getBundleName()
-    {
+    public String getBundleName() {
         return "TEXT";
     }
 
     /**
      * @return String bitstream format
-     * 
-     *         TODO: Check that this is correct
+     *
+     * TODO: Check that this is correct
      */
     @Override
-    public String getFormatString()
-    {
+    public String getFormatString() {
         return "Text";
     }
 
@@ -58,59 +52,48 @@ public class PowerPointFilter extends MediaFilter
      * @return String description
      */
     @Override
-    public String getDescription()
-    {
+    public String getDescription() {
         return "Extracted text";
     }
 
     /**
      * @param currentItem item
-     * @param source source input stream
-     * @param verbose verbose mode
-     * 
+     * @param source      source input stream
+     * @param verbose     verbose mode
      * @return InputStream the resulting input stream
      * @throws Exception if error
      */
     @Override
     public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
-            throws Exception
-    {
+        throws Exception {
 
-        try
-        {
+        try {
 
             String extractedText = null;
             new ExtractorFactory();
             POITextExtractor pptExtractor = ExtractorFactory
-                    .createExtractor(source);
+                .createExtractor(source);
 
             // PowerPoint XML files and legacy format PowerPoint files
             // require different classes and APIs for text extraction
 
             // If this is a PowerPoint XML file, extract accordingly
-            if (pptExtractor instanceof XSLFPowerPointExtractor)
-            {
+            if (pptExtractor instanceof XSLFPowerPointExtractor) {
 
                 // The true method arguments indicate that text from
                 // the slides and the notes is desired
                 extractedText = ((XSLFPowerPointExtractor) pptExtractor)
-                        .getText(true, true);
-            }
-
-            // Legacy PowerPoint files
-            else if (pptExtractor instanceof PowerPointExtractor)
-            {
+                    .getText(true, true);
+            } else if (pptExtractor instanceof PowerPointExtractor) { // Legacy PowerPoint files
 
                 extractedText = ((PowerPointExtractor) pptExtractor).getText()
-                        + " " + ((PowerPointExtractor) pptExtractor).getNotes();
+                    + " " + ((PowerPointExtractor) pptExtractor).getNotes();
 
             }
-            if (extractedText != null)
-            {
+            if (extractedText != null) {
                 // if verbose flag is set, print out extracted text
                 // to STDOUT
-                if (verbose)
-                {
+                if (verbose) {
                     System.out.println(extractedText);
                 }
 
@@ -120,9 +103,7 @@ public class PowerPointFilter extends MediaFilter
 
                 return bais;
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             log.error("Error filtering bitstream: " + e.getMessage(), e);
             throw e;
         }

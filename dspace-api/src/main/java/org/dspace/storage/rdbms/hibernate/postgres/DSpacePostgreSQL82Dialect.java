@@ -7,25 +7,25 @@
  */
 package org.dspace.storage.rdbms.hibernate.postgres;
 
+import java.sql.Types;
+
 import org.hibernate.dialect.PostgreSQL82Dialect;
-import org.hibernate.metamodel.spi.TypeContributions;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.PostgresUUIDType;
 import org.hibernate.type.descriptor.sql.LongVarcharTypeDescriptor;
 import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
-import java.sql.Types;
-
 /**
- * UUID's are not supported by default in hibernate due to differences in the database in order to fix this a custom sql dialect is needed.
- * Source: https://forum.hibernate.org/viewtopic.php?f=1&t=1014157
+ * UUID's are not supported by default in hibernate due to differences in the database in order to fix this a custom
+ * sql dialect is needed.
+ * Source: https://forum.hibernate.org/viewtopic.php?f=1&amp;t=1014157
  *
  * @author kevinvandevelde at atmire.com
  */
-public class DSpacePostgreSQL82Dialect extends PostgreSQL82Dialect
-{
+public class DSpacePostgreSQL82Dialect extends PostgreSQL82Dialect {
     @Override
-    public void contributeTypes(final TypeContributions typeContributions, final ServiceRegistry serviceRegistry) {
+    public void contributeTypes(final org.hibernate.boot.model.TypeContributions typeContributions,
+                                final ServiceRegistry serviceRegistry) {
         super.contributeTypes(typeContributions, serviceRegistry);
         typeContributions.contributeType(new InternalPostgresUUIDType());
     }
@@ -44,7 +44,8 @@ public class DSpacePostgreSQL82Dialect extends PostgreSQL82Dialect
     }
 
     /**
-     * Override is needed to properly support the CLOB on metadatavalue in postgres & oracle.
+     * Override is needed to properly support the CLOB on metadatavalue in Postgres and Oracle.
+     *
      * @param sqlCode {@linkplain java.sql.Types JDBC type-code} for the column mapped by this type.
      * @return Descriptor for the SQL/JDBC side of a value mapping.
      */

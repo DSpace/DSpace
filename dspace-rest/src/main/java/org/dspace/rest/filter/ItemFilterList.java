@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
- package org.dspace.rest.filter;
+package org.dspace.rest.filter;
 
 public interface ItemFilterList {
     public ItemFilterTest[] getFilters();

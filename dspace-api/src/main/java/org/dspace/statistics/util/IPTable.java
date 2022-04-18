@@ -12,6 +12,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * A Spare v4 IPTable implementation that uses nested HashMaps
  * to optimize IP address matching over ranges of IP addresses.
@@ -19,15 +22,26 @@ import java.util.Set;
  * @author mdiggory at atmire.com
  */
 public class IPTable {
+    private static final Logger log = LogManager.getLogger(IPTable.class);
 
     /* A lookup tree for IP addresses and SubnetRanges */
-    private Map<String, Map<String, Map<String, Set<String>>>> map =
-            new HashMap<String, Map<String, Map<String, Set<String>>>>();
+    private final Map<String, Map<String, Map<String, Set<String>>>> map
+            = new HashMap<>();
 
     /**
-     * Can be full v4 IP, subnet or range string
+     * Can be full v4 IP, subnet or range string.
+     * <ul>
+     *   <li>A full address is a complete dotted-quad:  {@code "1.2.3.4".}
+     *   <li>A subnet is a dotted-triplet:  {@code "1.2.3"}.  It means an entire
+     *       Class C subnet:  "1.2.3.0-1.2.3.255".
+     *   <li>A range is two dotted-quad addresses separated by hyphen:
+     *       {@code "1.2.3.4-1.2.3.14"}.  Only the final octet may be different.
+     * </ul>
      *
-     * @param ip
+     * Any attempt at CIDR notation is ignored.
+     *
+     * @param ip IP address(es)
+     * @throws IPFormatException Exception Class to deal with IPFormat errors.
      */
     public void add(String ip) throws IPFormatException {
 
@@ -42,8 +56,7 @@ public class IPTable {
             start = range[0].trim().split("/")[0].split("\\.");
             end = range[1].trim().split("/")[0].split("\\.");
 
-            if (start.length != 4 || end.length != 4)
-            {
+            if (start.length != 4 || end.length != 4) {
                 throw new IPFormatException(ip + " - Ranges need to be full IPv4 Addresses");
             }
 
@@ -59,7 +72,6 @@ public class IPTable {
 
             if (subnets.length < 3) {
                 throw new IPFormatException(ip + " - require at least three subnet places (255.255.255.0");
-
             }
 
             start = subnets;
@@ -67,27 +79,24 @@ public class IPTable {
         }
 
         if (start.length >= 3) {
-
-
             Map<String, Map<String, Set<String>>> first = map.get(start[0]);
 
             if (first == null) {
-                first = new HashMap<String, Map<String, Set<String>>>();
+                first = new HashMap<>();
                 map.put(start[0], first);
             }
 
             Map<String, Set<String>> second = first.get(start[1]);
 
-
             if (second == null) {
-                second = new HashMap<String, Set<String>>();
+                second = new HashMap<>();
                 first.put(start[1], second);
             }
 
             Set<String> third = second.get(start[2]);
 
             if (third == null) {
-                third = new HashSet<String>();
+                third = new HashSet<>();
                 second.put(start[2], third);
             }
 
@@ -111,39 +120,44 @@ public class IPTable {
         }
     }
 
-    /** Check whether a given address is contained in this netblock.
-     * 
+    /**
+     * Check whether a given address is contained in this netblock.
+     *
      * @param ip the address to be tested
-     * @return true if {@code ip} is within this table's limits
-     * @throws IPFormatException
+     * @return true if {@code ip} is within this table's limits.  Returns false
+     *         if {@link ip} looks like an IPv6 address.
+     * @throws IPFormatException Exception Class to deal with IPFormat errors.
      */
     public boolean contains(String ip) throws IPFormatException {
 
         String[] subnets = ip.split("\\.");
 
-        if (subnets.length != 4)
-        {
+        // Does it look like IPv6?
+        if (subnets.length > 4 || ip.contains("::")) {
+            log.warn("Address {} assumed not to match.  IPv6 is not implemented.", ip);
+            return false;
+        }
+
+        // Does it look like a subnet?
+        if (subnets.length < 4) {
             throw new IPFormatException("needs to be a single IP address");
         }
 
         Map<String, Map<String, Set<String>>> first = map.get(subnets[0]);
 
-        if (first == null)
-        {
+        if (first == null) {
             return false;
         }
 
         Map<String, Set<String>> second = first.get(subnets[1]);
 
-        if (second == null)
-        {
+        if (second == null) {
             return false;
         }
 
         Set<String> third = second.get(subnets[2]);
 
-        if (third == null)
-        {
+        if (third == null) {
             return false;
         }
 
@@ -151,11 +165,13 @@ public class IPTable {
 
     }
 
-    /** Convert to a Set.
+    /**
+     * Convert to a Set.
+     *
      * @return this table's content as a Set
      */
     public Set<String> toSet() {
-        HashSet<String> set = new HashSet<String>();
+        HashSet<String> set = new HashSet<>();
 
         for (Map.Entry<String, Map<String, Map<String, Set<String>>>> first : map.entrySet()) {
             String firstString = first.getKey();
@@ -184,6 +200,13 @@ public class IPTable {
         return set;
     }
 
+    /**
+     * Return whether IPTable is empty (having no entries)
+     * @return true if empty, false otherwise
+     */
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
 
     /**
      * Exception Class to deal with IPFormat errors.

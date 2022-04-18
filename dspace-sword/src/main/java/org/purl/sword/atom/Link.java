@@ -10,10 +10,10 @@ package org.purl.sword.atom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
 import nu.xom.Attribute;
 import nu.xom.Element;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.purl.sword.base.Namespaces;
 import org.purl.sword.base.SwordElementInterface;
 import org.purl.sword.base.SwordValidationInfo;
@@ -23,476 +23,427 @@ import org.purl.sword.base.XmlElement;
 import org.purl.sword.base.XmlName;
 
 /**
- * Represents an ATOM Link element. 
- * 
+ * Represents an ATOM Link element.
+ *
  * @author Neil Taylor
  */
-public class Link extends XmlElement implements SwordElementInterface
-{
-	/**
-	 * Label for the href attribute. 
-	 */
-	public static final String ATTRIBUTE_HREF = "href";
+public class Link extends XmlElement implements SwordElementInterface {
+    /**
+     * Label for the href attribute.
+     */
+    public static final String ATTRIBUTE_HREF = "href";
 
-	/**
-	 * Label for the rel attribute. 
-	 */
-	public static final String ATTRIBUTE_REL = "rel";
+    /**
+     * Label for the rel attribute.
+     */
+    public static final String ATTRIBUTE_REL = "rel";
 
-	/**
-	 * Label for the type attribute. 
-	 */
-	public static final String ATTRIBUTE_TYPE = "type";
+    /**
+     * Label for the type attribute.
+     */
+    public static final String ATTRIBUTE_TYPE = "type";
 
-	/**
-	 * Label for the hreflang attribute. 
-	 */
-	public static final String ATTRIBUTE_HREF_LANG = "hreflang";
+    /**
+     * Label for the hreflang attribute.
+     */
+    public static final String ATTRIBUTE_HREF_LANG = "hreflang";
 
-	/**
-	 * Label for the title attribute. 
-	 */
-	public static final String ATTRIBUTE_TITLE = "title";
+    /**
+     * Label for the title attribute.
+     */
+    public static final String ATTRIBUTE_TITLE = "title";
 
     /**
      * Label for the length attribute.
      */
     public static final String ATTRIBUTE_LENGTH = "length";
-	
-   /**
-	* Local name for the element. 
-	*/
-   @Deprecated
-   public static final String ELEMENT_NAME = "link";
-   
-   /**
-    * Stores the href. 
-    */
-   private String href; 
 
-   /**
-    * Stores the Rel attribute. 
-    */
-   private String rel; 
+    /**
+     * Local name for the element.
+     */
+    @Deprecated
+    public static final String ELEMENT_NAME = "link";
 
-   /**
-    * Stores the type. 
-    */
-   private String type; 
+    /**
+     * Stores the href.
+     */
+    private String href;
 
-   /**
-    * Stores the HREF lang. 
-    */
-   private String hreflang;
+    /**
+     * Stores the Rel attribute.
+     */
+    private String rel;
 
-   /**
-    * Stores the title. 
-    */
-   private String title; 
+    /**
+     * Stores the type.
+     */
+    private String type;
 
-   /**
-    * Stores the length. 
-    */
-   private String length;
+    /**
+     * Stores the HREF lang.
+     */
+    private String hreflang;
 
-   /**
-    * Stores the content. 
-    */
-   private String content; 
+    /**
+     * Stores the title.
+     */
+    private String title;
 
-   /**
-    * The logger. 
-    */
-   private static Logger log = Logger.getLogger(Link.class);
+    /**
+     * Stores the length.
+     */
+    private String length;
 
-   private static final XmlName XML_NAME = new XmlName(
-           Namespaces.PREFIX_ATOM, "link", Namespaces.NS_ATOM);
+    /**
+     * Stores the content.
+     */
+    private String content;
 
-   /**
-    * Create a new instance and set prefix and local name to 'atom' and 'link', 
-    * respectively. 
-    */
-   public Link()
-   {
-      super(XML_NAME);
-   }
+    /**
+     * The logger.
+     */
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Link.class);
 
-   public static XmlName elementName()
-   {
-       return XML_NAME;
-   }
+    private static final XmlName XML_NAME = new XmlName(
+        Namespaces.PREFIX_ATOM, "link", Namespaces.NS_ATOM);
 
-   /**
-    * Mashall the data stored in this object into Element objects. 
-    * 
-    * @return An element that holds the data associated with this object. 
-    */
-   public Element marshall()
-   {
-      Element element = new Element(getQualifiedName(), xmlName.getNamespace());
+    /**
+     * Create a new instance and set prefix and local name to 'atom' and 'link',
+     * respectively.
+     */
+    public Link() {
+        super(XML_NAME);
+    }
 
-      if( content != null )
-      {
-         element.appendChild(content);
-      }
+    public static XmlName elementName() {
+        return XML_NAME;
+    }
 
-      if( href != null ) 
-      {
-         Attribute hrefAttribute = new Attribute(ATTRIBUTE_HREF, href);
-         element.addAttribute(hrefAttribute);
-      }
+    /**
+     * Mashall the data stored in this object into Element objects.
+     *
+     * @return An element that holds the data associated with this object.
+     */
+    public Element marshall() {
+        Element element = new Element(getQualifiedName(), xmlName.getNamespace());
 
-      if( rel != null ) 
-      {
-         Attribute relAttribute = new Attribute(ATTRIBUTE_REL, rel);
-         element.addAttribute(relAttribute);
-      }
+        if (content != null) {
+            element.appendChild(content);
+        }
 
-      if( type != null ) 
-      {
-         Attribute typeAttribute = new Attribute(ATTRIBUTE_TYPE, type);
-         element.addAttribute(typeAttribute);
-      }
+        if (href != null) {
+            Attribute hrefAttribute = new Attribute(ATTRIBUTE_HREF, href);
+            element.addAttribute(hrefAttribute);
+        }
 
-      if( hreflang != null ) 
-      {
-         Attribute hreflangAttribute = new Attribute(ATTRIBUTE_HREF_LANG, hreflang);
-         element.addAttribute(hreflangAttribute);
-      }
+        if (rel != null) {
+            Attribute relAttribute = new Attribute(ATTRIBUTE_REL, rel);
+            element.addAttribute(relAttribute);
+        }
 
-      if( title != null ) 
-      {
-         Attribute titleAttribute = new Attribute(ATTRIBUTE_TITLE, title);
-         element.addAttribute(titleAttribute);
-      }
+        if (type != null) {
+            Attribute typeAttribute = new Attribute(ATTRIBUTE_TYPE, type);
+            element.addAttribute(typeAttribute);
+        }
 
-      if( length != null ) 
-      {
-         Attribute lengthAttribute = new Attribute(ATTRIBUTE_LENGTH, length);
-         element.addAttribute(lengthAttribute);
-      }
+        if (hreflang != null) {
+            Attribute hreflangAttribute = new Attribute(ATTRIBUTE_HREF_LANG, hreflang);
+            element.addAttribute(hreflangAttribute);
+        }
 
-      return element;
-   }
+        if (title != null) {
+            Attribute titleAttribute = new Attribute(ATTRIBUTE_TITLE, title);
+            element.addAttribute(titleAttribute);
+        }
 
-   /**
-    * Unmarshall the contents of the Link element into the internal data objects
-    * in this object. 
-    * 
-    * @param link The Link element to process. 
-    *
-    * @throws UnmarshallException If the element does not contain an ATOM link
-    *         element, or if there is a problem processing the element or any 
-    *         subelements. 
-    */
-   public void unmarshall(Element link)
-   throws UnmarshallException 
-   {
-      unmarshall(link, null);
-   }
+        if (length != null) {
+            Attribute lengthAttribute = new Attribute(ATTRIBUTE_LENGTH, length);
+            element.addAttribute(lengthAttribute);
+        }
 
-   
-   public SwordValidationInfo unmarshall(Element link, Properties validationProperties)
-   throws UnmarshallException
-   {
-      if( ! isInstanceOf(link, xmlName) )
-      {
-         return handleIncorrectElement(link, validationProperties);
-      }
+        return element;
+    }
 
-      ArrayList<SwordValidationInfo> validationItems = new ArrayList<SwordValidationInfo>();
-      ArrayList<SwordValidationInfo> attributeItems = new ArrayList<SwordValidationInfo>();
+    /**
+     * Unmarshall the contents of the Link element into the internal data objects
+     * in this object.
+     *
+     * @param link The Link element to process.
+     * @throws UnmarshallException If the element does not contain an ATOM link
+     *                             element, or if there is a problem processing the element or any
+     *                             subelements.
+     */
+    public void unmarshall(Element link)
+        throws UnmarshallException {
+        unmarshall(link, null);
+    }
 
-      try
-      {
-         // get the attributes
-         int attributeCount = link.getAttributeCount();
-         Attribute attribute = null; 
-         for( int i = 0; i < attributeCount; i++ )
-         {
-            attribute = link.getAttribute(i);
-            if( ATTRIBUTE_HREF.equals(attribute.getQualifiedName()))
-            {
-               href = attribute.getValue();
-               if( validationProperties != null)
-               {
-                   attributeItems.add(createValidAttributeInfo(ATTRIBUTE_HREF, href));
-               }
+
+    public SwordValidationInfo unmarshall(Element link, Properties validationProperties)
+        throws UnmarshallException {
+        if (!isInstanceOf(link, xmlName)) {
+            return handleIncorrectElement(link, validationProperties);
+        }
+
+        ArrayList<SwordValidationInfo> validationItems = new ArrayList<SwordValidationInfo>();
+        ArrayList<SwordValidationInfo> attributeItems = new ArrayList<SwordValidationInfo>();
+
+        try {
+            // get the attributes
+            int attributeCount = link.getAttributeCount();
+            Attribute attribute = null;
+            for (int i = 0; i < attributeCount; i++) {
+                attribute = link.getAttribute(i);
+                if (ATTRIBUTE_HREF.equals(attribute.getQualifiedName())) {
+                    href = attribute.getValue();
+                    if (validationProperties != null) {
+                        attributeItems.add(createValidAttributeInfo(ATTRIBUTE_HREF, href));
+                    }
+                } else if (ATTRIBUTE_REL.equals(attribute.getQualifiedName())) {
+                    rel = attribute.getValue();
+                    if (validationProperties != null) {
+                        attributeItems.add(createValidAttributeInfo(ATTRIBUTE_REL, rel));
+                    }
+                } else if (ATTRIBUTE_TYPE.equals(attribute.getQualifiedName())) {
+                    type = attribute.getValue();
+                    if (validationProperties != null) {
+                        attributeItems.add(createValidAttributeInfo(ATTRIBUTE_TYPE, type));
+                    }
+                } else if (ATTRIBUTE_HREF_LANG.equals(attribute.getQualifiedName())) {
+                    hreflang = attribute.getValue();
+                    if (validationProperties != null) {
+                        attributeItems.add(createValidAttributeInfo(ATTRIBUTE_HREF_LANG, hreflang));
+                    }
+                } else if (ATTRIBUTE_TITLE.equals(attribute.getQualifiedName())) {
+                    title = attribute.getValue();
+                    if (validationProperties != null) {
+                        attributeItems.add(createValidAttributeInfo(ATTRIBUTE_TITLE, title));
+                    }
+                } else if (ATTRIBUTE_LENGTH.equals(attribute.getQualifiedName())) {
+                    length = attribute.getValue();
+                    if (validationProperties != null) {
+                        attributeItems.add(createValidAttributeInfo(ATTRIBUTE_LENGTH, length));
+                    }
+                } else {
+                    XmlName attributeName = new XmlName(attribute);
+
+                    SwordValidationInfo unknown = new SwordValidationInfo(xmlName,
+                                                                          attributeName,
+                                                                          SwordValidationInfo.UNKNOWN_ATTRIBUTE,
+                                                                          SwordValidationInfoType.INFO);
+                    unknown.setContentDescription(attribute.getValue());
+                    attributeItems.add(unknown);
+                }
             }
-            else if( ATTRIBUTE_REL.equals(attribute.getQualifiedName()))
-            {
-               rel = attribute.getValue();
-               if( validationProperties != null)
-               {
-                   attributeItems.add(createValidAttributeInfo(ATTRIBUTE_REL, rel));
-               }
+
+            if (link.getChildCount() > 0) {
+                SwordValidationInfo content = new SwordValidationInfo(xmlName,
+                                                                      "This element has content, but it is not used " +
+                                                                          "by SWORD",
+                                                                      SwordValidationInfoType.INFO);
+                validationItems.add(content);
             }
-            else if( ATTRIBUTE_TYPE.equals(attribute.getQualifiedName()))
-            {
-               type = attribute.getValue();
-               if( validationProperties != null)
-               {
-                   attributeItems.add(createValidAttributeInfo(ATTRIBUTE_TYPE, type));
-               }
+
+        } catch (Exception ex) {
+            log.error("Unable to parse an element in Link: " + ex.getMessage());
+            throw new UnmarshallException("Unable to parse element in link", ex);
+        }
+
+        SwordValidationInfo result = null;
+        if (validationProperties != null) {
+            result = validate(validationItems, attributeItems, validationProperties);
+        }
+        return result;
+    }
+
+    public SwordValidationInfo validate(Properties validationContext) {
+        return validate(null, null, validationContext);
+    }
+
+    public SwordValidationInfo validate(List<SwordValidationInfo> elements,
+                                        List<SwordValidationInfo> attributes,
+                                        Properties validationContext) {
+        boolean validateAll = (elements == null);
+
+        SwordValidationInfo result = new SwordValidationInfo(xmlName);
+
+        if (href == null) {
+            XmlName attributeName = new XmlName(xmlName.getPrefix(),
+                                                ATTRIBUTE_HREF,
+                                                xmlName.getNamespace());
+
+            SwordValidationInfo item = new SwordValidationInfo(xmlName, attributeName,
+                                                               SwordValidationInfo.MISSING_ATTRIBUTE_WARNING,
+                                                               SwordValidationInfoType.ERROR);
+            result.addAttributeValidationInfo(item);
+        }
+
+        if (validateAll) {
+            if (href != null) {
+                result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_HREF, href));
             }
-            else if( ATTRIBUTE_HREF_LANG.equals(attribute.getQualifiedName()))
-            {
-               hreflang = attribute.getValue();
-               if( validationProperties != null)
-               {
-                   attributeItems.add(createValidAttributeInfo(ATTRIBUTE_HREF_LANG, hreflang));
-               }
+
+            if (rel != null) {
+                result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_REL, rel));
             }
-            else if( ATTRIBUTE_TITLE.equals(attribute.getQualifiedName()))
-            {
-               title = attribute.getValue();
-               if( validationProperties != null)
-               {
-                   attributeItems.add(createValidAttributeInfo(ATTRIBUTE_TITLE, title));
-               }
+
+            if (type != null) {
+                result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_TYPE, type));
             }
-            else if( ATTRIBUTE_LENGTH.equals(attribute.getQualifiedName()))
-            {
-               length = attribute.getValue();
-               if( validationProperties != null)
-               {
-                   attributeItems.add(createValidAttributeInfo(ATTRIBUTE_LENGTH, length));
-               }
+
+            if (hreflang != null) {
+                result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_HREF_LANG, hreflang));
             }
-            else
-            {
-               XmlName attributeName = new XmlName(attribute);
 
-               SwordValidationInfo unknown = new SwordValidationInfo(xmlName,
-                       attributeName, 
-                       SwordValidationInfo.UNKNOWN_ATTRIBUTE, 
-                       SwordValidationInfoType.INFO);
-               unknown.setContentDescription(attribute.getValue());
-               attributeItems.add(unknown);
+            if (title != null) {
+                result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_TITLE, title));
             }
-         }
 
-         if( link.getChildCount() > 0 )
-         {
-             SwordValidationInfo content = new SwordValidationInfo(xmlName,
-                     "This element has content, but it is not used by SWORD",
-                     SwordValidationInfoType.INFO);
-             validationItems.add(content);
-         }
+            if (length != null) {
+                result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_LENGTH, length));
+            }
 
-      }
-      catch( Exception ex )
-      {
-         log.error("Unable to parse an element in Link: " + ex.getMessage());
-         throw new UnmarshallException("Unable to parse element in link", ex);
-      }
+        }
 
-      SwordValidationInfo result = null;
-      if( validationProperties != null )
-      {
-          result = validate(validationItems, attributeItems, validationProperties);
-      }
-      return result; 
-   }
+        result.addUnmarshallValidationInfo(elements, attributes);
+        return result;
+    }
 
-   public SwordValidationInfo validate(Properties validationContext)
-   {
-      return validate(null, null, validationContext);
-   }
+    /**
+     * Get the HREF attribute.
+     *
+     * @return The HREF.
+     */
+    public String getHref() {
+        return href;
+    }
 
-   public SwordValidationInfo validate(List<SwordValidationInfo> elements,
-           List<SwordValidationInfo> attributes,
-           Properties validationContext)
-   {
-       boolean validateAll = (elements == null);
+    /**
+     * Set the HREF attribute.
+     *
+     * @param href The href.
+     */
+    public void setHref(String href) {
+        this.href = href;
+    }
 
-       SwordValidationInfo result = new SwordValidationInfo(xmlName);
+    /**
+     * Get the Rel attribute.
+     *
+     * @return The Rel.
+     */
+    public String getRel() {
+        return rel;
+    }
 
-       if( href == null )
-       {
-          XmlName attributeName = new XmlName(xmlName.getPrefix(),
-                       ATTRIBUTE_HREF,
-                       xmlName.getNamespace());
+    /**
+     * Set the Rel attribute.
+     *
+     * @param rel The Rel.
+     */
+    public void setRel(String rel) {
+        this.rel = rel;
+    }
 
-          SwordValidationInfo item = new SwordValidationInfo(xmlName, attributeName,
-                  SwordValidationInfo.MISSING_ATTRIBUTE_WARNING,
-                  SwordValidationInfoType.ERROR);
-          result.addAttributeValidationInfo(item);
-       }
+    /**
+     * Get the type.
+     *
+     * @return The type.
+     */
+    public String getType() {
+        return type;
+    }
 
-       if( validateAll )
-       {
-          if( href != null )
-          {
-              result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_HREF, href));
-          }
+    /**
+     * Set the type.
+     *
+     * @param type The type.
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
 
-          if( rel != null )
-          {
-              result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_REL, rel));
-          }
+    /**
+     * Get the HREF Lang attribute.
+     *
+     * @return The HREF Lang.
+     */
+    public String getHreflang() {
+        return hreflang;
+    }
 
-          if( type != null )
-          {
-              result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_TYPE, type));
-          }
+    /**
+     * Set the HREF Lang attribute.
+     *
+     * @param hreflang The HREF Lang.
+     */
+    public void setHreflang(String hreflang) {
+        this.hreflang = hreflang;
+    }
 
-          if( hreflang != null )
-          {
-              result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_HREF_LANG, hreflang));
-          }
+    /**
+     * Get the title.
+     *
+     * @return The title.
+     */
+    public String getTitle() {
+        return title;
+    }
 
-          if( title != null )
-          {
-              result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_TITLE, title));
-          }
+    /**
+     * Set the title.
+     *
+     * @param title The title.
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-          if( length != null )
-          {
-              result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_LENGTH, length));
-          }
-          
-       }
+    /**
+     * Get the length.
+     *
+     * @return The length.
+     */
+    public String getLength() {
+        return length;
+    }
 
-       result.addUnmarshallValidationInfo(elements, attributes);
-       return result; 
-   }
+    /**
+     * Set the length.
+     *
+     * @param length The length.
+     */
+    public void setLength(String length) {
+        this.length = length;
+    }
 
-   /**
-    * Get the HREF attribute. 
-    * 
-    * @return The HREF. 
-    */
-   public String getHref() {
-      return href;
-   }
+    /**
+     * Get the content.
+     *
+     * @return The content.
+     */
+    public String getContent() {
+        return content;
+    }
 
-   /**
-    * Set the HREF attribute. 
-    * 
-    * @param href The href. 
-    */
-   public void setHref(String href) {
-      this.href = href;
-   }
+    /**
+     * Set the content.
+     *
+     * @param content The content.
+     */
+    public void setContent(String content) {
+        this.content = content;
+    }
 
-   /**
-    * Get the Rel attribute. 
-    * 
-    * @return The Rel. 
-    */
-   public String getRel() {
-      return rel;
-   }
-
-   /**
-    * Set the Rel attribute. 
-    * 
-    * @param rel The Rel. 
-    */
-   public void setRel(String rel) {
-      this.rel = rel;
-   }
-
-   /**
-    * Get the type. 
-    * 
-    * @return The type. 
-    */
-   public String getType() {
-      return type;
-   }
-
-   /**
-    * Set the type. 
-    * @param type The type. 
-    */
-   public void setType(String type) {
-      this.type = type;
-   }
-
-   /**
-    * Get the HREF Lang attribute. 
-    * 
-    * @return The HREF Lang. 
-    */
-   public String getHreflang() {
-      return hreflang;
-   }
-
-   /**
-    * Set the HREF Lang attribute. 
-    * 
-    * @param hreflang The HREF Lang. 
-    */
-   public void setHreflang(String hreflang) {
-      this.hreflang = hreflang;
-   }
-
-   /**
-    * Get the title. 
-    * 
-    * @return The title. 
-    */
-   public String getTitle() {
-      return title;
-   }
-
-   /**
-    * Set the title. 
-    * 
-    * @param title The title. 
-    */
-   public void setTitle(String title) {
-      this.title = title;
-   }
-
-   /**
-    * Get the length. 
-    * 
-    * @return The length. 
-    */
-   public String getLength() {
-      return length;
-   }
-
-   /**
-    * Set the length. 
-    * 
-    * @param length The length. 
-    */
-   public void setLength(String length) {
-      this.length = length;
-   }
-
-   /**
-    * Get the content. 
-    * 
-    * @return The content. 
-    */
-   public String getContent() {
-      return content;
-   }
-
-   /**
-    * Set the content. 
-    * 
-    * @param content The content. 
-    */
-   public void setContent(String content) {
-      this.content = content;
-   }
-   
-   public String toString()
-   {
-      return "Link -" + 
-      " href: " + getHref() + 
-      " hreflang: " + getHreflang() + 
-      " title: " + getTitle() + 
-      " rel: " + getRel() + 
-      " content: " + getContent() + 
-      " type: " + getType() + 
-      " length: " + getLength();
-   }
+    public String toString() {
+        return "Link -" +
+            " href: " + getHref() +
+            " hreflang: " + getHreflang() +
+            " title: " + getTitle() +
+            " rel: " + getRel() +
+            " content: " + getContent() +
+            " type: " + getType() +
+            " length: " + getLength();
+    }
 
 }

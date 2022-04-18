@@ -9,7 +9,7 @@ package org.dspace.services.model;
 
 /**
  * Encodes the configuration for a cache into an object.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class CacheConfig {
@@ -17,9 +17,9 @@ public class CacheConfig {
     /**
      * Controls the scope of each created cache.
      */
-    public enum CacheScope { 
+    public enum CacheScope {
         /**
-         * This cache is destroyed at the end of the current request for 
+         * This cache is destroyed at the end of the current request for
          * the current thread it was created in.
          */
         REQUEST,
@@ -39,21 +39,27 @@ public class CacheConfig {
          * changes or is created.
          */
         CLUSTERREPLICATED;
-    };
+    }
+
+    ;
 
     /**
      * Defines the lifecycle of the cache.
+     *
      * @see CacheScope
      */
     private CacheScope cacheScope;
+
     /**
      * @return the scope of the associated cache
      */
     public final CacheScope getCacheScope() {
         return cacheScope;
     }
+
     /**
      * Configure the cache to use the given scope.
+     *
      * @param cacheScope defines the lifecycle of the cache
      */
     public CacheConfig(CacheScope cacheScope) {

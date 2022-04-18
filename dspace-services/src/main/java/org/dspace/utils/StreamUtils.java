@@ -15,10 +15,15 @@ import java.io.InputStreamReader;
 
 /**
  * Simple set of utilities which handle various stream operations.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class StreamUtils {
+
+    /**
+     * Default constructor
+     */
+    private StreamUtils() { }
 
     /**
      * A simple utility to convert {@code InputStream}s into strings.

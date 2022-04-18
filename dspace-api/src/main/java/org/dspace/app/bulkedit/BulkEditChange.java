@@ -7,67 +7,94 @@
  */
 package org.dspace.app.bulkedit;
 
-import org.dspace.content.Item;
-import org.dspace.content.Collection;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
 
 /**
  * Utility class to store changes to item that may occur during a batch edit.
  *
  * @author Stuart Lewis
  */
-public class BulkEditChange
-{
-    /** The item these changes relate to */
+public class BulkEditChange {
+
+    /**
+     * The item these changes relate to
+     */
     private Item item;
 
-    /** The List of hashtables with the new elements */
+    /**
+     * The List of hashtables with the new elements
+     */
     private List<BulkEditMetadataValue> adds;
 
-    /** The List of hashtables with the removed elements */
+    /**
+     * The List of hashtables with the removed elements
+     */
     private List<BulkEditMetadataValue> removes;
 
-    /** The List of hashtables with the unchanged elements */
+    /**
+     * The List of hashtables with the unchanged elements
+     */
     private List<BulkEditMetadataValue> constant;
 
-    /** The List of the complete set of new values (constant + adds) */
+    /**
+     * The List of the complete set of new values (constant + adds)
+     */
     private List<BulkEditMetadataValue> complete;
 
-    /** The list of old collections the item used to be mapped to */
+    /**
+     * The list of old collections the item used to be mapped to
+     */
     private List<Collection> oldMappedCollections;
 
-    /** The list of new collections the item has been mapped into */
+    /**
+     * The list of new collections the item has been mapped into
+     */
     private List<Collection> newMappedCollections;
 
-    /** The old owning collection */
+    /**
+     * The old owning collection
+     */
     private Collection oldOwningCollection;
 
-    /** The new owning collection */
+    /**
+     * The new owning collection
+     */
     private Collection newOwningCollection;
 
-    /** Is this a new item */
+    /**
+     * Is this a new item
+     */
     private boolean newItem;
 
-    /** Has this item been deleted? */
+    /**
+     * Has this item been deleted?
+     */
     private boolean deleted;
 
-    /** Has this item been withdrawn? */
+    /**
+     * Has this item been withdrawn?
+     */
     private boolean withdrawn;
 
-    /** Has this item been reinstated? */
+    /**
+     * Has this item been reinstated?
+     */
     private boolean reinstated;
 
-    /** Have any changes actually been made? */
+    /**
+     * Have any changes actually been made?
+     */
     private boolean empty;
 
 
     /**
-     * Initialise a change holder for a new item 
+     * Initialise a change holder for a new item
      */
-    public BulkEditChange()
-    {
+    public BulkEditChange() {
         // Set the item to be null
         item = null;
         newItem = true;
@@ -89,8 +116,7 @@ public class BulkEditChange
      *
      * @param i The Item to store
      */
-    public BulkEditChange(Item i)
-    {
+    public BulkEditChange(Item i) {
         // Store the item
         item = i;
         newItem = false;
@@ -110,8 +136,7 @@ public class BulkEditChange
      *
      * @param i The item
      */
-    public void setItem(Item i)
-    {
+    public void setItem(Item i) {
         // Store the item
         item = i;
     }
@@ -121,8 +146,7 @@ public class BulkEditChange
      *
      * @param dcv The value to add
      */
-    public void registerAdd(BulkEditMetadataValue dcv)
-    {
+    public void registerAdd(BulkEditMetadataValue dcv) {
         // Add the added value
         adds.add(dcv);
         complete.add(dcv);
@@ -134,8 +158,7 @@ public class BulkEditChange
      *
      * @param dcv The value to remove
      */
-    public void registerRemove(BulkEditMetadataValue dcv)
-    {
+    public void registerRemove(BulkEditMetadataValue dcv) {
         // Add the removed value
         removes.add(dcv);
         empty = false;
@@ -146,8 +169,7 @@ public class BulkEditChange
      *
      * @param dcv The value to keep unchanged
      */
-    public void registerConstant(BulkEditMetadataValue dcv)
-    {
+    public void registerConstant(BulkEditMetadataValue dcv) {
         // Add the removed value
         constant.add(dcv);
         complete.add(dcv);
@@ -158,8 +180,7 @@ public class BulkEditChange
      *
      * @param c The new mapped Collection
      */
-    public void registerNewMappedCollection(Collection c)
-    {
+    public void registerNewMappedCollection(Collection c) {
         // Add the new owning Collection
         newMappedCollections.add(c);
         empty = false;
@@ -170,27 +191,22 @@ public class BulkEditChange
      *
      * @param c The old mapped Collection
      */
-    public void registerOldMappedCollection(Collection c)
-    {
+    public void registerOldMappedCollection(Collection c) {
         // Add the old owning Collection (if it isn't there already, or is an old collection)
         boolean found = false;
 
         if ((this.getOldOwningCollection() != null) &&
-            (this.getOldOwningCollection().getHandle().equals(c.getHandle())))
-        {
+            (this.getOldOwningCollection().getHandle().equals(c.getHandle()))) {
             found = true;
         }
 
-        for (Collection collection : oldMappedCollections)
-        {
-            if (collection.getHandle().equals(c.getHandle()))
-            {
+        for (Collection collection : oldMappedCollections) {
+            if (collection.getHandle().equals(c.getHandle())) {
                 found = true;
             }
         }
 
-        if (!found)
-        {
+        if (!found) {
             oldMappedCollections.add(c);
             empty = false;
         }
@@ -202,8 +218,7 @@ public class BulkEditChange
      * @param oldC The old owning collection
      * @param newC The new owning collection
      */
-    public void changeOwningCollection(Collection oldC, Collection newC)
-    {
+    public void changeOwningCollection(Collection oldC, Collection newC) {
         // Store the old owning collection
         oldOwningCollection = oldC;
 
@@ -217,8 +232,7 @@ public class BulkEditChange
      *
      * @param newC The new owning collection
      */
-    public void setOwningCollection(Collection newC)
-    {
+    public void setOwningCollection(Collection newC) {
         // Store the new owning collection
         newOwningCollection = newC;
         //empty = false;
@@ -229,8 +243,7 @@ public class BulkEditChange
      *
      * @return The item
      */
-    public Item getItem()
-    {
+    public Item getItem() {
         // Return the item
         return item;
     }
@@ -240,8 +253,7 @@ public class BulkEditChange
      *
      * @return the list of elements and their values that have been added.
      */
-    public List<BulkEditMetadataValue> getAdds()
-    {
+    public List<BulkEditMetadataValue> getAdds() {
         // Return the array
         return adds;
     }
@@ -251,8 +263,7 @@ public class BulkEditChange
      *
      * @return the list of elements and their values that have been removed.
      */
-    public List<BulkEditMetadataValue> getRemoves()
-    {
+    public List<BulkEditMetadataValue> getRemoves() {
         // Return the array
         return removes;
     }
@@ -262,8 +273,7 @@ public class BulkEditChange
      *
      * @return the list of unchanged values
      */
-    public List<BulkEditMetadataValue> getConstant()
-    {
+    public List<BulkEditMetadataValue> getConstant() {
         // Return the array
         return constant;
     }
@@ -273,8 +283,7 @@ public class BulkEditChange
      *
      * @return the list of all values
      */
-    public List<BulkEditMetadataValue> getComplete()
-    {
+    public List<BulkEditMetadataValue> getComplete() {
         // Return the array
         return complete;
     }
@@ -284,8 +293,7 @@ public class BulkEditChange
      *
      * @return the list of new mapped collections
      */
-    public List<Collection> getNewMappedCollections()
-    {
+    public List<Collection> getNewMappedCollections() {
         // Return the array
         return newMappedCollections;
     }
@@ -295,8 +303,7 @@ public class BulkEditChange
      *
      * @return the list of old mapped collections
      */
-    public List<Collection> getOldMappedCollections()
-    {
+    public List<Collection> getOldMappedCollections() {
         // Return the array
         return oldMappedCollections;
     }
@@ -306,8 +313,7 @@ public class BulkEditChange
      *
      * @return the old owning collection
      */
-    public Collection getOldOwningCollection()
-    {
+    public Collection getOldOwningCollection() {
         // Return the old owning collection
         return oldOwningCollection;
     }
@@ -317,8 +323,7 @@ public class BulkEditChange
      *
      * @return the new owning collection
      */
-    public Collection getNewOwningCollection()
-    {
+    public Collection getNewOwningCollection() {
         // Return the new owning collection
         return newOwningCollection;
     }
@@ -328,8 +333,7 @@ public class BulkEditChange
      *
      * @return Whether or not this is for a new item
      */
-    public boolean isNewItem()
-    {
+    public boolean isNewItem() {
         // Return the new item status
         return newItem;
     }
@@ -339,8 +343,7 @@ public class BulkEditChange
      *
      * @return Whether or not this is for a deleted item
      */
-    public boolean isDeleted()
-    {
+    public boolean isDeleted() {
         // Return the new item status
         return deleted;
     }
@@ -359,8 +362,7 @@ public class BulkEditChange
      *
      * @return Whether or not this is for a withdrawn item
      */
-    public boolean isWithdrawn()
-    {
+    public boolean isWithdrawn() {
         // Return the new item status
         return withdrawn;
     }
@@ -379,8 +381,7 @@ public class BulkEditChange
      *
      * @return Whether or not this is for a reinstated item
      */
-    public boolean isReinstated()
-    {
+    public boolean isReinstated() {
         // Return the new item status
         return reinstated;
     }
@@ -399,8 +400,7 @@ public class BulkEditChange
      *
      * @return Whether or not changes have been made
      */
-    public boolean hasChanges()
-    {
+    public boolean hasChanges() {
         return !empty;
     }
 }

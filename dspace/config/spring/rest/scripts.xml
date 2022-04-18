@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="dspaceRunnableThreadExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="5"/>
+    </bean>
+
+    <!-- This primary attribute is present so that we can assure that in the REST layer we'll always use this
+        bean if it is present-->
+    <bean id="metadata-import" class="org.dspace.app.bulkedit.MetadataImportScriptConfiguration" primary="true">
+        <property name="description" value="Import metadata after batch editing" />
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataImport"/>
+    </bean>
+
+    <bean id="metadata-export" class="org.dspace.app.bulkedit.MetadataExportScriptConfiguration" primary="true">
+        <property name="description" value="Export metadata for batch editing"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExport"/>
+    </bean>
+
+    <bean id="curate" class="org.dspace.curate.CurationScriptConfiguration">
+        <property name="description" value="Curation tasks"/>
+        <property name="dspaceRunnableClass" value="org.dspace.curate.Curation"/>
+    </bean>
+
+    <!-- Not runnable from REST -->
+    <bean id="submission-forms-migrate" class="org.dspace.submit.migration.SubmissionFormsMigrationScriptConfiguration">
+        <property name="description" value="Script for migrating submission forms to DSpace 7"/>
+        <property name="dspaceRunnableClass" value="org.dspace.submit.migration.SubmissionFormsMigration"/>
+    </bean>
+    
+    <bean id="metadata-deletion" class="org.dspace.app.bulkedit.MetadataDeletionScriptConfiguration" primary="true">
+        <property name="description" value="Delete all the values of the specified metadata field"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletion"/>
+    </bean>
+
+    <bean id="harvest" class="org.dspace.app.harvest.HarvestScriptConfiguration">
+        <property name="description" value="Manage the OAI-PMH harvesting of external collections"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.harvest.Harvest"/>
+    </bean>
+</beans>

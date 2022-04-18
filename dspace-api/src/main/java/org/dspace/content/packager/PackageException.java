@@ -10,7 +10,7 @@ package org.dspace.content.packager;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This is a superclass for exceptions representing a failure when
@@ -19,72 +19,60 @@ import org.apache.log4j.Logger;
  * exceptions. This class is intended for declarations and catch clauses.
  *
  * @author Larry Stone
- * @version $Revision$
  */
-public class PackageException extends Exception
-{
+public class PackageException extends Exception {
     /**
      * Create a new exception with no message.
      */
-    public PackageException()
-    {
+    public PackageException() {
         super();
     }
 
     /**
      * Create a new exception with the given message.
+     *
      * @param message - message text.
      */
-    public PackageException(String message)
-    {
+    public PackageException(String message) {
         super(message);
     }
 
     /**
      * Create a new exception wrapping the given underlying cause.
+     *
      * @param cause - exception specifying the cause of this failure.
      */
-    public PackageException(Throwable cause)
-    {
+    public PackageException(Throwable cause) {
         super(cause);
     }
 
     /**
      * Create a new exception wrapping it around another exception.
+     *
      * @param message - message text.
-     * @param cause - exception specifying the cause of this failure.
+     * @param cause   - exception specifying the cause of this failure.
      */
-    public PackageException(String message, Throwable cause)
-    {
+    public PackageException(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
      * Write details of this exception to the indicated logger.
      * Dump a stack trace to the log to aid in debugging.
+     *
      * @param log logger
      */
-    public void log(Logger log)
-    {
+    public void log(Logger log) {
         log.error(toString());
 
         Throwable cause = getCause();
-        if (cause != null)
-        {
-            if (cause.getCause() != null)
-            {
+        if (cause != null) {
+            if (cause.getCause() != null) {
                 cause = cause.getCause();
             }
             StringWriter sw = new StringWriter();
             cause.printStackTrace(new PrintWriter(sw));
             log.error(sw.toString());
         }
-    }
-
-    public String toString()
-    {
-        String base = getClass().getName() + ": " + getMessage();
-        return (getCause() == null) ? base :
-            base + ", Reason: "+getCause().toString();
     }
 }

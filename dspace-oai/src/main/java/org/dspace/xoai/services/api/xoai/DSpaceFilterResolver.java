@@ -7,7 +7,6 @@
  */
 package org.dspace.xoai.services.api.xoai;
 
-
 import com.lyncode.xoai.dataprovider.filter.Scope;
 import com.lyncode.xoai.dataprovider.filter.conditions.Condition;
 import com.lyncode.xoai.dataprovider.services.api.FilterResolver;

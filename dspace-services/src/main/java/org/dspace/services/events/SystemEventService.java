@@ -7,23 +7,24 @@
  */
 package org.dspace.services.events;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.PreDestroy;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.dspace.kernel.mixins.ShutdownService;
+import org.apache.commons.lang3.ArrayUtils;
 import org.dspace.services.CachingService;
 import org.dspace.services.EventService;
 import org.dspace.services.RequestService;
-import org.dspace.services.SessionService;
 import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
+import org.dspace.services.model.CacheConfig.CacheScope;
 import org.dspace.services.model.Event;
+import org.dspace.services.model.Event.Scope;
 import org.dspace.services.model.EventListener;
 import org.dspace.services.model.RequestInterceptor;
-import org.dspace.services.model.Session;
-import org.dspace.services.model.CacheConfig.CacheScope;
-import org.dspace.services.model.Event.Scope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,32 +33,30 @@ import org.springframework.beans.factory.annotation.Autowired;
  * This is a placeholder until we get a real event service going.
  * It does pretty much everything the service should do EXCEPT sending
  * the events across a cluster.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski@gmail.com) - azeckoski - 4:02:31 PM Nov 19, 2008
  */
-public final class SystemEventService implements EventService, ShutdownService {
+public final class SystemEventService implements EventService {
 
     private final Logger log = LoggerFactory.getLogger(SystemEventService.class);
 
     private static final String QUEUE_CACHE_NAME = "eventQueueCache";
-    
+
     /**
      * Map for holding onto the listeners which is ClassLoader safe.
      */
-    private Map<String, EventListener> listenersMap = new ConcurrentHashMap<String, EventListener>();
+    private final Map<String, EventListener> listenersMap = new ConcurrentHashMap<>();
 
     private final RequestService requestService;
-    private final SessionService sessionService;
     private final CachingService cachingService;
     private EventRequestInterceptor requestInterceptor;
 
-    @Autowired(required=true)
-    public SystemEventService(RequestService requestService, SessionService sessionService, CachingService cachingService) {
-        if (requestService == null || cachingService == null || sessionService == null) {
+    @Autowired(required = true)
+    public SystemEventService(RequestService requestService, CachingService cachingService) {
+        if (requestService == null || cachingService == null) {
             throw new IllegalArgumentException("requestService, cachingService, and all inputs must not be null");
         }
         this.requestService = requestService;
-        this.sessionService = sessionService;
         this.cachingService = cachingService;
 
         // register interceptor
@@ -65,9 +64,7 @@ public final class SystemEventService implements EventService, ShutdownService {
         this.requestService.registerRequestInterceptor(this.requestInterceptor);
     }
 
-    /* (non-Javadoc)
-     * @see org.dspace.kernel.mixins.ShutdownService#shutdown()
-     */
+    @PreDestroy
     public void shutdown() {
         this.requestInterceptor = null; // clear the interceptor
         this.listenersMap.clear();
@@ -77,6 +74,7 @@ public final class SystemEventService implements EventService, ShutdownService {
     /* (non-Javadoc)
      * @see org.dspace.services.EventService#fireEvent(org.dspace.services.model.Event)
      */
+    @Override
     public void fireEvent(Event event) {
         validateEvent(event);
         // check scopes for this event
@@ -98,6 +96,7 @@ public final class SystemEventService implements EventService, ShutdownService {
     /* (non-Javadoc)
      * @see org.dspace.services.EventService#queueEvent(org.dspace.services.model.Event)
      */
+    @Override
     public void queueEvent(Event event) {
         validateEvent(event);
 
@@ -111,7 +110,7 @@ public final class SystemEventService implements EventService, ShutdownService {
             queueCache.put(key, event);
         } else {
             // no request so fire the event immediately
-            log.info("No request to queue this event ("+event+") so firing immediately");
+            log.info("No request to queue this event (" + event + ") so firing immediately");
             fireEvent(event);
         }
     }
@@ -119,6 +118,7 @@ public final class SystemEventService implements EventService, ShutdownService {
     /* (non-Javadoc)
      * @see org.dspace.services.EventService#registerEventListener(org.dspace.services.model.EventListener)
      */
+    @Override
     public void registerEventListener(EventListener listener) {
         if (listener == null) {
             throw new IllegalArgumentException("Cannot register a listener that is null");
@@ -138,12 +138,15 @@ public final class SystemEventService implements EventService, ShutdownService {
         // send event to all interested listeners
         for (EventListener listener : listenersMap.values()) {
             // filter the event if the listener has filter rules
-            if (listener != null && filterEvent(listener, event) ) {
+            if (listener != null && filterEvent(listener, event)) {
                 // passed filters so send the event to this listener
                 try {
                     listener.receiveEvent(event);
                 } catch (Exception e) {
-                    log.warn("Listener ("+listener+")["+listener.getClass().getName()+"] failed to recieve event ("+event+"): " + e.getMessage() + ":" + e.getCause());
+                    log.warn("Listener (" + listener + ")[" + listener.getClass()
+                                                                      .getName() + "] failed to recieve event (" +
+                                 event + "): " + e
+                        .getMessage() + ":" + e.getCause());
                 }
             }
         }
@@ -152,26 +155,30 @@ public final class SystemEventService implements EventService, ShutdownService {
     /**
      * Will eventually fire events to the entire cluster.
      * TODO not implemented.
-     * 
+     *
      * @param event a validated event
      */
     private void fireClusterEvent(Event event) {
-        log.debug("fireClusterEvent is not implemented yet, no support for cluster events yet, could not fire event to the cluster: " + event);
+        log.debug(
+            "fireClusterEvent is not implemented yet, no support for cluster events yet, could not fire event to the " +
+                "cluster: " + event);
     }
 
     /**
      * Will eventually fire events to external systems.
      * TODO not implemented.
-     * 
+     *
      * @param event a validated event
      */
     private void fireExternalEvent(Event event) {
-        log.debug("fireExternalEvent is not implemented yet, no support for external events yet, could not fire event to external listeners: " + event);
+        log.debug(
+            "fireExternalEvent is not implemented yet, no support for external events yet, could not fire event to " +
+                "external listeners: " + event);
     }
 
     /**
      * Fires all queued events for the current request.
-     * 
+     *
      * @return the number of events which were fired
      */
     protected int fireQueuedEvents() {
@@ -193,7 +200,7 @@ public final class SystemEventService implements EventService, ShutdownService {
 
     /**
      * Clears all events for the current request.
-     * 
+     *
      * @return the number of events that were cleared
      */
     protected int clearQueuedEvents() {
@@ -204,39 +211,39 @@ public final class SystemEventService implements EventService, ShutdownService {
     }
 
     /**
-     * This will validate the event object and set any values which are 
+     * This will validate the event object and set any values which are
      * unset but can be figured out.
-     * 
+     *
      * @param event the event which is being sent into the system
      */
     private void validateEvent(Event event) {
         if (event == null) {
             throw new IllegalArgumentException("Cannot fire null events");
         }
-        if (event.getName() == null || "".equals(event.getName()) ) {
+        if (event.getName() == null || "".equals(event.getName())) {
             throw new IllegalArgumentException("Event name must be set");
         }
-        if (event.getId() == null || "".equals(event.getId()) ) {
+        if (event.getId() == null || "".equals(event.getId())) {
             // generate an id then
             event.setId(makeEventId());
         }
-        if (event.getUserId() == null || "".equals(event.getUserId()) ) {
+        if (event.getUserId() == null || "".equals(event.getUserId())) {
             // set to the current user
-            String userId = this.sessionService.getCurrentUserId();
+            String userId = this.requestService.getCurrentUserId();
             event.setUserId(userId);
         }
         if (event.getScopes() == null) {
             // set to local/cluster scope
-            event.setScopes( new Event.Scope[] {Scope.LOCAL, Scope.CLUSTER});
+            event.setScopes(new Event.Scope[] {Scope.LOCAL, Scope.CLUSTER});
         }
     }
 
     /**
-     * Checks to see if the filtering in the given listener allows the 
+     * Checks to see if the filtering in the given listener allows the
      * event to be received.
-     * 
+     *
      * @param listener an event listener
-     * @param event an event
+     * @param event    an event
      * @return true if the event should be received, false if the event is filtered out
      */
     private boolean filterEvent(EventListener listener, Event event) {
@@ -258,7 +265,10 @@ public final class SystemEventService implements EventService, ShutdownService {
                 }
             }
         } catch (Exception e1) {
-            log.warn("Listener ("+listener+")["+listener.getClass().getName()+"] failure calling getEventNamePrefixes: " + e1.getMessage() + ":" + e1.getCause());
+            log.warn("Listener (" + listener + ")[" + listener.getClass()
+                                                              .getName() + "] failure calling getEventNamePrefixes: "
+                         + e1
+                .getMessage() + ":" + e1.getCause());
         }
         boolean allowResource = true;
         try {
@@ -276,13 +286,16 @@ public final class SystemEventService implements EventService, ShutdownService {
                 }
             }
         } catch (Exception e1) {
-            log.warn("Listener ("+listener+")["+listener.getClass().getName()+"] failure calling getResourcePrefix: " + e1.getMessage() + ":" + e1.getCause());
+            log.warn("Listener (" + listener + ")[" + listener.getClass()
+                                                              .getName() + "] failure calling getResourcePrefix: " + e1
+                .getMessage() + ":" + e1.getCause());
         }
 
         return allowName && allowResource;
     }
 
-    private Random random = new Random();
+    private final Random random = new Random();
+
     /**
      * Generate an event ID used to identify and track this event uniquely.
      *
@@ -295,34 +308,40 @@ public final class SystemEventService implements EventService, ShutdownService {
     /**
      * The request interceptor for the event service.
      * This will take care of firing queued events at the end of the request.
-     * 
+     *
      * @author Aaron Zeckoski (azeckoski@gmail.com) - azeckoski - 10:24:58 AM Nov 20, 2008
      */
     public final class EventRequestInterceptor implements RequestInterceptor {
 
         /* (non-Javadoc)
-         * @see org.dspace.services.model.RequestInterceptor#onStart(java.lang.String, org.dspace.services.model.Session)
+         * @see org.dspace.services.model.RequestInterceptor#onStart(java.lang.String, org.dspace.services.model
+         * .Session)
          */
-        public void onStart(String requestId, Session session) {
+        @Override
+        public void onStart(String requestId) {
             // nothing to really do here unless we decide we should purge out any existing events? -AZ
         }
 
         /* (non-Javadoc)
-         * @see org.dspace.services.model.RequestInterceptor#onEnd(java.lang.String, org.dspace.services.model.Session, boolean, java.lang.Exception)
+         * @see org.dspace.services.model.RequestInterceptor#onEnd(java.lang.String, org.dspace.services.model
+         * .Session, boolean, java.lang.Exception)
          */
-        public void onEnd(String requestId, Session session, boolean succeeded, Exception failure) {
+        @Override
+        public void onEnd(String requestId, boolean succeeded, Exception failure) {
             if (succeeded) {
                 int fired = fireQueuedEvents();
-                log.debug("Fired "+fired+" events at the end of the request ("+requestId+")");
+                log.debug("Fired " + fired + " events at the end of the request (" + requestId + ")");
             } else {
                 int cleared = clearQueuedEvents();
-                log.debug("Cleared/cancelled "+cleared+" events at the end of the failed request ("+requestId+")");
+                log.debug(
+                    "Cleared/cancelled " + cleared + " events at the end of the failed request (" + requestId + ")");
             }
         }
 
         /* (non-Javadoc)
          * @see org.dspace.kernel.mixins.OrderedService#getOrder()
          */
+        @Override
         public int getOrder() {
             return 20; // this should fire pretty late
         }

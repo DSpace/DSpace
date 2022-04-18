@@ -1,0 +1,46 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Internal Types Registry</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>dspace</name>
+        <namespace>http://dspace.org/dspace</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>process</element>
+        <qualifier>filetype</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>agreements</element>
+        <qualifier>end-user</qualifier>
+        <scope_note>Stores whether the End User Agreement has been accepted by an EPerson. Valid values; true, false</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>agreements</element>
+        <qualifier>cookies</qualifier>
+        <scope_note>Stores the cookie preferences of an EPerson, as selected in last session. Value will be an array of cookieName/boolean pairs, specifying which cookies are allowed or not allowed.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>entity</element>
+        <qualifier>type</qualifier>
+        <scope_note>Stores the type of Entity that a specific Item represents</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>iiif</element>
+        <qualifier>enabled</qualifier>
+        <scope_note>Stores a boolean text value (true or false) to indicate if the iiif feature is enabled or not for the dspace object. If absent the value is derived from the parent dspace object</scope_note>
+    </dc-type>
+</dspace-dc-types>

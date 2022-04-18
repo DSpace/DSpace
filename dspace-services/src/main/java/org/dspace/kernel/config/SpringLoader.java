@@ -20,6 +20,7 @@ public interface SpringLoader {
 
     /**
      * Returns all the locations that contain spring files
+     *
      * @param configurationService the dspace configuration service
      * @return an array containing spring file locations
      */

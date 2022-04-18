@@ -10,27 +10,22 @@ package org.dspace.sort;
 /**
  * Just a quick SortException class to give us the relevant data type
  */
-public class SortException extends Exception
-{
+public class SortException extends Exception {
 
-    public SortException()
-    {
+    public SortException() {
         super();
     }
 
-    public SortException(String message)
-    {
+    public SortException(String message) {
         super(message);
     }
 
-	public SortException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
+    public SortException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public SortException(Throwable cause)
-	{
-		super(cause);
-	}
+    public SortException(Throwable cause) {
+        super(cause);
+    }
 
 }

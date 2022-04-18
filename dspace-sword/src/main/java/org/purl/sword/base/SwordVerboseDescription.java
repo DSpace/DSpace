@@ -8,27 +8,22 @@
 package org.purl.sword.base;
 
 /**
- *
  * @author Neil Taylor (nst@aber.ac.uk)
  */
-public class SwordVerboseDescription extends BasicStringContentElement
-{
+public class SwordVerboseDescription extends BasicStringContentElement {
     private static final XmlName XML_NAME =
-            new XmlName(Namespaces.PREFIX_SWORD, "verboseDescription", Namespaces.NS_SWORD);
+        new XmlName(Namespaces.PREFIX_SWORD, "verboseDescription", Namespaces.NS_SWORD);
 
-    public SwordVerboseDescription()
-    {
+    public SwordVerboseDescription() {
         super(XML_NAME);
     }
 
-    public SwordVerboseDescription(String version)
-    {
+    public SwordVerboseDescription(String version) {
         this();
-        setContent(version); 
+        setContent(version);
     }
 
-    public static XmlName elementName()
-    {
+    public static XmlName elementName() {
         return XML_NAME;
     }
 }

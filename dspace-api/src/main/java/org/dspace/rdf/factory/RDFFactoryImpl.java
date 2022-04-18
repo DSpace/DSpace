@@ -8,45 +8,42 @@
 
 package org.dspace.rdf.factory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.rdf.conversion.RDFConverter;
 import org.dspace.rdf.storage.RDFStorage;
 import org.dspace.rdf.storage.URIGenerator;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- *
  * @author Pascal-Nicolas Becker (p dot becker at tu hyphen berlin dot de)
  */
-public class RDFFactoryImpl extends RDFFactory
-{
+public class RDFFactoryImpl extends RDFFactory {
     // we have several URIGenerators that use each other as fallback
     // following we have to instantiate all of them and cannot use autowiring
-    // by type here. So we use setters and properties in spring configuration
+    // by type here. So we use setters and properties in Spring configuration
     // instead.
 
-    private static final Logger log = Logger.getLogger(RDFFactoryImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RDFFactoryImpl.class);
 
     private RDFStorage storage;
     private URIGenerator generator;
     private RDFConverter converter;
 
-    @Required
+    @Autowired(required = true)
     public void setStorage(RDFStorage storage) {
         this.storage = storage;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setGenerator(URIGenerator generator) {
-        if (log.isDebugEnabled())
-        {
-            log.debug("Using '" + generator.getClass().getCanonicalName() 
-                    + "' as URIGenerator.");
+        if (log.isDebugEnabled()) {
+            log.debug("Using '" + generator.getClass().getCanonicalName()
+                          + "' as URIGenerator.");
         }
         this.generator = generator;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setConverter(RDFConverter converter) {
         this.converter = converter;
     }
@@ -65,5 +62,5 @@ public class RDFFactoryImpl extends RDFFactory
     public RDFConverter getRDFConverter() {
         return converter;
     }
-    
+
 }

@@ -8,12 +8,11 @@
 package org.dspace.services.session;
 
 import org.dspace.services.model.RequestInterceptor;
-import org.dspace.services.model.Session;
 
 
 /**
  * This is a mock request interceptor for testing
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class MockRequestInterceptor implements RequestInterceptor {
@@ -22,9 +21,10 @@ public class MockRequestInterceptor implements RequestInterceptor {
     public int hits = 0;
 
     /* (non-Javadoc)
-     * @see org.dspace.services.model.RequestInterceptor#onEnd(java.lang.String, org.dspace.services.model.Session, boolean, java.lang.Exception)
+     * @see org.dspace.services.model.RequestInterceptor#onEnd(java.lang.String, org.dspace.services.model.Session,
+     * boolean, java.lang.Exception)
      */
-    public void onEnd(String requestId, Session session, boolean succeeded, Exception failure) {
+    public void onEnd(String requestId, boolean succeeded, Exception failure) {
         if (succeeded) {
             state = "end:success:" + requestId;
         } else {
@@ -36,7 +36,7 @@ public class MockRequestInterceptor implements RequestInterceptor {
     /* (non-Javadoc)
      * @see org.dspace.services.model.RequestInterceptor#onStart(java.lang.String, org.dspace.services.model.Session)
      */
-    public void onStart(String requestId, Session session) {
+    public void onStart(String requestId) {
         state = "start:" + requestId;
         hits++;
     }

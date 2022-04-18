@@ -7,22 +7,24 @@
  */
 package org.dspace.authority.indexer;
 
-import org.apache.commons.collections.CollectionUtils;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * DSpaceAuthorityIndexer is used in IndexClient, which is called by the AuthorityConsumer and the indexing-script.
@@ -30,6 +32,13 @@ import java.util.*;
  * The DSpaceAuthorityIndexer will return a list of all authority values for a
  * given item. It will return an authority value for all metadata fields defined
  * in dspace.conf with 'authority.author.indexer.field'.
+<<<<<<< HEAD
+=======
+ * <p>
+ * You have to call getAuthorityValues for every Item you want to index. But you
+ * can supply an optional cache, to save the mapping from the metadata value to
+ * the new authority values for metadata fields without an authority key.
+>>>>>>> dspace-7.2.1
  * <p>
  * You have to call getAuthorityValues for every Item you want to index. But you
  * can supply an optional cache, to save the mapping from the metadata value to
@@ -42,13 +51,16 @@ import java.util.*;
  */
 public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, InitializingBean {
 
-    private static final Logger log = Logger.getLogger(DSpaceAuthorityIndexer.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceAuthorityIndexer.class);
 
     /**
      * The list of metadata fields which are to be indexed *
      */
     protected List<String> metadataFields;
+<<<<<<< HEAD
 
+=======
+>>>>>>> dspace-7.2.1
     @Autowired(required = true)
     protected AuthorityValueService authorityValueService;
 
@@ -71,6 +83,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
 
     @Override
     public List<AuthorityValue> getAuthorityValues(Context context, Item item)
+<<<<<<< HEAD
             throws SQLException, AuthorizeException
     {
         return getAuthorityValues(context, item, null);
@@ -82,23 +95,40 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
     {
         List<AuthorityValue> values = new ArrayList<>();
 
+=======
+            throws SQLException, AuthorizeException {
+        return getAuthorityValues(context, item, null);
+    }
+
+    public List<AuthorityValue> getAuthorityValues(Context context, Item item, Map<String, AuthorityValue> cache)
+            throws SQLException, AuthorizeException {
+        List<AuthorityValue> values = new ArrayList<>();
+>>>>>>> dspace-7.2.1
         for (String metadataField : metadataFields) {
             List<MetadataValue> metadataValues = itemService.getMetadataByMetadataString(item, metadataField);
             for (MetadataValue metadataValue : metadataValues) {
                 String content = metadataValue.getValue();
                 String authorityKey = metadataValue.getAuthority();
+<<<<<<< HEAD
 
                 // We only want to update our item IF our UUID is not present
                 // or if we need to generate one.
                 boolean requiresItemUpdate = StringUtils.isBlank(authorityKey) ||
                         StringUtils.startsWith(authorityKey, AuthorityValueService.GENERATE);
 
+=======
+                 // We only want to update our item IF our UUID is not present
+                // or if we need to generate one.
+                boolean requiresItemUpdate = StringUtils.isBlank(authorityKey) ||
+                        StringUtils.startsWith(authorityKey, AuthorityValueService.GENERATE);
+>>>>>>> dspace-7.2.1
                 AuthorityValue value = null;
                 if (StringUtils.isBlank(authorityKey) && cache != null) {
                     // This is a value currently without an authority. So query
                     // the cache, if an authority is found for the exact value.
                     value = cache.get(content);
                 }
+<<<<<<< HEAD
 
                 if (value == null) {
                     value = getAuthorityValue(context, metadataField, content,authorityKey);
@@ -123,6 +153,25 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                     values.add(value);
                 }
                 else {
+=======
+                if (value == null) {
+                    value = getAuthorityValue(context, metadataField, content,authorityKey);
+                }
+                if (value != null) {
+                    if (requiresItemUpdate) {
+                        value.updateItem(context, item, metadataValue);
+                        try {
+                            itemService.update(context, item);
+                        } catch (Exception e) {
+                            log.error("Error creating a metadatavalue's authority", e);
+                        }
+                    }
+                    if (cache != null) {
+                        cache.put(content, value);
+                    }
+                    values.add(value);
+                } else {
+>>>>>>> dspace-7.2.1
                     log.error("Error getting an authority value for " +
                             "the metadata value \"" + content + "\" " +
                             "in the field \"" + metadataField + "\" " +
@@ -130,16 +179,23 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                 }
             }
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> dspace-7.2.1
         return values;
     }
-
     /**
      * This method looks at the authority of a metadata value.
      * If the authority can be found in solr, that value is reused.
      * Otherwise a new authority value will be generated that will be indexed in solr.
      *
+<<<<<<< HEAD
      * If the authority starts with AuthorityValueGenerator.GENERATE, a specific type of AuthorityValue will be generated.
+=======
+     * If the authority starts with AuthorityValueGenerator.GENERATE, a specific type of AuthorityValue will be
+     * generated.
+>>>>>>> dspace-7.2.1
      * Depending on the type this may involve querying an external REST service
      *
      * @param context Current DSpace context
@@ -148,19 +204,29 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
      * @param metadataAuthorityKey Existing authority of the metadata value.
      */
     private AuthorityValue getAuthorityValue(Context context, String metadataField,
+<<<<<<< HEAD
             String metadataContent, String metadataAuthorityKey)
     {
+=======
+            String metadataContent, String metadataAuthorityKey) {
+>>>>>>> dspace-7.2.1
         if (StringUtils.isNotBlank(metadataAuthorityKey) &&
                 !metadataAuthorityKey.startsWith(AuthorityValueService.GENERATE)) {
             // !uid.startsWith(AuthorityValueGenerator.GENERATE) is not strictly
             // necessary here but it prevents exceptions in solr
+<<<<<<< HEAD
 
+=======
+>>>>>>> dspace-7.2.1
             AuthorityValue value = authorityValueService.findByUID(context, metadataAuthorityKey);
             if (value != null) {
                 return value;
             }
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> dspace-7.2.1
         return authorityValueService.generate(context, metadataAuthorityKey,
                 metadataContent, metadataField.replaceAll("\\.", "_"));
     }
@@ -168,8 +234,10 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
     @Override
     public boolean isConfiguredProperly() {
         boolean isConfiguredProperly = true;
-        if(CollectionUtils.isEmpty(metadataFields)){
-            log.warn("Authority indexer not properly configured, no metadata fields configured for indexing. Check the \"authority.author.indexer.field\" properties.");
+        if (CollectionUtils.isEmpty(metadataFields)) {
+            log.warn(
+                "Authority indexer not properly configured, no metadata fields configured for indexing. Check the " +
+                    "\"authority.author.indexer.field\" properties.");
             isConfiguredProperly = false;
         }
         return isConfiguredProperly;

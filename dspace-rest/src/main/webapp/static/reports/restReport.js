@@ -11,11 +11,16 @@ var Report = function() {
     this.COUNT_LIMIT = 500;
     this.ITEM_LIMIT = 100;
 
+<<<<<<< HEAD
     //set default to work on demo.dspace.org
     this.ROOTPATH = "/xmlui/handle/"
     //this.ROOTPATH = "/jspui/handle/"
     //this.ROOTPATH = "/handle/"
     
+=======
+    this.ROOTPATH = "/handle/"
+
+>>>>>>> dspace-7.2.1
     //Indicate if Password Authentication is supported
     this.makeAuthLink = function(){return false;};
 
@@ -27,34 +32,34 @@ var Report = function() {
     this.getId = function(obj) {
         return obj.uuid;
     }
-    
+
     //Override this method is sortable.js has been included
     this.hasSorttable = function() {
         return false;
     }
-    
+
     this.getDefaultParameters = function(){
         return {};
     }
     this.getCurrentParameters = function(){
         return {};
     }
-    
+
     this.saveUrl = function() {
         this.myReportParameters.saveAsUrl(this.getCurrentParameters());
     }
-    
+
     this.getLoginPayload = function() {
         //Placeholder to allow a customized report to prompt for email/password
         //If not enabled, the authenticaton callback will be called immediately
         var email = $("#restemail").val();
         var pass = $("#restpass").val();
         if (email == "" || pass == "") {
-          return undefined;  
+          return undefined;
         } else if (email == null || pass == null) {
-           return undefined;  
+           return undefined;
         } else {
-           return {email: email, password: pass};      
+           return {email: email, password: pass};
         }
     }
     this.getLangSuffix = function(){
@@ -82,15 +87,15 @@ var Report = function() {
         className: 'spinner', // The CSS class to assign to the spinner
         zIndex: 2e9, // The z-index (defaults to 2000000000)
         top:  '400px', // Top position relative to parent
-        left: '600px' // Left position relative to parent        
+        left: '600px' // Left position relative to parent
     });
-    
+
     this.displayItems = function(itemsTitle, offset, limit, total, funcdec, funcinc) {
         var count = $("#itemtable tr.data").length;
-        
+
         var last = offset + limit;
         var suff = "";
-        
+
         if (total == null) {
             last = offset + count;
             suff = (count == limit) ? " of " + last + "+ " : " of " + last;
@@ -102,7 +107,7 @@ var Report = function() {
             suff = " of " + total;
         }
         suff += " unfiltered; displaying " + count + " filtered" ;
-        
+
         itemsTitle += " (" + (offset+1) + " - " + last + suff + ")";
         $("#prev,#next").attr("disabled",true);
         $("#itemdiv h3").text(itemsTitle);
@@ -110,34 +115,51 @@ var Report = function() {
         if (offset > 0) $("#prev").attr("disabled", false);
         $("#prev").off("click").on("click", funcdec);
         //in case of filters, always allow next
-        
+
         if (total == null) {
-            $("#next").attr("disabled", false);                
+            $("#next").attr("disabled", false);
         } else if (offset + limit  < total) {
+<<<<<<< HEAD
             $("#next").attr("disabled", false);            
       $("#exlimit").addClass("red");
         } else if (limit == total) {
             //total may only be accurate to one page
             $("#next").attr("disabled", false);            
+=======
+            $("#next").attr("disabled", false);
+      $("#exlimit").addClass("red");
+        } else if (limit == total) {
+            //total may only be accurate to one page
+            $("#next").attr("disabled", false);
+>>>>>>> dspace-7.2.1
       $("#exlimit").addClass("red");
         }
         $("#next").off("click").on("click", funcinc);
     }
-    
+
     this.myReportParameters = undefined;
     this.myFilters = undefined;
     this.myMetadataFields = undefined;
-    
+
     this.initMetadataFields = function() {
         this.myMetadataFields = new MetadataFields(self);
-        this.myMetadataFields.load();        
+        this.myMetadataFields.load();
     }
+<<<<<<< HEAD
     
   this.initBitstreamFields = function() {
     this.myBitstreamFields = new BitstreamFields(self);
     this.myBitstreamFields.load();    
   }
   
+=======
+
+  this.initBitstreamFields = function() {
+    this.myBitstreamFields = new BitstreamFields(self);
+    this.myBitstreamFields.load();
+  }
+
+>>>>>>> dspace-7.2.1
     this.baseInit = function() {
         this.myReportParameters = new ReportParameters(
                 this.getDefaultParameters(),
@@ -173,13 +195,17 @@ var Report = function() {
         });
         return itemdata;
     }
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> dspace-7.2.1
     this.export = function(rows) {
     var itemdata = "data:text/csv;charset=utf-8," + this.makeCsv(rows);
         var encodedUri = encodeURI(itemdata);
-        window.open(encodedUri);        
+        window.open(encodedUri);
     }
-    
+
     //this is meant to be overridden for each report
     this.exportCol = function(colnum, col) {
         var data = "";
@@ -187,7 +213,7 @@ var Report = function() {
         data += self.exportCell(col);
         return data;
     }
-    
+
     this.exportCell = function(col) {
         data = "\"";
         $(col).contents().each(function(i, node){
@@ -198,16 +224,16 @@ var Report = function() {
                 if ($(node).is("div:not(:last-child)")) {
                     data += "||";
                 }
-            }        
+            }
         });
         data += "\"";
         return data;
     }
-    
+
     this.init = function() {
-        this.baseInit();    
+        this.baseInit();
     }
-    
+
 }
 
 var Auth = function(report) {
@@ -242,9 +268,18 @@ var Auth = function(report) {
                 self.authStat();
                 self.callback();
             }
-        });        
+        });
     }
 
+    this.verifyShibLogin = function() {
+        var self = this;
+        $.ajax({
+            url: "/rest/shibboleth-login",
+            success: self.authStat
+        });
+    }
+
+<<<<<<< HEAD
     this.verifyShibLogin = function() {
         var self = this;
         $.ajax({
@@ -253,6 +288,8 @@ var Auth = function(report) {
         });
     }
   
+=======
+>>>>>>> dspace-7.2.1
     this.authStat = function() {
         var self = this;
         $.ajax({
@@ -264,13 +301,21 @@ var Auth = function(report) {
             success: function(data) {
                 var user = "";
                 if (data.email != undefined) {
+<<<<<<< HEAD
                     user = data.email;                  
+=======
+                    user = data.email;
+>>>>>>> dspace-7.2.1
                 } else {
                     user = "You are not logged in.  Some items may be excluded from reports.";
                 }
                 var anchor = $("<a/>").text(user);
                 if (self.report.makeShibLink()) {
+<<<<<<< HEAD
                     anchor.attr("href", self.report.shibPath + "?target="+document.location);
+=======
+                  anchor.attr("href", self.report.shibPath + "?target="+document.location);
+>>>>>>> dspace-7.2.1
                 }
                 if (self.report.makeAuthLink()) {
                     anchor.attr("href","javascript:window.open('authenticate.html','Authenticate (Password Auth Only)','height=200,width=500')");
@@ -279,10 +324,17 @@ var Auth = function(report) {
                 if (data.email == undefined && self.report.makeShibLink()) {
                     self.verifyShibLogin();
                 }
+<<<<<<< HEAD
             } 
         });     
     }
   
+=======
+            }
+        });
+    }
+
+>>>>>>> dspace-7.2.1
     this.logout = function() {
         var self = this;
         $.ajax({
@@ -293,7 +345,7 @@ var Auth = function(report) {
             complete: function(xhr, status) {
                 self.authStat();
             }
-        });     
+        });
     }
     this.getHeaders = function() {
         var HEADERS = {};
@@ -314,14 +366,14 @@ var ReportParameters = function(defaultParams, prmstr) {
         var field = tmparr[0];
         var val = decodeURIComponent(tmparr[1]);
         var pval = this.params[field];
-              
+
         if ($.isArray(pval)) {
-            pval[pval.length] = val;          
+            pval[pval.length] = val;
         } else {
             this.params[field] = val;
         }
     }
-    $("#limit").val(this.params.limit);  
+    $("#limit").val(this.params.limit);
     $("#offset").val(this.params.offset);
     this.limit = this.params.limit;
     this.offset = this.params.offset;
@@ -350,11 +402,11 @@ var ReportParameters = function(defaultParams, prmstr) {
         var lim = $("#limit").val();
         if ($.isNumeric(val) && $.isNumeric(lim)) {
             if (increment) {
-                $("#offset").val(this.getNextOffset());                
+                $("#offset").val(this.getNextOffset());
             } else {
-                $("#offset").val(this.getPrevOffset());                
+                $("#offset").val(this.getPrevOffset());
             }
-        }        
+        }
     }
 
     this.saveAsUrl = function(params) {
@@ -381,7 +433,7 @@ var Filters = function() {
                 $("#filter-reload").attr("disabled", false);
             }
         );
-        
+
         $.getJSON(
             "/rest/filters",
             function(data){
@@ -444,13 +496,13 @@ var Filters = function() {
             list = "none";
         }
         return list;
-    }    
+    }
 }
 
 var MetadataFields = function(report) {
     this.metadataSchemas = undefined;
     var self = this;
-    
+
     this.load = function(){
         $.ajax({
             url: "/rest/registries/schema",
@@ -463,15 +515,15 @@ var MetadataFields = function(report) {
             },
             complete: function(xhr, status) {
             }
-        });        
+        });
     }
-    
+
     this.initFields = function(data, report) {
         var params = report.myReportParameters.params;
         self.metadataSchemas = data;
         self.drawShowFields(params["show_fields[]"]);
     }
-    
+
     this.getShowFields = function(){
         var val = $("#show-fields select").val();
         return val == null ? Array() : val;
@@ -497,7 +549,7 @@ var MetadataFields = function(report) {
             });
         });
     }
-    
+
     this.initQueries = function(){};
 }
 
@@ -508,15 +560,24 @@ var BitstreamFields = function(report) {
   }
   this.map = [
     {
+<<<<<<< HEAD
       key: "original-file-names", 
       name: "Original File Names", 
+=======
+      key: "original-file-names",
+      name: "Original File Names",
+>>>>>>> dspace-7.2.1
       ftest: self.isOriginal,
       fval: function(bit) {
         return bit.name;
       }
     },
     {
+<<<<<<< HEAD
       key: "mime-type", 
+=======
+      key: "mime-type",
+>>>>>>> dspace-7.2.1
       name: "Mime Type",
       ftest: self.isOriginal,
       fval: function(bit) {
@@ -524,7 +585,11 @@ var BitstreamFields = function(report) {
       }
     },
     {
+<<<<<<< HEAD
       key: "bitstream-format", 
+=======
+      key: "bitstream-format",
+>>>>>>> dspace-7.2.1
       name: "Bitstream Format",
       ftest: self.isOriginal,
       fval: function(bit) {
@@ -532,7 +597,11 @@ var BitstreamFields = function(report) {
       }
     },
     {
+<<<<<<< HEAD
       key: "bitstream-description", 
+=======
+      key: "bitstream-description",
+>>>>>>> dspace-7.2.1
       name: "Bitstream Description",
       ftest: self.isOriginal,
       fval: function(bit) {
@@ -540,7 +609,11 @@ var BitstreamFields = function(report) {
       }
     },
     {
+<<<<<<< HEAD
       key: "bitstream-size", 
+=======
+      key: "bitstream-size",
+>>>>>>> dspace-7.2.1
       name: "Bitstream Size",
       ftest: self.isOriginal,
       fval: function(bit) {
@@ -548,18 +621,30 @@ var BitstreamFields = function(report) {
       }
     },
     {
+<<<<<<< HEAD
       key: "bitstream-checksum", 
+=======
+      key: "bitstream-checksum",
+>>>>>>> dspace-7.2.1
       name: "MD5 Checksum",
       ftest: self.isOriginal,
       fval: function(bit) {
         if (bit.checkSum.checkSumAlgorithm === "MD5") {
+<<<<<<< HEAD
           return bit.checkSum.value;          
+=======
+          return bit.checkSum.value;
+>>>>>>> dspace-7.2.1
         }
         return "";
       }
     },
   ];
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> dspace-7.2.1
   this.load = function(){
     self.initFields(report);
   }
@@ -568,7 +653,11 @@ var BitstreamFields = function(report) {
     var params = report.myReportParameters.params;
     self.drawShowFieldsBits(params["show_fields_bits[]"]);
   };
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> dspace-7.2.1
   this.hasBitstreamFields = function() {
     return self.getShowFieldsBits() != null;
   }
@@ -576,13 +665,18 @@ var BitstreamFields = function(report) {
     var val = $("#show-fields-bits select").val();
     return val == null ? Array() : val;
   }
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> dspace-7.2.1
   this.drawShowFieldsBits = function(pfieldsBits) {
     var sel = $("<select name='show_fields_bits'/>");
     sel.attr("multiple","true").attr("size","8").appendTo("#show-fields-bits");
     for(var i=0; i<this.map.length; i++) {
       var opt = report.myHtmlUtil.addOpt(sel, this.map[i].name, this.map[i].key);
       if (pfieldsBits != null) {
+<<<<<<< HEAD
         opt.attr("selected", pfieldsBits[this.map[i].key] != undefined ? "Y" : null);        
       }
       sel.append(opt);      
@@ -590,6 +684,15 @@ var BitstreamFields = function(report) {
   }
   
   
+=======
+        opt.attr("selected", pfieldsBits[this.map[i].key] != undefined ? "Y" : null);
+      }
+      sel.append(opt);
+    }
+  }
+
+
+>>>>>>> dspace-7.2.1
   this.getKeyText = function(key, item, bitfields) {
     var ret = [];
     if (bitfields == null || item.bitstreams == null) {
@@ -608,12 +711,17 @@ var BitstreamFields = function(report) {
     if (mapval == null) {
       return ret;
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> dspace-7.2.1
     $.each(item.bitstreams, function(colindex, bitstream) {
       if (mapval.ftest(bitstream)) {
         var val = mapval.fval(bitstream);
         if (val != null) {
           if (isNaN(val) || ret.length == 0) {
+<<<<<<< HEAD
             ret.push(val);            
           } else {
             ret[0] += val;
@@ -622,6 +730,16 @@ var BitstreamFields = function(report) {
         }
       }
     });         
+=======
+            ret.push(val);
+          } else {
+            ret[0] += val;
+          }
+
+        }
+      }
+    });
+>>>>>>> dspace-7.2.1
     return ret;
   }
 }
@@ -661,6 +779,7 @@ var HtmlUtil = function() {
         a.append(val);
         a.attr("href", href);
         a.attr("target", "_blank");
+        a.attr("rel", "noopener noreferrer");
         return a;
     }
 
@@ -704,7 +823,7 @@ var CommunitySelector = function(report, parent, paramCollSel) {
     var collSel = $("<select/>").attr("id","collSel").attr("name","collSel").attr("multiple", true).attr("size",15);
     parent.append(collSel);
     report.myHtmlUtil.addOpt(collSel, "Whole Repository", "");
-    
+
     $.ajax({
         url: "/rest/hierarchy",
         dataType: "json",
@@ -722,7 +841,7 @@ var CommunitySelector = function(report, parent, paramCollSel) {
         },
         complete: function(xhr, status) {
         }
-    });    
+    });
 
     this.addCommLabel = function(collSel, comm, indent, paramCollSel) {
         var prefix = "";
@@ -738,12 +857,12 @@ var CommunitySelector = function(report, parent, paramCollSel) {
                         opt.attr("selected", true);
                     }
                 });
-            });        
+            });
         }
         if (comm.community != null) {
             $.each(comm.community, function(index, scomm) {
                 self.addCommLabel(collSel, scomm, indent + 1, paramCollSel);
-            });        
+            });
         }
     }
 }

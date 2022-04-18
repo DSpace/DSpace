@@ -11,14 +11,14 @@ import java.lang.ref.WeakReference;
 
 
 /**
- * A holder which is designed to make it easy to hold onto a reference 
- * to a class which is outside of our ClassLoader and not cause it to 
+ * A holder which is designed to make it easy to hold onto a reference
+ * to a class which is outside of our ClassLoader and not cause it to
  * not be able to reload happily.  The reference to the
- * object that is held onto here needs to not be the only one in the 
- * system or this object will be garbage collected before it probably 
- * should be.  That is generally outside the purview of the service 
+ * object that is held onto here needs to not be the only one in the
+ * system or this object will be garbage collected before it probably
+ * should be.  That is generally outside the purview of the service
  * manager system though.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class ProviderHolder<T> {
@@ -28,10 +28,12 @@ public final class ProviderHolder<T> {
     /**
      * Default constructor.
      */
-    public ProviderHolder() {}
+    public ProviderHolder() {
+    }
 
     /**
      * Create the holder with a provider already in it.
+     *
      * @param provider the provider to place in the holder to start
      */
     public ProviderHolder(T provider) {
@@ -70,7 +72,7 @@ public final class ProviderHolder<T> {
 
     /**
      * Stores a provider in this holder in a ClassLoader safe way.
-     * 
+     *
      * @param provider the provider to store.  If this is null then the current provider is cleared.
      */
     public void setProvider(T provider) {
@@ -121,5 +123,5 @@ public final class ProviderHolder<T> {
         T provider = getProvider();
         return "ph:" + (provider == null ? null : provider.getClass() + ":" + provider) + ": " + super.toString();
     }
-    
+
 }

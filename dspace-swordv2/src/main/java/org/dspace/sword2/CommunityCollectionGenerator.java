@@ -7,64 +7,59 @@
  */
 package org.dspace.sword2;
 
+import java.util.List;
+
 import org.apache.abdera.i18n.iri.IRI;
-import org.apache.commons.lang.StringUtils;
-import org.dspace.content.DSpaceObject;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Community;
-import org.apache.log4j.Logger;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.swordapp.server.SwordCollection;
 
-import java.util.List;
-
-public class CommunityCollectionGenerator implements AtomCollectionGenerator
-{
-    private static Logger log = Logger
-            .getLogger(CommunityCollectionGenerator.class);
+public class CommunityCollectionGenerator implements AtomCollectionGenerator {
+    private static Logger log = LogManager
+        .getLogger(CommunityCollectionGenerator.class);
 
     protected HandleService handleService = HandleServiceFactory.getInstance()
-            .getHandleService();
+                                                                .getHandleService();
 
     protected CommunityService communityService = ContentServiceFactory
-            .getInstance().getCommunityService();
+        .getInstance().getCommunityService();
 
     public SwordCollection buildCollection(Context context, DSpaceObject dso,
-            SwordConfigurationDSpace swordConfig)
-            throws DSpaceSwordException
-    {
-        if (!(dso instanceof Community))
-        {
+                                           SwordConfigurationDSpace swordConfig)
+        throws DSpaceSwordException {
+        if (!(dso instanceof Community)) {
             log.error(
-                    "buildCollection passed something other than a Community object");
+                "buildCollection passed something other than a Community object");
             throw new DSpaceSwordException(
-                    "Incorrect ATOMCollectionGenerator instantiated");
+                "Incorrect ATOMCollectionGenerator instantiated");
         }
 
         // get the things we need out of the service
         SwordUrlManager urlManager = swordConfig
-                .getUrlManager(context, swordConfig);
+            .getUrlManager(context, swordConfig);
 
         Community com = (Community) dso;
         SwordCollection scol = new SwordCollection();
 
         // prepare the parameters to be put in the sword collection
         String location = urlManager.getDepositLocation(com);
-        if (location == null)
-        {
+        if (location == null) {
             location = handleService.getCanonicalForm(com.getHandle());
         }
         scol.setLocation(location);
 
         // collection title is just the community name
         String title = communityService.getName(com);
-        if (StringUtils.isNotBlank(title))
-        {
+        if (StringUtils.isNotBlank(title)) {
             scol.setTitle(title);
         }
 
@@ -74,12 +69,10 @@ public class CommunityCollectionGenerator implements AtomCollectionGenerator
 
         // abstract is the short description of the collection
         List<MetadataValue> abstracts = communityService
-                .getMetadataByMetadataString(com, "short_description");
-        if (abstracts != null && !abstracts.isEmpty())
-        {
+            .getMetadataByMetadataString(com, "short_description");
+        if (abstracts != null && !abstracts.isEmpty()) {
             String firstValue = abstracts.get(0).getValue();
-            if (StringUtils.isNotBlank(firstValue))
-            {
+            if (StringUtils.isNotBlank(firstValue)) {
                 scol.setAbstract(firstValue);
             }
         }

@@ -19,13 +19,11 @@ package org.dspace.core;
  * @see org.dspace.core.service.PluginService
  */
 
-public class PluginConfigurationError extends Error
-{
+public class PluginConfigurationError extends Error {
     /**
      * @param msg Error message text.
      */
-    public PluginConfigurationError(String msg)
-    {
+    public PluginConfigurationError(String msg) {
         super(msg);
     }
 }

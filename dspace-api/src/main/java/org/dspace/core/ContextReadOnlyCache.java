@@ -7,6 +7,12 @@
  */
 package org.dspace.core;
 
+<<<<<<< HEAD
+=======
+import java.util.HashMap;
+import java.util.Set;
+
+>>>>>>> dspace-7.2.1
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
@@ -16,9 +22,12 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.springframework.util.CollectionUtils;
 
+<<<<<<< HEAD
 import java.util.HashMap;
 import java.util.Set;
 
+=======
+>>>>>>> dspace-7.2.1
 /**
  * Object that manages the read-only caches for the Context class
  */
@@ -69,7 +78,11 @@ public class ContextReadOnlyCache {
 
     public void cacheAllMemberGroupsSet(EPerson ePerson, Set<Group> groups) {
         allMemberGroupsCache.put(buildAllMembersGroupKey(ePerson),
+<<<<<<< HEAD
                 groups);
+=======
+                                 groups);
+>>>>>>> dspace-7.2.1
 
         //clear the individual groupMembershipCache as we have all memberships now.
         groupMembershipCache.clear();
@@ -89,15 +102,27 @@ public class ContextReadOnlyCache {
         return ePerson == null ? "" : ePerson.getID().toString();
     }
 
+<<<<<<< HEAD
     private ImmutableTriple<String, Integer, String> buildAuthorizedActionKey(DSpaceObject dspaceObject, int action, EPerson eperson) {
         return new ImmutableTriple<>(dspaceObject == null ? "" : dspaceObject.getID().toString(),
                 Integer.valueOf(action),
                 eperson == null ? "" : eperson.getID().toString());
+=======
+    private ImmutableTriple<String, Integer, String> buildAuthorizedActionKey(DSpaceObject dspaceObject, int action,
+                                                                              EPerson eperson) {
+        return new ImmutableTriple<>(dspaceObject == null ? "" : dspaceObject.getID().toString(),
+                                     Integer.valueOf(action),
+                                     eperson == null ? "" : eperson.getID().toString());
+>>>>>>> dspace-7.2.1
     }
 
     private Pair<String, String> buildGroupMembershipKey(Group group, EPerson eperson) {
         return new ImmutablePair<>(group == null ? "" : group.getName(),
+<<<<<<< HEAD
                 eperson == null ? "" : eperson.getID().toString());
+=======
+                                   eperson == null ? "" : eperson.getID().toString());
+>>>>>>> dspace-7.2.1
     }
 
 }

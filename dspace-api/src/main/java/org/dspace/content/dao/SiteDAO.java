@@ -7,10 +7,10 @@
  */
 package org.dspace.content.dao;
 
+import java.sql.SQLException;
+
 import org.dspace.content.Site;
 import org.dspace.core.Context;
-
-import java.sql.SQLException;
 
 /**
  * Database Access Object interface class for the Site object.

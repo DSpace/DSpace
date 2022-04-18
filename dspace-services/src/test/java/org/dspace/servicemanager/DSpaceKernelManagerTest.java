@@ -7,7 +7,8 @@
  */
 package org.dspace.servicemanager;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
@@ -18,7 +19,7 @@ import org.junit.Test;
 
 /**
  * Testing the kernel manager
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceKernelManagerTest {
@@ -54,7 +55,7 @@ public class DSpaceKernelManagerTest {
         DSpaceKernel k2 = kernelManager.getKernel();
         assertNotNull(k2);
         assertEquals(kernel, k2);
-        
+
         kernel = k2 = null;
     }
 

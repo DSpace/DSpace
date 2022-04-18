@@ -7,12 +7,35 @@
  */
 package org.dspace.discovery;
 
+<<<<<<< HEAD
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+=======
+import static org.dspace.core.Utils.emptyIfNull;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.SequenceInputStream;
+import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import javax.annotation.Nullable;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
+>>>>>>> dspace-7.2.1
 import org.apache.solr.common.util.ContentStreamBase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -23,6 +46,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 
+<<<<<<< HEAD
 import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -40,6 +64,13 @@ import static org.dspace.core.Utils.emptyIfNull;
 public class FullTextContentStreams extends ContentStreamBase
 {
     private static final Logger log = Logger.getLogger(FullTextContentStreams.class);
+=======
+/**
+ * Construct a <code>ContentStream</code> from a <code>File</code>
+ */
+public class FullTextContentStreams extends ContentStreamBase {
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(FullTextContentStreams.class);
+>>>>>>> dspace-7.2.1
 
     public static final String FULLTEXT_BUNDLE = "TEXT";
 
@@ -53,9 +84,15 @@ public class FullTextContentStreams extends ContentStreamBase
     }
 
     protected void init(Item parentItem) {
+<<<<<<< HEAD
         fullTextStreams = new LinkedList<>();
 
         if(parentItem != null) {
+=======
+        fullTextStreams = new ArrayList<>();
+
+        if (parentItem != null) {
+>>>>>>> dspace-7.2.1
             sourceInfo = parentItem.getHandle();
 
             //extracted full text is always extracted as plain text
@@ -79,9 +116,15 @@ public class FullTextContentStreams extends ContentStreamBase
                     fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
 
                     log.debug("Added BitStream: "
+<<<<<<< HEAD
                             + fulltextBitstream.getStoreNumber() + " "
                             + fulltextBitstream.getSequenceID() + " "
                             + fulltextBitstream.getName());
+=======
+                                  + fulltextBitstream.getStoreNumber() + " "
+                                  + fulltextBitstream.getSequenceID() + " "
+                                  + fulltextBitstream.getName());
+>>>>>>> dspace-7.2.1
                 }
             }
         }
@@ -102,6 +145,7 @@ public class FullTextContentStreams extends ContentStreamBase
     public Long getSize() {
         long result = 0;
 
+<<<<<<< HEAD
         if(CollectionUtils.isNotEmpty(fullTextStreams)) {
             Iterable<Long> individualSizes = Iterables.transform(fullTextStreams, new Function<FullTextBitstream, Long>() {
                 @Nullable
@@ -110,6 +154,17 @@ public class FullTextContentStreams extends ContentStreamBase
                     return input == null ? 0L : input.getSize();
                 }
             });
+=======
+        if (CollectionUtils.isNotEmpty(fullTextStreams)) {
+            Iterable<Long> individualSizes = Iterables
+                .transform(fullTextStreams, new Function<FullTextBitstream, Long>() {
+                    @Nullable
+                    @Override
+                    public Long apply(@Nullable FullTextBitstream input) {
+                        return input == null ? 0L : input.getSize();
+                    }
+                });
+>>>>>>> dspace-7.2.1
 
             for (Long size : individualSizes) {
                 result += size;
@@ -139,15 +194,24 @@ public class FullTextContentStreams extends ContentStreamBase
     }
 
     private BitstreamService getBitstreamService() {
+<<<<<<< HEAD
         if(bitstreamService == null) {
+=======
+        if (bitstreamService == null) {
+>>>>>>> dspace-7.2.1
             bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
         }
         return bitstreamService;
     }
 
     private class FullTextBitstream {
+<<<<<<< HEAD
         private String itemHandle;
         private Bitstream bitstream;
+=======
+        private final String itemHandle;
+        private final Bitstream bitstream;
+>>>>>>> dspace-7.2.1
 
         public FullTextBitstream(final String parentHandle, final Bitstream file) {
             this.itemHandle = parentHandle;
@@ -164,7 +228,11 @@ public class FullTextContentStreams extends ContentStreamBase
         }
 
         public long getSize() {
+<<<<<<< HEAD
             return bitstream.getSize();
+=======
+            return bitstream.getSizeBytes();
+>>>>>>> dspace-7.2.1
         }
 
         public InputStream getInputStream() throws SQLException, IOException, AuthorizeException {
@@ -176,6 +244,7 @@ public class FullTextContentStreams extends ContentStreamBase
         }
     }
 
+<<<<<<< HEAD
     private class FullTextEnumeration implements Enumeration<InputStream> {
 
         private final Iterator<FullTextBitstream> fulltextIterator;
@@ -184,10 +253,30 @@ public class FullTextContentStreams extends ContentStreamBase
             this.fulltextIterator = fulltextStreams;
         }
 
+=======
+    /**
+     * {@link Enumeration} is implemented because instances of this class are
+     * passed to a JDK class that requires this obsolete type.
+     */
+    @SuppressWarnings("JdkObsolete")
+    private static class FullTextEnumeration implements Enumeration<InputStream> {
+
+        private final Iterator<FullTextBitstream> fulltextIterator;
+
+        public FullTextEnumeration(final Iterator<FullTextBitstream> fulltextIterator) {
+            this.fulltextIterator = fulltextIterator;
+        }
+
+        @Override
+>>>>>>> dspace-7.2.1
         public boolean hasMoreElements() {
             return fulltextIterator.hasNext();
         }
 
+<<<<<<< HEAD
+=======
+        @Override
+>>>>>>> dspace-7.2.1
         public InputStream nextElement() {
             InputStream inputStream = null;
             FullTextBitstream bitstream = null;
@@ -197,6 +286,7 @@ public class FullTextContentStreams extends ContentStreamBase
                 inputStream = bitstream.getInputStream();
             } catch (Exception e) {
                 log.warn("Unable to add full text bitstream " + (bitstream == null ? "NULL" :
+<<<<<<< HEAD
                         bitstream.getFileName() + " for item " + bitstream.getItemHandle())
                         + " to SOLR:" + e.getMessage(), e);
 
@@ -205,6 +295,17 @@ public class FullTextContentStreams extends ContentStreamBase
 
             return inputStream == null ? null : new SequenceInputStream(
                     new ByteArrayInputStream("\n".getBytes(Charsets.UTF_8)), inputStream);
+=======
+                    bitstream.getFileName() + " for item " + bitstream.getItemHandle())
+                             + " to SOLR:" + e.getMessage(), e);
+
+                inputStream = new ByteArrayInputStream(
+                    (e.getClass() + ": " + e.getMessage()).getBytes(StandardCharsets.UTF_8));
+            }
+
+            return inputStream == null ? null : new SequenceInputStream(
+                new ByteArrayInputStream("\n".getBytes(StandardCharsets.UTF_8)), inputStream);
+>>>>>>> dspace-7.2.1
         }
     }
 

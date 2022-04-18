@@ -18,7 +18,7 @@ import org.junit.BeforeClass;
  * and includes an automatic request wrapper around every test method which will start and
  * end a request, the default behavior is to end the request with a failure which causes
  * a rollback and reverts the storage to the previous values
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public abstract class DSpaceAbstractRequestTest extends DSpaceAbstractKernelTest {

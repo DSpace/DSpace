@@ -7,24 +7,27 @@
  */
 package org.dspace.content.dao;
 
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
+
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * Database Access Object interface class for the Bitstream object.
- * The implementation of this class is responsible for all database calls for the Bitstream object and is autowired by spring
+ * The implementation of this class is responsible for all database calls for the Bitstream object and is autowired
+ * by spring
  * This class should only be accessed from a single service and should never be exposed outside of the API
  *
  * @author kevinvandevelde at atmire.com
  */
 public interface BitstreamDAO extends DSpaceObjectLegacySupportDAO<Bitstream> {
+
+    public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException;
 
     public List<Bitstream> findDeletedBitstreams(Context context) throws SQLException;
 

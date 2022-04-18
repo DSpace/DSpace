@@ -17,8 +17,7 @@ public interface NewsService {
     /**
      * Reads news from a text file.
      *
-     * @param newsFile
-     *        name of the news file to read in, relative to the news file path.
+     * @param newsFile name of the news file to read in, relative to the news file path.
      * @return contents
      */
     public String readNewsFile(String newsFile);
@@ -26,10 +25,8 @@ public interface NewsService {
     /**
      * Writes news to a text file.
      *
-     * @param newsFile
-     *        name of the news file to read in, relative to the news file path.
-     * @param news
-     *            the text to be written to the file.
+     * @param newsFile name of the news file to read in, relative to the news file path.
+     * @param news     the text to be written to the file.
      * @return string
      */
     public String writeNewsFile(String newsFile, String news);
@@ -42,11 +39,11 @@ public interface NewsService {
     public String getNewsFilePath();
 
     /**
-     * Check if the newsName is a valid one
-     * 
-     * @param newsName
-     * @return true 
-     * 				if the newsName is valid
+     * Check if the newsName is an acceptable file name
+     *
+     * @param newsName news name
+     * @return true
+     * if the newsName is valid
      */
     public boolean validate(String newsName);
 }

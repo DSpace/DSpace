@@ -7,13 +7,16 @@
  */
 package org.dspace;
 
-import org.apache.log4j.Logger;
+import static org.junit.Assert.fail;
+
+import java.sql.SQLException;
+
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
-import org.dspace.discovery.MockIndexEventConsumer;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
@@ -21,11 +24,7 @@ import org.dspace.storage.rdbms.DatabaseUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-
-import java.sql.SQLException;
-
-import static org.junit.Assert.fail;
-
+import org.junit.Ignore;
 
 
 /**
@@ -35,13 +34,15 @@ import static org.junit.Assert.fail;
  * NOTE: This base class also performs in-memory (H2) database initialization.
  * If your tests don't need that, you may wish to just use AbstractDSpaceTest.
  *
- * @see AbstractDSpaceTest
  * @author pvillega
+ * @see AbstractDSpaceTest
  */
-public class AbstractUnitTest extends AbstractDSpaceTest
-{
-    /** log4j category */
-    private static final Logger log = Logger.getLogger(AbstractUnitTest.class);
+@Ignore
+public class AbstractUnitTest extends AbstractDSpaceTest {
+    /**
+     * log4j category
+     */
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractUnitTest.class);
 
     /**
      * Context mock object to use in the tests.
@@ -59,7 +60,7 @@ public class AbstractUnitTest extends AbstractDSpaceTest
      */
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
-    /** 
+    /**
      * This method will be run before the first test as per @BeforeClass. It will
      * initialize shared resources required for all tests of this class.
      * <p>
@@ -70,27 +71,15 @@ public class AbstractUnitTest extends AbstractDSpaceTest
      * initializes the in-memory database for tests that need it.
      */
     @BeforeClass
-    public static void initDatabase()
-    {
-        // Clear our old flyway object. Because this DB is in-memory, its
-        // data is lost when the last connection is closed. So, we need
-        // to (re)start Flyway from scratch for each Unit Test class.
-        DatabaseUtils.clearFlywayDBCache();
-
-        try
-        {
+    public static void initDatabase() {
+        try {
             // Update/Initialize the database to latest version (via Flyway)
             DatabaseUtils.updateDatabase();
-        }
-        catch(SQLException se)
-        {
+        } catch (SQLException se) {
             log.error("Error initializing database", se);
             fail("Error initializing database: " + se.getMessage()
-                    + (se.getCause() == null ? "" : ": " + se.getCause().getMessage()));
+                     + (se.getCause() == null ? "" : ": " + se.getCause().getMessage()));
         }
-
-        // Initialize mock indexer (which does nothing, since Solr isn't running)
-        new MockIndexEventConsumer();
     }
 
     /**
@@ -102,17 +91,15 @@ public class AbstractUnitTest extends AbstractDSpaceTest
      */
     @Before
     public void init() {
-        try
-        {
+        try {
             //Start a new context
-            context = new Context();
+            context = new Context(Context.Mode.BATCH_EDIT);
             context.turnOffAuthorisationSystem();
 
             //Find our global test EPerson account. If it doesn't exist, create it.
             EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
             eperson = ePersonService.findByEmail(context, "test@email.com");
-            if(eperson == null)
-            {
+            if (eperson == null) {
                 // This EPerson creation should only happen once (i.e. for first test run)
                 log.info("Creating initial EPerson (email=test@email.com) for Unit Tests");
                 eperson = ePersonService.create(context);
@@ -131,15 +118,18 @@ public class AbstractUnitTest extends AbstractDSpaceTest
             EPersonServiceFactory.getInstance().getGroupService().initDefaultGroupNames(context);
 
             context.restoreAuthSystemState();
-        }
-        catch (AuthorizeException ex)
-        {
+
+            // Ensure all tests run with Solr indexing disabled
+            // we turn this off because
+            // Solr is NOT used in the OLD dspace-api test framework. Instead, Solr/Discovery indexing is
+            // exercised in the new Integration Tests (which use an embedded Solr) and extends
+            // org.dspace.AbstractIntegrationTestWithDatabase
+            context.setDispatcher("exclude-discovery");
+        } catch (AuthorizeException ex) {
             log.error("Error creating initial eperson or default groups", ex);
             fail("Error creating initial eperson or default groups in AbstractUnitTest init()");
-        }
-        catch (SQLException ex) 
-        {
-            log.error(ex.getMessage(),ex);
+        } catch (SQLException ex) {
+            log.error(ex.getMessage(), ex);
             fail("SQL Error on AbstractUnitTest init()");
         }
     }
@@ -152,8 +142,7 @@ public class AbstractUnitTest extends AbstractDSpaceTest
      * but no execution order is guaranteed
      */
     @After
-    public void destroy()
-    {
+    public void destroy() {
         // Cleanup our global context object
         try {
             cleanupContext(context);
@@ -163,16 +152,19 @@ public class AbstractUnitTest extends AbstractDSpaceTest
     }
 
     /**
-     *  Utility method to cleanup a created Context object (to save memory).
-     *  This can also be used by individual tests to cleanup context objects they create.
+     * Utility method to cleanup a created Context object (to save memory).
+     * This can also be used by individual tests to cleanup context objects they create.
      */
     protected void cleanupContext(Context c) throws SQLException {
         // If context still valid, abort it
-        if(c!=null && c.isValid())
-           c.complete();
+        if (c != null && c.isValid()) {
+            c.abort();
+        }
 
         // Cleanup Context object by setting it to null
-        if(c!=null)
-           c = null;
+        if (c != null) {
+            c = null;
+        }
     }
+
 }

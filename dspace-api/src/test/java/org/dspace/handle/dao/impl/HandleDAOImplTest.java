@@ -7,7 +7,17 @@
  */
 package org.dspace.handle.dao.impl;
 
+<<<<<<< HEAD
 import org.apache.log4j.Logger;
+=======
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
+import org.apache.logging.log4j.Logger;
+>>>>>>> dspace-7.2.1
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -15,7 +25,16 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
+<<<<<<< HEAD
 import org.dspace.content.service.*;
+=======
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
+>>>>>>> dspace-7.2.1
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
@@ -27,19 +46,29 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+<<<<<<< HEAD
 import java.io.IOException;
 import java.sql.SQLException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+=======
+>>>>>>> dspace-7.2.1
 /**
  * Test class for the Handle DAO
  */
 public class HandleDAOImplTest extends AbstractUnitTest {
 
+<<<<<<< HEAD
     /** log4j category */
     private static final Logger log = Logger.getLogger(HandleDAOImplTest.class);
+=======
+    /**
+     * log4j category
+     */
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(HandleDAOImplTest.class);
+>>>>>>> dspace-7.2.1
 
     /**
      * Item instances for the tests
@@ -64,6 +93,7 @@ public class HandleDAOImplTest extends AbstractUnitTest {
     private Community owningCommunity;
 
     private static final String HANDLE_PREFIX = "123456789";
+<<<<<<< HEAD
     private static final String SUFFIX_1 = "11";
     private static final String SUFFIX_2 = "11.2";
     private static final String SUFFIX_3 = "33";
@@ -76,6 +106,18 @@ public class HandleDAOImplTest extends AbstractUnitTest {
         super.init();
         try
         {
+=======
+    private static final String SUFFIX_1 = "101";
+    private static final String SUFFIX_2 = "101.2";
+    private static final String SUFFIX_3 = "303";
+    private static final String SUFFIX_4 = "404";
+
+    @Before
+    @Override
+    public void init() {
+        super.init();
+        try {
+>>>>>>> dspace-7.2.1
             //we have to create a new community in the database
             context.turnOffAuthorisationSystem();
             this.owningCommunity = communityService.create(null, context);
@@ -100,6 +142,7 @@ public class HandleDAOImplTest extends AbstractUnitTest {
 
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
+<<<<<<< HEAD
         }
         catch (AuthorizeException ex)
         {
@@ -108,6 +151,12 @@ public class HandleDAOImplTest extends AbstractUnitTest {
         }
         catch (SQLException ex)
         {
+=======
+        } catch (AuthorizeException ex) {
+            log.error("Authorization Error in init", ex);
+            fail("Authorization Error in init: " + ex.getMessage());
+        } catch (SQLException ex) {
+>>>>>>> dspace-7.2.1
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
         } catch (IOException ex) {
@@ -118,6 +167,7 @@ public class HandleDAOImplTest extends AbstractUnitTest {
 
     @After
     @Override
+<<<<<<< HEAD
     public void destroy()
     {
         try {
@@ -133,6 +183,19 @@ public class HandleDAOImplTest extends AbstractUnitTest {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+=======
+    public void destroy() {
+        try {
+            context.turnOffAuthorisationSystem();
+
+            //Context might have been committed in the test method, so best to reload to entity so we're sure that it
+            // is attached.
+            owningCommunity = context.reloadEntity(owningCommunity);
+            ContentServiceFactory.getInstance().getCommunityService().delete(context, owningCommunity);
+            owningCommunity = null;
+        } catch (Exception e) {
+            throw new AssertionError("Error occurred in destroy()", e);
+>>>>>>> dspace-7.2.1
         }
         item1 = null;
         item2 = null;
@@ -159,4 +222,8 @@ public class HandleDAOImplTest extends AbstractUnitTest {
         context.restoreAuthSystemState();
     }
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> dspace-7.2.1

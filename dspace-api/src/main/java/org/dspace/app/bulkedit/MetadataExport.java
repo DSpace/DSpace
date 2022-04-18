@@ -7,86 +7,93 @@
  */
 package org.dspace.app.bulkedit;
 
-import com.google.common.collect.Iterators;
-import org.apache.commons.cli.*;
-
-import org.dspace.content.*;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.ItemService;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.handle.factory.HandleServiceFactory;
-
-import java.util.ArrayList;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.util.factory.UtilServiceFactory;
+import org.dspace.app.util.service.DSpaceObjectUtils;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataDSpaceCsvExportService;
+import org.dspace.core.Context;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.utils.DSpace;
 
 /**
  * Metadata exporter to allow the batch export of metadata into a file
  *
  * @author Stuart Lewis
  */
-public class MetadataExport
-{
-    /** The items to export */
-    protected Iterator<Item> toExport;
+public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfiguration> {
 
-    protected ItemService itemService;
+    private boolean help = false;
+    private String filename = null;
+    private String identifier = null;
+    private boolean exportAllMetadata = false;
+    private boolean exportAllItems = false;
 
+<<<<<<< HEAD
     protected Context context;
 
     /** Whether to export all metadata, or just normally edited metadata */
     protected boolean exportAll;
+=======
+    private static final String EXPORT_CSV = "exportCSV";
+>>>>>>> dspace-7.2.1
 
-    protected MetadataExport() {
-        itemService = ContentServiceFactory.getInstance().getItemService();
-    }
+    private MetadataDSpaceCsvExportService metadataDSpaceCsvExportService = new DSpace().getServiceManager()
+                .getServicesByType(MetadataDSpaceCsvExportService.class).get(0);
 
-    /**
-     * Set up a new metadata export
-     *
-     * @param c The Context
-     * @param toExport The ItemIterator of items to export
-     * @param exportAll whether to export all metadata or not (include handle, provenance etc)
-     */
-    public MetadataExport(Context c, Iterator<Item> toExport, boolean exportAll)
-    {
-        itemService = ContentServiceFactory.getInstance().getItemService();
+    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
+<<<<<<< HEAD
         // Store the export settings
         this.toExport = toExport;
         this.exportAll = exportAll;
         this.context = c;
     }
+=======
+    private DSpaceObjectUtils dSpaceObjectUtils = UtilServiceFactory.getInstance().getDSpaceObjectUtils();
+>>>>>>> dspace-7.2.1
 
-    /**
-     * Method to export a community (and sub-communities and collections)
-     *
-     * @param c The Context
-     * @param toExport The Community to export
-     * @param exportAll whether to export all metadata or not (include handle, provenance etc)
-     */
-    public MetadataExport(Context c, Community toExport, boolean exportAll)
-    {
-        itemService = ContentServiceFactory.getInstance().getItemService();
+    @Override
+    public void internalRun() throws Exception {
 
+<<<<<<< HEAD
         try
         {
             // Try to export the community
             this.toExport = buildFromCommunity(c, toExport, 0);
             this.exportAll = exportAll;
             this.context = c;
+=======
+        if (help) {
+            logHelpInfo();
+            printHelp();
+            return;
+>>>>>>> dspace-7.2.1
         }
-        catch (SQLException sqle)
-        {
-            // Something went wrong...
-            System.err.println("Error running exporter:");
-            sqle.printStackTrace(System.err);
-            System.exit(1);
+        Context context = new Context();
+        context.turnOffAuthorisationSystem();
+        try {
+            context.setCurrentUser(ePersonService.find(context, this.getEpersonIdentifier()));
+        } catch (SQLException e) {
+            handler.handleException(e);
         }
+        DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService
+            .handleExport(context, exportAllItems, exportAllMetadata, identifier,
+                          handler);
+        handler.writeFilestream(context, filename, dSpaceCSV.getInputStream(), EXPORT_CSV);
+        context.restoreAuthSystemState();
+        context.complete();
     }
 
+<<<<<<< HEAD
     /**
      * Build an array list of item ids that are in a community (include sub-communities and collections)
      *
@@ -171,60 +178,34 @@ public class MetadataExport
             e.printStackTrace();
             return null;
         }
+=======
+    protected void logHelpInfo() {
+        handler.logInfo("\nfull export: metadata-export");
+        handler.logInfo("partial export: metadata-export -i handle/UUID");
+>>>>>>> dspace-7.2.1
     }
 
-    /**
-     * Print the help message
-     *
-     * @param options The command line options the user gave
-     * @param exitCode the system exit code to use
-     */
-    private static void printHelp(Options options, int exitCode)
-    {
-        // print the help message
-        HelpFormatter myhelp = new HelpFormatter();
-        myhelp.printHelp("MetadataExport\n", options);
-        System.out.println("\nfull export: metadataexport -f filename");
-        System.out.println("partial export: metadataexport -i handle -f filename");
-        System.exit(exitCode);
+    @Override
+    public MetadataExportScriptConfiguration getScriptConfiguration() {
+        return new DSpace().getServiceManager().getServiceByName("metadata-export",
+                                                                 MetadataExportScriptConfiguration.class);
     }
 
-    /**
-	 * main method to run the metadata exporter
-	 *
-	 * @param argv the command line arguments given
-         * @throws Exception if error occurs
-	 */
-    public static void main(String[] argv) throws Exception
-    {
-        // Create an options object and populate it
-        CommandLineParser parser = new PosixParser();
+    @Override
+    public void setup() throws ParseException {
 
-        Options options = new Options();
-
-        options.addOption("i", "id", true, "ID or handle of thing to export (item, collection, or community)");
-        options.addOption("f", "file", true, "destination where you want file written");
-        options.addOption("a", "all", false, "include all metadata fields that are not normally changed (e.g. provenance)");
-        options.addOption("h", "help", false, "help");
-
-        CommandLine line = null;
-
-        try
-        {
-            line = parser.parse(options, argv);
-        }
-        catch (ParseException pe)
-        {
-            System.err.println("Error with commands.");
-            printHelp(options, 1);
-            System.exit(0);
+        if (commandLine.hasOption('h')) {
+            help = true;
+            return;
         }
 
-        if (line.hasOption('h'))
-        {
-            printHelp(options, 0);
+        if (!commandLine.hasOption('i')) {
+            exportAllItems = true;
         }
+        identifier = commandLine.getOptionValue('i');
+        filename = getFileNameForExportFile();
 
+<<<<<<< HEAD
         // Check a filename is given
         if (!line.hasOption('f'))
         {
@@ -240,62 +221,31 @@ public class MetadataExport
         // The things we'll export
         Iterator<Item> toExport = null;
         MetadataExport exporter = null;
+=======
+        exportAllMetadata = commandLine.hasOption('a');
+>>>>>>> dspace-7.2.1
 
-        // Export everything?
-        boolean exportAll = line.hasOption('a');
+    }
 
-        ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
-        // Check we have an item OK
-        ItemService itemService = contentServiceFactory.getItemService();
-        if (!line.hasOption('i'))
-        {
-            System.out.println("Exporting whole repository WARNING: May take some time!");
-            exporter = new MetadataExport(c, itemService.findAll(c), exportAll);
+    protected String getFileNameForExportFile() throws ParseException {
+        Context context = new Context();
+        try {
+            DSpaceObject dso = null;
+            if (StringUtils.isNotBlank(identifier)) {
+                dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, identifier);
+                if (dso == null) {
+                    dso = dSpaceObjectUtils.findDSpaceObject(context, UUID.fromString(identifier));
+                }
+            } else {
+                dso = ContentServiceFactory.getInstance().getSiteService().findSite(context);
+            }
+            if (dso == null) {
+                throw new ParseException("An identifier was given that wasn't able to be parsed to a DSpaceObject");
+            }
+            return dso.getID().toString() + ".csv";
+        } catch (SQLException e) {
+            handler.handleException("Something went wrong trying to retrieve DSO for identifier: " + identifier, e);
         }
-        else
-        {
-            String handle = line.getOptionValue('i');
-            DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(c, handle);
-            if (dso == null)
-            {
-                System.err.println("Item '" + handle + "' does not resolve to an item in your repository!");
-                printHelp(options, 1);
-            }
-
-            if (dso.getType() == Constants.ITEM)
-            {
-                System.out.println("Exporting item '" + dso.getName() + "' (" + handle + ")");
-                List<Item> item = new ArrayList<>();
-                item.add((Item) dso);
-                exporter = new MetadataExport(c, item.iterator(), exportAll);
-            }
-            else if (dso.getType() == Constants.COLLECTION)
-            {
-                System.out.println("Exporting collection '" + dso.getName() + "' (" + handle + ")");
-                Collection collection = (Collection)dso;
-                toExport = itemService.findByCollection(c, collection);
-                exporter = new MetadataExport(c, toExport, exportAll);
-            }
-            else if (dso.getType() == Constants.COMMUNITY)
-            {
-                System.out.println("Exporting community '" + dso.getName() + "' (" + handle + ")");
-                exporter = new MetadataExport(c, (Community)dso, exportAll);
-            }
-            else
-            {
-                System.err.println("Error identifying '" + handle + "'");
-                System.exit(1);
-            }
-        }
-
-        // Perform the export
-        DSpaceCSV csv = exporter.export();
-
-        // Save the files to the file
-        csv.save(filename);        
-
-        // Finish off and tidy up
-        c.restoreAuthSystemState();
-        c.complete();
+        return null;
     }
 }

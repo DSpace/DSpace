@@ -7,9 +7,9 @@
  */
 package org.dspace.discovery.configuration;
 
-import org.springframework.beans.factory.annotation.Required;
-
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -28,7 +28,7 @@ public class SidebarFacetConfiguration {
         return indexFieldName;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setIndexFieldName(String indexFieldName) {
         this.indexFieldName = indexFieldName;
     }
@@ -37,15 +37,15 @@ public class SidebarFacetConfiguration {
         return metadataFields;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setMetadataFields(List<String> metadataFields) {
         this.metadataFields = metadataFields;
     }
 
     public int getFacetLimit() {
-        if(facetLimit == -1){
+        if (facetLimit == -1) {
             return DEFAULT_FACET_LIMIT;
-        }else{
+        } else {
             return facetLimit;
         }
     }
@@ -59,12 +59,11 @@ public class SidebarFacetConfiguration {
     }
 
     public void setType(String type) {
-        if(type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_TEXT)){
+        if (type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_TEXT)) {
             this.type = DiscoveryConfigurationParameters.TYPE_TEXT;
-        } else
-        if(type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_DATE)){
+        } else if (type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_DATE)) {
             this.type = DiscoveryConfigurationParameters.TYPE_DATE;
-        }else{
+        } else {
             this.type = type;
         }
     }

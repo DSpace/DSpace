@@ -17,6 +17,6 @@
  * An operation returns an {@link org.dspace.identifier.ezid.EZIDResponse} which
  * gives easy access to EZID's status code and value, status of the underlying
  * HTTP request, and key/value pairs found in the response body (if any).
- * <p>
+ * </p>
  */
 package org.dspace.identifier.doi;

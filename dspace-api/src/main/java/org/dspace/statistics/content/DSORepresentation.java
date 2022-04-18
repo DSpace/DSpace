@@ -12,27 +12,37 @@ import org.dspace.core.Constants;
 /**
  * Describes the displayed representation of the statistics on a DSpaceObject
  * and its children.
+ *
  * @author TODO
  */
 public class DSORepresentation {
-    /** The type of DSpaceObject to be shown. */
+    /**
+     * The type of DSpaceObject to be shown.
+     */
     private Integer type;
-    /** The maximum number of children to show. **/
+    /**
+     * The maximum number of children to show.
+     **/
     private Integer max;
-    /** Determines if should show the DSOs as separate entities or use the sum of them. */
+    /**
+     * Determines if should show the DSOs as separate entities or use the sum of them.
+     */
     private Boolean separate;
 
     private Integer nameLength;
 
-    /** Construct a representation assumed to be of an ITEM. */
+    /**
+     * Construct a representation assumed to be of an ITEM.
+     */
     public DSORepresentation() {
         setType(Constants.ITEM);
     }
 
-    /** Construct a representation as described.
-     * 
-     * @param type Object type, e.g. Constants.COLLECTION
-     * @param max Maximum number of children to display
+    /**
+     * Construct a representation as described.
+     *
+     * @param type     Object type, e.g. Constants.COLLECTION
+     * @param max      Maximum number of children to display
      * @param separate True if children's statistics are distinct; false if summed
      */
     public DSORepresentation(Integer type, Integer max, Boolean separate) {

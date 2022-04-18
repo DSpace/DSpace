@@ -7,6 +7,11 @@
  */
 package org.dspace.content.crosswalk;
 
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.dspace.authorize.AuthorizeException;
@@ -16,13 +21,9 @@ import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class CrosswalkMetadataValidator {
 
@@ -32,24 +33,24 @@ public class CrosswalkMetadataValidator {
     private String schemaChoice;
     private String fieldChoice;
 
-    private Map<Triple<String, String, String>, MetadataField> validatedMetadataFields;
+    private final Map<Triple<String, String, String>, MetadataField> validatedMetadataFields;
 
     public CrosswalkMetadataValidator() {
         metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
         metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         validatedMetadataFields = new HashMap<>();
 
         // The two options, with three possibilities each: add, ignore, fail
-        schemaChoice = ConfigurationManager.getProperty("oai", "harvester.unknownSchema");
-        if (schemaChoice == null)
-        {
+        schemaChoice = configurationService.getProperty("oai.harvester.unknownSchema");
+        if (schemaChoice == null) {
             schemaChoice = "fail";
         }
 
-        fieldChoice = ConfigurationManager.getProperty("oai", "harvester.unknownField");
-        if (fieldChoice == null)
-        {
+        fieldChoice = configurationService.getProperty("oai.harvester.unknownField");
+        if (fieldChoice == null) {
             fieldChoice = "fail";
         }
     }
@@ -57,9 +58,22 @@ public class CrosswalkMetadataValidator {
     /**
      * Scans metadata for elements not defined in this DSpace instance. It then takes action based
      * on a configurable parameter (fail, ignore, add).
+     *
+     * @param context     The relevant DSpace Context.
+     * @param schema      metadata field schema
+     * @param element     metadata field element
+     * @param qualifier   metadata field qualifier
+     * @param forceCreate if true, force addinga schema or metadata field
+     * @return metadata field
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
+     * @throws CrosswalkException Superclass for more-specific crosswalk exceptions.
      */
-    public MetadataField checkMetadata(Context context, String schema, String element, String qualifier, boolean forceCreate) throws SQLException, AuthorizeException, CrosswalkException {
-        if(!validatedBefore(schema, element, qualifier)) {
+    public MetadataField checkMetadata(Context context, String schema, String element, String qualifier,
+                                       boolean forceCreate)
+        throws SQLException, AuthorizeException, CrosswalkException {
+        if (!validatedBefore(schema, element, qualifier)) {
             // Verify that the schema exists
             MetadataSchema mdSchema = metadataSchemaService.find(context, schema);
             MetadataField mdField = null;
@@ -75,10 +89,9 @@ public class CrosswalkMetadataValidator {
                         // This case should not be possible
                         e.printStackTrace();
                     }
-                }
-                // ignore the offending schema, quietly dropping all of its metadata elements before they clog our gears
-                else if (!schemaChoice.equals("ignore")) {
-                    throw new CrosswalkException("The '" + schema + "' schema has not been defined in this DSpace instance. ");
+                } else if (!schemaChoice.equals("ignore")) {
+                    throw new CrosswalkException(
+                        "The '" + schema + "' schema has not been defined in this DSpace instance. ");
                 }
             }
 
@@ -94,7 +107,9 @@ public class CrosswalkMetadataValidator {
                             e.printStackTrace();
                         }
                     } else if (!fieldChoice.equals("ignore")) {
-                        throw new CrosswalkException("The '" + element + "." + qualifier + "' element has not been defined in this DSpace instance. ");
+                        throw new CrosswalkException(
+                            "The '" + element + "." + qualifier + "' element has not been defined in this DSpace " +
+                                "instance. ");
                     }
                 }
             }
@@ -109,7 +124,8 @@ public class CrosswalkMetadataValidator {
         return validatedMetadataFields.containsKey(createKey(schema, element, qualifier));
     }
 
-    private ImmutableTriple<String, String, String> createKey(final String schema, final String element, final String qualifier) {
-        return new ImmutableTriple<String, String, String>(schema, element, qualifier);
+    private ImmutableTriple<String, String, String> createKey(final String schema, final String element,
+                                                              final String qualifier) {
+        return new ImmutableTriple<>(schema, element, qualifier);
     }
 }

@@ -12,11 +12,10 @@ import java.util.Date;
 
 /**
  * Represents a date facet for filtering.
- * 
+ *
  * @author kevinvandevelde at atmire.com
  * Date: 23-dec-2008
  * Time: 9:44:57
- * 
  */
 public class DatasetTimeGenerator extends DatasetGenerator {
 
@@ -28,9 +27,11 @@ public class DatasetTimeGenerator extends DatasetGenerator {
     private Date actualEndDate;
 
     //TODO: process includetotal
-    public DatasetTimeGenerator() {
-        
-    }
+
+    /**
+     * Default constructor
+     */
+    public DatasetTimeGenerator() { }
 
     /**
      * Sets the date interval.
@@ -39,12 +40,12 @@ public class DatasetTimeGenerator extends DatasetGenerator {
      * datatype = "month"
      * start = "-6"
      * end = "+1" // the +1 indicates this month also
-     * 
+     *
      * @param dateType type can be days, months, years
-     * @param start the start of the interval
-     * @param end the end of the interval
+     * @param start    the start of the interval
+     * @param end      the end of the interval
      */
-    public void setDateInterval(String dateType, String start, String end){
+    public void setDateInterval(String dateType, String start, String end) {
         this.startDate = start;
         this.endDate = end;
         this.dateType = dateType;
@@ -52,26 +53,23 @@ public class DatasetTimeGenerator extends DatasetGenerator {
     }
 
     public void setDateInterval(String dateType, Date start, Date end)
-            throws IllegalArgumentException
-    {
+        throws IllegalArgumentException {
         actualStartDate = (start == null ? null : new Date(start.getTime()));
         actualEndDate = (end == null ? null : new Date(end.getTime()));
-        
+
         this.dateType = dateType;
 
         //Check if end comes before start
         Calendar startCal1 = Calendar.getInstance();
         Calendar endCal1 = Calendar.getInstance();
 
-        if (startCal1 == null || endCal1 == null)
-        {
-            throw new IllegalStateException("Unable to create calendar instances");    
+        if (startCal1 == null || endCal1 == null) {
+            throw new IllegalStateException("Unable to create calendar instances");
         }
 
         startCal1.setTime(start);
         endCal1.setTime(end);
-        if(endCal1.before(startCal1))
-        {
+        if (endCal1.before(startCal1)) {
             throw new IllegalArgumentException();
         }
 
@@ -79,16 +77,13 @@ public class DatasetTimeGenerator extends DatasetGenerator {
         // have visits from the future.
         //Depending on our dateType check if we need to use days/months/years.
         int type = -1;
-        if("year".equalsIgnoreCase(dateType)){
+        if ("year".equalsIgnoreCase(dateType)) {
             type = Calendar.YEAR;
-        }else
-        if("month".equalsIgnoreCase(dateType)){
+        } else if ("month".equalsIgnoreCase(dateType)) {
             type = Calendar.MONTH;
-        }else
-        if("day".equalsIgnoreCase(dateType)){
+        } else if ("day".equalsIgnoreCase(dateType)) {
             type = Calendar.DATE;
-        }else
-        if("hour".equalsIgnoreCase(dateType)){
+        } else if ("hour".equalsIgnoreCase(dateType)) {
             type = Calendar.HOUR;
         }
 
@@ -97,22 +92,19 @@ public class DatasetTimeGenerator extends DatasetGenerator {
 //        System.out.println(difStart + " " + difEnd);
 
         boolean endPos = false;
-        if(difEnd == 0){
+        if (difEnd == 0) {
             //Includes the current
             difEnd = 1;
             endPos = true;
-        }else
-        if(0 < difEnd)
-        {
+        } else if (0 < difEnd) {
             endPos = true;
-        }
-        else{
+        } else {
             difEnd++;
         }
 
         startDate = "" + difStart;
         //We need +1 so we can count the current month/year/...
-        endDate   = (endPos ? "+" : "") + difEnd;
+        endDate = (endPos ? "+" : "") + difEnd;
     }
 
     public String getStartDate() {
@@ -163,23 +155,23 @@ public class DatasetTimeGenerator extends DatasetGenerator {
         this.type = type;
     }
 
-    /** Get the difference between two Dates in terms of a given interval.
+    /**
+     * Get the difference between two Dates in terms of a given interval.
      * That is:  if you specify the difference in months, you get back the
      * number of months between the dates.
      *
      * @param date1 the first date
      * @param date2 the other date
-     * @param type Calendar.HOUR or .DATE or .MONTH
+     * @param type  Calendar.HOUR or .DATE or .MONTH
      * @return number of {@code type} intervals between {@code date1} and
-     *  {@code date2}
+     * {@code date2}
      */
-    private int getTimeDifference(Date date1, Date date2, int type){
+    private int getTimeDifference(Date date1, Date date2, int type) {
         int toAdd;
         int elapsed = 0;
         //We need calendar objects to compare
-        Calendar cal1, cal2;
-        cal1 = Calendar.getInstance();
-        cal2 = Calendar.getInstance();
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
 
         cal1.setTime(date1);
         cal2.setTime(date2);
@@ -190,7 +182,7 @@ public class DatasetTimeGenerator extends DatasetGenerator {
         cal2.clear(Calendar.SECOND);
         cal1.clear(Calendar.MINUTE);
         cal2.clear(Calendar.MINUTE);
-        if(type != Calendar.HOUR){
+        if (type != Calendar.HOUR) {
             cal1.clear(Calendar.HOUR);
             cal2.clear(Calendar.HOUR);
             cal1.clear(Calendar.HOUR_OF_DAY);
@@ -199,34 +191,33 @@ public class DatasetTimeGenerator extends DatasetGenerator {
             cal1.set(Calendar.HOUR_OF_DAY, 0);
             cal2.set(Calendar.HOUR_OF_DAY, 0);
         }
-        if(type != Calendar.DATE){
+        if (type != Calendar.DATE) {
             cal1.set(Calendar.DATE, 1);
             cal2.set(Calendar.DATE, 1);
         }
-        if(type != Calendar.MONTH){
+        if (type != Calendar.MONTH) {
             cal1.clear(Calendar.MONTH);
             cal2.clear(Calendar.MONTH);
         }
 
         //Switch em if needed
-        if(cal1.after(cal2) || cal1.equals(cal2)){
+        if (cal1.after(cal2) || cal1.equals(cal2)) {
             Calendar backup = cal1;
             cal1 = cal2;
             cal2 = backup;
             toAdd = 1;
-        }else
-        {
+        } else {
             toAdd = -1;
         }
 
 
-        
+
         /*if(type != Calendar.YEAR){
             cal1.clear(Calendar.YEAR);
             cal2.clear(Calendar.YEAR);
         }
         */
-        while(cal1.before(cal2)){
+        while (cal1.before(cal2)) {
             cal1.add(type, 1);
             elapsed += toAdd;
         }
