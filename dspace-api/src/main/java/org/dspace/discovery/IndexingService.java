@@ -30,6 +30,9 @@ public interface IndexingService {
     void indexContent(Context context, IndexableObject dso,
                       boolean force, boolean commit) throws SQLException, SearchServiceException;
 
+    void indexContent(Context context, IndexableObject dso,
+                      boolean force, boolean commit, boolean preDb) throws SQLException, SearchServiceException;
+
     void unIndexContent(Context context, IndexableObject dso)
         throws SQLException, IOException;
 

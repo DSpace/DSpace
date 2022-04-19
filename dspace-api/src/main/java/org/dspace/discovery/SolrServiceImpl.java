@@ -8,6 +8,8 @@
 package org.dspace.discovery;
 
 import static java.util.stream.Collectors.joining;
+import static org.dspace.discovery.indexobject.ItemIndexFactoryImpl.STATUS_FIELD;
+import static org.dspace.discovery.indexobject.ItemIndexFactoryImpl.STATUS_FIELD_PREDB;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -164,6 +166,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                           IndexableObject indexableObject) throws IOException, SQLException, SolrServerException {
         final SolrInputDocument solrInputDocument = indexableObjectService.buildDocument(context, indexableObject);
         indexableObjectService.writeDocument(context, indexableObject, solrInputDocument);
+    }
+
+    protected void update(Context context, IndexFactory indexableObjectService,
+                          IndexableObject indexableObject, boolean preDB) throws IOException, SQLException, SolrServerException {
+        if (preDB) {
+            final SolrInputDocument solrInputDocument = indexableObjectService.buildNewDocument(context, indexableObject);
+            indexableObjectService.writeDocument(context, indexableObject, solrInputDocument);
+        } else {
+            update(context, indexableObjectService, indexableObject);
+        }
     }
 
     /**
@@ -753,6 +765,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             solrQuery.setParam(SpellingParams.SPELLCHECK_COLLATE, Boolean.TRUE);
             solrQuery.setParam("spellcheck", Boolean.TRUE);
         }
+
+        // Exclude items with status:predb to avoid solr docs being removed during large imports (Issue #8125)
+        solrQuery.addFilterQuery("!" + STATUS_FIELD + ":" + STATUS_FIELD_PREDB);
 
         for (int i = 0; i < discoveryQuery.getFilterQueries().size(); i++) {
             String filterQuery = discoveryQuery.getFilterQueries().get(i);
@@ -1379,6 +1394,28 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     public void indexContent(Context context, IndexableObject dso, boolean force,
                              boolean commit) throws SearchServiceException, SQLException {
         indexContent(context, dso, force);
+        if (commit) {
+            commit();
+        }
+    }
+
+    @Override
+    public void indexContent(Context context, IndexableObject indexableObject, boolean force,
+                             boolean commit, boolean preDb) throws SearchServiceException, SQLException {
+        if (preDb) {
+            try {
+                final IndexFactory indexableObjectFactory = indexObjectServiceFactory.
+                        getIndexableObjectFactory(indexableObject);
+                if (force || requiresIndexing(indexableObject.getUniqueIndexID(), indexableObject.getLastModified())) {
+                    update(context, indexableObjectFactory, indexableObject, true);
+                    log.info(LogManager.getHeader(context, "indexed_object", indexableObject.getUniqueIndexID()));
+                }
+            } catch (IOException | SQLException | SolrServerException | SearchServiceException e) {
+                log.error(e.getMessage(), e);
+            }
+        } else {
+            indexContent(context, indexableObject, force);
+        }
         if (commit) {
             commit();
         }

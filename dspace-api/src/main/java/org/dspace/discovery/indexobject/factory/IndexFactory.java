@@ -47,6 +47,14 @@ public interface IndexFactory<T extends IndexableObject, S> {
     SolrInputDocument buildDocument(Context context, T indexableObject) throws SQLException, IOException;
 
     /**
+     * Create solr document with all the shared fields initialized.
+     * Can contain special fields required for "new" documents vs regular buildDocument
+     * @param indexableObject   the indexableObject that we want to index
+     * @return                  initialized solr document
+     */
+    SolrInputDocument buildNewDocument(Context context, T indexableObject) throws SQLException, IOException;
+
+    /**
      * Write the provided document to the solr core
      * @param context               DSpace context object
      * @param indexableObject       The indexable object that we want to store in the search core
