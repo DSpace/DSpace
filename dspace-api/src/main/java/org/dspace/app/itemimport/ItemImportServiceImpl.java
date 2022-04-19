@@ -113,19 +113,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.mail.MessagingException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.*;
-import java.net.URL;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
 
 /**
  * Import items into DSpace. The conventional use is upload files by copying
@@ -929,10 +916,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             value = "";
         } else {
             value = value.trim();
-        }
-        else
-        {
-        	value = value.trim();
         }
         // //getElementData(n, "element");
         String element = getAttributeValue(n, "element");

@@ -39,10 +39,6 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-
 /**
  * MediaFilterManager is the class that invokes the media/format filters over the
  * repository's content. A few command line flags affect the operation of the
@@ -335,6 +331,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 }
             }
         }
+
         // if exists and overwrite = false, exit
         if (!overWrite && (existingBitstream != null)) {
             if (!isQuiet) {

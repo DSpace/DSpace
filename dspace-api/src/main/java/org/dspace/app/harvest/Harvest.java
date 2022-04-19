@@ -36,12 +36,6 @@ import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.utils.DSpace;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-
 /**
  * Test class for harvested collections.
  *

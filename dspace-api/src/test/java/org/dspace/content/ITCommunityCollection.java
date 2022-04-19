@@ -252,14 +252,7 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
         communityService.delete(context, child3);
         assertThat("Community Admin unable to delete sub-Community",
                 communityService.find(context, commId), nullValue());
-        
-        // Test deletion of single Sub-Community with own admin group
-        communityService.createAdministrators(context, child3);
-        commId = child3.getID();
-        communityService.delete(context, child3);
-        assertThat("Community Admin unable to delete sub-Community",
-                communityService.find(context, commId), nullValue());
-        
+
         // Test deletion of Sub-Community Hierarchy as a Community Admin
         commId = child.getID();
         collId = childCol.getID();

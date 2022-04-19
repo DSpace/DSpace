@@ -225,6 +225,7 @@
     </profiles>
 
 
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -330,7 +331,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <version>${spring-boot.version}</version>
+	        <version>${spring-boot.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -342,7 +343,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
-            <version>${spring-boot.version}</version>
+	        <version>${spring-boot.version}</version>
         </dependency>
 
         <!-- DSpace dependencies -->
