@@ -132,7 +132,3 @@ wufoo.feedback.field.agent = Field8
 wufoo.feedback.field.date = Field13
 wufoo.feedback.field.session = Field11
 wufoo.feedback.field.host = Field15
-
-# IRUS Tracker Environment
-stats.tracker.environment = test
-stats.spider.agentregex.regexfile = ${dspace.dir}/config/COUNTER_Robots_list.txt
