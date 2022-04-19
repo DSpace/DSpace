@@ -526,15 +526,19 @@ public class RelationshipServiceImpl implements RelationshipService {
             logRelationshipTypeDetailsForError(relationshipType);
             return false;
         }
-        if (!verifyMaxCardinality(context, relationship.getLeftItem(),
+        if (!relationship.getLatestVersionStatus().equals(LatestVersionStatus.RIGHT_ONLY)
+            && !verifyMaxCardinality(context, relationship.getLeftItem(),
                                   relationshipType.getLeftMaxCardinality(), relationshipType, true)) {
+            //If RIGHT_ONLY => it's a copied relationship, and the count can be ignored
             log.warn("The relationship has been deemed invalid since the left item has more" +
                          " relationships than the left max cardinality allows after we'd store this relationship");
             logRelationshipTypeDetailsForError(relationshipType);
             return false;
         }
-        if (!verifyMaxCardinality(context, relationship.getRightItem(),
+        if (!relationship.getLatestVersionStatus().equals(LatestVersionStatus.LEFT_ONLY)
+                && !verifyMaxCardinality(context, relationship.getRightItem(),
                                   relationshipType.getRightMaxCardinality(), relationshipType, false)) {
+            //If LEFT_ONLY => it's a copied relationship, and the count can be ignored
             log.warn("The relationship has been deemed invalid since the right item has more" +
                          " relationships than the right max cardinality allows after we'd store this relationship");
             logRelationshipTypeDetailsForError(relationshipType);
