@@ -8,10 +8,7 @@
 package org.dspace.authority.rest;
 
 import org.dspace.authority.SolrAuthorityInterface;
-<<<<<<< HEAD
-=======
 import org.dspace.external.OrcidRestConnector;
->>>>>>> dspace-7.2.1
 
 /**
  * @author Antoine Snyers (antoine at atmire.com)
@@ -26,8 +23,4 @@ public abstract class RestSource implements SolrAuthorityInterface {
     public RestSource(String url) {
         this.restConnector = new OrcidRestConnector(url);
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> dspace-7.2.1
 }

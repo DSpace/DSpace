@@ -7,27 +7,10 @@
  */
 package org.dspace.content;
 
-<<<<<<< HEAD
-import mockit.NonStrictExpectations;
-import org.apache.log4j.Logger;
-import org.dspace.AbstractUnitTest;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.*;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-=======
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
->>>>>>> dspace-7.2.1
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -153,32 +136,6 @@ public class InstallItemTest extends AbstractUnitTest {
     /**
      * Test of installItem method (with an invalid handle), of class InstallItem.
      */
-<<<<<<< HEAD
-    @Test
-    public void testInstallItem_invalidHandle() throws Exception
-    {
-        //Default to Full-Admin rights
-        new NonStrictExpectations(authorizeService.getClass())
-        {{
-            // Deny Community ADD perms
-                authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                    Constants.ADD); result = false;
-            // Allow full Admin perms
-                authorizeService.isAdmin((Context) any); result = true;
-                authorizeService.isAdmin((Context) any, (EPerson) any); result = true;
-        }};
-
-        String handle = "123456789/56789";
-        WorkspaceItem is = workspaceItemService.create(context, collection, false);
-        WorkspaceItem is2 = workspaceItemService.create(context, collection, false);
-        
-        //Test assigning the same Handle to two different items
-        installItemService.installItem(context, is, handle);
-
-        // Assigning the same handle again should throw a RuntimeException
-        thrown.expect(RuntimeException.class);
-        installItemService.installItem(context, is2, handle);
-=======
     @Test(expected = IllegalStateException.class)
     public void testInstallItem_invalidHandle() throws Exception {
         // create two items for tests
@@ -196,7 +153,6 @@ public class InstallItemTest extends AbstractUnitTest {
         } finally {
             context.restoreAuthSystemState();
         }
->>>>>>> dspace-7.2.1
         fail("Exception expected");
     }
 

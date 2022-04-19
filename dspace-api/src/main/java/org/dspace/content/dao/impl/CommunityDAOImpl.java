@@ -116,13 +116,8 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
                                 " WHERE c.parentCommunities IS EMPTY " +
                                 " ORDER BY LOWER(title.value)");
         Query query = createQuery(context, queryBuilder.toString());
-<<<<<<< HEAD
-        query.setParameter(sortField.toString(), sortField.getID());
-        query.setCacheable(true);
-=======
         query.setParameter("sortField", sortField);
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
->>>>>>> dspace-7.2.1
 
         return findMany(context, query);
     }
@@ -158,16 +153,6 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         for (Integer action : actions) {
             orPredicates.add(criteriaBuilder.equal(join.get(ResourcePolicy_.actionId), action));
         }
-<<<<<<< HEAD
-        criteria.add(Restrictions.and(
-                Restrictions.eq("resourcePolicy.resourceTypeId", Constants.COMMUNITY),
-                Restrictions.eq("resourcePolicy.eperson", ePerson),
-                actionQuery
-        ));
-        criteria.setCacheable(true);
-
-        return list(criteria);
-=======
         Predicate orPredicate = criteriaBuilder.or(orPredicates.toArray(new Predicate[] {}));
         criteriaQuery.select(communityRoot);
         criteriaQuery.where(
@@ -177,7 +162,6 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
             )
         );
         return list(context, criteriaQuery, true, Community.class, -1, -1);
->>>>>>> dspace-7.2.1
     }
 
     @Override
@@ -193,14 +177,6 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
             query.append("rp.actionId=").append(action);
         }
         query.append(" AND rp.resourceTypeId=").append(Constants.COMMUNITY);
-<<<<<<< HEAD
-        query.append(" AND rp.epersonGroup.id IN (select g.id from Group g where (from EPerson e where e.id = :eperson_id) in elements(epeople))");
-        Query hibernateQuery = createQuery(context, query.toString());
-        hibernateQuery.setParameter("eperson_id", ePerson.getID());
-        hibernateQuery.setCacheable(true);
-
-        return list(hibernateQuery);
-=======
         query.append(
             " AND rp.epersonGroup.id IN (select g.id from Group g where (from EPerson e where e.id = :eperson_id) in " +
                 "elements(epeople))");
@@ -210,7 +186,6 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         persistenceQuery.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
         return list(persistenceQuery);
->>>>>>> dspace-7.2.1
     }
 
     @Override

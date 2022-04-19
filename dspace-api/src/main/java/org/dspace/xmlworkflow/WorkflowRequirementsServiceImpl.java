@@ -75,14 +75,6 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
         ipu.setUser(user);
         ipu.setFinished(false);
         inProgressUserService.update(context, ipu);
-<<<<<<< HEAD
-
-        //Make sure the user has the necessary rights to update the item after the tasks is removed from the pool
-        xmlWorkflowService.grantUserAllItemPolicies(context, wfi.getItem(), user);
-
-        int totalUsers = inProgressUserService.getNumberOfInProgressUsers(context, wfi) + inProgressUserService.getNumberOfFinishedUsers(context, wfi);
-=======
->>>>>>> dspace-7.2.1
 
         //Make sure the user has the necessary rights to update the item after the tasks is removed from the pool
         xmlWorkflowService.grantUserAllItemPolicies(context, wfi.getItem(), user, ResourcePolicy.TYPE_WORKFLOW);

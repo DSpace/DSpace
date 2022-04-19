@@ -10,12 +10,8 @@
 -->
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="ehcache.xsd"
-<<<<<<< HEAD
-         updateCheck='false'>
-=======
          updateCheck='false'
          name='org.dspace.hibernate'>
->>>>>>> dspace-7.2.1
 
     <diskStore path="java.io.tmpdir"/>
 
@@ -111,8 +107,4 @@
            timeToLiveSeconds="1800" overflowToDisk="true" diskExpiryThreadIntervalSeconds="60"
            memoryStoreEvictionPolicy="LRU"/>
 
-<<<<<<< HEAD
 </ehcache>
-=======
-</ehcache>
->>>>>>> dspace-7.2.1

@@ -7,8 +7,6 @@
  */
 package org.dspace.app.mediafilter;
 
-<<<<<<< HEAD
-=======
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
->>>>>>> dspace-7.2.1
 import org.dspace.app.mediafilter.service.MediaFilterService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -161,23 +158,6 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     @Override
     public void applyFiltersItem(Context c, Item item) throws Exception {
         //only apply filters if item not in skip-list
-<<<<<<< HEAD
-        if(!inSkipList(item.getHandle()))
-        {
-    	  //cache this item in MediaFilterManager
-    	  //so it can be accessed by MediaFilters as necessary
-    	  currentItem = item;
-    	
-          if (filterItem(c, item))
-          {
-              // increment processed count
-              ++processed;
-          }
-          // clear item objects from context cache and internal cache
-          c.uncacheEntity(currentItem);
-          currentItem = null;
-        }  
-=======
         if (!inSkipList(item.getHandle())) {
             //cache this item in MediaFilterManager
             //so it can be accessed by MediaFilters as necessary
@@ -191,7 +171,6 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             c.uncacheEntity(currentItem);
             currentItem = null;
         }
->>>>>>> dspace-7.2.1
     }
 
     @Override
@@ -342,13 +321,8 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         Bundle existingBundle = null;
         Bitstream existingBitstream = null;
         List<Bundle> bundles = itemService.getBundles(item, formatFilter.getBundleName());
-<<<<<<< HEAD
-        if (bundles.size() > 0)
-        {
-=======
 
         if (bundles.size() > 0) {
->>>>>>> dspace-7.2.1
             // only finds the last match (FIXME?)
             for (Bundle bundle : bundles) {
                 List<Bitstream> bitstreams = bundle.getBitstreams();
@@ -376,11 +350,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                                    + " (item: " + item.getHandle() + ")");
         }
 
-<<<<<<< HEAD
-        System.out.println("File: " + newName);
-=======
         logInfo("File: " + newName);
->>>>>>> dspace-7.2.1
 
         // start filtering of the bitstream, using try with resource to close all InputStreams properly
         try (
@@ -399,20 +369,10 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             }
 
             Bundle targetBundle; // bundle we're modifying
-<<<<<<< HEAD
-            if (bundles.size() < 1)
-            {
-                // create new bundle if needed
-                targetBundle = bundleService.create(context, item, formatFilter.getBundleName());
-            }
-            else
-            {
-=======
             if (bundles.size() < 1) {
                 // create new bundle if needed
                 targetBundle = bundleService.create(context, item, formatFilter.getBundleName());
             } else {
->>>>>>> dspace-7.2.1
                 // take the first match as we already looked out for the correct bundle name
                 targetBundle = bundles.get(0);
             }
@@ -435,11 +395,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             authorizeService.removeAllPolicies(context, b);
 
             //- Determine if this is a public-derivative format
-<<<<<<< HEAD
-            if(publicFiltersClasses.contains(formatFilter.getClass().getSimpleName())) {
-=======
             if (publicFiltersClasses.contains(formatFilter.getClass().getSimpleName())) {
->>>>>>> dspace-7.2.1
                 //- Set derivative bitstream to be publicly accessible
                 Group anonymous = groupService.findByName(context, Group.ANONYMOUS);
                 authorizeService.addPolicy(context, b, Constants.READ, anonymous);
@@ -451,24 +407,13 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             //do post-processing of the generated bitstream
             formatFilter.postProcessBitstream(context, item, b);
 
-<<<<<<< HEAD
-
-        } catch (OutOfMemoryError oome) {
-            System.out.println("!!! OutOfMemoryError !!!");
-=======
         } catch (OutOfMemoryError oome) {
             logError("!!! OutOfMemoryError !!!");
->>>>>>> dspace-7.2.1
         }
 
         // fixme - set date?
         // we are overwriting, so remove old bitstream
-<<<<<<< HEAD
-        if (existingBitstream != null)
-        {
-=======
         if (existingBitstream != null) {
->>>>>>> dspace-7.2.1
             bundleService.removeBitstream(context, existingBundle, existingBitstream);
         }
 

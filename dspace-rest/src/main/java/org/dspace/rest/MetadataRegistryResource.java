@@ -93,21 +93,12 @@ public class MetadataRegistryResource extends Resource {
      */
     @GET
     @Path("/schema")
-<<<<<<< HEAD
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public MetadataSchema[] getSchemas(@QueryParam("expand") @DefaultValue("fields") String expand, 
-    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
-            throws WebApplicationException
-    {
-=======
     @Produces( {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public MetadataSchema[] getSchemas(@QueryParam("expand") @DefaultValue("fields") String expand,
                                        @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
                                        @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers,
                                        @Context HttpServletRequest request)
         throws WebApplicationException {
->>>>>>> dspace-7.2.1
 
         log.info("Reading all metadata schemas.");
         org.dspace.core.Context context = null;
@@ -159,14 +150,6 @@ public class MetadataRegistryResource extends Resource {
      */
     @GET
     @Path("/schema/{schema_prefix}")
-<<<<<<< HEAD
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public MetadataSchema getSchema(@PathParam("schema_prefix") String schemaPrefix, @QueryParam("expand") @DefaultValue("fields") String expand,
-    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
-            throws WebApplicationException
-    {
-=======
     @Produces( {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public MetadataSchema getSchema(@PathParam("schema_prefix") String schemaPrefix,
                                     @QueryParam("expand") @DefaultValue("fields") String expand,
@@ -174,7 +157,6 @@ public class MetadataRegistryResource extends Resource {
                                     @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers,
                                     @Context HttpServletRequest request)
         throws WebApplicationException {
->>>>>>> dspace-7.2.1
 
         log.info("Reading metadata schemas.");
         org.dspace.core.Context context = null;
@@ -228,15 +210,6 @@ public class MetadataRegistryResource extends Resource {
     @Path("/schema/{schema_prefix}/metadata-fields/{element}")
     @Produces( {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public MetadataField getMetadataFieldUnqualified(@PathParam("schema_prefix") String schemaPrefix,
-<<<<<<< HEAD
-    		@PathParam("element") String element,
-    		@QueryParam("expand") String expand,
-    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
-            throws WebApplicationException
-    {
-    	return getMetadataFieldQualified(schemaPrefix, element, "", expand, user_ip, user_agent, xforwardedfor, headers, request);
-=======
                                                      @PathParam("element") String element,
                                                      @QueryParam("expand") String expand,
                                                      @QueryParam("userIP") String user_ip,
@@ -246,7 +219,6 @@ public class MetadataRegistryResource extends Resource {
         throws WebApplicationException {
         return getMetadataFieldQualified(schemaPrefix, element, "", expand, user_ip, user_agent, xforwardedfor, headers,
                                          request);
->>>>>>> dspace-7.2.1
     }
 
     /**
@@ -276,15 +248,6 @@ public class MetadataRegistryResource extends Resource {
     @Path("/schema/{schema_prefix}/metadata-fields/{element}/{qualifier}")
     @Produces( {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public MetadataField getMetadataFieldQualified(@PathParam("schema_prefix") String schemaPrefix,
-<<<<<<< HEAD
-            @PathParam("element") String element,
-            @PathParam("qualifier") @DefaultValue("") String qualifier,
-            @QueryParam("expand") String expand,
-            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
-            throws WebApplicationException
-    {
-=======
                                                    @PathParam("element") String element,
                                                    @PathParam("qualifier") @DefaultValue("") String qualifier,
                                                    @QueryParam("expand") String expand,
@@ -293,7 +256,6 @@ public class MetadataRegistryResource extends Resource {
                                                    @QueryParam("xforwardedfor") String xforwardedfor,
                                                    @Context HttpHeaders headers, @Context HttpServletRequest request)
         throws WebApplicationException {
->>>>>>> dspace-7.2.1
 
         log.info("Reading metadata field.");
         org.dspace.core.Context context = null;
@@ -353,15 +315,6 @@ public class MetadataRegistryResource extends Resource {
      */
     @GET
     @Path("/metadata-fields/{field_id}")
-<<<<<<< HEAD
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public MetadataField getMetadataField(@PathParam("field_id") Integer fieldId,  
-    		@QueryParam("expand") @DefaultValue("parentSchema") String expand,
-    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
-            throws WebApplicationException
-    {
-=======
     @Produces( {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public MetadataField getMetadataField(@PathParam("field_id") Integer fieldId,
                                           @QueryParam("expand") @DefaultValue("parentSchema") String expand,
@@ -370,7 +323,6 @@ public class MetadataRegistryResource extends Resource {
                                           @QueryParam("xforwardedfor") String xforwardedfor,
                                           @Context HttpHeaders headers, @Context HttpServletRequest request)
         throws WebApplicationException {
->>>>>>> dspace-7.2.1
 
         log.info("Reading metadata field.");
         org.dspace.core.Context context = null;

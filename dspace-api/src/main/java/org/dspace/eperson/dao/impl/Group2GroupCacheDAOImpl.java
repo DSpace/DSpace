@@ -22,17 +22,6 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.Group2GroupCache;
 import org.dspace.eperson.Group2GroupCache_;
 import org.dspace.eperson.dao.Group2GroupCacheDAO;
-<<<<<<< HEAD
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.criterion.Disjunction;
-import org.hibernate.criterion.Restrictions;
-
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Set;
-=======
->>>>>>> dspace-7.2.1
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Group2GroupCache object.
@@ -58,21 +47,12 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
 
     @Override
     public List<Group2GroupCache> findByChildren(Context context, Iterable<Group> groups) throws SQLException {
-<<<<<<< HEAD
-        Criteria criteria = createCriteria(context, Group2GroupCache.class);
-
-        Disjunction orDisjunction = Restrictions.or();
-        for(Group group : groups)
-        {
-            orDisjunction.add(Restrictions.eq("child.id", group.getID()));
-=======
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Group2GroupCache.class);
         Root<Group2GroupCache> group2GroupCacheRoot = criteriaQuery.from(Group2GroupCache.class);
         List<Predicate> eqPredicates = new LinkedList<>();
         for (Group group : groups) {
             eqPredicates.add(criteriaBuilder.equal(group2GroupCacheRoot.get(Group2GroupCache_.child), group));
->>>>>>> dspace-7.2.1
         }
         Predicate orPredicate = criteriaBuilder.or(eqPredicates.toArray(new Predicate[] {}));
         criteriaQuery.select(group2GroupCacheRoot);
@@ -88,19 +68,6 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
         query.setParameter("parentGroup", parent);
         query.setParameter("childGroup", child);
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
-
-        return singleResult(query);
-    }
-
-    @Override
-    public Group2GroupCache findByParentAndChild(Context context, Group parent, Group child) throws SQLException {
-        Query query = createQuery(context,
-                "FROM Group2GroupCache g WHERE g.parent = :parentGroup AND g.child = :childGroup");
-
-        query.setParameter("parentGroup", parent);
-        query.setParameter("childGroup", child);
-
-        query.setCacheable(true);
 
         return singleResult(query);
     }

@@ -7,14 +7,6 @@
  */
 package org.dspace.statistics;
 
-<<<<<<< HEAD
-import java.io.File;
-
-import com.maxmind.geoip2.DatabaseReader;
-import org.dspace.services.ConfigurationService;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-=======
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
@@ -40,46 +32,22 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
->>>>>>> dspace-7.2.1
 
 /**
  * Mock service that uses an embedded SOLR server for the statistics core.
  */
-<<<<<<< HEAD
-public class MockSolrLoggerServiceImpl
-        extends SolrLoggerServiceImpl
-        implements InitializingBean {
-
-    @Autowired(required = true)
-    private ConfigurationService configurationService;
-=======
 @Service
 public class MockSolrLoggerServiceImpl
         extends SolrLoggerServiceImpl
         implements InitializingBean, DisposableBean {
 
     private MockSolrServer mockSolrServer;
->>>>>>> dspace-7.2.1
 
     public MockSolrLoggerServiceImpl() {
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-<<<<<<< HEAD
-        //We don't use SOLR in the tests of this module
-        solr = null;
-
-        new FakeDatabaseReader(); // Activate fake
-        new FakeDatabaseReader.Builder(); // Activate fake
-        String locationDbPath = configurationService.getProperty("usage-statistics.dbfile");
-        File locationDb = new File(locationDbPath);
-        locationDb.createNewFile();
-        locationService = new DatabaseReader.Builder(locationDb).build();
-        useProxies = configurationService.getBooleanProperty("useProxies");
-    }
-
-=======
         // Initialize our service with a Mock Solr statistics core
         mockSolrServer = new MockSolrServer("statistics");
         solr = mockSolrServer.getSolrServer();
@@ -125,5 +93,4 @@ public class MockSolrLoggerServiceImpl
     public void destroy() throws Exception {
         mockSolrServer.destroy();
     }
->>>>>>> dspace-7.2.1
 }

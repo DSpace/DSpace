@@ -14,11 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-<<<<<<< HEAD
-import org.apache.log4j.Logger;
-=======
 import org.apache.logging.log4j.Logger;
->>>>>>> dspace-7.2.1
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -75,12 +71,7 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
     @Autowired(required = true)
     protected ConfigurationService configurationService;
 
-<<<<<<< HEAD
-    protected MetadataExposureServiceImpl()
-    {
-=======
     protected MetadataExposureServiceImpl() {
->>>>>>> dspace-7.2.1
 
     }
 
@@ -138,22 +129,6 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
 
             List<String> propertyKeys = configurationService.getPropertyKeys();
             for (String key : propertyKeys) {
-<<<<<<< HEAD
-                if (key.startsWith(CONFIG_PREFIX))
-                {
-                    if (configurationService.getBooleanProperty(key, true)){
-                    String mdField = key.substring(CONFIG_PREFIX.length());
-                    String segment[] = mdField.split("\\.", 3);
-
-                    // got schema.element.qualifier
-                    if (segment.length == 3)
-                    {
-                        Map<String,Set<String>> eltMap = hiddenElementMaps.get(segment[0]);
-                        if (eltMap == null)
-                        {
-                            eltMap = new HashMap<String,Set<String>>();
-                            hiddenElementMaps.put(segment[0], eltMap);
-=======
                 if (key.startsWith(CONFIG_PREFIX)) {
                     if (configurationService.getBooleanProperty(key, true)) {
                         String mdField = key.substring(CONFIG_PREFIX.length());
@@ -178,11 +153,9 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
                         } else { // oops..
                             log.warn("Bad format in hidden metadata directive, field=\"" + mdField + "\", " +
                                     "config property=" + key);
->>>>>>> dspace-7.2.1
                         }
                     }
                 }
-            }
             }
         }
     }

@@ -7,9 +7,6 @@
  */
 package org.dspace.discovery;
 
-<<<<<<< HEAD
-import org.apache.commons.io.Charsets;
-=======
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -22,7 +19,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
->>>>>>> dspace-7.2.1
 import org.apache.commons.io.IOUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -33,19 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-<<<<<<< HEAD
-import org.mockito.runners.MockitoJUnitRunner;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
-=======
 import org.mockito.junit.MockitoJUnitRunner;
->>>>>>> dspace-7.2.1
 
 @RunWith(MockitoJUnitRunner.class)
 public class FullTextContentStreamsTest {
@@ -88,15 +72,6 @@ public class FullTextContentStreamsTest {
         when(textBitstream2.getName()).thenReturn("Full Text 2");
         when(textBitstream3.getName()).thenReturn("Full Text 3");
 
-<<<<<<< HEAD
-        when(textBitstream1.getSize()).thenReturn(1L);
-        when(textBitstream2.getSize()).thenReturn(2L);
-        when(textBitstream3.getSize()).thenReturn(3L);
-
-        when(bitstreamService.retrieve(null, textBitstream1)).thenReturn(new ByteArrayInputStream("This is text 1".getBytes(Charsets.UTF_8)));
-        when(bitstreamService.retrieve(null, textBitstream2)).thenReturn(new ByteArrayInputStream("This is text 2".getBytes(Charsets.UTF_8)));
-        when(bitstreamService.retrieve(null, textBitstream3)).thenReturn(new ByteArrayInputStream("This is text 3".getBytes(Charsets.UTF_8)));
-=======
         when(textBitstream1.getSizeBytes()).thenReturn(1L);
         when(textBitstream2.getSizeBytes()).thenReturn(2L);
         when(textBitstream3.getSizeBytes()).thenReturn(3L);
@@ -107,7 +82,6 @@ public class FullTextContentStreamsTest {
             .thenReturn(new ByteArrayInputStream("This is text 2".getBytes(StandardCharsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstream3))
             .thenReturn(new ByteArrayInputStream("This is text 3".getBytes(StandardCharsets.UTF_8)));
->>>>>>> dspace-7.2.1
 
         streams.bitstreamService = bitstreamService;
     }
@@ -176,11 +150,7 @@ public class FullTextContentStreamsTest {
         InputStream inputStream = streams.getStream();
         assertNotNull(inputStream);
         assertEquals("The data in the input stream should match the text of the bitstream", "\nThis is text 1",
-<<<<<<< HEAD
-                IOUtils.toString(inputStream, Charsets.UTF_8));
-=======
                      IOUtils.toString(inputStream, StandardCharsets.UTF_8));
->>>>>>> dspace-7.2.1
     }
 
     @Test
@@ -193,21 +163,13 @@ public class FullTextContentStreamsTest {
         assertEquals("Source info should give you the handle", HANDLE, streams.getSourceInfo());
         assertEquals("Content type should be plain text", CONTENT_TYPE, streams.getContentType());
         assertEquals("The name should match the concatenation of the names of the bitstreams",
-<<<<<<< HEAD
-                "Full Text 1;Full Text 2;Full Text 3", streams.getName());
-=======
                      "Full Text 1;Full Text 2;Full Text 3", streams.getName());
->>>>>>> dspace-7.2.1
         assertEquals("The size of the streams should be the sum of the bitstream sizes", (Long) 6L, streams.getSize());
         assertFalse("Content stream should not be empty", streams.isEmpty());
         InputStream inputStream = streams.getStream();
         assertNotNull(inputStream);
         assertEquals("The data in the input stream should match 'This is text 1'", "\nThis is text 1" +
-<<<<<<< HEAD
-                "\nThis is text 2\nThis is text 3", IOUtils.toString(inputStream, Charsets.UTF_8));
-=======
             "\nThis is text 2\nThis is text 3", IOUtils.toString(inputStream, StandardCharsets.UTF_8));
->>>>>>> dspace-7.2.1
     }
 
     @Test
@@ -221,31 +183,11 @@ public class FullTextContentStreamsTest {
         assertEquals("Source info should give you the handle", HANDLE, streams.getSourceInfo());
         assertEquals("Content type should be plain text", CONTENT_TYPE, streams.getContentType());
         assertEquals("The name should match the concatenation of the names of the bitstreams",
-<<<<<<< HEAD
-                "Full Text 1;Full Text 2;Full Text 3", streams.getName());
-=======
                      "Full Text 1;Full Text 2;Full Text 3", streams.getName());
->>>>>>> dspace-7.2.1
         assertEquals("The size of the streams should be the sum of the bitstream sizes", (Long) 6L, streams.getSize());
         assertFalse("Content stream should not be empty", streams.isEmpty());
         InputStream inputStream = streams.getStream();
         assertNotNull(inputStream);
-<<<<<<< HEAD
-        String content = IOUtils.toString(inputStream, Charsets.UTF_8);
-        assertTrue("The data should contain data of the first bitstream that is not corrupt",
-                content.contains("This is text 1"));
-        assertFalse("The data should NOT contain data of the second bitstream that is corrupt",
-                content.contains("This is text 2"));
-        assertTrue("The data should contain data of the third bistream that is not corrupt",
-                content.contains("This is text 3"));
-        assertTrue("The data should contain data on the exception that occurred",
-                content.contains("java.io.IOException"));
-        assertTrue("The data should contain data on the exception that occurred",
-                content.contains("NOTFOUND"));
-    }
-
-}
-=======
         String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         assertTrue("The data should contain data of the first bitstream that is not corrupt",
                    content.contains("This is text 1"));
@@ -260,4 +202,3 @@ public class FullTextContentStreamsTest {
     }
 
 }
->>>>>>> dspace-7.2.1

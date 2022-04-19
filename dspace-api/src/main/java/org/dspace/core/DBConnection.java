@@ -24,19 +24,12 @@ import org.dspace.storage.rdbms.DatabaseConfigVO;
  *
  * @param <T> type of the persistence provider's session object.
  * @author kevinvandevelde at atmire.com
-<<<<<<< HEAD
- * @param <T> type of the persistence provider's session object.
-=======
->>>>>>> dspace-7.2.1
  */
 public interface DBConnection<T> {
 
     /**
      * Access to the underlying persistence provider's session object.
-<<<<<<< HEAD
-=======
      *
->>>>>>> dspace-7.2.1
      * @return the provider's session object for this connection.
      * @throws SQLException passed through.
      */
@@ -54,30 +47,21 @@ public interface DBConnection<T> {
 
     /**
      * Commit the open transaction.
-<<<<<<< HEAD
-=======
      *
->>>>>>> dspace-7.2.1
      * @throws SQLException passed through.
      */
     public void commit() throws SQLException;
 
     /**
      * Roll back the open transaction.
-<<<<<<< HEAD
-=======
      *
->>>>>>> dspace-7.2.1
      * @throws SQLException passed through.
      */
     public void rollback() throws SQLException;
 
     /**
      * Close this session:  close DBMS connection(s) and clean up resources.
-<<<<<<< HEAD
-=======
      *
->>>>>>> dspace-7.2.1
      * @throws SQLException passed through.
      */
     public void closeDBConnection() throws SQLException;
@@ -90,30 +74,21 @@ public interface DBConnection<T> {
 
     /**
      * Some description of the DBMS used to persist entities.
-<<<<<<< HEAD
-=======
      *
->>>>>>> dspace-7.2.1
      * @return Brand, version, dialect, etc.  Implementation specific.
      */
     public String getType();
 
     /**
      * The JDBC DataSource used by this session.  Think carefully before using.
-<<<<<<< HEAD
-=======
      *
->>>>>>> dspace-7.2.1
      * @return the source of DBMS connections.
      */
     public DataSource getDataSource();
 
     /**
      * Identify certain characteristics of the DBMS being used to support persistence.
-<<<<<<< HEAD
-=======
      *
->>>>>>> dspace-7.2.1
      * @return a collection of DBMS, database and connection information.
      * @throws SQLException passed through.
      */
@@ -121,20 +96,12 @@ public interface DBConnection<T> {
 
     /**
      * Configure the connection for special uses.
-<<<<<<< HEAD
-     * @param batchOptimized if true, optimize for batch use.  Typically this
-     *  means suppressing automatic flushing of updates, thus requiring manual
-     *  flushing at appropriate points in the process.
-     * @param readOnlyOptimized if true, optimize for read-only use.  Typically
-     *  this suppresses all updating.
-=======
      *
      * @param batchOptimized    if true, optimize for batch use.  Typically this
      *                          means suppressing automatic flushing of updates, thus requiring manual
      *                          flushing at appropriate points in the process.
      * @param readOnlyOptimized if true, optimize for read-only use.  Typically
      *                          this suppresses all updating.
->>>>>>> dspace-7.2.1
      * @throws SQLException
      */
     public void setConnectionMode(boolean batchOptimized, boolean readOnlyOptimized) throws SQLException;
@@ -143,20 +110,14 @@ public interface DBConnection<T> {
      * Has this session been configured for large batches?  Typically this means
      * that automatic flushing of updates to the database is suppressed, and
      * thus one must take care to flush manually (or commit) at appropriate times.
-<<<<<<< HEAD
-=======
      *
->>>>>>> dspace-7.2.1
      * @return true if configured for batch.
      */
     public boolean isOptimizedForBatchProcessing();
 
     /**
      * How many entities are cached in this session?
-<<<<<<< HEAD
-=======
      *
->>>>>>> dspace-7.2.1
      * @return number of cached entities.
      * @throws SQLException passed through.
      */
@@ -166,12 +127,8 @@ public interface DBConnection<T> {
      * Reload a DSpace object from the database. This will make sure the object
      * is valid and stored in the cache.  The returned object should be used
      * henceforth instead of the passed object.
-<<<<<<< HEAD
-     * @param <E> type of {@link entity}
-=======
      *
      * @param <E>    type of {@link entity}
->>>>>>> dspace-7.2.1
      * @param entity The DSpace object to reload
      * @return the reloaded entity.
      * @throws java.sql.SQLException passed through.
@@ -185,16 +142,10 @@ public interface DBConnection<T> {
      * <p>Objects removed from cache are not saved in any way. Therefore, if you
      * have modified an object, you should be sure to {@link commit()} changes
      * before calling this method.
-<<<<<<< HEAD
-     * @param <E> Type of {@link entity}
-     * @param entity The DSpace object to decache.
-     * @throws java.sql.SQLException
-=======
      *
      * @param <E>    Type of {@link entity}
      * @param entity The DSpace object to decache.
      * @throws java.sql.SQLException passed through.
->>>>>>> dspace-7.2.1
      */
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException;
 }

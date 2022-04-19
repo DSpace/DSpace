@@ -21,10 +21,6 @@ import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-<<<<<<< HEAD
-import org.apache.http.client.HttpClient;
-=======
->>>>>>> dspace-7.2.1
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -34,13 +30,8 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-<<<<<<< HEAD
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
-=======
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
->>>>>>> dspace-7.2.1
 import org.apache.http.util.EntityUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -693,21 +684,6 @@ public class DataCiteConnector
      * @throws DOIIdentifierException if DOI error
      */
     protected DataCiteResponse sendHttpRequest(HttpUriRequest req, String doi)
-<<<<<<< HEAD
-            throws DOIIdentifierException
-    {
-        // create credentials and auth cache to build the http client
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(
-                new AuthScope(HOST, 443),
-                new UsernamePasswordCredentials(this.getUsername(), this.getPassword()));
-
-        HttpClient httpclient = HttpClientBuilder
-                .create()
-                .setDefaultCredentialsProvider(credentialsProvider)
-                .setRetryHandler(new StandardHttpRequestRetryHandler(3, true))
-                .build();
-=======
         throws DOIIdentifierException {
         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(new AuthScope(HOST, 443),
@@ -715,7 +691,6 @@ public class DataCiteConnector
 
         HttpClientContext httpContext = HttpClientContext.create();
         httpContext.setCredentialsProvider(credentialsProvider);
->>>>>>> dspace-7.2.1
 
         HttpEntity entity = null;
         try ( CloseableHttpClient httpclient = HttpClientBuilder.create().build(); ) {
@@ -783,11 +758,7 @@ public class DataCiteConnector
                 // another party or if there is a login problem.
                 case (403): {
                     log.info("Managing a DOI ({}) was prohibited by the DOI "
-<<<<<<< HEAD
-                            + "registration agency: {}", new String[] {doi, content});
-=======
                                  + "registration agency: {}", doi, content);
->>>>>>> dspace-7.2.1
                     throw new DOIIdentifierException("We can check, register or "
                                                          + "reserve DOIs that belong to us only.",
                                                      DOIIdentifierException.FOREIGN_DOI);
@@ -797,11 +768,7 @@ public class DataCiteConnector
                 // 500 is documented and signals an internal server error
                 case (500): {
                     log.warn("Caught an http status code 500 while managing DOI "
-<<<<<<< HEAD
-                            +"{}. Message was: {}", new String[] {content, doi});
-=======
                                  + "{}. Message was: " + content);
->>>>>>> dspace-7.2.1
                     throw new DOIIdentifierException("DataCite API has an internal error. "
                                                          + "It is temporarily impossible to manage DOIs. "
                                                          + "Further information can be found in DSpace log file.",

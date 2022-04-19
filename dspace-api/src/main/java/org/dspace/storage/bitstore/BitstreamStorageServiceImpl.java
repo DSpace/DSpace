@@ -93,8 +93,8 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     public void afterPropertiesSet() throws Exception {
         for (Map.Entry<Integer, BitStoreService> storeEntry : stores.entrySet()) {
             storeEntry.getValue().init();
-            }
         }
+    }
 
     @Override
     public UUID store(Context context, Bitstream bitstream, InputStream is) throws SQLException, IOException {
@@ -110,7 +110,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
          * where it should go
          */
         bitstream.setStoreNumber(incoming);
-        
+
         //For efficiencies sake, PUT is responsible for setting bitstream size_bytes, checksum, and checksum_algorithm
         stores.get(incoming).put(bitstream, is);
         //bitstream.setSizeBytes(file.length());
@@ -225,12 +225,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         Context context = null;
         int commitCounter = 0;
 
-<<<<<<< HEAD
-        try
-        {
-=======
         try {
->>>>>>> dspace-7.2.1
             context = new Context(Context.Mode.BATCH_EDIT);
             context.turnOffAuthorisationSystem();
 
@@ -263,18 +258,10 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 
                 // This is a small chance that this is a file which is
                 // being stored -- get it next time.
-<<<<<<< HEAD
-                if (isRecent(Long.valueOf(receivedMetadata.get("modified").toString())))
-                {
-                	log.debug("file is recent");
-                    context.uncacheEntity(bitstream);
-                	continue;
-=======
                 if (isRecent(Long.valueOf(receivedMetadata.get("modified").toString()))) {
                     log.debug("file is recent");
                     context.uncacheEntity(bitstream);
                     continue;
->>>>>>> dspace-7.2.1
                 }
 
                 if (deleteDbRecords) {
@@ -289,17 +276,6 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                     bitstreamService.expunge(context, bitstream);
                 }
 
-<<<<<<< HEAD
-				if (isRegisteredBitstream(bitstream.getInternalId())) {
-                    context.uncacheEntity(bitstream);
-				    continue;			// do not delete registered bitstreams
-				}
-
-
-                // Since versioning allows for multiple bitstreams, check if the internal identifier isn't used on another place
-                if(bitstreamService.findDuplicateInternalIdentifier(context, bitstream).isEmpty())
-                {
-=======
                 if (isRegisteredBitstream(bitstream.getInternalId())) {
                     context.uncacheEntity(bitstream);
                     continue;            // do not delete registered bitstreams
@@ -309,7 +285,6 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                 // Since versioning allows for multiple bitstreams, check if the internal identifier isn't used on
                 // another place
                 if (bitstreamService.findDuplicateInternalIdentifier(context, bitstream).isEmpty()) {
->>>>>>> dspace-7.2.1
                     stores.get(bitstream.getStoreNumber()).remove(bitstream);
 
                     String message = ("Deleted bitstreamID " + bid + ", internalID " + bitstream.getInternalId());
@@ -352,23 +327,6 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         }
     }
 
-<<<<<<< HEAD
-    @Override
-    public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException 
-    {
-        Bitstream clonedBitstream = bitstreamService.clone(context, bitstream);
-        clonedBitstream.setStoreNumber(bitstream.getStoreNumber());
-        
-        List<MetadataValue> metadataValues = bitstreamService.getMetadata(bitstream, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        
-        for (MetadataValue metadataValue : metadataValues) 
-        {
-            bitstreamService.addMetadata(context, clonedBitstream, metadataValue.getMetadataField(), metadataValue.getLanguage(), metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence());
-        }
-        bitstreamService.update(context, clonedBitstream);
-        return clonedBitstream;
-
-=======
     @Nullable
     @Override
     public Long getLastModified(Bitstream bitstream) throws IOException {
@@ -416,7 +374,6 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             context.restoreAuthSystemState();
         }
         return clonedBitstream;
->>>>>>> dspace-7.2.1
     }
 
     /**

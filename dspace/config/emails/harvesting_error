@@ -1,17 +1,3 @@
-<<<<<<< HEAD
-# E-mail sent to designated address when a harvest process fails
-#
-# Parameters: {0} Collection id
-#             {1} Date & time
-#             {2} Status flag
-#             {3} Exception message
-#             {4} Exception stack trace
-#
-# See org.dspace.core.Email for information on the format of this file.
-#
-Subject: DRUM: Harvesting Error
-Collection {0} failed on harvest:
-=======
 ## E-mail sent to designated address when a harvest process fails
 ##
 ## Parameters: {0} Collection id
@@ -22,9 +8,8 @@ Collection {0} failed on harvest:
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
-#set($subject = 'DSpace: Harvesting Error')
+#set($subject = 'DRUM: Harvesting Error')
 Collection ${params[0]} failed on harvest:
->>>>>>> dspace-7.2.1
 
 Date:       	${params[1]}
 Status Flag: 	${params[2]}

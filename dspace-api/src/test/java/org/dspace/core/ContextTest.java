@@ -7,10 +7,6 @@
  */
 package org.dspace.core;
 
-<<<<<<< HEAD
-import mockit.NonStrictExpectations;
-import org.apache.commons.lang.StringUtils;
-=======
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -28,31 +24,17 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
->>>>>>> dspace-7.2.1
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.exception.DatabaseSchemaValidationException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
-<<<<<<< HEAD
-import org.junit.Test;
-
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-=======
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
->>>>>>> dspace-7.2.1
 
 /**
  * Perform some basic unit tests for Context Class
@@ -99,40 +81,6 @@ public class ContextTest extends AbstractUnitTest {
 
         assertThat("testGetDBConnection 0", connection, notNullValue());
         assertThat("testGetDBConnection 1", connection.isSessionAlive(), equalTo(true));
-    }
-
-    /**
-     * Test of getDBConnection method, of class Context.
-     */
-    @Test
-    public void testSchemaValidation() throws SQLException
-    {
-        try {
-            //Stop the current kernel and database
-            destroy();
-            destroyKernel();
-
-            //Create a new Kernel but do not init the database. This should trigger missing table validation errors
-            initKernel();
-            init();
-
-            //If we get here without exception, the validation did not happen
-            fail();
-
-        } catch(DatabaseSchemaValidationException ex) {
-            assertTrue(StringUtils.isNotBlank(ex.getMessage()));
-            assertTrue(StringUtils.contains(ex.getMessage(), "Missing table"));
-
-        } finally {
-
-            //restore correct state
-            destroy();
-            destroyKernel();
-
-            initKernel();
-            initDatabase();
-            init();
-        }
     }
 
     /**
@@ -470,27 +418,6 @@ public class ContextTest extends AbstractUnitTest {
 
         // Create a new read-only context
         Context instance = new Context(Context.Mode.READ_ONLY);
-<<<<<<< HEAD
-        assertThat("testIsReadOnly 1", instance.isReadOnly(), equalTo(true));
-
-        //When in read-only, we only support abort().
-        instance.abort();
-
-        // Cleanup our context
-        cleanupContext(instance);
-    }
-
-    /**
-     * Test that commit cannot be called when the context is in read-only mode
-     */
-    @Test
-    public void testIsReadOnlyCommit() throws SQLException
-    {
-        // Create a new read-only context
-        Context instance = new Context(Context.Mode.READ_ONLY);
-        assertThat("testIsReadOnly 1", instance.isReadOnly(), equalTo(true));
-
-=======
         assertThat("testIsReadOnly 1", instance.isReadOnly(), equalTo(true));
 
         //When in read-only, we only support abort().
@@ -509,7 +436,6 @@ public class ContextTest extends AbstractUnitTest {
         Context instance = new Context(Context.Mode.READ_ONLY);
         assertThat("testIsReadOnly 1", instance.isReadOnly(), equalTo(true));
 
->>>>>>> dspace-7.2.1
         try {
             //When in read-only, calling commit() should result in an error
             instance.commit();

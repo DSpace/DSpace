@@ -164,12 +164,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
      *
      * @return the MIME type
      */
-<<<<<<< HEAD
-    public String getMIMEType()
-    {
-=======
     public String getMIMEType() {
->>>>>>> dspace-7.2.1
         return mimetype;
     }
 
@@ -178,12 +173,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
      *
      * @param s the new MIME type
      */
-<<<<<<< HEAD
-    public void setMIMEType(String s)
-    {
-=======
     public void setMIMEType(String s) {
->>>>>>> dspace-7.2.1
         this.mimetype = s;
     }
 

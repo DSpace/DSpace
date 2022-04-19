@@ -72,14 +72,6 @@ public class HierarchyResource extends Resource {
     @GET
     @Produces( {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public HierarchySite getHierarchy(
-<<<<<<< HEAD
-    		@QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
-    		@Context HttpHeaders headers, @Context HttpServletRequest request) throws UnsupportedEncodingException, WebApplicationException {
-		
-		org.dspace.core.Context context = null;
-		HierarchySite repo = new HierarchySite();
-		
-=======
         @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
         @Context HttpHeaders headers, @Context HttpServletRequest request)
         throws UnsupportedEncodingException, WebApplicationException {
@@ -87,7 +79,6 @@ public class HierarchyResource extends Resource {
         org.dspace.core.Context context = null;
         HierarchySite repo = new HierarchySite();
 
->>>>>>> dspace-7.2.1
         try {
             context = createContext();
 

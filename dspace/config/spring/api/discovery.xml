@@ -149,11 +149,6 @@
                 <ref bean="searchFilterAbstract" />
                 <ref bean="searchFilterLanguage" />
                 <ref bean="searchFilterIssued" />
-<<<<<<< HEAD
-		        <ref bean="searchFilterContentInOriginalBundle"/>
-                <ref bean="searchFilterFileNameInOriginalBundle" />
-                <ref bean="searchFilterFileDescriptionInOriginalBundle" />
-=======
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterFileNameInOriginalBundle" />
                 <ref bean="searchFilterFileDescriptionInOriginalBundle" />
@@ -163,7 +158,6 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
->>>>>>> dspace-7.2.1
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -300,11 +294,6 @@
                 <ref bean="searchFilterAbstract" />
                 <ref bean="searchFilterLanguage" />
                 <ref bean="searchFilterIssued" />
-<<<<<<< HEAD
-		        <ref bean="searchFilterContentInOriginalBundle"/>
-                <ref bean="searchFilterFileNameInOriginalBundle" />
-                <ref bean="searchFilterFileDescriptionInOriginalBundle" />
-=======
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterFileNameInOriginalBundle" />
                 <ref bean="searchFilterFileDescriptionInOriginalBundle" />
@@ -314,7 +303,6 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
->>>>>>> dspace-7.2.1
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -399,8 +387,6 @@
                             <property name="snippets" value="5"/>
                         </bean>
                         -->
-<<<<<<< HEAD
-=======
                     </list>
                 </property>
             </bean>
@@ -413,7 +399,6 @@
                         <value>dc.contributor.author</value>
                         <value>dc.creator</value>
                         <value>dc.subject</value>
->>>>>>> dspace-7.2.1
                     </list>
                 </property>
                 <!--The minimum number of matching terms across the metadata fields above before an item is found as related -->
@@ -481,12 +466,8 @@
             queries done by discovery for this configuration -->
         <property name="defaultFilterQueries">
             <list>
-<<<<<<< HEAD
-                <value>dc.title.*</value>
-=======
                 <!--Only find items-->
                 <value>search.resourcetype:Item</value>
->>>>>>> dspace-7.2.1
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -577,17 +558,11 @@
         <!--Which sidebar facets are to be displayed (same as defaultConfiguration above)-->
         <property name="sidebarFacets">
             <list>
-<<<<<<< HEAD
-                <value>dc.contributor.author</value>
-                <value>dc.creator.*</value>
-                <value>dc.description.statementofresponsibility</value>
-=======
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterEntityType"/>
->>>>>>> dspace-7.2.1
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->

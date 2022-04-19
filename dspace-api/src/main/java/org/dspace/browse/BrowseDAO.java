@@ -391,11 +391,7 @@ public interface BrowseDAO {
 
     public boolean isEnableBrowseFrequencies();
 
-<<<<<<< HEAD
-	public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies);
-=======
     public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies);
->>>>>>> dspace-7.2.1
 
     public void setStartsWith(String startsWith);
 

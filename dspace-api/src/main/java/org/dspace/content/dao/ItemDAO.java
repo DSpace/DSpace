@@ -101,14 +101,9 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
 
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
 
-<<<<<<< HEAD
-    public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset) throws SQLException;
-    
-=======
     public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
         throws SQLException;
 
->>>>>>> dspace-7.2.1
     /**
      * Count number of items in a given collection
      *

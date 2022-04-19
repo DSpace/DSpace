@@ -550,21 +550,6 @@ public class BitstreamResource extends Resource {
 
             UUID newBitstreamId = bitstreamStorageService.store(context, dspaceBitstream, is);
             log.trace("Bitstream data stored: " + newBitstreamId);
-<<<<<<< HEAD
-
-            context.complete();
-        }
-        catch (SQLException e)
-        {
-            processException("Could not update bitstream(id=" + bitstreamId + ") data, SQLException. Message: " + e, context);
-        }
-        catch (IOException e)
-        {
-            processException("Could not update bitstream(id=" + bitstreamId + ") data, IOException. Message: " + e, context);
-        }
-        catch (ContextException e)
-        {
-=======
             context.complete();
         } catch (SQLException e) {
             processException("Could not update bitstream(id=" + bitstreamId + ") data, SQLException. Message: " + e,
@@ -573,7 +558,6 @@ public class BitstreamResource extends Resource {
             processException("Could not update bitstream(id=" + bitstreamId + ") data, IOException. Message: " + e,
                              context);
         } catch (ContextException e) {
->>>>>>> dspace-7.2.1
             processException(
                 "Could not update bitstream(id=" + bitstreamId + ") data, ContextException. Message: " + e.getMessage(),
                 context);
@@ -705,19 +689,11 @@ public class BitstreamResource extends Resource {
                 }
                 log.trace("Policy for bitstream(id=" + bitstreamId + ") was successfully removed.");
             }
-<<<<<<< HEAD
-            context.complete();
-        }
-        catch (SQLException e)
-        {
-            processException("Someting went wrong while deleting policy(id=" + policyId + ") to bitstream(id=" + bitstreamId
-=======
 
             context.complete();
         } catch (SQLException e) {
             processException(
                 "Someting went wrong while deleting policy(id=" + policyId + ") to bitstream(id=" + bitstreamId
->>>>>>> dspace-7.2.1
                     + "), SQLException! Message: " + e, context);
         } catch (ContextException e) {
             processException(

@@ -22,17 +22,6 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.dao.MetadataValueDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
-<<<<<<< HEAD
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
-import org.hibernate.Query;
-import org.hibernate.criterion.Restrictions;
-
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-=======
->>>>>>> dspace-7.2.1
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the MetadataValue object.
@@ -60,15 +49,6 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
     }
 
     @Override
-<<<<<<< HEAD
-    public Iterator<MetadataValue> findByValueLike(Context context, String value) throws SQLException {
-        String queryString = "SELECT m FROM MetadataValue m JOIN m.metadataField f " +
-                "WHERE m.value like concat('%', concat(:searchString,'%')) ORDER BY m.id ASC";
-
-        Query query = createQuery(context, queryString);
-        query.setString("searchString", value);
-
-=======
     public Iterator<MetadataValue> findItemValuesByFieldAndValue(Context context,
                                                                  MetadataField metadataField, String value)
             throws SQLException {
@@ -89,7 +69,6 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
         Query query = createQuery(context, queryString);
         query.setParameter("searchString", value);
 
->>>>>>> dspace-7.2.1
         return iterate(query);
     }
 

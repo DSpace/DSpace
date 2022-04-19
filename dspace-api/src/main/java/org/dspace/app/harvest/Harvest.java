@@ -7,9 +7,6 @@
  */
 package org.dspace.app.harvest;
 
-<<<<<<< HEAD
-import org.apache.commons.cli.*;
-=======
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -18,7 +15,6 @@ import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
->>>>>>> dspace-7.2.1
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
@@ -51,77 +47,6 @@ import java.util.UUID;
  *
  * @author Alexey Maslov
  */
-<<<<<<< HEAD
-public class Harvest
-{
-    private static Context context;
-
-    private static final HarvestedCollectionService harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
-    private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    private static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-
-    public static void main(String[] argv) throws Exception
-    {
-        // create an options object and populate it
-        CommandLineParser parser = new PosixParser();
-
-        Options options = new Options();
-
-        options.addOption("p", "purge", false, "delete all items in the collection");
-        options.addOption("r", "run", false, "run the standard harvest procedure");
-        options.addOption("g", "ping", false, "test the OAI server and set");
-        options.addOption("o", "once", false, "run the harvest procedure with specified parameters");
-        options.addOption("s", "setup", false, "Set the collection up for harvesting");
-        options.addOption("S", "start", false, "start the harvest loop");
-        options.addOption("R", "reset", false, "reset harvest status on all collections");
-        options.addOption("P", "purge", false, "purge all harvestable collections");
-        
-
-        options.addOption("e", "eperson", true, "eperson");
-        options.addOption("c", "collection", true, "harvesting collection (handle or id)");
-        options.addOption("t", "type", true, "type of harvesting (0 for none)");
-        options.addOption("a", "address", true, "address of the OAI-PMH server");
-        options.addOption("i", "oai_set_id", true, "id of the PMH set representing the harvested collection");
-        options.addOption("m", "metadata_format", true, "the name of the desired metadata format for harvesting, resolved to namespace and crosswalk in dspace.cfg");
-
-        options.addOption("h", "help", false, "help");
-
-        CommandLine line = parser.parse(options, argv);
-
-        String command = null; 
-        String eperson = null;
-        String collection = null;
-        String oaiSource = null;
-        String oaiSetID = null;
-        String metadataKey = null;
-        int harvestType = 0;
-        
-        if (line.hasOption('h'))
-        {
-            HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("Harvest\n", options);
-            System.out
-    				.println("\nPING OAI server: Harvest -g -a oai_source -i oai_set_id");
-            System.out
-					.println("RUNONCE harvest with arbitrary options: Harvest -o -e eperson -c collection -t harvest_type -a oai_source -i oai_set_id -m metadata_format");
-            System.out
-                    .println("SETUP a collection for harvesting: Harvest -s -c collection -t harvest_type -a oai_source -i oai_set_id -m metadata_format");
-            System.out
-            		.println("RUN harvest once: Harvest -r -e eperson -c collection");
-            System.out
-    				.println("START harvest scheduler: Harvest -S");
-            System.out
-					.println("RESET all harvest status: Harvest -R");
-            System.out
-                    .println("PURGE a collection of items and settings: Harvest -p -e eperson -c collection");
-            System.out
-					.println("PURGE all harvestable collections: Harvest -P -e eperson");
-            
-            
-
-            System.exit(0);
-        }
-=======
 public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
 
     private HarvestedCollectionService harvestedCollectionService;
@@ -137,7 +62,6 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
     private int harvestType = 0;
 
     protected Context context;
->>>>>>> dspace-7.2.1
 
 
     public HarvestScriptConfiguration getScriptConfiguration() {
@@ -198,31 +122,6 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
         if (commandLine.hasOption('m')) {
             metadataKey = commandLine.getOptionValue('m');
         }
-<<<<<<< HEAD
-        
-
-        // Instantiate our class
-        Harvest harvester = new Harvest();
-        harvester.context = new Context(Context.Mode.BATCH_EDIT);
-        
-        
-        // Check our options
-        if (command == null)
-        {
-            System.out
-                    .println("Error - no parameters specified (run with -h flag for details)");
-            System.exit(1);
-        }
-        // Run a single harvest cycle on a collection using saved settings.
-        else if ("run".equals(command))
-        {
-            if (collection == null || eperson == null)
-            {
-                System.out
-                        .println("Error - a target collection and eperson must be provided");
-                System.out.println(" (run with -h flag for details)");
-                System.exit(1);
-=======
     }
 
     /**
@@ -240,7 +139,6 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
             if (eperson == null) {
                 super.handler.logError("EPerson not found: " + currentUserUuid);
                 throw new IllegalArgumentException("Unable to find a user with uuid: " + currentUserUuid);
->>>>>>> dspace-7.2.1
             }
             this.context.setCurrentUser(eperson);
         } catch (SQLException e) {
@@ -445,20 +343,6 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
                 Item item = it.next();
                 handler.logInfo("Deleting: " + item.getHandle());
                 collectionService.removeItem(context, collection, item);
-<<<<<<< HEAD
-                context.uncacheEntity(item);
-                
-    			// Dispatch events every 50 items
-    			if (i%50 == 0) {
-    				context.dispatchEvents();
-    				i=0;
-    			}
-    		}
-    		
-    		HarvestedCollection hc = harvestedCollectionService.find(context, collection);
-    		if (hc != null) {
-	    		hc.setLastHarvested(null);
-=======
                 context.uncacheEntity(item);// Dispatch events every 50 items
                 if (i % 50 == 0) {
                     context.dispatchEvents();
@@ -469,7 +353,6 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
             HarvestedCollection hc = harvestedCollectionService.find(context, collection);
             if (hc != null) {
                 hc.setLastHarvested(null);
->>>>>>> dspace-7.2.1
                 hc.setHarvestMessage("");
                 hc.setHarvestStatus(HarvestedCollection.STATUS_READY);
                 hc.setHarvestStartTime(null);

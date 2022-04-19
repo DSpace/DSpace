@@ -21,14 +21,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 
-<<<<<<< HEAD
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-=======
->>>>>>> dspace-7.2.1
 /**
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -39,12 +31,6 @@ public class AuthorityIndexClient {
 
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AuthorityIndexClient.class);
 
-<<<<<<< HEAD
-    protected static final AuthorityService authorityService = AuthorityServiceFactory.getInstance().getAuthorityService();
-    protected static final AuthorityIndexingService indexingService = AuthorityServiceFactory.getInstance().getAuthorityIndexingService();
-    protected static final List<AuthorityIndexerInterface> indexers = AuthorityServiceFactory.getInstance().getAuthorityIndexers();
-    protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-=======
     protected static final AuthorityService authorityService =
         AuthorityServiceFactory.getInstance().getAuthorityService();
     protected static final AuthorityIndexingService indexingService =
@@ -58,7 +44,6 @@ public class AuthorityIndexClient {
      * Default constructor
      */
     private AuthorityIndexClient() { }
->>>>>>> dspace-7.2.1
 
     public static void main(String[] args) throws Exception {
 
@@ -82,32 +67,18 @@ public class AuthorityIndexClient {
 
         //Get all our values from the input forms
         Map<String, AuthorityValue> toIndexValues = new HashMap<>();
-
         for (AuthorityIndexerInterface indexerInterface : indexers) {
             log.info("Initialize " + indexerInterface.getClass().getName());
             System.out.println("Initialize " + indexerInterface.getClass().getName());
-<<<<<<< HEAD
-
-=======
->>>>>>> dspace-7.2.1
             Iterator<Item> allItems = itemService.findAll(context);
             Map<String, AuthorityValue> authorityCache = new HashMap<>();
             while (allItems.hasNext()) {
                 Item item = allItems.next();
-<<<<<<< HEAD
-
-                List<AuthorityValue> authorityValues = indexerInterface.getAuthorityValues(context, item, authorityCache);
-                for (AuthorityValue authorityValue : authorityValues) {
-                    toIndexValues.put(authorityValue.getId(), authorityValue);
-                }
-
-=======
                 List<AuthorityValue> authorityValues = indexerInterface.getAuthorityValues(
                     context, item, authorityCache);
                 for (AuthorityValue authorityValue : authorityValues) {
                     toIndexValues.put(authorityValue.getId(), authorityValue);
                 }
->>>>>>> dspace-7.2.1
                 context.uncacheEntity(item);
             }
         }
@@ -118,11 +89,7 @@ public class AuthorityIndexClient {
         indexingService.cleanIndex();
         log.info("Writing new data");
         System.out.println("Writing new data");
-<<<<<<< HEAD
-        for(String id : toIndexValues.keySet()){
-=======
         for (String id : toIndexValues.keySet()) {
->>>>>>> dspace-7.2.1
             indexingService.indexContent(toIndexValues.get(id));
             indexingService.commit();
         }

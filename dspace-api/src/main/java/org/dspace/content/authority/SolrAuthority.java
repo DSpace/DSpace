@@ -7,10 +7,6 @@
  */
 package org.dspace.content.authority;
 
-<<<<<<< HEAD
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-=======
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,7 +17,6 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
->>>>>>> dspace-7.2.1
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -30,13 +25,8 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.CommonParams;
 import org.dspace.authority.AuthoritySearchService;
 import org.dspace.authority.AuthorityValue;
-<<<<<<< HEAD
-import org.dspace.authority.factory.AuthorityServiceFactory;
-import org.dspace.authority.SolrAuthorityInterface;
-=======
 import org.dspace.authority.SolrAuthorityInterface;
 import org.dspace.authority.factory.AuthorityServiceFactory;
->>>>>>> dspace-7.2.1
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.core.NameAwarePlugin;
 import org.dspace.services.ConfigurationService;
@@ -66,16 +56,8 @@ public class SolrAuthority implements ChoiceAuthority {
     protected final AuthorityValueService authorityValueService
             = AuthorityServiceFactory.getInstance().getAuthorityValueService();
 
-<<<<<<< HEAD
-    private static final Logger log = Logger.getLogger(SolrAuthority.class);
-    protected SolrAuthorityInterface source = DSpaceServicesFactory.getInstance().getServiceManager()
-                                                       .getServiceByName("AuthoritySource", SolrAuthorityInterface.class);
-    protected boolean externalResults = false;
-    protected final AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance().getAuthorityValueService();
-=======
     protected final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
->>>>>>> dspace-7.2.1
 
     public Choices getMatches(String text, int start, int limit, String locale,
                               boolean bestMatch) {

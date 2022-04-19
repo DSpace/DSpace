@@ -19,7 +19,6 @@
 
     <bean name="localStore" class="org.dspace.storage.bitstore.DSBitStoreService" scope="singleton">
         <property name="baseDir" value="${assetstore.dir}"/>
-<<<<<<< HEAD
     </bean>
 
     <bean name="localStore1" class="org.dspace.storage.bitstore.DSBitStoreService" scope="singleton">
@@ -36,8 +35,6 @@
 
     <bean name="localStore4" class="org.dspace.storage.bitstore.DSBitStoreService" scope="singleton">
         <property name="baseDir" value="${assetstore.dir.4}"/>
-=======
->>>>>>> dspace-7.2.1
     </bean>
 
     <bean name="s3Store" class="org.dspace.storage.bitstore.S3BitStoreService" scope="singleton">

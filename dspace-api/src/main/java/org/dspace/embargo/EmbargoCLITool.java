@@ -120,12 +120,7 @@ public class EmbargoCLITool {
         }
 
         Context context = null;
-<<<<<<< HEAD
-        try
-        {
-=======
         try {
->>>>>>> dspace-7.2.1
             context = new Context(Context.Mode.BATCH_EDIT);
             context.turnOffAuthorisationSystem();
             Date now = new Date();
@@ -149,17 +144,9 @@ public class EmbargoCLITool {
                 }
             } else {
                 Iterator<Item> ii = embargoService.findItemsByLiftMetadata(context);
-<<<<<<< HEAD
-                while (ii.hasNext())
-                {
-                    Item item = ii.next();
-                    if (processOneItem(context, item, line, now))
-                    {
-=======
                 while (ii.hasNext()) {
                     Item item = ii.next();
                     if (processOneItem(context, item, line, now)) {
->>>>>>> dspace-7.2.1
                         status = 1;
                     }
                     context.uncacheEntity(item);

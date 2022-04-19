@@ -36,8 +36,4 @@
             memoryStoreEvictionPolicy="LRU">
     </defaultCache>
 
-<<<<<<< HEAD
 </ehcache>
-=======
-</ehcache>
->>>>>>> dspace-7.2.1

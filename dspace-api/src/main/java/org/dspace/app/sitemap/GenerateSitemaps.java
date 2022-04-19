@@ -7,12 +7,6 @@
  */
 package org.dspace.app.sitemap;
 
-<<<<<<< HEAD
-import org.apache.commons.cli.*;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-=======
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +32,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
->>>>>>> dspace-7.2.1
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -55,16 +48,6 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Command-line utility for generating HTML and Sitemaps.org protocol Sitemaps.

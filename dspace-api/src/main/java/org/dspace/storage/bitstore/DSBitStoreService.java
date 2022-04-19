@@ -105,21 +105,13 @@ public class DSBitStoreService implements BitStoreService {
      * @param in The stream of bits to store
      * @throws java.io.IOException If a problem occurs while storing the bits
      */
-<<<<<<< HEAD
-	public void put(Bitstream bitstream, InputStream in) throws IOException
-	{
-        try
-        {
-=======
     public void put(Bitstream bitstream, InputStream in) throws IOException {
         try {
->>>>>>> dspace-7.2.1
             File file = getFile(bitstream);
 
             // Make the parent dirs if necessary
             File parent = file.getParentFile();
-            if (!parent.exists())
-            {
+            if (!parent.exists()) {
                 parent.mkdirs();
             }
             //Create the corresponding file and open it
@@ -129,25 +121,14 @@ public class DSBitStoreService implements BitStoreService {
                     FileOutputStream fos = new FileOutputStream(file);
                     // Read through a digest input stream that will work out the MD5
                     DigestInputStream dis = new DigestInputStream(in, MessageDigest.getInstance(CSA));
-<<<<<<< HEAD
-            )
-            {
-=======
             ) {
->>>>>>> dspace-7.2.1
                 Utils.bufferedCopy(dis, fos);
                 in.close();
 
                 bitstream.setSizeBytes(file.length());
                 bitstream.setChecksum(Utils.toHex(dis.getMessageDigest().digest()));
                 bitstream.setChecksumAlgorithm(CSA);
-<<<<<<< HEAD
-            }
-            catch (NoSuchAlgorithmException nsae)
-            {
-=======
             } catch (NoSuchAlgorithmException nsae) {
->>>>>>> dspace-7.2.1
                 // Should never happen
                 log.warn("Caught NoSuchAlgorithmException", nsae);
             }

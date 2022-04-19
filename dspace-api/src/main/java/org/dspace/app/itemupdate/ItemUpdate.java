@@ -28,11 +28,6 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-<<<<<<< HEAD
-import org.apache.commons.cli.PosixParser;
-import org.apache.commons.lang.StringUtils;
-=======
->>>>>>> dspace-7.2.1
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -85,8 +80,6 @@ public class ItemUpdate {
     protected static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
-<<<<<<< HEAD
-=======
 
     static {
         filterAliases.put("ORIGINAL", "org.dspace.app.itemupdate.OriginalBitstreamFilter");
@@ -95,7 +88,6 @@ public class ItemUpdate {
         filterAliases.put("TEXT", "org.dspace.app.itemupdate.DerivativeTextBitstreamFilter");
         filterAliases.put("THUMBNAIL", "org.dspace.app.itemupdate.ThumbnailBitstreamFilter");
     }
->>>>>>> dspace-7.2.1
 
     // File listing filter to check for folders
     static FilenameFilter directoryFilter = new FilenameFilter() {
@@ -327,35 +319,6 @@ public class ItemUpdate {
             if (!iu.actionMgr.hasActions()) {
                 pr("Error - an action must be specified");
                 System.exit(1);
-<<<<<<< HEAD
-	        }
-	        else  
-	        {
-	        	pr("Actions to be performed: ");
-	        	
-	        	for (UpdateAction ua : iu.actionMgr)
-	        	{
-	        		pr("    " + ua.getClass().getName());
-	        	}
-	        }
-	        
-	        pr("ItemUpdate - initializing run on " + (new Date()).toString());
-	               	
-	        context = new Context(Context.Mode.BATCH_EDIT);
-	        iu.setEPerson(context, iu.eperson);	
-	        context.turnOffAuthorisationSystem();
-	        
-	    	HANDLE_PREFIX = handleService.getCanonicalPrefix();
-	    		        
-        	iu.processArchive(context, sourcedir, itemField, metadataIndexName, alterProvenance, isTest);		        	            
-
-	        context.complete();  // complete all transactions
-        }
-        catch (Exception e)
-        {
-            if (context != null && context.isValid())
-            {
-=======
             } else {
                 pr("Actions to be performed: ");
 
@@ -377,7 +340,6 @@ public class ItemUpdate {
             context.complete();  // complete all transactions
         } catch (Exception e) {
             if (context != null && context.isValid()) {
->>>>>>> dspace-7.2.1
                 context.abort();
             }
             e.printStackTrace();
@@ -455,23 +417,12 @@ public class ItemUpdate {
                 if (!isTest) {
                     Item item = itarch.getItem();
                     itemService.update(context, item);  //need to update before commit
-<<<<<<< HEAD
-					context.uncacheEntity(item);
-	    		}
-    			ItemUpdate.pr("Item " + dirname + " completed");
-    			successItemCount++;
-    		}
-    		catch(Exception e)
-    		{
-    			pr("Exception processing item " + dirname + ": " + e.toString());
-=======
                     context.uncacheEntity(item);
                 }
                 ItemUpdate.pr("Item " + dirname + " completed");
                 successItemCount++;
             } catch (Exception e) {
                 pr("Exception processing item " + dirname + ": " + e.toString());
->>>>>>> dspace-7.2.1
                 e.printStackTrace();
             }
         }

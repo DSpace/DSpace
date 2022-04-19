@@ -48,14 +48,6 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         //Isn't required, is just here for other DB implementation. Hibernate auto keeps track of changes.
     }
 
-<<<<<<< HEAD
-    /**
-     * The Session used to manipulate entities of this type.
-     * @param context current DSpace context.
-     * @return the current Session.
-     * @throws SQLException
-     */
-=======
    /**
     * The Session used to manipulate entities of this type.
     *
@@ -63,7 +55,6 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     * @return the current Session.
     * @throws SQLException
     */
->>>>>>> dspace-7.2.1
     protected Session getHibernateSession(Context context) throws SQLException {
         return ((Session) context.getDBConnection().getSession());
     }
@@ -135,51 +126,6 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     }
 
     /**
-<<<<<<< HEAD
-     * Create criteria matching an entity type or a supertype thereof.
-     * Use when building a criteria query.
-     * @param context current DSpace context.
-     * @param persistentClass specifies the type to be matched by the criteria.
-     * @return criteria concerning the type to be found.
-     * @throws SQLException passed through.
-     */
-    public Criteria createCriteria(Context context, Class<T> persistentClass) throws SQLException {
-        return getHibernateSession(context).createCriteria(persistentClass);
-    }
-
-    /**
-     * Create criteria matching an entity type or a supertype thereof.
-     * Use when building a criteria query.
-     * @param context current DSpace context.
-     * @param persistentClass specifies the type to be matched by the criteria.
-     * @param alias alias for the type.
-     * @return criteria concerning the type to be found.
-     * @throws SQLException passed through.
-     */
-    public Criteria createCriteria(Context context, Class<T> persistentClass, String alias) throws SQLException {
-        return getHibernateSession(context).createCriteria(persistentClass, alias);
-    }
-
-    /**
-     * Create a parsed query from a query expression.
-     * @param context current DSpace context.
-     * @param query textual form of the query.
-     * @return parsed form of the query.
-     * @throws SQLException
-     */
-    public Query createQuery(Context context, String query) throws SQLException {
-        return getHibernateSession(context).createQuery(query);
-    }
-
-    /**
-     * Get the entities matched by the given Criteria.
-     * Use this if you need all results together.
-     * @param criteria description of desired entities.
-     * @return the entities matched.
-     */
-    public List<T> list(Criteria criteria)
-    {
-=======
      * Create a parsed query from a query expression.
      *
      * @param context current DSpace context.
@@ -253,22 +199,12 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * @return The list of results for the given query
      */
     public List<T> list(Query query) {
->>>>>>> dspace-7.2.1
         @SuppressWarnings("unchecked")
         List<T> result = (List<T>) query.getResultList();
         return result;
     }
 
     /**
-<<<<<<< HEAD
-     * Get the entities matching a given parsed query.
-     * Use this if you need all results together.
-     * @param query the query to be executed.
-     * @return entities matching the query.
-     */
-    public List<T> list(Query query)
-    {
-=======
      * This method will return a list of results for the given Query and parameters
      * 
      * @param query     The query for which the resulting list will be returned
@@ -279,20 +215,12 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     public List<T> list(Query query, int limit, int offset) {
         query.setFirstResult(offset);
         query.setMaxResults(limit);
->>>>>>> dspace-7.2.1
         @SuppressWarnings("unchecked")
         List<T> result = (List<T>) query.getResultList();
         return result;
     }
 
     /**
-<<<<<<< HEAD
-     * Retrieve a unique result selected by criteria.  If multiple results CAN be
-     * retrieved an exception will be thrown,
-     * so only use when the criteria state uniqueness in the database.
-     * @param criteria description of the desired entity.
-     * @return a DAO specified by the criteria
-=======
      * Retrieve a unique result from the query.  If multiple results CAN be
      * retrieved an exception will be thrown, so only use when the criteria
      * state uniqueness in the database.
@@ -304,7 +232,6 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      *          or {@code null} if none match.
      * @throws java.sql.SQLException passed through.
      * @throws IllegalArgumentException if multiple objects match.
->>>>>>> dspace-7.2.1
      */
     public T uniqueResult(Context context, CriteriaQuery criteriaQuery,
             boolean cacheable, Class<T> clazz) throws SQLException {
@@ -321,50 +248,13 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     }
 
     /**
-     * Retrieve a unique result selected by a query.  If multiple results CAN be
-     * retrieved then an exception will be thrown, so only use when the query
-     * states uniqueness in the database.
-     * @param query description of the desired entity.
-     * @return the found entity.
-     */
-    public T uniqueResult(Query query)
-    {
-        @SuppressWarnings("unchecked")
-        T result = (T) query.uniqueResult();
-        return result;
-    }
-
-    /**
-     * Retrieve a single result selected by criteria.  Best used if you expect a
+     * Retrieve a single result from the query.  Best used if you expect a
      * single result, but this isn't enforced on the database.
-<<<<<<< HEAD
-     * @param criteria description of the desired entities.
-=======
      * @param context current DSpace session
      * @param criteriaQuery JPA criteria
->>>>>>> dspace-7.2.1
      * @return a DAO specified by the criteria
      * @throws java.sql.SQLException passed through.
      */
-<<<<<<< HEAD
-    public T singleResult(Criteria criteria)
-    {
-        criteria.setMaxResults(1);
-        List<T> list = list(criteria);
-        if(CollectionUtils.isNotEmpty(list))
-        {
-            return list.get(0);
-        }else{
-            return null;
-        }
-    }
-
-    /**
-     * Retrieve a single result matching a query.  Best used if you expect a
-     * single result, but this isn't enforced on the database.
-     * @param query description of desired entities.
-     * @return matched entities.
-=======
     public T singleResult(Context context, CriteriaQuery criteriaQuery) throws SQLException {
         Query query = this.getHibernateSession(context).createQuery(criteriaQuery);
         return singleResult(query);
@@ -377,7 +267,6 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * @param query
      *         The query that is to be executed
      * @return One result from the given query or null if none was found
->>>>>>> dspace-7.2.1
      */
     public T singleResult(final Query query) {
         query.setMaxResults(1);
@@ -391,15 +280,6 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     }
 
     /**
-<<<<<<< HEAD
-     * Get an iterator over a stream of query results.
-     * Use this when consuming results one at a time.
-     * @param query description of desired entities.
-     * @return iterator over the results of the query.
-     */
-    public Iterator<T> iterate(Query query)
-    {
-=======
      * This method will return a singular result for the given query
      *
      * @param query
@@ -420,7 +300,6 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * @return The Iterator for the results of this query
      */
     public Iterator<T> iterate(Query query) {
->>>>>>> dspace-7.2.1
         @SuppressWarnings("unchecked")
         org.hibernate.query.Query hquery = query.unwrap(org.hibernate.query.Query.class);
         Stream<T> stream = hquery.stream();
@@ -457,36 +336,6 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     }
 
     /**
-<<<<<<< HEAD
-     * How many rows match these criteria?
-     * The same value as {@link countLong(Criteria)}, coerced to {@code int}.
-     * @param criteria description of the rows.
-     * @return count of matching rows.
-     */
-    public int count(Criteria criteria)
-    {
-        return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
-    }
-
-    /**
-     * How many rows match this query?
-     * @param query description of the rows.
-     * @return count of matching rows.
-     */
-    public int count(Query query)
-    {
-        return ((Long) query.uniqueResult()).intValue();
-    }
-
-    /**
-     * How many rows match these criteria?
-     * @param criteria description of the rows.
-     * @return count of matching rows.
-     */
-    public long countLong(Criteria criteria)
-    {
-        return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
-=======
      * This method will return the count of items for this query as an integer
      * This query needs to already be in a formate that'll return one record that contains the amount
      *
@@ -532,7 +381,6 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     public CriteriaQuery<T> getCriteriaQuery(CriteriaBuilder criteriaBuilder, Class<T> clazz) {
         CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(clazz);
         return criteriaQuery;
->>>>>>> dspace-7.2.1
     }
 
     /**

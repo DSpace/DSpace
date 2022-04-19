@@ -39,20 +39,6 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
 
     public List<ResourcePolicy> findByDSoAndAction(Context context, DSpaceObject dso, int actionId) throws SQLException;
 
-<<<<<<< HEAD
-    public List<ResourcePolicy> findByTypeGroupAction(Context context, DSpaceObject dso, Group group, int action) throws SQLException;
-    
-    /**
-     * Look for ResourcePolicies by DSpaceObject, Group, and action, ignoring IDs with a specific PolicyID.
-     * This method can be used to detect duplicate ResourcePolicies.
-     * @param notPolicyID ResourcePolicies with this ID will be ignored while looking out for equal ResourcePolicies.
-     * @return List of resource policies for the same DSpaceObject, group and action but other policyID.
-     * @throws SQLException 
-     */
-    public List<ResourcePolicy> findByTypeGroupActionExceptId(Context context, DSpaceObject dso, Group group, int action, int notPolicyID) throws SQLException;
-    
-    public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, List<Group> groups, int action, int type_id) throws SQLException;
-=======
     public List<ResourcePolicy> findByTypeGroupAction(Context context, DSpaceObject dso, Group group, int action)
         throws SQLException;
 
@@ -69,7 +55,6 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
 
     public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, List<Group> groups,
                                                                int action, int type_id) throws SQLException;
->>>>>>> dspace-7.2.1
 
     public void deleteByDso(Context context, DSpaceObject dso) throws SQLException;
 

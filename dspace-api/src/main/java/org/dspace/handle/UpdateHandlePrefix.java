@@ -7,9 +7,6 @@
  */
 package org.dspace.handle;
 
-<<<<<<< HEAD
-import org.apache.log4j.Logger;
-=======
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
@@ -17,7 +14,6 @@ import java.util.Iterator;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.launcher.ScriptLauncher;
->>>>>>> dspace-7.2.1
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataValueService;
@@ -26,14 +22,6 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-<<<<<<< HEAD
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.sql.SQLException;
-import java.util.Iterator;
-=======
->>>>>>> dspace-7.2.1
 
 /**
  * A script to update the handle values in the database. This is typically used
@@ -49,15 +37,10 @@ public class UpdateHandlePrefix {
     private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
                                                                                           .getConfigurationService();
 
-<<<<<<< HEAD
-    private static final Logger log = Logger.getLogger(UpdateHandlePrefix.class);
-    private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-=======
     /**
      * Default constructor
      */
     private UpdateHandlePrefix() { }
->>>>>>> dspace-7.2.1
 
     /**
      * When invoked as a command-line tool, updates handle prefix
@@ -112,17 +95,6 @@ public class UpdateHandlePrefix {
                         );
 
                         System.out.print("Updating metadatavalues table... ");
-<<<<<<< HEAD
-                        MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
-
-                        String handlePrefix = handleService.getCanonicalPrefix();
-                        Iterator<MetadataValue> metadataValues = metadataValueService.findByValueLike(context, handlePrefix + oldH);
-
-                        int updMeta = 0;
-                        while(metadataValues.hasNext()) {
-                            MetadataValue metadataValue = metadataValues.next();
-                            metadataValue.setValue(metadataValue.getValue().replace(handlePrefix + oldH, handlePrefix + newH));
-=======
                         MetadataValueService metadataValueService = ContentServiceFactory.getInstance()
                                                                                          .getMetadataValueService();
 
@@ -135,7 +107,6 @@ public class UpdateHandlePrefix {
                             MetadataValue metadataValue = metadataValues.next();
                             metadataValue
                                 .setValue(metadataValue.getValue().replace(handlePrefix + oldH, handlePrefix + newH));
->>>>>>> dspace-7.2.1
                             metadataValueService.update(context, metadataValue, true);
                             context.uncacheEntity(metadataValue);
                             updMeta++;

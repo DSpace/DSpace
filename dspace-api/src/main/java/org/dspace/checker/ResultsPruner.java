@@ -122,11 +122,7 @@ public final class ResultsPruner {
                 duration = Utils.parseDuration(props.getProperty(name));
             } catch (ParseException e) {
                 throw new IllegalStateException("Problem parsing duration: "
-<<<<<<< HEAD
-                        + e.getMessage(), e);
-=======
                                                     + e.getMessage(), e);
->>>>>>> dspace-7.2.1
             }
             if ("default".equals(resultCode)) {
                 rp.setDefaultDuration(duration);

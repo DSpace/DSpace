@@ -208,16 +208,6 @@ public class StatisticsDataSearches extends StatisticsData {
      */
     protected String getQuery() {
         String query;
-<<<<<<< HEAD
-        if(currentDso != null){
-            query = "scopeType: " + currentDso.getType() + " AND ";
-            if(currentDso instanceof DSpaceObjectLegacySupport){
-                query += " (scopeId:" + currentDso.getID() + " OR scopeId:" + ((DSpaceObjectLegacySupport) currentDso).getLegacyId() + ")";
-            }else{
-                query += "scopeId:" + currentDso.getID();
-            }
-        }else{
-=======
         if (currentDso != null) {
             query = "scopeType: " + currentDso.getType() + " AND ";
             if (currentDso instanceof DSpaceObjectLegacySupport) {
@@ -227,7 +217,6 @@ public class StatisticsDataSearches extends StatisticsData {
                 query += "scopeId:" + currentDso.getID();
             }
         } else {
->>>>>>> dspace-7.2.1
             query = "*:*";
         }
         return query;

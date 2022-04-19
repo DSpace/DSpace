@@ -21,7 +21,6 @@ import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
@@ -134,34 +133,20 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
      * Get a copy of the bitstream list of this bundle
      * Note that this is a copy and if you wish to manipulate the bistream list, you should use
      * {@ref Bundle.addBitstream}, {@ref Bundle.removeBitstream} or {@ref Bundle.clearBitstreams}
-<<<<<<< HEAD
-     * 
-     * @return the bitstreams
-     */
-    public List<Bitstream> getBitstreams() {
-        List<Bitstream> bitstreamList = new LinkedList<>(this.bitstreams);
-=======
      *
      * @return the bitstreams
      */
     public List<Bitstream> getBitstreams() {
         List<Bitstream> bitstreamList = new ArrayList<>(this.bitstreams);
->>>>>>> dspace-7.2.1
         return bitstreamList;
     }
 
     /**
      * Add a new bitstream to this bundle.
-<<<<<<< HEAD
-     * @param bitstream
-     */
-    void addBitstream(Bitstream bitstream){
-=======
      *
      * @param bitstream
      */
     void addBitstream(Bitstream bitstream) {
->>>>>>> dspace-7.2.1
         bitstreams.add(bitstream);
     }
 
@@ -174,10 +159,7 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     /**
      * Remove the given bitstream from this bundles bitstream list
-<<<<<<< HEAD
-=======
      *
->>>>>>> dspace-7.2.1
      * @param bitstream The bitstream to remove
      */
     public void removeBitstream(Bitstream bitstream) {

@@ -7,13 +7,6 @@
  */
 package org.dspace.core;
 
-<<<<<<< HEAD
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.*;
-import org.dspace.handle.Handle;
-import org.dspace.storage.rdbms.DatabaseConfigVO;
-import org.hibernate.*;
-=======
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -33,23 +26,11 @@ import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
->>>>>>> dspace-7.2.1
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.proxy.HibernateProxyHelper;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-<<<<<<< HEAD
-import org.springframework.orm.hibernate4.SessionFactoryUtils;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-
-/**
- * Hibernate implementation of the DBConnection.
-=======
 import org.springframework.orm.hibernate5.SessionFactoryUtils;
 
 /**
@@ -71,7 +52,6 @@ import org.springframework.orm.hibernate5.SessionFactoryUtils;
  * DSpace generally follows the "Session-per-request" transactional pattern described here:
  * https://docs.jboss.org/hibernate/orm/5.0/userguide/en-US/html/ch06.html#session-per-request
  *
->>>>>>> dspace-7.2.1
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -254,17 +234,10 @@ public class HibernateDBConnection implements DBConnection<Session> {
     }
 
     private void configureDatabaseMode() throws SQLException {
-<<<<<<< HEAD
-        if(batchModeEnabled) {
-            getSession().setFlushMode(FlushMode.ALWAYS);
-        } else if(readOnlyEnabled) {
-            getSession().setFlushMode(FlushMode.MANUAL);
-=======
         if (batchModeEnabled) {
             getSession().setHibernateFlushMode(FlushMode.ALWAYS);
         } else if (readOnlyEnabled) {
             getSession().setHibernateFlushMode(FlushMode.MANUAL);
->>>>>>> dspace-7.2.1
         } else {
             getSession().setHibernateFlushMode(FlushMode.AUTO);
         }
@@ -282,32 +255,20 @@ public class HibernateDBConnection implements DBConnection<Session> {
      */
     @Override
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException {
-<<<<<<< HEAD
-        if(entity != null) {
-=======
         if (entity != null) {
->>>>>>> dspace-7.2.1
             if (entity instanceof DSpaceObject) {
                 DSpaceObject dso = (DSpaceObject) entity;
 
                 // The metadatavalue relation has CascadeType.ALL, so they are evicted automatically
                 // and we don' need to uncache the values explicitly.
 
-<<<<<<< HEAD
-                if(Hibernate.isInitialized(dso.getHandles())) {
-=======
                 if (Hibernate.isInitialized(dso.getHandles())) {
->>>>>>> dspace-7.2.1
                     for (Handle handle : Utils.emptyIfNull(dso.getHandles())) {
                         uncacheEntity(handle);
                     }
                 }
 
-<<<<<<< HEAD
-                if(Hibernate.isInitialized(dso.getResourcePolicies())) {
-=======
                 if (Hibernate.isInitialized(dso.getResourcePolicies())) {
->>>>>>> dspace-7.2.1
                     for (ResourcePolicy policy : Utils.emptyIfNull(dso.getResourcePolicies())) {
                         uncacheEntity(policy);
                     }
@@ -321,93 +282,52 @@ public class HibernateDBConnection implements DBConnection<Session> {
                 //DO NOT uncache the submitter. This could be the current eperson. Uncaching could lead to
                 //LazyInitializationExceptions (see DS-3648)
 
-<<<<<<< HEAD
-                if(Hibernate.isInitialized(item.getBundles())) {
-=======
                 if (Hibernate.isInitialized(item.getBundles())) {
->>>>>>> dspace-7.2.1
                     for (Bundle bundle : Utils.emptyIfNull(item.getBundles())) {
                         uncacheEntity(bundle);
                     }
                 }
-<<<<<<< HEAD
-            // BUNDLE
-            } else if (entity instanceof Bundle) {
-                Bundle bundle = (Bundle) entity;
-
-                if(Hibernate.isInitialized(bundle.getBitstreams())) {
-=======
                 // BUNDLE
             } else if (entity instanceof Bundle) {
                 Bundle bundle = (Bundle) entity;
 
                 if (Hibernate.isInitialized(bundle.getBitstreams())) {
->>>>>>> dspace-7.2.1
                     for (Bitstream bitstream : Utils.emptyIfNull(bundle.getBitstreams())) {
                         uncacheEntity(bitstream);
                     }
                 }
-<<<<<<< HEAD
-            // BITSTREAM
-            // No specific child entities to decache
-
-            // COMMUNITY
-=======
                 // BITSTREAM
                 // No specific child entities to decache
 
                 // COMMUNITY
->>>>>>> dspace-7.2.1
             } else if (entity instanceof Community) {
                 Community community = (Community) entity;
 
                 // We don't uncache groups as they might still be referenced from the Context object
 
-<<<<<<< HEAD
-                if(Hibernate.isInitialized(community.getLogo())) {
-                    uncacheEntity(community.getLogo());
-                }
-
-            // COLLECTION
-=======
                 if (Hibernate.isInitialized(community.getLogo())) {
                     uncacheEntity(community.getLogo());
                 }
 
                 // COLLECTION
->>>>>>> dspace-7.2.1
             } else if (entity instanceof Collection) {
                 Collection collection = (Collection) entity;
 
                 //We don't uncache groups as they might still be referenced from the Context object
 
-<<<<<<< HEAD
-                if(Hibernate.isInitialized(collection.getLogo())) {
-                    uncacheEntity(collection.getLogo());
-                }
-                if(Hibernate.isInitialized(collection.getTemplateItem())) {
-=======
                 if (Hibernate.isInitialized(collection.getLogo())) {
                     uncacheEntity(collection.getLogo());
                 }
                 if (Hibernate.isInitialized(collection.getTemplateItem())) {
->>>>>>> dspace-7.2.1
                     uncacheEntity(collection.getTemplateItem());
                 }
             }
 
             // Unless this object exists in the session, we won't do anything
-<<<<<<< HEAD
-            if(getSession().contains(entity)) {
-
-                // If our Session has unsaved changes (dirty) and not READ-ONLY
-                if(!readOnlyEnabled && getSession().isDirty()) {
-=======
             if (getSession().contains(entity)) {
 
                 // If our Session has unsaved changes (dirty) and not READ-ONLY
                 if (!readOnlyEnabled && getSession().isDirty()) {
->>>>>>> dspace-7.2.1
                     // write changes to database (don't worry if transaction fails, flushed changes will be rolled back)
                     getSession().flush();
                 }

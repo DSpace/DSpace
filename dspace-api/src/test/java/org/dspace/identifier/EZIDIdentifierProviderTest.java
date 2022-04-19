@@ -118,14 +118,8 @@ public class EZIDIdentifierProviderTest
      * @throws IOException        if IO error
      */
     private Item newItem()
-<<<<<<< HEAD
-            throws SQLException, AuthorizeException, IOException, WorkflowException
-    {
-         //Install a fresh item
-=======
         throws SQLException, AuthorizeException, IOException, WorkflowException {
         //Install a fresh item
->>>>>>> dspace-7.2.1
         context.turnOffAuthorisationSystem();
 
         WorkspaceItem wsItem = workspaceItemService.create(context, collection, false);
@@ -436,16 +430,9 @@ public class EZIDIdentifierProviderTest
      */
     @Test
     public void testCrosswalkMetadata()
-<<<<<<< HEAD
-            throws Exception
-    {
-        try {
-        System.out.println("crosswalkMetadata");
-=======
         throws Exception {
         try {
             System.out.println("crosswalkMetadata");
->>>>>>> dspace-7.2.1
 
             // Set up the instance to be tested
             EZIDIdentifierProvider instance = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
@@ -454,30 +441,6 @@ public class EZIDIdentifierProviderTest
 //        instance.setCrosswalk(aCrosswalk);
 //        instance.setCrosswalkTransform(crosswalkTransforms);
 
-<<<<<<< HEAD
-        // Let's have a fresh Item to work with
-        DSpaceObject dso = newItem();
-        String handle = dso.getHandle();
-
-        // Test!
-        Map<String, String> metadata = instance.crosswalkMetadata(context, dso);
-
-        // Evaluate
-        String target = (String) metadata.get("_target");
-        assertEquals("Generates correct _target metadatum",
-                config.getProperty("dspace.url") + "/handle/" + handle,
-                target);
-        assertTrue("Has title", metadata.containsKey("datacite.title"));
-        assertTrue("Has publication year", metadata.containsKey("datacite.publicationyear"));
-        assertTrue("Has publisher", metadata.containsKey("datacite.publisher"));
-        assertTrue("Has creator", metadata.containsKey("datacite.creator"));
-
-        // Dump out the generated metadata for inspection
-        System.out.println("Results:");
-        for (Entry metadatum : metadata.entrySet())
-        {
-            System.out.printf("  %s : %s\n", metadatum.getKey(), metadatum.getValue());
-=======
             // Let's have a fresh Item to work with
             DSpaceObject dso = newItem();
             String handle = dso.getHandle();
@@ -506,15 +469,6 @@ public class EZIDIdentifierProviderTest
             ex.printStackTrace(pw);
             System.out.println(sw.toString());
             org.apache.logging.log4j.LogManager.getLogger(EZIDIdentifierProviderTest.class).fatal("Caught NPE", ex);
-            throw ex;
->>>>>>> dspace-7.2.1
-        }
-        } catch (NullPointerException ex) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            ex.printStackTrace(pw);
-            System.out.println(sw.toString());
-            org.apache.log4j.Logger.getLogger(EZIDIdentifierProviderTest.class).fatal("Caught NPE", ex);
             throw ex;
         }
     }

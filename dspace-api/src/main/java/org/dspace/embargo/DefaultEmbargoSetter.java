@@ -166,29 +166,6 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
                 // can have READ long as the bitstreams in them do not.
                 if (!(bnn.equals("TEXT") || bnn.equals("THUMBNAIL"))) {
                     // check for ANY read policies and report them:
-<<<<<<< HEAD
-                    for (ResourcePolicy rp : getAuthorizeService().getPoliciesActionFilter(context, bn, Constants.READ))
-                    {
-                    	if (rp.getStartDate() == null)
-                    	{
-                            System.out.println("CHECK WARNING: Item "+item.getHandle()+", Bundle "+bn.getName()+" allows READ by "+
-                              ((rp.getEPerson() == null) ? "Group "+rp.getGroup().getName() :
-                                                           "EPerson "+rp.getEPerson().getFullName()));
-                    	}
-                    }
-                }
-
-                for (Bitstream bs : bn.getBitstreams())
-                {
-                    for (ResourcePolicy rp : getAuthorizeService().getPoliciesActionFilter(context, bs, Constants.READ))
-                    {
-                    	if (rp.getStartDate() == null)
-                    	{
-                            System.out.println("CHECK WARNING: Item "+item.getHandle()+", Bitstream "+bs.getName()+" (in Bundle "+bn.getName()+") allows READ by "+
-                              ((rp.getEPerson() == null) ? "Group "+rp.getGroup().getName() :
-                                                           "EPerson "+rp.getEPerson().getFullName()));
-                    	}
-=======
                     for (ResourcePolicy rp : getAuthorizeService()
                         .getPoliciesActionFilter(context, bn, Constants.READ)) {
                         if (rp.getStartDate() == null) {
@@ -209,7 +186,6 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
                                     ((rp.getEPerson() != null) ? "Group " + rp.getGroup().getName() :
                                             "EPerson " + rp.getEPerson().getFullName()));
                         }
->>>>>>> dspace-7.2.1
                     }
                 }
             }

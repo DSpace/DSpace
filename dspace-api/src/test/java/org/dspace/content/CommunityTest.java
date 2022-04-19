@@ -8,11 +8,6 @@
 
 package org.dspace.content;
 
-<<<<<<< HEAD
-import mockit.NonStrictExpectations;
-import org.apache.log4j.Logger;
-import org.dspace.app.util.AuthorizeUtil;
-=======
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -37,7 +32,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
->>>>>>> dspace-7.2.1
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -46,27 +40,12 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-<<<<<<< HEAD
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-=======
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
->>>>>>> dspace-7.2.1
 
 /**
  * Unit Tests for class Community
@@ -526,13 +505,6 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
 
         context.turnOffAuthorisationSystem();
         Collection collection = collectionService.create(context, c);
-<<<<<<< HEAD
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "collection B");
-        collection = collectionService.create(context, c);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "collection C");
-        collection = collectionService.create(context, c);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "collection A");
-=======
         collectionService
             .setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
                                     "title", null, Item.ANY, "collection B");
@@ -544,20 +516,13 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         collectionService
             .setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
                                     "title", null, Item.ANY, "collection A");
->>>>>>> dspace-7.2.1
         //we need to commit the changes so we don't block the table for testing
         context.restoreAuthSystemState();
 
         //sorted
-<<<<<<< HEAD
-        assertTrue("testGetCollections 2",c.getCollections().get(0).getName().equals("collection A"));
-        assertTrue("testGetCollections 3",c.getCollections().get(1).getName().equals("collection B"));
-        assertTrue("testGetCollections 4",c.getCollections().get(2).getName().equals("collection C"));
-=======
         assertTrue("testGetCollections 2", c.getCollections().get(0).getName().equals("collection A"));
         assertTrue("testGetCollections 3", c.getCollections().get(1).getName().equals("collection B"));
         assertTrue("testGetCollections 4", c.getCollections().get(2).getName().equals("collection C"));
->>>>>>> dspace-7.2.1
     }
 
     /**
@@ -571,13 +536,6 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
 
         context.turnOffAuthorisationSystem();
         Community community = communityService.create(c, context);
-<<<<<<< HEAD
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "subcommunity B");
-        community = communityService.create(c, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "subcommunity A");
-        community = communityService.create(c, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "subcommunity C");
-=======
         communityService
             .setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
                                     "title", null, Item.ANY, "subcommunity B");
@@ -589,20 +547,13 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         communityService
             .setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
                                     "title", null, Item.ANY, "subcommunity C");
->>>>>>> dspace-7.2.1
         //we need to commit the changes so we don't block the table for testing
         context.restoreAuthSystemState();
 
         //get Subcommunities sorted
-<<<<<<< HEAD
-        assertTrue("testGetCollections 2",c.getSubcommunities().get(0).getName().equals("subcommunity A"));
-        assertTrue("testGetCollections 3",c.getSubcommunities().get(1).getName().equals("subcommunity B"));
-        assertTrue("testGetCollections 4",c.getSubcommunities().get(2).getName().equals("subcommunity C"));
-=======
         assertTrue("testGetCollections 2", c.getSubcommunities().get(0).getName().equals("subcommunity A"));
         assertTrue("testGetCollections 3", c.getSubcommunities().get(1).getName().equals("subcommunity B"));
         assertTrue("testGetCollections 4", c.getSubcommunities().get(2).getName().equals("subcommunity C"));
->>>>>>> dspace-7.2.1
     }
 
     /**

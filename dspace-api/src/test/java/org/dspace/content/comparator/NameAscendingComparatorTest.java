@@ -7,24 +7,14 @@
  */
 package org.dspace.content.comparator;
 
-<<<<<<< HEAD
-=======
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
->>>>>>> dspace-7.2.1
 import org.dspace.content.DSpaceObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-<<<<<<< HEAD
-import org.mockito.runners.MockitoJUnitRunner;
-
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
-=======
 import org.mockito.junit.MockitoJUnitRunner;
->>>>>>> dspace-7.2.1
 
 @RunWith(MockitoJUnitRunner.class)
 public class NameAscendingComparatorTest {
@@ -64,20 +54,12 @@ public class NameAscendingComparatorTest {
 
     @Test
     public void testCompareFirstNull() throws Exception {
-<<<<<<< HEAD
-        when(dso2.getName()).thenReturn("b");
-=======
->>>>>>> dspace-7.2.1
 
         assertTrue(comparator.compare(null, dso2) < 0);
     }
 
     @Test
     public void testCompareSecondNull() throws Exception {
-<<<<<<< HEAD
-        when(dso1.getName()).thenReturn("a");
-=======
->>>>>>> dspace-7.2.1
 
         assertTrue(comparator.compare(dso1, null) > 0);
     }
@@ -110,8 +92,4 @@ public class NameAscendingComparatorTest {
 
         assertTrue(comparator.compare(dso1, dso2) < 0);
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> dspace-7.2.1

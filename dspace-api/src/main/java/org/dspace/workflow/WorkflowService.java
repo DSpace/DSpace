@@ -29,13 +29,8 @@ import org.dspace.xmlworkflow.WorkflowConfigurationException;
  * @author kevinvandevelde at atmire.com
  */
 public interface WorkflowService<T extends WorkflowItem> {
-<<<<<<< HEAD
-    
-    
-=======
 
 
->>>>>>> dspace-7.2.1
     /**
      * Move an Item from a submitter's workspace into a collection's workflow
      * - in a single transaction do away with
@@ -68,12 +63,8 @@ public interface WorkflowService<T extends WorkflowItem> {
      * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws WorkflowException  if workflow error
      */
-<<<<<<< HEAD
-    public T startWithoutNotify(Context c, WorkspaceItem wsi) throws SQLException, AuthorizeException, IOException, WorkflowException;
-=======
     public T startWithoutNotify(Context c, WorkspaceItem wsi)
         throws SQLException, AuthorizeException, IOException, WorkflowException;
->>>>>>> dspace-7.2.1
 
     /**
      * abort() aborts a workflow, completely deleting it (administrator do this)

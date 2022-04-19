@@ -1,15 +1,4 @@
-<<<<<<< HEAD
-# Email sent to DRUM users when they successfully export an item or collection.
-#
-# Parameters: {0} the export error
-#             {1} the URL to the feedback page
-#             
-#
-# See org.dspace.core.Email for information on the format of this file.
-#
-Subject: DRUM - The item export you requested was not completed.
-=======
-## Email sent to DSpace users when they successfully export an item or collection.
+## Email sent to DRUM users when they successfully export an item or collection.
 ##
 ## Parameters: {0} the export error
 ##             {1} the URL to the feedback page
@@ -17,8 +6,7 @@ Subject: DRUM - The item export you requested was not completed.
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
-#set($subject = 'DSpace - The item export you requested was not completed.')
->>>>>>> dspace-7.2.1
+#set($subject = 'DRUM - The item export you requested was not completed.')
 The item export you requested was not completed, due to the following reason:
  ${params[0]}
 

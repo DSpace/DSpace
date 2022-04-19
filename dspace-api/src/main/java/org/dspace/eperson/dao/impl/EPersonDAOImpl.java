@@ -44,16 +44,6 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     }
 
     @Override
-<<<<<<< HEAD
-    public EPerson findByEmail(Context context, String email) throws SQLException
-    {
-        // All email addresses are stored as lowercase, so ensure that the email address is lowercased for the lookup
-        Criteria criteria = createCriteria(context, EPerson.class);
-        criteria.add(Restrictions.eq("email", email.toLowerCase()));
-
-        criteria.setCacheable(true);
-        return uniqueResult(criteria);
-=======
     public EPerson findByEmail(Context context, String email) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, EPerson.class);
@@ -61,20 +51,10 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         criteriaQuery.select(ePersonRoot);
         criteriaQuery.where(criteriaBuilder.equal(ePersonRoot.get(EPerson_.email), email.toLowerCase()));
         return uniqueResult(context, criteriaQuery, true, EPerson.class);
->>>>>>> dspace-7.2.1
     }
 
 
     @Override
-<<<<<<< HEAD
-    public EPerson findByNetid(Context context, String netid) throws SQLException
-    {
-        Criteria criteria = createCriteria(context, EPerson.class);
-        criteria.add(Restrictions.eq("netid", netid));
-
-        criteria.setCacheable(true);
-        return uniqueResult(criteria);
-=======
     public EPerson findByNetid(Context context, String netid) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, EPerson.class);
@@ -82,7 +62,6 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         criteriaQuery.select(ePersonRoot);
         criteriaQuery.where((criteriaBuilder.equal(ePersonRoot.get(EPerson_.netid), netid)));
         return uniqueResult(context, criteriaQuery, true, EPerson.class);
->>>>>>> dspace-7.2.1
     }
 
     @Override

@@ -31,16 +31,10 @@ public class SiteDAOImpl extends AbstractHibernateDAO<Site> implements SiteDAO {
 
     @Override
     public Site findSite(Context context) throws SQLException {
-<<<<<<< HEAD
-        Criteria criteria = createCriteria(context, Site.class);
-        criteria.setCacheable(true);
-        return uniqueResult(criteria);
-=======
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Site.class);
         Root<Site> siteRoot = criteriaQuery.from(Site.class);
         criteriaQuery.select(siteRoot);
         return uniqueResult(context, criteriaQuery, true, Site.class);
->>>>>>> dspace-7.2.1
     }
 }

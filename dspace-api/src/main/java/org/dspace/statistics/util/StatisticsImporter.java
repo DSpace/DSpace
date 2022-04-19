@@ -15,15 +15,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
-<<<<<<< HEAD
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-=======
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
->>>>>>> dspace-7.2.1
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,18 +29,6 @@ import java.util.Random;
 import java.util.UUID;
 
 import com.maxmind.geoip2.DatabaseReader;
-<<<<<<< HEAD
-import com.maxmind.geoip2.model.CityResponse;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.log4j.Logger;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-=======
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
 import org.apache.commons.cli.CommandLine;
@@ -56,7 +39,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
->>>>>>> dspace-7.2.1
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrInputDocument;
@@ -105,15 +87,9 @@ public class StatisticsImporter {
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
-<<<<<<< HEAD
-     * GEOIP lookup service
-     */
-    private static DatabaseReader geoipLookup;
-=======
      * Solr server connection
      */
     private static HttpSolrClient solr;
->>>>>>> dspace-7.2.1
 
     /**
      * GEOIP lookup service
@@ -501,15 +477,9 @@ public class StatisticsImporter {
         if (verbose) {
             System.out.println("Writing to solr server at: " + sserver);
         }
-<<<<<<< HEAD
-		solr = new HttpSolrServer(sserver);
-
-        String dbPath = ConfigurationManager.getProperty("usage-statistics", "dbfile");
-=======
         solr = new HttpSolrClient.Builder(sserver).build();
 
         String dbPath = configurationService.getProperty("usage-statistics", "dbfile");
->>>>>>> dspace-7.2.1
         try {
             File dbFile = new File(dbPath);
             geoipLookup = new DatabaseReader.Builder(dbFile).build();

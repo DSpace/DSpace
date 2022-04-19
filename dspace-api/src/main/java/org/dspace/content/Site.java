@@ -16,18 +16,9 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-<<<<<<< HEAD
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import javax.persistence.Cacheable;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-=======
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
->>>>>>> dspace-7.2.1
 
 /**
  * Represents the root of the DSpace Archive.

@@ -172,14 +172,6 @@ public class FilteredCollectionsResource extends Resource {
      */
     @GET
     @Path("/{collection_id}")
-<<<<<<< HEAD
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.FilteredCollection getCollection(@PathParam("collection_id") String collection_id, @QueryParam("expand") String expand, 
-    		@QueryParam("limit") @DefaultValue("1000") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
-    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
-    		@QueryParam("filters") @DefaultValue("is_item") String filters,
-    		@Context HttpHeaders headers, @Context HttpServletRequest request, @Context ServletContext servletContext) {
-=======
     @Produces( {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public org.dspace.rest.common.FilteredCollection getCollection(@PathParam("collection_id") String collection_id,
                                                                    @QueryParam("expand") String expand,
@@ -195,24 +187,17 @@ public class FilteredCollectionsResource extends Resource {
                                                                    @Context HttpHeaders headers,
                                                                    @Context HttpServletRequest request,
                                                                    @Context ServletContext servletContext) {
->>>>>>> dspace-7.2.1
         org.dspace.core.Context context = null;
         FilteredCollection retColl = new org.dspace.rest.common.FilteredCollection();
         try {
             context = createContext();
 
             org.dspace.content.Collection collection = collectionService.findByIdOrLegacyId(context, collection_id);
-<<<<<<< HEAD
-            if(authorizeService.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
-				writeStats(collection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
-                retColl = new org.dspace.rest.common.FilteredCollection(collection, servletContext, filters, expand, context, limit, offset);
-=======
             if (authorizeService.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
                 writeStats(collection, UsageEvent.Action.VIEW, user_ip,
                            user_agent, xforwardedfor, headers, request, context);
                 retColl = new org.dspace.rest.common.FilteredCollection(
                     collection, servletContext, filters, expand, context, limit, offset);
->>>>>>> dspace-7.2.1
             } else {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }

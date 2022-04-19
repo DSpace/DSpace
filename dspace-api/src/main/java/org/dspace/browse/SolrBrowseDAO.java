@@ -7,10 +7,6 @@
  */
 package org.dspace.browse;
 
-<<<<<<< HEAD
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-=======
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,28 +17,22 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
->>>>>>> dspace-7.2.1
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.discovery.*;
+import org.dspace.discovery.DiscoverFacetField;
+import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
+import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.DiscoverResult.FacetResult;
 import org.dspace.discovery.DiscoverResult.SearchDocument;
-<<<<<<< HEAD
-=======
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
->>>>>>> dspace-7.2.1
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.factory.DSpaceServicesFactory;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * @author Andrea Bollini (CILEA)
@@ -104,13 +94,9 @@ public class SolrBrowseDAO implements BrowseDAO {
 
     private String startsWith = null;
 
-<<<<<<< HEAD
-    /** field to look for value in */
-=======
     /**
      * field to look for value in
      */
->>>>>>> dspace-7.2.1
     private String valueField = null;
 
     /**
@@ -190,13 +176,6 @@ public class SolrBrowseDAO implements BrowseDAO {
             DiscoverQuery query = new DiscoverQuery();
             addLocationScopeFilter(query);
             addStatusFilter(query);
-<<<<<<< HEAD
-            if (distinct)
-            {
-                DiscoverFacetField dff;
-                if (StringUtils.isNotBlank(startsWith)) {
-                    dff = new DiscoverFacetField(facetField,
-=======
             if (distinct) {
                 DiscoverFacetField dff;
                 if (StringUtils.isNotBlank(startsWith)) {
@@ -205,12 +184,7 @@ public class SolrBrowseDAO implements BrowseDAO {
                         DiscoveryConfigurationParameters.SORT.VALUE, startsWith);
                 } else {
                     dff = new DiscoverFacetField(facetField,
->>>>>>> dspace-7.2.1
                         DiscoveryConfigurationParameters.TYPE_TEXT, -1,
-                            DiscoveryConfigurationParameters.SORT.VALUE, startsWith);
-                } else {
-                    dff = new DiscoverFacetField(facetField,
-                            DiscoveryConfigurationParameters.TYPE_TEXT, -1,
                         DiscoveryConfigurationParameters.SORT.VALUE);
                 }
                 query.addFacetField(dff);
@@ -479,11 +453,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         return startsWith;
     }
 
-<<<<<<< HEAD
-    /*
-=======
      /*
->>>>>>> dspace-7.2.1
      * (non-Javadoc)
      *
      * @see org.dspace.browse.BrowseDAO#getLimit()

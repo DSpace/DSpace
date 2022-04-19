@@ -42,31 +42,10 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
 
     /**
      * Clone the given bitstream by firstly creating a new bitstream, with a new ID.
-<<<<<<< HEAD
-     * Then set the internal identifier, file size, checksum, and 
-     * checksum algorithm as same as the given bitstream. 
-     * This allows multiple bitstreams to share the same internal identifier of assets . 
-     * An example of such a use case scenario is versioning.
-     * 
-     * @param context
-     *            DSpace context object
-     * @param bitstream
-     *            Bitstream to be cloned
-     * @return the clone 
-     * @throws SQLException if database error
-     */
-    public Bitstream clone(Context context, Bitstream bitstream) throws SQLException; 
-   
-    /**
-     * Create a new bitstream, with a new ID. The checksum and file size are
-     * calculated. No authorization checks are made in this method.
-     * The newly created bitstream has the "unknown" format.
-=======
      * Then set the internal identifier, file size, checksum, and
      * checksum algorithm as same as the given bitstream.
      * This allows multiple bitstreams to share the same internal identifier of assets .
      * An example of such a use case scenario is versioning.
->>>>>>> dspace-7.2.1
      *
      * @param context
      *            DSpace context object
@@ -103,14 +82,9 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
-<<<<<<< HEAD
-    public Bitstream create(Context context, Bundle bundle, InputStream is) throws IOException, SQLException, AuthorizeException;
- 
-=======
     public Bitstream create(Context context, Bundle bundle, InputStream is)
         throws IOException, SQLException, AuthorizeException;
 
->>>>>>> dspace-7.2.1
     /**
      * Register a new bitstream, with a new ID.  The checksum and file size
      * are calculated. The newly created bitstream has the "unknown"

@@ -29,32 +29,12 @@ public class SpiderDetector {
     private static final Logger log = LoggerFactory.getLogger(SpiderDetector.class);
 
     //Service where all methods get delegated to, this is instantiated by a spring-bean defined in core-services.xml
-<<<<<<< HEAD
-    private static SpiderDetectorService spiderDetectorService = StatisticsServiceFactory.getInstance().getSpiderDetectorService();
-
-    /**
-     * Get an immutable Set representing all the Spider Addresses here
-     *
-     * @return a set of IP addresses as strings
-     */
-    public static Set<String> getSpiderIpAddresses() {
-
-        spiderDetectorService.loadSpiderIpAddresses();
-        return spiderDetectorService.getTable().toSet();
-    }
-=======
     private static SpiderDetectorService spiderDetectorService = StatisticsServiceFactory.getInstance()
                                                                                          .getSpiderDetectorService();
->>>>>>> dspace-7.2.1
 
     /**
      * Default constructor
      */
-<<<<<<< HEAD
-    public static Set<String> readPatterns(File patternFile)
-            throws IOException
-    {
-=======
     private SpiderDetector() { }
 
     /**
@@ -77,7 +57,6 @@ public class SpiderDetector {
      */
     public static Set<String> readPatterns(File patternFile)
         throws IOException {
->>>>>>> dspace-7.2.1
         return spiderDetectorService.readPatterns(patternFile);
     }
 
@@ -94,12 +73,7 @@ public class SpiderDetector {
      * @return true if the client matches any spider characteristics list.
      */
     public static boolean isSpider(String clientIP, String proxyIPs,
-<<<<<<< HEAD
-                                   String hostname, String agent)
-    {
-=======
                                    String hostname, String agent) {
->>>>>>> dspace-7.2.1
         return spiderDetectorService.isSpider(clientIP, proxyIPs, hostname, agent);
     }
 
@@ -109,12 +83,7 @@ public class SpiderDetector {
      * @param request
      * @return true|false if the request was detected to be from a spider.
      */
-<<<<<<< HEAD
-    public static boolean isSpider(HttpServletRequest request)
-    {
-=======
     public static boolean isSpider(HttpServletRequest request) {
->>>>>>> dspace-7.2.1
         return spiderDetectorService.isSpider(request);
     }
 

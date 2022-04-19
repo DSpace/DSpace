@@ -205,12 +205,8 @@ public class GroupTest extends AbstractUnitTest {
         List<String> names = new ArrayList<>();
         List<String> sortedNames = new ArrayList<>();
         for (Group group : groups) {
-<<<<<<< HEAD
-            // Ignore any unnamed groups. This is only necessary when running unit tests via a persistent database (e.g. Postgres) as unnamed groups may be created by other tests.
-=======
             // Ignore any unnamed groups. This is only necessary when running unit tests via a persistent database (e
             // .g. Postgres) as unnamed groups may be created by other tests.
->>>>>>> dspace-7.2.1
             if (group.getName() == null) {
                 continue;
             }
@@ -375,8 +371,6 @@ public class GroupTest extends AbstractUnitTest {
             assertTrue(groupService.isMember(context, ePerson, topGroup));
             assertTrue(groupService.isMember(context, ePerson, level1Group));
             assertTrue(groupService.isMember(context, ePerson, level2Group));
-<<<<<<< HEAD
-=======
         } finally {
             if (ePerson != null) {
                 context.turnOffAuthorisationSystem();
@@ -423,7 +417,6 @@ public class GroupTest extends AbstractUnitTest {
             assertFalse(groupService.isMember(context, level2Group));
             assertTrue(groupService.isMember(context, specialGroup));
 
->>>>>>> dspace-7.2.1
         } finally {
             if (ePerson != null) {
                 context.turnOffAuthorisationSystem();
@@ -491,107 +484,6 @@ public class GroupTest extends AbstractUnitTest {
 
             ePerson = createEPersonAndAddToGroup("isMemberContextGroupSpecialDbMembership@dspace.org", level2Group);
 
-            assertTrue(groupService.isMember(context, ePerson, topGroup.getName()));
-            assertTrue(groupService.isMember(context, ePerson, level1Group.getName()));
-            assertTrue(groupService.isMember(context, ePerson, level2Group.getName()));
-        } finally {
-            if(ePerson != null)
-            {
-                context.turnOffAuthorisationSystem();
-                ePersonService.delete(context, ePerson);
-            }
-        }
-    }
-
-    @Test
-    public void isMemberContextSpecialGroup() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
-        EPerson ePerson = null;
-        Group specialGroup = null;
-        try {
-            specialGroup = createGroup("specialGroup");
-            groupService.addMember(context, level1Group, specialGroup);
-            groupService.update(context, level1Group);
-
-            ePerson = createEPerson("isMemberContextGroupSpecial@dspace.org");
-
-            context.setCurrentUser(ePerson);
-            context.setSpecialGroup(specialGroup.getID());
-
-            assertTrue(groupService.isMember(context, topGroup));
-            assertTrue(groupService.isMember(context, level1Group));
-            assertFalse(groupService.isMember(context, level2Group));
-            assertTrue(groupService.isMember(context, specialGroup));
-
-        } finally {
-            if(ePerson != null)
-            {
-                context.turnOffAuthorisationSystem();
-                ePersonService.delete(context, ePerson);
-            }
-            if(specialGroup != null)
-            {
-                context.turnOffAuthorisationSystem();
-                groupService.delete(context, specialGroup);
-            }
-        }
-    }
-
-    @Test
-    public void isMemberContextSpecialGroupOtherUser() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
-        EPerson ePerson1 = null;
-        EPerson ePerson2 = null;
-        Group specialGroup = null;
-        try {
-            specialGroup = createGroup("specialGroup");
-            groupService.addMember(context, level2Group, specialGroup);
-            groupService.update(context, level2Group);
-
-            //The authenticated user has a special group
-            ePerson1 = createEPerson("isMemberContextGroupSpecial@dspace.org");
-            context.setCurrentUser(ePerson1);
-            context.setSpecialGroup(specialGroup.getID());
-
-            //Or second user is member of the level 1 group
-            ePerson2 = createEPersonAndAddToGroup("isMemberContextSpecialGroupOtherUser@dspace.org", level1Group);
-
-            assertTrue(groupService.isMember(context, ePerson2, topGroup));
-            assertTrue(groupService.isMember(context, ePerson2, level1Group));
-            assertFalse(groupService.isMember(context, ePerson2, level2Group));
-            assertFalse(groupService.isMember(context, ePerson2, specialGroup));
-
-            assertTrue(groupService.isMember(context, ePerson1, level2Group));
-            assertTrue(groupService.isMember(context, ePerson1, specialGroup));
-
-        } finally {
-            if(ePerson1 != null)
-            {
-                context.turnOffAuthorisationSystem();
-                ePersonService.delete(context, ePerson1);
-            }
-            if(ePerson2 != null)
-            {
-                context.turnOffAuthorisationSystem();
-                ePersonService.delete(context, ePerson2);
-            }
-            if(specialGroup != null)
-            {
-                context.turnOffAuthorisationSystem();
-                groupService.delete(context, specialGroup);
-            }
-        }
-    }
-
-    @Test
-    public void isMemberContextSpecialGroupDbMembership() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
-        EPerson ePerson = null;
-        Group specialGroup = null;
-        try {
-            specialGroup = createGroup("specialGroup");
-            groupService.addMember(context, level1Group, specialGroup);
-            groupService.update(context, level1Group);
-
-            ePerson = createEPersonAndAddToGroup("isMemberContextGroupSpecialDbMembership@dspace.org", level2Group);
-
             context.setCurrentUser(ePerson);
             context.setSpecialGroup(specialGroup.getID());
 
@@ -605,12 +497,7 @@ public class GroupTest extends AbstractUnitTest {
                 context.turnOffAuthorisationSystem();
                 ePersonService.delete(context, ePerson);
             }
-<<<<<<< HEAD
-            if(specialGroup != null)
-            {
-=======
             if (specialGroup != null) {
->>>>>>> dspace-7.2.1
                 context.turnOffAuthorisationSystem();
                 groupService.delete(context, specialGroup);
             }

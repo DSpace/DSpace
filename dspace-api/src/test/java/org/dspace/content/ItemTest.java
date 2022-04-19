@@ -7,14 +7,6 @@
  */
 package org.dspace.content;
 
-<<<<<<< HEAD
-import mockit.NonStrictExpectations;
-import org.apache.commons.lang.time.DateUtils;
-import org.apache.log4j.Logger;
-import org.dspace.app.util.AuthorizeUtil;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.ResourcePolicy;
-=======
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -47,7 +39,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
->>>>>>> dspace-7.2.1
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.MetadataFieldService;
@@ -59,32 +50,14 @@ import org.dspace.eperson.Group;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-<<<<<<< HEAD
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLException;
-import java.util.*;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-=======
 import org.springframework.test.util.ReflectionTestUtils;
->>>>>>> dspace-7.2.1
 
 /**
  * Unit Tests for class Item
  *
  * @author pvillega
  */
-<<<<<<< HEAD
-public class ItemTest extends AbstractDSpaceObjectTest
-{
-=======
 public class ItemTest extends AbstractDSpaceObjectTest {
->>>>>>> dspace-7.2.1
 
     /**
      * log4j category
@@ -164,26 +137,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @After
     @Override
-<<<<<<< HEAD
-    public void destroy()
-    {
-        context.turnOffAuthorisationSystem();
-        try {
-            itemService.delete(context, it);
-        } catch(Exception e){
-        }
-        
-        try {
-            collectionService.delete(context, collection);
-        } catch(Exception e){
-        }
-        
-        try {
-            communityService.delete(context, owningCommunity);
-        } catch(Exception e){
-        }
-        
-=======
     public void destroy() {
         context.turnOffAuthorisationSystem();
         try {
@@ -204,19 +157,14 @@ public class ItemTest extends AbstractDSpaceObjectTest {
             // ignore
         }
 
->>>>>>> dspace-7.2.1
         context.restoreAuthSystemState();
         it = null;
         collection = null;
         owningCommunity = null;
         try {
             super.destroy();
-<<<<<<< HEAD
-        } catch(Exception e){
-=======
         } catch (Exception e) {
             // ignore
->>>>>>> dspace-7.2.1
         }
     }
 
@@ -300,32 +248,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         it.setWithdrawn(true);
         it.setArchived(false);
         it.setDiscoverable(true);
-<<<<<<< HEAD
-
-        // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
-        Iterator<Item> all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,DateUtils.addDays(it.getLastModified(),1));
-        assertThat("Returned list should not be null", all, notNullValue());
-
-        boolean added = false;
-        while(all.hasNext()) {
-            Item tmp = all.next();
-            if(tmp.equals(it)) {
-                added = true;
-            }
-        }
-
-        // Test 1: we should NOT find our item in this list
-        assertFalse("List should not contain item when passing a date newer than item last-modified date", added);
-
-        // Test 2: Using a past 'modified since' date, we should get a non-null list containing our item
-        all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,DateUtils.addDays(it.getLastModified(),-1));
-        assertThat("Returned list should not be null", all, notNullValue());
-
-        added = false;
-        while(all.hasNext()) {
-            Item tmp = all.next();
-            if(tmp.equals(it)) {
-=======
          // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
         Iterator<Item> all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),1));
@@ -347,27 +269,11 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
->>>>>>> dspace-7.2.1
                 added = true;
             }
         }
         // Test 3: we should find our item in this list
         assertTrue("List should contain item when passing a date older than item last-modified date", added);
-<<<<<<< HEAD
-
-        // Repeat Tests 2, 3 with withdrawn = false and archived = true as this should result in same behaviour
-        it.setWithdrawn(false);
-        it.setArchived(true);
-
-        // Test 4: Using a past 'modified since' date, we should get a non-null list containing our item
-        all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,DateUtils.addDays(it.getLastModified(),-1));
-        assertThat("Returned list should not be null", all, notNullValue());
-
-        added = false;
-        while(all.hasNext()) {
-            Item tmp = all.next();
-            if(tmp.equals(it)) {
-=======
          // Repeat Tests 2, 3 with withdrawn = false and archived = true as this should result in same behaviour
         it.setWithdrawn(false);
         it.setArchived(true);
@@ -379,24 +285,11 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
->>>>>>> dspace-7.2.1
                 added = true;
             }
         }
         // Test 5: We should find our item in this list
         assertTrue("List should contain item when passing a date older than item last-modified date", added);
-<<<<<<< HEAD
-
-        // Test 6: Make sure non-discoverable items are not returned, regardless of archived/withdrawn state
-        it.setDiscoverable(false);
-        all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,DateUtils.addDays(it.getLastModified(),-1));
-        assertThat("Returned list should not be null", all, notNullValue());
-
-        added = false;
-        while(all.hasNext()) {
-            Item tmp = all.next();
-            if(tmp.equals(it)) {
-=======
          // Test 6: Make sure non-discoverable items are not returned, regardless of archived/withdrawn state
         it.setDiscoverable(false);
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
@@ -406,22 +299,14 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
->>>>>>> dspace-7.2.1
                 added = true;
             }
         }
         // Test 7: We should not find our item in this list
         assertFalse("List should not contain non-discoverable items", added);
-<<<<<<< HEAD
-
-    }
-
-    /**
-=======
     }
 
      /**
->>>>>>> dspace-7.2.1
      * Test of findInArchiveOrWithdrawnNonDiscoverableModifiedSince method, of class Item.
      */
     @Test
@@ -430,55 +315,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         it.setWithdrawn(true);
         it.setArchived(false);
         it.setDiscoverable(false);
-<<<<<<< HEAD
-
-        // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
-        Iterator<Item> all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,DateUtils.addDays(it.getLastModified(),1));
-        assertThat("Returned list should not be null", all, notNullValue());
-
-        boolean added = false;
-        while(all.hasNext()) {
-            Item tmp = all.next();
-            if(tmp.equals(it)) {
-                added = true;
-            }
-        }
-
-        // Test 1: We should NOT find our item in this list
-        assertFalse("List should not contain item when passing a date newer than item last-modified date", added);
-
-        // Test 2: Using a past 'modified since' date, we should get a non-null list containing our item
-        all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,DateUtils.addDays(it.getLastModified(),-1));
-        assertThat("Returned list should not be null", all, notNullValue());
-
-        added = false;
-        while(all.hasNext()) {
-            Item tmp = all.next();
-            if(tmp.equals(it)) {
-                added = true;
-            }
-        }
-
-        // Test 3: We should find our item in this list
-        assertTrue("List should contain item when passing a date older than item last-modified date", added);
-
-        // Repeat Tests 2, 3 with discoverable = true
-        it.setDiscoverable(true);
-
-        // Test 4: Now we should still get a non-null list with NO items since item is discoverable
-        all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,DateUtils.addDays(it.getLastModified(),-1));
-        assertThat("Returned list should not be null", all, notNullValue());
-
-        added = false;
-        while(all.hasNext()) {
-            Item tmp = all.next();
-            if(tmp.equals(it)) {
-                added = true;
-            }
-        }
-
-        // Test 5: We should NOT find our item in this list
-=======
          // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
         Iterator<Item> all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),1));
@@ -519,7 +355,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
             }
         }
          // Test 5: We should NOT find our item in this list
->>>>>>> dspace-7.2.1
         assertFalse("List should not contain discoverable items", added);
     }
 
@@ -916,16 +751,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      * Test of getCollections method, of class Item.
      */
     @Test
-<<<<<<< HEAD
-    public void testGetCollections() throws Exception
-    {
-        context.turnOffAuthorisationSystem();
-        Collection collection = collectionService.create(context, owningCommunity);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "collection B");
-        it.addCollection(collection);
-        collection = collectionService.create(context, owningCommunity);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "collection A");
-=======
     public void testGetCollections() throws Exception {
         context.turnOffAuthorisationSystem();
         Collection collection = collectionService.create(context, owningCommunity);
@@ -935,7 +760,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         collection = collectionService.create(context, owningCommunity);
         collectionService.setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
                                                  "title", null, Item.ANY, "collection A");
->>>>>>> dspace-7.2.1
         it.addCollection(collection);
         context.restoreAuthSystemState();
         assertThat("testGetCollections 0", it.getCollections(), notNullValue());

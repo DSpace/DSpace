@@ -135,37 +135,6 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         }
     }
 
-<<<<<<< HEAD
-    @Override
-    public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale)
-    {
-    	init();
-    	log.debug("Getting matches for '" + text + "'");
-        String xpathExpression = "";
-        String[] textHierarchy = text.split(hierarchyDelimiter, -1);
-        for (int i = 0; i < textHierarchy.length; i++) {
-            xpathExpression += String.format(xpathTemplate, textHierarchy[i].replaceAll("'", "&apos;").toLowerCase());
-        }
-    	XPath xpath = XPathFactory.newInstance().newXPath();
-    	Choice[] choices;
-    	try {
-            NodeList results = (NodeList) xpath.evaluate(xpathExpression,
-                    vocabulary, XPathConstants.NODESET);
-            String[] authorities = new String[results.getLength()];
-            String[] values = new String[results.getLength()];
-            String[] labels = new String[results.getLength()];
-            for (int i = 0; i < results.getLength(); i++)
-            {
-                Node node = results.item(i);
-                String hierarchy = this.buildString(node);
-                if (this.suggestHierarchy)
-                {
-                    labels[i] = hierarchy;
-                }
-                else
-                {
-                    labels[i] = node.getAttributes().getNamedItem("label").getNodeValue();
-=======
     protected String buildString(Node node) {
         if (node.getNodeType() == Node.DOCUMENT_NODE) {
             return ("");
@@ -178,7 +147,6 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
                     return currentValue;
                 } else {
                     return (parentValue + this.hierarchyDelimiter + currentValue);
->>>>>>> dspace-7.2.1
                 }
             } else {
                 return (parentValue);

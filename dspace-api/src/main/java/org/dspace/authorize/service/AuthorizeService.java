@@ -178,17 +178,10 @@ public interface AuthorizeService {
      * @param c current context
      * @param e the user to check
      * @param o current DSpace Object, if <code>null</code> the call will be
-<<<<<<< HEAD
-     *         equivalent to a call to the <code>isAdmin(Context c)</code>
-     *         method
-     * @return {@code true} if the user has administrative privileges on the
-     *         given DSpace object
-=======
      *          equivalent to a call to the <code>isAdmin(Context c)</code>
      *          method
      * @return {@code true} if the user has administrative privileges on the
      * given DSpace object
->>>>>>> dspace-7.2.1
      * @throws SQLException if database error
      */
     public boolean isAdmin(Context c, EPerson e, DSpaceObject o) throws SQLException;
@@ -213,21 +206,10 @@ public interface AuthorizeService {
      *
      * @param c current context
      * @return {@code true} if user is an admin or ignore authorization
-<<<<<<< HEAD
-     *         flag set
-     * @throws SQLException if database error
-     */
-    public boolean isAdmin(Context c, EPerson e) throws SQLException;
-    
-    public boolean isCommunityAdmin(Context c) throws SQLException;
-    
-    public boolean isCollectionAdmin(Context c) throws SQLException; 
-=======
      * flag set
      * @throws SQLException if database error
      */
     public boolean isAdmin(Context c, EPerson e) throws SQLException;
->>>>>>> dspace-7.2.1
 
     ///////////////////////////////////////////////
     // policy manipulation methods
@@ -482,17 +464,11 @@ public interface AuthorizeService {
      * @return true if such a policy exists, false otherwise
      * @throws SQLException if there's a database problem
      */
-<<<<<<< HEAD
-    public boolean isAnIdenticalPolicyAlreadyInPlace(Context c, DSpaceObject o, Group group, int actionID, int policyID) throws SQLException;
-    
-    public ResourcePolicy findByTypeGroupAction(Context c, DSpaceObject dso, Group group, int action) throws SQLException;
-=======
     public boolean isAnIdenticalPolicyAlreadyInPlace(Context c, DSpaceObject o, Group group, int actionID, int policyID)
         throws SQLException;
 
     public ResourcePolicy findByTypeGroupAction(Context c, DSpaceObject dso, Group group, int action)
         throws SQLException;
->>>>>>> dspace-7.2.1
 
 
     /**

@@ -26,11 +26,6 @@ import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-<<<<<<< HEAD
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.GroupService;
-=======
->>>>>>> dspace-7.2.1
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
 
@@ -42,14 +37,8 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Entity
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-<<<<<<< HEAD
-@Table(name = "epersongroup" )
-public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
-{
-=======
 @Table(name = "epersongroup")
 public class Group extends DSpaceObject implements DSpaceObjectLegacySupport {
->>>>>>> dspace-7.2.1
 
     @Transient
     public static final String ANONYMOUS = "Anonymous";

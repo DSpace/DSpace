@@ -7,9 +7,6 @@
  */
 package org.dspace.app.packager;
 
-<<<<<<< HEAD
-import org.apache.commons.cli.*;
-=======
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,7 +20,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
->>>>>>> dspace-7.2.1
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
@@ -39,10 +35,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.workflow.WorkflowException;
-
-import java.io.*;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Command-line interface to the Packager plugin.
@@ -325,12 +317,7 @@ public class Packager {
 
 
         //If we are in REPLACE mode
-<<<<<<< HEAD
-        if(pkgParams.replaceModeEnabled())
-        {
-=======
         if (pkgParams.replaceModeEnabled()) {
->>>>>>> dspace-7.2.1
             context.setMode(Context.Mode.BATCH_EDIT);
             PackageIngester sip = (PackageIngester) pluginService
                 .getNamedPlugin(PackageIngester.class, myPackager.packageType);
@@ -385,15 +372,8 @@ public class Packager {
                 }
             }
 
-<<<<<<< HEAD
-        }
-        //else if normal SUBMIT mode (or basic RESTORE mode -- which is a special type of submission)
-        else if (myPackager.submit || pkgParams.restoreModeEnabled())
-        {
-=======
         } else if (myPackager.submit || pkgParams.restoreModeEnabled()) {
             //else if normal SUBMIT mode (or basic RESTORE mode -- which is a special type of submission)
->>>>>>> dspace-7.2.1
             context.setMode(Context.Mode.BATCH_EDIT);
 
             PackageIngester sip = (PackageIngester) pluginService
@@ -437,14 +417,8 @@ public class Packager {
                 System.out.println(e);
                 System.exit(1);
             }
-<<<<<<< HEAD
-        }// else, if DISSEMINATE mode
-        else
-        {
-=======
         } else {
             // else, if DISSEMINATE mode
->>>>>>> dspace-7.2.1
             context.setMode(Context.Mode.READ_ONLY);
 
             //retrieve specified package disseminator

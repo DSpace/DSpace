@@ -201,18 +201,11 @@ public interface XmlWorkflowService extends WorkflowService<XmlWorkflowItem> {
             List<EPerson> ePeople, String taskName, String action, String message)
             throws SQLException, IOException;
 
-<<<<<<< HEAD
-    public void grantUserAllItemPolicies(Context context, Item item, EPerson epa) throws AuthorizeException, SQLException;
-
-    public void removeUserItemPolicies(Context context, Item item, EPerson e) throws SQLException, AuthorizeException;
-
-=======
     /**
      * Get a description of an EPerson.
      *
      * @param ePerson the EPerson to be described.
      * @return the EPerson's full name and email address.
      */
->>>>>>> dspace-7.2.1
     public String getEPersonName(EPerson ePerson);
 }

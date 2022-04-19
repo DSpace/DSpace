@@ -56,7 +56,7 @@
         <url-pattern>/static/*</url-pattern>
     </servlet-mapping>
 
-    <!-- Security settings and mapping
+    <!-- Security settings and mapping -->
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>DSpace REST API (Deprecated)</web-resource-name>
@@ -65,13 +65,8 @@
         <user-data-constraint>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
-<<<<<<< HEAD
-    </security-constraint> -->
-    
-=======
     </security-constraint>
 
->>>>>>> dspace-7.2.1
     <!-- ConfigurationService initialization for dspace.dir -->
     <context-param>
         <description>

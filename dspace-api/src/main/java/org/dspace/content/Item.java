@@ -7,8 +7,6 @@
  */
 package org.dspace.content;
 
-<<<<<<< HEAD
-=======
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -30,23 +28,14 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
->>>>>>> dspace-7.2.1
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.hibernate.annotations.Sort;
-import org.hibernate.annotations.SortType;
 import org.hibernate.proxy.HibernateProxyHelper;
 
-<<<<<<< HEAD
-import javax.persistence.*;
-import java.util.*;
-
-=======
->>>>>>> dspace-7.2.1
 /**
  * Class representing an item in DSpace.
  * <P>
@@ -263,28 +252,6 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
      *
      * @return the collections this item is in, if any.
      */
-<<<<<<< HEAD
-    public List<Collection> getCollections()
-    {
-        // We return a copy because we do not want people to add elements to this collection directly.
-        // We return a list to maintain backwards compatibility
-        Collection[] output = collections.toArray(new Collection[]{});
-        Arrays.sort(output, new NameAscendingComparator());
-        return Arrays.asList(output);
-    }
-
-    void addCollection(Collection collection)
-    {
-        collections.add(collection);
-    }
-
-    void removeCollection(Collection collection)
-    {
-        collections.remove(collection);
-    }
-
-    public void clearCollections(){
-=======
     public List<Collection> getCollections() {
         // We return a copy because we do not want people to add elements to this collection directly.
         // We return a list to maintain backwards compatibility
@@ -302,7 +269,6 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     }
 
     public void clearCollections() {
->>>>>>> dspace-7.2.1
         collections.clear();
     }
 
@@ -332,22 +298,6 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
      *
      * @return the bundles in an unordered array
      */
-<<<<<<< HEAD
-    public List<Bundle> getBundles(String name)
-    {
-        List<Bundle> matchingBundles = new ArrayList<Bundle>();
-
-        // now only keep bundles with matching names
-        List<Bundle> bunds = getBundles();
-        for (Bundle bundle : bunds)
-        {
-            if (name.equals(bundle.getName()))
-            {
-                matchingBundles.add(bundle);
-            }
-        }
-
-=======
     public List<Bundle> getBundles(String name) {
         List<Bundle> matchingBundles = new ArrayList<>();
          // now only keep bundles with matching names
@@ -357,7 +307,6 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
                 matchingBundles.add(bundle);
             }
         }
->>>>>>> dspace-7.2.1
         return matchingBundles;
     }
 
@@ -388,31 +337,6 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
      * as this object
      */
     @Override
-<<<<<<< HEAD
-    public boolean equals(Object obj)
-    {
-        if (obj == null)
-        {
-            return false;
-        }
-        Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
-        if (this.getClass() != objClass)
-        {
-            return false;
-        }
-        final Item otherItem = (Item) obj;
-        if (!this.getID().equals(otherItem.getID()))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-=======
     public boolean equals(Object obj) {
         if (!(obj instanceof Item)) {
             return false;
@@ -427,7 +351,6 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     @Override
     public int hashCode() {
->>>>>>> dspace-7.2.1
         int hash = 5;
         hash += 71 * hash + getType();
         hash += 71 * hash + getID().hashCode();

@@ -303,16 +303,12 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         PDDocument sourceDocument = new PDDocument();
         try {
             Item item = (Item) bitstreamService.getParentObject(context, bitstream);
-<<<<<<< HEAD
-            sourceDocument = sourceDocument.load(bitstreamService.retrieve(context, bitstream));
-=======
             final InputStream inputStream = bitstreamService.retrieve(context, bitstream);
             try {
                 sourceDocument = sourceDocument.load(inputStream);
             } finally {
                 inputStream.close();
             }
->>>>>>> dspace-7.2.1
             PDPage coverPage = new PDPage(citationPageFormat);
             generateCoverPage(context, document, coverPage, item);
             addCoverPageToDocument(document, sourceDocument, coverPage);

@@ -11,16 +11,8 @@ var Report = function() {
     this.COUNT_LIMIT = 500;
     this.ITEM_LIMIT = 100;
 
-<<<<<<< HEAD
-    //set default to work on demo.dspace.org
-    this.ROOTPATH = "/xmlui/handle/"
-    //this.ROOTPATH = "/jspui/handle/"
-    //this.ROOTPATH = "/handle/"
-    
-=======
     this.ROOTPATH = "/handle/"
 
->>>>>>> dspace-7.2.1
     //Indicate if Password Authentication is supported
     this.makeAuthLink = function(){return false;};
 
@@ -119,19 +111,11 @@ var Report = function() {
         if (total == null) {
             $("#next").attr("disabled", false);
         } else if (offset + limit  < total) {
-<<<<<<< HEAD
-            $("#next").attr("disabled", false);            
-      $("#exlimit").addClass("red");
-        } else if (limit == total) {
-            //total may only be accurate to one page
-            $("#next").attr("disabled", false);            
-=======
             $("#next").attr("disabled", false);
       $("#exlimit").addClass("red");
         } else if (limit == total) {
             //total may only be accurate to one page
             $("#next").attr("disabled", false);
->>>>>>> dspace-7.2.1
       $("#exlimit").addClass("red");
         }
         $("#next").off("click").on("click", funcinc);
@@ -145,21 +129,12 @@ var Report = function() {
         this.myMetadataFields = new MetadataFields(self);
         this.myMetadataFields.load();
     }
-<<<<<<< HEAD
-    
-  this.initBitstreamFields = function() {
-    this.myBitstreamFields = new BitstreamFields(self);
-    this.myBitstreamFields.load();    
-  }
-  
-=======
 
   this.initBitstreamFields = function() {
     this.myBitstreamFields = new BitstreamFields(self);
     this.myBitstreamFields.load();
   }
 
->>>>>>> dspace-7.2.1
     this.baseInit = function() {
         this.myReportParameters = new ReportParameters(
                 this.getDefaultParameters(),
@@ -195,11 +170,7 @@ var Report = function() {
         });
         return itemdata;
     }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> dspace-7.2.1
     this.export = function(rows) {
     var itemdata = "data:text/csv;charset=utf-8," + this.makeCsv(rows);
         var encodedUri = encodeURI(itemdata);
@@ -279,17 +250,6 @@ var Auth = function(report) {
         });
     }
 
-<<<<<<< HEAD
-    this.verifyShibLogin = function() {
-        var self = this;
-        $.ajax({
-            url: "/rest/shibboleth-login", 
-            success: self.authStat
-        });
-    }
-  
-=======
->>>>>>> dspace-7.2.1
     this.authStat = function() {
         var self = this;
         $.ajax({
@@ -301,21 +261,13 @@ var Auth = function(report) {
             success: function(data) {
                 var user = "";
                 if (data.email != undefined) {
-<<<<<<< HEAD
-                    user = data.email;                  
-=======
                     user = data.email;
->>>>>>> dspace-7.2.1
                 } else {
                     user = "You are not logged in.  Some items may be excluded from reports.";
                 }
                 var anchor = $("<a/>").text(user);
                 if (self.report.makeShibLink()) {
-<<<<<<< HEAD
-                    anchor.attr("href", self.report.shibPath + "?target="+document.location);
-=======
                   anchor.attr("href", self.report.shibPath + "?target="+document.location);
->>>>>>> dspace-7.2.1
                 }
                 if (self.report.makeAuthLink()) {
                     anchor.attr("href","javascript:window.open('authenticate.html','Authenticate (Password Auth Only)','height=200,width=500')");
@@ -324,17 +276,10 @@ var Auth = function(report) {
                 if (data.email == undefined && self.report.makeShibLink()) {
                     self.verifyShibLogin();
                 }
-<<<<<<< HEAD
-            } 
-        });     
-    }
-  
-=======
             }
         });
     }
 
->>>>>>> dspace-7.2.1
     this.logout = function() {
         var self = this;
         $.ajax({
@@ -560,24 +505,15 @@ var BitstreamFields = function(report) {
   }
   this.map = [
     {
-<<<<<<< HEAD
-      key: "original-file-names", 
-      name: "Original File Names", 
-=======
       key: "original-file-names",
       name: "Original File Names",
->>>>>>> dspace-7.2.1
       ftest: self.isOriginal,
       fval: function(bit) {
         return bit.name;
       }
     },
     {
-<<<<<<< HEAD
-      key: "mime-type", 
-=======
       key: "mime-type",
->>>>>>> dspace-7.2.1
       name: "Mime Type",
       ftest: self.isOriginal,
       fval: function(bit) {
@@ -585,11 +521,7 @@ var BitstreamFields = function(report) {
       }
     },
     {
-<<<<<<< HEAD
-      key: "bitstream-format", 
-=======
       key: "bitstream-format",
->>>>>>> dspace-7.2.1
       name: "Bitstream Format",
       ftest: self.isOriginal,
       fval: function(bit) {
@@ -597,11 +529,7 @@ var BitstreamFields = function(report) {
       }
     },
     {
-<<<<<<< HEAD
-      key: "bitstream-description", 
-=======
       key: "bitstream-description",
->>>>>>> dspace-7.2.1
       name: "Bitstream Description",
       ftest: self.isOriginal,
       fval: function(bit) {
@@ -609,11 +537,7 @@ var BitstreamFields = function(report) {
       }
     },
     {
-<<<<<<< HEAD
-      key: "bitstream-size", 
-=======
       key: "bitstream-size",
->>>>>>> dspace-7.2.1
       name: "Bitstream Size",
       ftest: self.isOriginal,
       fval: function(bit) {
@@ -621,30 +545,18 @@ var BitstreamFields = function(report) {
       }
     },
     {
-<<<<<<< HEAD
-      key: "bitstream-checksum", 
-=======
       key: "bitstream-checksum",
->>>>>>> dspace-7.2.1
       name: "MD5 Checksum",
       ftest: self.isOriginal,
       fval: function(bit) {
         if (bit.checkSum.checkSumAlgorithm === "MD5") {
-<<<<<<< HEAD
-          return bit.checkSum.value;          
-=======
           return bit.checkSum.value;
->>>>>>> dspace-7.2.1
         }
         return "";
       }
     },
   ];
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> dspace-7.2.1
   this.load = function(){
     self.initFields(report);
   }
@@ -653,11 +565,7 @@ var BitstreamFields = function(report) {
     var params = report.myReportParameters.params;
     self.drawShowFieldsBits(params["show_fields_bits[]"]);
   };
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> dspace-7.2.1
   this.hasBitstreamFields = function() {
     return self.getShowFieldsBits() != null;
   }
@@ -665,26 +573,13 @@ var BitstreamFields = function(report) {
     var val = $("#show-fields-bits select").val();
     return val == null ? Array() : val;
   }
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> dspace-7.2.1
   this.drawShowFieldsBits = function(pfieldsBits) {
     var sel = $("<select name='show_fields_bits'/>");
     sel.attr("multiple","true").attr("size","8").appendTo("#show-fields-bits");
     for(var i=0; i<this.map.length; i++) {
       var opt = report.myHtmlUtil.addOpt(sel, this.map[i].name, this.map[i].key);
       if (pfieldsBits != null) {
-<<<<<<< HEAD
-        opt.attr("selected", pfieldsBits[this.map[i].key] != undefined ? "Y" : null);        
-      }
-      sel.append(opt);      
-    }
-  }
-  
-  
-=======
         opt.attr("selected", pfieldsBits[this.map[i].key] != undefined ? "Y" : null);
       }
       sel.append(opt);
@@ -692,7 +587,6 @@ var BitstreamFields = function(report) {
   }
 
 
->>>>>>> dspace-7.2.1
   this.getKeyText = function(key, item, bitfields) {
     var ret = [];
     if (bitfields == null || item.bitstreams == null) {
@@ -711,26 +605,12 @@ var BitstreamFields = function(report) {
     if (mapval == null) {
       return ret;
     }
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> dspace-7.2.1
     $.each(item.bitstreams, function(colindex, bitstream) {
       if (mapval.ftest(bitstream)) {
         var val = mapval.fval(bitstream);
         if (val != null) {
           if (isNaN(val) || ret.length == 0) {
-<<<<<<< HEAD
-            ret.push(val);            
-          } else {
-            ret[0] += val;
-          }
-          
-        }
-      }
-    });         
-=======
             ret.push(val);
           } else {
             ret[0] += val;
@@ -739,7 +619,6 @@ var BitstreamFields = function(report) {
         }
       }
     });
->>>>>>> dspace-7.2.1
     return ret;
   }
 }

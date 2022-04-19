@@ -230,10 +230,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
 
     /**
      * sets the Group referred to by this policy
-<<<<<<< HEAD
-=======
      *
->>>>>>> dspace-7.2.1
      * @param epersonGroup Group
      */
     public void setGroup(Group epersonGroup) {

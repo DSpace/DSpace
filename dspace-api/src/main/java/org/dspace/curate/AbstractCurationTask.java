@@ -82,12 +82,7 @@ public abstract class AbstractCurationTask implements CurationTask {
             int type = dso.getType();
             if (Constants.COLLECTION == type) {
                 Iterator<Item> iter = itemService.findByCollection(Curator.curationContext(), (Collection) dso);
-<<<<<<< HEAD
-                while (iter.hasNext())
-                {
-=======
                 while (iter.hasNext()) {
->>>>>>> dspace-7.2.1
                     Item item = iter.next();
                     performObject(item);
                     Curator.curationContext().uncacheEntity(item);
@@ -131,18 +126,10 @@ public abstract class AbstractCurationTask implements CurationTask {
     protected void performObject(DSpaceObject dso) throws SQLException, IOException {
         // By default this method only performs tasks on Items
         // (You should override this method if you want to perform task on all objects)
-<<<<<<< HEAD
-        if(dso.getType()==Constants.ITEM)
-        {
-            performItem((Item)dso);
-        }
-        
-=======
         if (dso.getType() == Constants.ITEM) {
             performItem((Item) dso);
         }
 
->>>>>>> dspace-7.2.1
         //no-op for all other types of DSpace Objects
     }
 

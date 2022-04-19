@@ -7,16 +7,6 @@
  */
 package org.dspace.discovery;
 
-<<<<<<< HEAD
-import org.apache.solr.common.SolrInputDocument;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.core.Context;
-
-import java.util.List;
-=======
 import java.util.List;
 
 import org.apache.solr.common.SolrInputDocument;
@@ -25,7 +15,6 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableItem;
->>>>>>> dspace-7.2.1
 
 /**
  * <p>
@@ -46,42 +35,12 @@ import org.dspace.discovery.indexobject.IndexableItem;
  *
  * @author Martin Walk
  */
-<<<<<<< HEAD
-public class SolrServiceFileInfoPlugin implements SolrServiceIndexPlugin
-{
-=======
 public class SolrServiceFileInfoPlugin implements SolrServiceIndexPlugin {
->>>>>>> dspace-7.2.1
     private static final String BUNDLE_NAME = "ORIGINAL";
     private static final String SOLR_FIELD_NAME_FOR_FILENAMES = "original_bundle_filenames";
     private static final String SOLR_FIELD_NAME_FOR_DESCRIPTIONS = "original_bundle_descriptions";
 
     @Override
-<<<<<<< HEAD
-    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document)
-    {
-        if (dso instanceof Item)
-        {
-            Item item = (Item) dso;
-            List<Bundle> bundles = item.getBundles();
-            if (bundles != null)
-            {
-                for (Bundle bundle : bundles)
-                {
-                    String bundleName = bundle.getName();
-                    if ((bundleName != null) && bundleName.equals(BUNDLE_NAME))
-                    {
-                        List<Bitstream> bitstreams = bundle.getBitstreams();
-                        if (bitstreams != null)
-                        {
-                            for (Bitstream bitstream : bitstreams)
-                            {
-                                document.addField(SOLR_FIELD_NAME_FOR_FILENAMES, bitstream.getName());
-
-                                String description = bitstream.getDescription();
-                                if ((description != null) && (!description.isEmpty()))
-                                {
-=======
     public void additionalIndex(Context context, IndexableObject indexableObject, SolrInputDocument document) {
         if (indexableObject instanceof IndexableItem) {
             Item item = ((IndexableItem) indexableObject).getIndexedObject();
@@ -97,7 +56,6 @@ public class SolrServiceFileInfoPlugin implements SolrServiceIndexPlugin {
 
                                 String description = bitstream.getDescription();
                                 if ((description != null) && !description.isEmpty()) {
->>>>>>> dspace-7.2.1
                                     document.addField(SOLR_FIELD_NAME_FOR_DESCRIPTIONS, description);
                                 }
                             }
@@ -107,8 +65,4 @@ public class SolrServiceFileInfoPlugin implements SolrServiceIndexPlugin {
             }
         }
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> dspace-7.2.1

@@ -49,15 +49,9 @@ public class FiltersResource {
     @GET
     @Produces( {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public ItemFilter[] getFilters(@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-<<<<<<< HEAD
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
-            throws WebApplicationException
-    {
-=======
                                    @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers,
                                    @Context HttpServletRequest request)
         throws WebApplicationException {
->>>>>>> dspace-7.2.1
 
         log.info("Reading all Item Filters.");
         return ItemFilter.getItemFilters(ItemFilter.ALL, false).toArray(new ItemFilter[0]);

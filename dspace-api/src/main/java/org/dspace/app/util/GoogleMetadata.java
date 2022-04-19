@@ -7,31 +7,6 @@
  */
 package org.dspace.app.util;
 
-<<<<<<< HEAD
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import org.apache.log4j.Logger;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.content.*;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.handle.factory.HandleServiceFactory;
-import org.jdom.Element;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.Collection;
-import java.util.Map.Entry;
-=======
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,7 +43,6 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Element;
->>>>>>> dspace-7.2.1
 
 /**
  * Configuration and mapping for Google Scholar output metadata
@@ -90,11 +64,7 @@ public class GoogleMetadata {
     protected String itemURL;
 
     // Configuration keys and fields
-<<<<<<< HEAD
-    protected static Map<String, String> googleScholarSettings = new HashMap<String, String>();
-=======
     protected static Map<String, String> googleScholarSettings = new HashMap<>();
->>>>>>> dspace-7.2.1
 
     // Google field names (e.g. citation_fieldname) and formatted metadata
     // values
@@ -163,17 +133,6 @@ public class GoogleMetadata {
     protected final int ALL_FIELDS_IN_OPTION = 2;
 
     private static GoogleBitstreamComparator googleBitstreamComparator = null;
-<<<<<<< HEAD
-
-    // Load configured fields from google-metadata.properties
-    static
-    {
-
-        File loadedFile = null;
-        URL url = null;
-        InputStream is = null;
-=======
->>>>>>> dspace-7.2.1
 
     private final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -221,12 +180,7 @@ public class GoogleMetadata {
                 String field = properties.getProperty(key);
 
                 if (null != name && !name.equals("") && null != field
-<<<<<<< HEAD
-                        && !field.equals(""))
-                {
-=======
                     && !field.equals("")) {
->>>>>>> dspace-7.2.1
                     googleScholarSettings.put(name.trim(), field.trim());
                 }
             }
@@ -245,14 +199,8 @@ public class GoogleMetadata {
 
         log.debug("Google Metadata Configuration Mapping:");
 
-<<<<<<< HEAD
-        for (String name : googleScholarSettings.keySet())
-        {
-            log.debug("  " + name + " => " + googleScholarSettings.get(name));
-=======
         for (String name : googleScholarSettings.keySet()) {
             log.debug("  {} => {}", name, googleScholarSettings.get(name));
->>>>>>> dspace-7.2.1
         }
     }
 
@@ -710,12 +658,7 @@ public class GoogleMetadata {
 
             // Use config value for patent country. Should be a literal.
             String countryConfig = googleScholarSettings.get(PATENT_COUNTRY);
-<<<<<<< HEAD
-            if (null != countryConfig && !countryConfig.trim().equals(""))
-            {
-=======
             if (null != countryConfig && !countryConfig.trim().equals("")) {
->>>>>>> dspace-7.2.1
                 metadataMappings.put(PATENT_COUNTRY, countryConfig.trim());
             }
 
@@ -984,25 +927,6 @@ public class GoogleMetadata {
         return "";
     }
 
-<<<<<<< HEAD
-	/**
-	 * A bitstream is considered linkable fulltext when it is either
-	 * <ul>
-	 *     <li>the item's only bitstream (in the ORIGINAL bundle); or</li>
-	 *     <li>the primary bitstream</li>
-	 * </ul>
-	 * Additionally, this bitstream must be publicly viewable.
-	 * @param item
-	 * @return a linkable bitstream or null if none found
-	 * @throws SQLException if database error
-	 */
-	protected Bitstream findLinkableFulltext(Item item) throws SQLException {
-		Bitstream bestSoFar = null;
-
-		List<Bundle> contentBundles = itemService.getBundles(item, "ORIGINAL");
-
-		for (Bundle bundle : contentBundles) {
-=======
     /**
      * A bitstream is considered linkable fulltext when it is either
      * <ul>
@@ -1020,7 +944,6 @@ public class GoogleMetadata {
 
         List<Bundle> contentBundles = itemService.getBundles(item, "ORIGINAL");
         for (Bundle bundle : contentBundles) {
->>>>>>> dspace-7.2.1
             List<Bitstream> bitstreams = bundle.getBitstreams();
             Collections.sort(bitstreams, googleBitstreamComparator);
 
@@ -1096,12 +1019,7 @@ public class GoogleMetadata {
      *
      * @param FIELD metadata field
      */
-<<<<<<< HEAD
-    protected void addMultipleValues(String FIELD)
-    {
-=======
     protected void addMultipleValues(String FIELD) {
->>>>>>> dspace-7.2.1
         String fieldConfig = googleScholarSettings.get(FIELD);
         ArrayList<MetadataValue> fields = resolveMetadataFields(fieldConfig);
 
@@ -1121,12 +1039,7 @@ public class GoogleMetadata {
     protected boolean itemIsDissertation() {
 
         String dConfig = googleScholarSettings.get(DISSERTATION_ID);
-<<<<<<< HEAD
-        if (null == dConfig || dConfig.trim().equals(""))
-        {
-=======
         if (null == dConfig || dConfig.trim().equals("")) {
->>>>>>> dspace-7.2.1
             return false;
         } else {
             return identifyItemType(dConfig);
@@ -1141,12 +1054,7 @@ public class GoogleMetadata {
     protected boolean itemIsPatent() {
 
         String dConfig = googleScholarSettings.get(PATENT_ID);
-<<<<<<< HEAD
-        if (null == dConfig || dConfig.trim().equals(""))
-        {
-=======
         if (null == dConfig || dConfig.trim().equals("")) {
->>>>>>> dspace-7.2.1
             return false;
         } else {
             return identifyItemType(dConfig);
@@ -1161,12 +1069,7 @@ public class GoogleMetadata {
     protected boolean itemIsTechReport() {
 
         String dConfig = googleScholarSettings.get(TECH_REPORT_ID);
-<<<<<<< HEAD
-        if (null == dConfig || dConfig.trim().equals(""))
-        {
-=======
         if (null == dConfig || dConfig.trim().equals("")) {
->>>>>>> dspace-7.2.1
             return false;
         } else {
             return identifyItemType(dConfig);

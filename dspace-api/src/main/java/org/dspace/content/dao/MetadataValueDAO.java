@@ -16,13 +16,6 @@ import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 
-<<<<<<< HEAD
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-
-=======
->>>>>>> dspace-7.2.1
 /**
  * Database Access Object interface class for the MetadataValue object.
  * The implementation of this class is responsible for all database calls for the MetadataValue object and is
@@ -35,13 +28,10 @@ public interface MetadataValueDAO extends GenericDAO<MetadataValue> {
 
     public List<MetadataValue> findByField(Context context, MetadataField fieldId) throws SQLException;
 
-<<<<<<< HEAD
-=======
     public Iterator<MetadataValue> findItemValuesByFieldAndValue(Context context,
                                                                  MetadataField metadataField, String value)
             throws SQLException;
 
->>>>>>> dspace-7.2.1
     public Iterator<MetadataValue> findByValueLike(Context context, String value) throws SQLException;
 
     public void deleteByMetadataField(Context context, MetadataField metadataField) throws SQLException;

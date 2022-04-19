@@ -927,15 +927,10 @@ public class ItemsResource extends Resource {
         try {
             context = createContext();
 
-<<<<<<< HEAD
-            Iterator<org.dspace.content.Item> itemIterator = itemService.findByMetadataField(context, metadataEntry.getSchema(),
-                    metadataEntry.getElement(), metadataEntry.getQualifier(), metadataEntry.getValue());
-=======
             Iterator<org.dspace.content.Item> itemIterator = itemService
                 .findByMetadataField(context, metadataEntry.getSchema(),
                                      metadataEntry.getElement(), metadataEntry.getQualifier(),
                                      metadataEntry.getValue());
->>>>>>> dspace-7.2.1
 
             while (itemIterator.hasNext()) {
                 org.dspace.content.Item dspaceItem = itemIterator.next();
@@ -943,11 +938,7 @@ public class ItemsResource extends Resource {
                 if (itemService.isItemListedForUser(context, dspaceItem)) {
                     Item item = new Item(dspaceItem, servletContext, expand, context);
                     writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
-<<<<<<< HEAD
-                            request, context);
-=======
                                request, context);
->>>>>>> dspace-7.2.1
                     items.add(item);
                 }
             }

@@ -17,13 +17,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
-<<<<<<< HEAD
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-
-=======
->>>>>>> dspace-7.2.1
 /**
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -34,10 +27,6 @@ public interface AuthorityIndexerInterface {
 
     public List<AuthorityValue> getAuthorityValues(Context context, Item item)
             throws SQLException, AuthorizeException;
-<<<<<<< HEAD
-
-=======
->>>>>>> dspace-7.2.1
     public List<AuthorityValue> getAuthorityValues(Context context, Item item, Map<String, AuthorityValue> cache)
             throws SQLException, AuthorizeException;
 

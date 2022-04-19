@@ -7,10 +7,6 @@
  */
 package org.dspace.checker;
 
-<<<<<<< HEAD
-import org.apache.commons.collections.MapUtils;
-import org.apache.log4j.Logger;
-=======
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
@@ -18,7 +14,6 @@ import java.util.Map;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.Logger;
->>>>>>> dspace-7.2.1
 import org.dspace.checker.factory.CheckerServiceFactory;
 import org.dspace.checker.service.ChecksumHistoryService;
 import org.dspace.checker.service.ChecksumResultService;
@@ -27,11 +22,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.Map;
 
 /**
  * <p>

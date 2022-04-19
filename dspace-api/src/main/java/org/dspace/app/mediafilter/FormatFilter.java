@@ -43,28 +43,16 @@ public interface FormatFilter {
 
     /**
      * @return string to describe the newly-generated Bitstream - how it was
-<<<<<<< HEAD
-     *         produced is a good idea
-=======
      * produced is a good idea
->>>>>>> dspace-7.2.1
      */
     public String getDescription();
 
     /**
      * Read the source stream and produce the filtered content.
      *
-<<<<<<< HEAD
-     * @param item Item
-     * @param source
-     *            input stream
-     * @param verbose verbosity flag
-     * 
-=======
      * @param item    Item
      * @param source  input stream
      * @param verbose verbosity flag
->>>>>>> dspace-7.2.1
      * @return result of filter's transformation as a byte stream.
      * @throws Exception if error
      */

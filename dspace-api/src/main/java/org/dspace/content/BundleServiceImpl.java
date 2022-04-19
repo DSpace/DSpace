@@ -149,14 +149,6 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 return;
             }
         }
-        
-        //Ensure that the last modified from the item is triggered !
-        Item owningItem = (Item) getParentObject(context, bundle);
-        if(owningItem != null)
-        {
-            itemService.updateLastModified(context, owningItem);
-            itemService.update(context, owningItem);
-        }
 
         // Ensure that the last modified from the item is triggered !
         Item owningItem = (Item) getParentObject(context, bundle);
@@ -207,19 +199,6 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             bundle.unsetPrimaryBitstreamID();
         }
 
-<<<<<<< HEAD
-        // Check if our bitstream is part of a single or no bundle. 
-        // Bitstream.getBundles() may be empty (the delete() method clears 
-        // the bundles). We should not delete the bitstream, if it is used
-        // in another bundle, instead we just remove the link between bitstream
-        // and this bundle.
-        if(bitstream.getBundles().size() <= 1)
-        {
-            // We don't need to remove the link between bundle & bitstream, 
-            // this will be handled in the delete() method.
-            bitstreamService.delete(context, bitstream);
-        }else{
-=======
         // Check if our bitstream is part of a single or no bundle.
         // Bitstream.getBundles() may be empty (the delete() method clears
         // the bundles). We should not delete the bitstream, if it is used
@@ -230,7 +209,6 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             // this will be handled in the delete() method.
             bitstreamService.delete(context, bitstream);
         } else {
->>>>>>> dspace-7.2.1
             bundle.removeBitstream(bitstream);
             bitstream.getBundles().remove(bundle);
         }
@@ -382,11 +360,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             Bitstream bitstream = bitstreamService.find(context, bitstreamId);
 
             // If we have an invalid Bitstream ID, just ignore it, but log a warning
-<<<<<<< HEAD
-            if(bitstream == null) {
-=======
             if (bitstream == null) {
->>>>>>> dspace-7.2.1
                 //This should never occur but just in case
                 log.warn(LogHelper.getHeader(context, "Invalid bitstream id while changing bitstream order",
                                               "Bundle: " + bundle.getID() + ", bitstream id: " + bitstreamId));
@@ -394,26 +368,6 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             }
 
             // If we have a Bitstream not in the current list, log a warning & exit immediately
-<<<<<<< HEAD
-            if(!currentBitstreams.contains(bitstream))
-            {
-                log.warn(LogManager.getHeader(context, "Encountered a bitstream not in this bundle while changing bitstream order. Bitstream order will not be changed.", "Bundle: " + bundle.getID() + ", bitstream id: " + bitstreamId));
-                return;
-            }
-            updatedBitstreams.add(bitstream);
-        }
-
-        // If our lists are different sizes, exit immediately
-        if(updatedBitstreams.size()!=currentBitstreams.size())
-        {
-            log.warn(LogManager.getHeader(context, "Size of old list and new list do not match. Bitstream order will not be changed.", "Bundle: " + bundle.getID()));
-            return;
-        }
-
-        // As long as the order has changed, update it
-        if(CollectionUtils.isNotEmpty(updatedBitstreams) && !updatedBitstreams.equals(currentBitstreams))
-        {
-=======
             if (!currentBitstreams.contains(bitstream)) {
                 log.warn(LogHelper.getHeader(context,
                                               "Encountered a bitstream not in this bundle while changing bitstream " +
@@ -435,32 +389,16 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
         // As long as the order has changed, update it
         if (CollectionUtils.isNotEmpty(updatedBitstreams) && !updatedBitstreams.equals(currentBitstreams)) {
->>>>>>> dspace-7.2.1
             //First clear out the existing list of bitstreams
             bundle.clearBitstreams();
 
             // Now add them back in the proper order
-<<<<<<< HEAD
-            for (Bitstream bitstream : updatedBitstreams)
-            {
-=======
             for (Bitstream bitstream : updatedBitstreams) {
->>>>>>> dspace-7.2.1
                 bitstream.getBundles().remove(bundle);
                 bundle.addBitstream(bitstream);
                 bitstream.getBundles().add(bundle);
                 bitstreamService.update(context, bitstream);
             }
-<<<<<<< HEAD
-
-            //The order of the bitstreams has changed, ensure that we update the last modified of our item
-            Item owningItem = (Item) getParentObject(context, bundle);
-            if(owningItem != null)
-            {
-                itemService.updateLastModified(context, owningItem);
-                itemService.update(context, owningItem);
-
-=======
 
             //The order of the bitstreams has changed, ensure that we update the last modified of our item
             Item owningItem = (Item) getParentObject(context, bundle);
@@ -468,7 +406,6 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 itemService.updateLastModified(context, owningItem);
                 itemService.update(context, owningItem);
 
->>>>>>> dspace-7.2.1
             }
         }
     }
@@ -564,19 +501,11 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
         // Remove bitstreams
         List<Bitstream> bitstreams = bundle.getBitstreams();
-<<<<<<< HEAD
-        bundle.clearBitstreams();
-        for (Bitstream bitstream : bitstreams) {
-            removeBitstream(context, bundle, bitstream);
-        }
-        
-=======
         for (Bitstream bitstream : bitstreams) {
             removeBitstream(context, bundle, bitstream);
         }
         bundle.clearBitstreams();
 
->>>>>>> dspace-7.2.1
         List<Item> items = new LinkedList<>(bundle.getItems());
         bundle.getItems().clear();
         for (Item item : items) {

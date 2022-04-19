@@ -7,10 +7,6 @@
  */
 package org.dspace.app.itemexport;
 
-<<<<<<< HEAD
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-=======
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,7 +35,6 @@ import javax.mail.MessagingException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
->>>>>>> dspace-7.2.1
 import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -53,16 +48,12 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-<<<<<<< HEAD
-import org.dspace.core.*;
-=======
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
->>>>>>> dspace-7.2.1
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleService;
@@ -287,18 +278,6 @@ public class ItemExportServiceImpl implements ItemExportService {
 
                 if (!migrate ||
                     (migrate && !(
-<<<<<<< HEAD
-                     ("date".equals(metadataField.getElement()) && "issued".equals(qualifier)) ||
-                     ("date".equals(metadataField.getElement()) && "accessioned".equals(qualifier)) ||
-                     ("date".equals(metadataField.getElement()) && "available".equals(qualifier)) ||
-                     ("identifier".equals(metadataField.getElement()) && "uri".equals(qualifier) &&
-                      (dcv.getValue() != null && dcv.getValue().startsWith(handleService.getCanonicalPrefix() +
-                          handleService.getPrefix() + "/"))) ||
-                     ("description".equals(metadataField.getElement()) && "provenance".equals(qualifier)) ||
-                     ("format".equals(metadataField.getElement()) && "extent".equals(qualifier)) ||
-                     ("format".equals(metadataField.getElement()) && "mimetype".equals(qualifier)))))
-                {
-=======
                         ("date".equals(metadataField.getElement()) && "issued".equals(qualifier)) ||
                             ("date".equals(metadataField.getElement()) && "accessioned".equals(qualifier)) ||
                             ("date".equals(metadataField.getElement()) && "available".equals(qualifier)) ||
@@ -308,7 +287,6 @@ public class ItemExportServiceImpl implements ItemExportService {
                             ("description".equals(metadataField.getElement()) && "provenance".equals(qualifier)) ||
                             ("format".equals(metadataField.getElement()) && "extent".equals(qualifier)) ||
                             ("format".equals(metadataField.getElement()) && "mimetype".equals(qualifier))))) {
->>>>>>> dspace-7.2.1
                     out.write(utf8, 0, utf8.length);
                 }
 

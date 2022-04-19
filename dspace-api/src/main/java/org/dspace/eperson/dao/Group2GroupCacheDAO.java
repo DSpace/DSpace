@@ -15,12 +15,6 @@ import org.dspace.core.GenericDAO;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Group2GroupCache;
 
-<<<<<<< HEAD
-import java.sql.SQLException;
-import java.util.List;
-
-=======
->>>>>>> dspace-7.2.1
 /**
  * Database Access Object interface class for the Group2GroupCache object.
  * The implementation of this class is responsible for all database calls for the Group2GroupCache object and is

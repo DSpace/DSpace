@@ -762,8 +762,6 @@
       <internal>false</internal>
       <extension>epub</extension>
     </bitstream-type>
-<<<<<<< HEAD
-=======
 
     <bitstream-type>
         <mimetype>video/mp4</mimetype>
@@ -782,6 +780,5 @@
         <internal>false</internal>
         <extension>mp3</extension>
     </bitstream-type>
->>>>>>> dspace-7.2.1
 
 </dspace-bitstream-types>

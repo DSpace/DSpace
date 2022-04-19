@@ -11,24 +11,19 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
-<<<<<<< HEAD
-import org.apache.log4j.Logger;
-=======
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
->>>>>>> dspace-7.2.1
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-<<<<<<< HEAD
-=======
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
->>>>>>> dspace-7.2.1
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
@@ -42,17 +37,9 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-<<<<<<< HEAD
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Set;
-=======
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.springframework.beans.factory.annotation.Autowired;
->>>>>>> dspace-7.2.1
 
 /**
  * Restriction plugin that ensures that indexes all the resource policies.
@@ -135,12 +122,6 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                                 document.addField("admin", fieldValue);
                             }
 
-<<<<<<< HEAD
-                document.addField("read", fieldValue);
-
-                //remove the policy from the cache to save memory
-                context.uncacheEntity(resourcePolicy);
-=======
                             // remove the policy from the cache to save memory
                             context.uncacheEntity(resourcePolicy);
                         }
@@ -151,7 +132,6 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                 log.error(LogHelper.getHeader(context, "Error while indexing resource policies",
                                                "DSpace object: (id " + dso.getID() + " type " + dso.getType() + ")"
                 ));
->>>>>>> dspace-7.2.1
             }
         }
     }

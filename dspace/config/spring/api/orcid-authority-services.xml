@@ -28,11 +28,8 @@
     <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
         <property name="types">
             <list>
-<<<<<<< HEAD
-                <bean class="org.dspace.authority.orcid.Orcidv2AuthorityValue"/>
-=======
-                <!-- <bean class="org.dspace.authority.orcid.Orcidv3AuthorityValue"/> -->
->>>>>>> dspace-7.2.1
+                <!-- <bean class="org.dspace.authority.orcid.Orcidv2AuthorityValue"/> -->
+                <bean class="org.dspace.authority.orcid.Orcidv3AuthorityValue"/>
                 <bean class="org.dspace.authority.PersonAuthorityValue"/>
             </list>
         </property>
@@ -45,15 +42,4 @@
         </property>
     </bean>
 
-<<<<<<< HEAD
-
-    <alias name="OrcidSource" alias="AuthoritySource"/>
-    <bean name="OrcidSource" class="org.dspace.authority.orcid.Orcidv2" init-method="init">
-        <constructor-arg value="${orcid.api.url}"/>
-    </bean>
-
-
 </beans>
-=======
-</beans>
->>>>>>> dspace-7.2.1

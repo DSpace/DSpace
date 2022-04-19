@@ -7,16 +7,6 @@
  */
 package org.dspace.app.itemimport;
 
-<<<<<<< HEAD
-import gr.ekt.bte.core.DataLoader;
-import gr.ekt.bte.core.TransformationEngine;
-import gr.ekt.bte.core.TransformationResult;
-import gr.ekt.bte.core.TransformationSpec;
-import gr.ekt.bte.dataloader.FileDataLoader;
-import gr.ekt.bteio.generators.DSpaceOutputGenerator;
-import gr.ekt.bteio.loaders.OAIPMHDataLoader;
-import org.apache.commons.collections.ComparatorUtils;
-=======
 import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_HEIGHT_QUALIFIER;
 import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE_ELEMENT;
 import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_LABEL_ELEMENT;
@@ -63,7 +53,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.collections4.ComparatorUtils;
->>>>>>> dspace-7.2.1
 import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -82,10 +71,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-<<<<<<< HEAD
-import org.dspace.content.service.*;
-import org.dspace.core.*;
-=======
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -112,17 +97,12 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogHelper;
->>>>>>> dspace-7.2.1
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.service.HandleService;
-<<<<<<< HEAD
-import org.dspace.utils.DSpace;
-=======
 import org.dspace.services.ConfigurationService;
->>>>>>> dspace-7.2.1
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.springframework.beans.factory.InitializingBean;
@@ -563,12 +543,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 if (itemFolderMap.containsKey(folderName)) {
                     return itemFolderMap.get(folderName);
                 }
-<<<<<<< HEAD
-                Item item = addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
-                c.uncacheEntity(item);
-                c.commit();
-                System.out.println(i + " " + dircontents[i]);
-=======
 
             } else {
 
@@ -578,7 +552,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 String metaValue = itemIdentifier.substring(i + 1);
                 return findItemByMetaValue(c, metaKey, metaValue);
 
->>>>>>> dspace-7.2.1
             }
 
         } else if (itemIdentifier.indexOf('/') != -1) {
@@ -979,14 +952,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         if ("none".equals(qualifier) || "".equals(qualifier)) {
             qualifier = null;
         }
-<<<<<<< HEAD
-        // only add metadata if it is no test and there is a real value
-        if (!isTest && !value.equals(""))
-        {
-=======
         // only add metadata if it is no test and there is an actual value
         if (!isTest && !value.equals("")) {
->>>>>>> dspace-7.2.1
             itemService.addMetadata(c, i, schema, element, qualifier, language, value);
         } else {
             // If we're just test the import, let's check that the actual metadata field exists.

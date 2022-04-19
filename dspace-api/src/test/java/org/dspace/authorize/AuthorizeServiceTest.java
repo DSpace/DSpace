@@ -8,20 +8,14 @@
 
 package org.dspace.authorize;
 
-<<<<<<< HEAD
-=======
 import java.sql.SQLException;
 
->>>>>>> dspace-7.2.1
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
-<<<<<<< HEAD
-=======
 import org.dspace.content.service.CollectionService;
->>>>>>> dspace-7.2.1
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
@@ -32,31 +26,10 @@ import org.dspace.eperson.service.GroupService;
 import org.junit.Assert;
 import org.junit.Test;
 
-<<<<<<< HEAD
-import java.sql.SQLException;
-
-=======
->>>>>>> dspace-7.2.1
 /**
  * Created by pbecker as he wanted to write a test against DS-3572.
  * This definitely needs to be extended, but it's at least a start.
  */
-<<<<<<< HEAD
-public class AuthorizeServiceTest  extends AbstractUnitTest
-{
-
-    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-    protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
-    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-
-    public AuthorizeServiceTest()
-    {}
-
-    @Test
-    public void testauthorizeMethodDoesNotConfuseEPersonWithCurrentUser()
-    {
-=======
 public class AuthorizeServiceTest extends AbstractUnitTest {
 
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
@@ -71,18 +44,12 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
 
     @Test
     public void testauthorizeMethodDoesNotConfuseEPersonWithCurrentUser() {
->>>>>>> dspace-7.2.1
         Community dso;
         EPerson eperson1;
         EPerson eperson2;
         Group group;
 
-<<<<<<< HEAD
-        try
-        {
-=======
         try {
->>>>>>> dspace-7.2.1
             context.turnOffAuthorisationSystem();
 
             // create two epersons: one to test a permission the other one to be used as currentUser
@@ -106,19 +73,9 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
             // set the other eperson as the current user
             // Notice that it is not a member of the group, and does not have write permission
             context.setCurrentUser(eperson2);
-<<<<<<< HEAD
-        }
-        catch (SQLException | AuthorizeException ex)
-        {
-            throw new RuntimeException(ex);
-        }
-        finally
-        {
-=======
         } catch (SQLException | AuthorizeException ex) {
             throw new RuntimeException(ex);
         } finally {
->>>>>>> dspace-7.2.1
             context.restoreAuthSystemState();
         }
 
@@ -127,34 +84,12 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
             Assert.assertTrue(authorizeService.authorizeActionBoolean(context, eperson1, dso, Constants.WRITE, true));
             // person2 shouldn't have write access
             Assert.assertFalse(authorizeService.authorizeActionBoolean(context, eperson2, dso, Constants.WRITE, true));
-<<<<<<< HEAD
-        }
-        catch (SQLException ex)
-        {
-=======
         } catch (SQLException ex) {
->>>>>>> dspace-7.2.1
             throw new RuntimeException(ex);
         }
     }
 
     @Test
-<<<<<<< HEAD
-    public void testauthorizeMethodRespectSpecialGroups()
-    {
-
-        EPerson eperson1;
-        EPerson eperson2;
-        Group group1;
-
-        Community dso;
-        try
-        {
-            context.turnOffAuthorisationSystem();
-
-            // create an eperson and a group
-            eperson1 = ePersonService.create(context);
-=======
     public void testauthorizeMethodRespectSpecialGroups() {
 
         EPerson eperson;
@@ -166,7 +101,6 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
 
             // create an eperson and a group
             eperson = ePersonService.create(context);
->>>>>>> dspace-7.2.1
             group1 = groupService.create(context);
             // A group has to have a name, otherwise there are queries that break
             groupService.setName(group1, "My test group 2");
@@ -178,38 +112,16 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
             // special group to the user. Then test if the action on the DSO
             // is allowed for the user
             authorizeService.addPolicy(context, dso, Constants.ADD, group1);
-<<<<<<< HEAD
-            context.setCurrentUser(eperson1);
-            context.setSpecialGroup(group1.getID());
-            context.commit();
-        }
-        catch (SQLException | AuthorizeException ex)
-        {
-            throw new RuntimeException(ex);
-        }
-        finally
-        {
-=======
             context.setCurrentUser(eperson);
             context.setSpecialGroup(group1.getID());
             context.commit();
         } catch (SQLException | AuthorizeException ex) {
             throw new AssertionError(ex);
         } finally {
->>>>>>> dspace-7.2.1
             context.restoreAuthSystemState();
         }
 
         try {
-<<<<<<< HEAD
-            Assert.assertTrue(authorizeService.authorizeActionBoolean(context, eperson1, dso, Constants.ADD, true));
-        }
-        catch (SQLException ex)
-        {
-            throw new RuntimeException(ex);
-        }
-    }
-=======
             Assert.assertTrue(authorizeService.authorizeActionBoolean(context, eperson, dso, Constants.ADD, true));
         } catch (SQLException ex) {
             throw new AssertionError(ex);
@@ -283,5 +195,4 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
 //            context.restoreAuthSystemState();
 //        }
 //    }
->>>>>>> dspace-7.2.1
 }

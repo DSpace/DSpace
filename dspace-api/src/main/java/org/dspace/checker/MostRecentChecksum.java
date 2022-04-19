@@ -7,14 +7,6 @@
  */
 package org.dspace.checker;
 
-<<<<<<< HEAD
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.dspace.content.Bitstream;
-
-import javax.persistence.*;
-=======
->>>>>>> dspace-7.2.1
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
@@ -74,11 +66,7 @@ public class MostRecentChecksum implements Serializable {
     private boolean bitstreamFound;
 
     @OneToOne
-<<<<<<< HEAD
-    @JoinColumn(name= "result", referencedColumnName = "result_code")
-=======
     @JoinColumn(name = "result", referencedColumnName = "result_code")
->>>>>>> dspace-7.2.1
     private ChecksumResult checksumResult;
 
     /**
@@ -178,11 +166,6 @@ public class MostRecentChecksum implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-<<<<<<< HEAD
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-=======
         if (this == o) {
             return true;
         }
@@ -190,25 +173,10 @@ public class MostRecentChecksum implements Serializable {
         if (o == null || !(o instanceof MostRecentChecksum)) {
             return false;
         }
->>>>>>> dspace-7.2.1
 
         MostRecentChecksum that = (MostRecentChecksum) o;
 
         return new EqualsBuilder()
-<<<<<<< HEAD
-                .append(toBeProcessed, that.toBeProcessed)
-                .append(matchedPrevChecksum, that.matchedPrevChecksum)
-                .append(infoFound, that.infoFound)
-                .append(bitstreamFound, that.bitstreamFound)
-                .append(bitstream, that.bitstream)
-                .append(expectedChecksum, that.expectedChecksum)
-                .append(currentChecksum, that.currentChecksum)
-                .append(processStartDate, that.processStartDate)
-                .append(processEndDate, that.processEndDate)
-                .append(checksumAlgorithm, that.checksumAlgorithm)
-                .append(checksumResult, that.checksumResult)
-                .isEquals();
-=======
             .append(toBeProcessed, that.toBeProcessed)
             .append(matchedPrevChecksum, that.matchedPrevChecksum)
             .append(infoFound, that.infoFound)
@@ -221,26 +189,11 @@ public class MostRecentChecksum implements Serializable {
             .append(checksumAlgorithm, that.checksumAlgorithm)
             .append(checksumResult, that.checksumResult)
             .isEquals();
->>>>>>> dspace-7.2.1
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-<<<<<<< HEAD
-                .append(bitstream)
-                .append(toBeProcessed)
-                .append(expectedChecksum)
-                .append(currentChecksum)
-                .append(processStartDate)
-                .append(processEndDate)
-                .append(checksumAlgorithm)
-                .append(matchedPrevChecksum)
-                .append(infoFound)
-                .append(bitstreamFound)
-                .append(checksumResult)
-                .toHashCode();
-=======
             .append(bitstream)
             .append(toBeProcessed)
             .append(expectedChecksum)
@@ -253,6 +206,5 @@ public class MostRecentChecksum implements Serializable {
             .append(bitstreamFound)
             .append(checksumResult)
             .toHashCode();
->>>>>>> dspace-7.2.1
     }
 }

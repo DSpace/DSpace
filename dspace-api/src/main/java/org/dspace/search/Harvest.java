@@ -99,32 +99,6 @@ public class Harvest {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);
 
-<<<<<<< HEAD
-        if (scope != null)
-        {
-            if (scope instanceof Community) 
-            {
-                discoverQuery.addFilterQueries("location:m" + scope.getID());
-            } 
-            else if (scope instanceof Collection) 
-            {
-                discoverQuery.addFilterQueries("location:l" + scope.getID());
-            }
-        }
-        
-        if (startDate != null && endDate != null)
-        {
-            discoverQuery.addFilterQueries("lastModified:[" + new DCDate(startDate).toString() 
-                                                   + " TO " + new DCDate(endDate).toString()+ "]");
-        }
-        else if (startDate != null)
-        {
-            discoverQuery.addFilterQueries("lastModified:[" + new DCDate(startDate).toString() + " TO *]");
-        }
-        else if (endDate != null)
-        {
-            discoverQuery.addFilterQueries("lastModified:[* TO " + new DCDate(endDate).toString()+ " ]");
-=======
         if (scope != null) {
             if (scope instanceof Community) {
                 discoverQuery.addFilterQueries("location:m" + scope.getID());
@@ -140,7 +114,6 @@ public class Harvest {
             discoverQuery.addFilterQueries("lastModified:[" + new DCDate(startDate).toString() + " TO *]");
         } else if (endDate != null) {
             discoverQuery.addFilterQueries("lastModified:[* TO " + new DCDate(endDate).toString() + " ]");
->>>>>>> dspace-7.2.1
         }
 
         if (!withdrawn) {

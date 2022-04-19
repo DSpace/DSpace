@@ -45,11 +45,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
-<<<<<<< HEAD
-import org.dspace.core.LogManager;
-=======
 import org.dspace.core.LogHelper;
->>>>>>> dspace-7.2.1
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Item;
 import org.dspace.rest.common.MetadataEntry;
@@ -374,21 +370,6 @@ public class CollectionsResource extends Resource {
 
             workspaceItemService.update(context, workspaceItem);
 
-<<<<<<< HEAD
-            try
-            {
-                // Must insert the item into workflow
-                log.trace("Starting workflow for item(id=" + dspaceItem.getID() + ").");
-                workflowService.start(context, workspaceItem);
-            }
-            catch (Exception e)
-            {
-                log.error(LogManager.getHeader(context, "Error while starting workflow", "Item id: " + dspaceItem.getID()), e);
-                throw new ContextException("Error while starting workflow for item(id=" + dspaceItem.getID() + ")", e);
-            }
-
-            returnItem = new Item(workspaceItem.getItem(), servletContext, "",context);
-=======
             try {
                 // Must insert the item into workflow
                 log.trace("Starting workflow for item(id=" + dspaceItem.getID() + ").");
@@ -402,7 +383,6 @@ public class CollectionsResource extends Resource {
             }
 
             returnItem = new Item(workspaceItem.getItem(), servletContext, "", context);
->>>>>>> dspace-7.2.1
 
             context.complete();
 

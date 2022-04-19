@@ -59,11 +59,7 @@ public class ClamScan extends AbstractCurationTask {
     protected final String NEW_ITEM_HANDLE = "in workflow";
 
     private static final Logger log = LoggerFactory.getLogger(ClamScan.class);
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> dspace-7.2.1
     protected String host = null;
     protected int port = 0;
     protected int timeout = 0;
@@ -200,34 +196,15 @@ public class ClamScan extends AbstractCurationTask {
         }
     }
 
-<<<<<<< HEAD
-    /** A buffer to hold chunks of an input stream to be scanned for viruses. */
-=======
     /**
      * A buffer to hold chunks of an input stream to be scanned for viruses.
      */
->>>>>>> dspace-7.2.1
     final byte[] buffer = new byte[DEFAULT_CHUNK_SIZE];
 
     /**
      * Issue the INSTREAM command and return the response to
      * and from the clamav daemon.
      *
-<<<<<<< HEAD
-     * @param bitstream the bitstream for reporting results
-     * @param inputstream the InputStream to read
-     * @param itemHandle the item handle for reporting results
-     * @return a ScanResult representing the server response
-     */
-    protected int scan(Bitstream bitstream, InputStream inputstream, String itemHandle)
-    {
-        try
-        {
-            dataOutputStream.write(INSTREAM);
-        }
-        catch (IOException e)
-        {
-=======
      * @param bitstream   the bitstream for reporting results
      * @param inputstream the InputStream to read
      * @param itemHandle  the item handle for reporting results
@@ -237,7 +214,6 @@ public class ClamScan extends AbstractCurationTask {
         try {
             dataOutputStream.write(INSTREAM);
         } catch (IOException e) {
->>>>>>> dspace-7.2.1
             log.error("Error writing INSTREAM command", e);
             return Curator.CURATE_ERROR;
         }
@@ -245,13 +221,7 @@ public class ClamScan extends AbstractCurationTask {
         while (read == DEFAULT_CHUNK_SIZE) {
             try {
                 read = inputstream.read(buffer);
-<<<<<<< HEAD
-            }
-            catch (IOException e)
-            {
-=======
             } catch (IOException e) {
->>>>>>> dspace-7.2.1
                 log.error("Failed attempting to read the InputStream", e);
                 return Curator.CURATE_ERROR;
             }
@@ -261,13 +231,7 @@ public class ClamScan extends AbstractCurationTask {
             try {
                 dataOutputStream.writeInt(read);
                 dataOutputStream.write(buffer, 0, read);
-<<<<<<< HEAD
-            }
-            catch (IOException e)
-            {
-=======
             } catch (IOException e) {
->>>>>>> dspace-7.2.1
                 log.error("Could not write to the socket", e);
                 return Curator.CURATE_ERROR;
             }
@@ -275,41 +239,22 @@ public class ClamScan extends AbstractCurationTask {
         try {
             dataOutputStream.writeInt(0);
             dataOutputStream.flush();
-<<<<<<< HEAD
-        }
-        catch (IOException e)
-        {
-            log.error("Error writing zero-length chunk to socket", e) ;
-=======
         } catch (IOException e) {
             log.error("Error writing zero-length chunk to socket", e);
->>>>>>> dspace-7.2.1
             return Curator.CURATE_ERROR;
         }
         try {
             read = socket.getInputStream().read(buffer);
 
-<<<<<<< HEAD
-        }
-        catch (IOException e)
-        {
-            log.error( "Error reading result from socket", e);
-=======
         } catch (IOException e) {
             log.error("Error reading result from socket", e);
->>>>>>> dspace-7.2.1
             return Curator.CURATE_ERROR;
         }
 
         if (read > 0) {
             String response = new String(buffer, 0, read);
             logDebugMessage("Response: " + response);
-<<<<<<< HEAD
-            if (response.contains("FOUND"))
-            {
-=======
             if (response.contains("FOUND")) {
->>>>>>> dspace-7.2.1
                 String itemMsg = "item - " + itemHandle + ": ";
                 String bsMsg = "bitstream - " + bitstream.getName() +
                     ": SequenceId - " + bitstream.getSequenceID() + ": infected";

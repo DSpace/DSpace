@@ -7,10 +7,6 @@
  */
 package org.dspace.rest.authentication;
 
-<<<<<<< HEAD
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-=======
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,16 +15,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
->>>>>>> dspace-7.2.1
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
-<<<<<<< HEAD
-import org.dspace.core.LogManager;
-=======
 import org.dspace.core.LogHelper;
->>>>>>> dspace-7.2.1
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.utils.DSpace;
@@ -86,11 +77,6 @@ public class DSpaceAuthenticationProvider implements AuthenticationProvider {
 
                     return createAuthenticationToken(password, context, grantedAuthorities);
 
-<<<<<<< HEAD
-                    return createAuthenticationToken(password, context, grantedAuthorities);
-
-=======
->>>>>>> dspace-7.2.1
                 } else {
                     log.info(LogHelper.getHeader(context, "failed_login",
                             "email=" + name + ", result=" + authenticateResult));
@@ -123,15 +109,6 @@ public class DSpaceAuthenticationProvider implements AuthenticationProvider {
         }
     }
 
-<<<<<<< HEAD
-    private Authentication createAuthenticationToken(final String password, final Context context, final List<SimpleGrantedAuthority> grantedAuthorities) {
-        EPerson ePerson = context.getCurrentUser();
-        if(ePerson != null && StringUtils.isNotBlank(ePerson.getEmail())) {
-            return new UsernamePasswordAuthenticationToken(ePerson.getEmail(), password, grantedAuthorities);
-
-        } else {
-            log.info(LogManager.getHeader(context, "failed_login", "No eperson with an non-blank e-mail address found"));
-=======
     private Authentication createAuthenticationToken(final String password, final Context context,
                                                      final List<SimpleGrantedAuthority> grantedAuthorities) {
         EPerson ePerson = context.getCurrentUser();
@@ -141,7 +118,6 @@ public class DSpaceAuthenticationProvider implements AuthenticationProvider {
         } else {
             log.info(LogHelper.getHeader(context, "failed_login",
                     "No eperson with an non-blank e-mail address found"));
->>>>>>> dspace-7.2.1
             throw new BadCredentialsException("Login failed");
         }
     }

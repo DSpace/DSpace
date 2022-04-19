@@ -44,89 +44,11 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
 
     private IndexClientOptions indexClientOptions;
 
-<<<<<<< HEAD
-    /**
-     * When invoked as a command-line tool, creates, updates, removes content
-     * from the whole index
-     *
-     * @param args the command-line arguments, none used
-     * @throws java.io.IOException
-     * @throws SQLException if database error
-     *
-     */
-    public static void main(String[] args) throws SQLException, IOException, SearchServiceException {
-
-        Context context = new Context(Context.Mode.READ_ONLY);
-        context.turnOffAuthorisationSystem();
-
-        String usage = "org.dspace.discovery.IndexClient [-cbhf] | [-r <handle>] | [-i <handle>] or nothing to update/clean an existing index.";
-        Options options = new Options();
-        HelpFormatter formatter = new HelpFormatter();
-        CommandLine line = null;
-
-        options
-                .addOption(OptionBuilder
-                        .withArgName("handle to remove")
-                        .hasArg(true)
-                        .withDescription(
-                                "remove an Item, Collection or Community from index based on its handle")
-                        .create("r"));
-
-        options
-                .addOption(OptionBuilder
-                        .withArgName("handle to add or update")
-                        .hasArg(true)
-                        .withDescription(
-                                "add or update an Item, Collection or Community based on its handle")
-                        .create("i"));
-
-        options
-                .addOption(OptionBuilder
-                        .isRequired(false)
-                        .withDescription(
-                                "clean existing index removing any documents that no longer exist in the db")
-                        .create("c"));
-
-        options.addOption(OptionBuilder.isRequired(false).withDescription(
-                "(re)build index, wiping out current one if it exists").create(
-                "b"));
-
-        options.addOption(OptionBuilder.isRequired(false).withDescription(
-                "Rebuild the spellchecker, can be combined with -b and -f.").create(
-                "s"));
-
-        options
-                .addOption(OptionBuilder
-                        .isRequired(false)
-                        .withDescription(
-                                "if updating existing index, force each handle to be reindexed even if uptodate")
-                        .create("f"));
-
-        options.addOption(OptionBuilder.isRequired(false).withDescription(
-                "print this help message").create("h"));
-
-        options.addOption(OptionBuilder.isRequired(false).withDescription(
-                "optimize search core").create("o"));
-
-        try {
-            line = new PosixParser().parse(options, args);
-        } catch (Exception e) {
-            // automatically generate the help statement
-            formatter.printHelp(usage, e.getMessage(), options, "");
-            System.exit(1);
-        }
-
-        if (line.hasOption("h")) {
-            // automatically generate the help statement
-            formatter.printHelp(usage, options);
-            System.exit(1);
-=======
     @Override
     public void internalRun() throws Exception {
         if (indexClientOptions == IndexClientOptions.HELP) {
             printHelp();
             return;
->>>>>>> dspace-7.2.1
         }
 
         /** Acquire from dspace-services in future */
@@ -196,11 +118,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             if (!indexableObject.isPresent()) {
                 throw new IllegalArgumentException("Cannot resolve " + param + " to a DSpace object");
             }
-<<<<<<< HEAD
-            log.info("Forcibly Indexing " + handle);
-=======
             handler.logInfo("Indexing " + param + " force " + commandLine.hasOption("f"));
->>>>>>> dspace-7.2.1
             final long startTimeMillis = System.currentTimeMillis();
             final long count = indexAll(indexer, ContentServiceFactory.getInstance().
                     getItemService(), context, indexableObject.get());

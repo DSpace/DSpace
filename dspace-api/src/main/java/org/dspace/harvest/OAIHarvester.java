@@ -248,16 +248,6 @@ public class OAIHarvester {
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      */
-<<<<<<< HEAD
-	public void runHarvest() throws SQLException, IOException, AuthorizeException
-	{
-		Context.Mode originalMode = ourContext.getCurrentMode();
-		ourContext.setMode(Context.Mode.BATCH_EDIT);
-
-		// figure out the relevant parameters
-		String oaiSource = harvestRow.getOaiSource();
-		String oaiSetId = harvestRow.getOaiSetId();
-=======
     public void runHarvest() throws SQLException, IOException, AuthorizeException {
         Context.Mode originalMode = ourContext.getCurrentMode();
         ourContext.setMode(Context.Mode.BATCH_EDIT);
@@ -266,7 +256,6 @@ public class OAIHarvester {
         String oaiSource = harvestRow.getOaiSource();
         String oaiSetId = harvestRow.getOaiSetId();
 
->>>>>>> dspace-7.2.1
         //If we have all selected then make sure that we do not include a set filter
         if ("all".equals(oaiSetId)) {
             oaiSetId = null;
@@ -456,36 +445,6 @@ public class OAIHarvester {
         } finally {
             harvestedCollectionService.update(ourContext, harvestRow);
             ourContext.turnOffAuthorisationSystem();
-<<<<<<< HEAD
-			collectionService.update(ourContext, targetCollection);
-			ourContext.restoreAuthSystemState();
-		}
-
-		// If we got to this point, it means the harvest was completely successful
-		Date finishTime = new Date();
-		long timeTaken = finishTime.getTime() - startTime.getTime();
-		harvestRow.setHarvestStartTime(startTime);
-		harvestRow.setHarvestMessage("Harvest from " + oaiSource + " successful");
-		harvestRow.setHarvestStatus(HarvestedCollection.STATUS_READY);
-		log.info("Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds. Harvested " + currentRecord + " items.");
-		harvestedCollection.update(ourContext, harvestRow);
-
-		ourContext.setMode(originalMode);
-	}
-
-	private void intermediateCommit() throws SQLException {
-		ourContext.commit();
-		reloadRequiredEntities();
-	}
-
-	private void reloadRequiredEntities() throws SQLException {
-		//Reload our objects in our cache
-		targetCollection = ourContext.reloadEntity(targetCollection);
-		harvestRow = ourContext.reloadEntity(harvestRow);
-	}
-
-	/**
-=======
             collectionService.update(ourContext, targetCollection);
             ourContext.restoreAuthSystemState();
         }
@@ -516,7 +475,6 @@ public class OAIHarvester {
     }
 
     /**
->>>>>>> dspace-7.2.1
      * Process an individual PMH record, making (or updating) a corresponding DSpace Item.
      *
      * @param record        a JDOM Element containing the actual PMH record with descriptive metadata.
@@ -707,21 +665,10 @@ public class OAIHarvester {
         log.info(String.format("Item %s (%s) has been ingested (item %d of %d). The whole process took: %d ms.",
                                item.getHandle(), item.getID(), currentRecord, totalListSize, timeTaken));
 
-<<<<<<< HEAD
-		//Clear the context cache
-		ourContext.uncacheEntity(wi);
-		ourContext.uncacheEntity(hi);
-		ourContext.uncacheEntity(item);
-
-    	// Stop ignoring authorization
-    	ourContext.restoreAuthSystemState();
-    }
-=======
         //Clear the context cache
         ourContext.uncacheEntity(wi);
         ourContext.uncacheEntity(hi);
         ourContext.uncacheEntity(item);
->>>>>>> dspace-7.2.1
 
         // Stop ignoring authorization
         ourContext.restoreAuthSystemState();

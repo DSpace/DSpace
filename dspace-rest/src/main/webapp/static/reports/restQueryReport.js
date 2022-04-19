@@ -10,15 +10,6 @@ var QueryReport = function() {
     
     //If sortable.js is included, uncomment the following
     //this.hasSorttable = function(){return true;}
-<<<<<<< HEAD
-
-    //Indicate if Password Authentication is supported
-    //this.makeAuthLink = function(){return true;};
-    //Indicate if Shibboleth Authentication is supported
-    //this.makeShibLink = function(){return true;};
-
-=======
->>>>>>> dspace-7.2.1
     this.getLangSuffix = function(){
       return "[en]";
     }

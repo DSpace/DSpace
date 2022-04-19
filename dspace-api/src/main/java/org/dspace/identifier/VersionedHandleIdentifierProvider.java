@@ -392,22 +392,12 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         }
         return identifier;
     }
-<<<<<<< HEAD
-    
-    protected void populateHandleMetadata(Context context, Item item, String handle)
-            throws SQLException, IOException, AuthorizeException
-    {
-        String handleref = handleService.getCanonicalForm(handle);
-        // we want to remove the old handle and insert the new. To do so, we 
-        // load all identifiers, clear the metadata field, re add all 
-=======
 
     protected void populateHandleMetadata(Context context, DSpaceObject dso, String handle)
         throws SQLException, IOException, AuthorizeException {
         String handleref = handleService.getCanonicalForm(handle);
         // we want to remove the old handle and insert the new. To do so, we
         // load all identifiers, clear the metadata field, re add all
->>>>>>> dspace-7.2.1
         // identifiers which are not from type handle and add the new handle.
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
         List<MetadataValue> identifiers = dsoService.getMetadata(dso,

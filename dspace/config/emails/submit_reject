@@ -1,24 +1,12 @@
-<<<<<<< HEAD
-# Rejection email message
-#
-# {0}  Title of submission
-# {1}  Name of collection
-# {2}  Name of the rejector
-# {3}  Reason for the rejection
-# {4}  Link to 'My DRUM' page
-#
-Subject: DRUM: Submission Rejected
-=======
 ## Rejection email message
 ##
 ## {0}  Title of submission
 ## {1}  Name of collection
 ## {2}  Name of the rejector
 ## {3}  Reason for the rejection
-## {4}  Link to 'My DSpace' page
+## {4}  Link to 'My DRUM' page
 ##
-#set($subject = 'DSpace: Submission Rejected')
->>>>>>> dspace-7.2.1
+#set($subject = 'DRUM: Submission Rejected')
 
 You submitted: ${params[0]}
 
@@ -30,10 +18,6 @@ with the following explanation:
 ${params[3]}
 
 Your submission has not been deleted.  You can access it from your
-<<<<<<< HEAD
-"My DRUM" page: {4}
-=======
 "My DSpace" page: ${params[4]}
->>>>>>> dspace-7.2.1
 
 DRUM

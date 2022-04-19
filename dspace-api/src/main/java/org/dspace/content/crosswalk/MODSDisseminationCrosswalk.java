@@ -40,11 +40,8 @@ import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-<<<<<<< HEAD
-=======
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
->>>>>>> dspace-7.2.1
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -103,11 +100,8 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     protected final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
-<<<<<<< HEAD
-=======
     protected static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
->>>>>>> dspace-7.2.1
 
     /**
      * Fill in the plugin alias table from DSpace configuration entries
@@ -425,11 +419,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         List<MetadataValueDTO> metadata = new ArrayList<>();
 
         String identifier_uri = handleService.getCanonicalPrefix()
-<<<<<<< HEAD
-                + site.getHandle();
-=======
             + site.getHandle();
->>>>>>> dspace-7.2.1
         String title = site.getName();
         String url = site.getURL();
 
@@ -456,19 +446,6 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      * @param community The community to derive metadata from
      * @return list of metadata
      */
-<<<<<<< HEAD
-    protected List<MockMetadataValue> community2Metadata(Community community)
-    {
-        List<MockMetadataValue> metadata = new ArrayList<>();
-
-        String description = communityService.getMetadata(community, "introductory_text");
-        String description_abstract = communityService.getMetadata(community, "short_description");
-        String description_table = communityService.getMetadata(community,"side_bar_text");
-        String identifier_uri = handleService.getCanonicalPrefix()
-                + community.getHandle();
-        String rights = communityService.getMetadata(community,"copyright_text");
-        String title = communityService.getMetadata(community,"name");
-=======
     protected List<MetadataValueDTO> community2Metadata(Community community) {
         List<MetadataValueDTO> metadata = new ArrayList<>();
 
@@ -484,7 +461,6 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                 CommunityService.MD_COPYRIGHT_TEXT, Item.ANY);
         String title = communityService.getMetadataFirstValue(community,
                 CommunityService.MD_NAME, Item.ANY);
->>>>>>> dspace-7.2.1
 
         metadata.add(createDCValue("description", null, description));
 
@@ -518,24 +494,6 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      * @param collection The collection to derive metadata from
      * @return list of metadata
      */
-<<<<<<< HEAD
-    protected List<MockMetadataValue> collection2Metadata(Collection collection)
-    {
-        List<MockMetadataValue> metadata = new ArrayList<>();
-
-        String description = collectionService.getMetadata(collection, "introductory_text");
-        String description_abstract = collectionService.getMetadata(collection, "short_description");
-        String description_table = collectionService.getMetadata(collection, "side_bar_text");
-        String identifier_uri = handleService.getCanonicalPrefix()
-                + collection.getHandle();
-        String provenance = collectionService.getMetadata(collection, "provenance_description");
-        String rights = collectionService.getMetadata(collection, "copyright_text");
-        String rights_license = collectionService.getMetadata(collection, "license");
-        String title = collectionService.getMetadata(collection, "name");
-
-        if (description != null)
-        {
-=======
     protected List<MetadataValueDTO> collection2Metadata(Collection collection) {
         List<MetadataValueDTO> metadata = new ArrayList<>();
 
@@ -557,7 +515,6 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                 CollectionService.MD_NAME, Item.ANY);
 
         if (description != null) {
->>>>>>> dspace-7.2.1
             metadata.add(createDCValue("description", null, description));
         }
 

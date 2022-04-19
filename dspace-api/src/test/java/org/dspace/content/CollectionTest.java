@@ -7,21 +7,6 @@
  */
 package org.dspace.content;
 
-<<<<<<< HEAD
-import mockit.NonStrictExpectations;
-import org.apache.log4j.Logger;
-import org.dspace.app.util.AuthorizeUtil;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.factory.CoreServiceFactory;
-import org.dspace.core.service.LicenseService;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-=======
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -36,7 +21,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
->>>>>>> dspace-7.2.1
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,10 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-<<<<<<< HEAD
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-=======
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -66,7 +46,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
->>>>>>> dspace-7.2.1
 
 /**
  * Unit Tests for class Collection
@@ -449,10 +428,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         Group g = groupService.create(context);
         context.restoreAuthSystemState();
         collection.setWorkflowGroup(context, step, g);
-<<<<<<< HEAD
-        assertThat("testSetWorkflowGroup 0",collectionService.getWorkflowGroup(collection, step), notNullValue());
-        assertThat("testSetWorkflowGroup 1",collectionService.getWorkflowGroup(collection, step), equalTo(g));
-=======
         assertThat("testSetWorkflowGroup 0", collectionService.getWorkflowGroup(context, collection, step),
                 notNullValue());
         assertThat("testSetWorkflowGroup 1", collectionService.getWorkflowGroup(context, collection, step), equalTo(g));
@@ -477,27 +452,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
                 notNullValue());
         assertThat("testSetWorkflowGroup 1", collectionService.getWorkflowGroup(context, collection, step),
                 equalTo(g2));
->>>>>>> dspace-7.2.1
-    }
-    
-    /**
-     * Test of setWorkflowGroup method, of class Collection.
-     * The setWorkflowGroup ajust the policies for the basic Workflow. This test
-     * shall assure that now exception (e.g. ConcurrentModificationException is
-     * thrown during these adjustments.
-     */
-    @Test
-    public void testChangeWorkflowGroup() throws SQLException, AuthorizeException
-    {
-        context.turnOffAuthorisationSystem(); //must be an Admin to create a Group
-        int step = 1;
-        Group g1 = groupService.create(context);
-        Group g2 = groupService.create(context);
-        context.restoreAuthSystemState();
-        collection.setWorkflowGroup(context, step, g1);
-        collection.setWorkflowGroup(context, step, g2);
-        assertThat("testSetWorkflowGroup 0",collectionService.getWorkflowGroup(collection, step), notNullValue());
-        assertThat("testSetWorkflowGroup 1",collectionService.getWorkflowGroup(collection, step), equalTo(g2));
     }
 
     /**
@@ -1062,26 +1016,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      * Test of getCommunities method, of class Collection.
      */
     @Test
-<<<<<<< HEAD
-    public void testGetCommunities() throws Exception
-    {
-        context.turnOffAuthorisationSystem();
-        Community community = communityService.create(null, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "community 3");
-        this.collection.addCommunity(community);
-        community = communityService.create(null, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "community 1");
-        this.collection.addCommunity(community);
-        community = communityService.create(null, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "community 2");
-        this.collection.addCommunity(community);
-        context.restoreAuthSystemState();
-        assertTrue("testGetCommunities 0",collection.getCommunities().size() == 4);
-        //Communities should be sorted by name
-        assertTrue("testGetCommunities 1",collection.getCommunities().get(1).getName().equals("community 1"));
-        assertTrue("testGetCommunities 1",collection.getCommunities().get(2).getName().equals("community 2"));
-        assertTrue("testGetCommunities 1",collection.getCommunities().get(3).getName().equals("community 3"));
-=======
     public void testGetCommunities() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = communityService.create(null, context);
@@ -1102,7 +1036,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         assertTrue("testGetCommunities 1", collection.getCommunities().get(1).getName().equals("community 1"));
         assertTrue("testGetCommunities 1", collection.getCommunities().get(2).getName().equals("community 2"));
         assertTrue("testGetCommunities 1", collection.getCommunities().get(3).getName().equals("community 3"));
->>>>>>> dspace-7.2.1
     }
 
     /**

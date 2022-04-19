@@ -96,21 +96,6 @@ public class MetadataImportInvalidHeadingException extends Exception {
      * @return The exception message
      */
     @Override
-<<<<<<< HEAD
-    public String getMessage()
-    {
-        if (type == SCHEMA)
-        {
-            return "Unknown metadata schema in column " + column + ": " + badHeading;
-        } else if (type == ELEMENT)
-        {
-            return "Unknown metadata element in column " + column + ": " + badHeading;
-        } else if (type == MISSING)
-        {
-            return "Row with missing header: column " + column;
-        } else
-        {
-=======
     public String getMessage() {
         if (type == SCHEMA) {
             return "Unknown metadata schema in column " + column + ": " + badHeading;
@@ -119,7 +104,6 @@ public class MetadataImportInvalidHeadingException extends Exception {
         } else if (type == MISSING) {
             return "Row with missing header: column " + column;
         } else {
->>>>>>> dspace-7.2.1
             return "Bad metadata declaration in column" + column + ": " + badHeading;
         }
     }

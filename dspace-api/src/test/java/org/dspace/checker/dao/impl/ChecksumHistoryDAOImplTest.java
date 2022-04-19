@@ -87,15 +87,9 @@ public class ChecksumHistoryDAOImplTest
         cal.add(Calendar.DATE, -1);
         Date matchDate = cal.getTime();
         checkId++;
-<<<<<<< HEAD
-        qry.setInteger("id", checkId);
-        qry.setDate("date", matchDate);
-        qry.setString("result", ChecksumResultCode.CHECKSUM_MATCH.name());
-=======
         qry.setParameter("id", checkId);
         qry.setParameter("date", matchDate);
         qry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
->>>>>>> dspace-7.2.1
         qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
         qry.executeUpdate();
 
@@ -103,15 +97,9 @@ public class ChecksumHistoryDAOImplTest
         cal.add(Calendar.DATE, -1);
         Date noMatchDate = cal.getTime();
         checkId++;
-<<<<<<< HEAD
-        qry.setInteger("id", checkId);
-        qry.setDate("date", noMatchDate);
-        qry.setString("result", ChecksumResultCode.CHECKSUM_NO_MATCH.name());
-=======
         qry.setParameter("id", checkId);
         qry.setParameter("date", noMatchDate);
         qry.setParameter("result", ChecksumResultCode.CHECKSUM_NO_MATCH.name());
->>>>>>> dspace-7.2.1
         qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
         qry.executeUpdate();
 
@@ -119,15 +107,9 @@ public class ChecksumHistoryDAOImplTest
         cal.add(Calendar.DATE, +3);
         Date futureDate = cal.getTime();
         checkId++;
-<<<<<<< HEAD
-        qry.setInteger("id", checkId);
-        qry.setDate("date", new java.sql.Date(futureDate.getTime()));
-        qry.setString("result", ChecksumResultCode.CHECKSUM_MATCH.name());
-=======
         qry.setParameter("id", checkId);
         qry.setParameter("date", new java.sql.Date(futureDate.getTime()));
         qry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
->>>>>>> dspace-7.2.1
         qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
         qry.executeUpdate();
 

@@ -26,13 +26,6 @@ import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-<<<<<<< HEAD
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.*;
-
-=======
->>>>>>> dspace-7.2.1
 /**
  * Service implementation for the PoolTask object.
  * This class is responsible for all business logic calls for the PoolTask object and is autowired by spring.

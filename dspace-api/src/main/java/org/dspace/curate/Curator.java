@@ -71,14 +71,6 @@ public class Curator {
     }
 
     // transaction scopes
-<<<<<<< HEAD
-    public static enum TxScope { OBJECT, CURATION, OPEN };
-
-    private static final Logger log = Logger.getLogger(Curator.class);
-    
-    protected static final ThreadLocal<Context> curationCtx = new ThreadLocal<>();
-    
-=======
     public static enum TxScope {
         OBJECT, CURATION, OPEN
     }
@@ -88,7 +80,6 @@ public class Curator {
     protected static final ThreadLocal<Context> curationCtx = new ThreadLocal<>();
 
     protected final Map<String, String> runParameters = new HashMap<>();
->>>>>>> dspace-7.2.1
     protected Map<String, TaskRunner> trMap = new HashMap<>();
     protected List<String> perfList = new ArrayList<>();
     protected TaskQueue taskQ = null;
@@ -232,11 +223,7 @@ public class Curator {
      * Note:  this method has the side-effect of setting this instance's Context
      * reference.  The setting is retained on return.
      *
-<<<<<<< HEAD
-     * @param c a DSpace context
-=======
      * @param c  a DSpace context
->>>>>>> dspace-7.2.1
      * @param id an object identifier
      * @throws IOException if IO error
      */
@@ -273,16 +260,6 @@ public class Curator {
     /**
      * Performs all configured tasks upon DSpace object
      * (Community, Collection or Item).
-<<<<<<< HEAD
-     * <P>
-     * Note: Site-wide tasks will default to running as
-     * an Anonymous User unless you call the Site-wide task
-     * via the {@link curate(Context,String)} or
-     * {@link #curate(Context, DSpaceObject)} method with an
-     * authenticated Context object.
-     *
-=======
->>>>>>> dspace-7.2.1
      * @param dso the DSpace object
      * @throws IOException if IO error
      */
@@ -314,21 +291,12 @@ public class Curator {
      * Note:  this method has the side-effect of setting this instance's Context
      * reference.  The setting is retained on return.
      *
-<<<<<<< HEAD
-     * @param c session context in which curation takes place.
-=======
      * @param c   session context in which curation takes place.
->>>>>>> dspace-7.2.1
      * @param dso the single object to be curated.
      * @throws java.io.IOException passed through.
      */
     public void curate(Context c, DSpaceObject dso)
-<<<<<<< HEAD
-            throws IOException
-    {
-=======
         throws IOException {
->>>>>>> dspace-7.2.1
         curationCtx.set(c);
         curate(dso);
     }
@@ -532,21 +500,11 @@ public class Curator {
             }
             Context context = curationContext();
             Iterator<Item> iter = itemService.findByCollection(context, coll);
-<<<<<<< HEAD
-            while (iter.hasNext())
-            {
-                Item item = iter.next();
-                boolean shouldContinue = tr.run(item);
-                context.uncacheEntity(item);
-                if (!shouldContinue)
-                {
-=======
             while (iter.hasNext()) {
                 Item item = iter.next();
                 boolean shouldContinue = tr.run(item);
                 context.uncacheEntity(item);
                 if (!shouldContinue) {
->>>>>>> dspace-7.2.1
                     return false;
                 }
             }

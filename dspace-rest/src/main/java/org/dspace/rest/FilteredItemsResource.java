@@ -100,19 +100,6 @@ public class FilteredItemsResource extends Resource {
      *                                 context(ContextException). It is thrown by NOT_FOUND and
      *                                 UNATHORIZED status codes, too.
      */
-<<<<<<< HEAD
-	@GET
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.ItemFilter getItemQuery(@QueryParam("expand") String expand, 
-    		@QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
-    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
-    		@QueryParam("filters") @DefaultValue("is_item,all_filters") String filters,
-            @QueryParam("query_field[]") @DefaultValue("dc.title") List<String> query_field,
-            @QueryParam("query_op[]") @DefaultValue("exists") List<String> query_op,
-            @QueryParam("query_val[]") @DefaultValue("") List<String> query_val,
-            @QueryParam("collSel[]") @DefaultValue("") List<String> collSel,
-    		@Context HttpHeaders headers, @Context HttpServletRequest request, @Context ServletContext servletContext) {
-=======
     @GET
     @Produces( {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public org.dspace.rest.common.ItemFilter getItemQuery(@QueryParam("expand") String expand,
@@ -134,17 +121,12 @@ public class FilteredItemsResource extends Resource {
                                                           @Context HttpHeaders headers,
                                                           @Context HttpServletRequest request,
                                                           @Context ServletContext servletContext) {
->>>>>>> dspace-7.2.1
         org.dspace.core.Context context = null;
         ItemFilterSet itemFilterSet = new ItemFilterSet(filters, true);
         ItemFilter result = itemFilterSet.getAllFiltersFilter();
         try {
             context = createContext();
-<<<<<<< HEAD
-            
-=======
 
->>>>>>> dspace-7.2.1
             int index = Math.min(query_field.size(), Math.min(query_op.size(), query_val.size()));
             List<ItemFilterQuery> itemFilterQueries = new ArrayList<ItemFilterQuery>();
             for (int i = 0; i < index; i++) {
@@ -163,18 +145,11 @@ public class FilteredItemsResource extends Resource {
                 .findByMetadataQuery(context, listFieldList, query_op, query_val, uuids, regexClause, offset, limit);
 
             int count = itemFilterSet.processSaveItems(context, servletContext, childItems, true, expand);
-<<<<<<< HEAD
-    	    writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
-    	    result.annotateQuery(query_field, query_op, query_val);
-    	    result.setUnfilteredItemCount(count);
-    	    context.complete();
-=======
             writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                        headers, request, context);
             result.annotateQuery(query_field, query_op, query_val);
             result.setUnfilteredItemCount(count);
             context.complete();
->>>>>>> dspace-7.2.1
         } catch (IOException e) {
             processException(e.getMessage(), context);
         } catch (SQLException e) {

@@ -24,14 +24,6 @@ import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
-<<<<<<< HEAD
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-
-=======
->>>>>>> dspace-7.2.1
 /**
  * Service implementation for the MetadataValue object.
  * This class is responsible for all business logic calls for the MetadataValue object and is autowired by spring.

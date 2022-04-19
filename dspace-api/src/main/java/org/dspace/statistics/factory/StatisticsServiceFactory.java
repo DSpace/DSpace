@@ -9,10 +9,6 @@ package org.dspace.statistics.factory;
 
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.service.SolrLoggerService;
-<<<<<<< HEAD
-import org.dspace.statistics.util.SpiderDetector;
-=======
->>>>>>> dspace-7.2.1
 import org.dspace.statistics.util.SpiderDetectorService;
 
 /**
@@ -27,16 +23,8 @@ public abstract class StatisticsServiceFactory {
 
     public abstract SpiderDetectorService getSpiderDetectorService();
 
-<<<<<<< HEAD
-    public abstract SpiderDetectorService getSpiderDetectorService();
-
-    public static StatisticsServiceFactory getInstance()
-    {
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("statisticsServiceFactory", StatisticsServiceFactory.class);
-=======
     public static StatisticsServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
                                     .getServiceByName("statisticsServiceFactory", StatisticsServiceFactory.class);
->>>>>>> dspace-7.2.1
     }
 }

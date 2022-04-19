@@ -7,8 +7,6 @@
  */
 package org.dspace.content;
 
-<<<<<<< HEAD
-=======
 import static org.dspace.content.service.DSpaceObjectService.MD_LICENSE;
 
 import java.sql.SQLException;
@@ -31,7 +29,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.dspace.authorize.AuthorizeException;
->>>>>>> dspace-7.2.1
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -41,14 +38,6 @@ import org.dspace.eperson.Group;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
 
-<<<<<<< HEAD
-import javax.persistence.*;
-import java.sql.SQLException;
-import java.util.*;
-import org.dspace.authorize.AuthorizeException;
-
-=======
->>>>>>> dspace-7.2.1
 /**
  * Class representing a collection.
  * <P>
@@ -63,18 +52,10 @@ import org.dspace.authorize.AuthorizeException;
  * @author Robert Tansley
  */
 @Entity
-<<<<<<< HEAD
-@Table(name="collection")
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport
-{
-=======
 @Table(name = "collection")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport {
->>>>>>> dspace-7.2.1
 
     @Column(name = "collection_id", insertable = false, updatable = false)
     private Integer legacyId;
@@ -109,11 +90,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         joinColumns = {@JoinColumn(name = "collection_id")},
         inverseJoinColumns = {@JoinColumn(name = "community_id")}
     )
-<<<<<<< HEAD
-    private Set<Community> communities = new HashSet<>();
-=======
     private final Set<Community> communities = new HashSet<>();
->>>>>>> dspace-7.2.1
 
     @Transient
     private transient CollectionService collectionService;
@@ -280,18 +257,10 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * @return array of <code>Community</code> objects
      * @throws SQLException if database error
      */
-<<<<<<< HEAD
-    public List<Community> getCommunities() throws SQLException
-    {
-        // We return a copy because we do not want people to add elements to this collection directly.
-        // We return a list to maintain backwards compatibility
-        Community[] output = communities.toArray(new Community[]{});
-=======
     public List<Community> getCommunities() throws SQLException {
         // We return a copy because we do not want people to add elements to this collection directly.
         // We return a list to maintain backwards compatibility
         Community[] output = communities.toArray(new Community[] {});
->>>>>>> dspace-7.2.1
         Arrays.sort(output, new NameAscendingComparator());
         return Arrays.asList(output);
     }
@@ -351,12 +320,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     }
 
     public void setWorkflowGroup(Context context, int step, Group g)
-<<<<<<< HEAD
-            throws SQLException, AuthorizeException 
-    {
-=======
         throws SQLException, AuthorizeException {
->>>>>>> dspace-7.2.1
         getCollectionService().setWorkflowGroup(context, this, step, g);
     }
 
@@ -371,8 +335,5 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         }
         return collectionService;
     }
-<<<<<<< HEAD
-=======
 
->>>>>>> dspace-7.2.1
 }

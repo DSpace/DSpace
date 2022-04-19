@@ -8,14 +8,6 @@
 
 package org.dspace.identifier.doi;
 
-<<<<<<< HEAD
-import org.apache.commons.cli.*;
-import org.apache.log4j.Logger;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.ItemService;
-import org.dspace.core.*;
-=======
 import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.SQLException;
@@ -43,7 +35,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
->>>>>>> dspace-7.2.1
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.DOI;
@@ -55,15 +46,6 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
-<<<<<<< HEAD
-import java.io.IOException;
-import java.io.PrintStream;
-import java.sql.SQLException;
-import java.util.*;
-
-
-=======
->>>>>>> dspace-7.2.1
 /**
  * @author Marsa Haoua
  * @author Pascal-Nicolas Becker

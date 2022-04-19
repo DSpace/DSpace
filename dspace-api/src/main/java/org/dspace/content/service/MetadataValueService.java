@@ -18,14 +18,6 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 
-<<<<<<< HEAD
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-
-=======
->>>>>>> dspace-7.2.1
 /**
  * Service interface class for the MetadataValue object.
  * The implementation of this class is responsible for all business logic calls for the MetadataValue object and is

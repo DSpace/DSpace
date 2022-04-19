@@ -167,14 +167,8 @@ public class XSLTIngestionCrosswalk
             throw new CrosswalkInternalException(
                 "Failed to initialize transformer, probably error loading stylesheet.");
         }
-<<<<<<< HEAD
-        try
-        {
-            JDOMSource source = new JDOMSource(new Document((Element)root.clone()));
-=======
         try {
             JDOMSource source = new JDOMSource(new Document((Element) root.clone()));
->>>>>>> dspace-7.2.1
             JDOMResult result = new JDOMResult();
             xform.transform(source, result);
             Document dimDoc = result.getDocument();

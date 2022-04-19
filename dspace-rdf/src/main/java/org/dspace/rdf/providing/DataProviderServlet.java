@@ -83,12 +83,7 @@ public class DataProviderServlet extends HttpServlet {
         // by RDFizer and RDFUtil we do not have to take care for permissions here!
         Context context = null;
         DSpaceObject dso = null;
-<<<<<<< HEAD
-        try
-        {
-=======
         try {
->>>>>>> dspace-7.2.1
             context = new Context(Context.Mode.READ_ONLY);
             dso = handleService.resolveToObject(context, handle);
         } catch (SQLException ex) {

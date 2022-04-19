@@ -119,12 +119,7 @@ public class HandleServiceImpl implements HandleService {
     }
 
     @Override
-<<<<<<< HEAD
-    public String getCanonicalPrefix()
-    {
-=======
     public String getCanonicalPrefix() {
->>>>>>> dspace-7.2.1
         // Let the admin define a new prefix, if not then we'll use the
         // CNRI default. This allows the admin to use "hdl:" if they want to or
         // use a locally branded prefix handle.myuni.edu.
@@ -134,17 +129,8 @@ public class HandleServiceImpl implements HandleService {
         return handlePrefix;
     }
 
-<<<<<<< HEAD
-        return handlePrefix;
-    }
-
-    @Override
-    public String getCanonicalForm(String handle)
-    {
-=======
     @Override
     public String getCanonicalForm(String handle) {
->>>>>>> dspace-7.2.1
         return getCanonicalPrefix() + handle;
     }
 
@@ -236,11 +222,7 @@ public class HandleServiceImpl implements HandleService {
 
                 //Also remove the handle from the DSO list to keep a consistent model
                 dso.getHandles().remove(handle);
-<<<<<<< HEAD
-                
-=======
 
->>>>>>> dspace-7.2.1
                 handleDAO.save(context, handle);
 
                 log.debug("Unbound Handle {} from object {} id={}",
@@ -248,17 +230,10 @@ public class HandleServiceImpl implements HandleService {
                     () -> Constants.typeText[dso.getType()],
                     () -> dso.getID());
             }
-<<<<<<< HEAD
-        }
-        else
-        {
-            log.trace("Cannot find Handle entry to unbind for object " + Constants.typeText[dso.getType()] + " id=" + dso.getID() + ". Handle could have been unbinded before.");
-=======
         } else {
             log.trace(
                 "Cannot find Handle entry to unbind for object {} id={}. Handle could have been unbound before.",
                     Constants.typeText[dso.getType()], dso.getID());
->>>>>>> dspace-7.2.1
         }
     }
 

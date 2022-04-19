@@ -24,16 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-<<<<<<< HEAD
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
-import com.coverity.security.Escape;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
-=======
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -53,7 +43,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
->>>>>>> dspace-7.2.1
 
 /**
  * Utility functions for DSpace.
@@ -516,9 +505,5 @@ public final class Utils {
     public static String interpolateConfigsInString(String string) {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         return StringSubstitutor.replace(string, config.getProperties());
-    }
-
-    public static <E> Collection<E> emptyIfNull(Collection<E> collection) {
-        return collection == null ? Collections.<E>emptyList() : collection;
     }
 }

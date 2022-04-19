@@ -25,14 +25,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
-<<<<<<< HEAD
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-=======
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
->>>>>>> dspace-7.2.1
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchServiceException;
@@ -662,11 +657,6 @@ public class DatabaseUtils {
      *                      If database cannot be upgraded.
      */
     protected static synchronized void updateDatabase(DataSource datasource,
-<<<<<<< HEAD
-            Connection connection, String targetVersion, boolean outOfOrder)
-            throws SQLException
-    {
-=======
                                                       Connection connection, String targetVersion, boolean outOfOrder)
         throws SQLException {
         updateDatabase(datasource, connection, targetVersion, outOfOrder, false);
@@ -697,21 +687,15 @@ public class DatabaseUtils {
     protected static synchronized void updateDatabase(DataSource datasource, Connection connection,
                                                       String targetVersion, boolean outOfOrder, boolean forceMigrate)
         throws SQLException {
->>>>>>> dspace-7.2.1
         if (null == datasource) {
             throw new SQLException("The datasource is a null reference -- cannot continue.");
         }
 
-<<<<<<< HEAD
-        try
-        {
-=======
         // Whether to reindex all content in Solr after successfully updating database
         boolean reindexAfterUpdate = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                           .getBooleanProperty("discovery.autoReindex", true);
 
         try {
->>>>>>> dspace-7.2.1
             // Setup Flyway API against our database
             FluentConfiguration flywayConfiguration = setupFlyway(datasource);
 
@@ -1338,12 +1322,8 @@ public class DatabaseUtils {
                     try {
                         context = new Context();
                         context.turnOffAuthorisationSystem();
-<<<<<<< HEAD
-                        log.info("Post database migration, reindexing all content in Discovery search and browse engine");
-=======
                         log.info(
                             "Post database migration, reindexing all content in Discovery search and browse engine");
->>>>>>> dspace-7.2.1
 
                         // Reindex Discovery completely
                         // Force clean all content
@@ -1410,33 +1390,14 @@ public class DatabaseUtils {
      *
      * @return DataSource
      */
-<<<<<<< HEAD
-    protected static DataSource getDataSource()
-    {
-        DataSource dataSource = DSpaceServicesFactory.getInstance()
-                .getServiceManager()
-                .getServiceByName("dataSource", DataSource.class);
-=======
     protected static DataSource getDataSource() {
         DataSource dataSource = DSpaceServicesFactory.getInstance()
                                                      .getServiceManager()
                                                      .getServiceByName("dataSource", DataSource.class);
->>>>>>> dspace-7.2.1
         if (null == dataSource) {
             log.error("The service manager could not find the DataSource.");
         }
         return dataSource;
-<<<<<<< HEAD
-    }
-
-    /**
-     * In case of a unit test the flyway db is cached to long leading to exceptions, we need to clear the object
-     */
-    public static void clearFlywayDBCache()
-    {
-        flywaydb = null;
-=======
->>>>>>> dspace-7.2.1
     }
 
     /**

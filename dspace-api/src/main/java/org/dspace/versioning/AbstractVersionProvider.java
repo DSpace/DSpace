@@ -79,16 +79,9 @@ public abstract class AbstractVersionProvider {
             List<ResourcePolicy> bundlePolicies =
                 authorizeService.findPoliciesByDSOAndType(c, nativeBundle, ResourcePolicy.TYPE_CUSTOM);
             authorizeService.addPolicies(c, bundlePolicies, bundleNew);
-<<<<<<< HEAD
-            
-            for(Bitstream nativeBitstream : nativeBundle.getBitstreams())
-            {
-                // Metadata and additional information like internal identifier, 
-=======
 
             for (Bitstream nativeBitstream : nativeBundle.getBitstreams()) {
                 // Metadata and additional information like internal identifier,
->>>>>>> dspace-7.2.1
                 // file size, checksum, and checksum algorithm are set by the bitstreamStorageService.clone(...)
                 // and respectively bitstreamService.clone(...) method.
                 Bitstream bitstreamNew =  bitstreamStorageService.clone(c, nativeBitstream);
@@ -115,10 +108,7 @@ public abstract class AbstractVersionProvider {
         }
     }
 
-<<<<<<< HEAD
-=======
 
->>>>>>> dspace-7.2.1
     public void setIgnoredMetadataFields(Set<String> ignoredMetadataFields) {
         this.ignoredMetadataFields = ignoredMetadataFields;
     }

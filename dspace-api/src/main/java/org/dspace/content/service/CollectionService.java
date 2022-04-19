@@ -157,11 +157,7 @@ public interface CollectionService
      * @throws AuthorizeException passed through.
      */
     public void setWorkflowGroup(Context context, Collection collection, int step, Group group)
-<<<<<<< HEAD
-            throws SQLException, AuthorizeException;
-=======
         throws SQLException, AuthorizeException;
->>>>>>> dspace-7.2.1
 
     /**
      * Get the the workflow group corresponding to a particular workflow step.

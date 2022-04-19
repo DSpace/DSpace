@@ -104,48 +104,6 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
-<<<<<<< HEAD
-    public List<ResourcePolicy> findByTypeGroupAction(Context context, DSpaceObject dso, Group group, int action) throws SQLException {
-        Criteria criteria = createCriteria(context, ResourcePolicy.class);
-        criteria.add(Restrictions.and(
-                Restrictions.eq("dSpaceObject", dso),
-                Restrictions.eq("epersonGroup", group),
-                Restrictions.eq("actionId", action)
-        ));
-        criteria.setMaxResults(1);
-        return list(criteria);
-    }
-    
-    @Override
-    public List<ResourcePolicy> findByTypeGroupActionExceptId(Context context, DSpaceObject dso, Group group, int action, int notPolicyID) throws SQLException {
-        Criteria criteria = createCriteria(context, ResourcePolicy.class);
-        criteria.add(Restrictions.and(
-                Restrictions.eq("dSpaceObject", dso),
-                Restrictions.eq("epersonGroup", group),
-                Restrictions.eq("actionId", action)
-        ));
-        criteria.add(Restrictions.and(Restrictions.not(Restrictions.eq("id", notPolicyID))));
-        return list(criteria);
-    }
-    
-     public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, List<Group> groups, int action, int type_id) throws SQLException
-     {
-         Criteria criteria = createCriteria(context, ResourcePolicy.class);
-         criteria.add(Restrictions.and(
-                  Restrictions.eq("resourceTypeId", type_id),
-                  Restrictions.eq("actionId", action),
-                  (Restrictions.or(
-                    Restrictions.eq("eperson", e),
-                    Restrictions.in("epersonGroup", groups)
-                    ))
-                 ));
-         return list(criteria);
-     }
-
-    @Override
-    public void deleteByDso(Context context, DSpaceObject dso) throws SQLException
-    {
-=======
     public List<ResourcePolicy> findByTypeGroupAction(Context context, DSpaceObject dso, Group group, int action)
         throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
@@ -199,7 +157,6 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
 
     @Override
     public void deleteByDso(Context context, DSpaceObject dso) throws SQLException {
->>>>>>> dspace-7.2.1
         String queryString = "delete from ResourcePolicy where dSpaceObject= :dSpaceObject";
         Query query = createQuery(context, queryString);
         query.setParameter("dSpaceObject", dso);

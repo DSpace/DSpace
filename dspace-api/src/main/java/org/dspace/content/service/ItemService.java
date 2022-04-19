@@ -164,8 +164,6 @@ public interface ItemService
 
     /**
      * Get all the archived items in this collection. The order is indeterminate.
-<<<<<<< HEAD
-=======
      *
      * @param context    DSpace context object
      * @param collection Collection (parent)
@@ -202,7 +200,6 @@ public interface ItemService
 
     /**
      * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
->>>>>>> dspace-7.2.1
      *
      * @param context DSpace context object
      * @param collection Collection (parent)
@@ -235,16 +232,6 @@ public interface ItemService
     public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
         throws SQLException;
 
-	/**
-     * Get all Items installed or withdrawn, NON-discoverable, and modified since a Date.
-     * @param context context
-     * @param since earliest interesting last-modified date, or null for no date test.
-     * @return an iterator over the items in the collection.
-     * @throws SQLException if database error
-     */
-    public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
-            throws SQLException;
-			
     /**
      * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
      *
@@ -254,18 +241,6 @@ public interface ItemService
      * @throws SQLException if database error
      */
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
-
-    /**
-     * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
-     *
-     * @param context DSpace context object
-     * @param collection Collection (parent)
-     * @return an iterator over the items in the collection.
-     * @param limit limited number of items
-     * @param offset offset value
-     * @throws SQLException if database error
-     */
-    public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset) throws SQLException;
 
     /**
      * See whether this Item is contained by a given Collection.
@@ -679,11 +654,7 @@ public interface ItemService
      * @throws SQLException if database error
      */
     public int countAllItems(Context context, Collection collection) throws SQLException;
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> dspace-7.2.1
     /**
      * Find all Items modified since a Date.
      *
@@ -714,15 +685,9 @@ public interface ItemService
      * @throws SQLException if database error
      */
     public int countAllItems(Context context, Community community) throws SQLException;
-<<<<<<< HEAD
-    
-    /**
-     * counts all items 
-=======
 
     /**
      * counts all items
->>>>>>> dspace-7.2.1
      *
      * @param context DSpace context object
      * @return total items

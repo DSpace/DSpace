@@ -69,19 +69,11 @@ public class SwordAuthenticator {
     protected CollectionService collectionService =
         ContentServiceFactory.getInstance().getCollectionService();
 
-<<<<<<< HEAD
-    protected ItemService itemService = ContentServiceFactory.getInstance()
-            .getItemService();
-
-    protected ConfigurationService configurationService = DSpaceServicesFactory
-            .getInstance().getConfigurationService();
-=======
     protected ItemService itemService =
         ContentServiceFactory.getInstance().getItemService();
 
     protected ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
->>>>>>> dspace-7.2.1
 
     /**
      * Does the given username and password authenticate for the
@@ -281,12 +273,7 @@ public class SwordAuthenticator {
      */
     public boolean canSubmit(SwordContext swordContext, DSpaceObject dso,
                              VerboseDescription msg)
-<<<<<<< HEAD
-            throws DSpaceSwordException, SwordError
-    {
-=======
         throws DSpaceSwordException, SwordError {
->>>>>>> dspace-7.2.1
         // determine if we can submit
         boolean submit = this.canSubmitTo(swordContext, dso);
 
@@ -517,12 +504,7 @@ public class SwordAuthenticator {
      */
     public List<Community> getCommunities(SwordContext swordContext,
                                           Community community)
-<<<<<<< HEAD
-            throws DSpaceSwordException
-    {
-=======
         throws DSpaceSwordException {
->>>>>>> dspace-7.2.1
         // a community is allowed if the following conditions are met
         //
         // - the authenticated user is an administrator
@@ -691,12 +673,7 @@ public class SwordAuthenticator {
      */
     public List<Item> getAllowedItems(SwordContext swordContext,
                                       org.dspace.content.Collection collection)
-<<<<<<< HEAD
-            throws DSpaceSwordException
-    {
-=======
         throws DSpaceSwordException {
->>>>>>> dspace-7.2.1
         // an item is allowed if the following conditions are met
         //
         // - the authenticated user is an administrator
@@ -738,20 +715,6 @@ public class SwordAuthenticator {
                     boolean add = false;
                     if (bundles.isEmpty()) {
                         add = authorizeService.authorizeActionBoolean(
-<<<<<<< HEAD
-                                swordContext.getAuthenticatorContext(), item,
-                                Constants.ADD);
-                    }
-                    else
-                    {
-                        for (Bundle bundle : bundles)
-                        {
-                            add = authorizeService.authorizeActionBoolean(
-                                    swordContext.getAuthenticatorContext(),
-                                    bundle, Constants.ADD);
-                            if (!add)
-                            {
-=======
                             swordContext.getAuthenticatorContext(), item,
                             Constants.ADD);
                     } else {
@@ -760,7 +723,6 @@ public class SwordAuthenticator {
                                 swordContext.getAuthenticatorContext(),
                                 bundle, Constants.ADD);
                             if (!add) {
->>>>>>> dspace-7.2.1
                                 break;
                             }
                         }
@@ -832,12 +794,7 @@ public class SwordAuthenticator {
      */
     public boolean canSubmitTo(SwordContext swordContext,
                                org.dspace.content.Collection collection)
-<<<<<<< HEAD
-            throws DSpaceSwordException
-    {
-=======
         throws DSpaceSwordException {
->>>>>>> dspace-7.2.1
         // a user can submit to a collection in the following conditions:
         //
         // - the authenticated user is an administrator
@@ -916,23 +873,6 @@ public class SwordAuthenticator {
 
             List<Bundle> bundles = item.getBundles(Constants.CONTENT_BUNDLE_NAME);
             boolean add = false;
-<<<<<<< HEAD
-            if (bundles.isEmpty())
-            {
-                add = authorizeService
-                        .authorizeActionBoolean(allowContext, item,
-                                Constants.ADD);
-            }
-            else
-            {
-                for (Bundle bundle : bundles)
-                {
-                    add = authorizeService
-                            .authorizeActionBoolean(allowContext, bundle,
-                                    Constants.ADD);
-                    if (!add)
-                    {
-=======
             if (bundles.isEmpty()) {
                 add = authorizeService.authorizeActionBoolean(
                     allowContext, item, Constants.ADD);
@@ -941,7 +881,6 @@ public class SwordAuthenticator {
                     add = authorizeService.authorizeActionBoolean(
                         allowContext, bundle, Constants.ADD);
                     if (!add) {
->>>>>>> dspace-7.2.1
                         break;
                     }
                 }

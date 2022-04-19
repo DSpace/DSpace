@@ -7,10 +7,6 @@
  */
 package org.dspace.eperson;
 
-<<<<<<< HEAD
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.ObjectUtils;
-=======
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +20,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
->>>>>>> dspace-7.2.1
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -258,15 +253,6 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public boolean isMember(Context context, EPerson ePerson, Group group)
-<<<<<<< HEAD
-            throws SQLException
-    {
-        if(group == null) {
-            return false;
-
-            // special, everyone is member of group 0 (anonymous)
-        } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
-=======
         throws SQLException {
         if (group == null) {
             return false;
@@ -274,29 +260,19 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             // special, everyone is member of group 0 (anonymous)
         } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS) ||
                    isParentOf(context, group, findByName(context, Group.ANONYMOUS))) {
->>>>>>> dspace-7.2.1
             return true;
 
         } else {
             Boolean cachedGroupMembership = context.getCachedGroupMembership(group, ePerson);
 
-<<<<<<< HEAD
-            if(cachedGroupMembership != null) {
-                return cachedGroupMembership.booleanValue();
-=======
             if (cachedGroupMembership != null) {
                 return cachedGroupMembership;
->>>>>>> dspace-7.2.1
 
             } else {
                 boolean isMember = false;
 
                 //If we have an ePerson, check we can find membership in the database
-<<<<<<< HEAD
-                if(ePerson != null) {
-=======
                 if (ePerson != null) {
->>>>>>> dspace-7.2.1
                     //lookup eperson in normal groups and subgroups with 1 query
                     isMember = isEPersonInGroup(context, group, ePerson);
                 }
@@ -306,13 +282,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 //special group is a subgroup of the provided group.
                 //Note that special groups should only be checked if the current user == the ePerson.
                 //This also works for anonymous users (ePerson == null) if IP authentication used
-<<<<<<< HEAD
-                if(!isMember && CollectionUtils.isNotEmpty(context.getSpecialGroups()) && isAuthenticatedUser(context, ePerson)) {
-=======
                 if (!isMember && CollectionUtils.isNotEmpty(context.getSpecialGroups()) &&
                     isAuthenticatedUser(context, ePerson)) {
 
->>>>>>> dspace-7.2.1
                     Iterator<Group> it = context.getSpecialGroups().iterator();
 
                     while (it.hasNext() && !isMember) {
@@ -332,11 +304,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     private boolean isAuthenticatedUser(final Context context, final EPerson ePerson) {
-<<<<<<< HEAD
-        return ObjectUtils.equals(context.getCurrentUser(), ePerson);
-=======
         return Objects.equals(context.getCurrentUser(), ePerson);
->>>>>>> dspace-7.2.1
     }
 
     @Override
@@ -357,11 +325,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     @Override
     public Set<Group> allMemberGroupsSet(Context context, EPerson ePerson) throws SQLException {
         Set<Group> cachedGroupMembership = context.getCachedAllMemberGroupsSet(ePerson);
-<<<<<<< HEAD
-        if(cachedGroupMembership != null) {
-=======
         if (cachedGroupMembership != null) {
->>>>>>> dspace-7.2.1
             return cachedGroupMembership;
         }
 
@@ -492,11 +456,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     public int searchResultCount(Context context, String groupIdentifier) throws SQLException {
         int result = 0;
         UUID uuid = UUIDUtils.fromString(groupIdentifier);
-<<<<<<< HEAD
-        if(uuid == null) {
-=======
         if (uuid == null) {
->>>>>>> dspace-7.2.1
             //Search by group name
             result = groupDAO.countByNameLike(context, groupIdentifier);
         } else {
@@ -641,16 +601,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
 
-<<<<<<< HEAD
-
-
-    protected boolean isEPersonInGroup(Context context, Group group, EPerson ePerson)
-            throws SQLException
-    {
-=======
     protected boolean isEPersonInGroup(Context context, Group group, EPerson ePerson)
         throws SQLException {
->>>>>>> dspace-7.2.1
         return groupDAO.findByIdAndMembership(context, group.getID(), ePerson) != null;
     }
 

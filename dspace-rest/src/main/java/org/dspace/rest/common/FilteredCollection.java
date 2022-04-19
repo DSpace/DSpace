@@ -119,15 +119,10 @@ public class FilteredCollection extends DSpaceObject {
 
         this.setNumberItemsProcessed(0);
         if (itemFilters.size() > 0) {
-<<<<<<< HEAD
-        	Iterator<org.dspace.content.Item> childItems = itemService.findAllByCollection(context, collection, limit, offset);
-            int numProc = itemFilterSet.processSaveItems(context, servletContext, childItems, items, reportItems, expand);
-=======
             Iterator<org.dspace.content.Item> childItems = itemService
                 .findAllByCollection(context, collection, limit, offset);
             int numProc = itemFilterSet
                 .processSaveItems(context, servletContext, childItems, items, reportItems, expand);
->>>>>>> dspace-7.2.1
             this.setNumberItemsProcessed(numProc);
         }
 

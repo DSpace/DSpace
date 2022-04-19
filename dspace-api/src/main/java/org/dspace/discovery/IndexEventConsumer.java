@@ -208,16 +208,6 @@ public class IndexEventConsumer implements Consumer {
                 }
             }
             // update the changed Items not deleted because they were on create list
-<<<<<<< HEAD
-            for (DSpaceObject o : objectsToUpdate) {
-                /* we let all types through here and 
-                 * allow the search indexer to make 
-                 * decisions on indexing and/or removal
-                 */
-                DSpaceObject iu = ctx.reloadEntity(o);
-                String hdl = iu.getHandle();
-                if (hdl != null && !handlesToDelete.contains(hdl)) {
-=======
             for (IndexableObject iu : objectsToUpdate) {
                 /* we let all types through here and
                  * allow the search indexer to make
@@ -226,7 +216,6 @@ public class IndexEventConsumer implements Consumer {
                 iu.setIndexedObject(ctx.reloadEntity(iu.getIndexedObject()));
                 String uniqueIndexID = iu.getUniqueIndexID();
                 if (uniqueIndexID != null) {
->>>>>>> dspace-7.2.1
                     try {
                         indexer.indexContent(ctx, iu, true, false);
                         log.debug("Indexed "

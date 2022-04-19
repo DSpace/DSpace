@@ -30,12 +30,7 @@ import org.dspace.content.MetadataField;
  * @author kevinvandevelde at atmire.com
  * @param <T> type of DSO represented.
  */
-<<<<<<< HEAD
-public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends AbstractHibernateDAO<T>
-{
-=======
 public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends AbstractHibernateDAO<T> {
->>>>>>> dspace-7.2.1
     /**
      * Find a DSO by its "legacy ID".  Former versions of DSpace used integer
      * record IDs, and these may still be found in external records such as AIPs.
@@ -48,20 +43,12 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * @return
      * @throws SQLException
      */
-<<<<<<< HEAD
-    public T findByLegacyId(Context context, int legacyId, Class<T> clazz) throws SQLException
-    {
-        Criteria criteria = createCriteria(context, clazz);
-        criteria.add(Restrictions.eq("legacyId", legacyId));
-        return uniqueResult(criteria);
-=======
     public T findByLegacyId(Context context, int legacyId, Class<T> clazz) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, clazz);
         Root<T> root = criteriaQuery.from(clazz);
         criteriaQuery.where(criteriaBuilder.equal(root.get("legacyId"), legacyId));
         return uniqueResult(context, criteriaQuery, false, clazz);
->>>>>>> dspace-7.2.1
     }
 
     /**
@@ -69,11 +56,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * The identifier of the join will be the toString() representation of the metadata field.
      * The joined metadata fields can then be used to query or sort.
      * @param query the query string being built.
-<<<<<<< HEAD
-     * @param tableIdentifier name of the DSO type.
-=======
      * @param tableIdentifier name of the table to be joined.
->>>>>>> dspace-7.2.1
      * @param metadataFields names of the desired fields.
      */
     protected void addMetadataLeftJoin(StringBuilder query, String tableIdentifier,
@@ -130,12 +113,8 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * @param metadataSortFields fields on which to sort -- use this OR columnSortFields.
      * @param columnSortFields columns on which to sort -- use this OR metadataSortFields.
      */
-<<<<<<< HEAD
-    protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields, List<String> columnSortFields) {
-=======
     protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields,
                                         List<String> columnSortFields) {
->>>>>>> dspace-7.2.1
         addMetadataSortQuery(query, metadataSortFields, columnSortFields, ListUtils.EMPTY_LIST);
     }
 
@@ -146,13 +125,8 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * @param columnSortFields columns on which to sort -- use this OR metadataSortFields.
      * @param direction ASC or DESC for each field.  Unspecified fields will be ASC.
      */
-<<<<<<< HEAD
-    protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields, List<String> columnSortFields, List<String> direction)
-    {
-=======
     protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields,
                                         List<String> columnSortFields, List<String> direction) {
->>>>>>> dspace-7.2.1
 
         if (CollectionUtils.isNotEmpty(metadataSortFields)) {
             query.append(" ORDER BY ");
@@ -161,12 +135,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
                 query.append("STR(").append(metadataField.toString()).append(".value)");
                 String dir = direction.size() > i ? " " + direction.get(i) : "";
                 query.append(dir);
-<<<<<<< HEAD
-                if(i != metadataSortFields.size() -1)
-                {
-=======
                 if (i != metadataSortFields.size() - 1) {
->>>>>>> dspace-7.2.1
                     query.append(",");
                 }
             }

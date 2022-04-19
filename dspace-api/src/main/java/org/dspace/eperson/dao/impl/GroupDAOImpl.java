@@ -113,24 +113,6 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
 
     @Override
     public Group findByIdAndMembership(Context context, UUID id, EPerson ePerson) throws SQLException {
-<<<<<<< HEAD
-        if(id == null || ePerson == null) {
-            return null;
-        } else {
-            Query query = createQuery(context,
-                    "SELECT DISTINCT g FROM Group g " +
-                            "LEFT JOIN g.epeople p " +
-                            "WHERE g.id = :id AND " +
-                            "(p.id = :eperson_id OR " +
-                            "EXISTS ( " +
-                                "SELECT 1 FROM Group2GroupCache gc " +
-                                "JOIN gc.parent parent " +
-                                "JOIN gc.child child " +
-                                "JOIN child.epeople cp " +
-                                "WHERE parent.id = g.id AND cp.id = :eperson_id " +
-                                ") " +
-                            ")");
-=======
         if (id == null || ePerson == null) {
             return null;
         } else {
@@ -147,7 +129,6 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
                                           "WHERE parent.id = g.id AND cp.id = :eperson_id " +
                                           ") " +
                                           ")");
->>>>>>> dspace-7.2.1
 
             query.setParameter("id", id);
             query.setParameter("eperson_id", ePerson.getID());

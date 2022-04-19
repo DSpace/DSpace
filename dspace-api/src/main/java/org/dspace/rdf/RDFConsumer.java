@@ -290,12 +290,7 @@ public class RDFConsumer implements Consumer {
         // we don't want to store private data in a triplestore with public
         // SPARQL endpoint.
         ctx = new Context(Context.Mode.READ_ONLY);
-<<<<<<< HEAD
-        if (toDelete == null) 
-        {
-=======
         if (toDelete == null) {
->>>>>>> dspace-7.2.1
             log.debug("Deletion queue does not exists, creating empty queue.");
             this.toDelete = new LinkedList<>();
         }

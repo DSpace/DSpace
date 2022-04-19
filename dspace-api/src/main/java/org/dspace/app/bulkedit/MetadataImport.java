@@ -59,15 +59,12 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-<<<<<<< HEAD
-=======
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowException;
->>>>>>> dspace-7.2.1
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
@@ -356,38 +353,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         ArrayList<BulkEditChange> changes = new ArrayList<BulkEditChange>();
 
         // Make the changes
-<<<<<<< HEAD
-        try
-        {
-            Context.Mode originalMode = c.getCurrentMode();
-            c.setMode(Context.Mode.BATCH_EDIT);
-
-            // Process each change
-            for (DSpaceCSVLine line : toImport)
-            {
-                // Get the DSpace item to compare with
-                UUID id = line.getID();
-
-                // Is there an action column?
-                if (csv.hasActions() && (!"".equals(line.getAction())) && (id == null))
-                {
-                    throw new MetadataImportException("'action' not allowed for new items!");
-                }
-
-                WorkspaceItem wsItem = null;
-                WorkflowItem wfItem = null;
-                Item item = null;
-
-                // Is this a new item?
-                if (id != null)
-                {
-                    // Get the item
-                    item = itemService.find(c, id);
-                    if (item == null)
-                    {
-                        throw new MetadataImportException("Unknown item ID " + id);
-                    }
-=======
         Context.Mode originalMode = c.getCurrentMode();
         c.setMode(Context.Mode.BATCH_EDIT);
 
@@ -419,7 +384,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
                 // Record changes
                 BulkEditChange whatHasChanged = new BulkEditChange(item);
->>>>>>> dspace-7.2.1
 
                 // Has it moved collection?
                 List<String> collections = line.get("collection");
@@ -577,37 +541,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                     first = false;
                 }
 
-<<<<<<< HEAD
-                    // Create the new item?
-                    if (change)
-                    {
-                        // Create the item
-                        String collectionHandle = line.get("collection").get(0);
-                        collection = (Collection) handleService.resolveToObject(c, collectionHandle);
-                        wsItem = workspaceItemService.create(c, collection, useTemplate);
-                        item = wsItem.getItem();
-
-                        // Add the metadata to the item
-                        for (BulkEditMetadataValue dcv : whatHasChanged.getAdds())
-                        {
-                            itemService.addMetadata(c, item, dcv.getSchema(),
-                                             dcv.getElement(),
-                                             dcv.getQualifier(),
-                                             dcv.getLanguage(),
-                                             dcv.getValue(),
-                                             dcv.getAuthority(),
-                                             dcv.getConfidence());
-                        }
-
-                        // Should the workflow be used?
-                        if(useWorkflow){
-                            WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
-                            if (workflowNotify) {
-                                wfItem = workflowService.start(c, wsItem);
-                            } else {
-                                wfItem = workflowService.startWithoutNotify(c, wsItem);
-                            }
-=======
                 // Create the new item?
                 if (change) {
                     // Create the item
@@ -626,7 +559,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                                     dcv.getValue(),
                                                     dcv.getAuthority(),
                                                     dcv.getConfidence());
->>>>>>> dspace-7.2.1
                         }
                     }
                     //Add relations after all metadata has been processed
@@ -662,17 +594,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                     whatHasChanged.setItem(item);
                 }
 
-<<<<<<< HEAD
-                if (change) {
-                    //only clear cache if changes have been made.
-                    c.uncacheEntity(wsItem);
-                    c.uncacheEntity(wfItem);
-                    c.uncacheEntity(item);
-                }
-            }
-
-            c.setMode(originalMode);
-=======
                 // Record the changes
                 changes.add(whatHasChanged);
             }
@@ -686,7 +607,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             populateRefAndRowMap(line, item == null ? null : item.getID());
             // keep track of current rows processed
             rowCount++;
->>>>>>> dspace-7.2.1
         }
 
         c.setMode(originalMode);

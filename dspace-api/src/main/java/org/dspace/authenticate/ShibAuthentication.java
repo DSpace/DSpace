@@ -1095,85 +1095,6 @@ public class ShibAuthentication implements AuthenticationMethod {
     }
 
 
-<<<<<<< HEAD
-	/**
-	 * Find a particular Shibboleth header value and return the all values.
-	 * The header name uses a bit of fuzzy logic, so it will first try case
-	 * sensitive, then it will try lowercase, and finally it will try uppercase.
-	 * 
-	 * This method will not interpret the header value in any way.
-	 * 
-	 * This method will return null if value is empty.
-	 * 
-	 * @param request The HTTP request to look for values in.
-	 * @param name The name of the attribute or header
-	 * @return The value of the attribute or header requested, or null if none found.
-	 */
-    protected String findAttribute(HttpServletRequest request, String name) {
-		if ( name == null ) {
-			return null;
-		}
-		// First try to get the value from the attribute
-		String value = (String) request.getAttribute(name);
-		if (StringUtils.isEmpty(value))
-			value = (String) request.getAttribute(name.toLowerCase());
-		if (StringUtils.isEmpty(value))
-			value = (String) request.getAttribute(name.toUpperCase());
-
-		// Second try to get the value from the header
-		if (StringUtils.isEmpty(value))
-		    value = request.getHeader(name);
-		if (StringUtils.isEmpty(value))
-			value = request.getHeader(name.toLowerCase());
-		if (StringUtils.isEmpty(value))
-			value = request.getHeader(name.toUpperCase());
-		
-		// Added extra check for empty value of an attribute.
-        // In case that value is Empty, it should not be returned, return 'null' instead.
-		// This prevents passing empty value to other methods, stops the authentication process
-		// and prevents creation of 'empty' DSpace EPerson if autoregister == true and it subsequent
-		// authentication.
-        if (StringUtils.isEmpty(value))
-        {
-        	log.debug("ShibAuthentication - attribute " + name + " is empty!");
-       	 	return null;
-        }
-                
-                boolean reconvertAttributes = 
-                		configurationService.getBooleanProperty(
-                            "authentication-shibboleth.reconvert.attributes",
-                            false);
-                
-                if (!StringUtils.isEmpty(value) && reconvertAttributes)
-                {
-                    try {
-                        value = new String(value.getBytes("ISO-8859-1"), "UTF-8");
-                    } catch (UnsupportedEncodingException ex) {
-                        log.warn("Failed to reconvert shibboleth attribute ("
-                                + name + ").", ex);
-                    }
-                }
-		
-		return value;
-	}
-
-
-	/**
-	 * Find a particular Shibboleth header value and return the first value.
-	 * The header name uses a bit of fuzzy logic, so it will first try case
-	 * sensitive, then it will try lowercase, and finally it will try uppercase.
-	 * 
-	 * Shibboleth attributes may contain multiple values separated by a
-	 * semicolon. This method will return the first value in the attribute. If
-	 * you need multiple values use findMultipleAttributes instead.
-	 * 
-	 * If no attribute is found then null is returned.
-	 * 
-	 * @param request The HTTP request to look for headers values on.
-	 * @param name The name of the header
-	 * @return The value of the header requested, or null if none found.
-	 */
-=======
     /**
      * Find a particular Shibboleth header value and return the all values.
      * The header name uses a bit of fuzzy logic, so it will first try case
@@ -1254,7 +1175,6 @@ public class ShibAuthentication implements AuthenticationMethod {
      * @param name    The name of the header
      * @return The value of the header requested, or null if none found.
      */
->>>>>>> dspace-7.2.1
     protected String findSingleAttribute(HttpServletRequest request, String name) {
         if (name == null) {
             return null;

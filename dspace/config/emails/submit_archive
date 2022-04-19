@@ -1,20 +1,10 @@
-<<<<<<< HEAD
-# Item Archived email message
-#
-# {0}  Title of submission
-# {1}  Name of collection
-# {2}  handle
-#
-Subject: DRUM: Submission Approved and Archived
-=======
 ## Item Archived email message
 ##
 ## {0}  Title of submission
 ## {1}  Name of collection
 ## {2}  handle
 ##
-#set($subject = 'DSpace: Submission Approved and Archived')
->>>>>>> dspace-7.2.1
+#set($subject = 'DRUM: Submission Approved and Archived')
 
 You submitted: ${params[0]}
 

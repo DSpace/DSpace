@@ -7,15 +7,6 @@
  */
 package org.dspace.statistics.util;
 
-<<<<<<< HEAD
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
-import java.util.Set;
-
-/**
- * Interface to implement a SpiderDetectorService
-=======
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
@@ -24,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Interface to implement a SpiderDetectorService
  *
->>>>>>> dspace-7.2.1
  * @author frederic at atmire.com
  */
 public interface SpiderDetectorService {
@@ -38,11 +28,7 @@ public interface SpiderDetectorService {
     public void loadSpiderIpAddresses();
 
     public Set<String> readPatterns(File patternFile)
-<<<<<<< HEAD
-            throws IOException;
-=======
         throws IOException;
->>>>>>> dspace-7.2.1
 
     public IPTable getTable();
 

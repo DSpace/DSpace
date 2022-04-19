@@ -141,14 +141,8 @@ public interface BitstreamStorageService {
      */
     public void cleanup(boolean deleteDbRecords, boolean verbose) throws SQLException, IOException, AuthorizeException;
 
-<<<<<<< HEAD
-    
-    /**
-     * Clone the given bitstream to a new bitstream with a new ID. 
-=======
     /**
      * Clone the given bitstream to a new bitstream with a new ID.
->>>>>>> dspace-7.2.1
      * Metadata of the given bitstream are also copied to the new bitstream.
      * 
      * @param context

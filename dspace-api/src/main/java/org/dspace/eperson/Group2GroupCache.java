@@ -7,13 +7,6 @@
  */
 package org.dspace.eperson;
 
-<<<<<<< HEAD
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.hibernate.proxy.HibernateProxyHelper;
-
-import javax.persistence.*;
-=======
->>>>>>> dspace-7.2.1
 import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -88,16 +81,9 @@ public class Group2GroupCache implements Serializable {
 
     @Override
     public int hashCode() {
-<<<<<<< HEAD
-        return new org.apache.commons.lang.builder.HashCodeBuilder()
-                .append(parent == null ? "" : parent.getID())
-                .append(child == null ? "" : child.getID())
-                .toHashCode();
-=======
         return new org.apache.commons.lang3.builder.HashCodeBuilder()
             .append(parent == null ? "" : parent.getID())
             .append(child == null ? "" : child.getID())
             .toHashCode();
->>>>>>> dspace-7.2.1
     }
 }

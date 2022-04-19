@@ -48,21 +48,6 @@ import org.dspace.statistics.content.filter.StatisticsSolrDateFilter;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.statistics.util.LocationUtils;
-<<<<<<< HEAD
-import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.Constants;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.app.util.Util;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.util.ClientUtils;
-
-import java.util.*;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.io.UnsupportedEncodingException;
-=======
->>>>>>> dspace-7.2.1
 
 /**
  * Query factory associated with a DSpaceObject.
@@ -528,11 +513,7 @@ public class StatisticsDataVisits extends StatisticsData {
             //TODO: CHANGE & THROW AWAY THIS ENTIRE METHOD
             //Check if int
             String dsoId;
-<<<<<<< HEAD
-            //DS 3602: Until all legacy stats records have been upgraded to using UUID, 
-=======
             //DS 3602: Until all legacy stats records have been upgraded to using UUID,
->>>>>>> dspace-7.2.1
             //duplicate reports may be presented for each DSO.  A note will be appended when reporting legacy counts.
             String legacyNote = "";
             int dsoLength = query.getDsoLength();
@@ -542,11 +523,7 @@ public class StatisticsDataVisits extends StatisticsData {
                 try {
                     //Legacy identifier support
                     dsoId = String.valueOf(Integer.parseInt(value));
-<<<<<<< HEAD
-                    legacyNote = I18nUtil.getMessage("org.dspace.statistics.content.StatisticsDataVisits.legacy", context);
-=======
                     legacyNote = "(legacy)";
->>>>>>> dspace-7.2.1
                 } catch (NumberFormatException e1) {
                     dsoId = null;
                 }
@@ -614,11 +591,8 @@ public class StatisticsDataVisits extends StatisticsData {
                             }
                         }
                         return name + legacyNote;
-<<<<<<< HEAD
-=======
                     default:
                         break;
->>>>>>> dspace-7.2.1
                 }
             }
         }
@@ -842,27 +816,12 @@ public class StatisticsDataVisits extends StatisticsData {
             if (dso != null) {
                 query += (query.equals("") ? "" : " AND ");
 
-<<<<<<< HEAD
-                //Check (& add if needed) the dsoId
-                if(dso != null)
-                {
-                    query += (query.equals("") ? "" : " AND ");
-
-                    //DS-3602: For clarity, adding "id:" to the right hand side of the search
-                    //In the solr schema, "id" has been declared as the defaultSearchField so the field name is optional
-                    if(dso instanceof DSpaceObjectLegacySupport){
-                        query += " (id:" + dso.getID() + " OR id:" + ((DSpaceObjectLegacySupport) dso).getLegacyId() + ")";
-                    }else{
-                        query += "id:" + dso.getID();
-                    }
-=======
                 //DS-3602: For clarity, adding "id:" to the right hand side of the search
                 //In the solr schema, "id" has been declared as the defaultSearchField so the field name is optional
                 if (dso instanceof DSpaceObjectLegacySupport) {
                     query += " (id:" + dso.getID() + " OR id:" + ((DSpaceObjectLegacySupport) dso).getLegacyId() + ")";
                 } else {
                     query += "id:" + dso.getID();
->>>>>>> dspace-7.2.1
                 }
             }
 
@@ -870,28 +829,6 @@ public class StatisticsDataVisits extends StatisticsData {
             if (owningDso != null && currentDso != null) {
                 query += (query.equals("") ? "" : " AND ");
 
-<<<<<<< HEAD
-                    String owningStr = "";
-                    switch(currentDso.getType()){
-                        case Constants.ITEM:
-                            owningStr = "owningItem";
-                            break;
-                        case Constants.COLLECTION:
-                            owningStr = "owningColl";
-                            break;
-                        case Constants.COMMUNITY:
-                            owningStr = "owningComm";
-                            break;
-                    }
-                    if(currentDso instanceof DSpaceObjectLegacySupport){
-                        owningStr = "(" + owningStr + ":" + currentDso.getID() + " OR " 
-                            + owningStr + ":" + ((DSpaceObjectLegacySupport) currentDso).getLegacyId() + ")";
-                    }else{
-                        owningStr += ":" + currentDso.getID();
-                    }
-                    
-                    query += owningStr;
-=======
                 String owningStr = "";
                 switch (currentDso.getType()) {
                     case Constants.ITEM:
@@ -911,7 +848,6 @@ public class StatisticsDataVisits extends StatisticsData {
                         + owningStr + ":" + ((DSpaceObjectLegacySupport) currentDso).getLegacyId() + ")";
                 } else {
                     owningStr += ":" + currentDso.getID();
->>>>>>> dspace-7.2.1
                 }
 
                 query += owningStr;

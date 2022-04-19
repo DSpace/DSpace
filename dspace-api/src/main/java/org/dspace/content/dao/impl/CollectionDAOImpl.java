@@ -123,16 +123,6 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         for (Integer action : actions) {
             orPredicates.add(criteriaBuilder.equal(join.get(ResourcePolicy_.actionId), action));
         }
-<<<<<<< HEAD
-        criteria.add(Restrictions.and(
-                Restrictions.eq("resourcePolicy.resourceTypeId", Constants.COLLECTION),
-                Restrictions.eq("resourcePolicy.eperson", ePerson),
-                actionQuery
-        ));
-        criteria.setCacheable(true);
-
-        return list(criteria);
-=======
         Predicate orPredicate = criteriaBuilder.or(orPredicates.toArray(new Predicate[] {}));
         criteriaQuery.select(collectionRoot);
         criteriaQuery.where(
@@ -140,7 +130,6 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
                                 criteriaBuilder.equal(join.get(ResourcePolicy_.eperson), ePerson),
                                 orPredicate));
         return list(context, criteriaQuery, true, Collection.class, -1, -1);
->>>>>>> dspace-7.2.1
     }
 
     @Override
@@ -156,14 +145,6 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
             query.append("rp.actionId=").append(action);
         }
         query.append(" AND rp.resourceTypeId=").append(Constants.COLLECTION);
-<<<<<<< HEAD
-        query.append(" AND rp.epersonGroup.id IN (select g.id from Group g where (from EPerson e where e.id = :eperson_id) in elements(epeople))");
-        Query hibernateQuery = createQuery(context, query.toString());
-        hibernateQuery.setParameter("eperson_id", ePerson.getID());
-        hibernateQuery.setCacheable(true);
-
-        return list(hibernateQuery);
-=======
         query.append(
             " AND rp.epersonGroup.id IN (select g.id from Group g where (from EPerson e where e.id = :eperson_id) in " +
                 "elements(epeople))");
@@ -172,7 +153,6 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         persistenceQuery.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
         return list(persistenceQuery);
->>>>>>> dspace-7.2.1
 
 
     }

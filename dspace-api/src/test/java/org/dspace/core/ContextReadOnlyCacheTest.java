@@ -7,8 +7,6 @@
  */
 package org.dspace.core;
 
-<<<<<<< HEAD
-=======
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -18,7 +16,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.UUID;
 
->>>>>>> dspace-7.2.1
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -27,18 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-<<<<<<< HEAD
-import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.UUID;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
-=======
 import org.mockito.junit.MockitoJUnitRunner;
->>>>>>> dspace-7.2.1
 
 /**
  * Class to test the read-only Context cache
@@ -134,8 +120,4 @@ public class ContextReadOnlyCacheTest {
         return group;
     }
 
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> dspace-7.2.1
