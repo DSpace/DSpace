@@ -112,8 +112,6 @@
     <bean id="spiderDetectorService" class="org.dspace.statistics.util.SpiderDetectorServiceImpl"/>
     <bean id="clientInfoService" class="org.dspace.service.impl.ClientInfoServiceImpl"/>
 
-    <bean id="spiderDetectorService" class="org.dspace.statistics.util.SpiderDetectorServiceImpl"/>
-
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 
     <!-- Begin UMD Customization -->
