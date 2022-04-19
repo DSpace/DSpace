@@ -25,6 +25,11 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -74,10 +79,13 @@ import org.dspace.statistics.ObjectCount;
 import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
+import org.dspace.storage.bitstore.factory.StorageServiceFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Integration test to test the /api/core/bitstreams/[id]/* endpoints
@@ -1016,4 +1024,108 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                 bitstreamService.getMetadataByMetadataString(bitstream, "dc.format")
         ));
     }
+
+
+    @Test
+    public void closeInputStreamsRegularDownload() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community and one collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        Collection col1 =
+            CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        //2. A public item with a bitstream
+        String bitstreamContent = "0123456789";
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+
+            Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .build();
+
+            bitstream = BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Test bitstream")
+                .withDescription("This is a bitstream to test range requests")
+                .withMimeType("text/plain")
+                .build();
+        }
+        context.restoreAuthSystemState();
+
+        var bitstreamStorageService = StorageServiceFactory.getInstance().getBitstreamStorageService();
+        var inputStream = bitstreamStorageService.retrieve(context, bitstream);
+        var inputStreamSpy = spy(inputStream);
+        var bitstreamStorageServiceSpy = spy(bitstreamStorageService);
+        ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", bitstreamStorageServiceSpy);
+        doReturn(inputStreamSpy).when(bitstreamStorageServiceSpy).retrieve(any(), eq(bitstream));
+
+        //** WHEN **
+        //We download the bitstream
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+            //** THEN **
+            .andExpect(status().isOk());
+
+        Mockito.verify(bitstreamStorageServiceSpy, times(1)).retrieve(any(), eq(bitstream));
+        Mockito.verify(inputStreamSpy, times(1)).close();
+    }
+
+    @Test
+    public void closeInputStreamsDownloadWithCoverPage() throws Exception {
+        configurationService.setProperty("citation-page.enable_globally", true);
+        citationDocumentService.afterPropertiesSet();
+        context.turnOffAuthorisationSystem();
+
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community and one collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        Collection col1 =
+            CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        //2. A public item with a bitstream
+        File originalPdf = new File(testProps.getProperty("test.bitstream"));
+
+        try (InputStream is = new FileInputStream(originalPdf)) {
+
+            Item publicItem1 = ItemBuilder.createItem(context, col1)
+                    .withTitle("Public item citation cover page test 1")
+                    .withIssueDate("2017-10-17")
+                    .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                    .build();
+
+            bitstream = BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Test bitstream")
+                    .withDescription("This is a bitstream to test the citation cover page.")
+                    .withMimeType("application/pdf")
+                    .build();
+        }
+        context.restoreAuthSystemState();
+
+        var bitstreamStorageService = StorageServiceFactory.getInstance().getBitstreamStorageService();
+        var inputStreamSpy = spy(bitstreamStorageService.retrieve(context, bitstream));
+        var bitstreamStorageServiceSpy = spy(bitstreamStorageService);
+        ReflectionTestUtils.setField(bitstreamService, "bitstreamStorageService", bitstreamStorageServiceSpy);
+        doReturn(inputStreamSpy).when(bitstreamStorageServiceSpy).retrieve(any(), eq(bitstream));
+
+        //** WHEN **
+        //We download the bitstream
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+            //** THEN **
+            .andExpect(status().isOk());
+
+        Mockito.verify(bitstreamStorageServiceSpy, times(1)).retrieve(any(), eq(bitstream));
+        Mockito.verify(inputStreamSpy, times(1)).close();
+    }
+
 }
