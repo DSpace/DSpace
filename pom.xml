@@ -889,7 +889,9 @@
         <profile>
             <id>dspace-sword</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <file>
+                    <exists>dspace-sword/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>dspace-sword</module>

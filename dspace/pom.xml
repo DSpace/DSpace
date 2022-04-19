@@ -25,13 +25,6 @@
         <root.basedir>${basedir}/..</root.basedir>
     </properties>
 
-    <build>
-        <filters>
-            <!-- Filter using the properties file defined by dspace-parent POM -->
-            <filter>${filters.file}</filter>
-        </filters>
-    </build>
-
     <profiles>
 
         <!-- Build Profile. This builds all Overlay modules for DSpace -->
@@ -66,8 +59,8 @@
             </activation>
             <build>
                 <plugins>
-                    <!-- Assemble 'target/dspace-installer' using 'assembly.xml' -->
-                    <plugin>
+                   <!-- Assemble 'target/dspace-installer' using 'assembly.xml' -->
+                   <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
                         <inherited>false</inherited>
                         <configuration>
@@ -120,69 +113,39 @@
             Instead, a zip/tarball is generated from the parent [dspace-src] directory.
         -->
         <profile>
-            <id>distributions</id>
-            <activation>
-                <!-- Only enabled if "distributions=true" was passed on commandline -->
-                <property>
-                    <name>distributions</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <inherited>false</inherited>
-                        <executions>
-                            <execution>
-                                <inherited>false</inherited>
-                                <configuration>
-                                    <descriptors>
-                                        <descriptor>src/main/assembly/release.xml</descriptor>
-                                        <descriptor>src/main/assembly/src-release.xml</descriptor>
-                                    </descriptors>
-                                    <tarLongFileMode>gnu</tarLongFileMode>
-                                    <finalName>dspace-${project.version}</finalName>
-                                </configuration>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-                <resources>
-                    <!-- Enumerate filtered files explicitly to avoid issues with other config tech. -->
-                    <resource>
-                        <directory>${basedir}</directory>
-                        <filtering>true</filtering>
-                        <includes>
-                            <include>config/default.context.xml</include>
-                            <include>config/dspace.cfg</include>
-                            <include>config/log4j-handle-plugin.properties</include>
-                            <include>config/log4j.properties</include>
-                            <include>config/modules/curate.cfg</include>
-                            <include>config/modules/com.atmire.statistics.oai.cfg</include>
-                            <include>config/modules/solr-statistics.cfg</include>
-                        </includes>
-                    </resource>
-                    <!-- Declare a mutually exclusive resource set for non-filtered files. -->
-                    <resource>
-                        <directory>${basedir}</directory>
-                        <filtering>false</filtering>
-                        <excludes>
-                            <exclude>config/default.context.xml</exclude>
-                            <exclude>config/dspace.cfg</exclude>
-                            <exclude>config/log4j-handle-plugin.properties</exclude>
-                            <exclude>config/log4j.properties</exclude>
-                            <exclude>config/modules/curate.cfg</exclude>
-                            <exclude>config/modules/com.atmire.statistics.oai.cfg</exclude>
-                            <exclude>config/modules/solr-statistics.cfg</exclude>
-                        </excludes>
-                    </resource>
-                </resources>
-            </build>
+           <id>distributions</id>
+           <activation>
+              <!-- Only enabled if "distributions=true" was passed on commandline -->
+              <property>
+                  <name>distributions</name>
+                  <value>true</value>
+              </property>
+           </activation>
+           <build>
+              <plugins>
+                 <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <inherited>false</inherited>
+                    <executions>
+                       <execution>
+                          <inherited>false</inherited>
+                          <configuration>
+                             <descriptors>
+                                <descriptor>src/main/assembly/release.xml</descriptor>
+                                <descriptor>src/main/assembly/src-release.xml</descriptor>
+                             </descriptors>
+                             <tarLongFileMode>gnu</tarLongFileMode>
+                             <finalName>dspace-${project.version}</finalName>
+                          </configuration>
+                          <phase>package</phase>
+                          <goals>
+                             <goal>single</goal>
+                          </goals>
+                       </execution>
+                    </executions>
+                 </plugin>
+              </plugins>
+           </build>
         </profile>
 
         <!-- Profile to aggregate (local) code coverage reports created by JaCoCo (jacoco.org)
@@ -277,24 +240,18 @@
             <artifactId>additions</artifactId>
             <scope>provided</scope>
         </dependency>
-        <!-- This dependency ensures DSpace OAI JAR is added to [dspace]/lib/,
+    	<!-- This dependency ensures DSpace OAI JAR is added to [dspace]/lib/,
              so that the 'dspace oai' launcher.xml command works.  -->
-        <dependency>
+    	<dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-        </dependency>
-        <!-- Ensure that the additional service API classes are available during spring instantiation-->
-        <dependency>
-            <groupId>com.atmire</groupId>
-            <artifactId>atmire-statistics-exporter-api</artifactId>
-            <version>1.0.0</version>
-        </dependency>
+    	</dependency>
 
         <!-- The Servlet API is also needed by the 'dspace oai' launcher.xml
              command. -->
-        <dependency>
+    	<dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-        </dependency>
+    	</dependency>
     </dependencies>
 </project>

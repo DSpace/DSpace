@@ -9,15 +9,16 @@
     </description>
 
     <!--
-      A Parent POM that Maven inherits DSpace Default
-      POM attributes from.
-   -->
+       A Parent POM that Maven inherits DSpace Default
+       POM attributes from.
+    -->
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.2.1-drum-0-SNAPSHOT</version>
+        <version>7.2.1</version>
         <relativePath>..</relativePath>
     </parent>
+
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
@@ -46,11 +47,11 @@
 
         <!-- Leave this out for the moment, as the source is in the tree -->
         <!--
-<dependency>
-<groupId>org.dspace</groupId>
-<artifactId>sword-common</artifactId>
-<version>1.0.0</version>
-</dependency>-->
+        <dependency>
+        <groupId>org.dspace</groupId>
+        <artifactId>sword-common</artifactId>
+        <version>1.0.0</version>
+        </dependency>-->
 
         <dependency>
             <groupId>org.dspace</groupId>
@@ -118,10 +119,10 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
         </dependency>
-        <dependency>
+	<dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-web</artifactId>
-        </dependency>
+	</dependency>
 
         <dependency>
             <groupId>xom</groupId>
