@@ -53,6 +53,7 @@ import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersioningService;
 import org.hamcrest.Matcher;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWithDatabase {
@@ -1622,8 +1623,10 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         );
     }
 
-    @Test
+    @Ignore
     public void test_placeRecalculationAfterDelete() throws Exception {
+        // NOTE: this test currently doesn't make any sense. It is disabled until the test is reviewed in detail
+
         // NOTE: this test uses relationship isIssueOfJournalVolume, because it adds virtual metadata
         //       on both sides of the relationship
 
