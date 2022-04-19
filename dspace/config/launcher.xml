@@ -31,7 +31,7 @@
     <command>
         <name>classpath</name>
         <description>Calculate and display the DSpace classpath</description>
-        <step/>
+        <step />
     </command>
     <command>
         <name>cleanup</name>
@@ -192,8 +192,8 @@
         <description>Export usage statistics data from Solr for back-up purposes</description>
         <step passuserargs="true">
             <class>org.dspace.util.SolrImportExport</class>
-	    <argument>-a</argument>
-	    <argument>export</argument>
+            <argument>-a</argument>
+            <argument>export</argument>
         </step>
     </command>
     <command>
@@ -201,8 +201,8 @@
         <description>Import usage statistics data (as previously exported using solr-export-statistics) into Solr</description>
         <step passuserargs="true">
             <class>org.dspace.util.SolrImportExport</class>
-	    <argument>-a</argument>
-	    <argument>import</argument>
+            <argument>-a</argument>
+            <argument>import</argument>
         </step>
     </command>
     <command>
@@ -210,10 +210,8 @@
         <description>Reindex the Solr-based usage statistics, for example after an upgrade that changes the schema</description>
         <step passuserargs="true">
             <class>org.dspace.util.SolrImportExport</class>
-	    <argument>-a</argument>
-	    <argument>reindex</argument>
-<<<<<<< HEAD
-=======
+            <argument>-a</argument>
+            <argument>reindex</argument>
         </step>
     </command>
     <command>
@@ -221,7 +219,6 @@
         <description>Upgrade statistics (integer to UUID) to DSpace 6.x (or above) compatibility</description>
         <step passuserargs="true">
             <class>org.dspace.util.SolrUpgradePre6xStatistics</class>
->>>>>>> dspace-7.2.1
         </step>
     </command>
     <command>
@@ -349,14 +346,6 @@
         </step>
     </command>
     <command>
-<<<<<<< HEAD
-        <name>retry-tracker</name>
-        <description>Retry all failed commits to the OpenURLTracker</description>
-        <step>
-            <class>com.atmire.statistics.export.RetryOpenUrlTracker</class>
-        </step>
-     </command>
-=======
         <name>initialize-entities</name>
         <description>Initialize the entities with a provided xml</description>
         <step>
@@ -377,5 +366,4 @@
             <class>org.dspace.iiif.canvasdimension.CanvasDimensionCLI</class>
         </step>
     </command>
->>>>>>> dspace-7.2.1
 </commands>

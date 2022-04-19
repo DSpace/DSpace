@@ -891,8 +891,6 @@ Common usage:
 
         <antcall target="init_spiders" />
 
-        <antcall target="init_spiders" />
-
         <echo>
 ====================================================================
  The DSpace code has been installed.
