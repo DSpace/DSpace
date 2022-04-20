@@ -22,8 +22,8 @@
    </parent>
 
    <properties>
-       <!-- This is the path to the root [dspace-src] directory. -->
-       <root.basedir>${basedir}/../../..</root.basedir>
+      <!-- This is the path to the root [dspace-src] directory. -->
+      <root.basedir>${basedir}/../../..</root.basedir>
    </properties>
 
    <build>
@@ -225,18 +225,18 @@
          <artifactId>dspace-api</artifactId>
       </dependency>
       <dependency>
-          <groupId>org.dspace</groupId>
-          <artifactId>dspace-api</artifactId>
-          <type>test-jar</type>
-          <scope>test</scope>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api</artifactId>
+         <type>test-jar</type>
+         <scope>test</scope>
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-api-lang</artifactId>
       </dependency>
       <dependency>
-          <groupId>org.dspace</groupId>
-          <artifactId>dspace-services</artifactId>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-services</artifactId>
       </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>
