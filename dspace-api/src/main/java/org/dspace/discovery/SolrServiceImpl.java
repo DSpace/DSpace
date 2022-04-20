@@ -759,15 +759,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         solrQuery.addField(SearchUtils.RESOURCE_TYPE_FIELD);
         solrQuery.addField(SearchUtils.RESOURCE_ID_FIELD);
         solrQuery.addField(SearchUtils.RESOURCE_UNIQUE_ID);
+        solrQuery.addField(STATUS_FIELD);
 
         if (discoveryQuery.isSpellCheck()) {
             solrQuery.setParam(SpellingParams.SPELLCHECK_Q, query);
             solrQuery.setParam(SpellingParams.SPELLCHECK_COLLATE, Boolean.TRUE);
             solrQuery.setParam("spellcheck", Boolean.TRUE);
         }
-
-        // Exclude items with status:predb to avoid solr docs being removed during large imports (Issue #8125)
-        solrQuery.addFilterQuery("!" + STATUS_FIELD + ":" + STATUS_FIELD_PREDB);
 
         for (int i = 0; i < discoveryQuery.getFilterQueries().size(); i++) {
             String filterQuery = discoveryQuery.getFilterQueries().get(i);
@@ -912,11 +910,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         // Enables solr to remove documents related to items not on database anymore (Stale)
                         // if maxAttemps is greater than 0 cleanup the index on each step
                         if (maxAttempts >= 0) {
-                            zombieDocs.add((String) doc.getFirstValue(SearchUtils.RESOURCE_UNIQUE_ID));
-                            // avoid to process the response except if we are in the last allowed execution.
-                            // When maxAttempts is 0 this will be just the first and last run as the
-                            // executionCount is increased at the start of the loop it will be equals to 1
-                            skipLoadingResponse = maxAttempts + 1 != executionCount;
+                            Object statusObj = doc.getFirstValue(STATUS_FIELD);
+                            if (!(statusObj instanceof String && statusObj.equals(STATUS_FIELD_PREDB))) {
+                                zombieDocs.add((String) doc.getFirstValue(SearchUtils.RESOURCE_UNIQUE_ID));
+                                // avoid to process the response except if we are in the last allowed execution.
+                                // When maxAttempts is 0 this will be just the first and last run as the
+                                // executionCount is increased at the start of the loop it will be equals to 1
+                                skipLoadingResponse = maxAttempts + 1 != executionCount;
+                            }
                         }
                         continue;
                     }
