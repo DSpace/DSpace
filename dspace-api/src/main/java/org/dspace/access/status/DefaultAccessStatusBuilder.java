@@ -56,9 +56,11 @@ public class DefaultAccessStatusBuilder implements AccessStatusBuilder {
      * Look at the item's policies to determine an access status value.
      * It is also considering a date threshold for embargos and restrictions.
      *
+     * If the item is null, simply returns the "unknown" value.
+     *
      * @param context     the DSpace context
      * @param item        the item to embargo
-     * @param threshold   the embargo treshold date
+     * @param threshold   the embargo threshold date
      * @return an access status value
      */
     @Override
@@ -87,6 +89,21 @@ public class DefaultAccessStatusBuilder implements AccessStatusBuilder {
         return caculateAccessStatusForDso(context, bitstream, threshold);
     }
 
+    /**
+     * Look at the DSpace object's policies to determine an access status value.
+     *
+     * If the object is null, returns the "metadata.only" value.
+     * If any policy attached to the object is valid for the anonymous group,
+     * returns the "open.access" value.
+     * Otherwise, if the policy start date is before the embargo threshold date,
+     * returns the "embargo" value.
+     * Every other cases return the "restricted" value.
+     *
+     * @param context     the DSpace context
+     * @param dso         the DSpace object
+     * @param threshold   the embargo threshold date
+     * @return an access status value
+     */
     private String caculateAccessStatusForDso(Context context, DSpaceObject dso, Date threshold)
             throws SQLException {
         if (dso == null) {
