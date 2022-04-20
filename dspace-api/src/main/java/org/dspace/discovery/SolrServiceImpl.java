@@ -168,10 +168,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         indexableObjectService.writeDocument(context, indexableObject, solrInputDocument);
     }
 
-    protected void update(Context context, IndexFactory indexableObjectService,
-                          IndexableObject indexableObject, boolean preDB) throws IOException, SQLException, SolrServerException {
+    protected void update(Context context, IndexFactory indexableObjectService, IndexableObject indexableObject,
+                          boolean preDB) throws IOException, SQLException, SolrServerException {
         if (preDB) {
-            final SolrInputDocument solrInputDocument = indexableObjectService.buildNewDocument(context, indexableObject);
+            final SolrInputDocument solrInputDocument =
+                    indexableObjectService.buildNewDocument(context, indexableObject);
             indexableObjectService.writeDocument(context, indexableObject, solrInputDocument);
         } else {
             update(context, indexableObjectService, indexableObject);

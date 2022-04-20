@@ -172,7 +172,8 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     }
 
     @Override
-    public SolrInputDocument buildNewDocument(Context context, IndexableItem indexableItem) throws SQLException, IOException {
+    public SolrInputDocument buildNewDocument(Context context, IndexableItem indexableItem)
+            throws SQLException, IOException {
         SolrInputDocument doc = buildDocument(context, indexableItem);
         doc.addField(STATUS_FIELD, STATUS_FIELD_PREDB);
         return doc;
