@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -148,8 +148,8 @@ public class CASAuthentication implements AuthenticationMethod
     {
         final String ticket = request.getParameter("ticket");
         final String service = request.getRequestURL().toString();
-        log.info(LogManager.getHeader(context, "login", " ticket: " + ticket));
-        log.info(LogManager.getHeader(context, "login", "service: " + service));
+        log.info(LogHelper.getHeader(context, "login", " ticket: " + ticket));
+        log.info(LogHelper.getHeader(context, "login", "service: " + service));
 
         // administrator override, force login as a CAS user
         if (netid != null && password != null)
@@ -172,7 +172,7 @@ public class CASAuthentication implements AuthenticationMethod
                         // Save the ldap object in the session
                         request.getSession().setAttribute(CASUSER, ldap);
 
-                        log.debug(LogManager.getHeader(
+                        log.debug(LogHelper.getHeader(
                                 context,
                                 "authenticate",
                                 CASUSER
@@ -182,7 +182,7 @@ public class CASAuthentication implements AuthenticationMethod
 
                         // Logged in OK.
                         context.setCurrentUser(eperson);
-                        log.info(LogManager.getHeader(context, "authenticate",
+                        log.info(LogHelper.getHeader(context, "authenticate",
                                 "type=CAS (admin override)"));
                         return SUCCESS;
 
@@ -210,7 +210,7 @@ public class CASAuthentication implements AuthenticationMethod
                 // Determine CAS validation URL
                 String validate = configurationService
                         .getProperty("drum.cas.validate.url");
-                log.info(LogManager.getHeader(context, "login",
+                log.info(LogHelper.getHeader(context, "login",
                         "CAS validate:  " + validate));
                 if (validate == null)
                 {
@@ -241,7 +241,7 @@ public class CASAuthentication implements AuthenticationMethod
                 // Save the ldap object in the session
                 request.getSession().setAttribute(CASUSER, ldap);
 
-                log.debug(LogManager.getHeader(context, "authenticate", CASUSER
+                log.debug(LogHelper.getHeader(context, "authenticate", CASUSER
                         + "=" + request.getSession().getAttribute(CASUSER)));
 
                 // Locate the eperson in DSpace
@@ -269,7 +269,7 @@ public class CASAuthentication implements AuthenticationMethod
                     // Logged in OK.
 
                     context.setCurrentUser(eperson);
-                    log.info(LogManager.getHeader(context, "authenticate",
+                    log.info(LogHelper.getHeader(context, "authenticate",
                             "type=CAS"));
                     return SUCCESS;
                 }
@@ -288,7 +288,7 @@ public class CASAuthentication implements AuthenticationMethod
                     else
                     {
                         // No auto-registration for valid netid
-                        log.warn(LogManager
+                        log.warn(LogHelper
                                 .getHeader(context, "authenticate",
                                         "type=netid_but_no_record, cannot auto-register"));
                         return NO_SUCH_USER;

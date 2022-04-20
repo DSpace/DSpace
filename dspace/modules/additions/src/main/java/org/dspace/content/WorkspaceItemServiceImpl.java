@@ -17,7 +17,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
@@ -65,7 +65,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         {
             if (log.isDebugEnabled())
             {
-                log.debug(LogManager.getHeader(context, "find_workspace_item",
+                log.debug(LogHelper.getHeader(context, "find_workspace_item",
                         "not_found,workspace_item_id=" + id));
             }
         }
@@ -73,7 +73,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         {
             if (log.isDebugEnabled())
             {
-                log.debug(LogManager.getHeader(context, "find_workspace_item",
+                log.debug(LogHelper.getHeader(context, "find_workspace_item",
                         "workspace_item_id=" + id));
             }
         }
@@ -125,7 +125,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         itemService.update(context, item);
         workspaceItem.setItem(item);
 
-        log.info(LogManager.getHeader(context, "create_workspace_item",
+        log.info(LogHelper.getHeader(context, "create_workspace_item",
                 "workspace_item_id=" + workspaceItem.getID()
                         + "item_id=" + item.getID() + "collection_id="
                         + collection.getID()));
@@ -176,7 +176,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     public void update(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
                 // Authorisation is checked by the item.update() method below
 
-        log.info(LogManager.getHeader(context, "update_workspace_item",
+        log.info(LogHelper.getHeader(context, "update_workspace_item",
                 "workspace_item_id=" + workspaceItem.getID()));
 
         // Update the item
@@ -205,7 +205,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                     + "original submitter to delete a workspace item");
         }
 
-        log.info(LogManager.getHeader(context, "delete_workspace_item",
+        log.info(LogHelper.getHeader(context, "delete_workspace_item",
                 "workspace_item_id=" + workspaceItem.getID() + "item_id=" + item.getID()
                         + "collection_id=" + workspaceItem.getCollection().getID()));
 
@@ -241,7 +241,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         Item item = workspaceItem.getItem();
         authorizeService.authorizeAction(context, item, Constants.WRITE);
 
-        log.info(LogManager.getHeader(context, "delete_workspace_item",
+        log.info(LogHelper.getHeader(context, "delete_workspace_item",
                 "workspace_item_id=" + workspaceItem.getID() + "item_id=" + item.getID()
                         + "collection_id=" + workspaceItem.getCollection().getID()));
 

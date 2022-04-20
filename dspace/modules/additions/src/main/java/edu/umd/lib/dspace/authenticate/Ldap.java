@@ -25,7 +25,7 @@ import javax.naming.directory.SearchResult;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.MetadataSchema;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Unit;
@@ -136,7 +136,7 @@ public class Ldap {
 
     // Make sure we got something
     if (entries == null) {
-      log.warn(LogManager.getHeader(context,
+      log.warn(LogHelper.getHeader(context,
                                     "null returned on ctx.search for " + strFilter,
                                     ""));
       return false;
@@ -144,7 +144,7 @@ public class Ldap {
 
     // Check for a match
     if (!entries.hasMore()) {
-      log.debug(LogManager.getHeader(context,
+      log.debug(LogHelper.getHeader(context,
                                      "no matching entries for " + strFilter,
                                      ""));
       return false;
@@ -152,20 +152,20 @@ public class Ldap {
 
     // Get entry
     entry = (SearchResult)entries.next();
-    log.debug(LogManager.getHeader(context,
+    log.debug(LogHelper.getHeader(context,
                                    "matching entry for " + strUid + ": " + entry.getName(),
                                    ""));
 
     // Check for another match
     if (entries.hasMore()) {
       entry = null;
-      log.warn(LogManager.getHeader(context,
+      log.warn(LogHelper.getHeader(context,
                                     "multiple matching entries for " + strFilter,
                                     ""));
       return false;
     }
 
-    log.debug(LogManager.getHeader(context,
+    log.debug(LogHelper.getHeader(context,
                                    "ldap entry:\n" + entry,
                                    ""));
 
@@ -183,7 +183,7 @@ public class Ldap {
     throws NamingException
   {
     if (checkAdmin(strPassword)) {
-      log.info(LogManager.getHeader(context,
+      log.info(LogHelper.getHeader(context,
                                     "admin password override for uid=" + strUid,
                                     ""));
       return true;
@@ -204,7 +204,7 @@ public class Ldap {
 
     // Make sure we got something
     if (compare == null) {
-      log.warn(LogManager.getHeader(context,
+      log.warn(LogHelper.getHeader(context,
                                     "compare on userpassword failed for " + strUid,
                                     ""));
       return false;
@@ -212,7 +212,7 @@ public class Ldap {
 
     boolean ret = compare.hasMore();
 
-    log.debug(LogManager.getHeader(context,
+    log.debug(LogHelper.getHeader(context,
                                    "password compared '" + ret + "' for uid=" + strUid,
                                    ""));
     return ret;
@@ -245,7 +245,7 @@ public class Ldap {
       }
     }
     catch (Exception e) {
-      log.error(LogManager.getHeader(context,
+      log.error(LogHelper.getHeader(context,
                                      "Error looking up eperson: " + e,
                                      ""));
     }
@@ -502,7 +502,7 @@ public class Ldap {
       epersonService.update(context, eperson);
       context.commit();
                         
-      log.info(LogManager.getHeader(context,
+      log.info(LogHelper.getHeader(context,
                                     "create_um_eperson",
                                     "eperson_id="+eperson.getID() +
                                     ", uid=" + strUid));

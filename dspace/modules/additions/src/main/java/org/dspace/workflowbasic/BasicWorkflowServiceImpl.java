@@ -28,7 +28,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.curate.service.WorkflowCuratorService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -239,7 +239,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         Item myitem = wsi.getItem();
         Collection collection = wsi.getCollection();
 
-        log.info(LogManager.getHeader(context, "start_workflow", "workspace_item_id="
+        log.info(LogHelper.getHeader(context, "start_workflow", "workspace_item_id="
                 + wsi.getID() + "item_id=" + myitem.getID() + "collection_id="
                 + collection.getID()));
 
@@ -329,7 +329,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
             throw new IllegalArgumentException("Workflow Step " + taskstate + " is out of range.");
         }
 
-        log.info(LogManager.getHeader(context, "claim_task", "workflow_item_id="
+        log.info(LogHelper.getHeader(context, "claim_task", "workflow_item_id="
                 + workflowItem.getID() + "item_id=" + workflowItem.getItem().getID()
                 + "collection_id=" + workflowItem.getCollection().getID()
                 + "newowner_id=" + workflowItem.getOwner().getID() + "old_state="
@@ -356,7 +356,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         {
             if (! workflowCuratorService.doCuration(context, workflowItem)) {
                 // don't proceed - either curation tasks queued, or item rejected
-                log.info(LogManager.getHeader(context, "advance_workflow",
+                log.info(LogHelper.getHeader(context, "advance_workflow",
                         "workflow_item_id=" + workflowItem.getID() + ",item_id="
                         + workflowItem.getItem().getID() + ",collection_id="
                         + workflowItem.getCollection().getID() + ",old_state="
@@ -426,7 +426,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         // error handling? shouldn't get here
         }
 
-        log.info(LogManager.getHeader(context, "advance_workflow",
+        log.info(LogHelper.getHeader(context, "advance_workflow",
                 "workflow_item_id=" + workflowItem.getID() + ",item_id="
                         + workflowItem.getItem().getID() + ",collection_id="
                         + workflowItem.getCollection().getID() + ",old_state="
@@ -463,7 +463,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
             throw new IllegalStateException("WorkflowItem reach an unknown state.");
         }
 
-        log.info(LogManager.getHeader(context, "unclaim_workflow",
+        log.info(LogHelper.getHeader(context, "unclaim_workflow",
                 "workflow_item_id=" + workflowItem.getID() + ",item_id="
                         + workflowItem.getItem().getID() + ",collection_id="
                         + workflowItem.getCollection().getID() + ",old_state="
@@ -484,7 +484,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         // stop workflow regardless of its state
         taskListItemService.deleteByWorkflowItem(context, workflowItem);
 
-        log.info(LogManager.getHeader(context, "abort_workflow", "workflow_item_id="
+        log.info(LogHelper.getHeader(context, "abort_workflow", "workflow_item_id="
                 + workflowItem.getID() + "item_id=" + workflowItem.getItem().getID()
                 + "collection_id=" + workflowItem.getCollection().getID() + "eperson_id="
                 + e.getID()));
@@ -793,14 +793,14 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         Item item = workflowItem.getItem();
         Collection collection = workflowItem.getCollection();
 
-        log.info(LogManager.getHeader(context, "archive_item", "workflow_item_id="
+        log.info(LogHelper.getHeader(context, "archive_item", "workflow_item_id="
                 + workflowItem.getID() + "item_id=" + item.getID() + "collection_id="
                 + collection.getID()));
 
         installItemService.installItem(context, workflowItem);
 
         // Log the event
-        log.info(LogManager.getHeader(context, "install_item", "workflow_id="
+        log.info(LogHelper.getHeader(context, "install_item", "workflow_id="
                 + workflowItem.getID() + ", item_id=" + item.getID() + "handle=FIXME"));
 
         return item;
@@ -858,7 +858,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         }
         catch (MessagingException e)
         {
-            log.warn(LogManager.getHeader(context, "notifyOfArchive",
+            log.warn(LogHelper.getHeader(context, "notifyOfArchive",
                     "cannot email user; item_id=" + item.getID()
                     + ":  " + e.getMessage()));
         }
@@ -898,7 +898,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         workspaceItemService.update(c, workspaceItem);
 
         //myitem.update();
-        log.info(LogManager.getHeader(c, "return_to_workspace",
+        log.info(LogHelper.getHeader(c, "return_to_workspace",
                 "workflow_item_id=" + wfi.getID() + "workspace_item_id="
                         + workspaceItem.getID()));
 
@@ -959,7 +959,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         // notify that it's been rejected
         notifyOfReject(context, workflowItem, ePerson, rejection_message);
 
-        log.info(LogManager.getHeader(context, "reject_workflow", "workflow_item_id="
+        log.info(LogHelper.getHeader(context, "reject_workflow", "workflow_item_id="
                 + workflowItem.getID() + "item_id=" + workflowItem.getItem().getID()
                 + "collection_id=" + workflowItem.getCollection().getID() + "eperson_id="
                 + ePerson.getID()));
@@ -1015,7 +1015,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         }
         catch (MessagingException e)
         {
-            log.warn(LogManager.getHeader(c, "notifyOfCuration",
+            log.warn(LogHelper.getHeader(c, "notifyOfCuration",
                     "cannot email users of workflow_item_id " + wi.getID()
                             + ":  " + e.getMessage()));
         }
@@ -1103,7 +1103,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
             {
                 String gid = (mygroup != null) ?
                              String.valueOf(mygroup.getID()) : "none";
-                log.warn(LogManager.getHeader(c, "notifyGroupofTask",
+                log.warn(LogHelper.getHeader(c, "notifyGroupofTask",
                         "cannot email user group_id=" + gid
                                 + " workflow_item_id=" + wi.getID()
                                 + ":  " + e.getMessage()));
@@ -1156,7 +1156,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         catch (RuntimeException re)
         {
             // log this email error
-            log.warn(LogManager.getHeader(context, "notify_of_reject",
+            log.warn(LogHelper.getHeader(context, "notify_of_reject",
                     "cannot email user eperson_id=" + e.getID()
                             + " eperson_email=" + e.getEmail()
                             + " workflow_item_id=" + workflowItem.getID()
@@ -1167,7 +1167,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         catch (Exception ex)
         {
             // log this email error
-            log.warn(LogManager.getHeader(context, "notify_of_reject",
+            log.warn(LogHelper.getHeader(context, "notify_of_reject",
                     "cannot email user eperson_id=" + e.getID()
                             + " eperson_email=" + e.getEmail()
                             + " workflow_item_id=" + workflowItem.getID()

@@ -38,7 +38,7 @@ import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
@@ -142,7 +142,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         Item item = itemDAO.findByID(context, Item.class, id);
         if (item == null) {
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(context, "find_item",
+                log.debug(LogHelper.getHeader(context, "find_item",
                         "not_found,item_id=" + id));
             }
             return null;
@@ -150,7 +150,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // not null, return item
         if (log.isDebugEnabled()) {
-            log.debug(LogManager.getHeader(context, "find_item", "item_id="
+            log.debug(LogHelper.getHeader(context, "find_item", "item_id="
                     + id));
         }
 
@@ -166,7 +166,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         workspaceItem.setItem(item);
 
 
-        log.info(LogManager.getHeader(context, "create_item", "item_id="
+        log.info(LogHelper.getHeader(context, "create_item", "item_id="
                 + item.getID()));
 
         return item;
@@ -185,7 +185,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             collection.setTemplateItem(template);
             template.setTemplateItemOf(collection);
 
-            log.info(LogManager.getHeader(context, "create_template_item",
+            log.info(LogHelper.getHeader(context, "create_template_item",
                     "collection_id=" + collection.getID() + ",template_item_id="
                             + template.getID()));
 
@@ -299,7 +299,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // Check authorisation
         authorizeService.authorizeAction(context, item, Constants.ADD);
 
-        log.info(LogManager.getHeader(context, "add_bundle", "item_id="
+        log.info(LogHelper.getHeader(context, "add_bundle", "item_id="
                 + item.getID() + ",bundle_id=" + bundle.getID()));
 
         // Check it's not already there
@@ -326,7 +326,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // Check authorisation
         authorizeService.authorizeAction(context, item, Constants.REMOVE);
 
-        log.info(LogManager.getHeader(context, "remove_bundle", "item_id="
+        log.info(LogHelper.getHeader(context, "remove_bundle", "item_id="
                 + item.getID() + ",bundle_id=" + bundle.getID()));
 
         context.addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(),
@@ -388,7 +388,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         context.addEvent(new Event(Event.CREATE, Constants.ITEM, item.getID(),
                 null, getIdentifiers(context, item)));
 
-        log.info(LogManager.getHeader(context, "create_item", "item_id=" + item.getID()));
+        log.info(LogHelper.getHeader(context, "create_item", "item_id=" + item.getID()));
 
         return item;
     }
@@ -447,7 +447,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             authorizeService.authorizeAction(context, item, Constants.WRITE);
         }
 
-        log.info(LogManager.getHeader(context, "update_item", "item_id="
+        log.info(LogHelper.getHeader(context, "update_item", "item_id="
                 + item.getID()));
 
         super.update(context, item);
@@ -553,7 +553,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
 
         // Write log
-        log.info(LogManager.getHeader(context, "withdraw_item", "user="
+        log.info(LogHelper.getHeader(context, "withdraw_item", "user="
                 + e.getEmail() + ",item_id=" + item.getID()));
     }
 
@@ -621,7 +621,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
         
         // Write log
-        log.info(LogManager.getHeader(context, "reinstate_item", "user="
+        log.info(LogHelper.getHeader(context, "reinstate_item", "user="
                 + e.getEmail() + ",item_id=" + item.getID()));
     }
 
@@ -642,7 +642,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(),
                 item.getHandle(), getIdentifiers(context, item)));
 
-        log.info(LogManager.getHeader(context, "delete_item", "item_id="
+        log.info(LogHelper.getHeader(context, "delete_item", "item_id="
                 + item.getID()));
 
         // Remove bundles
@@ -687,7 +687,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
        bundleService.delete(context, b);
 
-       log.info(LogManager.getHeader(context, "remove_bundle", "item_id="
+       log.info(LogHelper.getHeader(context, "remove_bundle", "item_id="
                + item.getID() + ",bundle_id=" + b.getID()));
        context.addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(), Constants.BUNDLE, b.getID(), b.getName()));
    }
@@ -756,7 +756,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         adjustItemPolicies(context, item, collection);
         adjustBundleBitstreamPolicies(context, item, collection);
 
-        log.debug(LogManager.getHeader(context, "item_inheritCollectionDefaultPolicies",
+        log.debug(LogHelper.getHeader(context, "item_inheritCollectionDefaultPolicies",
                                                    "item_id=" + item.getID()));
     }
 
@@ -844,7 +844,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         if (isOwningCollection(item, from))
         {
             // Update the owning collection
-            log.info(LogManager.getHeader(context, "move_item",
+            log.info(LogHelper.getHeader(context, "move_item",
                                           "item_id=" + item.getID() + ", from " +
                                           "collection_id=" + from.getID() + " to " +
                                           "collection_id=" + to.getID()));
@@ -853,7 +853,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             // If applicable, update the item policies
             if (inheritDefaultPolicies)
             {
-                log.info(LogManager.getHeader(context, "move_item",
+                log.info(LogHelper.getHeader(context, "move_item",
                          "Updating item with inherited policies"));
                 inheritCollectionDefaultPolicies(context, item, to);
             }

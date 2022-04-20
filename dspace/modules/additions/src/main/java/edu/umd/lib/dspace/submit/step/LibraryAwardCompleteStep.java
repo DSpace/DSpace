@@ -17,7 +17,7 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.submit.AbstractProcessingStep;
 
 /**
@@ -83,7 +83,7 @@ public class LibraryAwardCompleteStep extends AbstractProcessingStep
     	itemService.update(context, item);
     	
         // The Submission is COMPLETE!!
-        log.debug(LogManager.getHeader(context, "la_complete",
+        log.debug(LogHelper.getHeader(context, "la_complete",
                 "Finished LibraryAward submission"));
         
         return STATUS_COMPLETE;

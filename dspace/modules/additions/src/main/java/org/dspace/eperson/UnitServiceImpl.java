@@ -19,7 +19,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObjectServiceImpl;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.dao.UnitDAO;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.UnitService;
@@ -62,7 +62,7 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
 
         context.addEvent(new Event(Event.CREATE, Constants.UNIT, newUnit.getID(), newUnit.getName()));
 
-        log.info(LogManager.getHeader(context, "create_unit",
+        log.info(LogHelper.getHeader(context, "create_unit",
                 "unit_id=" + newUnit.getID()));
 
         return newUnit;
@@ -109,7 +109,7 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
         // Authorize
         canEdit(context);
 
-        log.info(LogManager.getHeader(context, "update_unit",
+        log.info(LogHelper.getHeader(context, "update_unit",
                 "unit_id=" + unit.getID()));
 
         super.update(context, unit);
@@ -134,7 +134,7 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
          // Authorize
         canEdit(context);
 
-        log.info(LogManager.getHeader(context, "add_group",
+        log.info(LogHelper.getHeader(context, "add_group",
                 "unit_id=" + unit.getID() + ",group_id=" + group.getID()));
 
         unit.addGroup(group);
@@ -149,7 +149,7 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
          // Authorize
         canEdit(context);
 
-        log.info(LogManager.getHeader(context, "add_group",
+        log.info(LogHelper.getHeader(context, "add_group",
                 "unit_id=" + unit.getID() + ",group_id=" + group.getID()));
 
         unit.removeGroup(group);
@@ -169,7 +169,7 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
         // Authorize
         canEdit(context);
 
-        log.info(LogManager.getHeader(context, "delete_unit",
+        log.info(LogHelper.getHeader(context, "delete_unit",
                 "unit_id=" + unit.getID()));
 
         UUID removedId = unit.getID();

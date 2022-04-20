@@ -20,7 +20,7 @@ import org.dspace.content.dao.EtdUnitDAO;
 import org.dspace.content.service.EtdUnitService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.event.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -58,7 +58,7 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
 
         context.addEvent(new Event(Event.CREATE, Constants.ETDUNIT, newEtdunit.getID(), newEtdunit.getName()));
 
-        log.info(LogManager.getHeader(context, "create_etdunit",
+        log.info(LogHelper.getHeader(context, "create_etdunit",
                 "etdunit_id=" + newEtdunit.getID()));
 
         return newEtdunit;
@@ -105,7 +105,7 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
         // Authorize
         canEdit(context);
 
-        log.info(LogManager.getHeader(context, "update_etdunit",
+        log.info(LogHelper.getHeader(context, "update_etdunit",
                 "etdunit_id=" + etdunit.getID()));
 
         super.update(context, etdunit);
@@ -130,7 +130,7 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
          // Authorize
         canEdit(context);
 
-        log.info(LogManager.getHeader(context, "add_collection",
+        log.info(LogHelper.getHeader(context, "add_collection",
                 "etdunit_id=" + etdunit.getID() + ",collection_id=" + collection.getID()));
 
         etdunit.addCollection(collection);
@@ -145,7 +145,7 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
          // Authorize
         canEdit(context);
 
-        log.info(LogManager.getHeader(context, "add_collection",
+        log.info(LogHelper.getHeader(context, "add_collection",
                 "etdunit_id=" + etdunit.getID() + ",collection_id=" + collection.getID()));
 
         etdunit.removeCollection(collection);
@@ -165,7 +165,7 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
         // Authorize
         canEdit(context);
 
-        log.info(LogManager.getHeader(context, "delete_etdunit",
+        log.info(LogHelper.getHeader(context, "delete_etdunit",
                 "etdunit_id=" + etdunit.getID()));
 
         UUID removedId = etdunit.getID();
