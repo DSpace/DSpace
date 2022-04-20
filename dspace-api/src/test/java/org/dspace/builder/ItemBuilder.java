@@ -7,6 +7,8 @@
  */
 package org.dspace.builder;
 
+import static org.dspace.content.LicenseUtils.getLicenseText;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -15,6 +17,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
+import org.dspace.content.LicenseUtils;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.DSpaceObjectService;
@@ -246,4 +249,16 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         }
     }
 
+    public ItemBuilder grantLicense() {
+        String license;
+        try {
+            EPerson submitter = workspaceItem.getSubmitter();
+            submitter = context.reloadEntity(submitter);
+            license = getLicenseText(context.getCurrentLocale(), workspaceItem.getCollection(), item, submitter);
+            LicenseUtils.grantLicense(context, item, license, null);
+        } catch (Exception e) {
+            handleException(e);
+        }
+        return this;
+    }
 }
