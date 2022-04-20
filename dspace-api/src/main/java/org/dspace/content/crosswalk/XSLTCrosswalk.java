@@ -134,7 +134,7 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin {
      * We need to force this, because some dependency elsewhere interferes.
      */
     private static final String TRANSFORMER_FACTORY_CLASS
-        = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
+        = "org.apache.xalan.processor.TransformerFactoryImpl";
 
     private Transformer transformer = null;
     private File transformFile = null;
