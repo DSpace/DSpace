@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
- * Perform some basic unit tests for ACL Class
+ * Test ACL for admin and user.
  *
  * @author milanmajchrak
  */

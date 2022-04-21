@@ -581,18 +581,6 @@ public class DCInput {
         return acl.isAllowedAction(c, action);
     }
 
-    /**
-     * Returns true if there is a ACL with at least one ACE bound to this input field
-     *
-     * @return
-     */
-    public boolean hasACL() {
-        if (acl != null && !acl.isEmpty()) {
-            return true;
-        }
-        return false;
-    }
-
     public boolean isQualdropValue() {
         if ("qualdrop_value".equals(getInputType())) {
             return true;
