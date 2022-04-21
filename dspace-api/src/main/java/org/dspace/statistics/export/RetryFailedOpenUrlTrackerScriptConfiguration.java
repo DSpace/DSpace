@@ -56,15 +56,12 @@ public class RetryFailedOpenUrlTrackerScriptConfiguration<T extends RetryFailedO
             Options options = new Options();
 
             options.addOption("a", true, "Add a new \"failed\" row to the table with a url (test purposes only)");
-            options.getOption("a").setType(String.class);
 
             options.addOption("r", false,
                               "Retry sending requests to all urls stored in the table with failed requests. " +
                                       "This includes the url that can be added through the -a option.");
-            options.getOption("r").setType(boolean.class);
 
             options.addOption("h", "help", false, "print this help message");
-            options.getOption("h").setType(boolean.class);
 
             super.options = options;
         }

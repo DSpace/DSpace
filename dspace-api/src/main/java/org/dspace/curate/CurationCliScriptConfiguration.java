@@ -19,7 +19,6 @@ public class CurationCliScriptConfiguration extends CurationScriptConfiguration<
     public Options getOptions() {
         options = super.getOptions();
         options.addOption("e", "eperson", true, "email address of curating eperson");
-        options.getOption("e").setType(String.class);
         options.getOption("e").setRequired(true);
         return options;
     }
