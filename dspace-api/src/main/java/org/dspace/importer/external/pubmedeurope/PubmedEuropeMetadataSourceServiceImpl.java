@@ -42,7 +42,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implements a data source for querying PubmedEurope
+ * Implements a data source for querying PubMed Europe
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
@@ -51,7 +51,7 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private final static Logger log = LogManager.getLogger();
 
-    private static final String ENDPOINT_SEARCH = "https://www.ebi.ac.uk/europepmc/webservices/rest/search";
+    private String url;
 
     @Autowired
     private LiveImportClient liveImportClient;
@@ -61,38 +61,89 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
         return "pubmedeu";
     }
 
+    /**
+     * Get a single record from the PubMed Europe.
+     *
+     * @param id                         Identifier for the record
+     * @return                           The first matching record
+     * @throws MetadataSourceException   If the underlying methods throw any exception.
+     */
     @Override
     public ImportRecord getRecord(String id) throws MetadataSourceException {
         List<ImportRecord> records = retry(new SearchByIdCallable(id));
         return records == null || records.isEmpty() ? null : records.get(0);
     }
 
+    /**
+     * Find the number of records matching a query;
+     *
+     * @param query a query string to base the search on.
+     * @return the sum of the matching records over this import source
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
         return retry(new CountByQueryCallable(query));
     }
 
+    /**
+     * Find the number of records matching a query;
+     *
+     * @param query                      A query string to base the search on.
+     * @return                           The sum of the matching records over this import source
+     * @throws MetadataSourceException   If the underlying methods throw any exception.
+     */
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
         return retry(new CountByQueryCallable(query));
     }
 
+    /**
+     * Find records matching a string query.
+     *
+     * @param query                      A query string to base the search on.
+     * @param start                      Offset to start at
+     * @param count                      Number of records to retrieve.
+     * @return                           A set of records. Fully transformed.
+     * @throws MetadataSourceException   If the underlying methods throw any exception.
+     */
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
         return retry(new SearchByQueryCallable(query, count, start));
     }
 
+    /**
+     * Find records based on a object query.
+     *
+     * @param query                     A query object to base the search on.
+     * @return                          A set of records. Fully transformed.
+     * @throws MetadataSourceException  If the underlying methods throw any exception.
+     */
     @Override
     public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
         return retry(new SearchByQueryCallable(query));
     }
 
+    /**
+     * Get a single record from the PubMed Europe.
+     *
+     * @param query                       A query matching a single record
+     * @return                            The first matching record
+     * @throws MetadataSourceException    If the underlying methods throw any exception.
+     */
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
         List<ImportRecord> records = retry(new SearchByIdCallable(query));
         return records == null || records.isEmpty() ? null : records.get(0);
     }
 
+    /**
+     * Finds records based on query object.
+     *
+     * @param query                        A query object to base the search on.
+     * @return                             A collection of import records.
+     * @throws MetadataSourceException     If the underlying methods throw any exception.
+     */
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
         return retry(new FindMatchingRecordCallable(query));
@@ -100,7 +151,7 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for CrossRef");
+        throw new MethodNotFoundException("This method is not implemented for PubMed Europe");
     }
 
     @Override
@@ -112,6 +163,16 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
         return search(query.toString(), count, start);
     }
 
+    /**
+     * This class is a Callable implementation to get PubMed Europe entries based on
+     * query object.
+     * 
+     * This Callable use as query value the string queryString passed to constructor.
+     * If the object will be construct through Query.class instance, a Query's map entry with key "query" will be used.
+     * Pagination is supported too, using the value of the Query's map with keys "start" and "count".
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
+     */
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
 
         private Query query;
@@ -137,6 +198,11 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
         }
     }
 
+    /**
+     * This class is a Callable implementation to get an PubMed Europe entry using PubMed Europe ID
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
+     */
     private class SearchByIdCallable implements Callable<List<ImportRecord>> {
         private Query query;
 
@@ -155,6 +221,13 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
         }
     }
 
+    /**
+     * This class is a Callable implementation to search PubMed Europe entries
+     * using author, title and year.
+     * Pagination is supported too, using the value of the Query's map with keys "start" and "count".
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
+     */
     public class FindMatchingRecordCallable implements Callable<List<ImportRecord>> {
 
         private Query query;
@@ -175,6 +248,12 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
 
     }
 
+    /**
+     * This class is a Callable implementation to count the number
+     * of entries for an PubMed Europe query.
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
+     */
     private class CountByQueryCallable implements Callable<Integer> {
         private Query query;
 
@@ -198,6 +277,15 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
         }
     }
 
+    /**
+     * Returns the total number of PubMed Europe publications returned by a specific query
+     * 
+     * @param query                      A keyword or combination of keywords to be searched
+     * @throws URISyntaxException        If URI syntax error
+     * @throws ClientProtocolException   The client protocol exception
+     * @throws IOException               If IO error
+     * @throws JaxenException            If Xpath evaluation failed
+     */
     public Integer count(String query) throws URISyntaxException, ClientProtocolException, IOException, JaxenException {
         try {
             String response = liveImportClient.executeHttpGetRequest(1000, buildURI(1, query),
@@ -214,7 +302,7 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
     }
 
     public List<ImportRecord> search(String title, String author, int year, int count, int start)
-            throws HttpException, IOException {
+            throws IOException {
         StringBuffer query = new StringBuffer();
         query.append("(");
         if (StringUtils.isNotBlank(title)) {
@@ -250,10 +338,18 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
         return search(query.toString(), count, start);
     }
 
-    public List<ImportRecord> search(String query, Integer count, Integer start) throws IOException, HttpException {
+    /**
+     * Returns a list of PubMed Europe publication records
+     * 
+     * @param query           A keyword or combination of keywords to be searched
+     * @param count           The number of search results per page
+     * @param start           Start number for the acquired search result list
+     * @throws IOException    If IO error
+     */
+    public List<ImportRecord> search(String query, Integer count, Integer start) throws IOException {
         List<ImportRecord> results = new ArrayList<>();
         try {
-            URIBuilder uriBuilder = new URIBuilder("https://www.ebi.ac.uk/europepmc/webservices/rest/search");
+            URIBuilder uriBuilder = new URIBuilder(this.url);
             uriBuilder.addParameter("format", "xml");
             uriBuilder.addParameter("resulttype", "core");
             uriBuilder.addParameter("pageSize", String.valueOf(count));
@@ -300,12 +396,20 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
     }
 
     private String buildURI(Integer pageSize, String query) throws URISyntaxException {
-        URIBuilder uriBuilder = new URIBuilder(ENDPOINT_SEARCH);
+        URIBuilder uriBuilder = new URIBuilder(this.url);
         uriBuilder.addParameter("format", "xml");
         uriBuilder.addParameter("resulttype", "core");
         uriBuilder.addParameter("pageSize", String.valueOf(pageSize));
         uriBuilder.addParameter("query", query);
         return uriBuilder.toString();
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
 }

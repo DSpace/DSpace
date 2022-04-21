@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import javax.el.MethodNotFoundException;
 
@@ -54,7 +55,8 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
 
     private final static Logger log = LogManager.getLogger();
 
-    private static final String ENDPOINT_SEARCH = "https://ci.nii.ac.jp/naid/";
+    private String url;
+    private String urlSearch;
 
     @Autowired
     private LiveImportClient liveImportClient;
@@ -109,10 +111,35 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
-        throw new MethodNotFoundException("This method is not implemented for CrossRef");
+        throw new MethodNotFoundException("This method is not implemented for Cinii");
     }
 
+    public String getUrl() {
+        return url;
+    }
 
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getUrlSearch() {
+        return urlSearch;
+    }
+
+    public void setUrlSearch(String urlSearch) {
+        this.urlSearch = urlSearch;
+    }
+
+    /**
+     * This class is a Callable implementation to get CiNii entries based on
+     * query object.
+     * 
+     * This Callable use as query value the string queryString passed to constructor.
+     * If the object will be construct through Query.class instance, a Query's map entry with key "query" will be used.
+     * Pagination is supported too, using the value of the Query's map with keys "start" and "count".
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
+     */
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
 
         private Query query;
@@ -134,7 +161,7 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
             Integer count = query.getParameterAsClass("count", Integer.class);
             Integer start = query.getParameterAsClass("start", Integer.class);
             String queryString = query.getParameterAsClass("query", String.class);
-            String appId = configurationService.getProperty("submission.lookup.cinii.appid");
+            String appId = configurationService.getProperty("cinii.appid");
             List<String> ids = getCiniiIds(appId, count, null, null, null, start, queryString);
             if (ids != null && ids.size() > 0) {
                 for (String id : ids) {
@@ -156,6 +183,11 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
         }
     }
 
+    /**
+     * This class is a Callable implementation to get an CiNii entry using CiNii ID
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
+     */
     private class SearchByIdCallable implements Callable<List<ImportRecord>> {
         private Query query;
 
@@ -170,7 +202,7 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
 
         @Override
         public List<ImportRecord> call() throws Exception {
-            String appId = configurationService.getProperty("submission.lookup.cinii.appid");
+            String appId = configurationService.getProperty("cinii.appid");
             String id = query.getParameterAsClass("id", String.class);
             List<ImportRecord> importRecord = search(id, appId);
             MetadatumDTO metadatumDto = new MetadatumDTO();
@@ -185,6 +217,13 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
         }
     }
 
+    /**
+     * This class is a Callable implementation to search CiNii entries
+     * using author, title and year.
+     * Pagination is supported too, using the value of the Query's map with keys "start" and "count".
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
+     */
     private class FindMatchingRecordCallable implements Callable<List<ImportRecord>> {
 
         private Query query;
@@ -201,7 +240,7 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
             Integer year = query.getParameterAsClass("year", Integer.class);
             Integer maxResult = query.getParameterAsClass("maxResult", Integer.class);
             Integer start = query.getParameterAsClass("start", Integer.class);
-            String appId = configurationService.getProperty("submission.lookup.cinii.appid");
+            String appId = configurationService.getProperty("cinii.appid");
             List<String> ids = getCiniiIds(appId, maxResult, author, title, year, start, null);
             if (ids != null && ids.size() > 0) {
                 for (String id : ids) {
@@ -224,6 +263,12 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
 
     }
 
+    /**
+     * This class is a Callable implementation to count the number
+     * of entries for an CiNii query.
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
+     */
     private class CountByQueryCallable implements Callable<Integer> {
         private Query query;
 
@@ -239,12 +284,11 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
 
         @Override
         public Integer call() throws Exception {
-            String appId = configurationService.getProperty("submission.lookup.cinii.appid");
+            String appId = configurationService.getProperty("cinii.appid");
             String queryString = query.getParameterAsClass("query", String.class);
             return countCiniiElement(appId, null, null, null, null, null, queryString);
         }
     }
-
 
     /**
      * Get metadata by searching CiNii RDF API with CiNii NAID
@@ -259,7 +303,7 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
         throws IOException, HttpException {
         try {
             List<ImportRecord> records = new LinkedList<ImportRecord>();
-            URIBuilder uriBuilder = new URIBuilder(ENDPOINT_SEARCH + id + ".rdf?appid=" + appId);
+            URIBuilder uriBuilder = new URIBuilder(this.url + id + ".rdf?appid=" + appId);
             String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
                     new HashMap<String, String>());
             List<Element> elements = splitToRecords(response);
@@ -290,37 +334,49 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
         }
     }
 
+    /**
+     * Returns a list of uri links (for example:https://cir.nii.ac.jp/crid/123456789)
+     * to the searched CiNii articles
+     * 
+     * @param appId       Application ID
+     * @param maxResult   The number of search results per page
+     * @param author      Author name
+     * @param title       Article name
+     * @param year        Year of publication
+     * @param start       Start number for the acquired search result list
+     * @param query       Keyword to be searched
+     */
     private List<String> getCiniiIds(String appId, Integer maxResult, String author, String title,
         Integer year, Integer start, String query) {
         try {
             List<String> ids = new ArrayList<>();
-            URIBuilder uriBuilder = new URIBuilder("https://ci.nii.ac.jp/opensearch/search");
+            URIBuilder uriBuilder = new URIBuilder(this.urlSearch);
             uriBuilder.addParameter("format", "rss");
             if (StringUtils.isNotBlank(appId)) {
                 uriBuilder.addParameter("appid", appId);
             }
-            if (maxResult != null && maxResult != 0) {
+            if (Objects.nonNull(maxResult) && maxResult != 0) {
                 uriBuilder.addParameter("count", maxResult.toString());
             }
-            if (start != null) {
+            if (Objects.nonNull(start)) {
                 uriBuilder.addParameter("start", start.toString());
             }
-            if (title != null) {
+            if (StringUtils.isNotBlank(title)) {
                 uriBuilder.addParameter("title", title);
             }
-            if (author != null) {
+            if (StringUtils.isNotBlank(author)) {
                 uriBuilder.addParameter("author", author);
             }
-            if (query != null) {
+            if (StringUtils.isNotBlank(query)) {
                 uriBuilder.addParameter("q", query);
             }
-            if (year != null && year != -1 && year != 0) {
+            if (Objects.nonNull(year) && year != -1 && year != 0) {
                 uriBuilder.addParameter("year_from", String.valueOf(year));
                 uriBuilder.addParameter("year_to", String.valueOf(year));
             }
             String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
                     new HashMap<String, String>());
-            int url_len = "http://ci.nii.ac.jp/naid/".length();
+            int url_len = this.url.length() - 1;
             SAXBuilder saxBuilder = new SAXBuilder();
             Document document = saxBuilder.build(new StringReader(response));
             Element root = document.getRootElement();
@@ -343,28 +399,39 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
         }
     }
 
+    /**
+     * Returns the total number of CiNii articles returned by a specific query
+     * 
+     * @param appId       Application ID
+     * @param maxResult   The number of search results per page
+     * @param author      Author name
+     * @param title       Article name
+     * @param year        Year of publication
+     * @param start       Start number for the acquired search result list
+     * @param query       Keyword to be searched
+     */
     private Integer countCiniiElement(String appId, Integer maxResult, String author, String title,
             Integer year, Integer start, String query) {
         try {
-            URIBuilder uriBuilder = new URIBuilder("https://ci.nii.ac.jp/opensearch/search");
+            URIBuilder uriBuilder = new URIBuilder(this.urlSearch);
             uriBuilder.addParameter("format", "rss");
             uriBuilder.addParameter("appid", appId);
-            if (maxResult != null && maxResult != 0) {
+            if (Objects.nonNull(maxResult) && maxResult != 0) {
                 uriBuilder.addParameter("count", maxResult.toString());
             }
-            if (start != null) {
+            if (Objects.nonNull(start)) {
                 uriBuilder.addParameter("start", start.toString());
             }
-            if (title != null) {
+            if (StringUtils.isNotBlank(title)) {
                 uriBuilder.addParameter("title", title);
             }
-            if (author != null) {
+            if (StringUtils.isNotBlank(author)) {
                 uriBuilder.addParameter("author", author);
             }
-            if (query != null) {
+            if (StringUtils.isNotBlank(query)) {
                 uriBuilder.addParameter("q", query);
             }
-            if (year != null && year != -1 && year != 0) {
+            if (Objects.nonNull(year) && year != -1 && year != 0) {
                 uriBuilder.addParameter("year_from", String.valueOf(year));
                 uriBuilder.addParameter("year_to", String.valueOf(year));
             }
