@@ -8,7 +8,11 @@
 package sk.dtq.dspace.app.util;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -16,7 +20,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.stereotype.Component;
@@ -28,8 +31,7 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class ACL
-{
+public class ACL {
 
     /** Logger */
     private static final Logger log = Logger.getLogger(ACL.class);
@@ -51,18 +53,14 @@ public class ACL
      * @return ACL object
      */
 
-    public static ACL fromString(String s)
-    {
+    public static ACL fromString(String s) {
         List<ACE> acl = new ArrayList<ACE>();
-        if (s != null)
-        {
+        if (s != null) {
             String[] aclEntries = s.split(";");
-            for (int i = 0; i < aclEntries.length; i++)
-            {
+            for (int i = 0; i < aclEntries.length; i++) {
                 String aclEntry = aclEntries[i];
                 ACE ace = ACE.fromString(aclEntry);
-                if (ace != null)
-                {
+                if (ace != null) {
                     acl.add(ace);
                 }
             }
@@ -76,8 +74,7 @@ public class ACL
      * @param acl
      */
 
-    ACL(List<ACE> acl)
-    {
+    ACL(List<ACE> acl) {
         this.acl = acl;
     }
 
@@ -91,12 +88,9 @@ public class ACL
      * @return
      */
 
-    private boolean isAllowedAction(String userID, Set<Integer> groupIDs, int action)
-    {
-        for (ACE ace : acl)
-        {
-            if (ace.matches(userID, groupIDs, action))
-            {
+    private boolean isAllowedAction(String userID, Set<Integer> groupIDs, int action) {
+        for (ACE ace : acl) {
+            if (ace.matches(userID, groupIDs, action)) {
                 return ace.isAllowed();
             }
         }
@@ -114,25 +108,20 @@ public class ACL
      * @throws SQLException
      */
 
-    public boolean isAllowedAction(Context c, int action)
-    {
+    public boolean isAllowedAction(Context c, int action) {
         boolean res = false;
-        if (acl.isEmpty())
-        {
+        if (acl.isEmpty()) {
             // To maintain backwards compatibility allow everything if the ACL
             // is empty
             return true;
         }
-        try
-        {
-            if(authorizeService.isAdmin(c)) {
+        try {
+            if (authorizeService.isAdmin(c)) {
                 // Admin is always allowed
                 return true;
-            }
-            else {
+            } else {
                 EPerson e = c.getCurrentUser();
-                if (e != null)
-                {
+                if (e != null) {
                     UUID userID = e.getID();
                     List<Group> groupIDs = groupService.allMemberGroups(c, c.getCurrentUser());
                     Set<Integer> groupIDsInt = new HashSet<>();
@@ -142,9 +131,7 @@ public class ACL
                     return isAllowedAction(userID.toString(), groupIDsInt, action);
                 }
             }
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             log.error(e);
         }
         return res;
@@ -156,8 +143,7 @@ public class ACL
      * @return
      */
 
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return acl.isEmpty();
     }
 

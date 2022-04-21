@@ -7,18 +7,18 @@
  */
 package sk.dtq.dspace.app.util;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
+import java.sql.SQLException;
+
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.sql.SQLException;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 /**
  * Perform some basic unit tests for ACL Class
