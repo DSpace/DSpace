@@ -3,8 +3,12 @@
 # https://docs.github.com/en/free-pro-team@latest/actions/guides/building-and-testing-java-with-maven
 name: Build
 
-# Run this Build for all pushes / PRs to current branch
-on: [push, pull_request]
+# Run this Build for pushes to our main and all PRs
+on: 
+  push:
+    branches:
+      - dtq-dev
+  pull_request:
 
 permissions:
   contents: read  #  to fetch code (actions/checkout)
