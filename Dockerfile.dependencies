@@ -25,7 +25,7 @@ RUN apt-get update \
 USER dspace
 
 # Add maven settings
-COPY dspace/src/main/docker/mvn-settings.xml /home/dspace/.m2/settings.xml
+COPY --chown=dspace dspace/src/main/docker/mvn-settings.xml /home/dspace/.m2/settings.xml
 
 # Copy the DSpace source code (from local machine) into the workdir (excluding .dockerignore contents)
 ADD --chown=dspace . /app/

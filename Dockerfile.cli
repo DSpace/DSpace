@@ -8,7 +8,7 @@
 ARG JDK_VERSION=11
 
 # Step 1 - Run Maven Build
-FROM dspace/dspace-dependencies:dspace-7_x as build
+FROM docker.lib.umd.edu/drum-dependencies-7_x:latest as build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
@@ -18,6 +18,8 @@ RUN mkdir /install \
 USER dspace
 # Copy the DSpace source code (from local machine) into the workdir (excluding .dockerignore contents)
 ADD --chown=dspace . /app/
+COPY --chown=dspace dspace/src/main/docker/mvn-settings.xml /home/dspace/.m2/settings.xml
+
 # Build DSpace.  Copy the dspace-installer directory to /install.  Clean up the build to keep the docker image small
 RUN mvn package && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
