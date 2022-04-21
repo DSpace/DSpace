@@ -32,7 +32,6 @@ import org.dspace.core.Context;
 import org.dspace.submit.model.LanguageFormField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import sk.dtq.dspace.app.util.ACL;
 
 /**
@@ -77,7 +76,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
             for (DCInput dcinput : row) {
                 //skip if acl says no
                 Context con = ContextUtil.obtainCurrentRequestContext();
-                if(!isInputAuthorized(con ,dcinput)){
+                if (!isInputAuthorized(con ,dcinput)) {
                     continue;
                 }
                 fields.add(getField(dcinput, formName));
@@ -241,14 +240,11 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     /**
      * should we render the metadata field based on authorization?
      */
-    protected boolean isInputAuthorized(Context c, DCInput dcInput)
-    {
-
+    protected boolean isInputAuthorized(Context c, DCInput dcInput) {
         // If the input is not allowed according to ACL, skip it.
-        if(!dcInput.isAllowedAction(c, ACL.ACTION_READ) && !dcInput.isAllowedAction(c, ACL.ACTION_WRITE)) {
+        if (!dcInput.isAllowedAction(c, ACL.ACTION_READ) && !dcInput.isAllowedAction(c, ACL.ACTION_WRITE)) {
             return false;
         }
-
         return true;
     }
 

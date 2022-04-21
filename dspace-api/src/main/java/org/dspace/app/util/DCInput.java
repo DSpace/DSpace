@@ -21,7 +21,6 @@ import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import sk.dtq.dspace.app.util.ACL;
 
 /**
@@ -578,8 +577,7 @@ public class DCInput {
      *            Action
      * @return true if allowed, false otherwise
      */
-    public boolean isAllowedAction(Context c, int action)
-    {
+    public boolean isAllowedAction(Context c, int action) {
         return acl.isAllowedAction(c, action);
     }
 
@@ -588,10 +586,8 @@ public class DCInput {
      *
      * @return
      */
-    public boolean hasACL()
-    {
-        if(acl != null && !acl.isEmpty())
-        {
+    public boolean hasACL() {
+        if (acl != null && !acl.isEmpty()) {
             return true;
         }
         return false;

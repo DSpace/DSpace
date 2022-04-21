@@ -18,8 +18,7 @@ import org.apache.log4j.Logger;
  * @author milanmajchrak
  */
 
-public class ACE
-{
+public class ACE {
 
     /** Logger */
     private static final Logger log = Logger.getLogger(ACE.class);
@@ -75,8 +74,7 @@ public class ACE
      * @return ACE object or null
      */
 
-    public static ACE fromString(String s)
-    {
+    public static ACE fromString(String s) {
         ACE ace = null;
         String[] aceParts = s.split(",");
 
@@ -87,13 +85,11 @@ public class ACE
         int granteeType = 0;
         String granteeID = "";
 
-        for (int i = 0; i < aceParts.length; i++)
-        {
+        for (int i = 0; i < aceParts.length; i++) {
             String acePart = aceParts[i];
             String keyValue[] = acePart.split("=");
 
-            if (keyValue.length != 2)
-            {
+            if (keyValue.length != 2) {
                 log.error("Invalid ACE format: " + acePart);
                 errors++;
                 continue;
@@ -102,78 +98,48 @@ public class ACE
             String key = keyValue[0].trim();
             String value = keyValue[1].trim();
 
-            if (key.equals(POLICY_KEYWORD))
-            {
-                if (value.equals(POLICY_DENY_KEYWORD))
-                {
+            if (key.equals(POLICY_KEYWORD)) {
+                if (value.equals(POLICY_DENY_KEYWORD)) {
                     policy = POLICY_DENY;
-                }
-                else if (value.equals(POLICY_ALLOW_KEYWORD))
-                {
+                } else if (value.equals(POLICY_ALLOW_KEYWORD)) {
                     policy = POLICY_ALLOW;
-                }
-                else
-                {
+                } else {
                     log.error("Invalid ACE policy value: " + value);
                     errors++;
                 }
-            }
-            else if (key.equals(ACTION_KEYWORD))
-            {
-                if (value.equals(ACTION_READ_KEYWORD))
-                {
+            } else if (key.equals(ACTION_KEYWORD)) {
+                if (value.equals(ACTION_READ_KEYWORD)) {
                     action = ACTION_READ;
-                }
-                else if (value.equals(ACTION_WRITE_KEYWORD))
-                {
+                } else if (value.equals(ACTION_WRITE_KEYWORD)) {
                     action = ACTION_WRITE;
-                }
-                else
-                {
+                } else {
                     log.error("Invalid ACE action value: " + value);
                     errors++;
                 }
-            }
-            else if (key.equals(GRANTEE_TYPE_KEYWORD))
-            {
-                if (value.equals(GRANTEE_TYPE_USER_KEYWORD))
-                {
+            } else if (key.equals(GRANTEE_TYPE_KEYWORD)) {
+                if (value.equals(GRANTEE_TYPE_USER_KEYWORD)) {
                     granteeType = GRANTEE_TYPE_USER;
-                }
-                else if (value.equals(GRANTEE_TYPE_GROUP_KEYWORD))
-                {
+                } else if (value.equals(GRANTEE_TYPE_GROUP_KEYWORD)) {
                     granteeType = GRANTEE_TYPE_GROUP;
-                }
-                else
-                {
+                } else {
                     log.error("Invalid ACE grantee type value: " + value);
                     errors++;
                 }
-            }
-            else if (key.equals(GRANTEE_ID_KEYWORD))
-            {
-                if (value.equals(ANY_KEYWORD))
-                {
+            } else if (key.equals(GRANTEE_ID_KEYWORD)) {
+                if (value.equals(ANY_KEYWORD)) {
                     granteeID = GRANTEE_ID_ANY;
-                }
-                else if (Pattern.matches("\\d+", value))
-                {
+                } else if (Pattern.matches("\\d+", value)) {
                     granteeID = value;
-                }
-                else
-                {
+                } else {
                     log.error("Invalid ACE grantee ID value: " + value);
                     errors++;
                 }
-            }
-            else
-            {
+            } else {
                 log.error("Invalid ACE keyword: " + key);
                 errors++;
             }
         }
-        if (errors == 0)
-        {
+        if (errors == 0) {
             ace = new ACE(policy, action, granteeType, granteeID);
         }
         return ace;
@@ -188,8 +154,7 @@ public class ACE
      * @param granteeID
      */
 
-    private ACE(int policy, int action, int granteeType, String granteeID)
-    {
+    private ACE(int policy, int action, int granteeType, String granteeID) {
         this.policy = policy;
         this.action = action;
         this.granteeType = granteeType;
@@ -206,21 +171,14 @@ public class ACE
      * @return
      */
 
-    public boolean matches(String userID, Set<Integer> groupIDs, int action)
-    {
-        if (this.action == action)
-        {
-            if (granteeType == ACE.GRANTEE_TYPE_USER)
-            {
-                if (granteeID.equals(GRANTEE_ID_ANY) || userID.equals(granteeID))
-                {
+    public boolean matches(String userID, Set<Integer> groupIDs, int action) {
+        if (this.action == action) {
+            if (granteeType == ACE.GRANTEE_TYPE_USER) {
+                if (granteeID.equals(GRANTEE_ID_ANY) || userID.equals(granteeID)) {
                     return true;
                 }
-            }
-            else if (granteeType == ACE.GRANTEE_TYPE_GROUP)
-            {
-                if (granteeID == GRANTEE_ID_ANY || groupIDs.contains(Integer.valueOf(granteeID)))
-                {
+            } else if (granteeType == ACE.GRANTEE_TYPE_GROUP) {
+                if (granteeID == GRANTEE_ID_ANY || groupIDs.contains(Integer.valueOf(granteeID))) {
                     return true;
                 }
 
@@ -235,8 +193,7 @@ public class ACE
      * @return
      */
 
-    public boolean isAllowed()
-    {
+    public boolean isAllowed() {
         return policy == ACE.POLICY_ALLOW;
     }
 
