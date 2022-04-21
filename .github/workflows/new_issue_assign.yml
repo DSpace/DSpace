@@ -19,4 +19,4 @@ jobs:
       if: github.event.action == 'opened'
       with:
         project: 'https://github.com/orgs/dataquest-dev/projects/6'
-        column_name: 'To do'
+        column_name: 'Backlog'
