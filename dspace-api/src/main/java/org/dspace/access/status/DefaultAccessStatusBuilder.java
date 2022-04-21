@@ -115,12 +115,17 @@ public class DefaultAccessStatusBuilder implements AccessStatusBuilder {
         int openAccessCount = 0;
         int embargoCount = 0;
         int restrictedCount = 0;
+        int unknownCount = 0;
         // Looks at all read policies.
         for (ResourcePolicy policy : policies) {
             boolean isValid = resourcePolicyService.isDateValid(policy);
             Group group = policy.getGroup();
-            // Only calculate the status for the anonymous group.
-            if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
+            // The group must not be null here. However,
+            // if it is, consider this as an unexpected case.
+            if (group == null) {
+                unknownCount++;
+            } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
+                // Only calculate the status for the anonymous group.
                 if (isValid) {
                     // If the policy is valid, the anonymous group have access
                     // to the bitstream.
@@ -145,6 +150,9 @@ public class DefaultAccessStatusBuilder implements AccessStatusBuilder {
         }
         if (embargoCount > 0 && restrictedCount == 0) {
             return EMBARGO;
+        }
+        if (unknownCount > 0) {
+            return UNKNOWN;
         }
         return RESTRICTED;
     }
