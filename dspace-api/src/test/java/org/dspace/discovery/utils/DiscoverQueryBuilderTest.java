@@ -248,8 +248,6 @@ public class DiscoverQueryBuilderTest {
 
     @Test
     public void testSortByScore() throws Exception {
-//        page = PageRequest.of(2, 10, Sort.Direction.ASC, "SCORE");
-
         DiscoverQuery discoverQuery =
                 queryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, emptyList(), 10, 20L,
                                         "SCORE", "ASC");
