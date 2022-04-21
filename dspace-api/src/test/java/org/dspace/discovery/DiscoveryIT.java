@@ -712,7 +712,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private void assertSearchQuery(String resourceType, int size) throws SearchServiceException {
-        assertSearchQuery(resourceType, size, size, 0, - 1);
+        assertSearchQuery(resourceType, size, size, 0, -1);
     }
 
     private void assertSearchQuery(String resourceType, int size, int totalFound, int start, int limit)
