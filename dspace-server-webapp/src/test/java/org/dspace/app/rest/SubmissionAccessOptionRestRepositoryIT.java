@@ -94,4 +94,11 @@ public class SubmissionAccessOptionRestRepositoryIT extends AbstractControllerIn
                             .andExpect(status().isNotFound());
     }
 
+    @Test
+    public void test() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/config/submissionforms/sherpaPolicyStep"))
+                             .andExpect(status().isOk());
+    }
+
 }

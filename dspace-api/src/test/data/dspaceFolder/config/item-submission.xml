@@ -131,6 +131,12 @@
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
+
+        <step-definition id="sherpaPolicies" mandatory="true">
+            <heading>submit.progressbar.sherpapolicy</heading>
+            <processing-class>org.dspace.app.rest.submit.step.SherpaPolicyStep</processing-class>
+            <type>sherpaPolicy</type>
+        </step-definition>
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -166,6 +172,7 @@
             <!-- <step id="upload-with-embargo"/> -->
             <!-- <step id="extractionstep"/> -->
             <step id="defaultAC"/>
+            <step id="sherpaPolicies"/>
 
             <!--Step will be to Sign off on the License -->
             <step id="license"/>

@@ -47,6 +47,24 @@
             <offheap unit="MB">4</offheap>
         </resources>
     </cache-template>
+    <cache-template name="sherpa-default">
+        <listeners>
+            <listener>
+                <class>org.dspace.app.rest.cache.CanvasCacheLogger</class>
+                <event-firing-mode>ASYNCHRONOUS</event-firing-mode>
+                <event-ordering-mode>UNORDERED</event-ordering-mode>
+                <events-to-fire-on>CREATED</events-to-fire-on>
+                <events-to-fire-on>EXPIRED</events-to-fire-on>
+                <events-to-fire-on>REMOVED</events-to-fire-on>
+                <events-to-fire-on>EVICTED</events-to-fire-on>
+            </listener>
+        </listeners>
+        <resources>
+            <heap>3000</heap>
+            <offheap unit="MB">4</offheap>
+        </resources>
+    </cache-template>
     <cache alias="manifests" uses-template="iiif-default"/>
     <cache alias="canvasdimensions" uses-template="iiif-canvas"/>
+    <cache alias="sherpa.searchByJournalISSN" uses-template="sherpa-default"/>
 </config>

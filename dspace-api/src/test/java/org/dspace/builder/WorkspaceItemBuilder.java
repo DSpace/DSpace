@@ -177,12 +177,16 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, subject);
     }
 
-    public WorkspaceItemBuilder withAbstract(final String subject) {
-        return addMetadataValue(MetadataSchemaEnum.DC.getName(),"description", "abstract", subject);
+    public WorkspaceItemBuilder withIssn(String issn) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "identifier", "issn", issn);
     }
 
     public WorkspaceItemBuilder withEntityType(final String entityType) {
         return addMetadataValue("dspace", "entity", "type", entityType);
+    }
+
+    public WorkspaceItemBuilder withAbstract(final String subject) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(),"description", "abstract", subject);
     }
 
     public WorkspaceItemBuilder grantLicense() {

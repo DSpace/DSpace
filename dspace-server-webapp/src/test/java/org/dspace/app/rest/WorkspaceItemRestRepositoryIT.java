@@ -371,7 +371,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                 .withTitle("Workspace Item 1")
                 .withIssueDate("2017-10-17")
-                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withAuthor("Smith, Donald")
+                .withIssn("222731-0582")
+                .withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
 
@@ -7260,6 +7262,45 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                              bitstream2, ResourcePolicy.TYPE_CUSTOM, Constants.READ, "embargo")
                               )))
                              .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void test99() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Workspace Item 1")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withAuthor("Smith, Donald")
+                                                  .withIssn("222731-0582")
+                                                  .withAuthor("Doe, John")
+                                                  .withSubject("ExtraEntry")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                        .andExpect(status().isOk());
+
+        // create a list of values to use in add operation
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new RemoveOperation("/sections/sherpaPolicies/retrievalTime"));
+
+        String patchBody = getPatchContent(operations);
+        getClient(token).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk());
+
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                        .andExpect(status().isOk());
     }
 
 }

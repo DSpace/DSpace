@@ -12,10 +12,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -51,6 +53,9 @@ public class SHERPAResponse {
 
     // SHERPA URI (the human page version of this API response)
     private String uri;
+
+    @JsonIgnore
+    private Date retrievalTime = new Date();
 
     // Format enum - currently only JSON is supported
     public enum SHERPAFormat {
@@ -541,5 +546,9 @@ public class SHERPAResponse {
 
     public SHERPASystemMetadata getMetadata() {
         return metadata;
+    }
+
+    public Date getRetrievalTime() {
+        return retrievalTime;
     }
 }
