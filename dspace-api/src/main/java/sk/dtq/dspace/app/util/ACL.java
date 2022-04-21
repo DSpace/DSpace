@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 /**
  * Class that represents Access Control List
  *
- * @author Michal Josífko
+ * @author milanmajchrak
  */
 
 @Component
