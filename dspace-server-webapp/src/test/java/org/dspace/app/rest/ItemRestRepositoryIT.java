@@ -3862,6 +3862,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                  .andExpect(jsonPath("$.inArchive", Matchers.is(false)))
                  .andExpect(jsonPath("$._links.self.href",
                      Matchers.containsString("/api/core/items/" + item.getID().toString())))
+                 .andExpect(jsonPath("$._links.accessStatus.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/accessStatus")))
                  .andExpect(jsonPath("$._links.bundles.href",
                      Matchers.containsString("/api/core/items/" + item.getID().toString() + "/bundles")))
                  .andExpect(jsonPath("$._links.mappedCollections.href",
@@ -3885,7 +3887,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(tokenEperson).perform(get("/api/core/items/" + item.getID())
                  .param("projection", "full"))
                  .andExpect(status().isOk())
-                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                 .andExpect(jsonPath("$", HalMatcher.matchEmbeds("accessStatus")))
                  .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
                  .andExpect(jsonPath("$.name", Matchers.is(item.getName())))
                  .andExpect(jsonPath("$.handle", Matchers.is(item.getHandle())))
@@ -3894,6 +3896,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                  .andExpect(jsonPath("$.inArchive", Matchers.is(false)))
                  .andExpect(jsonPath("$._links.self.href",
                      Matchers.containsString("/api/core/items/" + item.getID().toString())))
+                 .andExpect(jsonPath("$._links.accessStatus.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/accessStatus")))
                  .andExpect(jsonPath("$._links.bundles.href",
                      Matchers.containsString("/api/core/items/" + item.getID().toString() + "/bundles")))
                  .andExpect(jsonPath("$._links.mappedCollections.href",
@@ -3916,7 +3920,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + item.getID())
                    .param("projection", "full"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                   .andExpect(jsonPath("$", HalMatcher.matchEmbeds("accessStatus")))
                    .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
                    .andExpect(jsonPath("$.name", Matchers.is(item.getName())))
                    .andExpect(jsonPath("$.handle", Matchers.is(item.getHandle())))
@@ -3927,6 +3931,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                        Matchers.containsString("/api/core/items/" + item.getID().toString())))
                    .andExpect(jsonPath("$._links.self.href",
                        Matchers.containsString("/api/core/items/" + item.getID().toString())))
+                   .andExpect(jsonPath("$._links.accessStatus.href",
+                       Matchers.containsString("/api/core/items/" + item.getID().toString() + "/accessStatus")))
                    .andExpect(jsonPath("$._links.bundles.href",
                        Matchers.containsString("/api/core/items/" + item.getID().toString() + "/bundles")))
                    .andExpect(jsonPath("$._links.mappedCollections.href",

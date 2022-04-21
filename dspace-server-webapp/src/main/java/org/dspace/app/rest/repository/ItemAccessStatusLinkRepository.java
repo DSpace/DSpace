@@ -23,7 +23,6 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,7 +38,6 @@ public class ItemAccessStatusLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     AccessStatusService accessStatusService;
 
-    @PreAuthorize("hasPermission(#itemId, 'ITEM', 'READ')")
     public AccessStatusRest getAccessStatus(@Nullable HttpServletRequest request,
                                             UUID itemId,
                                             @Nullable Pageable optionalPageable,
