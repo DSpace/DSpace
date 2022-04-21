@@ -2488,6 +2488,19 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
 
     }
 
+    /**
+     * Setup:
+     * - two people are linked to one publication
+     * - create a new version of the publication
+     * - create a new version of person 1
+     * - create a new version of person 2
+     *
+     * Goals:
+     * - check that the metadata (plain text and from relationships) of the items have the correct value and place,
+     *   as new versions of the items get created and edited
+     * - verify that changes to newer versions and relationships don't affect older versions and relationships
+     * - verify that the (versions of) items are properly indexed in the Solr search core
+     */
     @Test
     public void test_virtualMetadataPreserved() throws Exception {
         //////////////////////////////////////////////

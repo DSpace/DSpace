@@ -12,6 +12,11 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.Relationship;
 import org.dspace.content.Relationship.LatestVersionStatus;
 
+/**
+ * Class with utility methods to manipulate relationships that are linked to versioned items.
+ * Specifically focussed on the "latest version status" of relationships,
+ * which controls which related items are relevant (visible) to any given item.
+ */
 public class RelationshipVersioningUtils {
 
     private static final Logger log = LogManager.getLogger(RelationshipVersioningUtils.class);
@@ -34,6 +39,9 @@ public class RelationshipVersioningUtils {
 
     /**
      * Update {@link Relationship#latestVersionStatus} of the given relationship.
+     * If isLatest = true, this method will never throw IllegalStateException.
+     * If isLatest = false, you should make sure that the selected side of given relationship
+     * currently has "latest" status, otherwise IllegalStateException will be thrown.
      * @param relationship the relationship.
      * @param updateLeftSide whether the status of the left item or the right item should be updated.
      * @param isLatest to what the status should be set.
