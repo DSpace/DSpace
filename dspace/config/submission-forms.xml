@@ -101,9 +101,6 @@
                         You can leave out the day and/or month if they aren't applicable.
                     </hint>
                     <required>You must enter at least the year.</required>
-                    <acl>
-                        policy=deny,action=read,grantee-type=user,grantee-id=*
-                    </acl>
                 </field>
 
                 <field>
@@ -140,6 +137,9 @@
                     <input-type>series</input-type>
                     <hint>Enter the series and number assigned to this item by your community.</hint>
                     <required></required>
+<!--                    <acl>-->
+<!--                        policy=deny,action=read,grantee-type=user,grantee-id=*-->
+<!--                    </acl>-->
                 </field>
             </row>
             <row>
@@ -155,6 +155,9 @@
                         it, please enter the types and the actual numbers or codes.
                     </hint>
                     <required></required>
+<!--                    <acl>-->
+<!--                        policy=allow,action=read,grantee-type=user,grantee-id=*-->
+<!--                    </acl>-->
                 </field>
             </row>
             <row>
