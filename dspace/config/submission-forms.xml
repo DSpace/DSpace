@@ -101,6 +101,9 @@
                         You can leave out the day and/or month if they aren't applicable.
                     </hint>
                     <required>You must enter at least the year.</required>
+                    <acl>
+                        policy=deny,action=read,grantee-type=user,grantee-id=*
+                    </acl>
                 </field>
 
                 <field>
