@@ -46,9 +46,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component(ResearcherProfileRest.CATEGORY + "." + ResearcherProfileRest.NAME)
-@ConditionalOnProperty(
-        value = "researcher-profile.type"
-)
+@ConditionalOnProperty(value = "researcher-profile.entity-type")
 public class ResearcherProfileRestRepository extends DSpaceRestRepository<ResearcherProfileRest, UUID> {
 
     public static final String NO_VISIBILITY_CHANGE_MSG = "Refused to perform the Researcher Profile patch based "
@@ -136,7 +134,7 @@ public class ResearcherProfileRestRepository extends DSpaceRestRepository<Resear
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'PROFILE', 'WRITE')")
+    @PreAuthorize("hasPermission(#id, 'PROFILE', 'DELETE')")
     protected void delete(Context context, UUID id) {
         try {
             researcherProfileService.deleteById(context, id);

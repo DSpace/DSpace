@@ -20,16 +20,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.exception.ResourceConflictException;
-import org.dspace.app.rest.converter.ConverterService;
-import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.exception.ResourceAlreadyExistsException;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.TypeMismatchException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
 import org.springframework.http.HttpHeaders;
@@ -71,12 +67,6 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
 
     @Inject
     private ConfigurationService configurationService;
-
-    @Autowired
-    private ConverterService converterService;
-
-    @Autowired
-    private Utils utils;
 
     @ExceptionHandler({AuthorizeException.class, RESTAuthorizationException.class, AccessDeniedException.class})
     protected void handleAuthorizeException(HttpServletRequest request, HttpServletResponse response, Exception ex)
@@ -177,10 +167,10 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpStatus.BAD_REQUEST.value());
     }
 
-    @ExceptionHandler(ResourceConflictException.class)
-    protected ResponseEntity<? extends RestModel> resourceConflictException(ResourceConflictException ex) {
-        RestModel resource = converterService.toRest(ex.getResource(), utils.obtainProjection());
-        return new ResponseEntity<RestModel>(resource, HttpStatus.CONFLICT);
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    protected void resourceConflictException(HttpServletRequest request, HttpServletResponse response,
+        ResourceAlreadyExistsException ex) throws IOException {
+        sendErrorResponse(request, response, null, ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     @ExceptionHandler(MissingParameterException.class)

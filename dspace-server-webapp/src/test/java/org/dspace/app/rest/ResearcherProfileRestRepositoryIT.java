@@ -98,7 +98,6 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .build();
 
         configurationService.setProperty("researcher-profile.collection.uuid", personCollection.getID().toString());
-        configurationService.setProperty("claimable.entityType", "Person");
 
         context.setCurrentUser(user);
 
@@ -257,6 +256,23 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(jsonPath("$.name", is(name)));
     }
 
+    @Test
+    public void testCreateAndReturnWithPublicProfile() throws Exception {
+
+        configurationService.setProperty("researcher-profile.set-new-profile-private", false);
+        String id = user.getID().toString();
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id", is(id)))
+            .andExpect(jsonPath("$.visible", is(true)))
+            .andExpect(jsonPath("$.type", is("profile")))
+            .andExpect(jsonPath("$", matchLinks("http://localhost/api/eperson/profiles/" + id, "item", "eperson")));
+    }
+
     /**
      * Verify that an admin can call the createAndReturn endpoint to store a new
      * researcher profile related to another user.
@@ -345,10 +361,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         getClient(authToken).perform(post("/api/eperson/profiles/")
             .contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(status().isConflict())
-            .andExpect(jsonPath("$.id", is(id)))
-            .andExpect(jsonPath("$.visible", is(false)))
-            .andExpect(jsonPath("$.type", is("profile")));
+            .andExpect(status().isUnprocessableEntity());
 
     }
 
@@ -763,6 +776,37 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     }
 
     @Test
+    public void testAutomaticProfileClaimByEmailWithRegularEntity() throws Exception {
+
+        String userToken = getAuthToken(user.getEmail(), password);
+
+        context.turnOffAuthorisationSystem();
+
+        Item itemToBeClaimed = ItemBuilder.createItem(context, personCollection)
+            .withPersonEmail(user.getEmail())
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String id = user.getID().toString();
+
+        getClient(userToken).perform(get("/api/eperson/profiles/{id}", id))
+            .andExpect(status().isNotFound());
+
+        // the automatic claim is done after the user login
+        String newUserToken = getAuthToken(user.getEmail(), password);
+
+        getClient(newUserToken).perform(get("/api/eperson/profiles/{id}", id))
+            .andExpect(status().isOk());
+
+        // the profile item should be the same
+        String firstItemId = itemToBeClaimed.getID().toString();
+        String secondItemId = getItemIdByProfileId(newUserToken, id);
+        assertEquals("The item should be the same", firstItemId, secondItemId);
+
+    }
+
+    @Test
     public void testNoAutomaticProfileClaimOccursIfManyClaimableItemsAreFound() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -909,7 +953,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         getClient(authToken).perform(post("/api/eperson/profiles/")
                                          .contentType(TEXT_URI_LIST)
                                          .content("http://localhost:8080/server/api/core/items/" + otherPerson.getID().toString()))
-                            .andExpect(status().isConflict());
+                            .andExpect(status().isUnprocessableEntity());
 
         // other person trying to claim same profile
         context.turnOffAuthorisationSystem();
@@ -1032,7 +1076,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         getClient(authToken)
             .perform(post("/api/eperson/profiles/").contentType(TEXT_URI_LIST)
                                                 .content("http://localhost:8080/server/api/core/items/" + id))
-            .andExpect(status().isConflict());
+            .andExpect(status().isUnprocessableEntity());
     }
 
     private String getItemIdByProfileId(String token, String id) throws Exception {
