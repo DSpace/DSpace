@@ -9,6 +9,7 @@ package org.dspace.app.rest.utils;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static javax.mail.internet.MimeUtility.encodeText;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -163,7 +164,8 @@ public class HttpHeadersInitializer {
         }
 
         httpHeaders.put(CONTENT_DISPOSITION, Collections.singletonList(String.format(CONTENT_DISPOSITION_FORMAT,
-                                                                                     disposition, fileName)));
+                                                                                     disposition,
+                                                                                     encodeText(fileName))));
         log.debug("Content-Disposition : {}", disposition);
 
         // Content phase

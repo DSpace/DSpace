@@ -16,6 +16,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.license.CCLicenseField;
 import org.dspace.license.CCLicenseFieldEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,6 +28,8 @@ import org.springframework.stereotype.Component;
 public class SubmissionCCLicenseFieldConverter
         implements DSpaceConverter<CCLicenseField, SubmissionCCLicenseFieldRest> {
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
     @Autowired
     private ConverterService converter;
 

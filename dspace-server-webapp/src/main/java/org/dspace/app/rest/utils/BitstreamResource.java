@@ -7,11 +7,14 @@
  */
 package org.dspace.app.rest.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -32,24 +35,46 @@ import org.springframework.core.io.AbstractResource;
  */
 public class BitstreamResource extends AbstractResource {
 
-    private Bitstream bitstream;
     private String name;
     private UUID uuid;
-    private long sizeBytes;
     private UUID currentUserUUID;
+    private boolean shouldGenerateCoverPage;
+    private byte[] file;
 
     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private CitationDocumentService citationDocumentService =
         new DSpace().getServiceManager()
-            .getServicesByType(CitationDocumentService.class).get(0);
+                    .getServicesByType(CitationDocumentService.class).get(0);
 
-    public BitstreamResource(Bitstream bitstream, String name, UUID uuid, long sizeBytes, UUID currentUserUUID) {
-        this.bitstream = bitstream;
+    public BitstreamResource(String name, UUID uuid, UUID currentUserUUID,
+        boolean shouldGenerateCoverPage) {
         this.name = name;
         this.uuid = uuid;
-        this.sizeBytes = sizeBytes;
         this.currentUserUUID = currentUserUUID;
+        this.shouldGenerateCoverPage = shouldGenerateCoverPage;
+    }
+
+    /**
+     * Get Potential cover page by array, this method should only be called when a coverpage should be generated
+     * In case of failure the original file will be returned
+     *
+     * @param context   the DSpace context
+     * @param bitstream the pdf for which we want to generate a coverpage
+     * @return a byte array containing the cover page
+     */
+    private byte[] getCoverpageByteArray(Context context, Bitstream bitstream)
+        throws IOException, SQLException, AuthorizeException {
+        if (file == null) {
+            try {
+                Pair<byte[], Long> citedDocument = citationDocumentService.makeCitedDocument(context, bitstream);
+                this.file = citedDocument.getLeft();
+            } catch (Exception e) {
+                // Return the original bitstream without the cover page
+                this.file = IOUtils.toByteArray(bitstreamService.retrieve(context, bitstream));
+            }
+        }
+        return file;
     }
 
     @Override
@@ -59,27 +84,22 @@ public class BitstreamResource extends AbstractResource {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        Context context = new Context();
-        try {
+        try (Context context = new Context()) {
             EPerson currentUser = ePersonService.find(context, currentUserUUID);
             context.setCurrentUser(currentUser);
+            Bitstream bitstream = bitstreamService.find(context, uuid);
             InputStream out;
 
-            if (citationDocumentService.isCitationEnabledForBitstream(bitstream, context)) {
-                out = citationDocumentService.makeCitedDocument(context, bitstream).getLeft();
+            if (shouldGenerateCoverPage) {
+                out = new ByteArrayInputStream(getCoverpageByteArray(context, bitstream));
             } else {
                 out = bitstreamService.retrieve(context, bitstream);
             }
 
+            this.file = null;
             return out;
         } catch (SQLException | AuthorizeException e) {
             throw new IOException(e);
-        } finally {
-            try {
-                context.complete();
-            } catch (SQLException e) {
-                throw new IOException(e);
-            }
         }
     }
 
@@ -90,6 +110,17 @@ public class BitstreamResource extends AbstractResource {
 
     @Override
     public long contentLength() throws IOException {
-        return sizeBytes;
+        try (Context context = new Context()) {
+            EPerson currentUser = ePersonService.find(context, currentUserUUID);
+            context.setCurrentUser(currentUser);
+            Bitstream bitstream = bitstreamService.find(context, uuid);
+            if (shouldGenerateCoverPage) {
+                return getCoverpageByteArray(context, bitstream).length;
+            } else {
+                return bitstream.getSizeBytes();
+            }
+        } catch (SQLException | AuthorizeException e) {
+            throw new IOException(e);
+        }
     }
 }

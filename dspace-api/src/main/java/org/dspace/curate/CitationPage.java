@@ -7,6 +7,7 @@
  */
 package org.dspace.curate;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -154,7 +155,8 @@ public class CitationPage extends AbstractCurationTask {
                     try {
                         //Create the cited document
                         InputStream citedInputStream =
-                            citationDocument.makeCitedDocument(Curator.curationContext(), bitstream).getLeft();
+                            new ByteArrayInputStream(
+                                citationDocument.makeCitedDocument(Curator.curationContext(), bitstream).getLeft());
                         //Add the cited document to the approiate bundle
                         this.addCitedPageToItem(citedInputStream, bundle, pBundle,
                                                 dBundle, displayMap, item, bitstream);
