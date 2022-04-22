@@ -25,6 +25,7 @@
         <hibernate.version>5.6.5.Final</hibernate.version>
         <hibernate-validator.version>6.0.23.Final</hibernate-validator.version>
         <postgresql.driver.version>42.3.3</postgresql.driver.version>
+        <velocity.version>2.3</velocity.version>
         <solr.client.version>8.11.1</solr.client.version>
 
         <ehcache.version>3.4.0</ehcache.version>
@@ -851,6 +852,21 @@
             </modules>
         </profile>
 
+        <!--
+            Builds LDN extension for DSpace
+        -->
+        <profile>
+            <id>dspace-ldn</id>
+            <activation>
+                <file>
+                    <exists>dspace-ldn/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-ldn</module>
+            </modules>
+        </profile>
+
        <!-- REST Jersey (Deprecated REST API from DSpace 6.x or below) -->
        <!-- As this module is deprecated, it only builds if you activate it via -Pdspace-rest -->
        <profile>
@@ -1082,6 +1098,11 @@
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
+                <artifactId>dspace-ldn</artifactId>
+                <version>7.3-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <version>7.3-SNAPSHOT</version>
                 <type>jar</type>
@@ -1260,6 +1281,12 @@
                         <artifactId>mockito-core</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity-engine-core</artifactId>
+                <version>${velocity.version}</version>
             </dependency>
 
             <dependency>

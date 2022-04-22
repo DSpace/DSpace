@@ -1,0 +1,41 @@
+{
+  "@context": [
+    "https://purl.org/coar/notify",
+    "https://www.w3.org/ns/activitystreams"
+  ],
+  "id": "urn:uuid:a301c520-f790-4f3d-87b1-a18b2b617683",
+  "actor": {
+    "id": "http://dev-hdc3b.lib.harvard.edu",
+    "name": "Dataverse Repository",
+    "type": "Service"
+  },
+  "context": {
+    "IsSupplementTo": [
+      {
+        "id": "http://localhost/item/68f290d8-c604-4c14-8871-68adb0d02d0b",
+        "ietf:cite-as": "http://localhost/item/68f290d8-c604-4c14-8871-68adb0d02d0b",
+        "type": "sorg:ScholarlyArticle"
+      }
+    ]
+  },
+  "object": {
+    "id": "http://dev-hdc3b.lib.harvard.edu/dataset.xhtml?persistentId=doi:10.5072/FK2/NUB975",
+    "ietf:cite-as": "https://doi.org/10.5072/FK2/NUB975",
+    "sorg:name": "Not Really Replication Data for: The Future of the Internet and How to Stop It",
+    "type": "sorg:Dataset"
+  },
+  "origin": {
+    "id": "http://dev-hdc3b.lib.harvard.edu/",
+    "inbox": "http://dev-hdc3b.lib.harvard.edu/api/inbox",
+    "type": "Service"
+  },
+  "target": {
+    "id": "http://localhost/",
+    "inbox": "http://localhost/server/ldn/inbox",
+    "type": "Service"
+  },
+  "type": [
+    "Announce",
+    "coar-notify:ReleaseAction"
+  ]
+}

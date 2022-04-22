@@ -1,0 +1,41 @@
+{
+  "@context": [
+    "https://purl.org/coar/notify",
+    "https://www.w3.org/ns/activitystreams"
+  ],
+  "id": "urn:uuid:9ff5b44d-5a88-4dc9-a403-57b73be1ae5e",
+  "actor": {
+    "id": "http://dspace.swiftagiledev.com",
+    "name": "DSpace Repository",
+    "type": "Service"
+  },
+  "context": {
+    "IsSupplementedBy": [
+      {
+        "id": "http://dev-hdc3b.lib.harvard.edu/dataset.xhtml?persistentId=doi:10.5072/FK2/OMSPHN",
+        "ietf:cite-as": "https://doi.org/10.5072/FK2/NUB975",
+        "type": "sorg:Dataset"
+      }
+    ]
+  },
+  "object": {
+    "id": "http://dspace.swiftagiledev.com/handle/123456789/3",
+    "ietf:cite-as": "http://dspace.swiftagiledev.com/handle/123456789/3",
+    "sorg:name": "An Interesting Publication",
+    "type": "sorg:ScholarlyArticle"
+  },
+  "origin": {
+    "id": "http://dspace.swiftagiledev.com",
+    "inbox": "http://api.swiftagiledev.com/server/ldn/inbox",
+    "type": "Service"
+  },
+  "target": {
+    "id": "http://dev-hdc3b.lib.harvard.edu",
+    "inbox": "http://dev-hdc3b.lib.harvard.edu/api/inbox",
+    "type": "Service"
+  },
+  "type": [
+    "Announce",
+    "coar-notify:ReleaseAction"
+  ]
+}
