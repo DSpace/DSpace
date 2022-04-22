@@ -9,10 +9,11 @@ package sk.dtq.dspace.app.util;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -88,7 +89,7 @@ public class ACL {
      * @return
      */
 
-    private boolean isAllowedAction(String userID, Set<Integer> groupIDs, int action) {
+    private boolean isAllowedAction(String userID, Set<String> groupIDs, int action) {
         for (ACE ace : acl) {
             if (ace.matches(userID, groupIDs, action)) {
                 return ace.isAllowed();
@@ -123,12 +124,12 @@ public class ACL {
                 EPerson e = c.getCurrentUser();
                 if (e != null) {
                     UUID userID = e.getID();
-                    List<Group> groupIDs = groupService.allMemberGroups(c, c.getCurrentUser());
-                    Set<Integer> groupIDsInt = new HashSet<>();
-                    for (Group group: groupIDs) {
-                        groupIDsInt.add(group.getLegacyId());
-                    }
-                    return isAllowedAction(userID.toString(), groupIDsInt, action);
+                    List<Group> groups = groupService.allMemberGroups(c, c.getCurrentUser());
+
+                    Set<String> groupIDs = groups.stream().flatMap(group -> Stream.of(group.getID().toString()))
+                            .collect(Collectors.toSet());
+
+                    return isAllowedAction(userID.toString(), groupIDs, action);
                 }
             }
         } catch (SQLException e) {

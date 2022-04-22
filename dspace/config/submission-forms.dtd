@@ -28,7 +28,7 @@
  <!--
       ACL element for fine-grained access control
       the content should be semicolon separated list of entries in format matching the following regexp:
-      policy=(allow|deny),action=(read|write),grantee-type=(user|group),grantee-id=(\d+,\*)
+      policy=(allow|deny),action=(read|write),grantee-type=(user|group),grantee-id=(<UUID>)
  -->
  <!ELEMENT acl (#PCDATA)>
 

@@ -75,8 +75,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
             rows.add(rowRest);
             for (DCInput dcinput : row) {
                 //skip if acl says no
-                Context con = ContextUtil.obtainCurrentRequestContext();
-                if (!isInputAuthorized(con ,dcinput)) {
+                if (!isInputAuthorized(ContextUtil.obtainCurrentRequestContext() ,dcinput)) {
                     continue;
                 }
                 fields.add(getField(dcinput, formName));
