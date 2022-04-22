@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 /**
  * Class that represents single Access Control Entry
  *
+ * @author Michal Josífko
  * @author milanmajchrak
  */
 
