@@ -19,7 +19,8 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 
 /**
- * This contributor replace metadata value
+ * Scopus specific implementation of {@link MetadataContributor}
+ * Responsible for generating rights metadata value
  * if this matched in mapConverter-openAccesFlag.properties file
  * 
  * @author Boychuk Mykhaylo (boychuk.mykhaylo at 4science.com)
@@ -30,6 +31,15 @@ public class ReplaceFieldXPathMetadataContributor extends SimpleXpathMetadatumCo
 
     private SimpleMapConverter simpleMapConverter;
 
+    /**
+     * Retrieve the metadata associated with the given element object.
+     * Depending on the retrieved node (using the query),
+     * rights value will be replaced if this matched in mapConverter-openAccesFlag.properties file
+     * and will be added to the MetadatumDTO list
+     *
+     * @param t A class to retrieve metadata from.
+     * @return a collection of import records. Only the identifier of the found records may be put in the record.
+     */
     @Override
     public Collection<MetadatumDTO> contributeMetadata(Element element) {
         List<MetadatumDTO> values = new LinkedList<>();

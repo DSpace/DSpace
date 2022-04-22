@@ -24,6 +24,10 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 
 /**
+ * Scopus specific implementation of {@link MetadataContributor}
+ * Responsible for generating the ScopusID, orcid, author name and affiliationID
+ * from the retrieved item.
+ *
  * @author Boychuk Mykhaylo (boychuk.mykhaylo at 4science dot it)
  */
 public class AuthorMetadataContributor extends SimpleXpathMetadatumContributor {
@@ -37,6 +41,15 @@ public class AuthorMetadataContributor extends SimpleXpathMetadatumContributor {
 
     private Map<String, String> affId2affName = new HashMap<String, String>();
 
+    /**
+     * Retrieve the metadata associated with the given object.
+     * Depending on the retrieved node (using the query),
+     * different types of values will be added to the MetadatumDTO list.
+     *
+     * @param element    A class to retrieve metadata from.
+     * @return           A collection of import records. Only the ScopusID, orcid, author name and affiliation
+     *                     of the found records may be put in the record.
+     */
     @Override
     public Collection<MetadatumDTO> contributeMetadata(Element element) {
         List<MetadatumDTO> values = new LinkedList<>();
@@ -58,6 +71,15 @@ public class AuthorMetadataContributor extends SimpleXpathMetadatumContributor {
         return values;
     }
 
+    /**
+     * Retrieve the the ScopusID, orcid, author name and affiliationID
+     * metadata associated with the given element object.
+     * If the value retrieved from the element is empty
+     * it is set PLACEHOLDER_PARENT_METADATA_VALUE
+     * 
+     * @param element           A class to retrieve metadata from
+     * @throws JaxenException   If Xpath evaluation failed
+     */
     private List<MetadatumDTO> getMetadataOfAuthors(Element element) throws JaxenException {
         List<MetadatumDTO> metadatums = new ArrayList<MetadatumDTO>();
         Element authname = element.getChild("authname", NAMESPACE);

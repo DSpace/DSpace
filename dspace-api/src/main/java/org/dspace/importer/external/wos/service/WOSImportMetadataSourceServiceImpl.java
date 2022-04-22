@@ -41,7 +41,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implements a data source for querying WOS
+ * Implements a data source for querying Web of Science.
  * 
  * @author Boychuk Mykhaylo (boychuk.mykhaylo at 4Science dot it)
  */
@@ -50,11 +50,11 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     private static final String AI_PATTERN  = "^AI=(.*)";
     private static final Pattern ISI_PATTERN = Pattern.compile("^\\d{15}$");
-    private static final String ENDPOINT_SEARCH_BY_ID_WOS = "https://wos-api.clarivate.com/api/wos/id/";
-    private static final String ENDPOINT_SEARCH_WOS = "https://wos-api.clarivate.com/api/wos/?databaseId=WOS&lang=en&usrQuery=";
 
     private int timeout = 1000;
 
+    private String url;
+    private String urlSearch;
     private String apiKey;
 
     @Autowired
@@ -135,7 +135,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         public Integer call() throws Exception {
             if (StringUtils.isNotBlank(apiKey)) {
                 String queryString = URLEncoder.encode(checkQuery(query), StandardCharsets.UTF_8);
-                String url = ENDPOINT_SEARCH_WOS + queryString + "&count=1&firstRecord=1";
+                String url = urlSearch + queryString + "&count=1&firstRecord=1";
                 String response = liveImportClient.executeHttpGetRequest(timeout, url, getRequestParameters());
                 SAXBuilder saxBuilder = new SAXBuilder();
                 Document document = saxBuilder.build(new StringReader(response));
@@ -149,6 +149,11 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         }
     }
 
+    /**
+     * This class is a Callable implementation to get a Web of Science entry using Doi
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
+     */
     private class FindByIdCallable implements Callable<List<ImportRecord>> {
 
         private String doi;
@@ -161,8 +166,8 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         public List<ImportRecord> call() throws Exception {
             List<ImportRecord> results = new ArrayList<>();
             if (StringUtils.isNotBlank(apiKey)) {
-                String url = ENDPOINT_SEARCH_BY_ID_WOS + this.doi + "?databaseId=WOS&lang=en&count=10&firstRecord=1";
-                String response = liveImportClient.executeHttpGetRequest(timeout, url, getRequestParameters());
+                String urlString = url + this.doi + "?databaseId=WOS&lang=en&count=10&firstRecord=1";
+                String response = liveImportClient.executeHttpGetRequest(timeout, urlString, getRequestParameters());
                 List<Element> elements = splitToRecords(response);
                 for (Element record : elements) {
                     results.add(transformSourceRecords(record));
@@ -172,9 +177,19 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         }
     }
 
+    /**
+     * Find records matching a string query.
+     *
+     * @param query    A query string to base the search on.
+     * @param start    Offset to start at
+     * @param count    Number of records to retrieve.
+     * @return         A set of records. Fully transformed.
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
+     */
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
-        private Query query;
 
+        private Query query;
 
         private SearchByQueryCallable(String queryString, Integer maxResult, Integer start) {
             query = new Query();
@@ -194,7 +209,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             Integer start = query.getParameterAsClass("start", Integer.class);
             Integer count = query.getParameterAsClass("count", Integer.class);
             if (StringUtils.isNotBlank(apiKey)) {
-                String url = ENDPOINT_SEARCH_WOS + URLEncoder.encode(queryString, StandardCharsets.UTF_8)
+                String url = urlSearch + URLEncoder.encode(queryString, StandardCharsets.UTF_8)
                                                  + "&count=" + count + "&firstRecord=" + (start + 1);
                 String response = liveImportClient.executeHttpGetRequest(timeout, url, getRequestParameters());
                 List<Element> omElements = splitToRecords(response);
@@ -257,6 +272,22 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             return new ArrayList<Element>();
         }
         return new ArrayList<Element>();
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getUrlSearch() {
+        return urlSearch;
+    }
+
+    public void setUrlSearch(String urlSearch) {
+        this.urlSearch = urlSearch;
     }
 
     public String getApiKey() {

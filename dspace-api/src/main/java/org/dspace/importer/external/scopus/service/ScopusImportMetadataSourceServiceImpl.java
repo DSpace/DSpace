@@ -216,6 +216,11 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
         }
     }
 
+    /**
+     * This class is a Callable implementation to get a Scopus entry using EID
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
+     */
     private class FindByIdCallable implements Callable<List<ImportRecord>> {
 
         private String eid;
@@ -297,6 +302,16 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
         }
     }
 
+    /**
+     * Find records matching a string query.
+     *
+     * @param query    A query string to base the search on.
+     * @param start    Offset to start at
+     * @param count    Number of records to retrieve.
+     * @return         A set of records. Fully transformed.
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
+     */
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
         private Query query;
 

@@ -107,10 +107,10 @@
         <property name="field" ref="wos.doi"/>
         <property name="query" value="dynamic_data/cluster_related/identifiers/identifier"/>
         <property name="prefixToNamespaceMapping" ref="wosNs"/>
-        <property name="identifire2field" ref="identifires2fields"/>
+        <property name="identifier2field" ref="identifiers2fields"/>
     </bean>
 
-    <util:map id="identifires2fields" map-class="java.util.HashMap"
+    <util:map id="identifiers2fields" map-class="java.util.HashMap"
         key-type="java.lang.String" value-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <entry key="doi" value-ref="wos.doi" />
         <entry key="issn" value-ref="wos.issn" />

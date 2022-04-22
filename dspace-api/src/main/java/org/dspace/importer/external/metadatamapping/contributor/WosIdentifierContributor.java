@@ -6,6 +6,7 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.importer.external.metadatamapping.contributor;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -23,13 +24,14 @@ import org.jdom2.xpath.XPathFactory;
 
 /**
  * This contributor can retrieve the identifiers
- * configured in "this.identifire2field" from the WOS response.
+ * configured in "this.identifire2field" from the Web of Science response.
+ * The mapping and configuration of this class can be found in the following wos-integration.xml file.
  * 
  * @author Boychuk Mykhaylo (boychuk.mykhaylo at 4Science dot it)
  */
 public class WosIdentifierContributor extends SimpleXpathMetadatumContributor {
 
-    protected Map<String, MetadataFieldConfig> identifire2field;
+    protected Map<String, MetadataFieldConfig> identifier2field;
 
     @Override
     public Collection<MetadatumDTO> contributeMetadata(Element element) {
@@ -44,26 +46,26 @@ public class WosIdentifierContributor extends SimpleXpathMetadatumContributor {
         List<Element> nodes = xpath.evaluate(element);
         for (Element el : nodes) {
             String type = el.getAttributeValue("type");
-            setIdentyfire(type, el, values);
+            setIdentyfier(type, el, values);
         }
         return values;
     }
 
-    private void setIdentyfire(String type, Element el, List<MetadatumDTO> values) {
-        for (String id : identifire2field.keySet()) {
+    private void setIdentyfier(String type, Element el, List<MetadatumDTO> values) {
+        for (String id : identifier2field.keySet()) {
             if (StringUtils.equals(id, type)) {
                 String value = el.getAttributeValue("value");
-                values.add(metadataFieldMapping.toDCValue(identifire2field.get(id), value));
+                values.add(metadataFieldMapping.toDCValue(identifier2field.get(id), value));
             }
         }
     }
 
-    public Map<String, MetadataFieldConfig> getIdentifire2field() {
-        return identifire2field;
+    public Map<String, MetadataFieldConfig> getIdentifier2field() {
+        return identifier2field;
     }
 
-    public void setIdentifire2field(Map<String, MetadataFieldConfig> identifire2field) {
-        this.identifire2field = identifire2field;
+    public void setIdentifier2field(Map<String, MetadataFieldConfig> identifier2field) {
+        this.identifier2field = identifier2field;
     }
 
 }

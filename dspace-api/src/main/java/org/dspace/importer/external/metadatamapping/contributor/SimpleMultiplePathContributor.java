@@ -22,7 +22,11 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
 /**
- * This contributor can perform research on multi-paths
+ * Web of Science specific implementation of {@link MetadataContributor}.
+ * This contributor can perform research on multi-paths.
+ * For example, to populate the subject metadata, in the Web of Science response
+ * the values are contained in different paths,
+ * so this Contributor allows you to collect the values by configuring the paths in the paths list.
  * 
  * @author Boychuk Mykhaylo (boychuk.mykhaylo at 4Science dot it)
  */

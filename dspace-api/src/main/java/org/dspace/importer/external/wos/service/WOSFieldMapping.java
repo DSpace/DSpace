@@ -13,7 +13,7 @@ import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping
 
 /**
  * An implementation of {@link AbstractMetadataFieldMapping}
- * Responsible for defining the mapping of the WOS metadatum fields on the DSpace metadatum fields
+ * Responsible for defining the mapping of the Web of Science metadatum fields on the DSpace metadatum fields
  *
  * @author Boychuk Mykhaylo (boychuk.mykhaylo at 4science dot it)
  */

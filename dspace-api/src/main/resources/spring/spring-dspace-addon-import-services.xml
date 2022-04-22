@@ -127,6 +127,8 @@
     <bean id="WosImportService" class="org.dspace.importer.external.wos.service.WOSImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="wosMetadataFieldMapping"/>
         <property name="apiKey" value="${wos.apiKey}"/>
+        <property name="url" value="${wos.url}"/>
+        <property name="urlSearch" value="${wos.url.search}"/>
     </bean>
     <bean id="wosMetadataFieldMapping" class="org.dspace.importer.external.wos.service.WOSFieldMapping"/>
 

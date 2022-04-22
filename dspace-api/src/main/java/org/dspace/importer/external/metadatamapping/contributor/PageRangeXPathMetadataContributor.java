@@ -20,6 +20,9 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 
 /**
+ * Scopus specific implementation of {@link MetadataContributor}
+ * Responsible for generating the Scopus startPage and endPage from the retrieved item.
+ * 
  * @author Boychuk Mykhaylo (boychuk.mykhaylo at 4science.com)
  */
 public class PageRangeXPathMetadataContributor extends SimpleXpathMetadatumContributor {
@@ -28,6 +31,15 @@ public class PageRangeXPathMetadataContributor extends SimpleXpathMetadatumContr
 
     private MetadataFieldConfig endPageMetadata;
 
+    /**
+     * Retrieve the metadata associated with the given Element object.
+     * Depending on the retrieved node (using the query),
+     * StartPage and EndPage values will be added to the MetadatumDTO list
+     *
+     * @param el    A class to retrieve metadata from.
+     * @return      A collection of import records. Only the StartPage and EndPage
+     *                of the found records may be put in the record.
+     */
     @Override
     public Collection<MetadatumDTO> contributeMetadata(Element el) {
         List<MetadatumDTO> values = new LinkedList<>();

@@ -36,6 +36,11 @@ public class DoiCheck {
         return m.matches();
     }
 
+    /**
+     * This method is used to purge a doi link,
+     * for example: query=https://dx.doi.org/10.1234/123
+     * the returned value will be 10.1234/123
+     */
     public static String purgeDoiValue(final String query) {
         String value = query.replaceAll(",", "");
         for (final String prefix : DOI_PREFIXES) {
