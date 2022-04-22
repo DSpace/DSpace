@@ -84,6 +84,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -131,6 +132,8 @@ public class Utils {
     @Autowired
     private BitstreamFormatService bitstreamFormatService;
 
+    // Must be loaded @Lazy, as ConverterService also autowires Utils
+    @Lazy
     @Autowired
     private ConverterService converter;
 
