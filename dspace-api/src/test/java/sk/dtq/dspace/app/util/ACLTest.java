@@ -13,9 +13,14 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.dspace.AbstractUnitTest;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -32,6 +37,9 @@ public class ACLTest extends AbstractUnitTest {
      * (initialized / setup in @Before method)
      */
     private AuthorizeService authorizeServiceSpy;
+    private GroupService groupServiceSpy;
+
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -48,6 +56,10 @@ public class ACLTest extends AbstractUnitTest {
         // Initialize our spy of the autowired (global) authorizeService bean.
         // This allows us to customize the bean's method return values in tests below
         authorizeServiceSpy = spy(authorizeService);
+        groupServiceSpy = spy(groupService);
+
+//        ReflectionTestUtils.setField(ePersonService, "authorizeService", authorizeServiceSpy);
+        ReflectionTestUtils.setField(groupService, "authorizeService", authorizeServiceSpy);
     }
 
     @Test
@@ -116,5 +128,45 @@ public class ACLTest extends AbstractUnitTest {
 
         assertThat("testACLAllowWriteForUser 0", acl.isAllowedAction(context, ACL.ACTION_READ), equalTo(false));
         assertThat("testACLAllowWriteForUser 1", acl.isAllowedAction(context, ACL.ACTION_WRITE), equalTo(true));
+    }
+
+    @Test
+    public void testACLDenyForGroup() throws SQLException, AuthorizeException {
+        // Allow full Admin perms (in new context)
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
+
+        // Create a new group & add it as a special group
+        Group group = groupService.create(context);
+        ArrayList<Group> groups = new ArrayList<>(1);
+        groups.add(group);
+
+        String s = "policy=deny,action=read,grantee-type=group,grantee-id=" + group.getID();
+        ACL acl = ACL.fromString(s);
+
+        ReflectionTestUtils.setField(acl, "groupService", groupServiceSpy);
+        when(groupServiceSpy.allMemberGroups(context, context.getCurrentUser())).thenReturn(groups);
+
+        assertThat("testACLDenyForGroup 0", acl.isAllowedAction(context, ACL.ACTION_READ), equalTo(false));
+        assertThat("testACLDenyForGroup 1", acl.isAllowedAction(context, ACL.ACTION_WRITE), equalTo(false));
+    }
+
+    @Test
+    public void testACLAllowWriteForGroup() throws SQLException, AuthorizeException {
+        // Allow full Admin perms (in new context)
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
+
+        // Create a new group & add it as a special group
+        Group group = groupService.create(context);
+        ArrayList<Group> groups = new ArrayList<>(1);
+        groups.add(group);
+
+        String s = "policy=allow,action=read,grantee-type=group,grantee-id=" + group.getID();
+        ACL acl = ACL.fromString(s);
+
+        ReflectionTestUtils.setField(acl, "groupService", groupServiceSpy);
+        when(groupServiceSpy.allMemberGroups(context, context.getCurrentUser())).thenReturn(groups);
+
+        assertThat("testACLAllowWriteForGroup 0", acl.isAllowedAction(context, ACL.ACTION_READ), equalTo(true));
+        assertThat("testACLAllowWriteForGroup 1", acl.isAllowedAction(context, ACL.ACTION_WRITE), equalTo(false));
     }
 }

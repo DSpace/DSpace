@@ -8,7 +8,6 @@
 package sk.dtq.dspace.app.util;
 
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -128,11 +127,8 @@ public class ACE {
             } else if (key.equals(GRANTEE_ID_KEYWORD)) {
                 if (value.equals(ANY_KEYWORD)) {
                     granteeID = GRANTEE_ID_ANY;
-                } else if (Pattern.matches("\\d+", value)) {
-                    granteeID = value;
                 } else {
-                    log.error("Invalid ACE grantee ID value: " + value);
-                    errors++;
+                    granteeID = value;
                 }
             } else {
                 log.error("Invalid ACE keyword: " + key);
@@ -171,17 +167,16 @@ public class ACE {
      * @return
      */
 
-    public boolean matches(String userID, Set<Integer> groupIDs, int action) {
+    public boolean matches(String userID, Set<String> groupIDs, int action) {
         if (this.action == action) {
             if (granteeType == ACE.GRANTEE_TYPE_USER) {
                 if (granteeID.equals(GRANTEE_ID_ANY) || userID.equals(granteeID)) {
                     return true;
                 }
             } else if (granteeType == ACE.GRANTEE_TYPE_GROUP) {
-                if (granteeID == GRANTEE_ID_ANY || groupIDs.contains(Integer.valueOf(granteeID))) {
+                if (granteeID.equals(GRANTEE_ID_ANY) || groupIDs.contains(granteeID)) {
                     return true;
                 }
-
             }
         }
         return false;
