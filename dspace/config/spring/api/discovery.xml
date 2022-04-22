@@ -1427,7 +1427,7 @@
             <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
                 <property name="sortFields">
                     <list>
-                        <ref bean="sortTitleAsc"/>
+                        <ref bean="sortTitle"/>
                     </list>
                 </property>
             </bean>
