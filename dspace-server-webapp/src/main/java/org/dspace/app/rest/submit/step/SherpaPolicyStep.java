@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.submit.step;
 
+import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.patch.Operation;
@@ -30,11 +31,14 @@ public class SherpaPolicyStep extends AbstractProcessingStep {
     @SuppressWarnings("unchecked")
     public SherpaPolicy getData(SubmissionService submissionService, InProgressSubmission obj,
             SubmissionStepConfig config) throws Exception {
-        SherpaPolicy result = new SherpaPolicy();
         Context context = ContextUtil.obtainCurrentRequestContext();
         SHERPAResponse response = sherpaSubmitService.searchRelatedJournals(context, obj.getItem());
-        result.setSherpaResponse(response);
-        return result;
+        if (Objects.nonNull(response)) {
+            SherpaPolicy result = new SherpaPolicy();
+            result.setSherpaResponse(response);
+            return result;
+        }
+        return null;
     }
 
     @Override
@@ -43,8 +47,7 @@ public class SherpaPolicyStep extends AbstractProcessingStep {
         String path = op.getPath();
         SherpaCacheEvictService sherpaCacheEvictService = SherpaCacheEvictBeanLocator.getSherpaCacheEvictService();
         if (path.contains(SHERPA_RETRIEVAL_TIME)) {
-            // uuid or issn?
-            sherpaCacheEvictService.evictSingleCacheValue(source.getItem().getID().toString());
+            sherpaCacheEvictService.evictCacheValues(context, source.getItem());
         }
     }
 

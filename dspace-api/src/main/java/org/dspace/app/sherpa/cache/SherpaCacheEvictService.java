@@ -8,7 +8,11 @@
 package org.dspace.app.sherpa.cache;
 
 import java.util.Objects;
+import java.util.Set;
 
+import org.dspace.app.sherpa.submit.SHERPASubmitService;
+import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
@@ -26,9 +30,14 @@ public class SherpaCacheEvictService {
 
     @Autowired
     private CacheManager cacheManager;
+    @Autowired
+    private SHERPASubmitService sherpaSubmitService;
 
-    public void evictSingleCacheValue(String cacheKey) {
-        Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).evict(cacheKey);
+    public void evictCacheValues(Context context, Item item) {
+        Set<String> ISSNs = sherpaSubmitService.getISSNs(context, item);
+        for (String issn : ISSNs) {
+            Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).evict(issn);
+        }
     }
 
     public void evictAllCacheValues() {

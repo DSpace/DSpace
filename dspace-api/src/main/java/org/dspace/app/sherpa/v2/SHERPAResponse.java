@@ -77,6 +77,11 @@ public class SHERPAResponse {
     }
 
     /**
+     * Create an empty SHERPAResponse rappresentation
+     */
+    public SHERPAResponse() {}
+
+    /**
      * Parse the SHERPA v2 API JSON and construct Romeo policy data for display
      * This method does not return a value, but rather populates the metadata and journals objects
      * with data parsed from the JSON.

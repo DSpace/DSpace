@@ -82,12 +82,13 @@ public class SHERPASubmitService {
                     // Continue with loop
                     log.warn("Failed to look up SHERPA ROMeO result for ISSN: " + issn
                         + ": " + response.getMessage());
+                    return new SHERPAResponse("SHERPA ROMeO lookup failed");
                 } else if (!response.getJournals().isEmpty()) {
                     // return this response, if it is not empty
                     return response;
                 }
             }
-            return new SHERPAResponse("SHERPA ROMeO lookup failed");
+            return new SHERPAResponse();
         }
     }
 
