@@ -14,8 +14,8 @@ import java.util.Date;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.dspace.app.nbevent.RawJsonDeserializer;
-import org.dspace.app.nbevent.service.dto.NBMessage;
-import org.dspace.app.nbevent.service.dto.OpenaireMessage;
+import org.dspace.app.nbevent.service.dto.NBMessageDTO;
+import org.dspace.app.nbevent.service.dto.OpenaireMessageDTO;
 
 /**
  * This class represent the notification broker data as loaded in our solr
@@ -192,10 +192,10 @@ public class NBEvent {
 
     }
 
-    public Class<? extends NBMessage> getMessageDtoClass() {
+    public Class<? extends NBMessageDTO> getMessageDtoClass() {
         switch (getSource()) {
             case OPENAIRE_SOURCE:
-                return OpenaireMessage.class;
+                return OpenaireMessageDTO.class;
             default:
                 throw new IllegalArgumentException("Unknown event's source: " + getSource());
         }

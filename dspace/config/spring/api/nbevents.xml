@@ -29,7 +29,7 @@
         </property>
      </bean>
      
-     <bean id="ProjectLinkedEntityAction" class="org.dspace.app.nbevent.NBEntityMetadataAction">
+     <bean id="ProjectLinkedEntityAction" class="org.dspace.app.nbevent.NBEntityOpenaireMetadataAction">
         <!-- which metadata will hold the relation between the publication and the project -->
         <property name="relation" value="isPublicationOfProject" />
         <!-- the type of local entity used to store the project details -->
@@ -47,10 +47,10 @@
             </map>
         </property>    
      </bean>
-     <bean id="AbstractMetadataAction" class="org.dspace.app.nbevent.NBSimpleMetadataAction">
+     <bean id="AbstractMetadataAction" class="org.dspace.app.nbevent.NBOpenaireSimpleMetadataAction">
         <property name="metadata" value="dc.description.abstract" />
      </bean>
-     <bean id="PIDMetadataAction" class="org.dspace.app.nbevent.NBMetadataMapAction">
+     <bean id="PIDMetadataAction" class="org.dspace.app.nbevent.NBOpenaireMetadataMapAction">
 	     <property name="types">
 	         <map>
 	<!--The key are the type of identifier (or subject) reported in the message, the value is the metadata in 

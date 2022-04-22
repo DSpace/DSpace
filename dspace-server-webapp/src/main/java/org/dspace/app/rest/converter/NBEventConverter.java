@@ -13,8 +13,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import org.dspace.app.nbevent.service.dto.NBMessage;
-import org.dspace.app.nbevent.service.dto.OpenaireMessage;
+import org.dspace.app.nbevent.service.dto.NBMessageDTO;
+import org.dspace.app.nbevent.service.dto.OpenaireMessageDTO;
 import org.dspace.app.rest.model.NBEventMessageRest;
 import org.dspace.app.rest.model.NBEventRest;
 import org.dspace.app.rest.model.OpenaireNBEventMessageRest;
@@ -61,9 +61,9 @@ public class NBEventConverter implements DSpaceConverter<NBEvent, NBEventRest> {
         return rest;
     }
 
-    private NBEventMessageRest convertMessage(NBMessage dto) {
-        if (dto instanceof OpenaireMessage) {
-            OpenaireMessage openaireDto = (OpenaireMessage) dto;
+    private NBEventMessageRest convertMessage(NBMessageDTO dto) {
+        if (dto instanceof OpenaireMessageDTO) {
+            OpenaireMessageDTO openaireDto = (OpenaireMessageDTO) dto;
             OpenaireNBEventMessageRest message = new OpenaireNBEventMessageRest();
             message.setAbstractValue(openaireDto.getAbstracts());
             message.setOpenaireId(openaireDto.getOpenaireId());

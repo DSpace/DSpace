@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.nbevent.service.dto.NBMessage;
-import org.dspace.app.nbevent.service.dto.OpenaireMessage;
+import org.dspace.app.nbevent.service.dto.NBMessageDTO;
+import org.dspace.app.nbevent.service.dto.OpenaireMessageDTO;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.EntityType;
@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class NBEntityMetadataAction implements NBAction {
+public class NBEntityOpenaireMetadataAction implements NBAction {
     private String relation;
     private String entityType;
     private Map<String, String> entityMetadata;
@@ -103,7 +103,7 @@ public class NBEntityMetadataAction implements NBAction {
     }
 
     @Override
-    public void applyCorrection(Context context, Item item, Item relatedItem, NBMessage message) {
+    public void applyCorrection(Context context, Item item, Item relatedItem, NBMessageDTO message) {
         try {
             if (relatedItem != null) {
                 link(context, item, relatedItem);
@@ -134,6 +134,10 @@ public class NBEntityMetadataAction implements NBAction {
         }
     }
 
+    /**
+     * Create a new relationship between the two given item, based on the configured
+     * relation.
+     */
     private void link(Context context, Item item, Item relatedItem) throws SQLException, AuthorizeException {
         EntityType project = entityTypeService.findByEntityType(context, entityType);
         RelationshipType relType = relationshipTypeService.findByEntityType(context, project).stream()
@@ -151,12 +155,12 @@ public class NBEntityMetadataAction implements NBAction {
         relationshipService.update(context, persistedRelationship);
     }
 
-    private String getValue(NBMessage message, String key) {
-        if (!(message instanceof OpenaireMessage)) {
+    private String getValue(NBMessageDTO message, String key) {
+        if (!(message instanceof OpenaireMessageDTO)) {
             return null;
         }
 
-        OpenaireMessage openaireMessage = (OpenaireMessage) message;
+        OpenaireMessageDTO openaireMessage = (OpenaireMessageDTO) message;
 
         if (StringUtils.equals(key, "acronym")) {
             return openaireMessage.getAcronym();

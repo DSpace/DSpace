@@ -10,7 +10,7 @@ package org.dspace.app.nbevent;
 import java.util.Date;
 
 /**
- * This model class represent the notification broker source concept
+ * This model class represent the source/provider of the NB events (as OpenAIRE).
  * 
  * @author Luca Giamminonni (luca.giamminonni at 4Science)
  *

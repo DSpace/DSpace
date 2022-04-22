@@ -18,7 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.nbevent.service.dto.OpenaireMessage;
+import org.dspace.app.nbevent.service.dto.OpenaireMessageDTO;
 import org.dspace.content.NBEvent;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -56,7 +56,7 @@ public class NBEventMatcher {
                     hasJsonPath("$.status", Matchers.equalToIgnoringCase(event.getStatus())),
                     hasJsonPath("$.message",
                             matchMessage(event.getTopic(), jsonMapper.readValue(event.getMessage(),
-                                OpenaireMessage.class))),
+                                OpenaireMessageDTO.class))),
                     hasJsonPath("$._links.target.href", Matchers.endsWith(event.getEventId() + "/target")),
                     hasJsonPath("$._links.related.href", Matchers.endsWith(event.getEventId() + "/related")),
                     hasJsonPath("$._links.topic.href", Matchers.endsWith(event.getEventId() + "/topic")),
@@ -66,7 +66,7 @@ public class NBEventMatcher {
         }
     }
 
-    private static Matcher<? super Object> matchMessage(String topic, OpenaireMessage message) {
+    private static Matcher<? super Object> matchMessage(String topic, OpenaireMessageDTO message) {
         if (StringUtils.endsWith(topic, "/ABSTRACT")) {
             return allOf(hasJsonPath("$.abstract", is(message.getAbstracts())));
         } else if (StringUtils.endsWith(topic, "/PID")) {

@@ -15,7 +15,7 @@ import org.dspace.content.NBEvent;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public interface NBMessage {
+public interface NBMessageDTO {
 
 
 }

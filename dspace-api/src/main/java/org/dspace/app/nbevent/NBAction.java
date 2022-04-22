@@ -7,7 +7,7 @@
  */
 package org.dspace.app.nbevent;
 
-import org.dspace.app.nbevent.service.dto.NBMessage;
+import org.dspace.app.nbevent.service.dto.NBMessageDTO;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -27,5 +27,5 @@ public interface NBAction {
      * @param relatedItem the related item, if any
      * @param message     the message with the correction details
      */
-    public void applyCorrection(Context context, Item item, Item relatedItem, NBMessage message);
+    public void applyCorrection(Context context, Item item, Item relatedItem, NBMessageDTO message);
 }

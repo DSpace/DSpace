@@ -10,12 +10,12 @@ package org.dspace.app.nbevent.service.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Implementation of {@link NBMessage} that model message coming from OPENAIRE.
+ * Implementation of {@link NBMessageDTO} that model message coming from OPENAIRE.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class OpenaireMessage implements NBMessage {
+public class OpenaireMessageDTO implements NBMessageDTO {
 
     @JsonProperty("pids[0].value")
     private String value;

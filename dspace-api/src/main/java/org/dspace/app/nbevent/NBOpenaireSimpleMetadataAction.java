@@ -9,8 +9,8 @@ package org.dspace.app.nbevent;
 
 import java.sql.SQLException;
 
-import org.dspace.app.nbevent.service.dto.NBMessage;
-import org.dspace.app.nbevent.service.dto.OpenaireMessage;
+import org.dspace.app.nbevent.service.dto.NBMessageDTO;
+import org.dspace.app.nbevent.service.dto.OpenaireMessageDTO;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class NBSimpleMetadataAction implements NBAction {
+public class NBOpenaireSimpleMetadataAction implements NBAction {
     private String metadata;
     private String metadataSchema;
     private String metadataElement;
@@ -51,10 +51,10 @@ public class NBSimpleMetadataAction implements NBAction {
     }
 
     @Override
-    public void applyCorrection(Context context, Item item, Item relatedItem, NBMessage message) {
+    public void applyCorrection(Context context, Item item, Item relatedItem, NBMessageDTO message) {
         try {
             itemService.addMetadata(context, item, metadataSchema, metadataElement, metadataQualifier, null,
-                ((OpenaireMessage) message).getAbstracts());
+                ((OpenaireMessageDTO) message).getAbstracts());
             itemService.update(context, item);
         } catch (SQLException | AuthorizeException e) {
             throw new RuntimeException(e);

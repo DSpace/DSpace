@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
@@ -54,8 +53,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class NBEventServiceImpl implements NBEventService {
-
-    private static final Logger log = Logger.getLogger(NBEventServiceImpl.class);
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;

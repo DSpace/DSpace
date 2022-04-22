@@ -10,8 +10,8 @@ package org.dspace.app.nbevent;
 import java.sql.SQLException;
 import java.util.Map;
 
-import org.dspace.app.nbevent.service.dto.NBMessage;
-import org.dspace.app.nbevent.service.dto.OpenaireMessage;
+import org.dspace.app.nbevent.service.dto.NBMessageDTO;
+import org.dspace.app.nbevent.service.dto.OpenaireMessageDTO;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class NBMetadataMapAction implements NBAction {
+public class NBOpenaireMetadataMapAction implements NBAction {
     public static final String DEFAULT = "default";
 
     private Map<String, String> types;
@@ -44,14 +44,18 @@ public class NBMetadataMapAction implements NBAction {
         this.types = types;
     }
 
+    /**
+     * Apply the correction on one metadata field of the given item based on the
+     * openaire message type.
+     */
     @Override
-    public void applyCorrection(Context context, Item item, Item relatedItem, NBMessage message) {
+    public void applyCorrection(Context context, Item item, Item relatedItem, NBMessageDTO message) {
 
-        if (!(message instanceof OpenaireMessage)) {
+        if (!(message instanceof OpenaireMessageDTO)) {
             throw new IllegalArgumentException("Unsupported message type: " + message.getClass());
         }
 
-        OpenaireMessage openaireMessage = (OpenaireMessage) message;
+        OpenaireMessageDTO openaireMessage = (OpenaireMessageDTO) message;
 
         try {
             String targetMetadata = types.get(openaireMessage.getType());
@@ -65,6 +69,7 @@ public class NBMetadataMapAction implements NBAction {
         } catch (SQLException | AuthorizeException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     public String[] splitMetadata(String metadata) {

@@ -79,7 +79,7 @@ public class NBEventActionServiceImpl implements NBEventActionService {
             topicsToActions.get(nbevent.getTopic()).applyCorrection(context, item, related,
                 jsonMapper.readValue(nbevent.getMessage(), nbevent.getMessageDtoClass()));
             nbEventService.deleteEventByEventId(nbevent.getEventId());
-            makeAcknowledgement(nbevent.getEventId(), NBEvent.ACCEPTED);
+            makeAcknowledgement(nbevent.getEventId(), nbevent.getSource(), NBEvent.ACCEPTED);
         } catch (SQLException | JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -88,17 +88,20 @@ public class NBEventActionServiceImpl implements NBEventActionService {
     @Override
     public void discard(Context context, NBEvent nbevent) {
         nbEventService.deleteEventByEventId(nbevent.getEventId());
-        makeAcknowledgement(nbevent.getEventId(), NBEvent.DISCARDED);
+        makeAcknowledgement(nbevent.getEventId(), nbevent.getSource(), NBEvent.DISCARDED);
     }
 
     @Override
     public void reject(Context context, NBEvent nbevent) {
         nbEventService.deleteEventByEventId(nbevent.getEventId());
-        makeAcknowledgement(nbevent.getEventId(), NBEvent.REJECTED);
+        makeAcknowledgement(nbevent.getEventId(), nbevent.getSource(), NBEvent.REJECTED);
     }
 
-    private void makeAcknowledgement(String eventId, String status) {
-        String[] ackwnoledgeCallbacks = configurationService.getArrayProperty("oaire-nbevents.acknowledge-url");
+    /**
+     * Make acknowledgement to the configured urls for the event status.
+     */
+    private void makeAcknowledgement(String eventId, String source, String status) {
+        String[] ackwnoledgeCallbacks = configurationService.getArrayProperty(source + "-nbevents.acknowledge-url");
         if (ackwnoledgeCallbacks != null) {
             for (String ackwnoledgeCallback : ackwnoledgeCallbacks) {
                 if (StringUtils.isNotBlank(ackwnoledgeCallback)) {
