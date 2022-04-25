@@ -119,7 +119,7 @@ public class SubmissionFormFieldMatcher {
             // check each field definition
             hasJsonPath("$.input.type", is(type)),
             hasJsonPath("$.label", containsString(label)),
-            typeBind != null ? hasJsonPath("$.typeBind[0]", is(typeBind)) : hasNoJsonPath("$.typeBind"),
+            typeBind != null ? hasJsonPath("$.typeBind", is(typeBind)) : hasNoJsonPath("$.typeBind[0]"),
             hasJsonPath("$.selectableMetadata[0].metadata", is(metadata)),
             controlledVocabulary != null ? hasJsonPath("$.selectableMetadata[0].controlledVocabulary",
                     is(controlledVocabulary)) : hasNoJsonPath("$.selectableMetadata[0].controlledVocabulary"),
