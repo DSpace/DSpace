@@ -73,7 +73,7 @@ public class MetadataValidation extends AbstractValidation {
                 boolean isAuthorityControlled = metadataAuthorityService.isAuthorityControlled(fieldKey);
 
                 // Skip validation if field is not allowed for the current document type
-                if (input.isAllowedFor(documentTypeValue) == false) {
+                if (!input.isAllowedFor(documentTypeValue)) {
                     continue;
                 }
 
