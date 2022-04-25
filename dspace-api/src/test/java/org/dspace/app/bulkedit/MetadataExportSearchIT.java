@@ -9,6 +9,8 @@
 package org.dspace.app.bulkedit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -183,9 +185,37 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
 
         context.restoreAuthSystemState();
 
-        String [] args = new String[]{"metadata-export-search", "-f", "subject,equals=well-being"};
-        Item[] expectedResult = new Item[]{wellBeingItem};
+        String[] args = new String[] {"metadata-export-search", "-f", "subject,equals=well-being"};
+        Item[] expectedResult = new Item[] {wellBeingItem};
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
         checkItemsPresentInFile(filename, expectedResult);
+    }
+
+    @Test
+    public void exportMetadataSearchInvalidDiscoveryQueryTest()
+        throws InstantiationException, IllegalAccessException, IOException, CsvException {
+        String[] args = new String[] {"metadata-export-search", "-q", "blabla"};
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        Item[] items = {};
+        checkItemsPresentInFile(filename, items);
+    }
+
+    @Test
+    public void exportMetadataSearchNoResultsTest()
+        throws InstantiationException, IllegalAccessException, IOException, CsvException {
+        String[] args = new String[] {"metadata-export-search", "-f", "subject,equals=notExistingSubject"};
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        Item[] items = {};
+        checkItemsPresentInFile(filename, items);
+    }
+
+    @Test
+    public void exportMetadataSearchNonExistinFacetsTest() throws InstantiationException, IllegalAccessException {
+        String[] args = new String[] {"metadata-export-search", "-f", "nonExisting,equals=" + subject1, "-f",
+            "title,equals=" + String.format("%s item %d", subject1, 0)};
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        Exception exception = testDSpaceRunnableHandler.getException();
+        assertNotNull(exception);
+        assertEquals("nonExisting is not a valid search filter", exception.getMessage());
     }
 }
