@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -295,7 +296,13 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                 SubmissionFormFieldMatcher.matchFormFieldDefinition("series", "Series/Report No.",
                         "Technical Report", null, true,
                         "Enter the series and number assigned to this item by your community.",
-                        "dc.relation.ispartofseries"))));
+                        "dc.relation.ispartofseries"))))
+                // check the same row with a NON-matching type-bind 'Article' (expect false)
+                .andExpect(((jsonPath("$.rows[5].fields", not(contains(
+                SubmissionFormFieldMatcher.matchFormFieldDefinition("series", "Series/Report No.",
+                        "Article", null, true,
+                        "Enter the series and number assigned to this item by your community.",
+                        "dc.relation.ispartofseries")))))));
     }
 
     @Test
@@ -400,7 +407,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                  .andExpect(jsonPath("$._links.self.href", Matchers
                            .startsWith(REST_SERVER_URL + "config/submissionforms/languagetest")))
                  .andExpect(jsonPath("$.rows[0].fields", contains(SubmissionFormFieldMatcher
-                           .matchFormFieldDefinition("name", "Автор", "Потрібно ввести хочаб одного автора!", null,
+                           .matchFormFieldDefinition("name", "Автор", null, "Потрібно ввести хочаб одного автора!",
                                                true, "Додати автора", "dc.contributor.author"))))
                  .andExpect(jsonPath("$.rows[1].fields", contains(SubmissionFormFieldMatcher
                            .matchFormFieldDefinition("onebox", "Заголовок", null,
@@ -480,7 +487,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                  .andExpect(jsonPath("$._links.self.href", Matchers
                            .startsWith(REST_SERVER_URL + "config/submissionforms/languagetest")))
                  .andExpect(jsonPath("$.rows[0].fields", contains(SubmissionFormFieldMatcher
-                           .matchFormFieldDefinition("name", null, "Автор", "Потрібно ввести хочаб одного автора!",
+                           .matchFormFieldDefinition("name",  "Автор", null, "Потрібно ввести хочаб одного автора!",
                                                true, "Додати автора", "dc.contributor.author"))))
                  .andExpect(jsonPath("$.rows[1].fields", contains(SubmissionFormFieldMatcher
                            .matchFormFieldDefinition("onebox", "Заголовок", null,

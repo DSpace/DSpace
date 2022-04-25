@@ -9,9 +9,7 @@ package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 import org.hamcrest.Matcher;
 
@@ -119,7 +117,7 @@ public class SubmissionFormFieldMatcher {
             // check each field definition
             hasJsonPath("$.input.type", is(type)),
             hasJsonPath("$.label", containsString(label)),
-            typeBind != null ? hasJsonPath("$.typeBind", is(typeBind)) : hasNoJsonPath("$.typeBind[0]"),
+            typeBind != null ? hasJsonPath("$.typeBind", contains(typeBind)) : hasNoJsonPath("$.typeBind[0]"),
             hasJsonPath("$.selectableMetadata[0].metadata", is(metadata)),
             controlledVocabulary != null ? hasJsonPath("$.selectableMetadata[0].controlledVocabulary",
                     is(controlledVocabulary)) : hasNoJsonPath("$.selectableMetadata[0].controlledVocabulary"),
