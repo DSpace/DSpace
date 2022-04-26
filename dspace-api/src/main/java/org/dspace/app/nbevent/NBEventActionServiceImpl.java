@@ -101,7 +101,8 @@ public class NBEventActionServiceImpl implements NBEventActionService {
      * Make acknowledgement to the configured urls for the event status.
      */
     private void makeAcknowledgement(String eventId, String source, String status) {
-        String[] ackwnoledgeCallbacks = configurationService.getArrayProperty(source + "-nbevents.acknowledge-url");
+        String[] ackwnoledgeCallbacks = configurationService
+            .getArrayProperty("nbevents." + source + ".acknowledge-url");
         if (ackwnoledgeCallbacks != null) {
             for (String ackwnoledgeCallback : ackwnoledgeCallbacks) {
                 if (StringUtils.isNotBlank(ackwnoledgeCallback)) {

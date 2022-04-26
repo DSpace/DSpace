@@ -109,7 +109,8 @@ public class NBEntityOpenaireMetadataAction implements NBAction {
                 link(context, item, relatedItem);
             } else {
 
-                Collection collection = collectionService.retrieveCollectionByEntityType(context, item, entityType);
+                Collection collection = collectionService.retrieveCollectionWithSubmitByEntityType(context,
+                    item, entityType);
                 if (collection == null) {
                     throw new IllegalStateException("No collection found by entity type: " + collection);
                 }

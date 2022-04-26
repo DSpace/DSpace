@@ -35,6 +35,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.app.nbevent.NBSource;
 import org.dspace.app.nbevent.NBTopic;
+import org.dspace.app.nbevent.dao.NBEventsDao;
 import org.dspace.app.nbevent.dao.impl.NBEventsDaoImpl;
 import org.dspace.app.nbevent.service.NBEventService;
 import org.dspace.content.Item;
@@ -47,7 +48,10 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implementation of {@link NBEventService} that use Solr to store events.
+ * Implementation of {@link NBEventService} that use Solr to store events. When
+ * the user performs an action on the event (such as accepting the suggestion or
+ * rejecting it) then the event is removed from solr and saved in the database
+ * (see {@link NBEventsDao}) so that it is no longer proposed.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
@@ -92,7 +96,7 @@ public class NBEventServiceImpl implements NBEventService {
     protected SolrClient getSolr() {
         if (solr == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
-                    .getProperty("oaire-nbevents.solr.server", "http://localhost:8983/solr/nbevent");
+                    .getProperty("nbevents.solr.server", "http://localhost:8983/solr/nbevent");
             return new HttpSolrClient.Builder(solrService).build();
         }
         return solr;

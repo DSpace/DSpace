@@ -13,9 +13,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.dspace.app.nbevent.RawJsonDeserializer;
 import org.dspace.app.nbevent.service.dto.NBMessageDTO;
 import org.dspace.app.nbevent.service.dto.OpenaireMessageDTO;
+import org.dspace.util.RawJsonDeserializer;
 
 /**
  * This class represent the notification broker data as loaded in our solr
@@ -173,7 +173,8 @@ public class NBEvent {
 
     /*
      * DTO constructed via Jackson use empty constructor. In this case, the eventId
-     * must be compute on the get method
+     * must be compute on the get method. This method create a signature based on
+     * the event fields and store it in the eventid attribute.
      */
     private void computedEventId() throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest digester = MessageDigest.getInstance("MD5");

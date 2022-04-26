@@ -18,8 +18,8 @@
      <bean id="org.dspace.app.nbevent.NBEventActionService" class="org.dspace.app.nbevent.NBEventActionServiceImpl">
         <property name="topicsToActions">
             <map>
-	<!--The key are the TOPIC, the value must be a valid implementation of the 
-		org.dspace.app.nbevent.NBEventAction interface -->
+            	<!--The key are the TOPIC, the value must be a valid implementation of the 
+            		org.dspace.app.nbevent.NBEventAction interface -->
                <entry key="ENRICH/MORE/PROJECT" value-ref="ProjectLinkedEntityAction" />
                <entry key="ENRICH/MISSING/PROJECT" value-ref="ProjectLinkedEntityAction" />
                <entry key="ENRICH/MISSING/ABSTRACT" value-ref="AbstractMetadataAction" />
@@ -29,6 +29,8 @@
         </property>
      </bean>
      
+     <!-- This action bind the publication to the project, otherwise if the project has not been specified, 
+      create a new project with the available data and then bind it to the publication -->
      <bean id="ProjectLinkedEntityAction" class="org.dspace.app.nbevent.NBEntityOpenaireMetadataAction">
         <!-- which metadata will hold the relation between the publication and the project -->
         <property name="relation" value="isPublicationOfProject" />
@@ -50,6 +52,7 @@
      <bean id="AbstractMetadataAction" class="org.dspace.app.nbevent.NBOpenaireSimpleMetadataAction">
         <property name="metadata" value="dc.description.abstract" />
      </bean>
+     <!-- Add a new identifier to the given item, using the defined types mapping -->
      <bean id="PIDMetadataAction" class="org.dspace.app.nbevent.NBOpenaireMetadataMapAction">
 	     <property name="types">
 	         <map>

@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.nbevent;
+package org.dspace.util;
 
 import java.io.IOException;
 

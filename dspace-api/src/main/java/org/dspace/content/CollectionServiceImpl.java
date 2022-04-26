@@ -1018,16 +1018,18 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public Collection retrieveCollectionByEntityType(Context context, Item item, String entityType)
-            throws SQLException {
+    public Collection retrieveCollectionWithSubmitByEntityType(Context context, Item item,
+        String entityType) throws SQLException {
         Collection ownCollection = item.getOwningCollection();
-        return retrieveCollectionByEntityType(context, ownCollection.getCommunities(), entityType);
+        return retrieveWithSubmitCollectionByEntityType(context, ownCollection.getCommunities(), entityType);
     }
 
-    private Collection retrieveCollectionByEntityType(Context context, List<Community> communities, String entityType) {
+    private Collection retrieveWithSubmitCollectionByEntityType(Context context, List<Community> communities,
+        String entityType) {
 
         for (Community community : communities) {
-            Collection collection = retrieveCollectionByCommunityAndEntityType(context, community, entityType);
+            Collection collection = retrieveCollectionWithSubmitByCommunityAndEntityType(context, community,
+                entityType);
             if (collection != null) {
                 return collection;
             }
@@ -1035,17 +1037,17 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         for (Community community : communities) {
             List<Community> parentCommunities = community.getParentCommunities();
-            Collection collection = retrieveCollectionByEntityType(context, parentCommunities, entityType);
+            Collection collection = retrieveWithSubmitCollectionByEntityType(context, parentCommunities, entityType);
             if (collection != null) {
                 return collection;
             }
         }
 
-        return retrieveCollectionByCommunityAndEntityType(context, null, entityType);
+        return retrieveCollectionWithSubmitByCommunityAndEntityType(context, null, entityType);
     }
 
     @Override
-    public Collection retrieveCollectionByCommunityAndEntityType(Context context, Community community,
+    public Collection retrieveCollectionWithSubmitByCommunityAndEntityType(Context context, Community community,
         String entityType) {
         context.turnOffAuthorisationSystem();
         List<Collection> collections;
@@ -1060,7 +1062,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
         if (community != null) {
             for (Community subCommunity : community.getSubcommunities()) {
-                Collection collection = retrieveCollectionByCommunityAndEntityType(context, subCommunity, entityType);
+                Collection collection = retrieveCollectionWithSubmitByCommunityAndEntityType(context,
+                    subCommunity, entityType);
                 if (collection != null) {
                     return collection;
                 }

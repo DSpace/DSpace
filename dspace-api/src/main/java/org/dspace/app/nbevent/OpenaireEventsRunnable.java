@@ -33,8 +33,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link DSpaceRunnable} to perfom a NBEvents import from file.
- *
+ * Implementation of {@link DSpaceRunnable} to perfom a NBEvents import from a
+ * json file. The JSON file contains an array of JSON Events, where each event
+ * has the following structure
+ * 
+ * <code> <br/>
+ * { <br/>
+ * "originalId": "oai:www.openstarts.units.it:10077/21838",<br/>
+ * "title": "Egypt, crossroad of translations and literary interweavings", <br/>
+ * "topic": "ENRICH/MORE/PROJECT", <br/>
+ * "trust": 1.0, <br/>
+ * "message": { <br/>
+ * "projects[0].acronym": "PAThs", <br/>
+ * "projects[0].code": "687567", <br/>
+ * "projects[0].funder": "EC",<br/>
+ * "projects[0].fundingProgram": "H2020", <br/>
+ * "projects[0].jurisdiction": "EU",<br/>
+ * "projects[0].openaireId": "40|corda__h2020::6e32f5eb912688f2424c68b851483ea4", <br/>
+ * "projects[0].title": "Tracking Papyrus and Parchment Paths" <br/>
+ * } <br/>
+ * }
+ * </code>
+ * 
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  *
  */
@@ -76,7 +96,7 @@ public class OpenaireEventsRunnable extends DSpaceRunnable<OpenaireEventsScriptC
 
         configurationService = dspace.getConfigurationService();
 
-        topicsToImport = configurationService.getArrayProperty("oaire-nbevents.import.topic");
+        topicsToImport = configurationService.getArrayProperty("nbevents.openaire.import.topic");
 
         fileLocation = commandLine.getOptionValue("f");
 

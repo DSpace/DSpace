@@ -15,11 +15,11 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.nbevent.service.NBEventService;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.NBEventRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -47,7 +47,8 @@ import org.springframework.web.bind.annotation.RestController;
  * "/api/integration/nbevents/{nbeventid}/related"
  */
 @RestController
-@RequestMapping("/api/integration/nbevents" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG + "/related")
+@RequestMapping("/api/" + NBEventRest.CATEGORY + "/nbevents" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG
+    + "/related")
 public class NBEventRestController {
     @Autowired
     protected Utils utils;
@@ -87,8 +88,6 @@ public class NBEventRestController {
         if (nbevent.getRelated() != null) {
             throw new UnprocessableEntityException("The nb event with ID: " + nbeventId + " already has " +
                                                        "a related item");
-        } else if (!StringUtils.endsWith(nbevent.getTopic(), "/PROJECT")) {
-            return ControllerUtils.toEmptyResponse(HttpStatus.BAD_REQUEST);
         }
 
         Item relatedItem = itemService.find(context, relatedItemUUID);

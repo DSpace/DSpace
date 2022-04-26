@@ -422,13 +422,14 @@ public interface CollectionService
      * @return            the first collection in the community or its descending
      *                    that support the provided entityType
      */
-    public Collection retrieveCollectionByCommunityAndEntityType(Context context, Community community,
+    public Collection retrieveCollectionWithSubmitByCommunityAndEntityType(Context context, Community community,
         String entityType);
 
     /**
-     * Retrieve the close collection to the item that support the provided
-     * entityType. Close mean the collection that can be reach with the minimum
-     * steps starting from the item (owningCollection, brothers collections, etc)
+     * Retrieve the close collection to the item for which the current user has
+     * 'submit' privileges that support the provided entityType. Close mean the
+     * collection that can be reach with the minimum steps starting from the item
+     * (owningCollection, brothers collections, etc)
      *
      * @param  context    the DSpace context
      * @param  item       the item from where the search start
@@ -436,7 +437,7 @@ public interface CollectionService
      * @return            the first collection in the community or its descending
      *                    that support the provided entityType
      */
-    public Collection retrieveCollectionByEntityType(Context context, Item item, String entityType)
+    public Collection retrieveCollectionWithSubmitByEntityType(Context context, Item item, String entityType)
         throws SQLException;
 
     /**

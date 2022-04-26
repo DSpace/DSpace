@@ -51,6 +51,10 @@ public class NBOpenaireMetadataMapAction implements NBAction {
     @Override
     public void applyCorrection(Context context, Item item, Item relatedItem, NBMessageDTO message) {
 
+        if (relatedItem != null) {
+            throw new IllegalArgumentException("NBOpenaireMetadataMapAction does not support related item");
+        }
+
         if (!(message instanceof OpenaireMessageDTO)) {
             throw new IllegalArgumentException("Unsupported message type: " + message.getClass());
         }
