@@ -52,11 +52,6 @@ public class NBOpenaireSimpleMetadataAction implements NBAction {
 
     @Override
     public void applyCorrection(Context context, Item item, Item relatedItem, NBMessageDTO message) {
-
-        if (relatedItem != null) {
-            throw new IllegalArgumentException("NBOpenaireSimpleMetadataAction does not support related item");
-        }
-
         try {
             itemService.addMetadata(context, item, metadataSchema, metadataElement, metadataQualifier, null,
                 ((OpenaireMessageDTO) message).getAbstracts());

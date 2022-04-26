@@ -88,6 +88,8 @@ public class NBEventRestController {
         if (nbevent.getRelated() != null) {
             throw new UnprocessableEntityException("The nb event with ID: " + nbeventId + " already has " +
                                                        "a related item");
+        } else if (!StringUtils.endsWith(nbevent.getTopic(), "/PROJECT")) {
+            return ControllerUtils.toEmptyResponse(HttpStatus.BAD_REQUEST);
         }
 
         Item relatedItem = itemService.find(context, relatedItemUUID);
