@@ -1,8 +1,8 @@
 # Digital Repository at the University of Maryland (DRUM)
 
-Home: http://drum.lib.umd.edu/
+Home: <http://drum.lib.umd.edu/>
 
-See http://drum.lib.umd.edu/help/about_drum.jsp for more information.
+See <http://drum.lib.umd.edu/help/about_drum.jsp> for more information.
 
 ## Documentation
 
@@ -11,52 +11,11 @@ The original DSpace documentation:
 * [README-DSPACE.md](README-DSPACE.md)
 * [DSpace Manual](dspace/docs/pdf/DSpace-Manual.pdf)
 
-### Installation
+### Development Environment
 
-### Installation
-
-Instructions for building and running drum locally.
-#### Prerequisites
-
-The following images needs to be built once for the Dockerfile.dev to build successfully.
-
-```
-docker build -t docker.lib.umd.edu/drum-dependencies-6_x:latest -f Dockerfile.dependencies .
-docker build -t docker.lib.umd.edu/drum-ant:latest -f Dockerfile.ant .
-docker build -t docker.lib.umd.edu/drum-tomcat:latest -f Dockerfile.tomcat .
-```
-
-#### Build
-
-To build the dspace development image used by the docker-compose.yml
-
-```
-docker build -t docker.lib.umd.edu/drum:dev -f Dockerfile.dev .
-```
-
-#### Run
-
-Start the drum using docker-compose.
-
-```
-docker-compose up -d
-```
-
-Useful commands
-```
-# To stop all the containers
-docker-compose down
-
-# To stop just the dspace container
-docker-compose stop dspace
-
-# To attach to the dspace container
-docker exec -it $(docker ps -f name=dspace$ --format {{.ID}}) bash
-
-```
+Instructions for building and running drum locally can be found at: [Drum7DockerDevelopmentEnvironment.md](docs/Drum7DockerDevelopmentEnvironment.md)
 
 ### Building Images for K8s Deployment
-
 
 #### DSpace Image
 
@@ -96,8 +55,6 @@ docker build -t docker.lib.umd.edu/drum-solr:<VERSION> .
 
 We could follow the same versioning scheme as the main drum image, but we don't necessariliy have create new image versions for solr for every patch or hotfix version increments. The solr image can be built when there is a relevant change.
 
-
-
 ### Deployment
 
 The `dspace-installer` directory that contains all the artifacts and the ant script to perform the deployment. The `installer-dist` maven profile creates a tar file of the installer directory which can be pushed to the UMD nexus by using the `deploy-release` or `deploy-snapshot` profile.
@@ -124,4 +81,4 @@ mvn -P installer-dist,deploy-release
 
 ## License
 
-See the [DRUM-LICENSE](DRUM-LICENSE.md) file for license rights and limitations (Apache 2.0). This lincense only governs the part of code base developed at UMD. The DSpace license can be found at https://github.com/DSpace/DSpace
+See the [DRUM-LICENSE](DRUM-LICENSE.md) file for license rights and limitations (Apache 2.0). This lincense only governs the part of code base developed at UMD. The DSpace license can be found at <https://github.com/DSpace/DSpace>
