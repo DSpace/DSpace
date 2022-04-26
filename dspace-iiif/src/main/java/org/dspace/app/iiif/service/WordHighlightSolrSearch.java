@@ -188,8 +188,11 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
                 String pageId = getCanvasId(snippet.get("pages"));
                 // Loop through array of highlights for each snippet.
                 for (final JsonNode highlight : snippet.get("highlights")) {
-                    // Add annotation associated with each highlight
-                    searchResult.addResource(getAnnotation(highlight, pageId, uuid));
+                    // May be multiple word highlights on a page, so loop through them.
+                    for (int i = 0; i < highlight.size(); i++) {
+                        // Add annotation associated with each highlight
+                        searchResult.addResource(getAnnotation(highlight.get(i), pageId, uuid));
+                    }
                 }
             }
         }
