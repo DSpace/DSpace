@@ -8,7 +8,6 @@
 package org.dspace.disseminate;
 
 import java.awt.Color;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -297,7 +296,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     }
 
     @Override
-    public Pair<InputStream, Long> makeCitedDocument(Context context, Bitstream bitstream)
+    public Pair<byte[], Long> makeCitedDocument(Context context, Bitstream bitstream)
             throws IOException, SQLException, AuthorizeException {
         PDDocument document = new PDDocument();
         PDDocument sourceDocument = new PDDocument();
@@ -318,7 +317,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
                 document.save(out);
 
                 byte[] data = out.toByteArray();
-                return Pair.of(new ByteArrayInputStream(data), Long.valueOf(data.length));
+                return Pair.of(data, Long.valueOf(data.length));
             }
 
         } finally {

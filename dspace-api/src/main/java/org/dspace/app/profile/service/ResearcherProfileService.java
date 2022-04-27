@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
@@ -52,22 +53,26 @@ public interface ResearcherProfileService {
         throws AuthorizeException, SQLException, SearchServiceException;
 
     /**
-     * Removes the association between the researcher profile and eperson related to
-     * the input uuid.
+     * Delete the profile with the given id. Based on the
+     * researcher-profile.hard-delete.enabled configuration, this method deletes the
+     * related item or removes the association between the researcher profile and
+     * eperson related to the input uuid.
      *
-     * @param context the relevant DSpace Context.
-     * @param id      the researcher profile id
+     * @param  context            the relevant DSpace Context.
+     * @param  id                 the researcher profile id
      * @throws AuthorizeException
      * @throws SQLException
      */
     public void deleteById(Context context, UUID id) throws SQLException, AuthorizeException;
 
     /**
-     * Changes the visibility of the given profile using the given new visible value
+     * Changes the visibility of the given profile using the given new visible
+     * value.
      *
-     * @param context the relevant DSpace Context.
-     * @param profile the researcher profile to update
-     * @param visible the visible value to set
+     * @param  context            the relevant DSpace Context.
+     * @param  profile            the researcher profile to update
+     * @param  visible            the visible value to set. If true the profile will
+     *                            be visible to all users.
      * @throws SQLException
      * @throws AuthorizeException
      */
@@ -76,11 +81,32 @@ public interface ResearcherProfileService {
 
     /**
      * Claims and links an eperson to an existing DSpaceObject
-     * @param context the relevant DSpace Context.
-     * @param ePerson the ePerson
-     * @param uri uri of existing DSpaceObject to be linked to the eperson
-     * @return
+     * @param  context                  the relevant DSpace Context.
+     * @param  ePerson                  the ePerson
+     * @param  uri                      uri of existing Item to be linked to the
+     *                                  eperson
+     * @return                          the created profile
+     * @throws IllegalArgumentException if the given uri is not related to an
+     *                                  archived item or if the item cannot be
+     *                                  claimed
      */
     ResearcherProfile claim(Context context, EPerson ePerson, URI uri)
         throws SQLException, AuthorizeException, SearchServiceException;
+
+    /**
+     * Check if the given item has an entity type compatible with that of the
+     * researcher profile. If the given item does not have an entity type, the check
+     * returns false.
+     * 
+     * @param  item the item to check
+     * @return      the check result
+     */
+    boolean hasProfileType(Item item);
+
+    /**
+     * Returns the profile entity type, if any.
+     *
+     * @return the profile type
+     */
+    String getProfileType();
 }

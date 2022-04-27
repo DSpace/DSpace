@@ -68,7 +68,9 @@
                         <!--Skip license check of third party files included/customized from HAL Browser -->
                         <exclude>src/main/webapp/index.html</exclude>
                         <exclude>src/main/webapp/login.html</exclude>
+                        <exclude>src/main/webapp/styles.css</exclude>
                         <exclude>src/main/webapp/js/hal/**</exclude>
+                        <exclude>src/main/webapp/js/vendor/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -238,28 +240,18 @@
 
     <dependencies>
 
-        <!-- These next two dependencies build a WAR that is BOTH executable
-             AND deployable into an external container (Tomcat).
-             See: http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging -->
-        <!-- NOTE: For rapid development (if you don't need Solr or other webapps),
-             you can temporarily comment these out, and switch <packaging> to "jar".
-             This lets you develop in a standalone, runnable JAR application. -->
-        <!--<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>-->
-        <!-- Ensure embedded servlet container doesn't interfere when this
-             WAR is deployed to an external Tomcat (i.e. provided). -->
-        <!--<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
-        </dependency>-->
-
+        <!-- Spring Boot dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>${spring-boot.version}</version>
+            <exclusions>
+                <!-- Later version provided by dspace-api -->
+                <exclusion>
+                    <groupId>org.hibernate.validator</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -286,20 +278,24 @@
             <version>0.4.6</version>
         </dependency>
 
-        <!-- The HAL Browser -->
+        <!-- HAL Browser (via WebJars) : https://github.com/mikekelly/hal-browser -->
+        <!-- This is primarily used to pull in the HAL Browser core Javascript code ('js' folder), as we've overridden
+             many dependencies below and the HTML pages in src/main/webapp/ -->
+        <!-- NOTE: Eventually this should be replaced by the HAL Explorer included in Spring Data REST,
+             see https://github.com/DSpace/DSpace/issues/3017 -->
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-rest-hal-browser</artifactId>
-            <version>${spring-hal-browser.version}</version>
+            <groupId>org.webjars</groupId>
+            <artifactId>hal-browser</artifactId>
+            <version>ad9b865</version>
         </dependency>
 
-        <!-- WebJars dependencies used to update/enhance the default HAL Browser -->
+        <!-- Pull in several WebJars dependencies used to update/enhance the default HAL Browser -->
         <!-- Pull in current version of JQuery via WebJars
              Made available at: webjars/jquery/dist/jquery.min.js -->
         <dependency>
             <groupId>org.webjars.bowergithub.jquery</groupId>
             <artifactId>jquery-dist</artifactId>
-            <version>3.5.1</version>
+            <version>3.6.0</version>
         </dependency>
         <!-- Pull in current version of Toastr (toastrjs.com) via WebJars
              Made available at: webjars/toastr/build/toastr.min.js -->
@@ -308,16 +304,45 @@
             <artifactId>toastr</artifactId>
             <version>2.1.4</version>
         </dependency>
-        <!-- Also pull in current version of Bootstrap via WebJars. This is currently ONLY used by our OAI-PMH
-             interface. But, it is include here so that it's accessible to all interfaces enabled in server webapp.
+        <!-- Pull in current version of URI.js (https://medialize.github.io/URI.js/) via WebJars
+             Made available at: webjars/urijs/src/URI.min.js -->
+        <dependency>
+            <groupId>org.webjars.bowergithub.medialize</groupId>
+            <artifactId>uri.js</artifactId>
+            <version>1.19.10</version>
+        </dependency>
+        <!-- Pull in current version of Underscore.js (https://underscorejs.org/) via WebJars
+             Made available at: webjars/underscore/underscore-min.js -->
+        <dependency>
+            <groupId>org.webjars.bowergithub.jashkenas</groupId>
+            <artifactId>underscore</artifactId>
+            <version>1.13.2</version>
+        </dependency>
+        <!-- Pull in current version of Backbone.js (http://backbonejs.org/) via WebJars
+             Made available at: webjars/backbone/backbone-min.js -->
+        <dependency>
+            <groupId>org.webjars.bowergithub.jashkenas</groupId>
+            <artifactId>backbone</artifactId>
+            <version>1.4.1</version>
+        </dependency>
+        <!-- Pull in current version of json-editor.js (https://github.com/json-editor/json-editor) via WebJars
+             Made available at: webjars/json-editor__json-editor/2.6.1/dist/jsoneditor.js
+             (Required by js/vendor/CustomPostForm.js)
+             NOTE: Because the path contains the version, you MUST update index.html when updating this dependency -->
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>json-editor__json-editor</artifactId>
+            <version>2.6.1</version>
+        </dependency>
+        <!-- Also pull in current version of Bootstrap via WebJars.
+             This is used by BOTH our HAL Browser and our OAI-PMH interface.
              Made available at: webjars/bootstrap/dist/js/bootstrap.min.js and
              webjars/bootstrap/dist/css/bootstrap.min.css -->
         <dependency>
             <groupId>org.webjars.bowergithub.twbs</groupId>
             <artifactId>bootstrap</artifactId>
-            <version>4.5.2</version>
+            <version>4.6.1</version>
         </dependency>
-
 
         <!-- Add in Spring Security for AuthN and AuthZ -->
         <dependency>
@@ -364,13 +389,12 @@
             <artifactId>dspace-services</artifactId>
         </dependency>
 
+        <!-- DSpace modules to deploy (these modules are all optional, but add features/endpoints to webapp) -->
+        <!-- You may choose to comment out any of these modules if you do not want/need its features -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-iiif</artifactId>
         </dependency>
-
-        <!-- DSpace modules to deploy (this modules are all optional, but add features/endpoints to webapp) -->
-        <!-- You may choose to comment out any of these modules if you do not want/need its features -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
@@ -416,6 +440,32 @@
             <version>${nimbus-jose-jwt.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj</artifactId>
+            <version>${solr.client.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
+             Caching dependencies for iiif endpoint. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/javax.cache/cache-api -->
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.ehcache/ehcache -->
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${ehcache.version}</version>
+        </dependency>
+
         <!-- TEST DEPENDENCIES -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -431,13 +481,11 @@
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
-            <version>${json-path.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path-assert</artifactId>
-            <version>${json-path.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -466,50 +514,6 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
             <version>${solr.client.version}</version>
-            <scope>test</scope>
-            <exclusions>
-                <!-- Newer version brought in by opencsv -->
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-text</artifactId>
-                </exclusion>
-                <!-- Newer Jetty version brought in via Parent POM -->
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-http</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-io</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-util</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
-             Caching dependencies for iiif endpoint. -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
-            <version>${spring-boot.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/javax.cache/cache-api -->
-        <dependency>
-            <groupId>javax.cache</groupId>
-            <artifactId>cache-api</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.ehcache/ehcache -->
-        <dependency>
-            <groupId>org.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-            <version>${ehcache.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-cell</artifactId>
             <scope>test</scope>
             <exclusions>
                 <!-- Newer version brought in by opencsv -->

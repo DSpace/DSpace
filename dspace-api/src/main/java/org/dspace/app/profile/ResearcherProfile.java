@@ -52,6 +52,11 @@ public class ResearcherProfile {
         return dspaceObjectOwner.getValue();
     }
 
+    /**
+     * A profile is considered visible if accessible by anonymous users. This method
+     * returns true if the given item has a READ policy related to ANONYMOUS group,
+     * false otherwise.
+     */
     public boolean isVisible() {
         return item.getResourcePolicies().stream()
             .filter(policy -> policy.getGroup() != null)

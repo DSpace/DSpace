@@ -23,7 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Checks if the given user can claim the given item.
+ * Checks if the given user can claim the given item. An item can be claimed
+ * only if the show claim is enabled for it (see
+ * {@link org.dspace.app.rest.authorization.impl.ShowClaimItemFeature}).
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *

@@ -25,10 +25,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.common.io.CharStreams;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMXMLBuilderFactory;
-import org.apache.axiom.om.OMXMLParserWrapper;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -38,7 +34,13 @@ import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.FileSource;
 import org.dspace.importer.external.service.components.QuerySource;
-import org.jaxen.JaxenException;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 
 /**
  * Implements a data source for querying PubMed Central
@@ -46,7 +48,7 @@ import org.jaxen.JaxenException;
  * @author Roeland Dillen (roeland at atmire dot com)
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
-public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement>
+public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Element>
     implements QuerySource, FileSource {
 
     private String baseAddress;
@@ -59,7 +61,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
     /**
      * Set the file extensions supported by this metadata service
      * 
-     * @param supportedExtensionsthe file extensions (xml,txt,...) supported by this service
+     * @param supportedExtensions the file extensions (xml,txt,...) supported by this service
      */
     public void setSupportedExtensions(List<String> supportedExtensions) {
         this.supportedExtensions = supportedExtensions;
@@ -243,17 +245,21 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
 
     private String getSingleElementValue(String src, String elementName) {
-        OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(src));
-        OMElement element = records.getDocumentElement();
-        AXIOMXPath xpath = null;
         String value = null;
+
         try {
-            xpath = new AXIOMXPath("//" + elementName);
-            List<OMElement> recordsList = xpath.selectNodes(element);
-            if (!recordsList.isEmpty()) {
-                value = recordsList.get(0).getText();
+            SAXBuilder saxBuilder = new SAXBuilder();
+            Document document = saxBuilder.build(new StringReader(src));
+            Element root = document.getRootElement();
+
+            XPathExpression<Element> xpath =
+                XPathFactory.instance().compile("//" + elementName, Filters.element());
+
+            Element record = xpath.evaluateFirst(root);
+            if (record != null) {
+                value = record.getText();
             }
-        } catch (JaxenException e) {
+        } catch (JDOMException | IOException e) {
             value = null;
         }
         return value;
@@ -314,9 +320,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             invocationBuilder = getRecordsTarget.request(MediaType.TEXT_PLAIN_TYPE);
             response = invocationBuilder.get();
 
-            List<OMElement> omElements = splitToRecords(response.readEntity(String.class));
+            List<Element> elements = splitToRecords(response.readEntity(String.class));
 
-            for (OMElement record : omElements) {
+            for (Element record : elements) {
                 records.add(transformSourceRecords(record));
             }
 
@@ -324,15 +330,18 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         }
     }
 
-    private List<OMElement> splitToRecords(String recordsSrc) {
-        OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(recordsSrc));
-        OMElement element = records.getDocumentElement();
-        AXIOMXPath xpath = null;
+    private List<Element> splitToRecords(String recordsSrc) {
         try {
-            xpath = new AXIOMXPath("//PubmedArticle");
-            List<OMElement> recordsList = xpath.selectNodes(element);
+            SAXBuilder saxBuilder = new SAXBuilder();
+            Document document = saxBuilder.build(new StringReader(recordsSrc));
+            Element root = document.getRootElement();
+
+            XPathExpression<Element> xpath =
+                XPathFactory.instance().compile("//PubmedArticle", Filters.element());
+
+            List<Element> recordsList = xpath.evaluate(root);
             return recordsList;
-        } catch (JaxenException e) {
+        } catch (JDOMException | IOException e) {
             return null;
         }
     }
@@ -362,13 +371,13 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
             Response response = invocationBuilder.get();
 
-            List<OMElement> omElements = splitToRecords(response.readEntity(String.class));
+            List<Element> elements = splitToRecords(response.readEntity(String.class));
 
-            if (omElements.size() == 0) {
+            if (elements.isEmpty()) {
                 return null;
             }
 
-            return transformSourceRecords(omElements.get(0));
+            return transformSourceRecords(elements.get(0));
         }
     }
 
@@ -441,8 +450,8 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private List<ImportRecord> parseXMLString(String xml) {
         List<ImportRecord> records = new LinkedList<ImportRecord>();
-        List<OMElement> omElements = splitToRecords(xml);
-        for (OMElement record : omElements) {
+        List<Element> elements = splitToRecords(xml);
+        for (Element record : elements) {
             records.add(transformSourceRecords(record));
         }
         return records;

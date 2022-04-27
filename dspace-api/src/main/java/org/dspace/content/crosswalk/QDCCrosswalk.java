@@ -36,10 +36,10 @@ import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.input.SAXBuilder;
 
 /**
  * Configurable QDC Crosswalk
@@ -290,7 +290,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
                 qdc2element.put(qdc, element);
                 element2qdc.put(makeQualifiedTagName(element), qdc);
                 log.debug("Building Maps: qdc=\"" + qdc + "\", element=\"" + element.toString() + "\"");
-            } catch (org.jdom.JDOMException je) {
+            } catch (org.jdom2.JDOMException je) {
                 throw new CrosswalkInternalException(
                     "Failed parsing XML fragment in properties file: \"" + prolog + val + postlog + "\": " + je
                         .toString(), je);
@@ -326,6 +326,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
      * @throws IOException        if IO error
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
+     * @return List of Elements
      */
     @Override
     public List<Element> disseminateList(Context context, DSpaceObject dso)

@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
@@ -21,7 +20,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,15 +43,11 @@ public class ShowClaimItemFeature implements AuthorizationFeature {
 
     private final ItemService itemService;
     private final ResearcherProfileService researcherProfileService;
-    private final ConfigurationService configurationService;
 
     @Autowired
-    public ShowClaimItemFeature(ItemService itemService,
-                            ResearcherProfileService researcherProfileService,
-                            ConfigurationService configurationService) {
+    public ShowClaimItemFeature(ItemService itemService, ResearcherProfileService researcherProfileService) {
         this.itemService = itemService;
         this.researcherProfileService = researcherProfileService;
-        this.configurationService = configurationService;
     }
 
     @Override
@@ -67,23 +61,16 @@ public class ShowClaimItemFeature implements AuthorizationFeature {
         String id = ((ItemRest) object).getId();
         Item item = itemService.find(context, UUID.fromString(id));
 
-        return claimableEntityType(item) && hasNotAlreadyAProfile(context);
+        return researcherProfileService.hasProfileType(item) && hasNotAlreadyAProfile(context);
     }
 
     private boolean hasNotAlreadyAProfile(Context context) {
         try {
             return researcherProfileService.findById(context, context.getCurrentUser().getID()) == null;
         } catch (SQLException | AuthorizeException e) {
-            LOG.warn("Error while checking if eperson has a ResearcherProfileAssociated: {}",
-                     e.getMessage(), e);
+            LOG.warn("Error while checking if eperson has a ResearcherProfileAssociated: {}", e.getMessage(), e);
             return false;
         }
-    }
-
-    private boolean claimableEntityType(Item item) {
-        String[] claimableEntityTypes = configurationService.getArrayProperty("claimable.entityType");
-        String entityType = itemService.getEntityType(item);
-        return ArrayUtils.contains(claimableEntityTypes, entityType);
     }
 
     @Override

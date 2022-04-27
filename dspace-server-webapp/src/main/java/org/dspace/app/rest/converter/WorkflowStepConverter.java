@@ -14,6 +14,7 @@ import org.dspace.app.rest.model.WorkflowStepRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.xmlworkflow.state.Step;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,6 +25,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkflowStepConverter implements DSpaceConverter<Step, WorkflowStepRest> {
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
     @Autowired
     ConverterService converter;
 

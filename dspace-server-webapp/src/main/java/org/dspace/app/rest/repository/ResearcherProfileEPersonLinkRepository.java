@@ -52,7 +52,7 @@ public class ResearcherProfileEPersonLinkRepository extends AbstractDSpaceRestRe
      * @param projection the projection object
      * @return the ePerson rest representation
      */
-    @PreAuthorize("hasPermission(#id, 'PROFILE', 'READ')")
+    @PreAuthorize("hasPermission(#id, 'EPERSON', 'READ')")
     public EPersonRest getEPerson(@Nullable HttpServletRequest request, UUID id,
         @Nullable Pageable pageable, Projection projection) {
 

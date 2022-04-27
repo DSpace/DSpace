@@ -24,7 +24,6 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +37,6 @@ public class CanClaimItemFeatureIT extends AbstractControllerIntegrationTest {
 
     private Item collectionAProfile;
     private Item collectionBProfile;
-
-    @Autowired
-    private ConfigurationService configurationService;
 
     @Autowired
     private ItemConverter itemConverter;
@@ -72,8 +68,6 @@ public class CanClaimItemFeatureIT extends AbstractControllerIntegrationTest {
 
         collectionAProfile = ItemBuilder.createItem(context, personCollection).build();
         collectionBProfile = ItemBuilder.createItem(context, claimableCollectionB).build();
-
-        configurationService.addPropertyValue("claimable.entityType", "Person");
 
         context.restoreAuthSystemState();
 
@@ -171,22 +165,6 @@ public class CanClaimItemFeatureIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded").doesNotExist())
             .andExpect(jsonPath("$.page.totalElements", equalTo(0)));
-    }
-
-    @Test
-    public void testWithoutClaimableEntities() throws Exception {
-
-        configurationService.setProperty("claimable.entityType", null);
-
-        getClient(getAuthToken(context.getCurrentUser().getEmail(), password))
-            .perform(get("/api/authz/authorizations/search/object")
-                .param("uri", uri(collectionAProfile))
-                .param("eperson", context.getCurrentUser().getID().toString())
-                .param("feature", canClaimProfileFeature.getName()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded").doesNotExist())
-            .andExpect(jsonPath("$.page.totalElements", equalTo(0)));
-
     }
 
     private String uri(Item item) {

@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -20,11 +21,14 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.util.UUIDUtils;
 
 /**
+ * Implementation of {@link ChoiceAuthority} based on EPerson. Allows you to set
+ * the id of an eperson as authority.
  *
  * @author Mykhaylo Boychuk (4science.it)
  */
 public class EPersonAuthority implements ChoiceAuthority {
-    private static final Logger log = Logger.getLogger(EPersonAuthority.class);
+
+    private static final Logger log = LogManager.getLogger(EPersonAuthority.class);
 
     /**
      * the name assigned to the specific instance by the PluginService, @see
