@@ -48,6 +48,7 @@ import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.matcher.AuthenticationStatusMatcher;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.matcher.EPersonMatcher;
+import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.projection.DefaultProjection;
@@ -158,6 +159,39 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         // Logout
         getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
+    }
+    
+    @Test
+    public void testStatusRetrieveSpecialGroups() throws Exception {
+    	
+    	context.turnOffAuthorisationSystem();
+    	Group specialGroup = GroupBuilder.createGroup(context)
+                 .withName("specialGroup")
+                 .build();
+    	configurationService.setProperty("authentication-password.login.specialgroup","specialGroup");
+    	context.restoreAuthSystemState();
+    	
+    	String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/authn/status").param("projection", "full"))
+        
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+        .andExpect(content().contentType(contentType))
+        .andExpect(jsonPath("$.okay", is(true)))
+        .andExpect(jsonPath("$.authenticated", is(true)))
+        .andExpect(jsonPath("$.authenticationMethod", is("password")))
+        .andExpect(jsonPath("$.type", is("status")))
+
+        .andExpect(jsonPath("$._links.specialGroups.href", startsWith(REST_SERVER_URL)))
+        .andExpect(jsonPath("$._embedded.specialGroups",
+        		Matchers.containsInAnyOrder(GroupMatcher.matchGroupWithName("specialGroup"))));
+
+        getClient(token).perform(get("/api/authn/status"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
+
     }
 
     @Test

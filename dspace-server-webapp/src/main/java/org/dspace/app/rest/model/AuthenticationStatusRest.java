@@ -7,8 +7,12 @@
  */
 package org.dspace.app.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.List;
+
 import org.dspace.app.rest.RestResourceController;
+import org.springframework.data.domain.Page;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Find out your authentication status.
@@ -17,6 +21,9 @@ public class AuthenticationStatusRest extends BaseObjectRest<Integer> {
     private boolean okay;
     private boolean authenticated;
     private String authenticationMethod;
+    
+    private EPersonRest ePersonRest;
+    private List<GroupRest> specialGroups;
 
     public static final String NAME = "status";
     public static final String CATEGORY = RestAddressableModel.AUTHENTICATION;
@@ -37,12 +44,19 @@ public class AuthenticationStatusRest extends BaseObjectRest<Integer> {
         return getType();
     }
 
+    @LinkRest(name="specialGroups")
+    @JsonIgnore
+    public List<GroupRest> getSpecialGroups() {
+    	return specialGroups;
+    }
+    
+    public void setSpecialGroups(List<GroupRest> specialGroups) {
+    	this.specialGroups = specialGroups;
+    }
+    
     public Class getController() {
         return RestResourceController.class;
     }
-
-
-    private EPersonRest ePersonRest;
 
     public AuthenticationStatusRest() {
         setOkay(true);
