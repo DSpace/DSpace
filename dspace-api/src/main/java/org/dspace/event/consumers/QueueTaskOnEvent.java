@@ -10,7 +10,8 @@ package org.dspace.event.consumers;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.curate.QueueManager;
@@ -28,7 +29,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public abstract class QueueTaskOnEvent implements Consumer {
 
     ConfigurationService configurationService;
-    private static final Logger log = Logger.getLogger(QueueTaskOnEvent.class);
+    private static final Logger log = LogManager.getLogger(QueueTaskOnEvent.class);
 
     private QueueManager queueManager;
 

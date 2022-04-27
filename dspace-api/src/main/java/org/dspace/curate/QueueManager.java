@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
@@ -25,7 +26,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @author Kim Shepherd kim@shepherd.nz update and refactor for DSpace 6.x generic usage
  */
 public class QueueManager {
-    private static final Logger log = Logger.getLogger(QueueManager.class);
+    private static final Logger log = LogManager.getLogger(QueueManager.class);
     private static final ConfigurationService configurationService =
             DSpaceServicesFactory.getInstance().getConfigurationService();
 

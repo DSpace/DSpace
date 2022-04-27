@@ -11,7 +11,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -37,7 +38,7 @@ import org.dspace.event.Event;
  */
 public class QueueTaskOnBitstreamChange extends QueueTaskOnEvent {
 
-    private static final Logger log = Logger.getLogger(QueueTaskOnBitstreamChange.class);
+    private static final Logger log = LogManager.getLogger(QueueTaskOnBitstreamChange.class);
 
     /**
      * Return the current object if it is already an item, or the owning item of the current subject.
