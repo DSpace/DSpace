@@ -42,9 +42,9 @@ public class QueueManager {
         String queueConfig = configurationService.getProperty(queueProperty);
         if (queueConfig != null && !"".equals(queueConfig)) {
             queueName = queueConfig;
-            log.info("Using queue name " + queueName);
+            log.debug("Using queue name " + queueName);
         } else {
-            log.info("No queue name specified, using default: " + queueName);
+            log.debug("No queue name specified, using default: " + queueName);
         }
     }
 
@@ -55,7 +55,7 @@ public class QueueManager {
     public void initTaskNames(String tasksProperty) {
         String[] taskConfig = configurationService.getArrayProperty(tasksProperty, new String[]{});
         taskNames.addAll(Arrays.asList(taskConfig));
-        log.info("Setting up tasks as " + Arrays.deepToString(taskNames.toArray()));
+        log.debug("Setting up tasks as " + Arrays.deepToString(taskNames.toArray()));
     }
 
     /**
@@ -67,7 +67,7 @@ public class QueueManager {
             toQueue = new ArrayList<Item>();
         }
         toQueue.add(item);
-        log.info("Adding item " + item.getHandle() + " to list of items to queue");
+        log.debug("Adding item " + item.getHandle() + " to list of items to queue");
     }
 
     /**
@@ -78,7 +78,7 @@ public class QueueManager {
      */
     public void queueForCuration(Context ctx) throws IOException {
         if (toQueue != null && !toQueue.isEmpty()) {
-            log.info("Actually queueing " + toQueue.size() + " items for curation");
+            log.debug("Actually queueing " + toQueue.size() + " items for curation");
             for (String taskName : taskNames) {
                 Curator curator = new Curator().addTask(taskName);
                 for (Item item : toQueue) {
