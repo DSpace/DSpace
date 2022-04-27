@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
 import org.dspace.app.rest.submit.SubmissionService;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
@@ -25,7 +26,6 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -84,10 +84,8 @@ public class MetadataValidation extends AbstractValidation {
                         List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fullFieldname);
                         // If the input is not allowed for this type, strip it from item metadata.
                         if (!input.isAllowedFor(documentTypeValue)) {
-                            // We temporarily need a context for this specific operation
-                            Context context = new Context();
-                            itemService.removeMetadataValues(context, obj.getItem(), mdv);
-                            context.complete();
+                            itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
+                                    obj.getItem(), mdv);
                         } else {
                             validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
                             if (mdv.size() > 0 && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
@@ -112,10 +110,7 @@ public class MetadataValidation extends AbstractValidation {
                 for (String fieldName : fieldsName) {
                     List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fieldName);
                     if (!input.isAllowedFor(documentTypeValue)) {
-                        // We temporarily need a context for this specific operation
-                        Context context = new Context();
-                        itemService.removeMetadataValues(context, obj.getItem(), mdv);
-                        context.complete();
+                        itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(), obj.getItem(), mdv);
                         // Continue here, this skips the required check since we've just removed values that previously
                         // appeared, and the configuration already indicates this field shouldn't be included
                         continue;
