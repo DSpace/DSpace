@@ -440,28 +440,43 @@ public class RelationshipServiceImpl implements RelationshipService {
         int newPlace = getPlace(relationship, isLeft);
 
         for (Relationship sibling : relationships) {
-            int siblingPlace = getPlace(sibling, isLeft);
-            if (
-                (deleted && siblingPlace > newPlace)
-                // If the relationship was deleted, all relationships after it should shift left
-                // We must make the distinction between deletes and moves because for inserts oldPlace == newPlace
-                    || (movedUp && siblingPlace <= newPlace && siblingPlace > oldPlace)
-                        // If the relationship was moved up e.g. from place 2 to 5, all relationships
-                        // with place > 2 (the old place) and <= to 5 should shift left
-            ) {
-                setPlace(sibling, isLeft, siblingPlace - 1);
-            } else if (
-                (inserted && siblingPlace >= newPlace)
-                // If the relationship was inserted, all relationships starting from that place should shift right
-                // We must make the distinction between inserts and moves because for inserts oldPlace == newPlace
-                    || (!movedUp && siblingPlace >= newPlace && siblingPlace < oldPlace)
-                        // If the relationship was moved down e.g. from place 5 to 2, all relationships
-                        // with place >= 2 and < 5 (the old place) should shift right
-            ) {
-                setPlace(sibling, isLeft, siblingPlace + 1);
+            // NOTE: If and only if the other side of the relationship has "latest" status, the relationship will appear
+            //       as a metadata value on the item at the current side (indicated by isLeft) of the relationship.
+            //
+            //       Example: volume <----> issue (LEFT_ONLY)
+            //       => LEFT_ONLY means that the volume has "latest" status, but the issue does NOT have "latest" status
+            //       => the volume will appear in the metadata of the issue,
+            //          but the issue will NOT appear in the metadata of the volume
+            //
+            //       This means that the other side of the relationship has to have "latest" status, otherwise this
+            //       relationship is NOT relevant for place calculation.
+            if (relationshipVersioningUtils.otherSideIsLatest(isLeft, sibling.getLatestVersionStatus())) {
+                int siblingPlace = getPlace(sibling, isLeft);
+                if (
+                    (deleted && siblingPlace > newPlace)
+                    // If the relationship was deleted, all relationships after it should shift left
+                    // We must make the distinction between deletes and moves because for inserts oldPlace == newPlace
+                        || (movedUp && siblingPlace <= newPlace && siblingPlace > oldPlace)
+                            // If the relationship was moved up e.g. from place 2 to 5, all relationships
+                            // with place > 2 (the old place) and <= to 5 should shift left
+                ) {
+                    setPlace(sibling, isLeft, siblingPlace - 1);
+                } else if (
+                    (inserted && siblingPlace >= newPlace)
+                    // If the relationship was inserted, all relationships starting from that place should shift right
+                    // We must make the distinction between inserts and moves because for inserts oldPlace == newPlace
+                        || (!movedUp && siblingPlace >= newPlace && siblingPlace < oldPlace)
+                            // If the relationship was moved down e.g. from place 5 to 2, all relationships
+                            // with place >= 2 and < 5 (the old place) should shift right
+                ) {
+                    setPlace(sibling, isLeft, siblingPlace + 1);
+                }
             }
         }
         for (MetadataValue mdv : metadata) {
+            // NOTE: Plain text metadata values should ALWAYS be included in the place calculation,
+            //       because they are by definition only visible/relevant to the side of the relationship
+            //       that we are currently processing.
             int mdvPlace = mdv.getPlace();
             if (
                 (deleted && mdvPlace > newPlace)

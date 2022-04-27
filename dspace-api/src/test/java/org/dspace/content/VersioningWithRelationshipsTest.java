@@ -2069,7 +2069,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         Item v1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("journal volume 1")
             .withMetadata("dspace", "entity", "type", journalVolumeEntityType.getLabel())
-            .withMetadata("publicationvolume", "volumeNumber", null, "volume nr 3 (rel)")
+            .withMetadata("publicationvolume", "volumeNumber", null, "volume nr 1 (rel)")
             .build();
 
         // journal issue 1.1
@@ -2161,7 +2161,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals(4, mdvs1.get(4).getPlace());
 
         /////////////////////////////////////
-        // create new version - volume 3.2 //
+        // create new version - volume 1.2 //
         /////////////////////////////////////
 
         Item v1_2 = versioningService.createNewVersion(context, v1_1).getItem();
@@ -2217,7 +2217,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals(4, mdvs4.get(4).getPlace());
 
         ////////////////////////////////////////////////
-        // after version creation - verify volume 3.2 //
+        // after version creation - verify volume 1.2 //
         ////////////////////////////////////////////////
 
         assertThat(
@@ -2356,13 +2356,8 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("issue nr 5 (rel)", mdvs12.get(3).getValue());
         assertEquals(3, mdvs12.get(3).getPlace());
 
-
-        ///////////////////////////////////////////////
-        // add relationship - volume 3.2 & issue 3.2 //
-        ///////////////////////////////////////////////
-
         ////////////////////////////////////
-        // create new version - issue 3.2 //
+        // create new version - issue 3.3 //
         ////////////////////////////////////
 
         // journal issue 3.3
@@ -2372,15 +2367,18 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
                 .withMetadata("publicationissue", "issueNumber", null, "issue nr 3 (rel)")
                 .build();
 
-        // relationship - volume 1 & issue 3
+        ///////////////////////////////////////////////
+        // add relationship - volume 1.2 & issue 3.3 //
+        ///////////////////////////////////////////////
+
         RelationshipBuilder.createRelationshipBuilder(context, v1_2, i3_3, isIssueOfJournalVolume, 2, -1)
                 .build();
 
         context.commit();
 
-        ////////////////////////////////////
-        // after remove 1 - cache busting //
-        ////////////////////////////////////
+        ////////////////////////////////////////////
+        // after add relationship - cache busting //
+        ////////////////////////////////////////////
 
         v1_2.setMetadataModified();
         v1_2 = context.reloadEntity(v1_2);
@@ -2389,7 +2387,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         i3_3 = context.reloadEntity(i3_3);
 
         ////////////////////////////////////////////////
-        // after add relationship - verify volume 3.1 //
+        // after add relationship - verify volume 1.1 //
         ////////////////////////////////////////////////
 
         assertThat(
@@ -2428,17 +2426,16 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("issue nr 5 (rel)", mdvs14.get(4).getValue());
         assertEquals(4, mdvs14.get(4).getPlace());
 
-        ////////////////////////////////////////
-        // after add relationship - verify volume 3.2 //
-        ////////////////////////////////////////
+        ////////////////////////////////////////////////
+        // after add relationship - verify volume 1.2 //
+        ////////////////////////////////////////////////
 
         assertThat(
             relationshipService.findByItem(context, v1_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(v1_2, isIssueOfJournalVolume, i1_1, BOTH, 0, 0),
                 isRel(v1_2, isIssueOfJournalVolume, i2_1, BOTH, 1, 0),
-                isRel(v1_2, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 2, 0), //TODO: this test is broken
-                    //It uses leftPlace 3, which implies it has been moved while that shouldn't happen
+                isRel(v1_2, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 2, 0),
                 isRel(v1_2, isIssueOfJournalVolume, i3_3, BOTH, 2, 0),
                 isRel(v1_2, isIssueOfJournalVolume, i4_1, BOTH, 3, 0),
                 isRel(v1_2, isIssueOfJournalVolume, i5_1, BOTH, 4, 0)
@@ -2475,17 +2472,12 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("issue nr 5 (rel)", mdvs17.get(4).getValue());
         assertEquals(4, mdvs17.get(4).getPlace());
 
-        // TODO
-        // delete mdv from older
-        // delete rel from older
-
         /////////////////////////////////////////////
         // delete volume first for min cardinality //
         /////////////////////////////////////////////
 
         itemService.delete(context, context.reloadEntity(v1_1));
         itemService.delete(context, context.reloadEntity(v1_2));
-
     }
 
     /**
