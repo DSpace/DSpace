@@ -43,8 +43,8 @@ public abstract class QueueTaskOnEvent implements Consumer {
         queueManager = new QueueManager();
         queueManager.initTaskNames(getTasksProperty());
         if (!queueManager.hasTaskNames()) {
-            log.error("QueueTaskOnEvent: no configuration value found for tasks to queue ("
-                    + getTasksProperty() + "), can't initialise.");
+            log.error("QueueTaskOnEvent: no configuration value found for tasks to queue ({}), can't initialise.",
+                    getTasksProperty());
             return;
         }
 

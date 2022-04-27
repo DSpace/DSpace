@@ -42,9 +42,9 @@ public class QueueManager {
         String queueConfig = configurationService.getProperty(queueProperty);
         if (queueConfig != null && !"".equals(queueConfig)) {
             queueName = queueConfig;
-            log.debug("Using queue name " + queueName);
+            log.debug("Using queue name {}", queueName);
         } else {
-            log.debug("No queue name specified, using default: " + queueName);
+            log.debug("No queue name specified, using default: {}", queueName);
         }
     }
 
@@ -55,7 +55,7 @@ public class QueueManager {
     public void initTaskNames(String tasksProperty) {
         String[] taskConfig = configurationService.getArrayProperty(tasksProperty, new String[]{});
         taskNames.addAll(Arrays.asList(taskConfig));
-        log.debug("Setting up tasks as " + Arrays.deepToString(taskNames.toArray()));
+        log.debug("Setting up tasks as {}", Arrays.deepToString(taskNames.toArray()));
     }
 
     /**
@@ -67,7 +67,7 @@ public class QueueManager {
             toQueue = new ArrayList<Item>();
         }
         toQueue.add(item);
-        log.debug("Adding item " + item.getHandle() + " to list of items to queue");
+        log.debug("Adding item {} to list of items to queue", item.getHandle());
     }
 
     /**
@@ -78,7 +78,7 @@ public class QueueManager {
      */
     public void queueForCuration(Context ctx) throws IOException {
         if (toQueue != null && !toQueue.isEmpty()) {
-            log.debug("Actually queueing " + toQueue.size() + " items for curation");
+            log.debug("Actually queueing {} items for curation", toQueue.size());
             for (String taskName : taskNames) {
                 Curator curator = new Curator().addTask(taskName);
                 for (Item item : toQueue) {
@@ -88,8 +88,7 @@ public class QueueManager {
                     } else {
                         identifier = item.getID() + "";
                     }
-                    log.info("Queued item " + identifier + " for curation in queue "
-                            + queueName + ", task " + taskName);
+                    log.info("Queued item {} for curation in queue {}, task {}", identifier, queueName, taskName);
                     curator.queue(ctx, identifier, queueName);
                 }
             }
