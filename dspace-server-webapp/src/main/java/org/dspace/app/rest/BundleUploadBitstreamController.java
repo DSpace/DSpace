@@ -59,7 +59,7 @@ import org.springframework.web.multipart.MultipartFile;
  * </pre>
  */
 @RestController
-@RequestMapping("/api/" + BundleRest.CATEGORY + "/" + BundleRest.PLURAL_NAME + "/"
+@RequestMapping("/api/" + BundleRest.CATEGORY + "/" + BundleRest.PLURAL_NAME
         + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/" + BitstreamRest.PLURAL_NAME)
 public class BundleUploadBitstreamController {
 

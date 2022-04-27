@@ -7,8 +7,10 @@
  */
 package org.dspace.importer.external.arxiv.service;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -20,10 +22,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMXMLBuilderFactory;
-import org.apache.axiom.om.OMXMLParserWrapper;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
@@ -31,7 +29,14 @@ import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
-import org.jaxen.JaxenException;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 
 /**
  * Implements a data source for querying ArXiv
@@ -39,7 +44,7 @@ import org.jaxen.JaxenException;
  * @author Pasquale Cavallo (pasquale.cavallo at 4Science dot it)
  *
  */
-public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement>
+public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Element>
     implements QuerySource {
 
     private WebTarget webTarget;
@@ -213,15 +218,20 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             Response response = invocationBuilder.get();
             if (response.getStatus() == 200) {
                 String responseString = response.readEntity(String.class);
-                OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(responseString));
-                OMElement element = records.getDocumentElement();
-                AXIOMXPath xpath = null;
+
+                SAXBuilder saxBuilder = new SAXBuilder();
+                Document document = saxBuilder.build(new StringReader(responseString));
+                Element root = document.getRootElement();
+
+                List namespaces = Arrays.asList(Namespace.getNamespace("opensearch",
+                                                      "http://a9.com/-/spec/opensearch/1.1/"));
+                XPathExpression<Element> xpath =
+                    XPathFactory.instance().compile("opensearch:totalResults", Filters.element(), null, namespaces);
+
+                Element count = xpath.evaluateFirst(root);
                 try {
-                    xpath = new AXIOMXPath("opensearch:totalResults");
-                    xpath.addNamespace("opensearch", "http://a9.com/-/spec/opensearch/1.1/");
-                    OMElement count = (OMElement) xpath.selectSingleNode(element);
                     return Integer.parseInt(count.getText());
-                } catch (JaxenException e) {
+                } catch (NumberFormatException e) {
                     return null;
                 }
             } else {
@@ -274,8 +284,8 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             Response response = invocationBuilder.get();
             if (response.getStatus() == 200) {
                 String responseString = response.readEntity(String.class);
-                List<OMElement> omElements = splitToRecords(responseString);
-                for (OMElement record : omElements) {
+                List<Element> elements = splitToRecords(responseString);
+                for (Element record : elements) {
                     results.add(transformSourceRecords(record));
                 }
                 return results;
@@ -321,8 +331,8 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             Response response = invocationBuilder.get();
             if (response.getStatus() == 200) {
                 String responseString = response.readEntity(String.class);
-                List<OMElement> omElements = splitToRecords(responseString);
-                for (OMElement record : omElements) {
+                List<Element> elements = splitToRecords(responseString);
+                for (Element record : elements) {
                     results.add(transformSourceRecords(record));
                 }
                 return results;
@@ -359,8 +369,8 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             Response response = invocationBuilder.get();
             if (response.getStatus() == 200) {
                 String responseString = response.readEntity(String.class);
-                List<OMElement> omElements = splitToRecords(responseString);
-                for (OMElement record : omElements) {
+                List<Element> elements = splitToRecords(responseString);
+                for (Element record : elements) {
                     results.add(transformSourceRecords(record));
                 }
                 return results;
@@ -387,16 +397,21 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
         }
     }
 
-    private List<OMElement> splitToRecords(String recordsSrc) {
-        OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(recordsSrc));
-        OMElement element = records.getDocumentElement();
-        AXIOMXPath xpath = null;
+    private List<Element> splitToRecords(String recordsSrc) {
+
         try {
-            xpath = new AXIOMXPath("ns:entry");
-            xpath.addNamespace("ns", "http://www.w3.org/2005/Atom");
-            List<OMElement> recordsList = xpath.selectNodes(element);
+            SAXBuilder saxBuilder = new SAXBuilder();
+            Document document = saxBuilder.build(new StringReader(recordsSrc));
+            Element root = document.getRootElement();
+
+            List namespaces = Arrays.asList(Namespace.getNamespace("ns",
+                                                                   "http://www.w3.org/2005/Atom"));
+            XPathExpression<Element> xpath =
+                XPathFactory.instance().compile("ns:entry", Filters.element(), null, namespaces);
+
+            List<Element> recordsList = xpath.evaluate(root);
             return recordsList;
-        } catch (JaxenException e) {
+        } catch (JDOMException | IOException e) {
             return null;
         }
     }

@@ -404,6 +404,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                           .withIssueDate("2021-04-27")
                           .withAuthor("Doe, John")
                           .withSubject("ExtraEntry")
+                          .grantLicense()
                           .build();
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();
@@ -471,6 +472,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withIssueDate("2021-03-20")
                                .withAuthor("Doe, John")
                                .withSubject("ExtraEntry")
+                               .grantLicense()
                                .build();
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();
@@ -1418,6 +1420,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withIssueDate("2021-03-20")
                                .withAuthor("Doe, John")
                                .withSubject("ExtraEntry")
+                               .grantLicense()
                                .build();
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();
@@ -1488,6 +1491,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withIssueDate("2021-03-20")
                                .withAuthor("Doe, John")
                                .withSubject("ExtraEntry")
+                               .grantLicense()
                                .build();
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();

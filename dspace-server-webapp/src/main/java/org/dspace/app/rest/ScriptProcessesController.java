@@ -55,13 +55,15 @@ public class ScriptProcessesController {
      * This method can be called by sending a POST request to the system/scripts/{name}/processes endpoint
      * This will start a process for the script that matches the given name
      * @param scriptName    The name of the script that we want to start a process for
+     * @param files         (Optional) any files that need to be passed to the script for it to run
      * @return              The ProcessResource object for the created process
      * @throws Exception    If something goes wrong
      */
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<RepresentationModel<?>> startProcess(@PathVariable(name = "name") String scriptName,
-                                                        @RequestParam(name = "file") List<MultipartFile> files)
+    public ResponseEntity<RepresentationModel<?>> startProcess(
+        @PathVariable(name = "name") String scriptName,
+        @RequestParam(name = "file", required = false) List<MultipartFile> files)
         throws Exception {
         if (log.isTraceEnabled()) {
             log.trace("Starting Process for Script with name: " + scriptName);

@@ -18,6 +18,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Collection;
 import org.dspace.harvest.HarvestedCollection;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,6 +29,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class HarvestedCollectionConverter implements DSpaceConverter<HarvestedCollection, HarvestedCollectionRest> {
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
     @Autowired
     private ConverterService converter;
 
