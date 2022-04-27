@@ -1967,7 +1967,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        // Try to add isPartOfSeries (type bound to technical report) - this should fail
+        // Try to add isPartOfSeries (type bound to technical report) - this should not work and instead we'll get
+        // no JSON path for that field
         List<Operation> updateSeries = new ArrayList<Operation>();
         List<Map<String, String>> seriesValues = new ArrayList<>();
         Map<String, String> value = new HashMap<String, String>();
@@ -1994,7 +1995,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         // Check this - we should match an item with no series or type
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, null, null))));
 
-        // Set the type to Technical Report and try again
+        // Set the type to Technical Report confirm it worked
         List<Operation> updateType = new ArrayList<>();
         List<Map<String, String>> typeValues = new ArrayList<>();
         value = new HashMap<String, String>();
@@ -2011,14 +2012,36 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(jsonPath("$",
                         // Check this - we should now match an item with the expected type and series
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, "Technical Report",
-                                "New Series"))));
+                                null))));
 
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, "Technical Report",
-                                "New Series"))));
+                                null))));
+
+        // Another test, this time adding the series value should be successful and we'll see the value
+        patchBody = getPatchContent(updateSeries);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        // Check this - we should match an item with no series or type
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem,
+                                "Technical Report", "New Series"))));
+
+        // Verify that the metadata isn't in the workspace item
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        // Check this - we should match an item with no series or type
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem,
+                                "Technical Report", "New Series"))));
 
         // One final update, to a different type, this should lose the series as we're back to a non-matching type
         updateType = new ArrayList<>();
