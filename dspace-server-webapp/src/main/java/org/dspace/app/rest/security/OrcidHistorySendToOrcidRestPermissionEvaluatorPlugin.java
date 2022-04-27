@@ -59,7 +59,7 @@ public class OrcidHistorySendToOrcidRestPermissionEvaluatorPlugin extends RestOb
 
         EPerson currentUser = context.getCurrentUser();
         String url = targetId.toString();
-        Pattern pattern = Pattern.compile("\\[.*\\/api\\/cris\\/orcidqueues\\/(.*)\\]");
+        Pattern pattern = Pattern.compile("\\[.*\\/api\\/eperson\\/orcidqueues\\/(.*)\\]");
         Matcher matcher = pattern.matcher(url);
 
         matcher.find();
@@ -84,7 +84,8 @@ public class OrcidHistorySendToOrcidRestPermissionEvaluatorPlugin extends RestOb
 
     private boolean hasAccess(Context context, EPerson currentUser, OrcidQueue orcidQueue) {
         if (orcidQueue != null) {
-            List<MetadataValue> value = itemService.getMetadata(orcidQueue.getOwner(), "cris", "owner", null, null);
+            List<MetadataValue> value = itemService.getMetadata(orcidQueue.getOwner(),
+                "dspace", "object", "owner", null);
             if (value.get(0).getAuthority().equals(currentUser.getID().toString())) {
                 return true;
             }

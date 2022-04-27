@@ -11,7 +11,6 @@ import static org.apache.commons.lang.StringUtils.endsWith;
 import static org.dspace.app.matcher.LambdaMatcher.has;
 import static org.dspace.app.matcher.LambdaMatcher.matches;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
@@ -146,8 +145,6 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(work.getPublicationDate(), matches(date("2021", "04", "30")));
         assertThat(work.getShortDescription(), is("Publication description"));
         assertThat(work.getPutCode(), nullValue());
-        assertThat(work.getWorkCitation(), notNullValue());
-        assertThat(work.getWorkCitation().getCitation(), containsString("Test publication"));
         assertThat(work.getWorkType(), is(WorkType.BOOK));
         assertThat(work.getWorkTitle(), notNullValue());
         assertThat(work.getWorkTitle().getTitle(), notNullValue());
@@ -193,7 +190,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         Work work = (Work) activity;
 
         List<ExternalID> externalIds = work.getExternalIdentifiers().getExternalIdentifier();
-        assertThat(externalIds, hasSize(2));
+        assertThat(externalIds, hasSize(1));
         assertThat(externalIds, has(selfExternalId("handle", publication.getHandle())));
     }
 
@@ -271,7 +268,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         Work work = (Work) activity;
 
         List<ExternalID> externalIds = work.getExternalIdentifiers().getExternalIdentifier();
-        assertThat(externalIds, hasSize(2));
+        assertThat(externalIds, hasSize(1));
         assertThat(externalIds, has(selfExternalId("handle", publication.getHandle())));
     }
 
@@ -303,7 +300,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         Work work = (Work) activity;
 
         List<ExternalID> externalIds = work.getExternalIdentifiers().getExternalIdentifier();
-        assertThat(externalIds, hasSize(2));
+        assertThat(externalIds, hasSize(1));
         assertThat(externalIds, has(selfExternalId("handle", publication.getHandle())));
     }
 
@@ -336,7 +333,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         Work work = (Work) activity;
 
         List<ExternalID> externalIds = work.getExternalIdentifiers().getExternalIdentifier();
-        assertThat(externalIds, hasSize(2));
+        assertThat(externalIds, hasSize(1));
         assertThat(externalIds, has(selfExternalId("handle", publication.getHandle())));
     }
 
@@ -360,7 +357,6 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(work.getPublicationDate(), nullValue());
         assertThat(work.getShortDescription(), nullValue());
         assertThat(work.getPutCode(), nullValue());
-        assertThat(work.getWorkCitation(), notNullValue());
         assertThat(work.getWorkType(), is(WorkType.OTHER));
         assertThat(work.getWorkTitle(), nullValue());
         assertThat(work.getWorkContributors(), notNullValue());
@@ -504,13 +500,13 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
     private Predicate<Contributor> contributor(String name, ContributorRole role, SequenceType sequence) {
         return contributor -> contributor.getCreditName().getContent().equals(name)
-            && role.value().equals(contributor.getContributorAttributes().getContributorRole())
+            && role.equals(contributor.getContributorAttributes().getContributorRole())
             && contributor.getContributorAttributes().getContributorSequence() == sequence;
     }
 
     private Predicate<FundingContributor> fundingContributor(String name, FundingContributorRole role) {
         return contributor -> contributor.getCreditName().getContent().equals(name)
-            && role.value().equals(contributor.getContributorAttributes().getContributorRole());
+            && role.equals(contributor.getContributorAttributes().getContributorRole());
     }
 
     private Predicate<FundingContributor> fundingContributor(String name, FundingContributorRole role, String email) {

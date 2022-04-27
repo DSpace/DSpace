@@ -90,7 +90,7 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
             .build();
         context.restoreAuthSystemState();
 
-        List<MetadataValue> values = List.of(getMetadata(item, "crisrp.country", 0));
+        List<MetadataValue> values = List.of(getMetadata(item, "person.country", 0));
 
         Object orcidObject = profileSectionFactoryService.createOrcidObject(context, values, COUNTRY);
         assertThat(orcidObject, instanceOf(Address.class));
@@ -201,12 +201,12 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
             .build();
         context.restoreAuthSystemState();
 
-        List<MetadataValue> values = List.of(getMetadata(item, "crisrp.name.variant", 0));
+        List<MetadataValue> values = List.of(getMetadata(item, "person.name.variant", 0));
         Object orcidObject = profileSectionFactoryService.createOrcidObject(context, values, OTHER_NAMES);
         assertThat(orcidObject, instanceOf(OtherName.class));
         assertThat((OtherName) orcidObject, matches(hasValue("Variant name")));
 
-        values = List.of(getMetadata(item, "crisrp.name.translated", 0));
+        values = List.of(getMetadata(item, "person.name.translated", 0));
         orcidObject = profileSectionFactoryService.createOrcidObject(context, values, OTHER_NAMES);
         assertThat(orcidObject, instanceOf(OtherName.class));
         assertThat((OtherName) orcidObject, matches(hasValue("Vernacular name")));

@@ -92,7 +92,7 @@ public class OrcidQueueAndHistoryRestPermissionEvaluatorPlugin extends RestObjec
                 return true;
             }
 
-            return itemService.getMetadata(owner, "cris", "owner", null, Item.ANY).stream()
+            return itemService.getMetadata(owner, "dspace", "object", "owner", Item.ANY).stream()
                 .map(metadataValue -> metadataValue.getAuthority())
                 .anyMatch(authority -> currentUser.getID().toString().equals(authority));
 

@@ -18,7 +18,6 @@ import static org.dspace.app.profile.OrcidProfileSyncPreference.BIOGRAPHICAL;
 import static org.dspace.app.profile.OrcidProfileSyncPreference.IDENTIFIERS;
 import static org.dspace.builder.OrcidHistoryBuilder.createOrcidHistory;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
@@ -64,7 +63,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     @Before
     public void setup() {
 
-        context.setDispatcher("cris-default");
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -93,6 +91,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withTitle("Test User")
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
+            .withSubject("test")
             .withOrcidSynchronizationProfilePreference(BIOGRAPHICAL)
             .withOrcidSynchronizationProfilePreference(IDENTIFIERS)
             .build();
@@ -102,18 +101,18 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords.get(0), matches(profile, profile, "BIOGRAPHICAL", null,
-            containsString("4Science"), "Researcher at 4Science ( from 2021-01-01 to present )", INSERT));
+        assertThat(queueRecords.get(0),
+            matches(profile, profile, "KEYWORDS", null, "dc.subject::test", "test", INSERT));
 
-        addMetadata(profile, "crisrp", "education", null, "High School", null);
+        addMetadata(profile, "person", "name", "variant", "User Test", null);
         context.commit();
 
         queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(2));
-        assertThat(queueRecords, hasItem(matches(profile, profile, "AFFILIATION", null,
-            containsString("4Science"), "Researcher at 4Science ( from 2021-01-01 to present )", INSERT)));
-        assertThat(queueRecords, hasItem(matches(profile, profile, "EDUCATION", null,
-            containsString("High School"), "High School ( from unspecified to present )", INSERT)));
+        assertThat(queueRecords, hasItem(
+            matches(profile, profile, "KEYWORDS", null, "dc.subject::test", "test", INSERT)));
+        assertThat(queueRecords, hasItem(matches(profile, profile, "OTHER_NAMES",
+            null, "person.name.variant::User Test", "User Test", INSERT)));
     }
 
     @Test
@@ -129,7 +128,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
             .withRecordType("COUNTRY")
-            .withMetadata("crisrp.country::IT")
+            .withMetadata("person.country::IT")
             .withPutCode("123456")
             .withOperation(OrcidOperation.INSERT)
             .withTimestamp(Date.from(Instant.ofEpochMilli(100000)))
@@ -138,7 +137,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
             .withRecordType("COUNTRY")
-            .withMetadata("crisrp.country::IT")
+            .withMetadata("person.country::IT")
             .withPutCode("123456")
             .withOperation(OrcidOperation.DELETE)
             .withTimestamp(Date.from(Instant.ofEpochMilli(200000)))
@@ -150,12 +149,12 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         assertThat(orcidQueueService.findAll(context), empty());
 
-        addMetadata(profile, "crisrp", "country", null, "IT", null);
+        addMetadata(profile, "person", "country", null, "IT", null);
         context.commit();
 
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords.get(0), matches(profile, "COUNTRY", null, "crisrp.country::IT", "IT", INSERT));
+        assertThat(queueRecords.get(0), matches(profile, "COUNTRY", null, "person.country::IT", "IT", INSERT));
     }
 
     @Test
@@ -173,7 +172,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
             .withRecordType("COUNTRY")
-            .withMetadata("crisrp.country::IT")
+            .withMetadata("person.country::IT")
             .withPutCode("123456")
             .withOperation(OrcidOperation.INSERT)
             .withTimestamp(Date.from(Instant.ofEpochMilli(100000)))
@@ -182,7 +181,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
             .withRecordType("COUNTRY")
-            .withMetadata("crisrp.country::IT")
+            .withMetadata("person.country::IT")
             .withPutCode("123456")
             .withOperation(OrcidOperation.DELETE)
             .withTimestamp(Date.from(Instant.ofEpochMilli(200000)))
@@ -191,7 +190,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
             .withRecordType("COUNTRY")
-            .withMetadata("crisrp.country::IT")
+            .withMetadata("person.country::IT")
             .withPutCode("123456")
             .withOperation(OrcidOperation.INSERT)
             .withTimestamp(Date.from(Instant.ofEpochMilli(300000)))
@@ -203,7 +202,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         assertThat(orcidQueueService.findAll(context), empty());
 
-        addMetadata(profile, "crisrp", "country", null, "IT", null);
+        addMetadata(profile, "person", "country", null, "IT", null);
         context.commit();
 
         assertThat(orcidQueueService.findAll(context), empty());
@@ -225,7 +224,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
             .withRecordType("COUNTRY")
-            .withMetadata("crisrp.country::IT")
+            .withMetadata("person.country::IT")
             .withPutCode("123456")
             .withOperation(OrcidOperation.INSERT)
             .withTimestamp(Date.from(Instant.ofEpochMilli(100000)))
@@ -234,7 +233,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
             .withRecordType("COUNTRY")
-            .withMetadata("crisrp.country::IT")
+            .withMetadata("person.country::IT")
             .withPutCode("123456")
             .withOperation(OrcidOperation.DELETE)
             .withTimestamp(Date.from(Instant.ofEpochMilli(200000)))
@@ -246,43 +245,11 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         assertThat(orcidQueueService.findAll(context), empty());
 
-        addMetadata(profile, "crisrp", "country", null, "IT", null);
+        addMetadata(profile, "person", "country", null, "IT", null);
         context.commit();
 
         assertThat(orcidQueueService.findAll(context), empty());
 
-    }
-
-    @Test
-    public void testOrcidQueueRecordCreationForDeletionOfProfileMetadata() throws Exception {
-
-        context.turnOffAuthorisationSystem();
-
-        Item profile = ItemBuilder.createItem(context, profileCollection)
-            .withTitle("Test User")
-            .withOrcidIdentifier("0000-1111-2222-3333")
-            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
-            .withOrcidSynchronizationProfilePreference(BIOGRAPHICAL)
-            .build();
-
-        OrcidHistoryBuilder.createOrcidHistory(context, profile, profile)
-            .withMetadata("XX/YY/ZZ/AA")
-            .withRecordType("BIOGRAPHICAL")
-            .withOperation(OrcidOperation.INSERT)
-            .withDescription("4Science (2020, 2021)")
-            .withStatus(201)
-            .withPutCode("12345")
-            .build();
-
-        addMetadata(profile, "crisrp", "education", null, "High School", null);
-
-        context.restoreAuthSystemState();
-        context.commit();
-
-        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
-        assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords.get(0), matches(profile, "AFFILIATION", "12345", "XX/YY/ZZ/AA",
-            "4Science (2020, 2021)", DELETE));
     }
 
     @Test
@@ -510,7 +477,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         assertThat(orcidQueueService.findAll(context), empty());
 
-        addMetadata(profile, "cris", "orcid", "sync-publications", DISABLED.name(), null);
+        addMetadata(profile, "dspace", "orcid", "sync-publications", DISABLED.name(), null);
         addMetadata(publication, "dc", "date", "issued", "2021-01-01", null);
         context.commit();
 
@@ -539,7 +506,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withPutCode("123456")
             .build();
 
-        addMetadata(funding, "crisfund", "coinvestigators", null, "Test User", profile.getID().toString());
+        addMetadata(funding, "funding", "coinvestigators", null, "Test User", profile.getID().toString());
 
         context.restoreAuthSystemState();
         context.commit();
@@ -594,7 +561,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(records, hasItem(matches(profile, "KEYWORDS", null, "dc.subject::Math", "Math", INSERT)));
 
         addMetadata(profile, "person", "identifier", "rid", "ID", null);
-        addMetadata(profile, "cris", "orcid", "sync-profile", IDENTIFIERS.name(), null);
+        addMetadata(profile, "dspace", "orcid", "sync-profile", IDENTIFIERS.name(), null);
 
         context.commit();
 
@@ -603,7 +570,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(records, hasItem(matches(profile, "KEYWORDS", null, "dc.subject::Math", "Math", INSERT)));
         assertThat(records, hasItem(matches(profile, "EXTERNAL_IDS", null, "person.identifier.rid::ID", "ID", INSERT)));
 
-        removeMetadata(profile, "cris", "orcid", "sync-profile");
+        removeMetadata(profile, "dspace", "orcid", "sync-profile");
 
         context.commit();
 

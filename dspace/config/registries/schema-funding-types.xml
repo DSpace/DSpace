@@ -1,0 +1,28 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>Funding Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>funding</name>
+        <namespace>https://schema.org/Funding</namespace>
+    </dc-schema>
+    
+    <dc-type>
+        <schema>funding</schema>
+        <element>award</element>
+        <qualifier>url</qualifier>
+    </dc-type>
+    
+    <dc-type>
+        <schema>funding</schema>
+        <element>investigators</element>
+    </dc-type>
+    
+    <dc-type>
+        <schema>funding</schema>
+        <element>coinvestigators</element>
+    </dc-type>
+    
+</dspace-dc-types>

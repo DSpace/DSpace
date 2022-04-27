@@ -148,7 +148,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
     @Test
     public void findAllTest() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/cris/orcidhistories"))
+        getClient(authToken).perform(get("/api/eperson/orcidhistories"))
             .andExpect(status().isMethodNotAllowed());
     }
 
@@ -167,19 +167,19 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         String tokenResearcher = getAuthToken(researcher.getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
-        getClient(tokenResearcher).perform(get("/api/cris/orcidhistories/" + orcidHistory.getID().toString()))
+        getClient(tokenResearcher).perform(get("/api/eperson/orcidhistories/" + orcidHistory.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", is(OrcidHistoryMatcher.matchOrcidHistory(
                 orcidHistory, 201, "123456", "<xml><work>...</work>"))))
             .andExpect(jsonPath("$._links.self.href", Matchers
-                .containsString("/api/cris/orcidhistories/" + orcidHistory.getID())));
+                .containsString("/api/eperson/orcidhistories/" + orcidHistory.getID())));
 
-        getClient(tokenAdmin).perform(get("/api/cris/orcidhistories/" + orcidHistory.getID().toString()))
+        getClient(tokenAdmin).perform(get("/api/eperson/orcidhistories/" + orcidHistory.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", is(OrcidHistoryMatcher.matchOrcidHistory(
                 orcidHistory, 201, "123456", "<xml><work>...</work>"))))
             .andExpect(jsonPath("$._links.self.href", Matchers
-                .containsString("/api/cris/orcidhistories/" + orcidHistory.getID())));
+                .containsString("/api/eperson/orcidhistories/" + orcidHistory.getID())));
     }
 
     @Test
@@ -196,7 +196,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
 
-        getClient(tokenEperson).perform(get("/api/cris/orcidhistories/" + orcidHistory.getID().toString()))
+        getClient(tokenEperson).perform(get("/api/eperson/orcidhistories/" + orcidHistory.getID().toString()))
             .andExpect(status().isForbidden());
     }
 
@@ -211,14 +211,14 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/cris/orcidhistories/" + orcidHistory.getID().toString()))
+        getClient().perform(get("/api/eperson/orcidhistories/" + orcidHistory.getID().toString()))
             .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void findOneNotFoundTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/cris/orcidhistories/" + Integer.MAX_VALUE))
+        getClient(tokenAdmin).perform(get("/api/eperson/orcidhistories/" + Integer.MAX_VALUE))
             .andExpect(status().isNotFound());
     }
 
@@ -231,9 +231,9 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
 
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenEperson).perform(post("/api/cris/orcidhistories")
+        getClient(tokenEperson).perform(post("/api/eperson/orcidhistories")
             .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-            .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+            .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
             .andExpect(status().isForbidden());
     }
 
@@ -245,9 +245,9 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
         context.restoreAuthSystemState();
 
-        getClient().perform(post("/api/cris/orcidhistories")
+        getClient().perform(post("/api/eperson/orcidhistories")
             .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-            .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+            .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
             .andExpect(status().isUnauthorized());
 
     }
@@ -271,13 +271,13 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         try {
 
             getClient(getAuthToken(researcher.getEmail(), password))
-                .perform(post("/api/cris/orcidhistories")
+                .perform(post("/api/eperson/orcidhistories")
                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                    .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+            getClient(authToken).perform(get("/api/eperson/orcidhistories/" + idRef.get()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
@@ -328,13 +328,13 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         try {
 
             getClient(getAuthToken(researcher.getEmail(), password))
-                .perform(post("/api/cris/orcidhistories")
+                .perform(post("/api/eperson/orcidhistories")
                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                    .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+            getClient(authToken).perform(get("/api/eperson/orcidhistories/" + idRef.get()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
@@ -376,13 +376,13 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         try {
 
             getClient(getAuthToken(researcher.getEmail(), password))
-                .perform(post("/api/cris/orcidhistories")
+                .perform(post("/api/eperson/orcidhistories")
                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                    .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+            getClient(authToken).perform(get("/api/eperson/orcidhistories/" + idRef.get()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
@@ -425,13 +425,13 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         try {
 
             getClient(getAuthToken(researcher.getEmail(), password))
-                .perform(post("/api/cris/orcidhistories")
+                .perform(post("/api/eperson/orcidhistories")
                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                    .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+            getClient(authToken).perform(get("/api/eperson/orcidhistories/" + idRef.get()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
@@ -482,14 +482,14 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         try {
 
             getClient(getAuthToken(researcher.getEmail(), password))
-                .perform(post("/api/cris/orcidhistories")
+                .perform(post("/api/eperson/orcidhistories")
                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                    .content("/api/cris/orcidqueues/" + orcidQueue.getID())
+                    .content("/api/eperson/orcidqueues/" + orcidQueue.getID())
                     .param("forceAddition", "true"))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+            getClient(authToken).perform(get("/api/eperson/orcidhistories/" + idRef.get()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
@@ -535,13 +535,13 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         try {
 
             getClient(getAuthToken(researcher.getEmail(), password))
-                .perform(post("/api/cris/orcidhistories")
+                .perform(post("/api/eperson/orcidhistories")
                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                    .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+            getClient(authToken).perform(get("/api/eperson/orcidhistories/" + idRef.get()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
@@ -577,13 +577,13 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         try {
 
             getClient(getAuthToken(researcher.getEmail(), password))
-                .perform(post("/api/cris/orcidhistories")
+                .perform(post("/api/eperson/orcidhistories")
                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                    .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+            getClient(authToken).perform(get("/api/eperson/orcidhistories/" + idRef.get()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
@@ -624,13 +624,13 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         try {
 
             getClient(getAuthToken(researcher.getEmail(), password))
-                .perform(post("/api/cris/orcidhistories")
+                .perform(post("/api/eperson/orcidhistories")
                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                    .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+            getClient(authToken).perform(get("/api/eperson/orcidhistories/" + idRef.get()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
@@ -682,13 +682,13 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         try {
 
             getClient(getAuthToken(researcher.getEmail(), password))
-                .perform(post("/api/cris/orcidhistories")
+                .perform(post("/api/eperson/orcidhistories")
                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                    .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+            getClient(authToken).perform(get("/api/eperson/orcidhistories/" + idRef.get()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
@@ -754,13 +754,13 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         try {
 
             getClient(getAuthToken(researcher.getEmail(), password))
-                .perform(post("/api/cris/orcidhistories")
+                .perform(post("/api/eperson/orcidhistories")
                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                    .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+            getClient(authToken).perform(get("/api/eperson/orcidhistories/" + idRef.get()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
@@ -837,13 +837,13 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         try {
 
             getClient(getAuthToken(researcher.getEmail(), password))
-                .perform(post("/api/cris/orcidhistories")
+                .perform(post("/api/eperson/orcidhistories")
                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                    .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+            getClient(authToken).perform(get("/api/eperson/orcidhistories/" + idRef.get()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
@@ -911,13 +911,13 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         try {
 
             getClient(getAuthToken(researcher.getEmail(), password))
-                .perform(post("/api/cris/orcidhistories")
+                .perform(post("/api/eperson/orcidhistories")
                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                    .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+            getClient(authToken).perform(get("/api/eperson/orcidhistories/" + idRef.get()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
@@ -986,13 +986,13 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         try {
 
             getClient(getAuthToken(researcher.getEmail(), password))
-                .perform(post("/api/cris/orcidhistories")
+                .perform(post("/api/eperson/orcidhistories")
                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                    .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+            getClient(authToken).perform(get("/api/eperson/orcidhistories/" + idRef.get()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
@@ -1038,13 +1038,13 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         try {
 
             getClient(getAuthToken(researcher.getEmail(), password))
-                .perform(post("/api/cris/orcidhistories")
+                .perform(post("/api/eperson/orcidhistories")
                     .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                    .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                    .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                 .andExpect(status().isCreated())
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+            getClient(authToken).perform(get("/api/eperson/orcidhistories/" + idRef.get()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
@@ -1104,9 +1104,9 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         when(orcidClientMock.push(eq(ACCESS_TOKEN), eq(ORCID), any())).thenReturn(createdResponse("12345"));
 
         getClient(getAuthToken(researcher.getEmail(), password))
-            .perform(post("/api/cris/orcidhistories")
+            .perform(post("/api/eperson/orcidhistories")
                 .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                .content("/api/eperson/orcidqueues/" + orcidQueue.getID()))
             .andExpect(status().isUnprocessableEntity());
 
         assertThat(context.reloadEntity(orcidQueue), notNullValue());

@@ -301,7 +301,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     public ItemBuilder withFundingAwardUrl(String url) {
-        return addMetadataValue(item, "crisfund", "award", "url", url);
+        return addMetadataValue(item, "funding", "award", "url", url);
     }
 
     public ItemBuilder withOrgUnitCountry(String addressCountry) {
@@ -333,19 +333,19 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     public ItemBuilder withFundingInvestigator(String investigator) {
-        return addMetadataValue(item, "crisfund", "investigators", null, investigator);
+        return addMetadataValue(item, "funding", "investigators", null, investigator);
     }
 
     public ItemBuilder withFundingInvestigator(String investigator, String authority) {
-        return addMetadataValue(item, "crisfund", "investigators", null, null, investigator, authority, 600);
+        return addMetadataValue(item, "funding", "investigators", null, null, investigator, authority, 600);
     }
 
     public ItemBuilder withFundingCoInvestigator(String investigator) {
-        return addMetadataValue(item, "crisfund", "coinvestigators", null, investigator);
+        return addMetadataValue(item, "funding", "coinvestigators", null, investigator);
     }
 
     public ItemBuilder withFundingCoInvestigator(String investigator, String authority) {
-        return addMetadataValue(item, "crisfund", "coinvestigators", null, null, investigator, authority, 600);
+        return addMetadataValue(item, "funding", "coinvestigators", null, null, investigator, authority, 600);
     }
 
     public ItemBuilder withInternalId(String internalId) {
