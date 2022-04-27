@@ -1,0 +1,232 @@
+<?xml version="1.0"?>
+
+<dspace-dc-types>
+
+	<dspace-header>
+		<title>OpenAIRE Cris Types</title>
+	</dspace-header>
+
+	<dc-schema>
+		<name>oairecerif</name>
+		<namespace>https://www.openaire.eu/cerif-profile/1.1/</namespace>
+	</dc-schema>
+
+	<dc-type>
+		<schema>oairecerif</schema>
+		<element>author</element>
+		<qualifier>affiliation</qualifier>
+		<scope_note></scope_note>
+	</dc-type>
+	
+	<dc-type>
+        <schema>oairecerif</schema>
+        <element>editor</element>
+        <qualifier>affiliation</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>identifier</element>
+        <qualifier>url</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>affiliation</element>
+        <qualifier>orgunit</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>affiliation</element>
+        <qualifier>startDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>affiliation</element>
+        <qualifier>endDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>affiliation</element>
+        <qualifier>role</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>person</element>
+        <qualifier>gender</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>person</element>
+        <qualifier>affiliation</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>acronym</element>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>internalid</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>funder</element>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>oamandate</element>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>oamandate</element>
+        <qualifier>url</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>project</element>
+        <qualifier>startDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>project</element>
+        <qualifier>endDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>project</element>
+        <qualifier>status</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>fundingProgram</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>fundingParent</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>amount</element>
+        <qualifier>currency</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>amount</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>funding</element>
+        <qualifier>identifier</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>funding</element>
+        <qualifier>startDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>citation</element>
+        <qualifier>number</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>funding</element>
+        <qualifier>endDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>event</element>
+        <qualifier>startDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>event</element>
+        <qualifier>endDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>event</element>
+        <qualifier>place</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>event</element>
+        <qualifier>country</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+<!-- These below should be moved in the oairecerif schema -->
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <qualifier>project</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <qualifier>funding</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <qualifier>grantno</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+</dspace-dc-types>
