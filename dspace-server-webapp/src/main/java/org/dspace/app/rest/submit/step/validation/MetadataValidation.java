@@ -56,8 +56,6 @@ public class MetadataValidation extends AbstractValidation {
 
     private MetadataAuthorityService metadataAuthorityService;
 
-    private final Context context = new Context();
-
     @Override
     public List<ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
                                     SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
@@ -86,7 +84,10 @@ public class MetadataValidation extends AbstractValidation {
                         List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fullFieldname);
                         // If the input is not allowed for this type, strip it from item metadata.
                         if (!input.isAllowedFor(documentTypeValue)) {
+                            // We temporarily need a context for this specific operation
+                            Context context = new Context();
                             itemService.removeMetadataValues(context, obj.getItem(), mdv);
+                            context.complete();
                         } else {
                             validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
                             if (mdv.size() > 0 && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
@@ -111,7 +112,10 @@ public class MetadataValidation extends AbstractValidation {
                 for (String fieldName : fieldsName) {
                     List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fieldName);
                     if (!input.isAllowedFor(documentTypeValue)) {
+                        // We temporarily need a context for this specific operation
+                        Context context = new Context();
                         itemService.removeMetadataValues(context, obj.getItem(), mdv);
+                        context.complete();
                         // Continue here, this skips the required check since we've just removed values that previously
                         // appeared, and the configuration already indicates this field shouldn't be included
                         continue;
