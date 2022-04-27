@@ -10,8 +10,10 @@ package org.dspace.app.orcid.service.impl;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static java.util.List.of;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
 import static org.dspace.content.Item.ANY;
 
 import java.sql.SQLException;
@@ -138,6 +140,28 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             itemService.setMetadataSingleValue(context, profile, "dspace", "orcid", "sync-mode", null, value.name());
             return true;
         }
+
+    }
+
+    @Override
+    public boolean isSynchronizationEnabled(Item profile, Item item) {
+
+        String entityType = itemService.getEntityType(item);
+        if (entityType == null) {
+            return false;
+        }
+
+        if (OrcidEntityType.isValid(entityType)) {
+            return getEntityPreference(profile, OrcidEntityType.fromString(entityType))
+                .filter(pref -> pref != DISABLED)
+                .isPresent();
+        }
+
+        if (entityType.equals(getProfileType())) {
+            return profile.equals(item) && !isEmpty(getProfilePreferences(profile));
+        }
+
+        return false;
 
     }
 

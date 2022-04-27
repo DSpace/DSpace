@@ -15,6 +15,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 
+import org.dspace.app.profile.OrcidEntitySyncPreference;
+import org.dspace.app.profile.OrcidProfileSyncPreference;
+import org.dspace.app.profile.OrcidSynchronizationMode;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
@@ -39,6 +42,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     private WorkspaceItem workspaceItem;
     private Item item;
     private Group readerGroup = null;
+    private String handle = null;
 
     protected ItemBuilder(Context context) {
         super(context);
@@ -86,6 +90,42 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     public ItemBuilder withAuthor(final String authorName, final String authority, final int confidence) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author",
                                 null, authorName, authority, confidence);
+    }
+
+    public ItemBuilder withEditor(final String editorName) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "editor", editorName);
+    }
+
+    public ItemBuilder withDescriptionAbstract(String description) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", "abstract", description);
+    }
+
+    public ItemBuilder withLanguage(String language) {
+        return addMetadataValue(item, "dc", "language", "iso", language);
+    }
+
+    public ItemBuilder withIsPartOf(String isPartOf) {
+        return addMetadataValue(item, "dc", "relation", "ispartof", isPartOf);
+    }
+
+    public ItemBuilder withDoiIdentifier(String doi) {
+        return addMetadataValue(item, "dc", "identifier", "doi", doi);
+    }
+
+    public ItemBuilder withScopusIdentifier(String scopus) {
+        return addMetadataValue(item, "dc", "identifier", "scopus", scopus);
+    }
+
+    public ItemBuilder withRelationFunding(String funding) {
+        return addMetadataValue(item, "dc", "relation", "funding", funding);
+    }
+
+    public ItemBuilder withRelationFunding(String funding, String authority) {
+        return addMetadataValue(item, DC.getName(), "relation", "funding", null, funding, authority, 600);
+    }
+
+    public ItemBuilder withRelationGrantno(String grantno) {
+        return addMetadataValue(item, "dc", "relation", "grantno", grantno);
     }
 
     public ItemBuilder withPersonIdentifierFirstName(final String personIdentifierFirstName) {
@@ -158,8 +198,81 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dspace", "object", "owner", null, value, authority, CF_ACCEPTED);
     }
 
+    public ItemBuilder withOrcidIdentifier(String orcid) {
+        return addMetadataValue(item, "person", "identifier", "orcid", orcid);
+    }
+
+    public ItemBuilder withOrcidAccessToken(String accessToken) {
+        return addMetadataValue(item, "dspace", "orcid", "access-token", accessToken);
+    }
+
+    public ItemBuilder withOrcidAuthenticated(String authenticated) {
+        return addMetadataValue(item, "dspace", "orcid", "authenticated", authenticated);
+    }
+
+    public ItemBuilder withOrcidSynchronizationPublicationsPreference(OrcidEntitySyncPreference value) {
+        return withOrcidSynchronizationPublicationsPreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationPublicationsPreference(String value) {
+        return setMetadataSingleValue(item, "dspace", "orcid", "sync-publications", value);
+    }
+
+    public ItemBuilder withOrcidSynchronizationFundingsPreference(OrcidEntitySyncPreference value) {
+        return withOrcidSynchronizationFundingsPreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationFundingsPreference(String value) {
+        return setMetadataSingleValue(item, "dspace", "orcid", "sync-fundings", value);
+    }
+
+    public ItemBuilder withOrcidSynchronizationProfilePreference(OrcidProfileSyncPreference value) {
+        return withOrcidSynchronizationProfilePreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationProfilePreference(String value) {
+        return addMetadataValue(item, "dspace", "orcid", "sync-profile", value);
+    }
+
+    public ItemBuilder withOrcidSynchronizationMode(OrcidSynchronizationMode mode) {
+        return withOrcidSynchronizationMode(mode.name());
+    }
+
+    private ItemBuilder withOrcidSynchronizationMode(String mode) {
+        return setMetadataSingleValue(item, "dspace", "orcid", "sync-mode", mode);
+    }
+
+    public ItemBuilder withPersonCountry(String country) {
+        return addMetadataValue(item, "person", "country", null, country);
+    }
+
+    public ItemBuilder withScopusAuthorIdentifier(String id) {
+        return addMetadataValue(item, "person", "identifier", "scopus-author-id", id);
+    }
+
+    public ItemBuilder withResearcherIdentifier(String rid) {
+        return addMetadataValue(item, "person", "identifier", "rid", rid);
+    }
+
+    public ItemBuilder withUrlIdentifier(String urlIdentifier) {
+        return addMetadataValue(item, "oairecerif", "identifier", "url", urlIdentifier);
+    }
+
+    public ItemBuilder withVernacularName(String vernacularName) {
+        return setMetadataSingleValue(item, "person", "name", "translated", vernacularName);
+    }
+
+    public ItemBuilder withVariantName(String variant) {
+        return addMetadataValue(item, "person", "name", "variant", variant);
+    }
+
     public ItemBuilder makeUnDiscoverable() {
         item.setDiscoverable(false);
+        return this;
+    }
+
+    public ItemBuilder withHandle(String handle) {
+        this.handle = handle;
         return this;
     }
 
@@ -183,6 +296,74 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return this;
     }
 
+    public ItemBuilder withFundingIdentifier(String identifier) {
+        return addMetadataValue(item, "oairecerif", "funding", "identifier", identifier);
+    }
+
+    public ItemBuilder withFundingAwardUrl(String url) {
+        return addMetadataValue(item, "crisfund", "award", "url", url);
+    }
+
+    public ItemBuilder withOrgUnitCountry(String addressCountry) {
+        return addMetadataValue(item, "organization", "address", "addressCountry", addressCountry);
+    }
+
+    public ItemBuilder withOrgUnitLocality(String addressLocality) {
+        return addMetadataValue(item, "organization", "address", "addressLocality", addressLocality);
+    }
+
+    public ItemBuilder withOrgUnitCrossrefIdentifier(String crossrefid) {
+        return addMetadataValue(item, "organization", "identifier", "crossrefid", crossrefid);
+    }
+
+    public ItemBuilder withFundingStartDate(String startDate) {
+        return addMetadataValue(item, "oairecerif", "funding", "startDate", startDate);
+    }
+
+    public ItemBuilder withFundingEndDate(String endDate) {
+        return addMetadataValue(item, "oairecerif", "funding", "endDate", endDate);
+    }
+
+    public ItemBuilder withFunder(String funder) {
+        return addMetadataValue(item, "oairecerif", "funder", null, funder);
+    }
+
+    public ItemBuilder withFunder(String funder, String authority) {
+        return addMetadataValue(item, "oairecerif", "funder", null, null, funder, authority, 600);
+    }
+
+    public ItemBuilder withFundingInvestigator(String investigator) {
+        return addMetadataValue(item, "crisfund", "investigators", null, investigator);
+    }
+
+    public ItemBuilder withFundingInvestigator(String investigator, String authority) {
+        return addMetadataValue(item, "crisfund", "investigators", null, null, investigator, authority, 600);
+    }
+
+    public ItemBuilder withFundingCoInvestigator(String investigator) {
+        return addMetadataValue(item, "crisfund", "coinvestigators", null, investigator);
+    }
+
+    public ItemBuilder withFundingCoInvestigator(String investigator, String authority) {
+        return addMetadataValue(item, "crisfund", "coinvestigators", null, null, investigator, authority, 600);
+    }
+
+    public ItemBuilder withInternalId(String internalId) {
+        return addMetadataValue(item, "oairecerif", "internalid", null, internalId);
+    }
+
+    public ItemBuilder withDescription(String description) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", null, description);
+    }
+
+    public ItemBuilder withAmount(String amount) {
+        return addMetadataValue(item, "oairecerif", "amount", null, amount);
+    }
+
+    public ItemBuilder withAmountCurrency(String currency) {
+        return addMetadataValue(item, "oairecerif", "amount", "currency", currency);
+    }
+
     /**
      * Create an admin group for the collection with the specified members
      *
@@ -202,7 +383,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     @Override
     public Item build() {
         try {
-            installItemService.installItem(context, workspaceItem);
+            installItemService.installItem(context, workspaceItem, handle);
             itemService.update(context, item);
 
             //Check if we need to make this item private. This has to be done after item install.
@@ -274,5 +455,9 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             handleException(e);
         }
         return this;
+    }
+
+    public ItemBuilder withAuthorAffiliation(String affiliation) {
+        return addMetadataValue(item, "oairecerif", "author", "affiliation", affiliation);
     }
 }

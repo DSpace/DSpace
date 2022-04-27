@@ -108,6 +108,17 @@ public interface OrcidSynchronizationService {
         throws SQLException;
 
     /**
+     * Check if the given researcher profile item is configured to synchronize the
+     * given item with ORCID.
+     *
+     * @param  profile the researcher profile item
+     * @param  item    the entity type to check
+     * @return         true if the given entity type can be synchronize with ORCID,
+     *                 false otherwise
+     */
+    public boolean isSynchronizationEnabled(Item profile, Item item);
+
+    /**
      * Returns the ORCID synchronization mode configured for the given profile item.
      *
      * @param  profile the researcher profile item

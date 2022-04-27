@@ -50,4 +50,10 @@
         <property name="description" value="Perform the media filtering to extract full text from documents and to create thumbnails"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.mediafilter.MediaFilterScript"/>
     </bean>
+    
+    <bean id="orcid-bulk-push" class="org.dspace.app.orcid.script.OrcidBulkPushScriptConfiguration">
+        <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.orcid.script.OrcidBulkPush"/>
+    </bean>
+    
 </beans>

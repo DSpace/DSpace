@@ -19,6 +19,10 @@ public final class OrcidConfiguration {
 
     private String apiUrl;
 
+    private String publicUrl;
+
+    private String domainUrl;
+
     private String redirectUrl;
 
     private String clientId;
@@ -37,6 +41,14 @@ public final class OrcidConfiguration {
 
     public void setApiUrl(String apiUrl) {
         this.apiUrl = apiUrl;
+    }
+
+    public String getDomainUrl() {
+        return domainUrl;
+    }
+
+    public void setDomainUrl(String domainUrl) {
+        this.domainUrl = domainUrl;
     }
 
     public String getRedirectUrl() {
@@ -85,6 +97,18 @@ public final class OrcidConfiguration {
 
     public String[] getScopes() {
         return StringUtils.isNotBlank(scopes) ? StringUtils.split(scopes, ",") : new String[] {};
+    }
+
+    public String getPublicUrl() {
+        return publicUrl;
+    }
+
+    public void setPublicUrl(String publicUrl) {
+        this.publicUrl = publicUrl;
+    }
+
+    public boolean isApiConfigured() {
+        return !StringUtils.isAnyBlank(clientId, clientSecret);
     }
 
 }
