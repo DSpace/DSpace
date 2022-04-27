@@ -129,18 +129,6 @@
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
-                    <dc-element>data</dc-element>
-                    <dc-qualifier>uri</dc-qualifier>
-                    <repeatable>true</repeatable>
-                    <label>Research Data</label>
-                    <input-type>onebox</input-type>
-                    <hint>Enter the URI of related research data to this item.</hint>
-                    <required></required>
-                </field>
-            </row>
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
                     <dc-element>relation</dc-element>
                     <dc-qualifier>ispartofseries</dc-qualifier>
                     <repeatable>true</repeatable>
@@ -162,6 +150,18 @@
                     <hint>If the item has any identification numbers or codes associated with
                         it, please enter the types and the actual numbers or codes.
                     </hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>data</dc-element>
+                    <dc-qualifier>uri</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Research Data</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the URI of related research data to this item.</hint>
                     <required></required>
                 </field>
             </row>
