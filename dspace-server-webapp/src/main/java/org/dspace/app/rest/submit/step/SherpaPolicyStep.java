@@ -14,18 +14,26 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.SherpaPolicy;
 import org.dspace.app.rest.submit.AbstractProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
-import org.dspace.app.sherpa.cache.SherpaCacheEvictBeanLocator;
 import org.dspace.app.sherpa.cache.SherpaCacheEvictService;
+import org.dspace.app.sherpa.submit.SHERPASubmitService;
 import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
+import org.dspace.utils.DSpace;
 import org.dspace.web.ContextUtil;
 
 /**
+ * SherpaPolicy step for DSpace Spring Rest. Expose information about
+ * the Sherpa policies for the in progress submission.
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 public class SherpaPolicyStep extends AbstractProcessingStep {
+
+    private SherpaCacheEvictService sherpaCacheEvictService = new DSpace().getSingletonService(
+                SherpaCacheEvictService.class);
+    private SHERPASubmitService sherpaSubmitService = new DSpace().getSingletonService(SHERPASubmitService.class);
 
     @Override
     @SuppressWarnings("unchecked")
@@ -45,7 +53,6 @@ public class SherpaPolicyStep extends AbstractProcessingStep {
     public void doPatchProcessing(Context context, HttpServletRequest currentRequest, InProgressSubmission source,
             Operation op, SubmissionStepConfig stepConf) throws Exception {
         String path = op.getPath();
-        SherpaCacheEvictService sherpaCacheEvictService = SherpaCacheEvictBeanLocator.getSherpaCacheEvictService();
         if (path.contains(SHERPA_RETRIEVAL_TIME)) {
             sherpaCacheEvictService.evictCacheValues(context, source.getItem());
         }

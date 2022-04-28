@@ -7,6 +7,8 @@
  */
 package org.dspace.app.sherpa.v2;
 
+import java.io.Serializable;
+
 /**
  * Plain java representation of a SHERPA Publisher object, based on SHERPA API v2 responses.
  *
@@ -18,7 +20,7 @@ package org.dspace.app.sherpa.v2;
  * @see SHERPAJournal
  * @see SHERPAPublisherResponse
  */
-public class SHERPAPublisher {
+public class SHERPAPublisher implements Serializable {
     private String name = null;
     private String relationshipType;
     private String country;

@@ -33,4 +33,18 @@
 		</property>	
 	</bean>
 
+    <!-- during test we need the mock sherpa service everywhere -->
+    <alias name="org.dspace.app.sherpa.SHERPAService" alias="org.dspace.app.sherpa.MockSHERPAService"/>
+    <bean class="org.dspace.app.sherpa.MockSHERPAService" id="org.dspace.app.sherpa.SHERPAService">
+        <property name="maxNumberOfTries" value="3"/>
+        <property name="sleepBetweenTimeouts" value="2000"/>
+        <property name="timeout" value="5000"/>
+    </bean>
+
+    <bean class="org.dspace.app.sherpa.submit.SHERPASubmitService"
+          id="org.dspace.app.sherpa.submit.SHERPASubmitService">
+        <property name="sherpaService" ref="org.dspace.app.sherpa.MockSHERPAService"/>
+        <property name="configuration" ref="org.dspace.app.sherpa.submit.SHERPASubmitConfigurationService"/>
+    </bean>
+
 </beans>

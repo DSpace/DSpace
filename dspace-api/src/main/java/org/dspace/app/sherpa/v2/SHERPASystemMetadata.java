@@ -7,6 +7,8 @@
  */
 package org.dspace.app.sherpa.v2;
 
+import java.io.Serializable;
+
 /**
  * Plain java representation of a SHERPA System Metadata object, based on SHERPA API v2 responses.
  *
@@ -18,7 +20,7 @@ package org.dspace.app.sherpa.v2;
  *
  * @author Kim Shepherd
  */
-public class SHERPASystemMetadata {
+public class SHERPASystemMetadata implements Serializable {
 
     private int id;
     private String uri;

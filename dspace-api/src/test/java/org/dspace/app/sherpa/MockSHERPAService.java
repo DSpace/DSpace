@@ -26,20 +26,6 @@ import org.dspace.app.sherpa.v2.SHERPAResponse;
 public class MockSHERPAService extends SHERPAService {
 
     /**
-     * Simple overridden 'searchByJournalISSN' so that we do attempt to build the URI but rather than make
-     * an actual HTTP call, return parsed SHERPAResponse for The Lancet based on known-good JSON stored with our
-     * test resources.
-     * If URI creation, parsing, or IO fails along the way, a SHERPAResponse with an error message set will be
-     * returned.
-     * @param query ISSN string to pass in an "issn equals" API query
-     * @return  SHERPAResponse
-     */
-    @Override
-    public SHERPAResponse searchByJournalISSN(String query) {
-        return performRequest("publication", "issn", "equals", query, 0, 1);
-    }
-
-    /**
      * Simple overridden performRequest so that we do attempt to build the URI but rather than make
      * an actual HTTP call, return parsed SHERPAResponse for The Lancet based on known-good JSON stored with our
      * test resources.

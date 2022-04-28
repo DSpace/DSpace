@@ -7,6 +7,7 @@
  */
 package org.dspace.app.sherpa.v2;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ import java.util.List;
  *
  * @author Kim Shepherd
  */
-public class SHERPAJournal {
+public class SHERPAJournal implements Serializable {
 
     private List<String> titles;
     private String url;

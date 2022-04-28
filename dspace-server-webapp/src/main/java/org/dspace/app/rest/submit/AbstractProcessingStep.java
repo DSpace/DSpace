@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.submit;
 
-import org.dspace.app.sherpa.submit.SHERPASubmitService;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -36,7 +35,4 @@ public abstract class AbstractProcessingStep implements DataProcessingStep {
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected SHERPASubmitService sherpaSubmitService = DSpaceServicesFactory.getInstance().getServiceManager()
-            .getServiceByName("org.dspace.app.sherpa.submit.SHERPASubmitService", SHERPASubmitService.class);
-
 }

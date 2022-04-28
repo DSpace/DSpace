@@ -7,6 +7,7 @@
  */
 package org.dspace.app.sherpa.v2;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ import java.util.List;
  *
  * @see SHERPAPublisherPolicy
  */
-public class SHERPAPermittedVersion {
+public class SHERPAPermittedVersion implements Serializable {
 
     // Version (submitted, accepted, published)
     private String articleVersion;
@@ -47,7 +48,7 @@ public class SHERPAPermittedVersion {
     // Embargo
     private SHERPAEmbargo embargo;
 
-    protected static class SHERPAEmbargo {
+    protected static class SHERPAEmbargo implements Serializable {
         String units;
         int amount;
     }

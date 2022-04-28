@@ -10,6 +10,7 @@ package org.dspace.app.sherpa.v2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,7 +36,7 @@ import org.json.JSONTokener;
  * @author Kim Shepherd
  *
  */
-public class SHERPAResponse {
+public class SHERPAResponse implements Serializable {
     // Is this response to be treated as an error?
     private boolean error;
 

@@ -44,6 +44,7 @@ import org.springframework.cache.annotation.Cacheable;
  * @author Kim Shepherd
  */
 public class SHERPAService {
+
     private CloseableHttpClient client = null;
 
     private int maxNumberOfTries;
@@ -415,4 +416,13 @@ public class SHERPAService {
     public void setTimeout(int timeout) {
         this.timeout = timeout;
     }
+
+    public CloseableHttpClient getClient() {
+        return client;
+    }
+
+    public void setClient(CloseableHttpClient client) {
+        this.client = client;
+    }
+
 }
