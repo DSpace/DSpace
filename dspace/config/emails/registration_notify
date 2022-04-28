@@ -1,17 +1,17 @@
-# Registration notification email
-#
-# Parameters: {0} The name of the DRUM instance
-#             {1} The URL of the DRUM instance
-#             {2} Name:
-#             {3} Email:
-#             {4} Registration Date:
-#
-# See org.dspace.core.Email for information on the format of this file.
-#
-Subject: DRUM: Registration Notification
+## Registration notification email
+##
+## Parameters: {0} The name of the DRUM instance
+##             {1} The URL of the DRUM instance
+##             {2} Name:
+##             {3} Email:
+##             {4} Registration Date:
+##
+## See org.dspace.core.Email for information on the format of this file.
+##
+#set($subject = 'DRUM: Registration Notification')
 
-A new user has registered on {0} at {1}:
+A new user has registered on ${params[0]} at ${params[1]}:
 
-Name:                   {2}
-Email:                  {3}
-Date:                   {4}
+Name:                   ${params[2]}
+Email:                  ${params[3]}
+Date:                   ${params[4]}

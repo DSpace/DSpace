@@ -11,12 +11,19 @@ package org.dspace.eperson;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingOptionException;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -27,8 +34,7 @@ import org.dspace.eperson.service.EPersonService;
  *
  * @author mwood
  */
-public class Groomer
-{
+public class Groomer {
     private static final ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
         @Override
         protected DateFormat initialValue() {
@@ -37,12 +43,20 @@ public class Groomer
     };
 
     private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
+    /**
+     * Default constructor
+     */
+    private Groomer() { }
+
     /**
      * Command line tool for "grooming" the EPerson collection.
+     *
+     * @param argv the command line arguments given
+     * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     static public void main(String[] argv)
-            throws SQLException
-    {
+        throws SQLException {
         final String USAGE = "Groomer -verb [option...]";
 
         OptionGroup verbs = new OptionGroup();
@@ -55,41 +69,37 @@ public class Groomer
         options.addOptionGroup(verbs);
 
         options.addOption("b", "last-used-before", true,
-                "date of last login was before this (for example:  "
-                        + dateFormat.get().format(Calendar.getInstance().getTime())
-                        + ')');
+                          "date of last login was before this (for example:  "
+                              + dateFormat.get().format(Calendar.getInstance().getTime())
+                              + ')');
         options.addOption("d", "delete", false, "delete matching epersons");
 
-        PosixParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine command = null;
         try {
             command = parser.parse(options, argv);
         } catch (ParseException ex) {
             System.err.println(ex.getMessage());
-            if (! (ex instanceof MissingOptionException))
+            if (!(ex instanceof MissingOptionException)) {
                 new HelpFormatter().printHelp(USAGE, options);
+            }
             System.exit(1);
         }
 
-         // Help the user
-        if (null == command || command.hasOption('h') || command.hasOption('?'))
-        {
+        // Help the user
+        if (null == command || command.hasOption('h') || command.hasOption('?')) {
             new HelpFormatter().printHelp(USAGE, options);
             System.exit(0);
-        }
-        // Scan for disused accounts
-        else if (command.hasOption('a'))
-        {
+        } else if (command.hasOption('a')) {
+            // Scan for disused accounts
             aging(command);
-        }
-        // List accounts with unsalted passwords
-        else if (command.hasOption('u'))
-        {
+        } else if (command.hasOption('u')) {
+            // List accounts with unsalted passwords
             findUnsalted();
-        }
-        // Should not happen:  verb option defined but no code!
-        else
+        } else {
+            // Should not happen:  verb option defined but no code!
             System.err.println("Unimplemented verb:  " + verbs.getSelected());
+        }
     }
 
     /**
@@ -98,65 +108,59 @@ public class Groomer
      * @param command a parsed command line.
      * @throws SQLException from callees.
      */
-    private static void aging(CommandLine command) throws SQLException
-    {
-            if (!command.hasOption('b'))
-            {
-                System.err.println("A last login date is required.");
-                System.exit(1);
-            }
+    private static void aging(CommandLine command) throws SQLException {
+        if (!command.hasOption('b')) {
+            System.err.println("A last login date is required.");
+            System.exit(1);
+        }
 
-            Date before = null;
-            try {
-                before = dateFormat.get().parse(command.getOptionValue('b'));
-            } catch (java.text.ParseException ex) {
-                System.err.println(ex.getMessage());
-                System.exit(1);
-            }
+        Date before = null;
+        try {
+            before = dateFormat.get().parse(command.getOptionValue('b'));
+        } catch (java.text.ParseException ex) {
+            System.err.println(ex.getMessage());
+            System.exit(1);
+        }
 
-            boolean delete = command.hasOption('d');
+        boolean delete = command.hasOption('d');
 
-            Context myContext = new Context();
-            List<EPerson> epeople = ePersonService.findNotActiveSince(myContext, before);
+        Context myContext = new Context();
+        List<EPerson> epeople = ePersonService.findNotActiveSince(myContext, before);
 
-            myContext.turnOffAuthorisationSystem();
-            for (EPerson account : epeople)
-            {
-                System.out.print(account.getID());
-                System.out.print('\t');
-                System.out.print(account.getLastActive());
-                System.out.print('\t');
-                System.out.print(account.getEmail());
-                System.out.print('\t');
-                System.out.print(account.getNetid());
-                System.out.print('\t');
-                System.out.print(account.getFullName());
-                System.out.println();
+        myContext.turnOffAuthorisationSystem();
+        for (EPerson account : epeople) {
+            System.out.print(account.getID());
+            System.out.print('\t');
+            System.out.print(account.getLastActive());
+            System.out.print('\t');
+            System.out.print(account.getEmail());
+            System.out.print('\t');
+            System.out.print(account.getNetid());
+            System.out.print('\t');
+            System.out.print(account.getFullName());
+            System.out.println();
 
-                if (delete)
-                {
-                    List<String> whyNot = ePersonService.getDeleteConstraints(myContext, account);
-                    if (!whyNot.isEmpty())
-                    {
-                        System.out.print("\tCannot be deleted; referenced in");
-                        for (String table : whyNot)
-                        {
-                            System.out.print(' ');
-                            System.out.print(table);
-                        }
-                        System.out.println();
+            if (delete) {
+                List<String> whyNot = ePersonService.getDeleteConstraints(myContext, account);
+                if (!whyNot.isEmpty()) {
+                    System.out.print("\tCannot be deleted; referenced in");
+                    for (String table : whyNot) {
+                        System.out.print(' ');
+                        System.out.print(table);
                     }
-                    else
-                        try {
-                            ePersonService.delete(myContext, account);
-                        } catch (AuthorizeException | IOException ex) {
-                            System.err.println(ex.getMessage());
-                        }
+                    System.out.println();
+                } else {
+                    try {
+                        ePersonService.delete(myContext, account);
+                    } catch (AuthorizeException | IOException ex) {
+                        System.err.println(ex.getMessage());
                     }
+                }
             }
+        }
 
-            myContext.restoreAuthSystemState();
-            myContext.complete();
+        myContext.restoreAuthSystemState();
+        myContext.complete();
     }
 
     /**
@@ -165,12 +169,12 @@ public class Groomer
      * @throws SQLException if database error
      */
     private static void findUnsalted()
-            throws SQLException
-    {
+        throws SQLException {
         Context myContext = new Context();
         List<EPerson> ePersons = ePersonService.findUnsalted(myContext);
-        for (EPerson ePerson : ePersons)
+        for (EPerson ePerson : ePersons) {
             System.out.println(ePerson.getEmail());
+        }
         myContext.abort(); // No changes to commit
     }
 }

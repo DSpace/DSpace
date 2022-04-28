@@ -9,12 +9,10 @@
 package org.dspace.rdf;
 
 /**
- *
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)
  */
 public class ItemNotDiscoverableException extends Exception {
-    public ItemNotDiscoverableException()
-    {
+    public ItemNotDiscoverableException() {
         super("The processed item is not discoverable.");
     }
 }

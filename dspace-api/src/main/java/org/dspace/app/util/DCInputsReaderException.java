@@ -16,41 +16,39 @@ package org.dspace.app.util;
  * @author Larry Stone
  * @version $Revision: 3761 $
  */
-public class DCInputsReaderException extends Exception
-{
+public class DCInputsReaderException extends Exception {
     /**
      * No-args constructor.
      */
-    public DCInputsReaderException()
-    {
+    public DCInputsReaderException() {
         super();
     }
 
     /**
      * Constructor for a given message.
+     *
      * @param message diagnostic message.
      */
-    public DCInputsReaderException(String message)
-    {
+    public DCInputsReaderException(String message) {
         super(message);
     }
 
     /**
      * Constructor for a given cause.
+     *
      * @param cause throwable that caused this exception
      */
-    public DCInputsReaderException(Throwable cause)
-    {
+    public DCInputsReaderException(Throwable cause) {
         super(cause);
     }
 
     /**
      * Constructor to create a new exception wrapping it around another exception.
+     *
      * @param message diagnostic message.
-     * @param cause throwable that caused this exception
+     * @param cause   throwable that caused this exception
      */
-    public DCInputsReaderException(String message, Throwable cause)
-    {
+    public DCInputsReaderException(String message, Throwable cause) {
         super(message, cause);
     }
 }

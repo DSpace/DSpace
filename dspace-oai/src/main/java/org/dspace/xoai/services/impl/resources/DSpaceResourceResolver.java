@@ -11,35 +11,36 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
-import org.dspace.core.ConfigurationManager;
-
 import com.lyncode.xoai.dataprovider.services.api.ResourceResolver;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
-public class DSpaceResourceResolver implements ResourceResolver
-{
+public class DSpaceResourceResolver implements ResourceResolver {
     private static final TransformerFactory transformerFactory = TransformerFactory
-            .newInstance();
+            .newInstance("net.sf.saxon.TransformerFactoryImpl", null);
 
-    private final String basePath = ConfigurationManager.getProperty("oai",
-            "config.dir");
+    private final String basePath;
+
+    public DSpaceResourceResolver() {
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        basePath = configurationService.getProperty("oai.config.dir");
+    }
 
     @Override
-    public InputStream getResource(String path) throws IOException
-    {
+    public InputStream getResource(String path) throws IOException {
         return new FileInputStream(new File(basePath, path));
     }
 
     @Override
     public Transformer getTransformer(String path) throws IOException,
-            TransformerConfigurationException
-    {
+        TransformerConfigurationException {
         // construct a Source that reads from an InputStream
         Source mySrc = new StreamSource(getResource(path));
         // specify a system ID (the path to the XSLT-file on the filesystem)

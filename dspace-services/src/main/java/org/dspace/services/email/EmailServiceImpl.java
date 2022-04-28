@@ -8,19 +8,22 @@
 package org.dspace.services.email;
 
 import java.util.Properties;
+import javax.annotation.PostConstruct;
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.naming.InitialContext;
+import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-import org.dspace.kernel.mixins.InitializedService;
+import javax.naming.NoInitialContextException;
+
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EmailService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Provides mail sending services through JavaMail.  If a {@link javax.mail.Session}
@@ -30,10 +33,9 @@ import org.springframework.beans.factory.annotation.Required;
  * @author mwood
  */
 public class EmailServiceImpl
-        extends Authenticator
-        implements EmailService, InitializedService
-{
-    private static final Logger logger = (Logger) LoggerFactory.getLogger(EmailServiceImpl.class);
+    extends Authenticator
+    implements EmailService {
+    private static final Logger logger = LoggerFactory.getLogger(EmailServiceImpl.class);
 
     private Session session = null;
 
@@ -41,100 +43,93 @@ public class EmailServiceImpl
 
     /**
      * Inject/set the ConfigurationService
+     *
      * @param cfg the configurationService object
      */
-    @Autowired
-    @Required
-    public void setCfg(ConfigurationService cfg)
-    {
+    @Autowired(required = true)
+    public void setCfg(ConfigurationService cfg) {
         this.cfg = cfg;
     }
 
     /**
      * Provide a reference to the JavaMail session.
      *
-     * @return the managed Session, or null if none could be created.
+     * @return the managed Session, or {@code null} if none could be created.
      */
     @Override
-    public Session getSession()
-    {
+    public Session getSession() {
         return session;
     }
 
-    @Override
-    public void init()
-    {
+    @PostConstruct
+    public void init() {
         // See if there is already a Session in our environment
         String sessionName = cfg.getProperty("mail.session.name");
-        if (null == sessionName)
-        {
+        if (null == sessionName) {
             sessionName = "Session";
         }
-        try
-        {
+        String sessionUri = "java:comp/env/mail/" + sessionName;
+        logger.debug("Looking up Session as {}", sessionUri);
+        try {
             InitialContext ctx = new InitialContext(null);
-            session = (Session) ctx.lookup("java:comp/env/mail/" + sessionName);
-        } catch (NamingException ex)
-        {
-            logger.warn("Couldn't get an email session from environment:  {}",
-                    ex.getMessage());
+            session = (Session) ctx.lookup(sessionUri);
+        } catch (NameNotFoundException | NoInitialContextException ex) {
+            // Not a problem -- build a new Session from configuration.
+        } catch (NamingException ex) {
+            logger.warn("Couldn't get an email session from environment:  {}:  {}",
+                        ex.getClass().getName(), ex.getMessage());
         }
 
-        if (null != session)
-        {
+        if (null != session) {
             logger.info("Email session retrieved from environment.");
-        }
-        else
-        { // No Session provided, so create one
+        } else { // No Session provided, so create one
             logger.info("Initializing an email session from configuration.");
             Properties props = new Properties();
             props.put("mail.transport.protocol", "smtp");
             String host = cfg.getProperty("mail.server");
-            if (null != host)
-            {
+            if (null != host) {
                 props.put("mail.host", cfg.getProperty("mail.server"));
             }
             String port = cfg.getProperty("mail.server.port");
-            if (null != port)
-            {
+            if (null != port) {
                 props.put("mail.smtp.port", port);
             }
             // Set extra configuration properties
             String[] extras = cfg.getArrayProperty("mail.extraproperties");
-            if (extras != null)
-            {
-                String key, value;
-                for (String argument : extras)
-                {
+            if (extras != null) {
+                String key;
+                String value;
+                for (String argument : extras) {
                     key = argument.substring(0, argument.indexOf('=')).trim();
                     value = argument.substring(argument.indexOf('=') + 1).trim();
                     props.put(key, value);
                 }
             }
-            if (null == cfg.getProperty("mail.server.username"))
-            {
+            if (StringUtils.isBlank(cfg.getProperty("mail.server.username"))) {
                 session = Session.getInstance(props);
-            }
-            else
-            {
+            } else {
                 props.put("mail.smtp.auth", "true");
                 session = Session.getInstance(props, this);
             }
-
-
         }
     }
 
     @Override
-    protected PasswordAuthentication getPasswordAuthentication()
-    {
-        if (null == cfg)
-        {
+    protected PasswordAuthentication getPasswordAuthentication() {
+        if (null == cfg) {
             cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
         }
 
         return new PasswordAuthentication(
-                cfg.getProperty("mail.server.username"),
-                cfg.getProperty("mail.server.password"));
+            cfg.getProperty("mail.server.username"),
+            cfg.getProperty("mail.server.password"));
+    }
+
+    /**
+     * Force a new initialization of the session, useful for testing purpose
+     */
+    public void reset() {
+        session = null;
+        init();
     }
 }

@@ -7,186 +7,189 @@
  */
 package org.dspace.rest.common;
 
+import java.util.Date;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import java.util.Date;
-
-import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "resourcepolicy")
-public class ResourcePolicy{
-	
-	public enum Action {
-		READ, WRITE, DELETE;
-	}
-	
-	private Integer id;
-	private Action action;
-	private String epersonId;   //UUID
-	private String groupId;     //UUID
-	private String resourceId;  //UUID
-	private String resourceType;
-	private String rpDescription;
-	private String rpName;
-	private String rpType;
-	private Date startDate;
-	private Date endDate;
-	
-	public ResourcePolicy() {}
-	
-	public ResourcePolicy(org.dspace.authorize.ResourcePolicy dspacePolicy) {
-		this.id = dspacePolicy.getID();
-		
-		switch(dspacePolicy.getAction()) {
-		case org.dspace.core.Constants.READ:
-			this.action = Action.READ;
-			break;
-		case org.dspace.core.Constants.WRITE:
-			this.action = Action.WRITE;
-			break;
-		case org.dspace.core.Constants.DELETE:
-			this.action = Action.DELETE;
-			break;
-		}
+public class ResourcePolicy {
 
-                EPerson ePerson = dspacePolicy.getEPerson();
-                if(ePerson != null) {
-                    this.epersonId = ePerson.getID().toString();
-                }
+    public enum Action {
+        READ, WRITE, DELETE;
+    }
 
-                Group group = dspacePolicy.getGroup();
-                if(group != null) {
-                    this.groupId = group.getID().toString();
-                }
+    private Integer id;
+    private Action action;
+    private String epersonId;   //UUID
+    private String groupId;     //UUID
+    private String resourceId;  //UUID
+    private String resourceType;
+    private String rpDescription;
+    private String rpName;
+    private String rpType;
+    private Date startDate;
+    private Date endDate;
 
-		this.resourceId = dspacePolicy.getdSpaceObject().getID().toString();
-		this.rpDescription = dspacePolicy.getRpDescription();
-		this.rpName = dspacePolicy.getRpName();
-		this.rpType = dspacePolicy.getRpType();
-		this.startDate = dspacePolicy.getStartDate();
-		this.endDate = dspacePolicy.getEndDate();
-		switch(dspacePolicy.getdSpaceObject().getType()) {
-		case org.dspace.core.Constants.BITSTREAM:
-			this.resourceType = "bitstream";
-			break;
-		case org.dspace.core.Constants.ITEM:
-			this.resourceType = "item";
-			break;
-		case org.dspace.core.Constants.COLLECTION:
-			this.resourceType = "collection";
-			break;
-		case org.dspace.core.Constants.COMMUNITY:
-			this.resourceType = "community";
-			break;
-		case org.dspace.core.Constants.BUNDLE:
-			this.resourceType = "bundle";
-			break;
-		default:
-			this.resourceType = "";
-			break;
-		}
-	}
+    public ResourcePolicy() {
+    }
 
-	public Integer getId() {
-		return id;
-	}
+    public ResourcePolicy(org.dspace.authorize.ResourcePolicy dspacePolicy) {
+        this.id = dspacePolicy.getID();
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+        switch (dspacePolicy.getAction()) {
+            case org.dspace.core.Constants.READ:
+                this.action = Action.READ;
+                break;
+            case org.dspace.core.Constants.WRITE:
+                this.action = Action.WRITE;
+                break;
+            case org.dspace.core.Constants.DELETE:
+                this.action = Action.DELETE;
+                break;
+            default:
+                break;
+        }
 
-	public Action getAction() {
-		return action;
-	}
-	
-	@JsonIgnore
-	public int getActionInt(){
-		switch(action) {
-		case READ:
-			return org.dspace.core.Constants.READ;
-		case WRITE:
-			return org.dspace.core.Constants.WRITE;
-		case DELETE:
-			return org.dspace.core.Constants.DELETE;
-		}
-		return org.dspace.core.Constants.READ;
-	}
+        EPerson ePerson = dspacePolicy.getEPerson();
+        if (ePerson != null) {
+            this.epersonId = ePerson.getID().toString();
+        }
 
-	public void setAction(Action action) {
-		this.action = action;
-	}
+        Group group = dspacePolicy.getGroup();
+        if (group != null) {
+            this.groupId = group.getID().toString();
+        }
 
-	public String getEpersonId() {
-		return epersonId;
-	}
+        this.resourceId = dspacePolicy.getdSpaceObject().getID().toString();
+        this.rpDescription = dspacePolicy.getRpDescription();
+        this.rpName = dspacePolicy.getRpName();
+        this.rpType = dspacePolicy.getRpType();
+        this.startDate = dspacePolicy.getStartDate();
+        this.endDate = dspacePolicy.getEndDate();
+        switch (dspacePolicy.getdSpaceObject().getType()) {
+            case org.dspace.core.Constants.BITSTREAM:
+                this.resourceType = "bitstream";
+                break;
+            case org.dspace.core.Constants.ITEM:
+                this.resourceType = "item";
+                break;
+            case org.dspace.core.Constants.COLLECTION:
+                this.resourceType = "collection";
+                break;
+            case org.dspace.core.Constants.COMMUNITY:
+                this.resourceType = "community";
+                break;
+            case org.dspace.core.Constants.BUNDLE:
+                this.resourceType = "bundle";
+                break;
+            default:
+                this.resourceType = "";
+                break;
+        }
+    }
 
-	public void setEpersonId(String epersonId) {
-		this.epersonId = epersonId;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public String getGroupId() {
-		return groupId;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
-	}
+    public Action getAction() {
+        return action;
+    }
 
-	public String getResourceId() {
-		return resourceId;
-	}
+    @JsonIgnore
+    public int getActionInt() {
+        switch (action) {
+            case READ:
+                return org.dspace.core.Constants.READ;
+            case WRITE:
+                return org.dspace.core.Constants.WRITE;
+            case DELETE:
+                return org.dspace.core.Constants.DELETE;
+            default:
+                return org.dspace.core.Constants.READ;
+        }
+    }
 
-	public void setResourceId(String resourceId) {
-		this.resourceId = resourceId;
-	}
+    public void setAction(Action action) {
+        this.action = action;
+    }
 
-	public String getResourceType() {
-		return resourceType;
-	}
+    public String getEpersonId() {
+        return epersonId;
+    }
 
-	public void setResourceType(String resourceType) {
-		this.resourceType = resourceType;
-	}
+    public void setEpersonId(String epersonId) {
+        this.epersonId = epersonId;
+    }
 
-	public String getRpDescription() {
-		return rpDescription;
-	}
+    public String getGroupId() {
+        return groupId;
+    }
 
-	public void setRpDescription(String rpDescription) {
-		this.rpDescription = rpDescription;
-	}
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
 
-	public String getRpName() {
-		return rpName;
-	}
+    public String getResourceId() {
+        return resourceId;
+    }
 
-	public void setRpName(String rpName) {
-		this.rpName = rpName;
-	}
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
+    }
 
-	public String getRpType() {
-		return rpType;
-	}
+    public String getResourceType() {
+        return resourceType;
+    }
 
-	public void setRpType(String rpType) {
-		this.rpType = rpType;
-	}
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
+    }
 
-	public Date getStartDate() {
-		return startDate;
-	}
+    public String getRpDescription() {
+        return rpDescription;
+    }
 
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
+    public void setRpDescription(String rpDescription) {
+        this.rpDescription = rpDescription;
+    }
 
-	public Date getEndDate() {
-		return endDate;
-	}
+    public String getRpName() {
+        return rpName;
+    }
 
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
-	
+    public void setRpName(String rpName) {
+        this.rpName = rpName;
+    }
+
+    public String getRpType() {
+        return rpType;
+    }
+
+    public void setRpType(String rpType) {
+        this.rpType = rpType;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
 }

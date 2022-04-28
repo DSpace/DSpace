@@ -8,7 +8,6 @@
 package org.dspace.content.crosswalk;
 
 /**
- *
  * This indicates a problem with the input metadata (for submission) or
  * item state (dissemination).  It is invalid or incomplete, or simply
  * unsuitable to be crosswalked.
@@ -16,25 +15,20 @@ package org.dspace.content.crosswalk;
  * @author Larry Stone
  * @version $Revision$
  */
-public class MetadataValidationException extends CrosswalkException
-{
-    public MetadataValidationException()
-    {
+public class MetadataValidationException extends CrosswalkException {
+    public MetadataValidationException() {
         super();
     }
 
-    public MetadataValidationException(String arg0, Throwable arg1)
-    {
+    public MetadataValidationException(String arg0, Throwable arg1) {
         super(arg0, arg1);
     }
 
-    public MetadataValidationException(String arg0)
-    {
+    public MetadataValidationException(String arg0) {
         super(arg0);
     }
 
-    public MetadataValidationException(Throwable arg0)
-    {
+    public MetadataValidationException(Throwable arg0) {
         super(arg0);
     }
 }

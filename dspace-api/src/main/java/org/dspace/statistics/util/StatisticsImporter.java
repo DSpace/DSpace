@@ -15,8 +15,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,25 +29,35 @@ import java.util.Random;
 import java.util.UUID;
 
 import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.log4j.Logger;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.dspace.content.*;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.common.SolrInputDocument;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.*;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.DSpaceObjectLegacySupportService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
@@ -53,47 +65,65 @@ import org.dspace.statistics.service.SolrLoggerService;
 /**
  * Class to load intermediate statistics files (produced from log files by {@link ClassicDSpaceLogConverter}) into Solr.
  *
- * @see ClassicDSpaceLogConverter
- *
  * @author Stuart Lewis
+ * @see ClassicDSpaceLogConverter
  */
-public class StatisticsImporter
-{
-    private static final Logger log = Logger.getLogger(StatisticsImporter.class);
+public class StatisticsImporter {
+    private static final Logger log = LogManager.getLogger(StatisticsImporter.class);
 
-    /** Date format (for solr) */
+    /**
+     * Date format (for solr)
+     */
     private static final ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
         @Override
         protected DateFormat initialValue() {
             return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         }
     };
-    protected final SolrLoggerService solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
 
-    /** Solr server connection */
-    private static HttpSolrServer solr;
+    protected final SolrLoggerService solrLoggerService
+            = StatisticsServiceFactory.getInstance().getSolrLoggerService();
+    protected static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    /**
+     * Solr server connection
+     */
+    private static HttpSolrClient solr;
 
     /**
      * GEOIP lookup service
      */
     private static DatabaseReader geoipLookup;
 
-    /** Whether to skip the DNS reverse lookup or not */
+    /**
+     * Whether to skip the DNS reverse lookup or not
+     */
     private static boolean skipReverseDNS = false;
 
-    /** Local items */
+    /**
+     * Local items
+     */
     private List<UUID> localItems;
 
-    /** Local collections */
+    /**
+     * Local collections
+     */
     private List<UUID> localCollections;
 
-    /** Local communities */
+    /**
+     * Local communities
+     */
     private List<UUID> localCommunities;
 
-    /** Local bitstreams */
+    /**
+     * Local bitstreams
+     */
     private List<UUID> localBitstreams;
 
-    /** Whether or not to replace item IDs with local values (for testing) */
+    /**
+     * Whether or not to replace item IDs with local values (for testing)
+     */
     private final boolean useLocal;
 
     protected final BitstreamService bitstreamService;
@@ -107,26 +137,22 @@ public class StatisticsImporter
      *
      * @param local Whether to use local data
      */
-    public StatisticsImporter(boolean local)
-    {
+    public StatisticsImporter(boolean local) {
         bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
         collectionService = ContentServiceFactory.getInstance().getCollectionService();
         communityService = ContentServiceFactory.getInstance().getCommunityService();
         itemService = ContentServiceFactory.getInstance().getItemService();
         // Setup the lists of communities, collections, items & bitstreams if required
         useLocal = local;
-        if (local)
-        {
-            try
-            {
+        if (local) {
+            try {
                 ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
                 System.out.print("Loading local communities... ");
 
                 Context c = new Context();
                 List<Community> communities = communityService.findAll(c);
                 localCommunities = new ArrayList<>();
-                for (Community community : communities)
-                {
+                for (Community community : communities) {
                     localCommunities.add(community.getID());
                 }
                 System.out.println("Found " + localCommunities.size());
@@ -134,8 +160,7 @@ public class StatisticsImporter
                 System.out.print("Loading local collections... ");
                 List<Collection> collections = collectionService.findAll(c);
                 localCollections = new ArrayList<>();
-                for (Collection collection : collections)
-                {
+                for (Collection collection : collections) {
                     localCollections.add(collection.getID());
                 }
                 System.out.println("Found " + localCollections.size());
@@ -144,8 +169,7 @@ public class StatisticsImporter
                 Iterator<Item> items = itemService.findAll(c);
                 localItems = new ArrayList<>();
                 Item i;
-                while (items.hasNext())
-                {
+                while (items.hasNext()) {
                     i = items.next();
                     localItems.add(i.getID());
                 }
@@ -154,17 +178,14 @@ public class StatisticsImporter
                 System.out.print("Loading local bitstreams... ");
                 List<Bitstream> bitstreams = bitstreamService.findAll(c);
                 localBitstreams = new ArrayList<>();
-                for (Bitstream bitstream : bitstreams)
-                {
-                    if (bitstream.getName() != null)
-                    {
+                for (Bitstream bitstream : bitstreams) {
+                    if (bitstream.getName() != null) {
                         localBitstreams.add(bitstream.getID());
                     }
                 }
                 System.out.println("Found " + localBitstreams.size());
 
-            } catch (Exception e)
-            {
+            } catch (SQLException e) {
                 System.err.println("Error retrieving items from DSpace database:");
                 e.printStackTrace();
                 System.exit(1);
@@ -176,26 +197,23 @@ public class StatisticsImporter
      * Read lines from the statistics file and load their data into solr.
      *
      * @param filename The filename of the file to load
-     * @param context The DSpace Context
-     * @param verbose Whether to display verbose output
+     * @param context  The DSpace Context
+     * @param verbose  Whether to display verbose output
      */
-    protected void load(String filename, Context context, boolean verbose)
-    {
+    protected void load(String filename, Context context, boolean verbose) {
         // Item counter
         int counter = 0;
         int errors = 0;
         int searchengines = 0;
 
-        try
-        {
+        try {
             BufferedReader input;
-            if (null == filename || "-".equals(filename))
-            {
+            if (null == filename || "-".equals(filename)) {
                 input = new BufferedReader(new InputStreamReader(System.in));
                 filename = "standard input";
-            }
-            else
+            } else {
                 input = new BufferedReader(new FileReader(new File(filename)));
+            }
 
             // Print out the filename for confirmation
             System.out.println("Processing file: " + filename);
@@ -220,14 +238,12 @@ public class StatisticsImporter
             Object fromCache;
             Random rand = new Random();
 
-            while ((line = input.readLine()) != null)
-            {
+            while ((line = input.readLine()) != null) {
                 // Tokenise the line
                 String data = "";
                 counter++;
                 errors++;
-                if (verbose)
-                {
+                if (verbose) {
                     System.out.println("Line:" + line);
                 }
                 String[] parts = line.split(",");
@@ -240,22 +256,16 @@ public class StatisticsImporter
 
                 // Resolve the dns (if applicable) to get rid of search engine bots early on in the processing chain
                 dns = "";
-                if (!skipReverseDNS)
-                {
+                if (!skipReverseDNS) {
                     // Is the IP address in the cache?
                     fromCache = dnsCache.get(ip);
-                    if (fromCache != null)
-                    {
-                        dns = (String)fromCache;
-                    }
-                    else
-                    {
-                        try
-                        {
+                    if (fromCache != null) {
+                        dns = (String) fromCache;
+                    } else {
+                        try {
                             dns = DnsLookup.reverseDns(ip);
                             dnsCache.put(ip, dns);
-                        } catch (Exception e)
-                        {
+                        } catch (IOException e) {
                             dns = "";
                         }
                     }
@@ -265,10 +275,8 @@ public class StatisticsImporter
                 data += (", dns name = " + dns);
                 if ((dns.endsWith(".googlebot.com.")) ||
                     (dns.endsWith(".crawl.yahoo.net.")) ||
-                    (dns.endsWith(".search.msn.com.")))
-                {
-                    if (verbose)
-                    {
+                    (dns.endsWith(".search.msn.com."))) {
+                    if (verbose) {
                         System.out.println(data + ", IGNORE (search engine)");
                     }
                     errors--;
@@ -293,61 +301,46 @@ public class StatisticsImporter
                     try {
                         continent = LocationUtils.getContinentCode(countryCode);
                     } catch (Exception e) {
-                        if (verbose)
-                        {
+                        if (verbose) {
                             System.out.println("Unknown country code: " + countryCode);
                         }
                         continue;
                     }
-                } catch (Exception e) {
+                } catch (GeoIp2Exception | IOException e) {
                     // No problem - just can't look them up
                 }
 
                 // Now find our dso
                 ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
                 DSpaceObjectLegacySupportService legacySupportService = null;
-                if ("view_bitstream".equals(action))
-                {
+                if ("view_bitstream".equals(action)) {
                     legacySupportService = contentServiceFactory.getBitstreamService();
-                    if (useLocal)
-                    {
+                    if (useLocal) {
                         id = "" + localBitstreams.get(rand.nextInt(localBitstreams.size()));
                     }
-                }
-                else if ("view_item".equals(action))
-                {
+                } else if ("view_item".equals(action)) {
                     legacySupportService = contentServiceFactory.getItemService();
-                    if (useLocal)
-                    {
+                    if (useLocal) {
                         id = "" + localItems.get(rand.nextInt(localItems.size()));
                     }
-                }
-                else if ("view_collection".equals(action))
-                {
+                } else if ("view_collection".equals(action)) {
                     legacySupportService = contentServiceFactory.getCollectionService();
-                    if (useLocal)
-                    {
+                    if (useLocal) {
                         id = "" + localCollections.get(rand.nextInt(localCollections.size()));
                     }
-                }
-                else if ("view_community".equals(action))
-                {
+                } else if ("view_community".equals(action)) {
                     legacySupportService = contentServiceFactory.getCommunityService();
-                    if (useLocal)
-                    {
+                    if (useLocal) {
                         id = "" + localCommunities.get(rand.nextInt(localCommunities.size()));
                     }
                 }
-                if(legacySupportService == null)
-                {
+                if (legacySupportService == null) {
                     continue;
                 }
 
                 DSpaceObject dso = legacySupportService.findByIdOrLegacyId(context, id);
-                if (dso == null)
-                {
-                    if (verbose)
-                    {
+                if (dso == null) {
+                    if (verbose) {
                         System.err.println(" - DSO with ID '" + id + "' is no longer in the system");
                     }
                     continue;
@@ -356,8 +349,7 @@ public class StatisticsImporter
                 // Get the eperson details
                 EPerson eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, user);
                 int epersonId = 0;
-                if (eperson != null)
-                {
+                if (eperson != null) {
                     eperson.getID();
                 }
 
@@ -373,12 +365,10 @@ public class StatisticsImporter
                 sid.addField("city", city);
                 sid.addField("latitude", latitude);
                 sid.addField("longitude", longitude);
-                if (epersonId > 0)
-                {
+                if (epersonId > 0) {
                     sid.addField("epersonid", epersonId);
                 }
-                if (dns != null)
-                {
+                if (dns != null) {
                     sid.addField("dns", dns.toLowerCase());
                 }
 
@@ -387,13 +377,9 @@ public class StatisticsImporter
                 errors--;
             }
 
-        }
-        catch (RuntimeException re)
-        {
+        } catch (RuntimeException re) {
             throw re;
-        }
-        catch (Exception e)
-        {
+        } catch (IOException | SQLException | ParseException | SolrServerException e) {
             System.err.println(e.getMessage());
             log.error(e.getMessage(), e);
         }
@@ -401,45 +387,40 @@ public class StatisticsImporter
         DecimalFormat percentage = new DecimalFormat("##.###");
         int committed = counter - errors - searchengines;
         System.out.println("Processed " + counter + " log lines");
-        if (counter > 0)
-        {
+        if (counter > 0) {
             Double committedpercentage = 100d * committed / counter;
-            System.out.println(" - " + committed + " entries added to solr: " + percentage.format(committedpercentage) + "%");
+            System.out
+                .println(" - " + committed + " entries added to solr: " + percentage.format(committedpercentage) + "%");
             Double errorpercentage = 100d * errors / counter;
             System.out.println(" - " + errors + " errors: " + percentage.format(errorpercentage) + "%");
             Double sepercentage = 100d * searchengines / counter;
-            System.out.println(" - " + searchengines + " search engine activity skipped: " + percentage.format(sepercentage) + "%");
+            System.out.println(
+                " - " + searchengines + " search engine activity skipped: " + percentage.format(sepercentage) + "%");
             System.out.print("About to commit data to solr...");
 
             // Commit at the end because it takes a while
-            try
-            {
+            try {
                 solr.commit();
-            }
-            catch (SolrServerException sse)
-            {
+            } catch (SolrServerException sse) {
                 System.err.println("Error committing statistics to solr server!");
                 sse.printStackTrace();
                 System.exit(1);
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 System.err.println("Error writing to solr server!");
                 ioe.printStackTrace();
                 System.exit(1);
             }
         }
         System.out.println(" done!");
-	}
+    }
 
     /**
      * Print the help message
      *
-     * @param options The command line options the user gave
+     * @param options  The command line options the user gave
      * @param exitCode the system exit code to use
      */
-    private static void printHelp(Options options, int exitCode)
-    {
+    private static void printHelp(Options options, int exitCode) {
         // print the help message
         HelpFormatter myhelp = new HelpFormatter();
         myhelp.printHelp("StatisticsImporter\n", options);
@@ -449,32 +430,35 @@ public class StatisticsImporter
     /**
      * Main method to run the statistics importer.
      *
-     * @param args The command line arguments
+     * @param args the command line arguments given
      * @throws Exception If something goes wrong
      */
-	public static void main(String[] args) throws Exception
-    {
-		CommandLineParser parser = new PosixParser();
+    public static void main(String[] args) throws Exception {
+        CommandLineParser parser = new DefaultParser();
 
-		Options options = new Options();
+        Options options = new Options();
 
-        options.addOption("i", "in", true, "the input file ('-' or omit for standard input)");
-        options.addOption("l", "local", false, "developers tool - map external log file to local handles");
-        options.addOption("m", "multiple", false, "treat the input file as having a wildcard ending");
-        options.addOption("s", "skipdns", false, "skip performing reverse DNS lookups on IP addresses");
-        options.addOption("v", "verbose", false, "display verbose output (useful for debugging)");
-        options.addOption("h", "help", false, "help");
+        options.addOption("i", "in", true,
+                          "the input file ('-' or omit for standard input)");
+        options.addOption("l", "local", false,
+                          "developers tool - map external log file to local handles");
+        options.addOption("m", "multiple", false,
+                          "treat the input file as having a wildcard ending");
+        options.addOption("s", "skipdns", false,
+                          "skip performing reverse DNS lookups on IP addresses");
+        options.addOption("v", "verbose", false,
+                          "display verbose output (useful for debugging)");
+        options.addOption("h", "help", false,
+                          "help");
 
-		CommandLine line = parser.parse(options, args);
+        CommandLine line = parser.parse(options, args);
 
         // Did the user ask to see the help?
-        if (line.hasOption('h'))
-        {
+        if (line.hasOption('h')) {
             printHelp(options, 0);
         }
 
-        if (line.hasOption('s'))
-        {
+        if (line.hasOption('s')) {
             skipReverseDNS = true;
         }
 
@@ -482,21 +466,20 @@ public class StatisticsImporter
         // (useful if using someone else's log file for testing)
         boolean local = line.hasOption('l');
 
-		// We got all our parameters now get the rest
-		Context context = new Context();
+        // We got all our parameters now get the rest
+        Context context = new Context();
 
         // Verbose option
         boolean verbose = line.hasOption('v');
 
         // Find our solr server
-        String sserver = ConfigurationManager.getProperty("solr-statistics", "server");
-        if (verbose)
-        {
+        String sserver = configurationService.getProperty("solr-statistics", "server");
+        if (verbose) {
             System.out.println("Writing to solr server at: " + sserver);
         }
-		solr = new HttpSolrServer(sserver);
+        solr = new HttpSolrClient.Builder(sserver).build();
 
-        String dbPath = ConfigurationManager.getProperty("usage-statistics", "dbfile");
+        String dbPath = configurationService.getProperty("usage-statistics", "dbfile");
         try {
             File dbFile = new File(dbPath);
             geoipLookup = new DatabaseReader.Builder(dbFile).build();
@@ -515,28 +498,22 @@ public class StatisticsImporter
 
 
         StatisticsImporter si = new StatisticsImporter(local);
-        if (line.hasOption('m'))
-        {
+        if (line.hasOption('m')) {
             // Convert all the files
             final File sample = new File(line.getOptionValue('i'));
             File dir = sample.getParentFile();
-            FilenameFilter filter = new FilenameFilter()
-            {
+            FilenameFilter filter = new FilenameFilter() {
                 @Override
-                public boolean accept(File dir, String name)
-                {
+                public boolean accept(File dir, String name) {
                     return name.startsWith(sample.getName());
                 }
             };
             String[] children = dir.list(filter);
-            for (String in : children)
-            {
+            for (String in : children) {
                 System.out.println(in);
                 si.load(dir.getAbsolutePath() + System.getProperty("file.separator") + in, context, verbose);
             }
-        }
-        else
-        {
+        } else {
             // Just convert the one file
             si.load(line.getOptionValue('i'), context, verbose);
         }
@@ -545,22 +522,20 @@ public class StatisticsImporter
 
     /**
      * Inner class to hold a cache of reverse lookups of IP addresses
-     * @param <K>
-     * @param <V>
+     *
+     * @param <K> key type.
+     * @param <V> value type.
      */
-    static class DNSCache<K,V> extends LinkedHashMap<K,V>
-    {
+    static class DNSCache<K, V> extends LinkedHashMap<K, V> {
         private final int maxCapacity;
 
-        public DNSCache(int initialCapacity, float loadFactor, int maxCapacity)
-        {
+        public DNSCache(int initialCapacity, float loadFactor, int maxCapacity) {
             super(initialCapacity, loadFactor, true);
             this.maxCapacity = maxCapacity;
         }
 
         @Override
-        protected boolean removeEldestEntry(java.util.Map.Entry<K,V> eldest)
-        {
+        protected boolean removeEldestEntry(java.util.Map.Entry<K, V> eldest) {
             return size() >= this.maxCapacity;
         }
     }

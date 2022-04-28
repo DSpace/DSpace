@@ -7,12 +7,23 @@
  */
 package org.dspace.testing;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -21,23 +32,15 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Simple class to transform a medline.xml file from PubMed into DSpace import package(s)
+ * Simple class to transform a medline.xml file from PubMed into DSpace import package(s).
  *
+ * <p>
  * This is a distinctly incomplete implementation - it doesn't even attempt to map a number of fields,
  * and has no means of customizing the mapping. More importantly, it makes assumptions in parsing the xml
  * that would be problematic for a production instance.
  *
+ * <p>
  * However, it does use SAX parsing, which means it has no problems with handling a 1GB+ input file.
  * This means it is a good way to generate a large number of realistic import packages very quickly -
  * simply go to http://www.ncbi.nlm.nih.gov/pubmed and search for something that returns a lot of records
@@ -46,9 +49,14 @@ import java.util.List;
  * which can then be loaded into DSpace using ItemImport.
  */
 public class PubMedToImport {
-    private static final Logger log = Logger.getLogger(PubMedToImport.class);
+    private static final Logger log = LogManager.getLogger(PubMedToImport.class);
 
     private static File outputDir = null;
+
+    /**
+     * Default constructor
+     */
+    private PubMedToImport() { }
 
     public static void main(String args[]) {
         Options options = new Options();
@@ -57,7 +65,7 @@ public class PubMedToImport {
         options.addOption(new Option("o", "output", true, "Output directory"));
 
         try {
-            CommandLine cli = new PosixParser().parse(options, args);
+            CommandLine cli = new DefaultParser().parse(options, args);
 
             String source = cli.getOptionValue("s");
             String output = cli.getOptionValue("o");
@@ -81,9 +89,9 @@ public class PubMedToImport {
             SAXParser saxParser = factory.newSAXParser();
 
             saxParser.parse(source, new PubMedHandler());
-            
+
         } catch (Exception e) {
-            
+            // ignore
         }
     }
 
@@ -101,7 +109,7 @@ public class PubMedToImport {
 
         private static void addDCValue(String element, String qualifier, String value) {
             if (dcValues == null) {
-                dcValues = new ArrayList<MockMetadataValue>();
+                dcValues = new ArrayList<>();
             }
 
             MockMetadataValue thisValue = new MockMetadataValue();
@@ -114,8 +122,8 @@ public class PubMedToImport {
         }
 
         @Override
-        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
-        {
+        public void startElement(String uri, String localName, String qName, Attributes attributes)
+            throws SAXException {
             if ("PubmedArticle".equals(qName)) {
                 System.out.println("Starting record " + recordCount);
             } else if ("CommensCorrectionsList".equals(qName)) {
@@ -134,8 +142,7 @@ public class PubMedToImport {
         }
 
         @Override
-        public void endElement(String uri, String localName, String qName) throws SAXException
-        {
+        public void endElement(String uri, String localName, String qName) throws SAXException {
             if (!isCorrection) {
                 if ("PMID".equals(qName)) {
                     addDCValue("identifier", null, value.toString());
@@ -169,13 +176,12 @@ public class PubMedToImport {
             }
 
             isFirstName = false;
-            isLastName  = false;
+            isLastName = false;
             super.endElement(uri, localName, qName);
         }
 
         @Override
-        public void characters(char[] chars, int start, int length) throws SAXException
-        {
+        public void characters(char[] chars, int start, int length) throws SAXException {
             if (isFirstName) {
                 firstName.append(chars, start, length);
 //                firstName = String.copyValueOf(chars, start, length);
@@ -190,26 +196,23 @@ public class PubMedToImport {
             super.characters(chars, start, length);
         }
 
-        private void writeItem() throws IOException
-        {
+        private void writeItem() throws IOException {
             File itemDir = new File(outputDir, String.valueOf(recordCount));
             itemDir.mkdirs();
 
             new File(itemDir, "contents").createNewFile();
-            
+
             Document doc = new Document();
             Element root = new Element("dublin_core");
 
             doc.setRootElement(root);
 
-            for (MockMetadataValue dcValue : dcValues)
-            {
+            for (MockMetadataValue dcValue : dcValues) {
                 Element dcNode = new Element("dcvalue");
 
                 dcNode.setAttribute("element", dcValue.element);
 
-                if (!StringUtils.isEmpty(dcValue.qualifier))
-                {
+                if (!StringUtils.isEmpty(dcValue.qualifier)) {
                     dcNode.setAttribute("qualifier", dcValue.qualifier);
                 }
 
@@ -236,8 +239,7 @@ public class PubMedToImport {
     }
 
 
-    protected static class MockMetadataValue
-    {
+    protected static class MockMetadataValue {
         public String schema;
         public String element;
         public String qualifier;

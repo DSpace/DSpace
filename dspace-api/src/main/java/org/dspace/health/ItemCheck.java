@@ -7,24 +7,34 @@
  */
 package org.dspace.health;
 
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.dspace.app.util.CollectionDropDown;
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.*;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
-import org.dspace.workflowbasic.service.BasicWorkflowItemService;
-
-import java.sql.SQLException;
-import java.util.*;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 
 /**
  * @author LINDAT/CLARIN dev team
@@ -32,28 +42,28 @@ import java.util.*;
 public class ItemCheck extends Check {
 
     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    private BundleService bundleService =  ContentServiceFactory.getInstance().getBundleService();
+    private BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    private BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
+    private XmlWorkflowItemService workflowItemService =
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
     private HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
 
-
     @Override
-    public String run( ReportInfo ri ) {
+    public String run(ReportInfo ri) {
         String ret = "";
         int tot_cnt = 0;
         Context context = new Context();
         try {
             for (Map.Entry<String, Integer> name_count : getCommunities(context)) {
                 ret += String.format("Community [%s]: %d\n",
-                    name_count.getKey(), name_count.getValue());
+                                     name_count.getKey(), name_count.getValue());
                 tot_cnt += name_count.getValue();
             }
         } catch (SQLException e) {
@@ -78,14 +88,14 @@ public class ItemCheck extends Check {
 
             for (Map.Entry<Integer, Long> row : workspaceItemService.getStageReachedCounts(context)) {
                 ret += String.format("\tIn Stage %s: %s\n",
-                    row.getKey(), //"stage_reached"
-                    row.getValue() //"cnt"
+                                     row.getKey(), //"stage_reached"
+                                     row.getValue() //"cnt"
                 );
             }
 
             ret += String.format(
                 "\tWaiting for approval (workflow items): %d\n",
-                basicWorkflowItemService.countTotal(context));
+                workflowItemService.countAll(context));
 
         } catch (SQLException e) {
             error(e);
@@ -101,36 +111,37 @@ public class ItemCheck extends Check {
     }
 
 
-    public  String getObjectSizesInfo(Context context) throws SQLException {
+    public String getObjectSizesInfo(Context context) throws SQLException {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Count %-14s: %s\n", "Bitstream",
-                    String.valueOf(bitstreamService.countTotal(context))));
+                                String.valueOf(bitstreamService.countTotal(context))));
         sb.append(String.format("Count %-14s: %s\n", "Bundle",
-                String.valueOf(bundleService.countTotal(context))));
+                                String.valueOf(bundleService.countTotal(context))));
         sb.append(String.format("Count %-14s: %s\n", "Collection",
-                String.valueOf(collectionService.countTotal(context))));
+                                String.valueOf(collectionService.countTotal(context))));
         sb.append(String.format("Count %-14s: %s\n", "Community",
-                String.valueOf(communityService.countTotal(context))));
+                                String.valueOf(communityService.countTotal(context))));
         sb.append(String.format("Count %-14s: %s\n", "MetadataValue",
-                String.valueOf(metadataValueService.countTotal(context))));
+                                String.valueOf(metadataValueService.countTotal(context))));
         sb.append(String.format("Count %-14s: %s\n", "EPerson",
-                String.valueOf(ePersonService.countTotal(context))));
+                                String.valueOf(ePersonService.countTotal(context))));
         sb.append(String.format("Count %-14s: %s\n", "Item",
-                String.valueOf(itemService.countTotal(context))));
+                                String.valueOf(itemService.countTotal(context))));
         sb.append(String.format("Count %-14s: %s\n", "Handle",
-                String.valueOf(handleService.countTotal(context))));
+                                String.valueOf(handleService.countTotal(context))));
         sb.append(String.format("Count %-14s: %s\n", "Group",
-                String.valueOf(groupService.countTotal(context))));
+                                String.valueOf(groupService.countTotal(context))));
         sb.append(String.format("Count %-14s: %s\n", "BasicWorkflowItem",
-                String.valueOf(basicWorkflowItemService.countTotal(context))));
+                                String.valueOf(workflowItemService.countAll(context))));
         sb.append(String.format("Count %-14s: %s\n", "WorkspaceItem",
-                String.valueOf(workspaceItemService.countTotal(context))));
+                                String.valueOf(workspaceItemService.countTotal(context))));
         return sb.toString();
     }
 
-    public  String getCollectionSizesInfo(final Context context) throws SQLException {
+    public String getCollectionSizesInfo(final Context context) throws SQLException {
         final StringBuffer ret = new StringBuffer();
-        List<Map.Entry<Collection, Long>> colBitSizes = collectionService.getCollectionsWithBitstreamSizesTotal(context);
+        List<Map.Entry<Collection, Long>> colBitSizes = collectionService
+            .getCollectionsWithBitstreamSizesTotal(context);
         long total_size = 0;
 
         Collections.sort(colBitSizes, new Comparator<Map.Entry<Collection, Long>>() {
@@ -138,7 +149,7 @@ public class ItemCheck extends Check {
             public int compare(Map.Entry<Collection, Long> o1, Map.Entry<Collection, Long> o2) {
                 try {
                     return CollectionDropDown.collectionPath(context, o1.getKey()).compareTo(
-                            CollectionDropDown.collectionPath(context, o2.getKey())
+                        CollectionDropDown.collectionPath(context, o2.getKey())
                     );
                 } catch (Exception e) {
                     ret.append(e.getMessage());
@@ -151,37 +162,38 @@ public class ItemCheck extends Check {
             total_size += size;
             Collection col = row.getKey();
             ret.append(String.format(
-                    "\t%s:  %s\n", CollectionDropDown.collectionPath(context, col), FileUtils.byteCountToDisplaySize((long) size)));
+                "\t%s:  %s\n", CollectionDropDown.collectionPath(context, col),
+                FileUtils.byteCountToDisplaySize((long) size)));
         }
         ret.append(String.format(
-                "Total size:              %s\n", FileUtils.byteCountToDisplaySize(total_size)));
+            "Total size:              %s\n", FileUtils.byteCountToDisplaySize(total_size)));
 
         ret.append(String.format(
-                "Resource without policy: %d\n", bitstreamService.countBitstreamsWithoutPolicy(context)));
+            "Resource without policy: %d\n", bitstreamService.countBitstreamsWithoutPolicy(context)));
 
         ret.append(String.format(
-                "Deleted bitstreams:      %d\n", bitstreamService.countDeletedBitstreams(context)));
+            "Deleted bitstreams:      %d\n", bitstreamService.countDeletedBitstreams(context)));
 
         String list_str = "";
         List<Bitstream> bitstreamOrphans = bitstreamService.getNotReferencedBitstreams(context);
         for (Bitstream orphan : bitstreamOrphans) {
             UUID id = orphan.getID();
-            list_str += String.format("%d, ", id);
+            list_str += String.format("%s, ", id);
         }
         ret.append(String.format(
-                "Orphan bitstreams:       %d [%s]\n", bitstreamOrphans.size(), list_str));
+            "Orphan bitstreams:       %d [%s]\n", bitstreamOrphans.size(), list_str));
 
         return ret.toString();
     }
 
-    public  List<Map.Entry<String, Integer>> getCommunities(Context context)
-            throws SQLException {
+    public List<Map.Entry<String, Integer>> getCommunities(Context context)
+        throws SQLException {
 
         List<Map.Entry<String, Integer>> cl = new java.util.ArrayList<>();
         List<Community> top_communities = communityService.findAllTop(context);
         for (Community c : top_communities) {
             cl.add(
-                    new java.util.AbstractMap.SimpleEntry<>(c.getName(), itemService.countItems(context, c))
+                new java.util.AbstractMap.SimpleEntry<>(c.getName(), itemService.countItems(context, c))
             );
         }
         return cl;

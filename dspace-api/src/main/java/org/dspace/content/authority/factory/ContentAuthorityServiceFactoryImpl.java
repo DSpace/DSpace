@@ -12,7 +12,8 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the content.authority package, use ContentAuthorityServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the content.authority package, use ContentAuthorityServiceFactory
+ * .getInstance() to retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -26,14 +27,12 @@ public class ContentAuthorityServiceFactoryImpl extends ContentAuthorityServiceF
 
 
     @Override
-    public ChoiceAuthorityService getChoiceAuthorityService()
-    {
+    public ChoiceAuthorityService getChoiceAuthorityService() {
         return choiceAuthorityService;
     }
 
     @Override
-    public MetadataAuthorityService getMetadataAuthorityService()
-    {
+    public MetadataAuthorityService getMetadataAuthorityService() {
         return metadataAuthorityService;
     }
 }

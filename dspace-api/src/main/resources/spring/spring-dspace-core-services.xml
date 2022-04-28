@@ -22,26 +22,28 @@
           autowire="byType"
           scope="singleton"/>
 
-   <!-- provider for exposing default Handle services implementaion. -->
+    <bean id="org.dspace.services.ConfigurationService"
+          class="org.dspace.servicemanager.config.DSpaceConfigurationService" scope="singleton"/>
+
+    <!-- provider for exposing default Handle services implementaion. -->
     <!--bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.HandleIdentifierProvider"
           scope="singleton">
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
     </bean-->
 
-    <bean id="org.dspace.identifier.VersionedHandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider"
+    <bean id="org.dspace.identifier.VersionedHandleIdentifierProvider"
+          class="org.dspace.identifier.VersionedHandleIdentifierProvider"
           scope="singleton">
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
     </bean>
 
-    <bean name="org.dspace.core.DBConnection" class="org.dspace.core.HibernateDBConnection" lazy-init="true"/>
-    <bean name="org.dspace.core.DatabaseSchemaValidator" class="org.dspace.core.HibernateDatabaseSchemaValidator" lazy-init="true"/>
+    <bean name="org.dspace.core.DBConnection" class="org.dspace.core.HibernateDBConnection" lazy-init="true" scope="prototype"/>
 
     <!-- Register all our Flyway callback classes (which run before/after database migrations) -->
-    <bean class="org.dspace.storage.rdbms.DatabaseRegistryUpdater"/>
+    <bean class="org.dspace.storage.rdbms.RegistryUpdater"/>
     <bean class="org.dspace.storage.rdbms.GroupServiceInitializer"/>
     <bean class="org.dspace.storage.rdbms.PostgreSQLCryptoChecker"/>
     <bean class="org.dspace.storage.rdbms.SiteServiceInitializer"/>
+    <bean class="org.dspace.storage.rdbms.EntityTypeServiceInitializer"/>
 
-    <!-- Initialize our LoggerService (i.e. log4j) -->
-    <bean class="org.dspace.core.LoggerServiceImpl"/>
 </beans>

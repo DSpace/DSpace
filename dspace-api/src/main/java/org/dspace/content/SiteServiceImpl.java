@@ -7,20 +7,19 @@
  */
 package org.dspace.content;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.UUID;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.SiteDAO;
 import org.dspace.content.service.SiteService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.UUID;
 
 /**
  * Service implementation for the Site object.
@@ -40,16 +39,14 @@ public class SiteServiceImpl extends DSpaceObjectServiceImpl<Site> implements Si
     @Autowired(required = true)
     protected SiteDAO siteDAO;
 
-    protected SiteServiceImpl()
-    {
+    protected SiteServiceImpl() {
         super();
     }
 
     @Override
     public Site createSite(Context context) throws SQLException {
         Site site = findSite(context);
-        if(site == null)
-        {
+        if (site == null) {
             //Only one site can be created at any point in time
             site = siteDAO.create(context, new Site());
             handleService.createHandle(context, site, configurationService.getProperty("handle.prefix") + "/0");
@@ -74,18 +71,19 @@ public class SiteServiceImpl extends DSpaceObjectServiceImpl<Site> implements Si
 
     @Override
     public void update(Context context, Site site) throws SQLException, AuthorizeException {
-        if(!authorizeService.isAdmin(context)){
+        if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException();
         }
 
         super.update(context, site);
 
-        if(site.isMetadataModified())
-        {
-            context.addEvent(new Event(Event.MODIFY_METADATA, site.getType(), site.getID(), site.getDetails(), getIdentifiers(context, site)));
+        if (site.isMetadataModified()) {
+            context.addEvent(new Event(Event.MODIFY_METADATA, site.getType(), site.getID(), site.getDetails(),
+                                       getIdentifiers(context, site)));
         }
-        if(site.isModified()) {
-            context.addEvent(new Event(Event.MODIFY, site.getType(), site.getID(), site.getDetails(), getIdentifiers(context, site)));
+        if (site.isModified()) {
+            context.addEvent(new Event(Event.MODIFY, site.getType(), site.getID(), site.getDetails(),
+                                       getIdentifiers(context, site)));
         }
         site.clearModified();
         site.clearDetails();
@@ -94,9 +92,8 @@ public class SiteServiceImpl extends DSpaceObjectServiceImpl<Site> implements Si
     }
 
     @Override
-    public String getName(Site dso)
-    {
-        return ConfigurationManager.getProperty("dspace.name");
+    public String getName(Site dso) {
+        return configurationService.getProperty("dspace.name");
     }
 
     @Override

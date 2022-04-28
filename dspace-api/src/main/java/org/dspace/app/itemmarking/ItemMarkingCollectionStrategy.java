@@ -18,33 +18,32 @@ import org.dspace.core.Context;
 /**
  * This is an item marking Strategy class that tries to mark an item
  * based on the collection the items belong to
- * 
+ *
  * @author Kostas Stamatis
- * 
  */
 public class ItemMarkingCollectionStrategy implements ItemMarkingExtractor {
 
-	Map<String, ItemMarkingInfo> mapping = new HashMap<String, ItemMarkingInfo>();
-	
-	public ItemMarkingCollectionStrategy() {
-	}
+    Map<String, ItemMarkingInfo> mapping = new HashMap<String, ItemMarkingInfo>();
 
-	@Override
-	public ItemMarkingInfo getItemMarkingInfo(Context context, Item item)
-			throws SQLException {
-		
-		if (mapping!=null){
-			for (Collection collection : item.getCollections()){
-				if (mapping.containsKey(collection.getHandle())){
-					return mapping.get(collection.getHandle());
-				}
-			}
-		}
-		
-		return null;
-	}
+    public ItemMarkingCollectionStrategy() {
+    }
 
-	public void setMapping(Map<String, ItemMarkingInfo> mapping) {
-		this.mapping = mapping;
-	}
+    @Override
+    public ItemMarkingInfo getItemMarkingInfo(Context context, Item item)
+        throws SQLException {
+
+        if (mapping != null) {
+            for (Collection collection : item.getCollections()) {
+                if (mapping.containsKey(collection.getHandle())) {
+                    return mapping.get(collection.getHandle());
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public void setMapping(Map<String, ItemMarkingInfo> mapping) {
+        this.mapping = mapping;
+    }
 }

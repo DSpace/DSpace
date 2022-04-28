@@ -7,21 +7,22 @@
  */
 package org.dspace.vocabulary;
 
-import org.apache.xpath.XPathAPI;
-import org.dspace.core.ConfigurationManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.apache.xpath.XPathAPI;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * This class represents a single controlled vocabulary node
@@ -48,22 +49,29 @@ public class ControlledVocabulary {
      *
      * @param fileName the name of the vocabulary file.
      * @return a controlled vocabulary object
-     * @throws IOException Should something go wrong with reading the file
-     * @throws SAXException Error during xml parsing
+     * @throws IOException                  Should something go wrong with reading the file
+     * @throws SAXException                 Error during xml parsing
      * @throws ParserConfigurationException Error during xml parsing
-     * @throws TransformerException Error during xml parsing
-     * TODO: add some caching !
+     * @throws TransformerException         Error during xml parsing
+     *                                      TODO: add some caching !
      */
-    public static ControlledVocabulary loadVocabulary(String fileName) throws IOException, SAXException, ParserConfigurationException, TransformerException {
+    public static ControlledVocabulary loadVocabulary(String fileName)
+        throws IOException, SAXException, ParserConfigurationException, TransformerException {
         StringBuilder filePath = new StringBuilder();
-        filePath.append(ConfigurationManager.getProperty("dspace.dir")).append(File.separatorChar).append("config").append(File.separatorChar).append("controlled-vocabularies").append(File.separator).append(fileName).append(".xml");
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        filePath.append(configurationService.getProperty("dspace.dir"))
+                .append(File.separatorChar).append("config")
+                .append(File.separatorChar).append("controlled-vocabularies")
+                .append(File.separator).append(fileName)
+                .append(".xml");
 
         File controlledVocFile = new File(filePath.toString());
-        if(controlledVocFile.exists()){
+        if (controlledVocFile.exists()) {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.parse(controlledVocFile);
             return loadVocabularyNode(XPathAPI.selectSingleNode(document, "node"), "");
-        }else{
+        } else {
             return null;
         }
 
@@ -71,7 +79,8 @@ public class ControlledVocabulary {
 
     /**
      * Loads a single node & all its child nodes recursively
-     * @param node The current node that we need to parse
+     *
+     * @param node         The current node that we need to parse
      * @param initialValue the value of parent node
      * @return a vocabulary node with all its children
      * @throws TransformerException should something go wrong with loading the xml
@@ -79,27 +88,27 @@ public class ControlledVocabulary {
     private static ControlledVocabulary loadVocabularyNode(Node node, String initialValue) throws TransformerException {
         Node idNode = node.getAttributes().getNamedItem("id");
         String id = null;
-        if(idNode != null){
+        if (idNode != null) {
             id = idNode.getNodeValue();
         }
         Node labelNode = node.getAttributes().getNamedItem("label");
         String label = null;
-        if(labelNode != null){
+        if (labelNode != null) {
             label = labelNode.getNodeValue();
         }
         String value;
-        if(0 < initialValue.length()){
+        if (0 < initialValue.length()) {
             value = initialValue + "::" + label;
-        }else{
+        } else {
             value = label;
         }
         NodeList subNodes = XPathAPI.selectNodeList(node, "isComposedBy/node");
 
-        List<ControlledVocabulary> subVocabularies = new ArrayList<ControlledVocabulary>(subNodes.getLength());
-        for(int i = 0; i < subNodes.getLength(); i++){
+        List<ControlledVocabulary> subVocabularies = new ArrayList<>(subNodes.getLength());
+        for (int i = 0; i < subNodes.getLength(); i++) {
             subVocabularies.add(loadVocabularyNode(subNodes.item(i), value));
         }
-        
+
         return new ControlledVocabulary(id, label, value, subVocabularies);
     }
 

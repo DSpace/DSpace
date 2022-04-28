@@ -7,18 +7,25 @@
  */
 package org.dspace.content;
 
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
-import org.dspace.content.service.SupervisedItemService;
-import org.dspace.content.service.WorkspaceItemService;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import org.dspace.authorize.AuthorizeException;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.SupervisedItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -26,26 +33,26 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SupervisorService;
-import org.junit.*;
-import static org.hamcrest.CoreMatchers.*;
-import org.apache.log4j.Logger;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- *
  * @author pvillega
  */
-public class SupervisedItemTest extends AbstractUnitTest
-{
+public class SupervisedItemTest extends AbstractUnitTest {
 
-    /** log4j category */
-    private static final Logger log = Logger.getLogger(SupervisedItemTest.class);
+    /**
+     * log4j category
+     */
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SupervisedItemTest.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-    protected SupervisedItemService supervisedItemService = ContentServiceFactory.getInstance().getSupervisedItemService();
+    protected SupervisedItemService supervisedItemService = ContentServiceFactory.getInstance()
+                                                                                 .getSupervisedItemService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
     protected SupervisorService supervisorService = EPersonServiceFactory.getInstance().getSupervisorService();
 
@@ -63,11 +70,9 @@ public class SupervisedItemTest extends AbstractUnitTest
      */
     @Before
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
-        try
-        {
+        try {
             //we have to create a new community in the database
             context.turnOffAuthorisationSystem();
             Community owningCommunity = communityService.create(null, context);
@@ -90,13 +95,10 @@ public class SupervisedItemTest extends AbstractUnitTest
             context.complete();
             context = new Context();
             context.setCurrentUser(currentUser);
-        } catch (AuthorizeException ex)
-        {
+        } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
             fail("Authorization Error in init: " + ex.getMessage());
-        }
-        catch (SQLException ex)
-        {
+        } catch (SQLException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init");
         }
@@ -111,8 +113,7 @@ public class SupervisedItemTest extends AbstractUnitTest
      */
     @After
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         try {
             context.turnOffAuthorisationSystem();
             communityService.delete(context, communityService.find(context, communityId));
@@ -128,29 +129,25 @@ public class SupervisedItemTest extends AbstractUnitTest
      * Test of getAll method, of class SupervisedItem.
      */
     @Test
-    public void testGetAll() throws Exception
-    {
+    public void testGetAll() throws Exception {
         List<WorkspaceItem> found = supervisedItemService.getAll(context);
         assertThat("testGetAll 0", found, notNullValue());
         assertTrue("testGetAll 1", found.size() >= 1);
 
         boolean added = false;
-        for(WorkspaceItem sia: found)
-        {
-            if(sia.getID() == workspaceItemId)
-            {
+        for (WorkspaceItem sia : found) {
+            if (sia.getID() == workspaceItemId) {
                 added = true;
             }
         }
-        assertTrue("testGetAll 2",added);
+        assertTrue("testGetAll 2", added);
     }
 
     /**
      * Test of getSupervisorGroups method, of class SupervisedItem.
      */
     @Test
-    public void testGetSupervisorGroups_Context_int() throws Exception
-    {
+    public void testGetSupervisorGroups_Context_int() throws Exception {
         List<Group> found = workspaceItemService.find(context, workspaceItemId).getSupervisorGroups();
         assertThat("testGetSupervisorGroups_Context_int 0", found, notNullValue());
         assertTrue("testGetSupervisorGroups_Context_int 1", found.size() == 1);
@@ -161,47 +158,41 @@ public class SupervisedItemTest extends AbstractUnitTest
      * Test of getSupervisorGroups method, of class SupervisedItem.
      */
     @Test
-    public void testGetSupervisorGroups_0args() throws Exception 
-    {
+    public void testGetSupervisorGroups_0args() throws Exception {
         List<Group> found = workspaceItemService.find(context, workspaceItemId).getSupervisorGroups();
         assertThat("testGetSupervisorGroups_0args 0", found, notNullValue());
         assertTrue("testGetSupervisorGroups_0args 1", found.size() == 1);
 
         boolean added = false;
-        for(Group g: found)
-        {
-            if(g.getID().equals(groupId))
-            {
+        for (Group g : found) {
+            if (g.getID().equals(groupId)) {
                 added = true;
             }
         }
-        assertTrue("testGetSupervisorGroups_0args 2",added);
+        assertTrue("testGetSupervisorGroups_0args 2", added);
     }
 
     /**
      * Test of findbyEPerson method, of class SupervisedItem.
      */
     @Test
-    public void testFindbyEPerson() throws Exception
-    {
+    public void testFindbyEPerson() throws Exception {
         context.turnOffAuthorisationSystem();
         List<WorkspaceItem> found = supervisedItemService.findbyEPerson(context, ePersonService.create(context));
         assertThat("testFindbyEPerson 0", found, notNullValue());
         assertTrue("testFindbyEPerson 1", found.size() == 0);
 
         found = supervisedItemService.findbyEPerson(context, context.getCurrentUser());
-        assertThat("testFindbyEPerson 2", found, notNullValue());        
+        assertThat("testFindbyEPerson 2", found, notNullValue());
         assertTrue("testFindbyEPerson 3", found.size() >= 1);
 
         boolean added = false;
-        for(WorkspaceItem sia: found)
-        {
-            if(sia.getID() == workspaceItemId)
-            {
+        for (WorkspaceItem sia : found) {
+            if (sia.getID() == workspaceItemId) {
                 added = true;
             }
         }
-        assertTrue("testFindbyEPerson 4",added);
+        assertTrue("testFindbyEPerson 4", added);
 
         context.restoreAuthSystemState();
     }

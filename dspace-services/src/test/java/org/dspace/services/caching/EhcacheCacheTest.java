@@ -7,11 +7,15 @@
  */
 package org.dspace.services.caching;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
-
 import org.dspace.services.caching.model.EhcacheCache;
 import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
@@ -25,7 +29,7 @@ import org.junit.Test;
 
 /**
  * Testing the functionality of the DSpace caches
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
@@ -43,12 +47,13 @@ public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
 
     @AfterClass
     public static void tearDownClass() {
-        if(cacheManager!=null)
+        if (cacheManager != null) {
             cacheManager.shutdown();
+        }
         cacheManager = null;
         cache = null;
     }
-    
+
     @Before
     public void init() {
         cache.clear();
@@ -60,11 +65,12 @@ public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
     @Test
     public void testGetCache() {
         assertTrue(cache instanceof EhcacheCache);
-        assertNotNull( ((EhcacheCache) cache).getCache() );
+        assertNotNull(((EhcacheCache) cache).getCache());
     }
 
     /**
-     * Test method for {@link org.dspace.services.caching.model.EhcacheCache#EhcacheCache(net.sf.ehcache.Ehcache, org.dspace.services.model.CacheConfig)}.
+     * Test method for
+     * {@link org.dspace.services.caching.model.EhcacheCache#EhcacheCache(net.sf.ehcache.Ehcache, org.dspace.services.model.CacheConfig)}.
      */
     @Test
     public void testEhcacheCache() {
@@ -74,7 +80,7 @@ public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
 
         EhcacheCache cache = new EhcacheCache(ehcache, new CacheConfig(CacheScope.INSTANCE));
         assertEquals("org.dspace.ehcache", cache.getName());
-        
+
         //trash the references
         ehcache = null;
         cache = null;
@@ -87,7 +93,7 @@ public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
     public void testGetConfig() {
         CacheConfig cacheConfig = cache.getConfig();
         assertNotNull(cacheConfig);
-        
+
         cacheConfig = null;
     }
 
@@ -136,10 +142,10 @@ public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
         assertNull(o);
 
         try {
-           cache.get(null);
-           fail("Should have thrown exception");
+            cache.get(null);
+            fail("Should have thrown exception");
         } catch (IllegalArgumentException e) {
-           assertNotNull(e.getMessage());
+            assertNotNull(e.getMessage());
         }
     }
 
@@ -163,7 +169,7 @@ public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
     public void testPut() {
         assertEquals(0, cache.size());
         cache.put("XXX", 123);
-        assertEquals(1, cache.size());      
+        assertEquals(1, cache.size());
         cache.put("YYY", null);
         assertEquals(2, cache.size());
         cache.put("XXX", "ABC");
@@ -174,10 +180,10 @@ public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
         assertNull(o);
 
         try {
-           cache.put(null, "XXX");
-           fail("Should have thrown exception");
+            cache.put(null, "XXX");
+            fail("Should have thrown exception");
         } catch (IllegalArgumentException e) {
-           assertNotNull(e.getMessage());
+            assertNotNull(e.getMessage());
         }
     }
 
@@ -197,10 +203,10 @@ public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
         assertEquals(1, cache.size());
 
         try {
-           cache.remove(null);
-           fail("Should have thrown exception");
+            cache.remove(null);
+            fail("Should have thrown exception");
         } catch (IllegalArgumentException e) {
-           assertNotNull(e.getMessage());
+            assertNotNull(e.getMessage());
         }
     }
 

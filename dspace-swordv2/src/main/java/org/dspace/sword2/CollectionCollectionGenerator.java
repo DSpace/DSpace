@@ -7,56 +7,59 @@
  */
 package org.dspace.sword2;
 
+import java.util.List;
+
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
-import org.dspace.core.ConfigurationManager;
-import org.apache.log4j.Logger;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.swordapp.server.SwordCollection;
-
-import java.util.Map;
-import java.util.List;
 
 /**
  * Class to generate ATOM Collection Elements which represent
  * DSpace Collections
- *
  */
-public class CollectionCollectionGenerator implements AtomCollectionGenerator
-{
-    private static Logger log = Logger
-            .getLogger(CommunityCollectionGenerator.class);
+public class CollectionCollectionGenerator implements AtomCollectionGenerator {
+    private static final Logger log = LogManager.getLogger(
+        CommunityCollectionGenerator.class);
 
-    protected CollectionService collectionService = ContentServiceFactory
-            .getInstance().getCollectionService();
+    protected CollectionService collectionService =
+        ContentServiceFactory.getInstance().getCollectionService();
+
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Build the collection for the given DSpaceObject.  In this implementation,
      * if the object is not a DSpace Collection, it will throw DSpaceSwordException
-     * @param dso
+     *
+     * @param context The relevant DSpace Context.
+     * @param dso     DSpace object
      * @return the SWORD ATOM collection
-     * @throws DSpaceSwordException
+     * @throws DSpaceSwordException can be thrown by the internals of the DSpace SWORD implementation
      */
+    @Override
     public SwordCollection buildCollection(Context context, DSpaceObject dso,
-            SwordConfigurationDSpace swordConfig)
-            throws DSpaceSwordException
-    {
-        if (!(dso instanceof org.dspace.content.Collection))
-        {
+                                           SwordConfigurationDSpace swordConfig)
+        throws DSpaceSwordException {
+        if (!(dso instanceof org.dspace.content.Collection)) {
             log.error(
-                    "buildCollection passed argument which is not of type Collection");
+                "buildCollection passed argument which is not of type Collection");
             throw new DSpaceSwordException(
-                    "Incorrect ATOMCollectionGenerator instantiated");
+                "Incorrect ATOMCollectionGenerator instantiated");
         }
 
         // get the things we need out of the service
         SwordUrlManager urlManager = swordConfig
-                .getUrlManager(context, swordConfig);
+            .getUrlManager(context, swordConfig);
 
         Collection col = (Collection) dso;
         SwordCollection scol = new SwordCollection();
@@ -75,7 +78,7 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator
 
         // abstract is the short description of the collection
         List<MetadataValue> dcAbstracts = collectionService
-                .getMetadataByMetadataString(col, "short_description");
+            .getMetadataByMetadataString(col, "short_description");
 
         // we just do support mediation
         boolean mediation = swordConfig.isMediated();
@@ -84,14 +87,12 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator
         scol.setLocation(location);
 
         // add the title if it exists
-        if (StringUtils.isNotBlank(title))
-        {
+        if (StringUtils.isNotBlank(title)) {
             scol.setTitle(title);
         }
 
         // add the collection policy if it exists
-        if (StringUtils.isNotBlank(collectionPolicy))
-        {
+        if (StringUtils.isNotBlank(collectionPolicy)) {
             scol.setCollectionPolicy(collectionPolicy);
         }
 
@@ -100,11 +101,9 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator
         // scol.setTreatment(treatment);
 
         // add the abstract if it exists
-        if (dcAbstracts != null && !dcAbstracts.isEmpty())
-        {
+        if (dcAbstracts != null && !dcAbstracts.isEmpty()) {
             String firstValue = dcAbstracts.get(0).getValue();
-            if (StringUtils.isNotBlank(firstValue))
-            {
+            if (StringUtils.isNotBlank(firstValue)) {
                 scol.setAbstract(firstValue);
             }
         }
@@ -112,25 +111,22 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator
         scol.setMediation(mediation);
 
         List<String> accepts = swordConfig.getCollectionAccepts();
-        for (String accept : accepts)
-        {
+        for (String accept : accepts) {
             scol.addAccepts(accept);
             scol.addMultipartAccepts(accept);
         }
 
         // add the accept packaging values
         List<String> aps = swordConfig.getAcceptPackaging(col);
-        for (String ap : aps)
-        {
+        for (String ap : aps) {
             scol.addAcceptPackaging(ap);
         }
 
         // should we offer the items in the collection up as deposit
         // targets?
-        boolean itemService = ConfigurationManager
-                .getBooleanProperty("sword.expose-items");
-        if (itemService)
-        {
+        boolean itemService = configurationService.getBooleanProperty(
+            "sword.expose-items");
+        if (itemService) {
             String subService = urlManager.constructSubServiceUrl(col);
             scol.addSubService(new IRI(subService));
         }

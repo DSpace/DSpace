@@ -7,17 +7,18 @@
  */
 package org.dspace.content;
 
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.SiteService;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.SiteService;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Represents the root of the DSpace Archive.
@@ -27,8 +28,7 @@ import javax.persistence.Transient;
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Table(name = "site")
-public class Site extends DSpaceObject
-{
+public class Site extends DSpaceObject {
 
     @Transient
     private transient SiteService siteService;
@@ -36,10 +36,8 @@ public class Site extends DSpaceObject
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.SiteService#createSite(Context)}
-     *
      */
-    protected Site()
-    {
+    protected Site() {
 
     }
 
@@ -49,25 +47,23 @@ public class Site extends DSpaceObject
      * @return type of the object
      */
     @Override
-    public int getType()
-    {
+    public int getType() {
         return Constants.SITE;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return getSiteService().getName(this);
     }
 
-    public String getURL()
-    {
-        return ConfigurationManager.getProperty("dspace.url");
+    public String getURL() {
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        return configurationService.getProperty("dspace.ui.url");
     }
 
     private SiteService getSiteService() {
-        if(siteService == null)
-        {
+        if (siteService == null) {
             siteService = ContentServiceFactory.getInstance().getSiteService();
         }
         return siteService;

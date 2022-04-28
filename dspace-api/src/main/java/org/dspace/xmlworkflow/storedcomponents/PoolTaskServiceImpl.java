@@ -7,7 +7,15 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
-import org.apache.commons.collections.CollectionUtils;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -17,10 +25,6 @@ import org.dspace.xmlworkflow.storedcomponents.dao.PoolTaskDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Service implementation for the PoolTask object.
@@ -39,13 +43,18 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     @Autowired(required = true)
     protected InProgressUserService inProgressUserService;
 
-    protected PoolTaskServiceImpl()
-    {
+    protected PoolTaskServiceImpl() {
 
     }
 
     @Override
-    public List<PoolTask> findByEperson(Context context, EPerson ePerson) throws SQLException, AuthorizeException, IOException {
+    public List<PoolTask> findAll(Context context) throws SQLException {
+        return poolTaskDAO.findAll(context, PoolTask.class);
+    }
+
+    @Override
+    public List<PoolTask> findByEperson(Context context, EPerson ePerson)
+        throws SQLException, AuthorizeException, IOException {
         List<PoolTask> result = poolTaskDAO.findByEPerson(context, ePerson);
         //Get all PoolTasks for groups of which this eperson is a member
         List<Group> groups = groupService.allMemberGroups(context, ePerson);
@@ -59,7 +68,7 @@ public class PoolTaskServiceImpl implements PoolTaskService {
             List<PoolTask> groupTasks = poolTaskDAO.findByGroup(context, group);
             for (PoolTask poolTask : groupTasks) {
                 XmlWorkflowItem workflowItem = poolTask.getWorkflowItem();
-                if(inProgressUserService.findByWorkflowItemAndEPerson(context, workflowItem, ePerson) == null){
+                if (inProgressUserService.findByWorkflowItemAndEPerson(context, workflowItem, ePerson) == null) {
                     result.add(poolTask);
                 }
             }
@@ -74,26 +83,26 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     @Override
-    public PoolTask findByWorkflowIdAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson) throws SQLException, AuthorizeException, IOException {
+    public PoolTask findByWorkflowIdAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+        throws SQLException, AuthorizeException, IOException {
         PoolTask poolTask = poolTaskDAO.findByWorkflowItemAndEPerson(context, workflowItem, ePerson);
 
         //If there is a pooltask for this eperson, return it
-        if(poolTask != null)
+        if (poolTask != null) {
             return poolTask;
-        else{
-            //If the user has a is processing or has finished the step for a workflowitem, there is no need to look for pooltasks for one of his
+        } else {
+            //If the user has a is processing or has finished the step for a workflowitem, there is no need to look
+            // for pooltasks for one of his
             //groups because the user already has the task claimed
-            if(inProgressUserService.findByWorkflowItemAndEPerson(context, workflowItem, ePerson)!=null){
+            if (inProgressUserService.findByWorkflowItemAndEPerson(context, workflowItem, ePerson) != null) {
                 return null;
-            }
-            else{
+            } else {
                 //If the user does not have a claimedtask yet, see whether one of the groups of the user has pooltasks
                 //for this workflow item
                 Set<Group> groups = groupService.allMemberGroupsSet(context, ePerson);
                 for (Group group : groups) {
                     poolTask = poolTaskDAO.findByWorkflowItemAndGroup(context, group, workflowItem);
-                    if(poolTask != null)
-                    {
+                    if (poolTask != null) {
                         return poolTask;
                     }
 
@@ -104,8 +113,22 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     @Override
-    public void deleteByWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem) throws SQLException, AuthorizeException {
+    public void deleteByWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem)
+        throws SQLException, AuthorizeException {
         List<PoolTask> tasks = find(context, xmlWorkflowItem);
+        //Use an iterator to remove the tasks !
+        Iterator<PoolTask> iterator = tasks.iterator();
+        while (iterator.hasNext()) {
+            PoolTask poolTask = iterator.next();
+            iterator.remove();
+            delete(context, poolTask);
+        }
+    }
+
+    @Override
+    public void deleteByEperson(Context context, EPerson ePerson)
+        throws SQLException, AuthorizeException, IOException {
+        List<PoolTask> tasks = findByEperson(context, ePerson);
         //Use an iterator to remove the tasks !
         Iterator<PoolTask> iterator = tasks.iterator();
         while (iterator.hasNext()) {
@@ -118,6 +141,11 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     @Override
     public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException {
         return poolTaskDAO.findByEPerson(context, ePerson);
+    }
+
+    @Override
+    public List<PoolTask> findByGroup(Context context, Group group) throws SQLException {
+        return poolTaskDAO.findByGroup(context, group);
     }
 
     @Override
@@ -137,7 +165,7 @@ public class PoolTaskServiceImpl implements PoolTaskService {
 
     @Override
     public void update(Context context, List<PoolTask> poolTasks) throws SQLException, AuthorizeException {
-        if(CollectionUtils.isNotEmpty(poolTasks)) {
+        if (CollectionUtils.isNotEmpty(poolTasks)) {
             for (PoolTask poolTask : poolTasks) {
                 poolTaskDAO.save(context, poolTask);
             }

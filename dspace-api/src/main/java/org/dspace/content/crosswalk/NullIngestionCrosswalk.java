@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
@@ -34,37 +34,36 @@ import org.jdom.output.XMLOutputter;
  * plugin.named.org.dspace.content.crosswalk.SubmissionCrosswalk = \
  *   org.dspace.content.crosswalk.NullIngestionCrosswalk = NULL, LOM
  * </pre>
+ *
  * @author Larry Stone
  * @version $Revision$
  */
 public class NullIngestionCrosswalk
-    implements IngestionCrosswalk
-{
-    /** log4j category */
-    private static Logger log = Logger.getLogger(NullIngestionCrosswalk.class);
+    implements IngestionCrosswalk {
+    /**
+     * log4j category
+     */
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(NullIngestionCrosswalk.class);
 
     private static XMLOutputter outputPretty = new XMLOutputter(Format.getPrettyFormat());
 
     @Override
     public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
-        throws CrosswalkException, IOException, SQLException, AuthorizeException
-    {
+        throws CrosswalkException, IOException, SQLException, AuthorizeException {
         // drop xml on the floor but mention what we're missing for debugging:
-        log.debug("Null crosswalk is ignoring this metadata Element: \n"+
-                outputPretty.outputString(root));
+        log.debug("Null crosswalk is ignoring this metadata Element: \n" +
+                      outputPretty.outputString(root));
     }
 
     @Override
     public void ingest(Context context, DSpaceObject dso, List<Element> ml, boolean createMissingMetadataFields)
-        throws CrosswalkException, IOException, SQLException, AuthorizeException
-    {
+        throws CrosswalkException, IOException, SQLException, AuthorizeException {
         // drop xml on the floor but mention what we're missing for debugging:
-        log.debug("Null crosswalk is ignoring this List of metadata: \n"+
-                outputPretty.outputString(ml));
+        log.debug("Null crosswalk is ignoring this List of metadata: \n" +
+                      outputPretty.outputString(ml));
     }
 
-    public boolean preferList()
-    {
+    public boolean preferList() {
         return false;
     }
 }

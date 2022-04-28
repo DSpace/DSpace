@@ -10,13 +10,11 @@ package org.dspace.checker;
 /**
  * Enumeration of ChecksumCheckResults containing constants for checksum
  * comparison result that must correspond to values in checksum_result table.
- * 
+ *
  * @author Jim Downing
  * @author Grace Carpenter
  * @author Nathan Sarr
  * @author Kevin Van de Velde
- * 
- * 
  */
 public enum ChecksumResultCode {
     BITSTREAM_NOT_FOUND,

@@ -11,7 +11,8 @@ import org.dspace.app.itemexport.service.ItemExportService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the itemexport package, use ItemExportServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the itemexport package, use ItemExportServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

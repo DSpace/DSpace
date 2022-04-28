@@ -21,7 +21,10 @@ public class DiscoveryConfigurationParameters {
     public static final String TYPE_AUTHORITY = "authority";
     public static final String TYPE_STANDARD = "standard";
 
-    public static enum SORT {VALUE, COUNT}
+    public static enum SORT { VALUE, COUNT }
 
-
+    /**
+     * Default constructor
+     */
+    private DiscoveryConfigurationParameters() { }
 }

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 
+import org.dspace.app.mediafilter.MediaFilter;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -18,12 +19,10 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.MetadataValidationException;
-import org.dspace.core.Context;
 import org.dspace.core.Constants;
-import org.dspace.app.mediafilter.MediaFilter;
+import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
-
 import org.jdom.Element;
 
 /**
@@ -46,23 +45,18 @@ import org.jdom.Element;
  * @see PackageIngester
  */
 public class DSpaceMETSIngester
-       extends AbstractMETSIngester
-{
+    extends AbstractMETSIngester {
     // first part of required mets@PROFILE value
     protected static final String PROFILE_START = "DSpace METS SIP Profile";
 
     // just check the profile name.
     @Override
     void checkManifest(METSManifest manifest)
-        throws MetadataValidationException
-    {
+        throws MetadataValidationException {
         String profile = manifest.getProfile();
-        if (profile == null)
-        {
+        if (profile == null) {
             throw new MetadataValidationException("Cannot accept METS with no PROFILE attribute!");
-        }
-        else if (!profile.startsWith(PROFILE_START))
-        {
+        } else if (!profile.startsWith(PROFILE_START)) {
             throw new MetadataValidationException("METS has unacceptable PROFILE value, profile=" + profile);
         }
     }
@@ -74,93 +68,76 @@ public class DSpaceMETSIngester
      * 1. Use whatever the <code>dmd</code> parameter specifies as the primary DMD.<br>
      * 2. If (1) is unspecified, find MODS (preferably) or DC as primary DMD.<br>
      * 3. If (1) or (2) succeeds, crosswalk it and ignore all other DMDs with
-     *    same GROUPID<br>
+     * same GROUPID<br>
      * 4. Crosswalk remaining DMDs not eliminated already.
-     * @throws CrosswalkException if crosswalk error
+     *
+     * @throws CrosswalkException         if crosswalk error
      * @throws PackageValidationException if validation error
-     * @throws IOException if IO error
-     * @throws SQLException if database error
-     * @throws AuthorizeException if authorization error
+     * @throws IOException                if IO error
+     * @throws SQLException               if database error
+     * @throws AuthorizeException         if authorization error
      */
     @Override
     public void crosswalkObjectDmd(Context context, DSpaceObject dso,
-                              METSManifest manifest,
-                              MdrefManager callback,
-                              Element dmds[], PackageParameters params)
+                                   METSManifest manifest,
+                                   MdrefManager callback,
+                                   Element dmds[], PackageParameters params)
         throws CrosswalkException, PackageValidationException,
-               AuthorizeException, SQLException, IOException
-    {
+        AuthorizeException, SQLException, IOException {
         int found = -1;
 
         // Check to see what dmdSec the user specified in the 'dmd' parameter
         String userDmd = null;
-        if (params != null)
-        {
+        if (params != null) {
             userDmd = params.getProperty("dmd");
         }
-        if (userDmd != null && userDmd.length() > 0)
-        {
-            for (int i = 0; i < dmds.length; ++i)
-            {
-                if (userDmd.equalsIgnoreCase(manifest.getMdType(dmds[i])))
-                {
+        if (userDmd != null && userDmd.length() > 0) {
+            for (int i = 0; i < dmds.length; ++i) {
+                if (userDmd.equalsIgnoreCase(manifest.getMdType(dmds[i]))) {
                     found = i;
                 }
             }
         }
 
         // MODS is preferred, if nothing specified by user
-        if (found == -1)
-        {
-            for (int i = 0; i < dmds.length; ++i)
-            {
+        if (found == -1) {
+            for (int i = 0; i < dmds.length; ++i) {
                 //NOTE: METS standard actually says this should be MODS (all uppercase). But,
                 // just in case, we're going to be a bit more forgiving.
-                if ("MODS".equalsIgnoreCase(manifest.getMdType(dmds[i])))
-                {
+                if ("MODS".equalsIgnoreCase(manifest.getMdType(dmds[i]))) {
                     found = i;
                 }
             }
         }
 
         // DC acceptable if no MODS
-        if (found == -1)
-        {
-            for (int i = 0; i < dmds.length; ++i)
-            {
+        if (found == -1) {
+            for (int i = 0; i < dmds.length; ++i) {
                 //NOTE: METS standard actually says this should be DC (all uppercase). But,
                 // just in case, we're going to be a bit more forgiving.
-                if ("DC".equalsIgnoreCase(manifest.getMdType(dmds[i])))
-                {
+                if ("DC".equalsIgnoreCase(manifest.getMdType(dmds[i]))) {
                     found = i;
                 }
             }
         }
 
         String groupID = null;
-        if (found >= 0)
-        {
+        if (found >= 0) {
             manifest.crosswalkItemDmd(context, params, dso, dmds[found], callback);
             groupID = dmds[found].getAttributeValue("GROUPID");
 
-            if (groupID != null)
-            {
-                for (int i = 0; i < dmds.length; ++i)
-                {
+            if (groupID != null) {
+                for (int i = 0; i < dmds.length; ++i) {
                     String g = dmds[i].getAttributeValue("GROUPID");
-                    if (g != null && !g.equals(groupID))
-                    {
+                    if (g != null && !g.equals(groupID)) {
                         manifest.crosswalkItemDmd(context, params, dso, dmds[i], callback);
                     }
                 }
             }
-        }
-        else
-        {
+        } else {
             // otherwise take the first.  Don't xwalk more than one because
             // each xwalk _adds_ metadata, and could add duplicate fields.
-            if (dmds.length > 0)
-            {
+            if (dmds.length > 0) {
                 manifest.crosswalkItemDmd(context, params, dso, dmds[0], callback);
             }
         }
@@ -172,19 +149,18 @@ public class DSpaceMETSIngester
      * supplied by explicit argument first, else use collection's
      * default deposit license.
      * For Creative Commons, look for a rightsMd containing a CC license.
+     *
      * @throws PackageValidationException if validation error
-     * @throws IOException if IO error
-     * @throws SQLException if database error
-     * @throws AuthorizeException if authorization error
+     * @throws IOException                if IO error
+     * @throws SQLException               if database error
+     * @throws AuthorizeException         if authorization error
      */
     @Override
     public void addLicense(Context context, Item item, String license,
-                                    Collection collection, PackageParameters params)
+                           Collection collection, PackageParameters params)
         throws PackageValidationException,
-               AuthorizeException, SQLException, IOException
-    {
-        if (PackageUtils.findDepositLicense(context, item) == null)
-        {
+        AuthorizeException, SQLException, IOException {
+        if (PackageUtils.findDepositLicense(context, item) == null) {
             PackageUtils.addDepositLicense(context, license, item, collection);
         }
     }
@@ -193,32 +169,27 @@ public class DSpaceMETSIngester
     public void finishObject(Context context, DSpaceObject dso,
                              PackageParameters params)
         throws PackageValidationException, CrosswalkException,
-         AuthorizeException, SQLException, IOException
-    {
+        AuthorizeException, SQLException, IOException {
         // nothing to do.
     }
 
     @Override
     public int getObjectType(METSManifest manifest)
-        throws PackageValidationException
-    {
+        throws PackageValidationException {
         return Constants.ITEM;
     }
 
     // return name of derived file as if MediaFilter created it, or null
     // only needed when importing a SIP without canonical DSpace derived file naming.
-    private String makeDerivedFilename(String bundleName, String origName)
-    {
+    private String makeDerivedFilename(String bundleName, String origName) {
         PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
 
         // get the MediaFilter that would create this bundle:
         String mfNames[] = pluginService.getAllPluginNames(MediaFilter.class);
 
-        for (int i = 0; i < mfNames.length; ++i)
-        {
-            MediaFilter mf = (MediaFilter)pluginService.getNamedPlugin(MediaFilter.class, mfNames[i]);
-            if (bundleName.equals(mf.getBundleName()))
-            {
+        for (int i = 0; i < mfNames.length; ++i) {
+            MediaFilter mf = (MediaFilter) pluginService.getNamedPlugin(MediaFilter.class, mfNames[i]);
+            if (bundleName.equals(mf.getBundleName())) {
                 return mf.getFilteredName(origName);
             }
         }
@@ -229,32 +200,29 @@ public class DSpaceMETSIngester
     /**
      * Take a second pass over files to correct names of derived files
      * (e.g. thumbnails, extracted text) to what DSpace expects:
+     *
      * @throws MetadataValidationException if validation error
-     * @throws IOException if IO error
-     * @throws SQLException if database error
-     * @throws AuthorizeException if authorization error
+     * @throws IOException                 if IO error
+     * @throws SQLException                if database error
+     * @throws AuthorizeException          if authorization error
      */
     @Override
     public void finishBitstream(Context context,
-                                                Bitstream bs,
-                                                Element mfile,
-                                                METSManifest manifest,
-                                                PackageParameters params)
-        throws MetadataValidationException, SQLException, AuthorizeException, IOException
-    {
+                                Bitstream bs,
+                                Element mfile,
+                                METSManifest manifest,
+                                PackageParameters params)
+        throws MetadataValidationException, SQLException, AuthorizeException, IOException {
         String bundleName = METSManifest.getBundleName(mfile);
-        if (!bundleName.equals(Constants.CONTENT_BUNDLE_NAME))
-        {
+        if (!bundleName.equals(Constants.CONTENT_BUNDLE_NAME)) {
             String opath = manifest.getOriginalFilePath(mfile);
-            if (opath != null)
-            {
+            if (opath != null) {
                 // String ofileId = origFile.getAttributeValue("ID");
                 // Bitstream obs = (Bitstream)fileIdToBitstream.get(ofileId);
 
                 String newName = makeDerivedFilename(bundleName, opath);
 
-                if (newName != null)
-                {
+                if (newName != null) {
                     //String mfileId = mfile.getAttributeValue("ID");
                     //Bitstream bs = (Bitstream)fileIdToBitstream.get(mfileId);
                     bs.setName(context, newName);
@@ -265,14 +233,12 @@ public class DSpaceMETSIngester
     }
 
     @Override
-    public String getConfigurationName()
-    {
+    public String getConfigurationName() {
         return "dspaceSIP";
     }
 
 
-    public boolean probe(Context context, InputStream in, PackageParameters params)
-    {
+    public boolean probe(Context context, InputStream in, PackageParameters params) {
         throw new UnsupportedOperationException("PDF package ingester does not implement probe()");
     }
 
@@ -286,14 +252,13 @@ public class DSpaceMETSIngester
      * with this packager
      */
     @Override
-    public String getParameterHelp()
-    {
+    public String getParameterHelp() {
         String parentHelp = super.getParameterHelp();
 
         //Return superclass help info, plus the extra parameter/option that this class supports
         return parentHelp +
-                "\n\n" +
-                "* dmd=[dmdSecType]      " +
-                   "Type of the METS <dmdSec> which should be used for primary item metadata (defaults to MODS, then DC)";
+            "\n\n" +
+            "* dmd=[dmdSecType]      " +
+            "Type of the METS <dmdSec> which should be used for primary item metadata (defaults to MODS, then DC)";
     }
 }

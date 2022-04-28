@@ -8,7 +8,8 @@
 package org.dspace.xoai.services.api.config;
 
 public class XOAIManagerResolverException extends Exception {
-    public XOAIManagerResolverException() {}
+    public XOAIManagerResolverException() {
+    }
 
     public XOAIManagerResolverException(String message) {
         super(message);

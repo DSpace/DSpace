@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+    default-lazy-init="true">
+
+    <bean class="org.dspace.content.virtual.VirtualMetadataPopulator">
+        <property name="map">
+            <!-- This map contains keys and value-refs to Map objects
+                 The keys will define which relationship type will add virtual metadata
+                 to its relationship's item and the map will define which virtual metadata fields
+                 are to be added to the item that has a relationship with this relationship type-->
+            <map>
+                <entry key="isAuthorOfPublication" value-ref="isAuthorOfPublicationMap"/>
+                <!-- relations based on OpenAIRE guidelines -->
+                <entry key="isContributorOfPublication" value-ref="isAuthorOfPublicationMap"/>
+                <entry key="isProjectOfPublication" value-ref="isProjectOfPublicationMap"/>
+                <entry key="isFundingAgencyOfProject" value-ref="isFundingAgencyOfProjectMap"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean class="org.dspace.content.virtual.EntityTypeToFilterQueryService">
+        <property name="map">
+            <map>
+                <entry key="Publication" value="f.entityType=Publication,equals"/>
+                <entry key="Person" value="f.entityType=Person,equals"/>
+                <entry key="Journal" value="f.entityType=Journal,equals"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata fields
+         like 'dc.contributor.author' and other specific for person.* on the appropriate item with the values 
+         defined in the value-ref.
+          This value-ref should be a bean of type VirtualMetadataConfiguration -->
+    <util:map id="isAuthorOfPublicationMap">
+        <entry key="dc.contributor.author" value-ref="publicationAuthor_author"/>
+        <entry key="person.givenName" value-ref="publicationAuthor_givenName"/>
+        <entry key="person.familyName" value-ref="publicationAuthor_familyName"/>
+        <entry key="person.affiliation.name" value-ref="publicationAuthor_affiliation"/>
+        <entry key="person.identifier" value-ref="publicationAuthor_identifier"/>
+        <entry key="person.identifier.scopus-author-id" value-ref="publicationAuthor_identifierScopusAuthorID"/>
+        <entry key="person.identifier.ciencia-id" value-ref="publicationAuthor_identifierCienciaID"/>
+        <entry key="person.identifier.gsid" value-ref="publicationAuthor_identifierGSID"/>
+        <entry key="person.identifier.orcid" value-ref="publicationAuthor_identifierOrcid"/>
+        <entry key="person.identifier.rid" value-ref="publicationAuthor_identifierRID"/>
+        <entry key="person.identifier.isni" value-ref="publicationAuthor_identifierISNI"/>
+        <entry key="organization.legalName" value-ref="publicationAuthor_orgName"/>
+        <entry key="organization.identifier" value-ref="publicationAuthor_orgIdentifier"/>
+    </util:map>
+    <!--
+         If the related item has:
+            person.familyName = Smith
+            person.givenName = John
+         Then the original item will have, in this case:
+            dc.contributor.author = Smith, John -->
+    <bean class="org.dspace.content.virtual.Concatenate" id="publicationAuthor_author">
+        <property name="fields">
+            <util:list>
+                <value>person.familyName</value>
+                <value>person.givenName</value>
+                <value>organization.legalName</value>
+            </util:list>
+        </property>
+        <property name="separator">
+            <value>, </value>
+        </property>
+        <property name="useForPlace" value="true"/>
+        <property name="populateWithNameVariant" value="true"/>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_givenName">
+        <property name="fields">
+            <util:list>
+                <value>person.givenName</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_familyName">
+        <property name="fields">
+            <util:list>
+                <value>person.familyName</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_affiliation">
+        <property name="fields">
+            <util:list>
+                <value>person.affiliation.name</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_identifier">
+        <property name="fields">
+            <util:list>
+                <value>person.identifier</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_identifierScopusAuthorID">
+        <property name="fields">
+            <util:list>
+                <value>person.identifier.scopus-author-id</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_identifierRID">
+        <property name="fields">
+            <util:list>
+                <value>person.identifier.rid</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_identifierCienciaID">
+        <property name="fields">
+            <util:list>
+                <value>person.identifier.ciencia-id</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_identifierGSID">
+        <property name="fields">
+            <util:list>
+                <value>person.identifier.gsid</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_identifierOrcid">
+        <property name="fields">
+            <util:list>
+                <value>person.identifier.orcid</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_identifierISNI">
+        <property name="fields">
+            <util:list>
+                <value>person.identifier.isni</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_orgName">
+        <property name="fields">
+            <util:list>
+                <value>organization.legalName</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationAuthor_orgIdentifier">
+        <property name="fields">
+            <util:list>
+                <value>organization.identifier</value>
+            </util:list>
+        </property>
+    </bean>
+
+    
+    <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata fields
+     'dc.relation', 'oaire' funding related, and 'project.funder' and some other related with the appropriate
+     item with the values defined in the value-ref.
+      This value-ref should be a bean of type VirtualMetadataConfiguration -->
+    <util:map id="isProjectOfPublicationMap">
+        <entry key="dc.relation" value-ref="publicationProject_name"/>
+        <entry key="oaire.fundingStream" value-ref="publicationProject_fundingStream"/>
+        <entry key="oaire.awardNumber" value-ref="publicationProject_awardNumber"/>
+        <entry key="oaire.awardURI" value-ref="publicationProject_awardURI"/>
+        <entry key="oaire.awardTitle" value-ref="publicationProject_name"/>
+        <entry key="project.funder.name" value-ref="publicationProject_projectFunderName_related"/>
+        <entry key="project.funder.identifier" value-ref="publicationProject_projectFunderId_related"/>
+    </util:map>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationProject_name">
+        <property name="fields">
+            <util:list>
+                <value>dc.title</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationProject_fundingStream">
+        <property name="fields">
+            <util:list>
+                <value>oaire.fundingStream</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationProject_awardNumber">
+        <property name="fields">
+            <util:list>
+                <value>dc.identifier</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="publicationProject_awardURI">
+        <property name="fields">
+            <util:list>
+                <value>dc.identifier.uri</value>
+            </util:list>
+        </property>
+    </bean>
+
+    <!-- This Related bean defines a relationship type that will be used on a publication (from a project).
+         -->
+    <bean class="org.dspace.content.virtual.Related" id="publicationProject_projectFunderName_related">
+        <property name="relationshipTypeString" value="isProjectOfFundingAgency"/>
+        <property name="place" value="1"/>
+        <property name="virtualMetadataConfiguration" ref="projectOrgUnit_orgName"/>
+    </bean>
+
+    <bean class="org.dspace.content.virtual.Related" id="publicationProject_projectFunderId_related">
+        <property name="relationshipTypeString" value="isProjectOfFundingAgency"/>
+        <property name="place" value="1"/>
+        <property name="virtualMetadataConfiguration" ref="projectOrgUnit_orgId"/>
+    </bean>
+    
+    <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
+     'project.funder.*' on the appropriate item with the values defined in the value-ref.
+      This value-ref should be a bean of type VirtualMetadataConfiguration -->
+    <util:map id="isFundingAgencyOfProjectMap">
+        <entry key="project.funder.name" value-ref="projectOrgUnit_orgName"/>
+        <entry key="project.funder.identifier" value-ref="projectOrgUnit_orgId"/>
+    </util:map> 
+
+    <bean class="org.dspace.content.virtual.Collected" id="projectOrgUnit_orgName">
+        <property name="fields">
+            <util:list>
+                <value>organization.legalName</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="projectOrgUnit_orgId">
+        <property name="fields">
+            <util:list>
+                <value>organization.identifier</value>
+            </util:list>
+        </property>
+    </bean>
+</beans>

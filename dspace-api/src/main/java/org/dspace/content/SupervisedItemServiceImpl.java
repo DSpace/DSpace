@@ -16,29 +16,25 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class SupervisedItemServiceImpl implements SupervisedItemService
-{
+public class SupervisedItemServiceImpl implements SupervisedItemService {
 
     @Autowired(required = true)
     protected WorkspaceItemService workspaceItemService;
 
-    protected SupervisedItemServiceImpl()
-    {
+    protected SupervisedItemServiceImpl() {
 
     }
 
     @Override
     public List<WorkspaceItem> getAll(Context context)
-        throws SQLException
-    {
+        throws SQLException {
         return workspaceItemService.findAllSupervisedItems(context);
     }
 
     @Override
     public List<WorkspaceItem> findbyEPerson(Context context, EPerson ep)
-        throws SQLException
-    {
+        throws SQLException {
         return workspaceItemService.findSupervisedItemsByEPerson(context, ep);
     }
-    
+
 }

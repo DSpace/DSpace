@@ -30,5 +30,5 @@ public class SearchServiceException extends Exception {
     public SearchServiceException(Throwable throwable) {
         super(throwable);
     }
-    
+
 }

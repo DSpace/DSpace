@@ -7,23 +7,28 @@
  */
 package org.dspace.authority;
 
-import org.dspace.authority.indexer.AuthorityIndexingService;
-import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrInputDocument;
-import org.dspace.core.ConfigurationManager;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrInputDocument;
+import org.dspace.authority.indexer.AuthorityIndexingService;
+import org.dspace.service.impl.HttpConnectionPoolService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -31,31 +36,40 @@ import java.util.List;
  */
 public class AuthoritySolrServiceImpl implements AuthorityIndexingService, AuthoritySearchService {
 
-    private static final Logger log = Logger.getLogger(AuthoritySolrServiceImpl.class);
+    private static final Logger log = LogManager.getLogger(AuthoritySolrServiceImpl.class);
 
-    protected AuthoritySolrServiceImpl()
-    {
+    @Inject @Named("solrHttpConnectionPoolService")
+    private HttpConnectionPoolService httpConnectionPoolService;
+
+    protected AuthoritySolrServiceImpl() {
 
     }
 
     /**
      * Non-Static CommonsHttpSolrServer for processing indexing events.
      */
-    protected HttpSolrServer solr = null;
+    protected SolrClient solr = null;
 
-    protected HttpSolrServer getSolr() throws MalformedURLException, SolrServerException {
+    protected SolrClient getSolr()
+            throws MalformedURLException, SolrServerException, IOException {
         if (solr == null) {
 
-            String solrService = ConfigurationManager.getProperty("solr.authority.server");
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+            String solrService = configurationService.getProperty("solr.authority.server");
 
             log.debug("Solr authority URL: " + solrService);
 
-            solr = new HttpSolrServer(solrService);
-            solr.setBaseURL(solrService);
+            HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService)
+                    .withHttpClient(httpConnectionPoolService.getClient())
+                    .build();
+            solrServer.setBaseURL(solrService);
 
             SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
 
-            solr.query(solrQuery);
+            solrServer.query(solrQuery);
+
+            solr = solrServer;
         }
 
         return solr;
@@ -65,18 +79,18 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
     public void indexContent(AuthorityValue value) {
         SolrInputDocument doc = value.getSolrInputDocument();
 
-        try{
+        try {
             writeDocument(doc);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error while writing authority value to the index: " + value.toString(), e);
         }
     }
 
     @Override
     public void cleanIndex() throws Exception {
-        try{
+        try {
             getSolr().deleteByQuery("*:*");
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Error while cleaning authority solr server index", e);
             throw new Exception(e);
         }
@@ -97,15 +111,19 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
     public boolean isConfiguredProperly() {
         boolean solrReturn = false;
         try {
-            solrReturn = (getSolr()!=null);
+            solrReturn = (getSolr() != null);
         } catch (Exception e) {
-            log.error("Authority solr is not correctly configured, check \"solr.authority.server\" property in the dspace.cfg", e);
+            log.error(
+                "Authority solr is not correctly configured, check \"solr.authority.server\" property in the dspace" +
+                    ".cfg",
+                e);
         }
         return solrReturn;
     }
 
     /**
      * Write the document to the solr index
+     *
      * @param doc the solr document
      * @throws IOException if IO error
      */
@@ -115,7 +133,10 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
             getSolr().add(doc);
         } catch (Exception e) {
             try {
-                log.error("An error occurred for document: " + doc.getField("id").getFirstValue() + ", source: " + doc.getField("source").getFirstValue() + ", field: " + doc.getField("field").getFirstValue() + ", full-text: " + doc.getField("full-text").getFirstValue(), e);
+                log.error("An error occurred for document: " + doc.getField("id").getFirstValue() + ", source: " + doc
+                    .getField("source").getFirstValue() + ", field: " + doc.getField("field")
+                                                                           .getFirstValue() + ", full-text: " + doc
+                    .getField("full-text").getFirstValue(), e);
             } catch (Exception e1) {
                 //shouldn't happen
             }
@@ -124,12 +145,14 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
     }
 
     @Override
-    public QueryResponse search(SolrQuery query) throws SolrServerException, MalformedURLException {
+    public QueryResponse search(SolrQuery query)
+            throws SolrServerException, MalformedURLException, IOException {
         return getSolr().query(query);
     }
 
     /**
      * Retrieves all the metadata fields which are indexed in the authority control
+     *
      * @return a list of metadata fields
      * @throws Exception if error
      */
@@ -142,11 +165,11 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
 
         QueryResponse response = getSolr().query(solrQuery);
 
-        List<String> results = new ArrayList<String>();
+        List<String> results = new ArrayList<>();
         FacetField facetField = response.getFacetField("field");
-        if(facetField != null){
+        if (facetField != null) {
             List<FacetField.Count> values = facetField.getValues();
-            if(values != null){
+            if (values != null) {
                 for (FacetField.Count facetValue : values) {
                     if (facetValue != null && facetValue.getName() != null) {
                         results.add(facetValue.getName());

@@ -7,30 +7,27 @@
  */
 package org.purl.sword.atom;
 
-import org.purl.sword.base.*;
+import org.purl.sword.base.BasicStringContentElement;
+import org.purl.sword.base.Namespaces;
+import org.purl.sword.base.XmlName;
 
 /**
- *
  * @author Neil Taylor (nst@aber.ac.uk)
  */
-public class Uri extends BasicStringContentElement
-{
+public class Uri extends BasicStringContentElement {
     private static final XmlName XML_NAME =
-            new XmlName(Namespaces.PREFIX_ATOM, "uri", Namespaces.NS_ATOM);
+        new XmlName(Namespaces.PREFIX_ATOM, "uri", Namespaces.NS_ATOM);
 
-    public Uri()
-    {
+    public Uri() {
         super(XML_NAME);
     }
 
-    public Uri(String uri)
-    {
+    public Uri(String uri) {
         this();
         setContent(uri);
     }
 
-    public static XmlName elementName()
-    {
-        return XML_NAME; 
+    public static XmlName elementName() {
+        return XML_NAME;
     }
 }

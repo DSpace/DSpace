@@ -12,7 +12,8 @@ import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.WorkflowService;
 
 /**
- * Abstract factory to get services for the workflow package, use WorkflowServiceFactory.getInstance() to retrieve an implementation
+ * Abstract factory to get services for the workflow package, use WorkflowServiceFactory.getInstance() to retrieve an
+ * implementation
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -22,8 +23,8 @@ public abstract class WorkflowServiceFactory {
 
     public abstract WorkflowItemService getWorkflowItemService();
 
-    public static WorkflowServiceFactory getInstance()
-    {
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("workflowServiceFactory", WorkflowServiceFactory.class);
+    public static WorkflowServiceFactory getInstance() {
+        return DSpaceServicesFactory.getInstance().getServiceManager()
+                                    .getServiceByName("workflowServiceFactory", WorkflowServiceFactory.class);
     }
 }

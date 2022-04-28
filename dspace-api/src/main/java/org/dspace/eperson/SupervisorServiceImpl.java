@@ -20,28 +20,25 @@ import org.dspace.core.Context;
 import org.dspace.eperson.service.SupervisorService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class SupervisorServiceImpl implements SupervisorService{
+public class SupervisorServiceImpl implements SupervisorService {
 
     @Autowired(required = true)
     protected ItemService itemService;
     @Autowired(required = true)
     protected ResourcePolicyService resourcePolicyService;
 
-    protected SupervisorServiceImpl()
-    {
+    protected SupervisorServiceImpl() {
     }
 
     @Override
     public boolean isOrder(Context context, WorkspaceItem workspaceItem, Group group)
-        throws SQLException
-    {
+        throws SQLException {
         return workspaceItem.getSupervisorGroups().contains(group);
     }
 
     @Override
     public void remove(Context context, WorkspaceItem workspaceItem, Group group)
-        throws SQLException, AuthorizeException
-    {
+        throws SQLException, AuthorizeException {
         // get the workspace item and the group from the request values
         workspaceItem.getSupervisorGroups().remove(group);
 
@@ -52,8 +49,7 @@ public class SupervisorServiceImpl implements SupervisorService{
 
     @Override
     public void add(Context context, Group group, WorkspaceItem workspaceItem, int policy)
-        throws SQLException, AuthorizeException
-    {
+        throws SQLException, AuthorizeException {
         // make a table row in the database table, and update with the relevant
         // details
         workspaceItem.getSupervisorGroups().add(group);
@@ -61,35 +57,31 @@ public class SupervisorServiceImpl implements SupervisorService{
 
         // If a default policy type has been requested, apply the policies using
         // the DSpace API for doing so
-        if (policy != POLICY_NONE)
-        {
+        if (policy != POLICY_NONE) {
             Item item = workspaceItem.getItem();
 
             // "Editor" implies READ, WRITE, ADD permissions
             // "Observer" implies READ permissions
-            if (policy == POLICY_EDITOR)
-            {
+            if (policy == POLICY_EDITOR) {
                 ResourcePolicy r = resourcePolicyService.create(context);
                 r.setdSpaceObject(item);
                 r.setGroup(group);
                 r.setAction(Constants.READ);
                 resourcePolicyService.update(context, r);
-                
+
                 r = resourcePolicyService.create(context);
                 r.setdSpaceObject(item);
                 r.setGroup(group);
                 r.setAction(Constants.WRITE);
                 resourcePolicyService.update(context, r);
-                
+
                 r = resourcePolicyService.create(context);
                 r.setdSpaceObject(item);
                 r.setGroup(group);
                 r.setAction(Constants.ADD);
                 resourcePolicyService.update(context, r);
-                
-            } 
-            else if (policy == POLICY_OBSERVER)
-            {
+
+            } else if (policy == POLICY_OBSERVER) {
                 ResourcePolicy r = resourcePolicyService.create(context);
                 r.setdSpaceObject(item);
                 r.setGroup(group);

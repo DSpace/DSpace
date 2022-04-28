@@ -9,11 +9,10 @@ package org.dspace.rest.common;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.SchemaOutputResolver;
 import javax.xml.transform.Result;
@@ -45,16 +44,16 @@ public class TestJAXBSchema {
         StringWriter writer = new StringWriter();
         TestSchemaOutputResolver resolver = new TestSchemaOutputResolver(writer);
         JAXBContext context = JAXBContext.newInstance(
-                Bitstream.class,
-                CheckSum.class,
-                Collection.class,
-                Community.class,
-                DSpaceObject.class,
-                Item.class,
-                MetadataEntry.class,
-                ResourcePolicy.class,
-                Status.class
-                );
+            Bitstream.class,
+            CheckSum.class,
+            Collection.class,
+            Community.class,
+            DSpaceObject.class,
+            Item.class,
+            MetadataEntry.class,
+            ResourcePolicy.class,
+            Status.class
+        );
         context.generateSchema(resolver);
 
         String res = "org/dspace/rest/common/expected_xsd0.xsd";

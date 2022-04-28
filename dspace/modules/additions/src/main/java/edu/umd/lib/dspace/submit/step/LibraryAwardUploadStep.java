@@ -33,7 +33,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.curate.Curator;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -520,7 +520,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
         BitstreamFormat bf = null;
         Bitstream b = null;
 
-        log.debug(LogManager.getHeader(context, "processUploadFile", "begin"));
+        log.debug(LogHelper.getHeader(context, "processUploadFile", "begin"));
  
         //NOTE: File should already be uploaded. 
         //Manakin does this automatically via Cocoon.
@@ -556,7 +556,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
                 // with the upload
                 if (filePath == null || fileInputStream == null)
                 {
-                    log.info(LogManager.getHeader(context, "processUploadFile",
+                    log.info(LogHelper.getHeader(context, "processUploadFile",
                             "upload error: 0"));
                     return STATUS_UPLOAD_ERROR;
                 }
@@ -565,7 +565,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
                 {
                     // In any event, if we don't have the submission info, the request
                     // was malformed
-                    log.error(LogManager.getHeader(context,
+                    log.error(LogHelper.getHeader(context,
                             "processUploadFile", "integrity error"));
                     return STATUS_INTEGRITY_ERROR;
                 }
@@ -804,12 +804,12 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
     {
         List<String> needed = new ArrayList<String>();
 
-        log.debug(LogManager.getHeader(context, "la_get_needed", "begin"));
+        log.debug(LogHelper.getHeader(context, "la_get_needed", "begin"));
 
         // iterate over the required bitstreams
         for (String required : requiredBitstreams)
         {
-            log.debug(LogManager.getHeader(context, "la_get_needed", required
+            log.debug(LogHelper.getHeader(context, "la_get_needed", required
                     + " is required"));
 
             boolean alreadyPresent = false;
@@ -821,7 +821,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
             {
                 String desc = b.getDescription();
 
-                log.debug(LogManager.getHeader(context, "la_get_needed",
+                log.debug(LogHelper.getHeader(context, "la_get_needed",
                         "checking for match on " + desc));
 
                 if (desc != null && desc.equals(required))
@@ -831,7 +831,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
                 }
             }
 
-            log.debug(LogManager.getHeader(context, "la_get_needed", required
+            log.debug(LogHelper.getHeader(context, "la_get_needed", required
                     + " is already present " + alreadyPresent));
 
             if (!alreadyPresent)
@@ -841,7 +841,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
 
         }
 
-        log.debug(LogManager.getHeader(context, "la_get_needed", "returning "
+        log.debug(LogHelper.getHeader(context, "la_get_needed", "returning "
                 + needed));
 
         return needed;
@@ -889,7 +889,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
             SubmissionInfo subInfo) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        log.debug(LogManager.getHeader(context, "isAllPdf", "begin"));
+        log.debug(LogHelper.getHeader(context, "isAllPdf", "begin"));
 
         List<Bitstream> bitstreams = itemService.getNonInternalBitstreams(context, subInfo.getSubmissionItem().getItem());
 

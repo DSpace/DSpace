@@ -7,11 +7,10 @@
  */
 package org.dspace.authority.util;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -22,19 +21,24 @@ public class EnumUtils {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(EnumUtils.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(EnumUtils.class);
+
+    /**
+     * Default constructor
+     */
+    private EnumUtils() { }
 
     private static String getEnumName(String value) {
         return StringUtils.isNotBlank(value) ?
-                value.toUpperCase().trim().replaceAll("[^a-zA-Z]", "_")
-                : null;
+            value.toUpperCase().trim().replaceAll("[^a-zA-Z]", "_")
+            : null;
     }
 
     public static <E extends Enum<E>> E lookup(Class<E> enumClass, String enumName) {
         try {
             return Enum.valueOf(enumClass, getEnumName(enumName));
         } catch (Exception ex) {
-            log.warn("Did not find an "+enumClass.getSimpleName()+" for value '"+enumName+"'");
+            log.warn("Did not find an " + enumClass.getSimpleName() + " for value '" + enumName + "'");
             return null;
         }
     }

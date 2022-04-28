@@ -21,7 +21,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.dao.Group2GroupCacheDAO;
 import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -89,7 +89,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         // Create a table row
         Group g = groupDAO.create(context, new Group());
 
-        log.info(LogManager.getHeader(context, "create_group", "group_id="
+        log.info(LogHelper.getHeader(context, "create_group", "group_id="
                 + g.getID()));
 
         context.addEvent(new Event(Event.CREATE, Constants.GROUP, g.getID(), null, getIdentifiers(context, g)));
@@ -434,7 +434,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         groupDAO.delete(context, group);
         rethinkGroupCache(context, false);
 
-        log.info(LogManager.getHeader(context, "delete_group", "group_id="
+        log.info(LogHelper.getHeader(context, "delete_group", "group_id="
                 + group.getID()));
     }
 
@@ -522,7 +522,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             group.clearGroupsChanged();
         }
 
-        log.info(LogManager.getHeader(context, "update_group", "group_id="
+        log.info(LogHelper.getHeader(context, "update_group", "group_id="
                 + group.getID()));
     }
 

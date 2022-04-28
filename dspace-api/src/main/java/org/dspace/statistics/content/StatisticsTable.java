@@ -14,16 +14,15 @@ package org.dspace.statistics.content;
  * @author kevinvandevelde at atmire.com
  * Date: 23-dec-2008
  * Time: 9:27:52
- * 
  */
-public class StatisticsTable extends StatisticsDisplay{
+public class StatisticsTable extends StatisticsDisplay {
 
-    public StatisticsTable(StatisticsData statisticsData){
+    public StatisticsTable(StatisticsData statisticsData) {
         super(statisticsData);
     }
- 
+
     @Override
-	public String getType() {
-		return "table";
-	}
+    public String getType() {
+        return "table";
+    }
 }

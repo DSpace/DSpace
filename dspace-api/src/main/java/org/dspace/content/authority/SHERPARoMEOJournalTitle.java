@@ -7,57 +7,81 @@
  */
 package org.dspace.content.authority;
 
-import java.util.ArrayList;
 import java.util.List;
-import org.apache.http.message.BasicNameValuePair;
-import org.dspace.content.Collection;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.dspace.app.sherpa.SHERPAService;
+import org.dspace.app.sherpa.v2.SHERPAResponse;
+import org.dspace.utils.DSpace;
 
 /**
- * Sample Journal-name authority based on SHERPA/RoMEO
+ * Journal-name authority based on SHERPA/RoMEO v2
  *
- * WARNING: This is a very crude and incomplete implementation, done mainly
- *  as a proof-of-concept.  Any site that actually wants to use it will
- *  probably have to refine it (and give patches back to dspace.org).
- *
- * @see SHERPARoMEOProtocol
  * @author Larry Stone
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @version $Revision $
+ * @see SHERPARoMEOProtocol
  */
-public class SHERPARoMEOJournalTitle extends SHERPARoMEOProtocol
-{
-    private static final String RESULT = "journal";
-    private static final String LABEL = "jtitle";
-    private static final String AUTHORITY = "issn";
+public class SHERPARoMEOJournalTitle implements ChoiceAuthority {
+    private String pluginInstanceName;
 
-    public SHERPARoMEOJournalTitle()
-    {
+    public SHERPARoMEOJournalTitle() {
         super();
     }
 
     @Override
-    public Choices getMatches(String text, Collection collection, int start, int limit, String locale)
-    {
+    public Choices getMatches(String text, int start, int limit, String locale) {
         // punt if there is no query text
-        if (text == null || text.trim().length() == 0)
-        {
+        if (text == null || text.trim().length() == 0) {
             return new Choices(true);
         }
-
-        // query args to add to SHERPA/RoMEO request URL
-        List<BasicNameValuePair> args = new ArrayList<BasicNameValuePair>();
-        args.add(new BasicNameValuePair("jtitle", text));
-        args.add(new BasicNameValuePair("qtype","contains")); // OR: starts, exact
-
-        Choices result = query(RESULT, LABEL, AUTHORITY, args, start, limit);
-        if (result == null)
-        {
-            result =  new Choices(true);
+        SHERPAService sherpaService = new DSpace().getSingletonService(SHERPAService.class);
+        SHERPAResponse sherpaResponse = sherpaService.performRequest("publication", "title",
+                "contains word", text, 0, 0);
+        Choices result;
+        if (CollectionUtils.isNotEmpty(sherpaResponse.getJournals())) {
+            List<Choice> list = sherpaResponse
+                    .getJournals().stream()
+                        .skip(start)
+                        .limit(limit)
+                        .map(sherpaJournal -> new Choice(sherpaJournal.getIssns().get(0),
+                            sherpaJournal.getTitles().get(0), sherpaJournal.getTitles().get(0)))
+                    .collect(Collectors.toList());
+            int total = sherpaResponse.getJournals().size();
+            result = new Choices(list.toArray(new Choice[list.size()]), start, total, Choices.CF_ACCEPTED,
+                    total > (start + limit));
+        } else {
+            result = new Choices(false);
         }
         return result;
     }
 
     @Override
-    public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale) {
-        return getMatches(text, collection, start, limit, locale);
+    public Choices getBestMatch(String text, String locale) {
+        return getMatches(text, 0, 1, locale);
+    }
+
+    @Override
+    public String getLabel(String key, String locale) {
+        SHERPAService sherpaService = new DSpace().getSingletonService(SHERPAService.class);
+        SHERPAResponse sherpaResponse = sherpaService.performRequest("publication", "issn",
+                "equals", key, 0, 1);
+        if (CollectionUtils.isNotEmpty(sherpaResponse.getJournals())) {
+            return sherpaResponse.getJournals().get(0).getTitles().get(0);
+        } else {
+            return null;
+        }
+
+    }
+
+    @Override
+    public void setPluginInstanceName(String name) {
+        this.pluginInstanceName = name;
+    }
+
+    @Override
+    public String getPluginInstanceName() {
+        return pluginInstanceName;
     }
 }

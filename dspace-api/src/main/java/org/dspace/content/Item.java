@@ -7,18 +7,34 @@
  */
 package org.dspace.content;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.hibernate.annotations.Sort;
-import org.hibernate.annotations.SortType;
 import org.hibernate.proxy.HibernateProxyHelper;
-
-import javax.persistence.*;
-import java.util.*;
 
 /**
  * Class representing an item in DSpace.
@@ -32,52 +48,54 @@ import java.util.*;
  *
  * @author Robert Tansley
  * @author Martin Hald
- * @version $Revision$
  */
 @Entity
-@Table(name="item")
-public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
-{
+@Table(name = "item")
+public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
      */
     public static final String ANY = "*";
 
-    @Column(name="item_id", insertable = false, updatable = false)
+    @Column(name = "item_id", insertable = false, updatable = false)
     private Integer legacyId;
 
-    @Column(name= "in_archive")
+    @Column(name = "in_archive")
     private boolean inArchive = false;
 
-    @Column(name= "discoverable")
+    @Column(name = "discoverable")
     private boolean discoverable = false;
 
-    @Column(name= "withdrawn")
+    @Column(name = "withdrawn")
     private boolean withdrawn = false;
 
-    @Column(name= "last_modified", columnDefinition="timestamp with time zone")
+    @Column(name = "last_modified", columnDefinition = "timestamp with time zone")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastModified = new Date();
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade={CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "owning_collection")
     private Collection owningCollection;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "template")
     private Collection templateItemOf;
 
-    /** The e-person who submitted this item */
+    /**
+     * The e-person who submitted this item
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "submitter_id")
     private EPerson submitter = null;
 
 
-    /** The bundles in this item - kept in sync with DB */
-    @ManyToMany(fetch = FetchType.LAZY, cascade={CascadeType.PERSIST})
+    /**
+     * The bundles in this item - kept in sync with DB
+     */
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinTable(
-            name = "collection2item",
-            joinColumns = {@JoinColumn(name = "item_id") },
-            inverseJoinColumns = {@JoinColumn(name = "collection_id") }
+        name = "collection2item",
+        joinColumns = {@JoinColumn(name = "item_id")},
+        inverseJoinColumns = {@JoinColumn(name = "collection_id")}
     )
     private final Set<Collection> collections = new HashSet<>();
 
@@ -88,13 +106,31 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
     private transient ItemService itemService;
 
     /**
+     * True if anything else was changed since last metadata retrieval()
+     * (to drive metadata cache)
+     */
+    @Transient
+    private boolean modifiedMetadataCache = true;
+
+    @Transient
+    private List<MetadataValue> cachedMetadata = new ArrayList<>();
+
+    /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.ItemService#create(Context, WorkspaceItem)}
-     *
      */
-    protected Item()
-    {
+    protected Item() {
 
+    }
+
+    /**
+     * Takes a pre-determined UUID to be passed to the object to allow for the
+     * restoration of previously defined UUID's.
+     *
+     * @param uuid Takes a uuid to be passed to the Pre-Defined UUID Generator
+     */
+    protected Item(UUID uuid) {
+        this.predefinedUUID = uuid;
     }
 
     /**
@@ -102,8 +138,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      *
      * @return true if the item is in the main archive
      */
-    public boolean isArchived()
-    {
+    public boolean isArchived() {
         return inArchive;
     }
 
@@ -112,14 +147,14 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      *
      * @return true if the item has been withdrawn
      */
-    public boolean isWithdrawn()
-    {
+    public boolean isWithdrawn() {
         return withdrawn;
     }
 
 
     /**
      * Set an item to be withdrawn, do NOT make this method public, use itemService().withdraw() to withdraw an item
+     *
      * @param withdrawn
      */
     void setWithdrawn(boolean withdrawn) {
@@ -131,8 +166,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      *
      * @return true if the item is discoverable
      */
-    public boolean isDiscoverable()
-    {
+    public boolean isDiscoverable() {
         return discoverable;
     }
 
@@ -141,10 +175,9 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      * last_modified is null
      *
      * @return the date the item was last modified, or the current date if the
-     *         column is null.
+     * column is null.
      */
-    public Date getLastModified()
-    {
+    public Date getLastModified() {
         return lastModified;
     }
 
@@ -156,11 +189,9 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      * Set the "is_archived" flag. This is public and only
      * <code>WorkflowItem.archive()</code> should set this.
      *
-     * @param isArchived
-     *            new value for the flag
+     * @param isArchived new value for the flag
      */
-    public void setArchived(boolean isArchived)
-    {
+    public void setArchived(boolean isArchived) {
         this.inArchive = isArchived;
         setModified();
     }
@@ -168,11 +199,9 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Set the "discoverable" flag. This is public and only
      *
-     * @param discoverable
-     *            new value for the flag
+     * @param discoverable new value for the flag
      */
-    public void setDiscoverable(boolean discoverable)
-    {
+    public void setDiscoverable(boolean discoverable) {
         this.discoverable = discoverable;
         setModified();
     }
@@ -180,11 +209,9 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Set the owning Collection for the item
      *
-     * @param c
-     *            Collection
+     * @param c Collection
      */
-    public void setOwningCollection(Collection c)
-    {
+    public void setOwningCollection(Collection c) {
         this.owningCollection = c;
         setModified();
     }
@@ -194,8 +221,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      *
      * @return Collection that is the owner of the item
      */
-    public Collection getOwningCollection()
-    {
+    public Collection getOwningCollection() {
         return owningCollection;
     }
 
@@ -204,8 +230,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      *
      * @return the submitter
      */
-    public EPerson getSubmitter()
-    {
+    public EPerson getSubmitter() {
         return submitter;
     }
 
@@ -215,11 +240,9 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      * package. <code>update</code> must be called to write the change to the
      * database.
      *
-     * @param sub
-     *            the submitter
+     * @param sub the submitter
      */
-    public void setSubmitter(EPerson sub)
-    {
+    public void setSubmitter(EPerson sub) {
         this.submitter = sub;
         setModified();
     }
@@ -229,26 +252,23 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      *
      * @return the collections this item is in, if any.
      */
-    public List<Collection> getCollections()
-    {
+    public List<Collection> getCollections() {
         // We return a copy because we do not want people to add elements to this collection directly.
         // We return a list to maintain backwards compatibility
-        Collection[] output = collections.toArray(new Collection[]{});
+        Collection[] output = collections.toArray(new Collection[] {});
         Arrays.sort(output, new NameAscendingComparator());
         return Arrays.asList(output);
     }
 
-    void addCollection(Collection collection)
-    {
+    void addCollection(Collection collection) {
         collections.add(collection);
     }
 
-    void removeCollection(Collection collection)
-    {
+    void removeCollection(Collection collection) {
         collections.remove(collection);
     }
 
-    public void clearCollections(){
+    public void clearCollections() {
         collections.clear();
     }
 
@@ -266,8 +286,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      *
      * @return the bundles in an unordered array
      */
-    public List<Bundle> getBundles()
-    {
+    public List<Bundle> getBundles() {
         return bundles;
     }
 
@@ -279,74 +298,59 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      *
      * @return the bundles in an unordered array
      */
-    public List<Bundle> getBundles(String name)
-    {
-        List<Bundle> matchingBundles = new ArrayList<Bundle>();
-
-        // now only keep bundles with matching names
+    public List<Bundle> getBundles(String name) {
+        List<Bundle> matchingBundles = new ArrayList<>();
+         // now only keep bundles with matching names
         List<Bundle> bunds = getBundles();
-        for (Bundle bundle : bunds)
-        {
-            if (name.equals(bundle.getName()))
-            {
+        for (Bundle bundle : bunds) {
+            if (name.equals(bundle.getName())) {
                 matchingBundles.add(bundle);
             }
         }
-
         return matchingBundles;
     }
 
     /**
      * Add a bundle to the item, should not be made public since we don't want to skip business logic
+     *
      * @param bundle the bundle to be added
      */
-    void addBundle(Bundle bundle)
-    {
+    void addBundle(Bundle bundle) {
         bundles.add(bundle);
     }
 
     /**
      * Remove a bundle from item, should not be made public since we don't want to skip business logic
+     *
      * @param bundle the bundle to be removed
      */
-    void removeBundle(Bundle bundle)
-    {
+    void removeBundle(Bundle bundle) {
         bundles.remove(bundle);
     }
 
     /**
      * Return <code>true</code> if <code>other</code> is the same Item as
-     * this object, <code>false</code> otherwise
+     * this object, <code>false</code> otherwise.
      *
-     * @param obj
-     *            object to compare to
+     * @param obj object to compare to
      * @return <code>true</code> if object passed in represents the same item
-     *         as this object
+     * as this object
      */
     @Override
-    public boolean equals(Object obj)
-    {
-        if (obj == null)
-        {
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Item)) {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
-        if (this.getClass() != objClass)
-        {
+        if (this.getClass() != objClass) {
             return false;
         }
         final Item otherItem = (Item) obj;
-        if (!this.getID().equals(otherItem.getID()))
-        {
-            return false;
-        }
-
-        return true;
+        return this.getID().equals(otherItem.getID());
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int hash = 5;
         hash += 71 * hash + getType();
         hash += 71 * hash + getID().hashCode();
@@ -359,15 +363,13 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      * @return int Constants.ITEM
      */
     @Override
-    public int getType()
-    {
+    public int getType() {
         return Constants.ITEM;
     }
 
     @Override
-    public String getName()
-    {
-        return getItemService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+    public String getName() {
+        return getItemService().getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
     }
 
     @Override
@@ -375,12 +377,29 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
         return legacyId;
     }
 
-    public ItemService getItemService()
-    {
-        if(itemService == null)
-        {
+    public ItemService getItemService() {
+        if (itemService == null) {
             itemService = ContentServiceFactory.getInstance().getItemService();
         }
         return itemService;
+    }
+
+    @Override
+    protected void setMetadataModified() {
+        super.setMetadataModified();
+        modifiedMetadataCache = true;
+    }
+
+    public boolean isModifiedMetadataCache() {
+        return modifiedMetadataCache;
+    }
+
+    protected List<MetadataValue> getCachedMetadata() {
+        return cachedMetadata;
+    }
+
+    protected void setCachedMetadata(List<MetadataValue> cachedMetadata) {
+        this.cachedMetadata = cachedMetadata;
+        modifiedMetadataCache = false;
     }
 }

@@ -7,13 +7,15 @@
  */
 package org.dspace.app.util.factory;
 
+import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.app.util.service.WebAppService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the util package, use UtilServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the util package, use UtilServiceFactory.getInstance() to retrieve an
+ * implementation
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -25,6 +27,8 @@ public class UtilServiceFactoryImpl extends UtilServiceFactory {
     private OpenSearchService openSearchService;
     @Autowired(required = true)
     private WebAppService webAppService;
+    @Autowired(required = true)
+    private DSpaceObjectUtils dSpaceObjectUtils;
 
     @Override
     public WebAppService getWebAppService() {
@@ -39,5 +43,10 @@ public class UtilServiceFactoryImpl extends UtilServiceFactory {
     @Override
     public MetadataExposureService getMetadataExposureService() {
         return metadataExposureService;
+    }
+
+    @Override
+    public DSpaceObjectUtils getDSpaceObjectUtils() {
+        return dSpaceObjectUtils;
     }
 }

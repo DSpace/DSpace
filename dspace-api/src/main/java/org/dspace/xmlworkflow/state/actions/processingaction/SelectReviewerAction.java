@@ -7,24 +7,24 @@
  */
 package org.dspace.xmlworkflow.state.actions.processingaction;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.workflow.WorkflowException;
+import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * Processing class for an action where an assigned user can
@@ -35,46 +35,49 @@ import java.util.UUID;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class SelectReviewerAction extends ProcessingAction{
+public class SelectReviewerAction extends ProcessingAction {
 
-    public static final int MAIN_PAGE = 0;
     public static final int SEARCH_RESULTS_PAGE = 1;
 
     public static final int RESULTS_PER_PAGE = 5;
 
-    private String roleId;
+    private static final String SUBMIT_CANCEL = "submit_cancel";
+    private static final String SUBMIT_SEARCH = "submit_search";
+    private static final String SUBMIT_SELECT_REVIEWER = "submit_select_reviewer_";
+
+    private Role role;
 
     @Autowired(required = true)
-    protected EPersonService ePersonService;
+    private EPersonService ePersonService;
 
     @Autowired(required = true)
-    protected WorkflowItemRoleService workflowItemRoleService;
+    private WorkflowItemRoleService workflowItemRoleService;
 
     @Override
-    public void activate(Context c, XmlWorkflowItem wf) throws SQLException, IOException, AuthorizeException, WorkflowException {
+    public void activate(Context c, XmlWorkflowItem wf) {
 
     }
 
     @Override
-    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException, WorkflowException {
-        String submitButton = Util.getSubmitButton(request, "submit_cancel");
+    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
+            throws SQLException, AuthorizeException {
+        String submitButton = Util.getSubmitButton(request, SUBMIT_CANCEL);
 
         //Check if our user has pressed cancel
-        if(submitButton.equals("submit_cancel")){
+        if (submitButton.equals(SUBMIT_CANCEL)) {
             //Send us back to the submissions page
             return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
 
-        }else
-        if(submitButton.equals("submit_search")){
+        } else if (submitButton.equals(SUBMIT_SEARCH)) {
             //Perform the search
             String query = request.getParameter("query");
             int page = Util.getIntParameter(request, "result-page");
-            if(page == -1){
+            if (page == -1) {
                 page = 0;
             }
 
             int resultCount = ePersonService.searchResultCount(c, query);
-            List<EPerson> epeople = ePersonService.search(c, query, page*RESULTS_PER_PAGE, RESULTS_PER_PAGE);
+            List<EPerson> epeople = ePersonService.search(c, query, page * RESULTS_PER_PAGE, RESULTS_PER_PAGE);
 
 
             request.setAttribute("eperson-result-count", resultCount);
@@ -82,15 +85,14 @@ public class SelectReviewerAction extends ProcessingAction{
             request.setAttribute("result-page", page);
             request.setAttribute("page", SEARCH_RESULTS_PAGE);
             return new ActionResult(ActionResult.TYPE.TYPE_PAGE, SEARCH_RESULTS_PAGE);
-        }else
-        if(submitButton.startsWith("submit_select_reviewer_")){
+        } else if (submitButton.startsWith(SUBMIT_SELECT_REVIEWER)) {
             //Retrieve the identifier of the eperson which will do the reviewing
             UUID reviewerId = UUID.fromString(submitButton.substring(submitButton.lastIndexOf("_") + 1));
             EPerson reviewer = ePersonService.find(c, reviewerId);
             //We have a reviewer, assign him, the workflowitemrole will be translated into a task in the autoassign
             WorkflowItemRole workflowItemRole = workflowItemRoleService.create(c);
             workflowItemRole.setEPerson(reviewer);
-            workflowItemRole.setRoleId(getRoleId());
+            workflowItemRole.setRoleId(getRole().getId());
             workflowItemRole.setWorkflowItem(wfi);
             workflowItemRoleService.update(c, workflowItemRole);
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
@@ -100,11 +102,20 @@ public class SelectReviewerAction extends ProcessingAction{
         return new ActionResult(ActionResult.TYPE.TYPE_ERROR);
     }
 
-    public String getRoleId() {
-        return roleId;
+    @Override
+    public List<String> getOptions() {
+        List<String> options = new ArrayList<>();
+        options.add(SUBMIT_SEARCH);
+        options.add(SUBMIT_SELECT_REVIEWER);
+        return options;
     }
 
-    public void setRoleId(String roleId) {
-        this.roleId = roleId;
+    public Role getRole() {
+        return role;
+    }
+
+    @Autowired(required = true)
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

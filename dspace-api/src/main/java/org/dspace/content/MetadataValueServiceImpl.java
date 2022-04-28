@@ -7,7 +7,12 @@
  */
 package org.dspace.content;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.MetadataValueDAO;
@@ -16,13 +21,8 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Service implementation for the MetadataValue object.
@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class MetadataValueServiceImpl implements MetadataValueService {
 
-    private static final Logger log = Logger.getLogger(MetadataValueServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataValueServiceImpl.class);
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -55,6 +55,8 @@ public class MetadataValueServiceImpl implements MetadataValueService {
 //An update here isn't needed, this is persited upon the merge of the owning object
 //        metadataValueDAO.save(context, metadataValue);
         metadataValue = metadataValueDAO.create(context, metadataValue);
+        log.info(LogHelper.getHeader(context, "add_metadatavalue",
+                                     "metadata_value_id=" + metadataValue.getID()));
 
         return metadataValue;
     }
@@ -66,24 +68,33 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     }
 
     @Override
-    public List<MetadataValue> findByField(Context context, MetadataField metadataField) throws IOException, SQLException {
+    public List<MetadataValue> findByField(Context context, MetadataField metadataField)
+        throws IOException, SQLException {
         return metadataValueDAO.findByField(context, metadataField);
+    }
+
+    @Override
+    public Iterator<MetadataValue> findByFieldAndValue(Context context, MetadataField metadataField, String value)
+            throws SQLException {
+        return metadataValueDAO.findItemValuesByFieldAndValue(context, metadataField, value);
     }
 
     @Override
     public void update(Context context, MetadataValue metadataValue) throws SQLException {
         metadataValueDAO.save(context, metadataValue);
-        log.info(LogManager.getHeader(context, "update_metadatavalue",
-                "metadata_value_id=" + metadataValue.getID()));
+        log.info(LogHelper.getHeader(context, "update_metadatavalue",
+                                      "metadata_value_id=" + metadataValue.getID()));
 
     }
 
     @Override
-    public void update(Context context, MetadataValue metadataValue, boolean updateLastModified) throws SQLException, AuthorizeException {
-        if(updateLastModified){
+    public void update(Context context, MetadataValue metadataValue, boolean updateLastModified)
+        throws SQLException, AuthorizeException {
+        if (updateLastModified) {
             authorizeService.authorizeAction(context, metadataValue.getDSpaceObject(), Constants.WRITE);
-            DSpaceObjectService<DSpaceObject> dSpaceObjectService = contentServiceFactory.getDSpaceObjectService(metadataValue.getDSpaceObject());
-			// get the right class for our dspaceobject not the DSpaceObject lazy proxy
+            DSpaceObjectService<DSpaceObject> dSpaceObjectService = contentServiceFactory
+                .getDSpaceObjectService(metadataValue.getDSpaceObject());
+            // get the right class for our dspaceobject not the DSpaceObject lazy proxy
             DSpaceObject dso = dSpaceObjectService.find(context, metadataValue.getDSpaceObject().getID());
             dSpaceObjectService.updateLastModified(context, dso);
         }
@@ -93,8 +104,8 @@ public class MetadataValueServiceImpl implements MetadataValueService {
 
     @Override
     public void delete(Context context, MetadataValue metadataValue) throws SQLException {
-        log.info(LogManager.getHeader(context, "delete_metadata_value",
-                " metadata_value_id=" + metadataValue.getID()));
+        log.info(LogHelper.getHeader(context, "delete_metadata_value",
+                                      " metadata_value_id=" + metadataValue.getID()));
         metadataValueDAO.delete(context, metadataValue);
     }
 
@@ -110,10 +121,9 @@ public class MetadataValueServiceImpl implements MetadataValueService {
 
     @Override
     public MetadataValue getMinimum(Context context, int metadataFieldId)
-            throws SQLException
-    {
+        throws SQLException {
         return metadataValueDAO.getMinimum(context,
-                metadataFieldId);
+                                           metadataFieldId);
     }
 
     @Override

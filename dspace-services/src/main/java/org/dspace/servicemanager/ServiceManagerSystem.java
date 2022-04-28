@@ -14,7 +14,7 @@ import org.dspace.kernel.ServiceManager;
 /**
  * This interface should be implemented by any service managers that we are using in the system,
  * e.g. Spring, Guice.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface ServiceManagerSystem extends ServiceManager {

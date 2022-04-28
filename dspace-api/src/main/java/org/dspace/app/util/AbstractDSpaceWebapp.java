@@ -14,8 +14,9 @@ import java.util.Date;
 
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.WebAppService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +28,7 @@ import org.slf4j.LoggerFactory;
  * @author mwood
  */
 abstract public class AbstractDSpaceWebapp
-        implements DSpaceWebappMXBean
-{
+    implements DSpaceWebappMXBean {
     private static final Logger log = LoggerFactory.getLogger(AbstractDSpaceWebapp.class);
 
     protected final WebAppService webAppService = UtilServiceFactory.getInstance().getWebAppService();
@@ -42,32 +42,34 @@ abstract public class AbstractDSpaceWebapp
 
     protected WebApp webApp;
 
-    /** Prevent null instantiation. */
-    protected AbstractDSpaceWebapp()
-    {
+    /**
+     * Prevent null instantiation.
+     */
+    protected AbstractDSpaceWebapp() {
     }
 
     /**
      * Construct a particular kind of DSpace application.
      *
-     * @param kind what kind of application is this?  (XMLUI, JSPUI, etc.)
+     * @param kind what kind of application is this?
      */
-    public AbstractDSpaceWebapp(String kind)
-    {
+    public AbstractDSpaceWebapp(String kind) {
         this.kind = kind;
 
         started = new Date();
 
-        url = ConfigurationManager.getProperty("dspace.url");
-        if (null == url)
-        {
-            throw new IllegalStateException("dspace.url is undefined");
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        url = configurationService.getProperty("dspace.ui.url");
+        if (null == url) {
+            throw new IllegalStateException("dspace.ui.url is undefined");
         }
     }
 
-    /** Record that this application is running. */
-    public void register()
-    {
+    /**
+     * Record that this application is running.
+     */
+    public void register() {
         // Create the database entry
         Timestamp now = new Timestamp(started.getTime());
         try {
@@ -79,9 +81,10 @@ abstract public class AbstractDSpaceWebapp
         }
     }
 
-    /** Record that this application is not running. */
-    public void deregister()
-    {
+    /**
+     * Record that this application is not running.
+     */
+    public void deregister() {
         // Remove the database entry
         try {
             Context context = new Context();
@@ -93,20 +96,17 @@ abstract public class AbstractDSpaceWebapp
     }
 
     @Override
-    public String getKind()
-    {
+    public String getKind() {
         return kind;
     }
 
     @Override
-    public String getURL()
-    {
+    public String getURL() {
         return url;
     }
 
     @Override
-    public String getStarted()
-    {
+    public String getStarted() {
         return started.toString();
     }
 }

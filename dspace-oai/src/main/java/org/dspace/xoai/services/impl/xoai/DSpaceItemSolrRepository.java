@@ -7,18 +7,25 @@
  */
 package org.dspace.xoai.services.impl.xoai;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import com.google.common.base.Function;
-import com.lyncode.builder.ListBuilder;
 import com.lyncode.xoai.dataprovider.core.ListItemIdentifiersResult;
 import com.lyncode.xoai.dataprovider.core.ListItemsResults;
 import com.lyncode.xoai.dataprovider.data.Item;
 import com.lyncode.xoai.dataprovider.data.ItemIdentifier;
 import com.lyncode.xoai.dataprovider.exceptions.IdDoesNotExistException;
 import com.lyncode.xoai.dataprovider.filter.ScopedFilter;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.dspace.xoai.data.DSpaceSolrItem;
@@ -29,22 +36,16 @@ import org.dspace.xoai.solr.DSpaceSolrSearch;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
 import org.dspace.xoai.solr.exceptions.SolrSearchEmptyException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 /**
- * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author Lyncode Development Team (dspace at lyncode dot com)
  */
-public class DSpaceItemSolrRepository extends DSpaceItemRepository
-{
-    private static Logger log = LogManager.getLogger(DSpaceItemSolrRepository.class);
-    private SolrServer server;
-    private SolrQueryResolver solrQueryResolver;
+public class DSpaceItemSolrRepository extends DSpaceItemRepository {
+    private static final Logger log = LogManager.getLogger(DSpaceItemSolrRepository.class);
+    private final SolrClient server;
+    private final SolrQueryResolver solrQueryResolver;
 
-    public DSpaceItemSolrRepository(SolrServer server, CollectionsService collectionsService, HandleResolver handleResolver, SolrQueryResolver solrQueryResolver)
-    {
+    public DSpaceItemSolrRepository(SolrClient server, CollectionsService collectionsService,
+                                    HandleResolver handleResolver, SolrQueryResolver solrQueryResolver) {
         super(collectionsService, handleResolver);
         this.server = server;
         this.solrQueryResolver = solrQueryResolver;
@@ -52,17 +53,15 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
 
     @Override
     public Item getItem(String identifier) throws IdDoesNotExistException {
-        if (identifier == null) throw new IdDoesNotExistException();
+        if (identifier == null) {
+            throw new IdDoesNotExistException();
+        }
         String parts[] = identifier.split(Pattern.quote(":"));
-        if (parts.length == 3)
-        {
-            try
-            {
+        if (parts.length == 3) {
+            try {
                 SolrQuery params = new SolrQuery("item.handle:" + parts[2]);
                 return new DSpaceSolrItem(DSpaceSolrSearch.querySingle(server, params));
-            }
-            catch (SolrSearchEmptyException ex)
-            {
+            } catch (SolrSearchEmptyException | IOException ex) {
                 throw new IdDoesNotExistException(ex);
             }
         }
@@ -71,53 +70,48 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
 
     @Override
     public ListItemIdentifiersResult getItemIdentifiers(
-            List<ScopedFilter> filters, int offset, int length)
-    {
-        try
-        {
+        List<ScopedFilter> filters, int offset, int length) {
+        try {
             QueryResult queryResult = retrieveItems(filters, offset, length);
-            List<ItemIdentifier> identifierList = new ListBuilder<Item>()
-                    .add(queryResult.getResults())
-                    .build(new Function<Item, ItemIdentifier>() {
-                        @Override
-                        public ItemIdentifier apply(Item elem) {
-                            return elem;
-                        }
-                    });
+            // transform results list from a list of Items to a list of ItemIdentifiers
+            List<ItemIdentifier> identifierList =
+                newArrayList(transform(queryResult.getResults(), new Function<Item, ItemIdentifier>() {
+                    @Override
+                    public ItemIdentifier apply(Item elem) {
+                        return elem;
+                    }
+                }));
             return new ListItemIdentifiersResult(queryResult.hasMore(), identifierList, queryResult.getTotal());
-        }
-        catch (DSpaceSolrException ex)
-        {
+        } catch (DSpaceSolrException | IOException ex) {
             log.error(ex.getMessage(), ex);
-            return new ListItemIdentifiersResult(false, new ArrayList<ItemIdentifier>());
+            return new ListItemIdentifiersResult(false, new ArrayList<>());
         }
     }
 
     @Override
     public ListItemsResults getItems(List<ScopedFilter> filters, int offset,
-            int length)
-    {
-        try
-        {
+                                     int length) {
+        try {
             QueryResult queryResult = retrieveItems(filters, offset, length);
             return new ListItemsResults(queryResult.hasMore(), queryResult.getResults(), queryResult.getTotal());
-        }
-        catch (DSpaceSolrException ex)
-        {
+        } catch (DSpaceSolrException | IOException ex) {
             log.error(ex.getMessage(), ex);
-            return new ListItemsResults(false, new ArrayList<Item>());
+            return new ListItemsResults(false, new ArrayList<>());
         }
     }
 
-    private QueryResult retrieveItems (List<ScopedFilter> filters, int offset, int length) throws DSpaceSolrException {
-        List<Item> list = new ArrayList<Item>();
+    private QueryResult retrieveItems(List<ScopedFilter> filters, int offset, int length)
+            throws DSpaceSolrException, IOException {
+        List<Item> list = new ArrayList<>();
         SolrQuery params = new SolrQuery(solrQueryResolver.buildQuery(filters))
-                .setRows(length)
-                .setStart(offset);
+            .setRows(length)
+            .setStart(offset);
         SolrDocumentList solrDocuments = DSpaceSolrSearch.query(server, params);
-        for (SolrDocument doc : solrDocuments)
+        for (SolrDocument doc : solrDocuments) {
             list.add(new DSpaceSolrItem(doc));
-        return new QueryResult(list, (solrDocuments.getNumFound() > offset + length), (int) solrDocuments.getNumFound());
+        }
+        return new QueryResult(list, (solrDocuments.getNumFound() > offset + length),
+                               (int) solrDocuments.getNumFound());
     }
 
     private class QueryResult {
