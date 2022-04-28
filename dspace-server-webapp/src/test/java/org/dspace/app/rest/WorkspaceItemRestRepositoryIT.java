@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -7265,8 +7266,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void test99() throws Exception {
+    public void sherpaPolicySectionCacheTest() throws Exception {
         context.turnOffAuthorisationSystem();
+
+        String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
@@ -7276,31 +7279,186 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                                                   .withTitle("Workspace Item 1")
-                                                  .withIssueDate("2017-10-17")
+                                                  .withIssueDate("2021-11-21")
                                                   .withAuthor("Smith, Donald")
-                                                  .withIssn("222731-0582")
-                                                  .withAuthor("Doe, John")
+                                                  .withIssn("2731-0582")
                                                   .withSubject("ExtraEntry")
                                                   .build();
 
         context.restoreAuthSystemState();
 
+        AtomicReference<String> retrievalTime = new AtomicReference<String>();
+        AtomicReference<String> retrievalTime2 = new AtomicReference<String>();
+
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
-                        .andExpect(status().isOk());
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(false)))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].titles[0]",
+                                         is("Nature Synthesis")))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].issns[0]",
+                                         is("2731-0582")))))
+                        .andDo(result -> retrievalTime.set(read(
+                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+
+        Date date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+
+        // reload page, to verify that the retrievalTime is not changed
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(false)))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].titles[0]",
+                                         is("Nature Synthesis")))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].issns[0]",
+                                         is("2731-0582")))))
+                        .andDo(result -> retrievalTime2.set(read(
+                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+
+        Date date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
+
+        assertTrue(date.equals(date2));
 
         // create a list of values to use in add operation
         List<Operation> operations = new ArrayList<>();
         operations.add(new RemoveOperation("/sections/sherpaPolicies/retrievalTime"));
 
+        // empty the cache and verify the retrivatTime
         String patchBody = getPatchContent(operations);
         getClient(token).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                         .content(patchBody)
                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                        .andExpect(status().isOk());
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(false)))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].titles[0]",
+                                         is("Nature Synthesis")))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].issns[0]",
+                                         is("2731-0582")))))
+                        .andDo(result -> retrievalTime.set(read(
+                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
+        date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+
+        assertTrue(date.after(date2));
+
+        // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
-                        .andExpect(status().isOk());
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(false)))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].titles[0]",
+                                         is("Nature Synthesis")))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals[0].issns[0]",
+                                         is("2731-0582")))))
+                        .andDo(result -> retrievalTime2.set(read(
+                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+
+        date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
+        assertTrue(date.equals(date2));
+    }
+
+    @Test
+    public void sherpaPolicySectionWithWrongIssnCacheTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Workspace Item 1")
+                                                  .withIssueDate("2021-11-21")
+                                                  .withAuthor("Smith, Donald")
+                                                  .withIssn("0000-0000")
+                                                  .withSubject("ExtraEntry")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<String> retrievalTime = new AtomicReference<String>();
+        AtomicReference<String> retrievalTime2 = new AtomicReference<String>();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(true)))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                              hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.message", is("No results found")))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals", nullValue()))))
+                        .andDo(result -> retrievalTime.set(read(
+                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+
+        Date date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+
+        // reload page, to verify that the retrievalTime is not changed
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(true)))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                              hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.message", is("No results found")))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals", nullValue()))))
+                        .andDo(result -> retrievalTime2.set(read(
+                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+
+        Date date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
+
+        assertTrue(date.equals(date2));
+
+        // create a list of values to use in add operation
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new RemoveOperation("/sections/sherpaPolicies/retrievalTime"));
+
+        // empty the cache and verify the retrivatTime
+        String patchBody = getPatchContent(operations);
+        getClient(token).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(true)))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                              hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.message", is("No results found")))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals", nullValue()))))
+                        .andDo(result -> retrievalTime.set(read(
+                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+
+        date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+
+        assertTrue(date.after(date2));
+
+        // reload page, to verify that the retrievalTime is not changed
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.error", is(true)))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                              hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.message", is("No results found")))))
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.sections.sherpaPolicies.sherpaResponse.journals", nullValue()))))
+                        .andDo(result -> retrievalTime2.set(read(
+                               result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
+
+        date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
+        assertTrue(date.equals(date2));
     }
 
 }

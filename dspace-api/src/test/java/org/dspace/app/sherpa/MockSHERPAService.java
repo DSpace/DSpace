@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 import org.dspace.app.sherpa.v2.SHERPAPublisherResponse;
 import org.dspace.app.sherpa.v2.SHERPAResponse;
@@ -53,8 +54,12 @@ public class MockSHERPAService extends SHERPAService {
                     return new SHERPAResponse("Error building URI");
                 }
 
-                // Get mock JSON - in this case, a known good result for The Lancet
-                content = getClass().getResourceAsStream("thelancet.json");
+                // Get mock JSON
+                // if a file with the name contained in the value does not exist, returns thelancet.json
+                content = getContent(value.concat(".json"));
+                if (Objects.isNull(content)) {
+                    content = getContent("thelancet.json");
+                }
 
                 // Parse JSON input stream and return response for later evaluation
                 return new SHERPAResponse(content, SHERPAResponse.SHERPAFormat.JSON);
@@ -72,6 +77,10 @@ public class MockSHERPAService extends SHERPAService {
             // This object will be marked as having an error for later evaluation
             return new SHERPAResponse(e.getMessage());
         }
+    }
+
+    private InputStream getContent(String fileName) {
+        return getClass().getResourceAsStream(fileName);
     }
 
     /**
@@ -119,4 +128,5 @@ public class MockSHERPAService extends SHERPAService {
             return new SHERPAPublisherResponse(e.getMessage());
         }
     }
+
 }
