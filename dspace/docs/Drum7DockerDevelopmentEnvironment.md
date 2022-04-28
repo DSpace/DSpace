@@ -8,7 +8,7 @@ using docker.
 1. Clone the Git repository and switch to the directory:
 
     ```bash
-    git clone git@github.com:umd-lib/drum.git
+    git clone -b drum-develop git@github.com:umd-lib/DSpace.git drum
     cd drum
     ```
 
@@ -64,7 +64,7 @@ docker exec -it dspace bash
 ## Create an adminstrator user
 
 ```bash
-$ docker-compose -p d7 -f docker-compose-cli.yml run dspace-cli create-administrator
+$ docker compose -p d7 -f docker-compose-cli.yml run dspace-cli create-administrator
 Creating d7_dspace-cli_run ... done
 Creating an initial administrator account
 E-mail address: <EMAIL_ADDRESS>
@@ -75,4 +75,14 @@ Password:
 Again to confirm:
 Is the above data correct? (y or n): y
 Administrator account created
+```
+
+## Populate the Solr search index
+
+```bash
+$ docker compose -p d7 -f docker-compose-cli.yml run dspace-cli index-discovery
+The script has started
+Updating Index
+Done with indexing
+The script has completed
 ```

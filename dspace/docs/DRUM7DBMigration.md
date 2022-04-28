@@ -31,5 +31,5 @@
 
     # Run the migration
     # NOTE: The command will
-    docker-compose -p d7 -f docker-compose-cli.yml run dspace-cli database migrate ignored
+    docker compose -p d7 -f docker-compose-cli.yml run dspace-cli database migrate ignored
     ```
