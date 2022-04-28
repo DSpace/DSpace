@@ -169,7 +169,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
         String trackPages = configurationService.getProperty("iiif.search.trackPages");
         String rows = configurationService.getProperty("iiif.search.rows");
         SolrQuery solrQuery = new SolrQuery();
-        solrQuery.set("q", "ocr_text:\"" + query + "\" AND manifest_url:\"" + manifestId + "\"");
+        solrQuery.set("q", "ocr_text:" + query + " AND manifest_url:\"" + manifestId + "\"");
         solrQuery.set(CommonParams.WT, "json");
         solrQuery.set("fl", "id");
         solrQuery.set("hl", "true");
