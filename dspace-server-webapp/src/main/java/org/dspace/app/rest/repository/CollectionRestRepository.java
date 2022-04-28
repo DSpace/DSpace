@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.GroupHasPendingWorkflowTasksException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
@@ -695,8 +696,8 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         throws SQLException, WorkflowConfigurationException, AuthorizeException, WorkflowException, IOException {
         Group group = workflowService.getWorkflowRoleGroup(context, collection, workflowRole, null);
         if (!poolTaskService.findByGroup(context, group).isEmpty()) {
-            throw new UnprocessableEntityException("The Group that was attempted to be deleted " +
-                                                       "still has Pooltasks open");
+            // todo: also handle claimed tasks that would become associated with this group once returned to the pool
+            throw new GroupHasPendingWorkflowTasksException();
         }
         if (group == null) {
             throw new ResourceNotFoundException("The requested Group was not found");
