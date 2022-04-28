@@ -57,6 +57,6 @@
     <bean class="org.dspace.app.sherpa.cache.SherpaCacheEvictService">
          <property name="sherpaSubmitService"
                    ref="org.dspace.app.sherpa.submit.SHERPASubmitService"/>
-         <property name="cacheManager" ref="cacheManager" />          
+         <property name="cacheManager" ref="cacheManager" />
     </bean>
 </beans>

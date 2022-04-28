@@ -43,17 +43,14 @@
 
     <bean name="org.dspace.core.DBConnection" class="org.dspace.core.HibernateDBConnection" lazy-init="true" scope="prototype"/>
 
-    <cache:annotation-driven />
+    <!-- <cache:annotation-driven />
     <bean id="cacheManager" class="org.springframework.cache.jcache.JCacheCacheManager">
-	<!--        <property name="configLocation">
-	            <value>file:${dspace.dir}/config/ehcache.xml</value>
-	        </property>-->
         <property name="cacheManager">
             <bean class="org.springframework.cache.jcache.JCacheManagerFactoryBean">
                <property name="cacheManagerUri" value="file:${dspace.dir}/config/ehcache.xml"/>
             </bean>
         </property>
-    </bean>
+    </bean>-->
 
     <!-- Register all our Flyway callback classes (which run before/after database migrations) -->
     <bean class="org.dspace.storage.rdbms.RegistryUpdater"/>
