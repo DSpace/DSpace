@@ -43,7 +43,7 @@ public class OrcidAuthenticationRestController {
 
     @PostConstruct
     public void postConstruct() {
-        discoverableEndpointsService.register(this, Arrays.asList(new Link("/api/" + AuthnRest.CATEGORY, "orcid")));
+        discoverableEndpointsService.register(this, Arrays.asList(Link.of("/api/" + AuthnRest.CATEGORY, "orcid")));
     }
 
     @GetMapping
