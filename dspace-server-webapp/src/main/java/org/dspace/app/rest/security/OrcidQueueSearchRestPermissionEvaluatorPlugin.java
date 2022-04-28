@@ -79,7 +79,7 @@ public class OrcidQueueSearchRestPermissionEvaluatorPlugin extends RestObjectPer
     }
 
     private boolean hasAccess(EPerson ePerson, Item owner) {
-        List<MetadataValue> values = itemService.getMetadata(owner, "cris", "owner", null, Item.ANY);
+        List<MetadataValue> values = itemService.getMetadata(owner, "dspace", "object", "owner", Item.ANY);
         if (values.get(0).getAuthority().equals(ePerson.getID().toString())) {
             return true;
         }

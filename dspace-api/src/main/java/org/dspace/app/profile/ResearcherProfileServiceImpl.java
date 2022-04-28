@@ -16,14 +16,17 @@ import static org.dspace.eperson.Group.ANONYMOUS;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.exception.ResourceAlreadyExistsException;
+import org.dspace.app.profile.service.AfterResearcherProfileCreationAction;
 import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -86,6 +89,18 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
     @Autowired
     private AuthorizeService authorizeService;
 
+    @Autowired(required = false)
+    private List<AfterResearcherProfileCreationAction> afterCreationActions;
+
+    @PostConstruct
+    public void postConstruct() {
+
+        if (afterCreationActions == null) {
+            afterCreationActions = Collections.emptyList();
+        }
+
+    }
+
     @Override
     public ResearcherProfile findById(Context context, UUID id) throws SQLException, AuthorizeException {
         Assert.notNull(id, "An id must be provided to find a researcher profile");
@@ -111,15 +126,16 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
             .orElseThrow(() -> new IllegalStateException("No collection found for researcher profiles"));
 
         context.turnOffAuthorisationSystem();
-        try {
+        Item item = createProfileItem(context, ePerson, collection);
+        context.restoreAuthSystemState();
 
-            Item item = createProfileItem(context, ePerson, collection);
-            return new ResearcherProfile(item);
+        ResearcherProfile researcherProfile = new ResearcherProfile(item);
 
-        } finally {
-            context.restoreAuthSystemState();
+        for (AfterResearcherProfileCreationAction afterCreationAction : afterCreationActions) {
+            afterCreationAction.perform(context, researcherProfile, ePerson);
         }
 
+        return researcherProfile;
     }
 
     @Override

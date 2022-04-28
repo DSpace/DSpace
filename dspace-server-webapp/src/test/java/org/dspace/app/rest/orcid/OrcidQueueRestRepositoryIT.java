@@ -45,7 +45,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
     @Test
     public void findAllTest() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/cris/orcidqueues"))
+        getClient(authToken).perform(get("/api/eperson/orcidqueues"))
                             .andExpect(status().isMethodNotAllowed());
     }
 
@@ -111,7 +111,6 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                       .withTitle("Title Project")
                                       .build();
 
-        itemService.addMetadata(context, itemPerson, "crisevent", "description", "keywords", null, "psychoceramics");
         itemService.addMetadata(context, itemPerson, "dc", "identifier", "scopus", null, "7004769520");
 
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication).build();
@@ -123,7 +122,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         String tokenResearcher = getAuthToken(researcher.getEmail(), password);
         String tokenResearcher2 = getAuthToken(researcher2.getEmail(), password);
 
-        getClient(tokenResearcher).perform(get("/api/cris/orcidqueue/search/findByOwner")
+        getClient(tokenResearcher).perform(get("/api/eperson/orcidqueue/search/findByOwner")
                                   .param("ownerId", itemPerson.getID().toString()))
                                   .andExpect(status().isOk())
                                   .andExpect(jsonPath("$._embedded.orcidqueues", Matchers.containsInAnyOrder(
@@ -132,7 +131,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                              )))
                                   .andExpect(jsonPath("$.page.totalElements", is(2)));
 
-        getClient(tokenResearcher2).perform(get("/api/cris/orcidqueue/search/findByOwner")
+        getClient(tokenResearcher2).perform(get("/api/eperson/orcidqueue/search/findByOwner")
                                    .param("ownerId", itemPerson2.getID().toString()))
                                    .andExpect(status().isOk())
                                    .andExpect(jsonPath("$._embedded.orcidqueues", Matchers.contains(
@@ -140,9 +139,9 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                               )))
                                    .andExpect(jsonPath("$.page.totalElements", is(1)))
                                    .andExpect(jsonPath("$._links.self.href", Matchers
-                                             .containsString("/api/cris/orcidqueue/search/findByOwner")));
+                .containsString("/api/eperson/orcidqueue/search/findByOwner")));
 
-        getClient(tokenAdmin).perform(get("/api/cris/orcidqueue/search/findByOwner")
+        getClient(tokenAdmin).perform(get("/api/eperson/orcidqueue/search/findByOwner")
                              .param("ownerId", itemPerson.getID().toString()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$._embedded.orcidqueues", Matchers.containsInAnyOrder(
@@ -206,7 +205,6 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withIssueDate("2013-02-17")
                                            .build();
 
-        itemService.addMetadata(context, itemPerson, "crisevent", "description", "keywords", null, "psychoceramics");
         itemService.addMetadata(context, itemPerson, "dc", "identifier", "scopus", null, "7004769520");
 
         OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication).build();
@@ -215,7 +213,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
         String tokenResearcher2 = getAuthToken(researcher2.getEmail(), password);
 
-        getClient(tokenResearcher2).perform(get("/api/cris/orcidqueue/search/findByOwner")
+        getClient(tokenResearcher2).perform(get("/api/eperson/orcidqueue/search/findByOwner")
                                    .param("ownerId", itemPerson.getID().toString()))
                                    .andExpect(status().isForbidden());
     }
@@ -255,14 +253,13 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .withIssueDate("2013-08-03")
                                           .build();
 
-        itemService.addMetadata(context, itemPerson, "crisevent", "description", "keywords", null, "psychoceramics");
         itemService.addMetadata(context, itemPerson, "dc", "identifier", "scopus", null, "7004769520");
 
         OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication).build();
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/cris/orcidqueue/search/findByOwner")
+        getClient().perform(get("/api/eperson/orcidqueue/search/findByOwner")
                    .param("ownerId", itemPerson.getID().toString()))
                    .andExpect(status().isUnauthorized());
     }
@@ -325,21 +322,21 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         String tokenResearcher = getAuthToken(researcher.getEmail(), password);
         String tokenResearcher2 = getAuthToken(researcher2.getEmail(), password);
 
-        getClient(tokenResearcher).perform(get("/api/cris/orcidqueues/" + orcidQueue.getID().toString()))
+        getClient(tokenResearcher).perform(get("/api/eperson/orcidqueues/" + orcidQueue.getID().toString()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue))))
                              .andExpect(jsonPath("$._links.self.href", Matchers
-                                       .containsString("/api/cris/orcidqueues/" + orcidQueue.getID())))
+                .containsString("/api/eperson/orcidqueues/" + orcidQueue.getID())))
                              .andExpect(jsonPath("$._links.owner.href", Matchers
                                        .containsString("/api/core/items/" + itemPerson1.getID())))
                              .andExpect(jsonPath("$._links.entity.href", Matchers
                                        .containsString("/api/core/items/" + itemPublication.getID())));
 
-        getClient(tokenResearcher2).perform(get("/api/cris/orcidqueues/" + orcidQueue2.getID().toString()))
+        getClient(tokenResearcher2).perform(get("/api/eperson/orcidqueues/" + orcidQueue2.getID().toString()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue2))))
                              .andExpect(jsonPath("$._links.self.href", Matchers
-                                       .containsString("/api/cris/orcidqueues/" + orcidQueue2.getID())))
+                .containsString("/api/eperson/orcidqueues/" + orcidQueue2.getID())))
                              .andExpect(jsonPath("$._links.owner.href", Matchers
                                        .containsString("/api/core/items/" + itemPerson2.getID())))
                              .andExpect(jsonPath("$._links.entity.href", Matchers
@@ -376,10 +373,10 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
         String tokenResearcher = getAuthToken(researcher.getEmail(), password);
 
-        getClient(tokenResearcher).perform(get("/api/cris/orcidqueues/" + orcidQueue.getID().toString()))
+        getClient(tokenResearcher).perform(get("/api/eperson/orcidqueues/" + orcidQueue.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue))))
-            .andExpect(jsonPath("$._links.self.href", containsString("/api/cris/orcidqueues/" + orcidQueue.getID())))
+            .andExpect(jsonPath("$._links.self.href", containsString("/api/eperson/orcidqueues/" + orcidQueue.getID())))
             .andExpect(jsonPath("$._links.owner.href", containsString("/api/core/items/" + itemPerson.getID())));
     }
 
@@ -422,7 +419,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
 
-        getClient(tokenEperson).perform(get("/api/cris/orcidqueues/" + orcidQueue.getID().toString()))
+        getClient(tokenEperson).perform(get("/api/eperson/orcidqueues/" + orcidQueue.getID().toString()))
                                .andExpect(status().isForbidden());
     }
 
@@ -464,14 +461,14 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/cris/orcidqueue/" + orcidQueue.getID().toString()))
+        getClient().perform(get("/api/eperson/orcidqueue/" + orcidQueue.getID().toString()))
                    .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void findOneNotFoundTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/cris/orcidQueues/" + Integer.MAX_VALUE))
+        getClient(tokenAdmin).perform(get("/api/eperson/orcidQueues/" + Integer.MAX_VALUE))
                              .andExpect(status().isNotFound());
     }
 
@@ -514,10 +511,10 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
         String tokenResearcher = getAuthToken(researcher.getEmail(), password);
 
-        getClient(tokenResearcher).perform(delete("/api/cris/orcidqueues/" + orcidQueue.getID()))
+        getClient(tokenResearcher).perform(delete("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                                   .andExpect(status().isNoContent());
 
-        getClient(tokenResearcher).perform(get("/api/cris/orcidqueues/" + orcidQueue.getID()))
+        getClient(tokenResearcher).perform(get("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                                   .andExpect(status().isNotFound());
     }
 
@@ -562,10 +559,10 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
         String tokenResearcher = getAuthToken(researcher.getEmail(), password);
 
-        getClient(tokenEPerson).perform(delete("/api/cris/orcidqueues/" + orcidQueue.getID()))
+        getClient(tokenEPerson).perform(delete("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                                .andExpect(status().isForbidden());
 
-        getClient(tokenResearcher).perform(get("/api/cris/orcidqueues/" + orcidQueue.getID()))
+        getClient(tokenResearcher).perform(get("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                                   .andExpect(status().isOk())
                                   .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue))));
     }
@@ -609,10 +606,10 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
         String tokenResearcher = getAuthToken(researcher.getEmail(), password);
 
-        getClient().perform(delete("/api/cris/orcidqueues/" + orcidQueue.getID()))
+        getClient().perform(delete("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                    .andExpect(status().isUnauthorized());
 
-        getClient(tokenResearcher).perform(get("/api/cris/orcidqueues/" + orcidQueue.getID()))
+        getClient(tokenResearcher).perform(get("/api/eperson/orcidqueues/" + orcidQueue.getID()))
                                   .andExpect(status().isOk())
                                   .andExpect(jsonPath("$", is(matchOrcidQueue(orcidQueue))));
     }
@@ -620,7 +617,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
     @Test
     public void deleteOneNotFoundTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(delete("/api/cris/orcidqueues/" + Integer.MAX_VALUE))
+        getClient(tokenAdmin).perform(delete("/api/eperson/orcidqueues/" + Integer.MAX_VALUE))
                              .andExpect(status().isNotFound());
     }
 }

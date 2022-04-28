@@ -612,7 +612,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withDescription("IT")
             .withOperation(OrcidOperation.INSERT)
             .withRecordType("COUNTRY")
-            .withMetadata("crisrp.country::IT")
+            .withMetadata("person.country::IT")
             .build();
         context.restoreAuthSystemState();
 
@@ -668,7 +668,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withDescription("IT")
             .withOperation(OrcidOperation.DELETE)
             .withRecordType("COUNTRY")
-            .withMetadata("crisrp.country::IT")
+            .withMetadata("person.country::IT")
             .withPutCode("12345")
             .build();
         context.restoreAuthSystemState();

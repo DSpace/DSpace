@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.exception.ResourceAlreadyExistsException;
+import org.dspace.app.orcid.exception.OrcidValidationException;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -132,6 +133,12 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         sendErrorResponse(request, response, null,
                 "Invalid search request",
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
+    }
+
+    @ExceptionHandler({ OrcidValidationException.class })
+    protected void handleOrcidValidationException(HttpServletRequest request, HttpServletResponse response,
+        OrcidValidationException ex) throws IOException {
+        sendErrorResponse(request, response, ex, ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     /**

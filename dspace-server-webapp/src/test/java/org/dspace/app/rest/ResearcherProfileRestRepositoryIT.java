@@ -1891,7 +1891,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         getClient(authToken)
             .perform(post("/api/eperson/profiles/").contentType(TEXT_URI_LIST)
                                                    .content("http://localhost:8080/server/api/core/items/" + id))
-            .andExpect(status().isConflict());
+            .andExpect(status().isUnprocessableEntity());
     }
 
     private Item createProfile(EPerson ePerson) throws Exception {

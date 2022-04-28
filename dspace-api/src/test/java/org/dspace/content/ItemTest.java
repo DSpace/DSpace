@@ -586,7 +586,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         String schema = "dc";
         String element = "contributor";
-        String qualifier = "author";
+        String qualifier = "editor";
         String lang = Item.ANY;
         List<String> values = Arrays.asList("value0", "value1");
         List<String> authorities = Arrays.asList("auth0", "auth2");
@@ -682,7 +682,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         String schema = "dc";
         String element = "contributor";
-        String qualifier = "author";
+        String qualifier = "editor";
         String lang = Item.ANY;
         String values = "value0";
         String authorities = "auth0";

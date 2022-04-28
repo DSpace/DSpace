@@ -26,6 +26,7 @@ import javax.persistence.Table;
 
 import org.dspace.content.Item;
 import org.dspace.core.ReloadableEntity;
+import org.hibernate.annotations.Type;
 
 /**
  * Entity that model a record on the ORCID synchronization queue.
@@ -61,6 +62,7 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
 
     @Lob
     @Column(name = "metadata")
+    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
     private String metadata;
 
     @Enumerated(EnumType.STRING)
