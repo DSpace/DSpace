@@ -43,9 +43,8 @@ public interface ItemService
     public Thumbnail getThumbnail(Context context, Item item, boolean requireOriginal) throws SQLException;
 
     /**
-     * Create a new item, with a new internal ID. This method is not public,
-     * since items need to be created as workspace items. Authorisation is the
-     * responsibility of the caller.
+     * Create a new item, with a new internal ID. Authorization is done
+     * inside of this method.
      *
      * @param context       DSpace context object
      * @param workspaceItem in progress workspace item
@@ -54,6 +53,19 @@ public interface ItemService
      * @throws AuthorizeException if authorization error
      */
     public Item create(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException;
+
+    /**
+     * Create a new item, with a provided ID. Authorisation is done
+     * inside of this method.
+     *
+     * @param context DSpace context object
+     * @param workspaceItem in progress workspace item
+     * @param uuid the pre-determined UUID to assign to the new item
+     * @return the newly created item
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     */
+    public Item create(Context context, WorkspaceItem workspaceItem, UUID uuid) throws SQLException, AuthorizeException;
 
     /**
      * Create an empty template item for this collection. If one already exists,
@@ -460,10 +472,40 @@ public interface ItemService
     public void inheritCollectionDefaultPolicies(Context context, Item item, Collection collection)
         throws java.sql.SQLException, AuthorizeException;
 
+    /**
+     * Adjust the Bundle and Bitstream policies to reflect what have been defined
+     * during the submission/workflow. The temporary SUBMISSION and WORKFLOW
+     * policies are removed and the policies defined at the item and collection
+     * level are copied and inherited as appropriate. Custom selected Item policies
+     * are copied to the bundle/bitstream only if no explicit custom policies were
+     * already applied to the bundle/bitstream. Collection's policies are inherited
+     * if there are no other policies defined or if the append mode is defined by
+     * the configuration via the core.authorization.installitem.inheritance-read.append-mode property
+     * 
+     * @param context             DSpace context object
+     * @param item                Item to adjust policies on
+     * @param collection          Collection
+     * @throws SQLException       If database error
+     * @throws AuthorizeException If authorization error
+     */
     public void adjustBundleBitstreamPolicies(Context context, Item item, Collection collection)
         throws SQLException, AuthorizeException;
 
 
+    /**
+     * Adjust the Item's policies to reflect what have been defined during the
+     * submission/workflow. The temporary SUBMISSION and WORKFLOW policies are
+     * removed and the default policies defined at the collection level are
+     * inherited as appropriate. Collection's policies are inherited if there are no
+     * other policies defined or if the append mode is defined by the configuration
+     * via the core.authorization.installitem.inheritance-read.append-mode property
+     * 
+     * @param context              DSpace context object
+     * @param item                 Item to adjust policies on
+     * @param collection           Collection
+     * @throws SQLException        If database error
+     * @throws AuthorizeException  If authorization error
+     */
     public void adjustItemPolicies(Context context, Item item, Collection collection)
         throws SQLException, AuthorizeException;
 

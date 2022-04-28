@@ -8,7 +8,6 @@
 package org.dspace.disseminate.service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -84,7 +83,7 @@ public interface CitationDocumentService {
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
-    public Pair<InputStream, Long> makeCitedDocument(Context context, Bitstream bitstream)
+    public Pair<byte[], Long> makeCitedDocument(Context context, Bitstream bitstream)
             throws IOException, SQLException, AuthorizeException;
 
     /**

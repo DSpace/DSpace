@@ -193,4 +193,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public Iterator<AuthenticationMethod> authenticationMethodIterator() {
         return getAuthenticationMethodStack().iterator();
     }
+
+    @Override
+    public String getAuthenticationMethod(final Context context, final HttpServletRequest request) {
+        final Iterator<AuthenticationMethod> authenticationMethodIterator = authenticationMethodIterator();
+
+        while (authenticationMethodIterator.hasNext()) {
+            final AuthenticationMethod authenticationMethod = authenticationMethodIterator.next();
+            if (authenticationMethod.isUsed(context, request)) {
+                return authenticationMethod.getName();
+            }
+        }
+
+        return null;
+    }
 }

@@ -70,11 +70,11 @@ import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.input.DOMBuilder;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.input.DOMBuilder;
+import org.jdom2.output.XMLOutputter;
 import org.xml.sax.SAXException;
 
 
@@ -701,7 +701,7 @@ public class OAIHarvester {
         if (values.size() > 0 && acceptedHandleServers != null) {
             for (MetadataValue value : values) {
                 //     0   1       2         3   4
-                //   http://hdl.handle.net/1234/12
+                //   https://hdl.handle.net/1234/12
                 String[] urlPieces = value.getValue().split("/");
                 if (urlPieces.length != 5) {
                     continue;

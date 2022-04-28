@@ -80,7 +80,7 @@ public class AuthenticationRestController implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         discoverableEndpointsService
-            .register(this, Arrays.asList(new Link("/api/" + AuthnRest.CATEGORY, AuthnRest.NAME)));
+            .register(this, Arrays.asList(Link.of("/api/" + AuthnRest.CATEGORY, AuthnRest.NAME)));
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -118,6 +118,7 @@ public class AuthenticationRestController implements InitializingBean {
 
             response.setHeader("WWW-Authenticate", authenticateHeaderValue);
         }
+        authenticationStatusRest.setAuthenticationMethod(context.getAuthenticationMethod());
         authenticationStatusRest.setProjection(projection);
         AuthenticationStatusResource authenticationStatusResource = converter.toResource(authenticationStatusRest);
 

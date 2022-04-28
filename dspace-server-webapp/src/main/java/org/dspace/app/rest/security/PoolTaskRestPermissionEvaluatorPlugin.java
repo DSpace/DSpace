@@ -57,7 +57,7 @@ public class PoolTaskRestPermissionEvaluatorPlugin extends RestObjectPermissionE
         }
 
         Request request = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext(request.getServletRequest());
+        Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
         EPerson ePerson = null;
         try {
             ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());

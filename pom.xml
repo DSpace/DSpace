@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>7.0</version>
+    <version>7.3-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -13,39 +13,41 @@
 
     <organization>
         <name>LYRASIS</name>
-        <url>http://www.dspace.org</url>
+        <url>https://dspace.org</url>
     </organization>
 
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>11</java.version>
-        <spring.version>5.2.5.RELEASE</spring.version>
-        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
-        <spring-security.version>5.2.2.RELEASE</spring-security.version> <!-- sync with version used by spring-boot-->
-        <hibernate.version>5.4.10.Final</hibernate.version>
-        <hibernate-validator.version>6.0.18.Final</hibernate-validator.version>
-        <postgresql.driver.version>42.2.9</postgresql.driver.version>
-        <solr.client.version>8.8.1</solr.client.version>
+        <spring.version>5.3.18</spring.version>
+        <spring-boot.version>2.6.6</spring-boot.version>
+        <spring-security.version>5.6.2</spring-security.version> <!-- sync with version used by spring-boot-->
+        <hibernate.version>5.6.5.Final</hibernate.version>
+        <hibernate-validator.version>6.0.23.Final</hibernate-validator.version>
+        <postgresql.driver.version>42.3.3</postgresql.driver.version>
+        <solr.client.version>8.11.1</solr.client.version>
 
-        <axiom.version>1.2.22</axiom.version>
-        <errorprone.version>2.3.4</errorprone.version>
+        <ehcache.version>3.4.0</ehcache.version>
+        <errorprone.version>2.10.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
         <jackson.version>2.12.3</jackson.version>
         <javax-annotation.version>1.3.2</javax-annotation.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
+        <jcache-version>1.1.0</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
-        <jetty.version>9.4.41.v20210516</jetty.version>
-        <log4j.version>2.13.3</log4j.version>
+        <jetty.version>9.4.44.v20210927</jetty.version>
+        <log4j.version>2.17.1</log4j.version>
         <pdfbox-version>2.0.24</pdfbox-version>
-        <poi-version>3.17</poi-version>
+        <rome.version>1.18.0</rome.version>
         <slf4j.version>1.7.25</slf4j.version>
+        <tika.version>2.3.0</tika.version>
+        <!-- Sync with whatever version Tika uses -->
+        <bouncycastle.version>1.70</bouncycastle.version>
 
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
-        <!-- Spring Data REST HAL Browser (used by Server webapp) -->
-        <spring-hal-browser.version>3.2.6.RELEASE</spring-hal-browser.version>
         <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath (used by Server webapp) -->
-        <json-path.version>2.4.0</json-path.version>
+        <json-path.version>2.6.0</json-path.version>
         <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home
              (used by Server webapp) -->
         <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
@@ -55,7 +57,7 @@
              https://jena.apache.org/documentation/migrate_jena2_jena3.html -->
         <jena.version>2.13.0</jena.version>
         <!-- Used by (now obsolete) 'dspace-rest' WAR -->
-        <jersey.version>2.30.1</jersey.version>
+        <jersey.version>2.35</jersey.version>
 
         <!--=== MAVEN SETTINGS ===-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -72,7 +74,7 @@
         <skipIntegrationTests>true</skipIntegrationTests>
 
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
-                     as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
+                     as it is used to reference the LICENSE.header and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
     </properties>
 
@@ -140,10 +142,21 @@
                     <version>3.8.1</version>
                     <configuration>
                         <release>11</release>
-                        <!-- Turn on http://errorprone.info -->
+                        <!-- Turn on http://errorprone.info (requires fork=true & below compilerArgs)-->
+                        <fork>true</fork>
                         <compilerArgs>
                             <arg>-XDcompilePolicy=simple</arg>
                             <arg>-Xplugin:ErrorProne</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
                         </compilerArgs>
                         <annotationProcessorPaths>
                             <path>
@@ -400,13 +413,13 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
-            <!-- Check license headers in all files using LICENSE_HEADER template -->
+            <!-- Check license headers in all files using LICENSE.header template -->
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
                     <!-- License header file (can be a URL, but that's less stable if external site is down on occasion) -->
-                    <header>${root.basedir}/LICENSE_HEADER</header>
+                    <header>${root.basedir}/LICENSE.header</header>
                     <!--Just check headers of everything in the /src directory -->
                     <includes>
                         <include>src/**</include>
@@ -681,33 +694,48 @@
                                     <fileTemplate>src/main/license/third-party-file-groupByLicense.ftl</fileTemplate>
                                     <!-- License names that should all be merged into the *first* listed name -->
                                     <licenseMerges>
-                                        <licenseMerge>Apache Software License, Version 2.0|The Apache Software License, Version 2.0|Apache License Version 2.0|Apache License, Version 2.0|Apache Public License 2.0|Apache License 2.0|Apache Software License - Version 2.0|Apache 2.0 License|Apache 2.0 license|Apache License V2.0|Apache 2|Apache License|Apache|ASF 2.0|Apache 2.0</licenseMerge>
+                                        <licenseMerge>Apache Software License, Version 2.0|Apache Software License, version 2.0|The Apache Software License, Version 2.0|Apache License Version 2.0|Apache License, Version 2.0|Apache Public License 2.0|Apache License 2.0|Apache Software License - Version 2.0|Apache 2.0 License|Apache 2.0 license|Apache License V2.0|Apache 2|Apache License|Apache|ASF 2.0|Apache 2.0|Apache License v2|Apache License v2.0|Apache License, 2.0|Apache License, version 2.0|Apache-2.0|The Apache License, Version 2.0</licenseMerge>
                                         <!-- Ant-contrib is an Apache License -->
                                         <licenseMerge>Apache Software License, Version 2.0|http://ant-contrib.sourceforge.net/tasks/LICENSE.txt</licenseMerge>
                                         <!-- XML Commons claims these licenses, but it's really Apache License: https://xerces.apache.org/xml-commons/licenses.html -->
                                         <licenseMerge>Apache Software License, Version 2.0|The SAX License|The W3C License</licenseMerge>
-                                        <licenseMerge>BSD License|The BSD License|BSD licence|BSD license|BSD|BSD-style license|New BSD License|New BSD license|Revised BSD License|BSD 2-Clause license</licenseMerge>
+                                        <!-- JDOM uses this license, but it's essentially just Apache -->
+                                        <licenseMerge>Apache Software License, Version 2.0|Similar to Apache License but with the acknowledgment clause removed</licenseMerge>
+                                        <licenseMerge>BSD License|The BSD License|BSD licence|BSD license|BSD|BSD-style license|New BSD License|New BSD license|Revised BSD License|BSD 2-Clause license|3-Clause BSD License|BSD 2-Clause|BSD 3-clause New License|BSD Licence 3|BSD-2-Clause|BSD-3-Clause|Modified BSD|The New BSD License</licenseMerge>
                                         <!-- DSpace uses a BSD License -->
                                         <licenseMerge>BSD License|DSpace BSD License|DSpace Sourcecode License</licenseMerge>
                                         <!-- Coverity uses modified BSD: https://github.com/coverity/coverity-security-library -->
                                         <licenseMerge>BSD License|BSD style modified by Coverity</licenseMerge>
                                         <!-- Jaxen claims this license, but it's really BSD: http://jaxen.codehaus.org/license.html -->
                                         <licenseMerge>BSD License|http://jaxen.codehaus.org/license.html</licenseMerge>
-                                        <licenseMerge>Common Development and Distribution License (CDDL)|Common Development and Distribution License (CDDL) v1.0|COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0|Common Development and Distribution License|CDDL, v1.0|CDDL 1.0 license|CDDL 1.0|CDDL 1.1|CDDL</licenseMerge>
+                                        <!-- Java Advanced Imaging Image I/O Tools API core is just a BSD: https://github.com/jai-imageio/jai-imageio-core/blob/master/LICENSE.txt -->
+                                        <licenseMerge>BSD License|BSD 3-clause License w/nuclear disclaimer</licenseMerge>
+                                        <licenseMerge>Common Development and Distribution License (CDDL)|Common Development and Distribution License (CDDL) v1.0|COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0|Common Development and Distribution License|CDDL, v1.0|CDDL 1.0 license|CDDL 1.0|CDDL 1.1|CDDL|Dual license consisting of the CDDL v1.1 and GPL v2</licenseMerge>
                                         <!-- Jersey / Java Servlet API claims this license, but is actually CDDL 1.0: http://servlet-spec.java.net -->
                                         <licenseMerge>Common Development and Distribution License (CDDL)|CDDL + GPLv2 with classpath exception</licenseMerge>
                                         <!-- Jersey claims this license, but it is dual licensed with CDDL 1.1 being one: https://jersey.java.net/license.html -->
                                         <licenseMerge>Common Development and Distribution License (CDDL)|CDDL+GPL License</licenseMerge>
                                         <!-- JavaMail claims this license, but it is dual licensed with CDDL being one: https://java.net/projects/javamail/pages/License -->
-                                        <licenseMerge>Common Development and Distribution License (CDDL)|GPLv2+CE</licenseMerge>
+                                        <licenseMerge>Common Development and Distribution License (CDDL)|GPLv2+CE|CDDL/GPLv2+CE</licenseMerge>
                                         <!-- JAXB claims this license, but it is dual licensed with CDDL being one: https://jaxb.java.net/ -->
                                         <licenseMerge>Common Development and Distribution License (CDDL)|GPL2 w/ CPE</licenseMerge>
-                                        <licenseMerge>Eclipse Public License|Eclipse Public License - Version 1.0|Eclipse Public License - v 1.0|EPL 1.0 license</licenseMerge>
+                                        <!-- JBoss Transaction API claims this license, but it is dual licensed with CDDL being one: https://github.com/jboss/jboss-transaction-api_spec -->
+                                        <licenseMerge>Common Development and Distribution License (CDDL)|GNU General Public License, Version 2 with the Classpath Exception</licenseMerge>
+                                        <licenseMerge>Eclipse Distribution License, Version 1.0|Eclipse Distribution License (EDL), Version 1.0|Eclipse Distribution License - v 1.0|Eclipse Distribution License v. 1.0|EDL 1.0</licenseMerge>
+                                        <licenseMerge>Eclipse Public License|Eclipse Public License - Version 1.0|Eclipse Public License - v 1.0|EPL 1.0 license|Eclipse Public License (EPL), Version 1.0|Eclipse Public License 1.0|Eclipse Public License v1.0|Eclipse Public License, Version 1.0|EPL 2.0</licenseMerge>
                                         <!-- JUnit claims this license but is actually Eclipse Public License: http://junit.org/license.html -->
                                         <licenseMerge>Eclipse Public License|Common Public License Version 1.0</licenseMerge>
-                                        <licenseMerge>GNU Lesser General Public License (LGPL)|The GNU Lesser General Public License, Version 2.1|GNU Lesser General Public License (LGPL), Version 2.1|GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1|GNU Lesser General Public License, version 2.1|GNU LESSER GENERAL PUBLIC LICENSE|GNU Lesser General Public License|GNU Lesser Public License|GNU Lesser General Public License, Version 2.1|Lesser General Public License (LGPL) v 2.1|LGPL 2.1|LGPL 2.1 license|LGPL 3.0 license|LGPL, v2.1 or later|LGPL</licenseMerge>
-                                        <licenseMerge>MIT License|The MIT License|MIT LICENSE</licenseMerge>
-                                        <licenseMerge>Mozilla Public License|Mozilla Public License version 1.1|Mozilla Public License 1.1 (MPL 1.1)|MPL 1.1</licenseMerge>
+                                        <!-- Jersey is dual licensed as EPL but lists its main license as GPL: https://github.com/eclipse-ee4j/jersey#licensing-and-governance -->
+                                        <licenseMerge>Eclipse Public License|The GNU General Public License (GPL), Version 2, With Classpath Exception</licenseMerge>
+                                        <licenseMerge>GNU Lesser General Public License (LGPL)|The GNU Lesser General Public License, Version 2.1|GNU Lesser General Public License (LGPL), Version 2.1|GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1|GNU Lesser General Public License, version 2.1|GNU LESSER GENERAL PUBLIC LICENSE|GNU Lesser General Public License|GNU Lesser Public License|GNU Lesser General Public License, Version 2.1|Lesser General Public License (LGPL) v 2.1|LGPL 2.1|LGPL 2.1 license|LGPL 3.0 license|LGPL, v2.1 or later|LGPL|LGPL, version 2.1|lgpl|Lesser General Public License, version 3 or greater</licenseMerge>
+                                        <!-- Hibernate ORM claims this license, but it's really regular LGPL: https://hibernate.org/community/license/ -->
+                                        <licenseMerge>GNU Lesser General Public License (LGPL)|GNU Library General Public License v2.1 or later</licenseMerge>
+                                        <licenseMerge>MIT License|The MIT License|MIT LICENSE|MIT|MIT license|MIT License (MIT)</licenseMerge>
+                                        <!-- BouncyCastle uses an MIT-style license: https://www.bouncycastle.org/licence.html -->
+                                        <licenseMerge>MIT License|Bouncy Castle Licence</licenseMerge>
+                                        <!-- netCDF tools uses an MIT-style license -->
+                                        <licenseMerge>MIT License|(MIT-style) netCDF C library license</licenseMerge>
+                                        <licenseMerge>Mozilla Public License|Mozilla Public License version 1.1|Mozilla Public License 1.1 (MPL 1.1)|MPL 1.1|Mozilla Public License Version 2.0|Mozilla Public License, Version 2.0</licenseMerge>
                                         <!-- H2 Database claims this license, but for our purposes it's MPL: http://www.h2database.com -->
                                         <licenseMerge>Mozilla Public License|MPL 2.0, and EPL 1.0</licenseMerge>
                                         <!-- "concurrent.concurrent" claims this license, but is actually Public Domain: http://mvnrepository.com/artifact/concurrent/concurrent/ -->
@@ -808,6 +836,21 @@
             </modules>
         </profile>
 
+        <!--
+            Builds IIIF extension for DSpace
+        -->
+        <profile>
+            <id>dspace-iiif</id>
+            <activation>
+                <file>
+                    <exists>dspace-iiif/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-iiif</module>
+            </modules>
+        </profile>
+
        <!-- REST Jersey (Deprecated REST API from DSpace 6.x or below) -->
        <!-- As this module is deprecated, it only builds if you activate it via -Pdspace-rest -->
        <profile>
@@ -827,14 +870,14 @@
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.0</version>
+                       <version>7.3-SNAPSHOT</version>
                        <type>jar</type>
                        <classifier>classes</classifier>
                    </dependency>
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.0</version>
+                       <version>7.3-SNAPSHOT</version>
                        <type>war</type>
                    </dependency>
                </dependencies>
@@ -918,8 +961,12 @@
                                  MUST be specified for server 'ossrh' -->
                             <serverId>ossrh</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <!-- Disable autoclose of repository after upload, as this sometimes times out -->
+                            <skipStagingRepositoryClose>true</skipStagingRepositoryClose>
                             <!-- Require manual verification / release to Maven Central -->
                             <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                            <!-- Increase Staging timeout to 10mins -->
+                            <stagingProgressTimeoutMinutes>10</stagingProgressTimeoutMinutes>
                         </configuration>
                     </plugin>
                     <!-- For new releases, generate Source JAR files -->
@@ -981,64 +1028,69 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>7.0</version>
+                <version>7.3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>7.0</version>
+                <version>7.3-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>7.0</version>
+                <version>7.3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>7.0</version>
+                <version>7.3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>7.0</version>
+                <version>7.3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>7.0</version>
+                <version>7.3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>7.0</version>
+                <version>7.3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>7.0</version>
+                <version>7.3-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>7.0</version>
+                <version>7.3-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dspace</groupId>
+                <artifactId>dspace-iiif</artifactId>
+                <version>7.3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.0</version>
+                <version>7.3-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.0</version>
+                <version>7.3-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
@@ -1056,28 +1108,6 @@
                 <version>${postgresql.driver.version}</version>
             </dependency>
 
-            <!-- Solr introduces multiple versions of zookeeper. So,
-                 we specify the version we want -->
-            <dependency>
-                <groupId>org.apache.zookeeper</groupId>
-                <artifactId>zookeeper</artifactId>
-                <version>3.4.14</version>
-            </dependency>
-
-            <!-- solr-cell and axiom-api disagree on versions -->
-            <dependency>
-                <groupId>org.apache.james</groupId>
-                <artifactId>apache-mime4j-core</artifactId>
-                <version>0.8.3</version>
-            </dependency>
-
-            <!-- solr-core, solr-cell disagree with nimbus-jose-jwt -->
-            <dependency>
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm</artifactId>
-                <version>8.0.1</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
@@ -1092,8 +1122,14 @@
 
             <dependency>
                 <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-ehcache</artifactId>
+                <artifactId>hibernate-jcache</artifactId>
                 <version>${hibernate.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.cache</groupId>
+                <artifactId>cache-api</artifactId>
+                <version>${jcache-version}</version>
             </dependency>
 
             <dependency>
@@ -1101,6 +1137,30 @@
                 <artifactId>hibernate-validator</artifactId>
                 <!-- This artifact doesn't track the main Hibernate version. -->
                 <version>${hibernate-validator.version}</version>
+            </dependency>
+
+            <!-- Hibernate introduces multiple versions of jboss-logging. So, specify version we want -->
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>3.4.3.Final</version>
+            </dependency>
+
+            <!-- Rome is used for RSS / ATOM syndication feeds -->
+            <dependency>
+                <groupId>com.rometools</groupId>
+                <artifactId>rome</artifactId>
+                <version>${rome.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.rometools</groupId>
+                <artifactId>rome-modules</artifactId>
+                <version>${rome.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.rometools</groupId>
+                <artifactId>rome-utils</artifactId>
+                <version>${rome.version}</version>
             </dependency>
 
             <dependency>
@@ -1204,7 +1264,7 @@
 
             <dependency>
                 <groupId>org.apache.solr</groupId>
-                <artifactId>solr-cell</artifactId>
+                <artifactId>solr-solrj</artifactId>
                 <version>${solr.client.version}</version>
             </dependency>
             <dependency>
@@ -1212,35 +1272,43 @@
                 <artifactId>lucene-core</artifactId>
                 <version>${solr.client.version}</version>
             </dependency>
-            <!-- Used for full-text indexing with Solr. Should be synced with version of Tika in solr-cell -->
+
+            <!-- Tika is used to extract full text from documents in order to index in Solr -->
             <dependency>
                 <groupId>org.apache.tika</groupId>
-                <artifactId>tika-parsers</artifactId>
-                <version>1.24.1</version>
-                <!-- Exclude a few tika-parsers dependencies that we already use, with slightly different versions -->
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.protobuf</groupId>
-                        <artifactId>protobuf-java</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>net.sf.ehcache</groupId>
-                        <artifactId>ehcache-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>jakarta.ws.rs</groupId>
-                        <artifactId>jakarta.ws.rs-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.xml.soap</groupId>
-                        <artifactId>javax.xml.soap-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jvnet.staxex</groupId>
-                        <artifactId>stax-ex</artifactId>
-                    </exclusion>
-                </exclusions>
+                <artifactId>tika-core</artifactId>
+                <version>${tika.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-parsers-standard-package</artifactId>
+                <version>${tika.version}</version>
+            </dependency>
+            <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk15on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <!-- Tika and axiom-api (in dspace-swordv2) disagree on versions -->
+            <dependency>
+                <groupId>org.apache.james</groupId>
+                <artifactId>apache-mime4j-core</artifactId>
+                <version>0.8.4</version>
+            </dependency>
+            <!-- Tika and solr-core disagree on versions of ASM -->
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>8.0.1</version>
+            </dependency>
+
             <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
              otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
             <dependency>
@@ -1266,7 +1334,7 @@
             <dependency>
                 <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
-                <version>1.10.9</version>
+                <version>1.10.11</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.jena</groupId>
@@ -1278,7 +1346,7 @@
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
-                    <!-- Newer version brought in by solr-cell -->
+                    <!-- Newer version brought in by Tika -->
                     <exclusion>
                         <groupId>org.apache.commons</groupId>
                         <artifactId>commons-csv</artifactId>
@@ -1400,9 +1468,9 @@
                 <version>2.9.2</version>
             </dependency>
             <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>mail</artifactId>
-                <version>1.4.7</version>
+                <groupId>com.sun.mail</groupId>
+                <artifactId>javax.mail</artifactId>
+                <version>1.6.2</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -1410,6 +1478,7 @@
                 <version>3.1.0</version>
             </dependency>
 
+            <!-- Jaxen is needed by xoai and sword2-server, but they disagree on the versions -->
             <dependency>
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
@@ -1423,8 +1492,8 @@
             </dependency>
             <dependency>
                 <groupId>org.jdom</groupId>
-                <artifactId>jdom</artifactId>
-                <version>1.1.3</version>
+                <artifactId>jdom2</artifactId>
+                <version>2.0.6.1</version>
             </dependency>
 
             <dependency>
@@ -1474,45 +1543,6 @@
                 <version>${pdfbox-version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi</artifactId>
-                <version>${poi-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-scratchpad</artifactId>
-                <version>${poi-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-                <version>${poi-version}</version>
-                <exclusions>
-                    <!-- Newer version brought in by solr-cell -->
-                    <exclusion>
-                        <groupId>com.github.virtuald</groupId>
-                        <artifactId>curvesapi</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml-schemas</artifactId>
-                <version>${poi-version}</version>
-                <exclusions>
-                    <!-- Newer version pulled in below -->
-                    <exclusion>
-                        <groupId>org.apache.xmlbeans</groupId>
-                        <artifactId>xmlbeans</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlbeans</groupId>
-                <artifactId>xmlbeans</artifactId>
-                <version>3.1.0</version>
-            </dependency>
-            <dependency>
                 <groupId>xalan</groupId>
                 <artifactId>xalan</artifactId>
                 <version>2.7.0</version>
@@ -1520,7 +1550,7 @@
             <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
-                <version>2.12.0</version>
+                <version>2.12.2</version>
             </dependency>
             <dependency>
                 <groupId>xml-apis</groupId>
@@ -1547,12 +1577,17 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
-                <version>4.4.4</version>
+                <version>4.4.15</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>4.5.13</version>
+            </dependency>
+            <dependency>
+              <groupId>org.apache.httpcomponents</groupId>
+              <artifactId>httpmime</artifactId>
+              <version>4.5.13</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -1603,14 +1638,14 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-inline</artifactId>
-                <version>3.8.0</version>
+                <version>3.12.4</version>
                 <scope>test</scope>
             </dependency>
             <!-- H2 is an in-memory database used for Unit/Integration tests -->
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>1.4.187</version>
+                <version>2.1.210</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -1653,7 +1688,7 @@
             <dependency>
                 <groupId>com.google.oauth-client</groupId>
                 <artifactId>google-oauth-client</artifactId>
-                <version>1.23.0</version>
+                <version>1.32.1</version>
             </dependency>
 
             <!-- Findbugs annotations -->
@@ -1694,13 +1729,35 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>30.0-jre</version>
+                <version>31.0.1-jre</version>
+                <exclusions>
+                    <!-- Use version provided by Solr / Postgres -->
+                    <exclusion>
+                        <groupId>org.checkerframework</groupId>
+                        <artifactId>checker-qual</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>xom</groupId>
                 <artifactId>xom</artifactId>
                 <version>1.2.5</version>
             </dependency>
+
+            <!-- json-path is needed by Spring HATEOAS -->
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path</artifactId>
+                <version>${json-path.version}</version>
+            </dependency>
+            <!-- json-path-assert is just needed by tests -->
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path-assert</artifactId>
+                <version>${json-path.version}</version>
+                <scope>test</scope>
+            </dependency>
+
             <!-- JAXB API and implementation (no longer bundled as of Java 11) -->
             <dependency>
                 <groupId>javax.xml.bind</groupId>
@@ -1717,6 +1774,13 @@
                 <groupId>javax.annotation</groupId>
                 <artifactId>javax.annotation-api</artifactId>
                 <version>${javax-annotation.version}</version>
+            </dependency>
+            <!-- mockito-inline and hibernate-ehcache pull in different versions of byte-buddy. Specify which we want. -->
+            <!-- TODO: We might be able to remove this after hibernate-ehcache is replaced by hibernate-jcache -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>1.11.13</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -1820,7 +1884,7 @@
         <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
         <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
         <url>git@github.com:DSpace/DSpace.git</url>
-        <tag>dspace-7.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
 

@@ -34,27 +34,27 @@ import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.jdom.xpath.XPath;
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 
 /**
  * ORE ingestion crosswalk
  * <p>
- * Processes an Atom-encoded ORE resource map and attemps to interpret it as a DSpace item
+ * Processes an Atom-encoded ORE resource map and attempts to interpret it as a DSpace item.
  *
  * @author Alexey Maslov
- * @version $Revision: 1 $
  */
 public class OREIngestionCrosswalk
     implements IngestionCrosswalk {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OREDisseminationCrosswalk.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     /* Namespaces */
     public static final Namespace ATOM_NS =
@@ -114,23 +114,21 @@ public class OREIngestionCrosswalk
         Document doc = new Document();
         doc.addContent(root.detach());
 
-        XPath xpathLinks;
         List<Element> aggregatedResources;
         String entryId;
-        try {
-            xpathLinks = XPath.newInstance("/atom:entry/atom:link[@rel=\"" + ORE_NS.getURI() + "aggregates" + "\"]");
-            xpathLinks.addNamespace(ATOM_NS);
-            aggregatedResources = xpathLinks.selectNodes(doc);
+        XPathExpression<Element> xpathLinks =
+            XPathFactory.instance()
+                        .compile("/atom:entry/atom:link[@rel=\"" + ORE_NS.getURI() + "aggregates" + "\"]",
+                                 Filters.element(), null, ATOM_NS);
+        aggregatedResources = xpathLinks.evaluate(doc);
 
-            xpathLinks = XPath.newInstance("/atom:entry/atom:link[@rel='alternate']/@href");
-            xpathLinks.addNamespace(ATOM_NS);
-            entryId = ((Attribute) xpathLinks.selectSingleNode(doc)).getValue();
-        } catch (JDOMException e) {
-            throw new CrosswalkException("JDOM exception occurred while ingesting the ORE", e);
-        }
+        XPathExpression<Attribute> xpathAltHref =
+            XPathFactory.instance()
+                        .compile("/atom:entry/atom:link[@rel='alternate']/@href",
+                                 Filters.attribute(), null, ATOM_NS);
+        entryId = xpathAltHref.evaluateFirst(doc).getValue();
 
         // Next for each resource, create a bitstream
-        XPath xpathDesc;
         NumberFormat nf = NumberFormat.getInstance();
         nf.setGroupingUsed(false);
         nf.setMinimumIntegerDigits(4);
@@ -141,16 +139,12 @@ public class OREIngestionCrosswalk
 
             String bundleName;
             Element desc = null;
-            try {
-                xpathDesc = XPath.newInstance(
-                    "/atom:entry/oreatom:triples/rdf:Description[@rdf:about=\"" + this.encodeForURL(href) + "\"][1]");
-                xpathDesc.addNamespace(ATOM_NS);
-                xpathDesc.addNamespace(ORE_ATOM);
-                xpathDesc.addNamespace(RDF_NS);
-                desc = (Element) xpathDesc.selectSingleNode(doc);
-            } catch (JDOMException e) {
-                e.printStackTrace();
-            }
+            XPathExpression<Element> xpathDesc =
+                XPathFactory.instance()
+                    .compile("/atom:entry/oreatom:triples/rdf:Description[@rdf:about=\"" +
+                                 this.encodeForURL(href) + "\"][1]",
+                             Filters.element(), null, ATOM_NS, ORE_ATOM, RDF_NS);
+            desc = xpathDesc.evaluateFirst(doc);
 
             if (desc != null && desc.getChild("type", RDF_NS).getAttributeValue("resource", RDF_NS)
                                     .equals(DS_NS.getURI() + "DSpaceBitstream")) {

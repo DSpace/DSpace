@@ -11,11 +11,11 @@ This Dockerfile is used to pre-cache Maven dependency downloads that will be use
 docker build -t dspace/dspace-dependencies:dspace-7_x -f Dockerfile.dependencies .
 ```
 
-**This image is built manually.**  It should be rebuilt each year or after each major release in order to refresh the cache of jars.
+This image is built *automatically* after each commit is made to the `main` branch.
 
 A corresponding image exists for DSpace 4-6.
 
-Admins to our DockerHub repo can publish with the following command.
+Admins to our DockerHub repo can manually publish with the following command.
 ```
 docker push dspace/dspace-dependencies:dspace-7_x
 ```
@@ -35,7 +35,7 @@ This image is built *automatically* after each commit is made to the `main` bran
 
 A corresponding image exists for DSpace 4-6.
 
-Admins to our DockerHub repo can publish with the following command.
+Admins to our DockerHub repo can manually publish with the following command.
 ```
 docker push dspace/dspace:dspace-7_x-test
 ```
@@ -129,9 +129,9 @@ docker run -i -t -d -p 80:80 -p 443:443 dspace/dspace-shibboleth
 This image can also be rebuilt using the `../docker-compose/docker-compose-shibboleth.yml` script.
 
 
-## local.cfg and test/ folder
+## test/ folder
 
-These resources are bundled into the `dspace/dspace` image at build time.
+These resources are bundled into the `dspace/dspace:dspace-*-test` image at build time.
 
 
 ## Debugging Docker builds

@@ -17,7 +17,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.sort.OrderFormat;
 import org.dspace.sort.SortOption;
 
@@ -85,7 +85,7 @@ public class BrowseEngine {
      */
     public BrowseInfo browse(BrowserScope bs)
         throws BrowseException {
-        log.debug(LogManager.getHeader(context, "browse", ""));
+        log.debug(LogHelper.getHeader(context, "browse", ""));
 
         // first, load the browse scope into the object
         this.scope = bs;
@@ -119,7 +119,7 @@ public class BrowseEngine {
      */
     public BrowseInfo browseMini(BrowserScope bs)
         throws BrowseException {
-        log.info(LogManager.getHeader(context, "browse_mini", ""));
+        log.info(LogHelper.getHeader(context, "browse_mini", ""));
 
         // load the scope into the object
         this.scope = bs;
@@ -198,10 +198,12 @@ public class BrowseEngine {
      */
     private BrowseInfo browseByItem(BrowserScope bs)
         throws BrowseException {
-        log.info(LogManager.getHeader(context, "browse_by_item", ""));
+        log.info(LogHelper.getHeader(context, "browse_by_item", ""));
         try {
             // get the table name that we are going to be getting our data from
             dao.setTable(browseIndex.getTableName());
+
+            dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
 
             // tell the browse query whether we are ascending or descending on the value
             dao.setAscending(scope.isAscending());
@@ -249,15 +251,15 @@ public class BrowseEngine {
                 }
             }
 
-            // this is the total number of results in answer to the query
-            int total = getTotalResults();
-
             // assemble the ORDER BY clause
             String orderBy = browseIndex.getSortField(scope.isSecondLevel());
             if (scope.getSortBy() > 0) {
                 orderBy = "sort_" + Integer.toString(scope.getSortBy());
             }
             dao.setOrderField(orderBy);
+
+            // this is the total number of results in answer to the query
+            int total = getTotalResults();
 
             int offset = scope.getOffset();
             String rawFocusValue = null;
@@ -270,9 +272,6 @@ public class BrowseEngine {
                 String focusValue = normalizeJumpToValue(rawFocusValue);
 
                 log.debug("browsing using focus: " + focusValue);
-
-                // Convert the focus value into an offset
-                offset = getOffsetForValue(focusValue);
             }
 
             dao.setOffset(offset);
@@ -374,14 +373,14 @@ public class BrowseEngine {
      */
     private BrowseInfo browseByValue(BrowserScope bs)
         throws BrowseException {
-        log.info(LogManager.getHeader(context, "browse_by_value", "focus=" + bs.getJumpToValue()));
+        log.info(LogHelper.getHeader(context, "browse_by_value", "focus=" + bs.getJumpToValue()));
 
         try {
             // get the table name that we are going to be getting our data from
             // this is the distinct table constrained to either community or collection
             dao.setTable(browseIndex.getDistinctTableName());
 
-            dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
+            dao.setStartsWith(normalizeJumpToValue(scope.getStartsWith()));
             // remind the DAO that this is a distinct value browse, so it knows what sort
             // of query to build
             dao.setDistinct(true);
@@ -518,17 +517,17 @@ public class BrowseEngine {
      */
     private String getJumpToValue()
         throws BrowseException {
-        log.debug(LogManager.getHeader(context, "get_focus_value", ""));
+        log.debug(LogHelper.getHeader(context, "get_focus_value", ""));
 
         // if the focus is by value, just return it
         if (scope.hasJumpToValue()) {
-            log.debug(LogManager.getHeader(context, "get_focus_value_return", "return=" + scope.getJumpToValue()));
+            log.debug(LogHelper.getHeader(context, "get_focus_value_return", "return=" + scope.getJumpToValue()));
             return scope.getJumpToValue();
         }
 
         // if the focus is to start with, then we need to return the value of the starts with
         if (scope.hasStartsWith()) {
-            log.debug(LogManager.getHeader(context, "get_focus_value_return", "return=" + scope.getStartsWith()));
+            log.debug(LogHelper.getHeader(context, "get_focus_value_return", "return=" + scope.getStartsWith()));
             return scope.getStartsWith();
         }
 
@@ -565,7 +564,7 @@ public class BrowseEngine {
         // item (I think)
         String max = dao.doMaxQuery(col, tableName, id);
 
-        log.debug(LogManager.getHeader(context, "get_focus_value_return", "return=" + max));
+        log.debug(LogHelper.getHeader(context, "get_focus_value_return", "return=" + max));
 
         return max;
     }
@@ -671,7 +670,7 @@ public class BrowseEngine {
      */
     private int getTotalResults(boolean distinct)
         throws SQLException, BrowseException {
-        log.debug(LogManager.getHeader(context, "get_total_results", "distinct=" + distinct));
+        log.debug(LogHelper.getHeader(context, "get_total_results", "distinct=" + distinct));
 
         // tell the browse query whether we are distinct
         dao.setDistinct(distinct);
@@ -685,13 +684,11 @@ public class BrowseEngine {
         // our count, storing them locally to reinstate later
         String focusField = dao.getJumpToField();
         String focusValue = dao.getJumpToValue();
-        String orderField = dao.getOrderField();
         int limit = dao.getLimit();
         int offset = dao.getOffset();
 
         dao.setJumpToField(null);
         dao.setJumpToValue(null);
-        dao.setOrderField(null);
         dao.setLimit(-1);
         dao.setOffset(-1);
 
@@ -701,12 +698,11 @@ public class BrowseEngine {
         // now put back the values we removed for this method
         dao.setJumpToField(focusField);
         dao.setJumpToValue(focusValue);
-        dao.setOrderField(orderField);
         dao.setLimit(limit);
         dao.setOffset(offset);
         dao.setCountValues(null);
 
-        log.debug(LogManager.getHeader(context, "get_total_results_return", "return=" + count));
+        log.debug(LogHelper.getHeader(context, "get_total_results_return", "return=" + count));
 
         return count;
     }

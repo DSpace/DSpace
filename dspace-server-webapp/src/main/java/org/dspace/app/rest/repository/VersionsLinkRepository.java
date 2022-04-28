@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,19 +52,25 @@ public class VersionsLinkRepository extends AbstractDSpaceRestRepository
      * @return                  The page containing relevant VersionRest objects
      * @throws SQLException     If something goes wrong
      */
+    @PreAuthorize("@versioningSecurity.isEnableVersioning() && " +
+                  "hasPermission(#versionHistoryId, 'VERSIONHISTORY', 'READ')")
     public Page<VersionRest> getVersions(@Nullable HttpServletRequest request,
                                                Integer versionHistoryId,
                                                @Nullable Pageable optionalPageable,
                                                Projection projection) throws SQLException {
 
         Context context = obtainContext();
+        int total = 0;
         VersionHistory versionHistory = versionHistoryService.find(context, versionHistoryId);
         if (versionHistory == null) {
             throw new ResourceNotFoundException("The versionHistory with ID: " + versionHistoryId +
                                                     " couldn't be found");
         }
-        List<Version> versions = versioningService.getVersionsByHistory(context, versionHistory);
         Pageable pageable = optionalPageable != null ? optionalPageable : PageRequest.of(0, 20);
-        return converter.toRestPage(versions, pageable, projection);
+        List<Version> versions = versioningService.getVersionsByHistoryWithItems(context, versionHistory,
+                                                   Math.toIntExact(pageable.getOffset()),
+                                                   Math.toIntExact(pageable.getPageSize()));
+        total = versioningService.countVersionsByHistoryWithItem(context, versionHistory);
+        return converter.toRestPage(versions, pageable, total, projection);
     }
 }

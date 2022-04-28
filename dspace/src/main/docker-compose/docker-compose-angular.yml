@@ -15,13 +15,17 @@ services:
     depends_on:
     - dspace
     environment:
-      DSPACE_HOST: dspace-angular
-      DSPACE_NAMESPACE: /
-      DSPACE_PORT: '4000'
-      DSPACE_SSL: "false"
-    image: dspace/dspace-angular:latest
+      DSPACE_UI_SSL: 'false'
+      DSPACE_UI_HOST: dspace-angular
+      DSPACE_UI_PORT: '4000'
+      DSPACE_UI_NAMESPACE: /
+      DSPACE_REST_SSL: 'false'
+      DSPACE_REST_HOST: localhost
+      DSPACE_REST_PORT: 8080
+      DSPACE_REST_NAMESPACE: /server
+    image: dspace/dspace-angular:dspace-7_x
     networks:
-      dspacenet: {}
+      dspacenet:
     ports:
     - published: 4000
       target: 4000
@@ -29,5 +33,3 @@ services:
       target: 9876
     stdin_open: true
     tty: true
-    volumes:
-    - ./dspace/src/main/docker-compose/environment.dev.ts:/app/src/environments/environment.dev.ts

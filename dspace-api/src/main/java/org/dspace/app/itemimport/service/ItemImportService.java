@@ -105,7 +105,7 @@ public interface ItemImportService {
                                 String inputType, Context context, boolean template) throws Exception;
 
     /**
-     * Since the BTE batch import is done in a new thread we are unable to communicate
+     * If a batch import is done in a new thread we are unable to communicate
      * with calling method about success or failure. We accomplish this
      * communication with email instead. Send a success email once the batch
      * import is complete
@@ -119,7 +119,7 @@ public interface ItemImportService {
                                     String fileName) throws MessagingException;
 
     /**
-     * Since the BTE batch import is done in a new thread we are unable to communicate
+     * If a batch import is done in a new thread we are unable to communicate
      * with calling method about success or failure. We accomplis this
      * communication with email instead. Send an error email if the batch
      * import fails

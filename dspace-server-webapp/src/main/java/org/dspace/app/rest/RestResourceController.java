@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT;
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_HEX32;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -126,7 +127,7 @@ public class RestResourceController implements InitializingBean {
             // Link l = linkTo(this.getClass(), r).withRel(r);
             String[] split = r.split("\\.", 2);
             String plural = English.plural(split[1]);
-            Link l = new Link("/api/" + split[0] + "/" + plural, plural);
+            Link l = Link.of("/api/" + split[0] + "/" + plural, plural);
             links.add(l);
             log.debug(l.getRel().value() + " " + l.getHref());
         }
@@ -820,7 +821,7 @@ public class RestResourceController implements InitializingBean {
                         link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath).withSelfRel();
                     }
 
-                    return new EntityModel(new EmbeddedPage(link.getHref(),
+                    return EntityModel.of(new EmbeddedPage(link.getHref(),
                             pageResult.map(converter::toResource), null, subpath));
                 } else {
                     RestModel object = (RestModel) linkMethod.invoke(linkRepository, request,
@@ -1145,6 +1146,36 @@ public class RestResourceController implements InitializingBean {
                                                     @PathVariable String apiCategory, @PathVariable String model,
                                                     @PathVariable Integer id) throws IOException {
         return putOneUriListInternal(request, apiCategory, model, id);
+    }
+
+    /**
+     * Execute a PUT request for an entity with id of type String and containing
+     * 32 hexadecimal digits.
+     *
+     * <p>
+     * curl -X PUT -H "Content-Type:application/json" http://<dspace.server.url>/api/{apiCategory}/{model}/{id}
+     *
+     * <p>Example:
+     * <pre>
+     * {@code
+     *      curl -X PUT -H "Content-Type:application/json" http://<dspace.server.url>/api/core/metadatafield/d41d8cd98f00b204e9800998ecf8427e
+     * }
+     * </pre>
+     *
+     * @param request     the http request
+     * @param apiCategory the API category e.g. "api"
+     * @param model       the DSpace model e.g. "collection"
+     * @param id        the ID of the target REST object
+     * @param jsonNode    the part of the request body representing the updated rest object
+     * @return the relevant REST resource
+     */
+    @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_HEX32,
+        consumes = {"application/json", "application/hal+json"})
+    public DSpaceResource<RestAddressableModel> put(HttpServletRequest request,
+                                                    @PathVariable String apiCategory, @PathVariable String model,
+                                                    @PathVariable String id,
+                                                    @RequestBody(required = true) JsonNode jsonNode) {
+        return putOneJsonInternal(request, apiCategory, model, id, jsonNode);
     }
 
     /**

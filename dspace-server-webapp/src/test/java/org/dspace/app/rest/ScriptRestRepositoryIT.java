@@ -8,12 +8,14 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -22,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -81,24 +84,14 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", containsInAnyOrder(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(0).getName(),
-                                                          scriptConfigurations.get(0).getDescription()),
-                                ScriptMatcher.matchScript(scriptConfigurations.get(1).getName(),
-                                                          scriptConfigurations.get(1).getDescription()),
-                                ScriptMatcher.matchScript(scriptConfigurations.get(2).getName(),
-                                                          scriptConfigurations.get(2).getDescription()),
-                                ScriptMatcher.matchScript(scriptConfigurations.get(3).getName(),
-                                                          scriptConfigurations.get(3).getDescription()),
-                                ScriptMatcher.matchScript(scriptConfigurations.get(4).getName(),
-                                                      scriptConfigurations.get(4).getDescription()),
-                                ScriptMatcher.matchScript(scriptConfigurations.get(5).getName(),
-                                                      scriptConfigurations.get(5).getDescription()),
-                                ScriptMatcher.matchScript(scriptConfigurations.get(6).getName(),
-                                                          scriptConfigurations.get(6).getDescription()),
-                                ScriptMatcher.matchScript(scriptConfigurations.get(7).getName(),
-                                                          scriptConfigurations.get(7).getDescription())
+                            scriptConfigurations
+                                .stream()
+                                .map(scriptConfiguration -> ScriptMatcher.matchScript(
+                                    scriptConfiguration.getName(),
+                                    scriptConfiguration.getDescription()
+                                ))
+                                .collect(Collectors.toList())
                         )));
-
     }
 
 
@@ -113,66 +106,74 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findAllScriptsPaginationTest() throws Exception {
+        List<ScriptConfiguration> alphabeticScripts =
+            scriptConfigurations.stream()
+                                .sorted(Comparator.comparing(s -> s.getClass().getName()))
+                                .collect(Collectors.toList());
+
+        int totalPages = scriptConfigurations.size();
+        int lastPage = totalPages - 1;
 
         String token = getAuthToken(admin.getEmail(), password);
 
+        // NOTE: the scripts are always returned in alphabetical order by fully qualified class name.
         getClient(token).perform(get("/api/system/scripts").param("size", "1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", Matchers.not(Matchers.hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(2).getName(),
-                                                          scriptConfigurations.get(2).getDescription())
+                            ScriptMatcher.matchScript(alphabeticScripts.get(1).getName(),
+                                                      alphabeticScripts.get(1).getDescription())
                         ))))
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(5).getName(),
-                                                          scriptConfigurations.get(5).getDescription())
+                            ScriptMatcher.matchScript(alphabeticScripts.get(0).getName(),
+                                                      alphabeticScripts.get(0).getDescription())
                         )))
                         .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
-                                Matchers.containsString("/api/system/scripts?"),
-                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                            Matchers.containsString("/api/system/scripts?"),
+                            Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
                         .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
-                                Matchers.containsString("/api/system/scripts?"),
-                                Matchers.containsString("size=1"))))
+                            Matchers.containsString("/api/system/scripts?"),
+                            Matchers.containsString("size=1"))))
                         .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
-                                Matchers.containsString("/api/system/scripts?"),
-                                Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                            Matchers.containsString("/api/system/scripts?"),
+                            Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
                         .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
-                                Matchers.containsString("/api/system/scripts?"),
-                                Matchers.containsString("page=7"), Matchers.containsString("size=1"))))
+                            Matchers.containsString("/api/system/scripts?"),
+                            Matchers.containsString("page=" + lastPage), Matchers.containsString("size=1"))))
                         .andExpect(jsonPath("$.page.size", is(1)))
                         .andExpect(jsonPath("$.page.number", is(0)))
-                        .andExpect(jsonPath("$.page.totalPages", is(8)))
-                        .andExpect(jsonPath("$.page.totalElements", is(8)));
+                        .andExpect(jsonPath("$.page.totalPages", is(totalPages)))
+                        .andExpect(jsonPath("$.page.totalElements", is(totalPages)));
 
 
         getClient(token).perform(get("/api/system/scripts").param("size", "1").param("page", "1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(2).getName(),
-                                                          scriptConfigurations.get(2).getDescription())
+                            ScriptMatcher.matchScript(alphabeticScripts.get(1).getName(),
+                                                      alphabeticScripts.get(1).getDescription())
                         )))
                         .andExpect(jsonPath("$._embedded.scripts", Matchers.not(hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(5).getName(),
-                                                          scriptConfigurations.get(5).getDescription())
+                            ScriptMatcher.matchScript(alphabeticScripts.get(0).getName(),
+                                                      alphabeticScripts.get(0).getDescription())
                         ))))
                         .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
-                                Matchers.containsString("/api/system/scripts?"),
-                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                            Matchers.containsString("/api/system/scripts?"),
+                            Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
                         .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
-                                Matchers.containsString("/api/system/scripts?"),
-                                Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                            Matchers.containsString("/api/system/scripts?"),
+                            Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
                         .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
-                                Matchers.containsString("/api/system/scripts?"),
-                                Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                            Matchers.containsString("/api/system/scripts?"),
+                            Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
                         .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
-                                Matchers.containsString("/api/system/scripts?"),
-                                Matchers.containsString("page=2"), Matchers.containsString("size=1"))))
+                            Matchers.containsString("/api/system/scripts?"),
+                            Matchers.containsString("page=2"), Matchers.containsString("size=1"))))
                         .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
-                                Matchers.containsString("/api/system/scripts?"),
-                                Matchers.containsString("page=7"), Matchers.containsString("size=1"))))
+                            Matchers.containsString("/api/system/scripts?"),
+                            Matchers.containsString("page=" + lastPage), Matchers.containsString("size=1"))))
                         .andExpect(jsonPath("$.page.size", is(1)))
                         .andExpect(jsonPath("$.page.number", is(1)))
-                        .andExpect(jsonPath("$.page.totalPages", is(8)))
-                        .andExpect(jsonPath("$.page.totalElements", is(8)));
+                        .andExpect(jsonPath("$.page.totalPages", is(totalPages)))
+                        .andExpect(jsonPath("$.page.totalElements", is(totalPages)));
     }
 
     @Test
@@ -182,8 +183,16 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts/mock-script"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", ScriptMatcher
-                                .matchMockScript(
-                                        scriptConfigurations.get(scriptConfigurations.size() - 1).getOptions())));
+                            .matchMockScript(
+                                scriptConfigurations
+                                    .stream()
+                                    .filter(scriptConfiguration
+                                                -> scriptConfiguration.getName().equals("mock-script"))
+                                    .findAny()
+                                    .orElseThrow()
+                                    .getOptions()
+                            )
+                        ));
     }
 
     @Test
@@ -204,29 +213,26 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void postProcessNonAdminAuthorizeException() throws Exception {
-
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data"))
+        getClient(token).perform(multipart("/api/system/scripts/mock-script/processes"))
                         .andExpect(status().isForbidden());
     }
 
     @Test
     public void postProcessAnonymousAuthorizeException() throws Exception {
-        getClient().perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data"))
+        getClient().perform(multipart("/api/system/scripts/mock-script/processes"))
                    .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void postProcessAdminWrongOptionsException() throws Exception {
-
-
         String token = getAuthToken(admin.getEmail(), password);
         AtomicReference<Integer> idRef = new AtomicReference<>();
 
         try {
             getClient(token)
-                    .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data"))
+                    .perform(multipart("/api/system/scripts/mock-script/processes"))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -270,9 +276,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         try {
             getClient(token)
-                    .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data")
-                                                                              .param("properties",
-                                                                                     new Gson().toJson(list)))
+                    .perform(multipart("/api/system/scripts/mock-script/processes")
+                                 .param("properties", new Gson().toJson(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -289,8 +294,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void postProcessNonExistingScriptNameException() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(post("/api/system/scripts/mock-script-invalid/processes")
-                                         .contentType("multipart/form-data"))
+        getClient(token).perform(multipart("/api/system/scripts/mock-script-invalid/processes"))
                         .andExpect(status().isBadRequest());
     }
 
@@ -316,9 +320,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         try {
             getClient(token)
-                    .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data")
-                                                                              .param("properties",
-                                                                                     new Gson().toJson(list)))
+                    .perform(multipart("/api/system/scripts/mock-script/processes")
+                                 .param("properties", new Gson().toJson(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -354,9 +357,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         try {
             getClient(token)
-                    .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data")
-                                                                              .param("properties",
-                                                                                     new Gson().toJson(list)))
+                    .perform(multipart("/api/system/scripts/mock-script/processes")
+                                 .param("properties", new Gson().toJson(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -461,9 +463,10 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         try {
             getClient(token)
-                    .perform(fileUpload("/api/system/scripts/mock-script/processes").file(bitstreamFile)
-                                                                                    .param("properties",
-                                                                                           new Gson().toJson(list)))
+                    .perform(multipart("/api/system/scripts/mock-script/processes")
+                                 .file(bitstreamFile)
+                                 .characterEncoding("UTF-8")
+                                 .param("properties", new Gson().toJson(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -475,6 +478,47 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         } finally {
             ProcessBuilder.deleteProcess(idRef.get());
         }
+    }
+
+    @Test
+    public void scriptTypeConversionTest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/scripts/type-conversion-test"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", ScriptMatcher
+                                .matchScript("type-conversion-test",
+                                             "Test the type conversion different option types")))
+                        .andExpect(jsonPath("$.parameters", containsInAnyOrder(
+                                allOf(
+                                        hasJsonPath("$.name", is("-b")),
+                                        hasJsonPath("$.description", is("option set to the boolean class")),
+                                        hasJsonPath("$.type", is("boolean")),
+                                        hasJsonPath("$.mandatory", is(false)),
+                                        hasJsonPath("$.nameLong", is("--boolean"))
+                                ),
+                                allOf(
+                                        hasJsonPath("$.name", is("-s")),
+                                        hasJsonPath("$.description", is("string option with an argument")),
+                                        hasJsonPath("$.type", is("String")),
+                                        hasJsonPath("$.mandatory", is(false)),
+                                        hasJsonPath("$.nameLong", is("--string"))
+                                ),
+                                allOf(
+                                        hasJsonPath("$.name", is("-n")),
+                                        hasJsonPath("$.description", is("string option without an argument")),
+                                        hasJsonPath("$.type", is("boolean")),
+                                        hasJsonPath("$.mandatory", is(false)),
+                                        hasJsonPath("$.nameLong", is("--noargument"))
+                                ),
+                                allOf(
+                                        hasJsonPath("$.name", is("-f")),
+                                        hasJsonPath("$.description", is("file option with an argument")),
+                                        hasJsonPath("$.type", is("InputStream")),
+                                        hasJsonPath("$.mandatory", is(false)),
+                                        hasJsonPath("$.nameLong", is("--file"))
+                                )
+                        ) ));
     }
 
 

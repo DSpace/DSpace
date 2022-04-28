@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +39,8 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -70,6 +73,11 @@ import org.springframework.web.context.WebApplicationContext;
 @ContextConfiguration(initializers = { DSpaceKernelInitializer.class, DSpaceConfigurationInitializer.class })
 // Tell Spring to make ApplicationContext an instance of WebApplicationContext (for web-based tests)
 @WebAppConfiguration
+// Load our src/test/resources/application-test.properties to override some settings in default application.properties
+@TestPropertySource(locations = "classpath:application-test.properties")
+// Enable our custom Logging listener to log when each test method starts/stops
+@TestExecutionListeners(listeners = {LoggingTestExecutionListener.class},
+    mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWithDatabase {
 
     protected static final String AUTHORIZATION_HEADER = "Authorization";
@@ -82,8 +90,9 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     public static final String REST_SERVER_URL = "http://localhost/api/";
     public static final String BASE_REST_SERVER_URL = "http://localhost";
 
+    // Our standard/expected content type
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
-                                                    MediaTypes.HAL_JSON.getSubtype());
+                                                    MediaTypes.HAL_JSON.getSubtype(), StandardCharsets.UTF_8);
 
     protected MediaType textUriContentType = RestMediaTypes.TEXT_URI_LIST;
 

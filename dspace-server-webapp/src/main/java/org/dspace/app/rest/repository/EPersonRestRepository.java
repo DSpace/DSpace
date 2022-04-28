@@ -293,16 +293,21 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     @PreAuthorize("hasPermission(#uuid, 'EPERSON', #patch)")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                          Patch patch) throws AuthorizeException, SQLException {
-        if (StringUtils.isNotBlank(request.getParameter("token"))) {
-            boolean passwordChangeFound = false;
-            for (Operation operation : patch.getOperations()) {
-                if (StringUtils.equalsIgnoreCase(operation.getPath(), "/password")) {
-                    passwordChangeFound = true;
-                }
+        boolean passwordChangeFound = false;
+        for (Operation operation : patch.getOperations()) {
+            if (StringUtils.equalsIgnoreCase(operation.getPath(), "/password")) {
+                passwordChangeFound = true;
             }
+        }
+        if (StringUtils.isNotBlank(request.getParameter("token"))) {
             if (!passwordChangeFound) {
                 throw new AccessDeniedException("Refused to perform the EPerson patch based on a token without " +
                                                     "changing the password");
+            }
+        } else {
+            if (passwordChangeFound && !StringUtils.equals(context.getAuthenticationMethod(), "password")) {
+                throw new AccessDeniedException("Refused to perform the EPerson patch based to change the password " +
+                                                        "for non \"password\" authentication");
             }
         }
         patchDSpaceObject(apiCategory, model, uuid, patch);
@@ -331,6 +336,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     @Override
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService.register(this, Arrays.asList(
-                new Link("/api/" + EPersonRest.CATEGORY + "/registrations", EPersonRest.NAME + "-registration")));
+                Link.of("/api/" + EPersonRest.CATEGORY + "/registrations", EPersonRest.NAME + "-registration")));
     }
 }

@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -183,7 +184,7 @@ public class PackageUtils {
                                          Item item, Collection collection)
         throws SQLException, IOException, AuthorizeException {
         if (license == null) {
-            license = collection.getLicenseCollection();
+            license = collectionService.getLicense(collection);
         }
         InputStream lis = new ByteArrayInputStream(license.getBytes());
 
@@ -447,6 +448,7 @@ public class PackageUtils {
      * @param parent  Parent Object
      * @param type    Type of new Object
      * @param handle  Handle of new Object (may be null)
+     * @param uuid
      * @param params  Properties-style list of options (interpreted by each packager).
      * @return newly created DSpace Object (or null)
      * @throws AuthorizeException if authorization error
@@ -454,29 +456,55 @@ public class PackageUtils {
      * @throws IOException        if IO error
      */
     public static DSpaceObject createDSpaceObject(Context context, DSpaceObject parent, int type, String handle,
-                                                  PackageParameters params)
+                                                  UUID uuid, PackageParameters params)
         throws AuthorizeException, SQLException, IOException {
         DSpaceObject dso = null;
 
         switch (type) {
             case Constants.COLLECTION:
-                dso = collectionService.create(context, (Community) parent, handle);
+                Collection collection = collectionService.find(context, uuid);
+                if (collection != null) {
+                    dso = collectionService.create(context, (Community) parent, handle);
+                } else {
+                    dso = collectionService.create(context, (Community) parent, handle, uuid);
+
+                }
                 return dso;
 
             case Constants.COMMUNITY:
                 // top-level community?
                 if (parent == null || parent.getType() == Constants.SITE) {
-                    dso = communityService.create(null, context, handle);
+                    Community community = communityService.find(context, uuid);
+                    if (community != null) {
+                        dso = communityService.create(null, context, handle);
+                    } else {
+                        dso = communityService.create(null, context, handle, uuid);
+                    }
                 } else {
-                    dso = communityService.createSubcommunity(context, ((Community) parent), handle);
+                    Community community = communityService.find(context, uuid);
+                    if (community != null) {
+                        dso = communityService.createSubcommunity(context, ((Community) parent), handle);
+                    } else {
+                        dso = communityService.createSubcommunity(context, ((Community) parent), handle, uuid);
+                    }
                 }
                 return dso;
 
             case Constants.ITEM:
                 //Initialize a WorkspaceItem
                 //(Note: Handle is not set until item is finished)
-                WorkspaceItem wsi = workspaceItemService
-                    .create(context, (Collection) parent, params.useCollectionTemplate());
+                Item item = itemService.find(context, uuid);
+                if (item != null) {
+                    return item;
+                }
+
+                WorkspaceItem wsi = null;
+                if (!params.replaceModeEnabled()) {
+                    wsi = workspaceItemService.create(context, (Collection)parent, params.useCollectionTemplate());
+                } else {
+                    wsi = workspaceItemService.create(context, (Collection)parent,
+                            uuid, params.useCollectionTemplate());
+                }
 
                 // Please note that we are returning an Item which is *NOT* yet in the Archive,
                 // and doesn't yet have a handle assigned.

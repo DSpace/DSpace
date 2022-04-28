@@ -58,6 +58,7 @@ public class WebApp implements ReloadableEntity<Integer> {
 
     }
 
+    @Override
     public Integer getID() {
         return id;
     }

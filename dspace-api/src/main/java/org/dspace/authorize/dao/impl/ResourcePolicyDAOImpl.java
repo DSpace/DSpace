@@ -8,12 +8,14 @@
 package org.dspace.authorize.dao.impl;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Root;
 
 import org.dspace.authorize.ResourcePolicy;
@@ -60,6 +62,9 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
                                        criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.rptype), type)
                    )
         );
+        List<Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(resourcePolicyRoot.get(ResourcePolicy_.id)));
+        criteriaQuery.orderBy(orderList);
         return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
     }
 
