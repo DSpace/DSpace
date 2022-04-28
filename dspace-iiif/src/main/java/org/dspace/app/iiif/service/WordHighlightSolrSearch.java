@@ -177,21 +177,30 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
         // https://github.com/dbmdz/solr-ocrhighlighting/blob/main/docs/query.md
         // Get the outer ocrHighlighting node
         JsonNode highs = body.get("ocrHighlighting");
-
-        // Loop through each highlight entry under ocrHighlighting
-        for (final JsonNode highEntry : highs) {
-            // Get the ocr_text node under the entry
-            JsonNode ocrNode = highEntry.get("ocr_text");
-            // Loop through the snippets array under that
-            for (final JsonNode snippet : ocrNode.get("snippets")) {
-                // Get a canvas ID based on snippet's pages
-                String pageId = getCanvasId(snippet.get("pages"));
-                // Loop through array of highlights for each snippet.
-                for (final JsonNode highlight : snippet.get("highlights")) {
-                    // May be multiple word highlights on a page, so loop through them.
-                    for (int i = 0; i < highlight.size(); i++) {
-                        // Add annotation associated with each highlight
-                        searchResult.addResource(getAnnotation(highlight.get(i), pageId, uuid));
+        if (highs != null) {
+            // Loop through each highlight entry under ocrHighlighting
+            for (final JsonNode highEntry : highs) {
+                // Get the ocr_text node under the entry
+                JsonNode ocrNode = highEntry.get("ocr_text");
+                if (ocrNode != null) {
+                    // Loop through the snippets array under that
+                    for (final JsonNode snippet : ocrNode.get("snippets")) {
+                        if (snippet != null) {
+                            // Get a canvas ID based on snippet's pages
+                            String pageId = getCanvasId(snippet.get("pages"));
+                            if (pageId != null) {
+                                // Loop through array of highlights for each snippet.
+                                for (final JsonNode highlights : snippet.get("highlights")) {
+                                    if (highlights != null) {
+                                        // May be multiple word highlights on a page, so loop through them.
+                                        for (int i = 0; i < highlights.size(); i++) {
+                                            // Add annotation associated with each highlight
+                                            searchResult.addResource(getAnnotation(highlights.get(i), pageId, uuid));
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -225,13 +234,16 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
      * canvas identifier in the manifest. For METS/ALTO documents, the page
      * order can be derived from the METS file when loading the solr index.
      * @param pagesNode the pages node
-     * @return canvas id
+     * @return canvas id or null if node was null
      */
     private String getCanvasId(JsonNode pagesNode) {
-        JsonNode page = pagesNode.get(0);
-        String[] identArr = page.get("id").asText().split("\\.");
-        // the canvas id.
-        return "c" + identArr[1];
+        if (pagesNode != null) {
+            JsonNode page = pagesNode.get(0);
+            String[] identArr = page.get("id").asText().split("\\.");
+            // the canvas id.
+            return "c" + identArr[1];
+        }
+        return null;
     }
 
     /**
