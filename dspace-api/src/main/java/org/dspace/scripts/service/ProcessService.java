@@ -16,6 +16,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessLogLevel;
@@ -32,11 +33,12 @@ public interface ProcessService {
      * @param ePerson       The ePerson for which this process will be created on
      * @param scriptName    The script name to be used for the process
      * @param parameters    The parameters to be used for the process
+     * @param specialGroups List Of special groups to be stored together with the process
      * @return The created process
      * @throws SQLException If something goes wrong
      */
     public Process create(Context context, EPerson ePerson, String scriptName,
-                          List<DSpaceCommandLineParameter> parameters) throws SQLException;
+                          List<DSpaceCommandLineParameter> parameters, final List<Group> specialGroups) throws SQLException;
 
     /**
      * This method will retrieve a Process object from the Database with the given ID
