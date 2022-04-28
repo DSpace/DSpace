@@ -141,7 +141,6 @@ public class AuthenticationRestController implements InitializingBean {
         authenticationStatusRest.setAuthenticationMethod(context.getAuthenticationMethod());
         authenticationStatusRest.setProjection(projection);
         
-        //context.setSpecialGroup(java.util.UUID.fromString("3c5e9fa5-c829-4a5f-b2f1-094281f7e38d"));
         List<GroupRest> groupList = context.getSpecialGroups().stream().map(g -> (GroupRest) converter.toRest(g, projection)).collect(Collectors.toList());
         
     	authenticationStatusRest.setSpecialGroups(groupList);
