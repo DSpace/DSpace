@@ -20,7 +20,7 @@ import org.apache.commons.io.IOUtils;
 
 public abstract class AbstractXSLTest {
     private static final TransformerFactory factory = TransformerFactory
-            .newInstance("net.sf.saxon.TransformerFactoryImpl", null);
+            .newInstance();
 
     protected TransformBuilder apply(String xslLocation) throws Exception {
         return new TransformBuilder(xslLocation);

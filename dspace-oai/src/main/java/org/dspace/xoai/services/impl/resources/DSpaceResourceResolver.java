@@ -23,7 +23,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class DSpaceResourceResolver implements ResourceResolver {
     private static final TransformerFactory transformerFactory = TransformerFactory
-            .newInstance("net.sf.saxon.TransformerFactoryImpl", null);
+            .newInstance();
 
     private final String basePath;
 
