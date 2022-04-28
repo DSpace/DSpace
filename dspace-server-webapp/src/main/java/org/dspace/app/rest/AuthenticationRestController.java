@@ -31,16 +31,16 @@ import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.hateoas.AuthenticationStatusResource;
 import org.dspace.app.rest.model.hateoas.AuthenticationTokenResource;
 import org.dspace.app.rest.model.hateoas.AuthnResource;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.GroupResource;
 import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.repository.AuthorizationSpecialGroupsLinkRepository;
+import org.dspace.app.rest.repository.BitstreamRestRepository;
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.eperson.Group;
 import org.dspace.service.ClientInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +90,9 @@ public class AuthenticationRestController implements InitializingBean {
 
     @Autowired
     private ClientInfoService clientInfoService;
+    
+    @Autowired
+    AuthorizationSpecialGroupsLinkRepository authorizationSpecialGroupsLinkRepository;
 
     @Autowired
     private Utils utils;
@@ -137,47 +140,48 @@ public class AuthenticationRestController implements InitializingBean {
         }
         authenticationStatusRest.setAuthenticationMethod(context.getAuthenticationMethod());
         authenticationStatusRest.setProjection(projection);
-        AuthenticationStatusResource authenticationStatusResource = converter.toResource(authenticationStatusRest);
         
+        //context.setSpecialGroup(java.util.UUID.fromString("3c5e9fa5-c829-4a5f-b2f1-094281f7e38d"));
         List<GroupRest> groupList = context.getSpecialGroups().stream().map(g -> (GroupRest) converter.toRest(g, projection)).collect(Collectors.toList());
+        
     	authenticationStatusRest.setSpecialGroups(groupList);
+        AuthenticationStatusResource authenticationStatusResource = converter.toResource(authenticationStatusRest);
 
         return authenticationStatusResource;
     }
     
     /**
-     * Check the current user's authentication status (i.e. whether they are authenticated or not) and if they are, retrieves
-     * their special groups.
-     * <P>
-     * @param request current request
-     * @param response response
-     * @return AuthenticationStatusResource
+     * Check the current user's authentication status (i.e. whether they are authenticated or not) and, if authenticated, retrieves the current 
+     * context's special groups.
+     * @param page
+     * @param assembler
+     * @param request
+     * @param response
+     * @return
      * @throws SQLException
      */
     @RequestMapping(value = "/status/specialGroups", method = RequestMethod.GET)
     public PagedModel<GroupResource> retrieveSpecialGroups(Pageable page, PagedResourcesAssembler assembler, 
     			HttpServletRequest request, HttpServletResponse response)
             throws SQLException {
-        Context context = ContextUtil.obtainContext(request);
-        GroupRest groupRest = null;
-        List<GroupRest> groupRests = new ArrayList<GroupRest>();
+    	
         Projection projection = utils.obtainProjection();
-        
-        context.setSpecialGroup(java.util.UUID.fromString("3c5e9fa5-c829-4a5f-b2f1-094281f7e38d"));
-        List<GroupRest> groupList = context.getSpecialGroups().stream().map(g -> (GroupRest) converter.toRest(g, projection)).collect(Collectors.toList());
-        Page<GroupRest> groupPage = (Page <GroupRest>) utils.getPage(groupList, page);
 
-    	  Page<GroupResource> resources;
-          try {
-              resources = groupPage.map(converter::toResource);
-          } catch (PaginationException pe) {
-              resources = new PageImpl<>(new ArrayList<>(), page, pe.getTotal());
-          }
-          Link link = linkTo(methodOn(AuthenticationRestController.class).retrieveSpecialGroups(page, assembler, request, response)).withRel("specialGroups");
+        Page<GroupRest> groupPage = authorizationSpecialGroupsLinkRepository.getSpecialGroups(request, page, projection);
+		Page<GroupResource> resources;
+		
+		try {
+			resources = groupPage.map(converter::toResource);
+		} catch (PaginationException pe) {
+			resources = new PageImpl<>(new ArrayList<>(), page, pe.getTotal());
+		}
+		Link link = linkTo(
+				methodOn(AuthenticationRestController.class).retrieveSpecialGroups(page, assembler, request, response))
+						.withRel("specialGroups");
 
-          PagedModel<GroupResource> result = assembler.toModel(resources, link);
-        
-          return result;
+		PagedModel<GroupResource> result = assembler.toModel(resources, link);
+
+		return result;
     }
 
     /**
