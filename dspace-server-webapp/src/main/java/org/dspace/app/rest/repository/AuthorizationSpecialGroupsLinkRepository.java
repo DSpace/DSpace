@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.model.AuthenticationStatusRest;
 import org.dspace.app.rest.model.AuthorizationRest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.projection.Projection;
@@ -22,7 +23,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "specialGroups" subresource of an individual authorization.
  */
-@Component(AuthorizationRest.CATEGORY + "." + AuthorizationRest.NAME + "." + AuthorizationRest.SPECIALGROUPS)
+@Component(AuthenticationStatusRest.CATEGORY + "." + AuthenticationStatusRest.NAME + "." + AuthenticationStatusRest.SPECIALGROUPS)
 public class AuthorizationSpecialGroupsLinkRepository {
 
 	@Autowired

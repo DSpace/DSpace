@@ -17,15 +17,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * Find out your authentication status.
  */
+@LinksRest(links = { @LinkRest(method = "getSpecialGroups", name = AuthenticationStatusRest.SPECIALGROUPS) })
 public class AuthenticationStatusRest extends BaseObjectRest<Integer> {
     private boolean okay;
     private boolean authenticated;
     private String authenticationMethod;
     
     private EPersonRest ePersonRest;
-    private List<GroupRest> specialGroups;
 
     public static final String NAME = "status";
+    public static final String SPECIALGROUPS = "specialGroups";
     public static final String CATEGORY = RestAddressableModel.AUTHENTICATION;
 
     @Override
@@ -44,16 +45,6 @@ public class AuthenticationStatusRest extends BaseObjectRest<Integer> {
         return getType();
     }
 
-    @LinkRest(name="specialGroups")
-    @JsonIgnore
-    public List<GroupRest> getSpecialGroups() {
-    	return specialGroups;
-    }
-    
-    public void setSpecialGroups(List<GroupRest> specialGroups) {
-    	this.specialGroups = specialGroups;
-    }
-    
     public Class getController() {
         return RestResourceController.class;
     }

@@ -19,7 +19,6 @@ import org.dspace.app.rest.RestResourceController;
  */
 @LinksRest(links = {
         @LinkRest(method = "getEperson", name = AuthorizationRest.EPERSON),
-        @LinkRest(method = "getSpecialGroups", name = AuthorizationRest.SPECIALGROUPS),
         @LinkRest(method = "getFeature", name = AuthorizationRest.FEATURE),
         @LinkRest(method = "getObject", name = AuthorizationRest.OBJECT)
 })
@@ -30,7 +29,6 @@ public class AuthorizationRest extends BaseObjectRest<String> {
     public static final String EPERSON = "eperson";
     public static final String FEATURE = "feature";
     public static final String OBJECT = "object";
-    public static final String SPECIALGROUPS = "specialGroups";
 
     @Override
     @JsonProperty(access = Access.READ_ONLY)

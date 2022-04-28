@@ -141,9 +141,6 @@ public class AuthenticationRestController implements InitializingBean {
         authenticationStatusRest.setAuthenticationMethod(context.getAuthenticationMethod());
         authenticationStatusRest.setProjection(projection);
         
-        List<GroupRest> groupList = context.getSpecialGroups().stream().map(g -> (GroupRest) converter.toRest(g, projection)).collect(Collectors.toList());
-        
-    	authenticationStatusRest.setSpecialGroups(groupList);
         AuthenticationStatusResource authenticationStatusResource = converter.toResource(authenticationStatusRest);
 
         return authenticationStatusResource;
