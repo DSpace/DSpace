@@ -15,8 +15,6 @@ import java.util.Set;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
@@ -40,7 +38,7 @@ public class IndexEventConsumer implements Consumer {
 
     // collect Items, Collections, Communities that need indexing
     private Set<IndexableObject> objectsToUpdate = new HashSet<>();
-    // collect freshly created Items that need indexing and require pre-db status
+    // collect freshly created Items that need indexing (requires pre-db status)
     private Set<IndexableObject> createdItemsToUpdate = new HashSet<>();
 
     // unique search IDs to delete
@@ -51,8 +49,6 @@ public class IndexEventConsumer implements Consumer {
                                                                      IndexingService.class);
 
     IndexObjectFactoryFactory indexObjectServiceFactory = IndexObjectFactoryFactory.getInstance();
-
-    ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     @Override
     public void initialize() throws Exception {
@@ -171,13 +167,7 @@ public class IndexEventConsumer implements Consumer {
                     // also update the object in order to index mapped/unmapped Items
                     if (subject != null &&
                         subject.getType() == Constants.COLLECTION && object.getType() == Constants.ITEM) {
-                        // If the item doesn't exist in the database yet, add it to createdItemsToUpdate
-                        // Otherwise use the standard objectsToUpdate
-                        if (itemService.find(ctx, object.getID()) == null) {
-                            createdItemsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, object));
-                        } else {
-                            objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, object));
-                        }
+                        createdItemsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, object));
                     }
                 }
                 break;
