@@ -1415,7 +1415,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         getIndexableObjectFactory(indexableObject);
                 if (force || requiresIndexing(indexableObject.getUniqueIndexID(), indexableObject.getLastModified())) {
                     update(context, indexableObjectFactory, indexableObject, true);
-                    log.info(LogManager.getHeader(context, "indexed_object", indexableObject.getUniqueIndexID()));
+                    log.info(LogHelper.getHeader(context, "indexed_object", indexableObject.getUniqueIndexID()));
                 }
             } catch (IOException | SQLException | SolrServerException | SearchServiceException e) {
                 log.error(e.getMessage(), e);

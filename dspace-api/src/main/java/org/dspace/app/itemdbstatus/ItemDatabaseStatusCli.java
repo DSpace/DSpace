@@ -16,7 +16,7 @@ import java.util.Calendar;
 import java.util.Optional;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -42,7 +42,7 @@ import org.dspace.utils.DSpace;
  */
 public class ItemDatabaseStatusCli extends DSpaceRunnable<ItemDatabaseStatusCliScriptConfiguration> {
     /* Log4j logger */
-    private static final Logger log = Logger.getLogger(ItemDatabaseStatusCli.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemDatabaseStatusCli.class);
 
     public static final String TIME_UNTIL_REINDEX_PROPERTY = "item-database-status.time-until-reindex";
 
