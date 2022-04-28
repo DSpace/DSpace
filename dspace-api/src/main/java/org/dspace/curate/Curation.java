@@ -259,9 +259,16 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
                 super.handler.logError("EPerson not found: " + currentUserUuid);
                 throw new IllegalArgumentException("Unable to find a user with uuid: " + currentUserUuid);
             }
+            assignSpecialGroupsInContext();
             this.context.setCurrentUser(eperson);
         } catch (SQLException e) {
             handler.handleException("Something went wrong trying to fetch eperson for uuid: " + currentUserUuid, e);
+        }
+    }
+
+    protected void assignSpecialGroupsInContext() throws SQLException {
+        for (UUID uuid : handler.getSpecialGroups()) {
+            context.setSpecialGroup(uuid);
         }
     }
 

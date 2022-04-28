@@ -10,7 +10,10 @@ package org.dspace.scripts.handler.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
@@ -112,5 +115,10 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
         throws IOException {
         File file = new File(fileName);
         FileUtils.copyInputStreamToFile(inputStream, file);
+    }
+
+    @Override
+    public List<UUID> getSpecialGroups() {
+        return Collections.emptyList();
     }
 }

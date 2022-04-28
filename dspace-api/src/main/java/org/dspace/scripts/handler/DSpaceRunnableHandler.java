@@ -10,7 +10,9 @@ package org.dspace.scripts.handler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.cli.Options;
 import org.dspace.authorize.AuthorizeException;
@@ -114,4 +116,6 @@ public interface DSpaceRunnableHandler {
      */
     public void writeFilestream(Context context, String fileName, InputStream inputStream, String type)
         throws IOException, SQLException, AuthorizeException;
+
+    public List<UUID> getSpecialGroups();
 }
