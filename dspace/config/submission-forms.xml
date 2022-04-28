@@ -161,7 +161,7 @@
                     <repeatable>true</repeatable>
                     <label>Research Data</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the URI of related research data to this item.</hint>
+                    <hint>If you have data in the Harvard Dataverse repository (or other data repository), please provide the DOI or URL here to link to the dataset. This link will appear in your public-facing DASH record.</hint>
                     <required></required>
                 </field>
             </row>
