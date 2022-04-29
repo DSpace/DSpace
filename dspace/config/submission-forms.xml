@@ -157,9 +157,6 @@
                         it, please enter the types and the actual numbers or codes.
                     </hint>
                     <required></required>
-<!--                    <acl>-->
-<!--                        policy=allow,action=read,grantee-type=user,grantee-id=*-->
-<!--                    </acl>-->
                 </field>
             </row>
             <row>
