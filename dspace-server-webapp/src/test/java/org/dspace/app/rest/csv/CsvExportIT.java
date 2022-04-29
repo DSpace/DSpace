@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
@@ -77,7 +77,7 @@ public class CsvExportIT extends AbstractControllerIntegrationTest {
 
             getClient(token)
                 .perform(multipart("/api/system/scripts/metadata-export/processes")
-                             .param("properties", new Gson().toJson(list)))
+                             .param("properties", new ObjectMapper().writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("metadata-export",
@@ -128,7 +128,7 @@ public class CsvExportIT extends AbstractControllerIntegrationTest {
 
             getClient(token)
                 .perform(multipart("/api/system/scripts/metadata-export/processes")
-                             .param("properties", new Gson().toJson(list)))
+                             .param("properties", new ObjectMapper().writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("metadata-export",
