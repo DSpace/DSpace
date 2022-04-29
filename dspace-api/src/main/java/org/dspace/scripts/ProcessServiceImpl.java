@@ -21,7 +21,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -47,7 +46,6 @@ import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.eperson.service.GroupService;
 import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -76,12 +74,10 @@ public class ProcessServiceImpl implements ProcessService {
     @Autowired
     private EPersonService ePersonService;
 
-    @Autowired
-    private GroupService groupService;
-
     @Override
     public Process create(Context context, EPerson ePerson, String scriptName,
-                          List<DSpaceCommandLineParameter> parameters, final List<Group> specialGroups) throws SQLException {
+                          List<DSpaceCommandLineParameter> parameters,
+                          final List<Group> specialGroups) throws SQLException {
 
         Process process = new Process();
         process.setEPerson(ePerson);
@@ -177,24 +173,10 @@ public class ProcessServiceImpl implements ProcessService {
         MetadataField dspaceProcessFileTypeField = metadataFieldService
             .findByString(context, Process.BITSTREAM_TYPE_METADATAFIELD, '.');
         bitstreamService.addMetadata(context, bitstream, dspaceProcessFileTypeField, null, type);
-        if (Objects.isNull(context.getCurrentUser())) {
-            Group anonymous = groupService.findByName(context, Group.ANONYMOUS);
-            authorizeService.addPolicy(context, bitstream, Constants.READ, anonymous);
-        } else {
-            authorizeService.addPolicy(context, bitstream, Constants.READ, context.getCurrentUser());
-            authorizeService.addPolicy(context, bitstream, Constants.WRITE, context.getCurrentUser());
-            authorizeService.addPolicy(context, bitstream, Constants.DELETE, context.getCurrentUser());
-        }
-
-        try {
-            context.turnOffAuthorisationSystem();
-            bitstreamService.update(context, bitstream);
-            context.restoreAuthSystemState();
-        } catch (SQLException | AuthorizeException e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e.getMessage(), e);
-        }
-
+        authorizeService.addPolicy(context, bitstream, Constants.READ, context.getCurrentUser());
+        authorizeService.addPolicy(context, bitstream, Constants.WRITE, context.getCurrentUser());
+        authorizeService.addPolicy(context, bitstream, Constants.DELETE, context.getCurrentUser());
+        bitstreamService.update(context, bitstream);
         process.addBitstream(bitstream);
         update(context, process);
     }

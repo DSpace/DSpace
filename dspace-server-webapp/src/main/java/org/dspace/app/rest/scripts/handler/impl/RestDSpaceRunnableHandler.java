@@ -61,7 +61,8 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
      * @param ePerson       The eperson that creates the process
      * @param scriptName    The name of the script for which is a process will be created
      * @param parameters    The parameters for this process
-     * @param specialGroups specialGroups The list of special groups related to eperson creating process at process creation time
+     * @param specialGroups specialGroups The list of special groups related to eperson
+     *                      creating process at process creation time
      */
     public RestDSpaceRunnableHandler(EPerson ePerson, String scriptName, List<DSpaceCommandLineParameter> parameters,
                                      final List<Group> specialGroups) {
