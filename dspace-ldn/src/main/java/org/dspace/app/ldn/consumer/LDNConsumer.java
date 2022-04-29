@@ -89,20 +89,23 @@ public class LDNConsumer implements Consumer {
 
                 if (item.isArchived() || ("ARCHIVED: " + true).equals(event.getDetail())) {
                     if (eventType == Event.MODIFY_METADATA) {
-                        List<MetadataValue> releaseMetadata = itemService.getMetadata(item, SCHEMA, ELEMENT, RELEASE, ANY);
+                        List<MetadataValue> releaseMetadata = itemService.getMetadata(
+                                item, SCHEMA, ELEMENT, RELEASE, ANY);
 
                         if (!releaseMetadata.isEmpty()) {
                             itemsToRelease.remove(item);
                             log.info("Skipping item {} as it has been notified of release", item.getID());
                             for (MetadataValue metadatum : releaseMetadata) {
-                                log.info("\t {}.{}.{} {} {}", SCHEMA, ELEMENT, RELEASE, ANY, metadatum.getValue());
+                                log.info("\t {}.{}.{} {} {}",
+                                        SCHEMA, ELEMENT, RELEASE, ANY, metadatum.getValue());
                             }
                             return;
                         }
 
                     }
 
-                    List<MetadataValue> researchMetadata = itemService.getMetadata(item, "dc", "data", "uri", ANY);
+                    List<MetadataValue> researchMetadata = itemService.getMetadata(
+                            item, "dc", "data", "uri", ANY);
 
                     if (researchMetadata.isEmpty()) {
                         log.info("Skipping item {} as it has no identifier to notify", item.getID());
@@ -144,11 +147,8 @@ public class LDNConsumer implements Consumer {
                 try {
                     ldnBusinessDelegate.announceRelease(item);
                 } catch (Exception e) {
-                    log.error(format(
-                        "Failed to announce item %s %s for release",
-                        item.getID(),
-                        item.getName()
-                    ), e);
+                    log.error(format("Failed to announce item %s %s for release",
+                            item.getID(), item.getName()), e);
                 }
             }
         }
