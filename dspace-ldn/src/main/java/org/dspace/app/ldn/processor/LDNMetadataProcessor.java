@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -38,9 +39,12 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -53,7 +57,11 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
     private final static String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
+    private final static String LOCATION_HEADER_KEY = "Location";
+
     private final VelocityEngine velocityEngine;
+
+    private final RestTemplate restTemplate;
 
     @Autowired
     private ItemService itemService;
@@ -61,11 +69,16 @@ public class LDNMetadataProcessor implements LDNProcessor {
     @Autowired
     private HandleService handleService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     private LDNContextRepeater repeater = new LDNContextRepeater();
 
     private List<LDNAction> actions = new ArrayList<>();
 
     private List<LDNMetadataChange> changes = new ArrayList<>();
+
+    private String dspaceUIUrl;
 
     /**
      * Initialize velocity engine for templating.
@@ -75,6 +88,12 @@ public class LDNMetadataProcessor implements LDNProcessor {
         velocityEngine.setProperty(Velocity.RESOURCE_LOADERS, "string");
         velocityEngine.setProperty("resource.loader.string.class", StringResourceLoader.class.getName());
         velocityEngine.init();
+        restTemplate = new RestTemplate();
+    }
+
+    @PostConstruct
+    public void init() {
+        this.dspaceUIUrl = configurationService.getProperty("dspace.ui.url");
     }
 
     /**
@@ -274,7 +293,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
     private Item lookupItem(Context context, Notification notification) throws SQLException {
         Item item = null;
 
-        String url = notification.getContext().getId();
+        String url = this.resolveContext(notification);
 
         log.info("Looking up item {}", url);
 
@@ -312,6 +331,29 @@ public class LDNMetadataProcessor implements LDNProcessor {
         }
 
         return item;
+    }
+
+    /**
+     * Attempts to resolve context id externally if not already a DSpace URL.
+     * Context id must resolve with an appropriate DSpace URL in Location header.
+     *
+     * @param notification current context notification
+     * @return external resolved DSpace URL
+     */
+    private String resolveContext(Notification notification) {
+        String url = notification.getContext().getId();
+        if (!url.startsWith(this.dspaceUIUrl)) {
+            log.info("Attempting to resolve external context id {}", url);
+            HttpHeaders headers = this.restTemplate.headForHeaders(url);
+            if (headers.containsKey(LOCATION_HEADER_KEY)) {
+                return headers.getFirst(LOCATION_HEADER_KEY);
+            } else {
+                log.error("External context id {} HEAD response did not contain Location header", url);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        format("Invalid context id %s", url));
+            }
+        }
+        return url;
     }
 
     /**
