@@ -78,8 +78,8 @@ public class SHERPAResponse implements Serializable {
     }
 
     /**
-     * Create an empty SHERPAResponse rappresentation
-     */
+	 * Create an empty SHERPAResponse representation
+	 */
     public SHERPAResponse() {}
 
     /**
