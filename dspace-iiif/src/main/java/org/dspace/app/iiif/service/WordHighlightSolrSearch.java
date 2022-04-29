@@ -195,7 +195,10 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
                                         // May be multiple word highlights on a page, so loop through them.
                                         for (int i = 0; i < highlights.size(); i++) {
                                             // Add annotation associated with each highlight
-                                            searchResult.addResource(getAnnotation(highlights.get(i), pageId, uuid));
+                                            AnnotationGenerator anno = getAnnotation(highlights.get(i), pageId, uuid);
+                                            if (anno != null) {
+                                                searchResult.addResource(anno);
+                                            }
                                         }
                                     }
                                 }
@@ -216,15 +219,19 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
      * @return generator for a single annotation
      */
     private AnnotationGenerator getAnnotation(JsonNode highlight, String pageId, UUID uuid) {
-        String text = (highlight.get("text").asText());
-        int ulx = highlight.get("ulx").asInt();
-        int uly = highlight.get("uly").asInt();
-        int lrx = highlight.get("lrx").asInt();
-        int lry = highlight.get("lry").asInt();
-        String w = Integer.toString(lrx - ulx);
-        String h = Integer.toString(lry - uly);
-        String params = ulx + "," + uly + "," + w + "," + h;
-        return createSearchResultAnnotation(params, text, pageId, uuid);
+        String text = highlight.get("text") != null ? highlight.get("text").asText() : null;
+        int ulx = highlight.get("ulx") != null ? highlight.get("ulx").asInt() : -1;
+        int uly = highlight.get("uly") != null ? highlight.get("uly").asInt() : -1;
+        int lrx = highlight.get("lrx") != null ? highlight.get("lrx").asInt() : -1;
+        int lry = highlight.get("lry") != null ? highlight.get("lry").asInt() : -1;
+        String w = (lrx >= 0 && ulx >= 0) ? Integer.toString(lrx - ulx) : null;
+        String h = (lry >= 0 && uly >= 0) ? Integer.toString(lry - uly) : null;
+
+        if (text != null && w != null && h != null) {
+            String params = ulx + "," + uly + "," + w + "," + h;
+            return createSearchResultAnnotation(params, text, pageId, uuid);
+        }
+        return null;
     }
 
     /**
@@ -239,9 +246,14 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
     private String getCanvasId(JsonNode pagesNode) {
         if (pagesNode != null) {
             JsonNode page = pagesNode.get(0);
-            String[] identArr = page.get("id").asText().split("\\.");
-            // the canvas id.
-            return "c" + identArr[1];
+            if (page != null) {
+                JsonNode pageId = page.get("id");
+                if (pageId != null) {
+                    String[] identArr = pageId.asText().split("\\.");
+                    // the canvas id.
+                    return "c" + identArr[1];
+                }
+            }
         }
         return null;
     }
