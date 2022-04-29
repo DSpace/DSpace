@@ -30,12 +30,12 @@ public class SherpaCacheEvictService {
     private SHERPASubmitService sherpaSubmitService;
 
     /**
-	 * Remove immediately from the cache all the response that are related to a specific item
-	 * extracting the ISSNs from the item
-	 * 
-	 * @param context The DSpace context
-	 * @param item    an Item
-	 */
+     * Remove immediately from the cache all the response that are related to a specific item
+     * extracting the ISSNs from the item
+     * 
+     * @param context The DSpace context
+     * @param item    an Item
+     */
     public void evictCacheValues(Context context, Item item) {
         Set<String> ISSNs = sherpaSubmitService.getISSNs(context, item);
         for (String issn : ISSNs) {
@@ -44,26 +44,26 @@ public class SherpaCacheEvictService {
     }
 
     /**
-	 * Invalidate immediately the Sherpa cache
-	 */
+     * Invalidate immediately the Sherpa cache
+     */
     public void evictAllCacheValues() {
         Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).invalidate();
     }
 
     /**
-	 * Set the reference to the cacheManager
-	 * 
-	 * @param cacheManager
-	 */
+     * Set the reference to the cacheManager
+     * 
+     * @param cacheManager
+     */
     public void setCacheManager(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
     }
 
     /**
-	 * Set the reference to the SherpaSubmitService
-	 * 
-	 * @param sherpaSubmitService
-	 */
+     * Set the reference to the SherpaSubmitService
+     * 
+     * @param sherpaSubmitService
+     */
     public void setSherpaSubmitService(SHERPASubmitService sherpaSubmitService) {
         this.sherpaSubmitService = sherpaSubmitService;
     }
