@@ -32,7 +32,7 @@ import org.dspace.core.Context;
 import org.dspace.submit.model.LanguageFormField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sk.dtq.dspace.app.util.ACL;
+import org.dspace.app.util.ACL;
 
 /**
  * This is the converter from/to the DCInputSet in the DSpace API data model and

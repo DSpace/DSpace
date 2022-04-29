@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package sk.dtq.dspace.app.util;
+package org.dspace.app.util;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.dspace.AbstractUnitTest;
+import org.dspace.app.util.ACL;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.eperson.Group;
@@ -28,7 +29,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 /**
  * Test ACL for admin and user.
  *
- * @author milanmajchrak
+ * @author Milan Majchrak (milan.majchrak at dataquest dot sk)
  */
 public class ACLTest extends AbstractUnitTest {
 
@@ -58,7 +59,6 @@ public class ACLTest extends AbstractUnitTest {
         authorizeServiceSpy = spy(authorizeService);
         groupServiceSpy = spy(groupService);
 
-//        ReflectionTestUtils.setField(ePersonService, "authorizeService", authorizeServiceSpy);
         ReflectionTestUtils.setField(groupService, "authorizeService", authorizeServiceSpy);
     }
 
