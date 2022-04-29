@@ -38,7 +38,8 @@ public interface ProcessService {
      * @throws SQLException If something goes wrong
      */
     public Process create(Context context, EPerson ePerson, String scriptName,
-                          List<DSpaceCommandLineParameter> parameters, final List<Group> specialGroups) throws SQLException;
+                          List<DSpaceCommandLineParameter> parameters,
+                          final List<Group> specialGroups) throws SQLException;
 
     /**
      * This method will retrieve a Process object from the Database with the given ID
