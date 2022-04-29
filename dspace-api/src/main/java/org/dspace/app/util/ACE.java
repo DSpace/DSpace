@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package sk.dtq.dspace.app.util;
+package org.dspace.app.util;
 
 import java.util.Set;
 
@@ -15,68 +15,46 @@ import org.apache.log4j.Logger;
  * Class that represents single Access Control Entry
  *
  * @author Michal Josífko
- * @author milanmajchrak
+ * Class is copied from the LINDAT/CLARIAH-CZ (https://github.com/ufal/clarin-dspace) and modified by
+ * @author Milan Majchrak (milan.majchrak at dataquest dot sk)
  */
 
 public class ACE {
 
     /** Logger */
     private static final Logger log = Logger.getLogger(ACE.class);
-
     private static final String POLICY_KEYWORD = "policy";
-
     private static final String POLICY_DENY_KEYWORD = "deny";
-
     private static final String POLICY_ALLOW_KEYWORD = "allow";
-
     private static final String ACTION_KEYWORD = "action";
-
     private static final String ACTION_READ_KEYWORD = "read";
-
     private static final String ACTION_WRITE_KEYWORD = "write";
-
     private static final String GRANTEE_TYPE_KEYWORD = "grantee-type";
-
     private static final String GRANTEE_TYPE_USER_KEYWORD = "user";
-
     private static final String GRANTEE_TYPE_GROUP_KEYWORD = "group";
-
     private static final String GRANTEE_ID_KEYWORD = "grantee-id";
-
     private static final String ANY_KEYWORD = "*";
-
     public static final int ACTION_READ = 1;
-
     public static final int ACTION_WRITE = 2;
-
     private static final int POLICY_DENY = 1;
-
     private static final int POLICY_ALLOW = 2;
-
     private static final int GRANTEE_TYPE_USER = 1;
-
     private static final int GRANTEE_TYPE_GROUP = 2;
-
     private static final String GRANTEE_ID_ANY = "-1";
-
     private int policy;
-
     private int action;
-
     private int granteeType;
-
     private String granteeID;
 
     /**
      * Creates new ACE object from given String
      *
-     * @param s
+     * @param aceDefinition from the acl definition string
      * @return ACE object or null
      */
-
-    public static ACE fromString(String s) {
+    public static ACE fromString(String aceDefinition) {
         ACE ace = null;
-        String[] aceParts = s.split(",");
+        String[] aceParts = aceDefinition.split(",");
 
         int errors = 0;
 
@@ -145,12 +123,11 @@ public class ACE {
     /**
      * Constructor for creating new Access Control Entry
      *
-     * @param policy
-     * @param action
-     * @param granteeType
-     * @param granteeID
+     * @param policy deny/allow
+     * @param action read/write
+     * @param granteeType user/group
+     * @param granteeID group UUID
      */
-
     private ACE(int policy, int action, int granteeType, String granteeID) {
         this.policy = policy;
         this.action = action;
@@ -159,15 +136,13 @@ public class ACE {
     }
 
     /**
-     * Method that checks whether the given inputs match this Access Control
-     * Entry
+     * Method that checks whether the given inputs match this Access Control Entry
      *
-     * @param userID
-     * @param groupIDs
-     * @param action
+     * @param userID of the current user
+     * @param groupIDs where is assigned the current user
+     * @param action could/couldn't be allowed for the user
      * @return
      */
-
     public boolean matches(String userID, Set<String> groupIDs, int action) {
         if (this.action == action) {
             if (granteeType == ACE.GRANTEE_TYPE_USER) {
@@ -186,9 +161,8 @@ public class ACE {
     /**
      * Convenience method to verify if this entry is allowing the action;
      *
-     * @return
+     * @return the action is allowed or not
      */
-
     public boolean isAllowed() {
         return policy == ACE.POLICY_ALLOW;
     }

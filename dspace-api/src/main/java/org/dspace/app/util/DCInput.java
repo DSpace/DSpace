@@ -20,7 +20,6 @@ import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sk.dtq.dspace.app.util.ACL;
 
 /**
  * Class representing a line in an input form.
@@ -137,6 +136,9 @@ public class DCInput {
      */
     private String regex = null;
 
+    /**
+     * Access Control List - is user allowed for particular ACL action on this input field in given
+     */
     private ACL acl = null;
 
     /**
@@ -542,13 +544,10 @@ public class DCInput {
     }
 
     /**
-     * Is user allowed for particular ACL action on this input field in given
-     * Context?
+     * Is user allowed for particular ACL action on this input field in given Context?
      *
-     * @param c
-     *            Contex
-     * @param action
-     *            Action
+     * @param c current Context, load the user data based on the current Context
+     * @param action read/write
      * @return true if allowed, false otherwise
      */
     public boolean isAllowedAction(Context c, int action) {
