@@ -13,7 +13,7 @@
     <cache-template name="iiif-default">
         <listeners>
             <listener>
-                <class>org.dspace.app.rest.cache.CacheLogger</class>
+                <class>org.dspace.iiif.logger.CacheLogger</class>
                 <event-firing-mode>ASYNCHRONOUS</event-firing-mode>
                 <event-ordering-mode>UNORDERED</event-ordering-mode>
                 <events-to-fire-on>CREATED</events-to-fire-on>
@@ -30,7 +30,7 @@
     <cache-template name="iiif-canvas">
         <listeners>
             <listener>
-                <class>org.dspace.app.rest.cache.CanvasCacheLogger</class>
+                <class>org.dspace.iiif.logger.CanvasCacheLogger</class>
                 <event-firing-mode>ASYNCHRONOUS</event-firing-mode>
                 <event-ordering-mode>UNORDERED</event-ordering-mode>
                 <events-to-fire-on>CREATED</events-to-fire-on>
