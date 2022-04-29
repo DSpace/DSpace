@@ -417,12 +417,4 @@ public class SHERPAService {
         this.timeout = timeout;
     }
 
-    public CloseableHttpClient getClient() {
-        return client;
-    }
-
-    public void setClient(CloseableHttpClient client) {
-        this.client = client;
-    }
-
 }
