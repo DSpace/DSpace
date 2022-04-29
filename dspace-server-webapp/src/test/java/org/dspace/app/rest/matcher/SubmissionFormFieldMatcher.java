@@ -142,6 +142,8 @@ public class SubmissionFormFieldMatcher {
      *            the expected hints message
      * @param metadata
      *            the expected metadata
+     * @param controlledVocabulary
+     *            the expected controlledVocabulary
      * @param relationshipType
      *            the type of relationship
      * @param filter
@@ -157,6 +159,7 @@ public class SubmissionFormFieldMatcher {
                                                                                    boolean repeatable,
                                                                                    String hints,
                                                                                    String metadata,
+                                                                                   String controlledVocabulary,
                                                                                    String relationshipType,
                                                                                    String filter,
                                                                                    String searchConfiguration,
@@ -166,7 +169,8 @@ public class SubmissionFormFieldMatcher {
             hasJsonPath("$.selectableRelationship.filter", is(filter)),
             hasJsonPath("$.selectableRelationship.searchConfiguration", is(searchConfiguration)),
             hasJsonPath("$.selectableRelationship.nameVariants", is(String.valueOf(nameVariants))),
-            matchFormFieldDefinition(type, label, mandatoryMessage, repeatable, hints, metadata));
+            matchFormFieldDefinition(type, label, mandatoryMessage, repeatable, hints, null, metadata,
+                controlledVocabulary));
     }
 
     /**
