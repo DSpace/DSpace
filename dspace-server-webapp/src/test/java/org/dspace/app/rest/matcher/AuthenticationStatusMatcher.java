@@ -28,7 +28,7 @@ public class AuthenticationStatusMatcher {
     public static Matcher<? super Object> matchFullEmbeds() {
         return matchEmbeds(
                 "eperson",
-        		"specialGroups"
+                "specialGroups"
         );
     }
 
@@ -37,6 +37,7 @@ public class AuthenticationStatusMatcher {
      */
     public static Matcher<? super Object> matchLinks() {
         return allOf(
+                //FIXME https://github.com/DSpace/DSpace/issues/8274
                 hasJsonPath("$._links.eperson.href", containsString("api/eperson/epersons")),
                 hasJsonPath("$._links.self.href", containsString("api/authn/status")),
                 hasJsonPath("$._links.specialGroups.href", containsString("api/authn/status/specialGroups")));

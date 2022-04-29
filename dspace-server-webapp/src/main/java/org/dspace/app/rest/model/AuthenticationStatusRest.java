@@ -9,9 +9,9 @@ package org.dspace.app.rest.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Find out your authentication status.
@@ -20,9 +20,9 @@ public class AuthenticationStatusRest extends BaseObjectRest<Integer> {
     private boolean okay;
     private boolean authenticated;
     private String authenticationMethod;
-    
+
     private EPersonRest ePersonRest;
-	private List<GroupRest> specialGroups;
+    private List<GroupRest> specialGroups;
 
     public static final String NAME = "status";
     public static final String SPECIALGROUPS = "specialGroups";
@@ -95,13 +95,13 @@ public class AuthenticationStatusRest extends BaseObjectRest<Integer> {
         this.authenticationMethod = authenticationMethod;
     }
 
-	public void setSpecialGroups(List<GroupRest> groupList) {
-		this.specialGroups = groupList;
-	}
+    public void setSpecialGroups(List<GroupRest> groupList) {
+        this.specialGroups = groupList;
+    }
 
-	@LinkRest(name = "specialGroups")
+    @LinkRest(name = "specialGroups")
     @JsonIgnore
-	public List<GroupRest> getSpecialGroups() {
-		return specialGroups;
-	}
+    public List<GroupRest> getSpecialGroups() {
+        return specialGroups;
+    }
 }
