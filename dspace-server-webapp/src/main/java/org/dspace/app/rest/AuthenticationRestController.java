@@ -34,8 +34,6 @@ import org.dspace.app.rest.model.hateoas.AuthnResource;
 import org.dspace.app.rest.model.hateoas.GroupResource;
 import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.AuthorizationSpecialGroupsLinkRepository;
-import org.dspace.app.rest.repository.BitstreamRestRepository;
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -47,7 +45,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
@@ -92,9 +89,6 @@ public class AuthenticationRestController implements InitializingBean {
     private ClientInfoService clientInfoService;
     
     @Autowired
-    AuthorizationSpecialGroupsLinkRepository authorizationSpecialGroupsLinkRepository;
-
-    @Autowired
     private Utils utils;
 
     @Override
@@ -129,6 +123,8 @@ public class AuthenticationRestController implements InitializingBean {
         if (context.getCurrentUser() != null) {
             ePersonRest = converter.toRest(context.getCurrentUser(), projection);
         }
+		List<GroupRest> groupList = context.getSpecialGroups().stream()
+				.map(g -> (GroupRest) converter.toRest(g, projection)).collect(Collectors.toList());
 
         AuthenticationStatusRest authenticationStatusRest = new AuthenticationStatusRest(ePersonRest);
         // When not authenticated add WWW-Authenticate so client can retrieve all available authentication methods
@@ -140,6 +136,7 @@ public class AuthenticationRestController implements InitializingBean {
         }
         authenticationStatusRest.setAuthenticationMethod(context.getAuthenticationMethod());
         authenticationStatusRest.setProjection(projection);
+        authenticationStatusRest.setSpecialGroups(groupList);
         
         AuthenticationStatusResource authenticationStatusResource = converter.toResource(authenticationStatusRest);
 
@@ -160,17 +157,13 @@ public class AuthenticationRestController implements InitializingBean {
     public PagedModel<GroupResource> retrieveSpecialGroups(Pageable page, PagedResourcesAssembler assembler, 
     			HttpServletRequest request, HttpServletResponse response)
             throws SQLException {
-    	
+        Context context = ContextUtil.obtainContext(request);
         Projection projection = utils.obtainProjection();
 
-        Page<GroupRest> groupPage = authorizationSpecialGroupsLinkRepository.getSpecialGroups(request, page, projection);
-		Page<GroupResource> resources;
-		
-		try {
-			resources = groupPage.map(converter::toResource);
-		} catch (PaginationException pe) {
-			resources = new PageImpl<>(new ArrayList<>(), page, pe.getTotal());
-		}
+		List<GroupRest> groupList = context.getSpecialGroups().stream()
+				.map(g -> (GroupRest) converter.toRest(g, projection)).collect(Collectors.toList());
+		Page<GroupRest> groupPage = (Page<GroupRest>) utils.getPage(groupList, page);
+		Page<GroupResource> resources = groupPage.map(converter::toResource);
 		Link link = linkTo(
 				methodOn(AuthenticationRestController.class).retrieveSpecialGroups(page, assembler, request, response))
 						.withRel("specialGroups");

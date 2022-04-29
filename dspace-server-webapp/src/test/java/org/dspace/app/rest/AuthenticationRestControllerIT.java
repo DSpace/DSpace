@@ -189,49 +189,61 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         configurationService.setProperty("authentication-ip.specialGroupIP", "123.123.123.123");
     	context.restoreAuthSystemState();
     	    	
-    	/*getClient().perform(get("/api/authn/status").param("projection", "full").with(ip("123.123.123.123")))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(contentType))
-        .andExpect(jsonPath("$.okay", is(true)))
-        .andExpect(jsonPath("$.authenticated", is(false)))
-        //.andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
-        .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
-        		Matchers.containsInAnyOrder(GroupMatcher.matchGroupWithName("specialGroupIP"))));*/
-
     	String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/authn/status").param("projection", "full"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
-        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
-        .andExpect(content().contentType(contentType))
-        .andExpect(jsonPath("$.okay", is(true)))
-        .andExpect(jsonPath("$.authenticated", is(true)))
-        .andExpect(jsonPath("$.authenticationMethod", is("password")))
-        .andExpect(jsonPath("$.type", is("status")))
-
-        .andExpect(jsonPath("$._links.specialGroups.href", startsWith(REST_SERVER_URL)))
-        .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
+	        .andExpect(status().isOk())
+	        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+	        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+	        .andExpect(content().contentType(contentType))
+	        .andExpect(jsonPath("$.okay", is(true)))
+	        .andExpect(jsonPath("$.authenticated", is(true)))
+	        .andExpect(jsonPath("$.authenticationMethod", is("password")))
+	        .andExpect(jsonPath("$.type", is("status")))
+	        .andExpect(jsonPath("$._links.specialGroups.href", startsWith(REST_SERVER_URL)))
+	        .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
         		Matchers.containsInAnyOrder(
         				//duplicated - bug on context.getSpecialGroups()
-        				GroupMatcher.matchGroupWithName("specialGroupPwd"),        			
+        				GroupMatcher.matchGroupWithName("specialGroupPwd"),
         				GroupMatcher.matchGroupWithName("specialGroupPwd"))));
-        
+
+        // try the special groups link endpoint in the same scenario than above
+        getClient(token).perform(get("/api/authn/status/specialGroups").param("projection", "full"))
+	        .andExpect(status().isOk())
+	        .andExpect(content().contentType(contentType))
+	        .andExpect(jsonPath("$._embedded.groups",
+	    		Matchers.containsInAnyOrder(
+	    				//duplicated - bug on context.getSpecialGroups()
+	    				GroupMatcher.matchGroupWithName("specialGroupPwd"),
+	    				GroupMatcher.matchGroupWithName("specialGroupPwd"))));
+
         getClient(token).perform(get("/api/authn/status").param("projection", "full")
                 .with(ip("123.123.123.123")))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
-        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
-        .andExpect(content().contentType(contentType))
-        .andExpect(jsonPath("$.okay", is(true)))
-        .andExpect(jsonPath("$.authenticated", is(true)))
-        .andExpect(jsonPath("$.authenticationMethod", is("password")))
-        .andExpect(jsonPath("$.type", is("status")))
-
-        .andExpect(jsonPath("$._links.specialGroups.href", startsWith(REST_SERVER_URL)))
-        .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
-        		Matchers.containsInAnyOrder(GroupMatcher.matchGroupWithName("specialGroupPwd"), 
-        				GroupMatcher.matchGroupWithName("specialGroupPwd"), GroupMatcher.matchGroupWithName("specialGroupIP"))));
+	        .andExpect(status().isOk())
+	        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+	        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+	        .andExpect(content().contentType(contentType))
+	        .andExpect(jsonPath("$.okay", is(true)))
+	        .andExpect(jsonPath("$.authenticated", is(true)))
+	        .andExpect(jsonPath("$.authenticationMethod", is("password")))
+	        .andExpect(jsonPath("$.type", is("status")))
+	        .andExpect(jsonPath("$._links.specialGroups.href", startsWith(REST_SERVER_URL)))
+	        .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
+	        		Matchers.containsInAnyOrder(
+	        				//duplicated - bug on context.getSpecialGroups()
+	        				GroupMatcher.matchGroupWithName("specialGroupPwd"),
+	        				GroupMatcher.matchGroupWithName("specialGroupPwd"),
+	        				GroupMatcher.matchGroupWithName("specialGroupIP"))));
+        
+//    	getClient().perform(get("/api/authn/status").param("projection", "full").with(ip("123.123.123.123")))
+//	        .andExpect(status().isOk())
+//	        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+//	        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+//	        .andExpect(content().contentType(contentType))
+//	        .andExpect(jsonPath("$.okay", is(true)))
+//	        .andExpect(jsonPath("$.authenticated", is(false)))
+//	        .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
+//	        		Matchers.containsInAnyOrder(GroupMatcher.matchGroupWithName("specialGroupIP"))));
         
     }
 

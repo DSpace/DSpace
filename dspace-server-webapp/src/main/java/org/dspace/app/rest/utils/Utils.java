@@ -843,7 +843,7 @@ public class Utils {
         } else if (linkedObject instanceof List) {
             // The full list has been retrieved and we need to provide the first page for embedding
             List<RestAddressableModel> list = (List<RestAddressableModel>) linkedObject;
-            if (list.size() > 0) {
+            if (list != null && list.size() > 0) {
                 PageImpl<RestAddressableModel> page = new PageImpl(
                         list.subList(0, list.size() > DEFAULT_PAGE_SIZE ? DEFAULT_PAGE_SIZE : list.size()),
                         PageRequest.of(0, DEFAULT_PAGE_SIZE), list.size());
