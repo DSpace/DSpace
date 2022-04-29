@@ -30,6 +30,5 @@
     docker exec -it dspacedb psql -U drum -c "DROP SEQUENCE openurltracker_seq;"
 
     # Run the migration
-    # NOTE: The command will
     docker compose -p d7 -f docker-compose-cli.yml run dspace-cli database migrate ignored
     ```
