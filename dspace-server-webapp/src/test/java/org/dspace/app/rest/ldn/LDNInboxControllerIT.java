@@ -94,7 +94,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
 
         Context context = notification.getContext().getIsSupplementTo().get(0);
 
-        String url = String.format("%s/item/%s", BASE_REST_SERVER_URL, item.getID());
+        String url = String.format("http://localhost:4000/item/%s", item.getID());
         context.setId(url);
         context.setIetfCiteAs(url);
 

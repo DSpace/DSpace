@@ -87,8 +87,8 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     //sits before the actual authentication token and can be used to easily compose or parse the Authorization header.
     protected static final String AUTHORIZATION_TYPE = "Bearer ";
 
-    public static final String REST_SERVER_URL = "http://localhost:8080/api/";
-    public static final String BASE_REST_SERVER_URL = "http://localhost:4000";
+    public static final String REST_SERVER_URL = "http://localhost/api/";
+    public static final String BASE_REST_SERVER_URL = "http://localhost";
 
     // Our standard/expected content type
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
