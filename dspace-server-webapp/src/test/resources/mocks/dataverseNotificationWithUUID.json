@@ -12,8 +12,8 @@
   "context": {
     "IsSupplementTo": [
       {
-        "id": "http://localhost/item/68f290d8-c604-4c14-8871-68adb0d02d0b",
-        "ietf:cite-as": "http://localhost/item/68f290d8-c604-4c14-8871-68adb0d02d0b",
+        "id": "http://localhost:4000/item/68f290d8-c604-4c14-8871-68adb0d02d0b",
+        "ietf:cite-as": "http://localhost:4000/item/68f290d8-c604-4c14-8871-68adb0d02d0b",
         "type": "sorg:ScholarlyArticle"
       }
     ]
@@ -30,8 +30,8 @@
     "type": "Service"
   },
   "target": {
-    "id": "http://localhost/",
-    "inbox": "http://localhost/server/ldn/inbox",
+    "id": "http://localhost:8080/",
+    "inbox": "http://localhost:8080/server/ldn/inbox",
     "type": "Service"
   },
   "type": [

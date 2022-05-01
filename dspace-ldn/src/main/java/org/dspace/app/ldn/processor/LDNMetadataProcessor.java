@@ -44,6 +44,7 @@ import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -344,13 +345,19 @@ public class LDNMetadataProcessor implements LDNProcessor {
         String url = notification.getContext().getId();
         if (!url.startsWith(this.dspaceUIUrl)) {
             log.info("Attempting to resolve external context id {}", url);
-            HttpHeaders headers = this.restTemplate.headForHeaders(url);
-            if (headers.containsKey(LOCATION_HEADER_KEY)) {
-                return headers.getFirst(LOCATION_HEADER_KEY);
-            } else {
-                log.error("External context id {} HEAD response did not contain Location header", url);
+            try {
+                HttpHeaders headers = this.restTemplate.headForHeaders(url);
+                if (headers.containsKey(LOCATION_HEADER_KEY)) {
+                    return headers.getFirst(LOCATION_HEADER_KEY);
+                } else {
+                    log.error("External context id {} HEAD response did not contain Location header", url);
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            format("Invalid context id %s", url));
+                }
+            } catch (RestClientException e) {
+                log.error(format("Failed to resolve context id %s.", url), e);
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        format("Invalid context id %s", url));
+                        format("Failed to resolve context id %s. %s", url, e.getMessage()));
             }
         }
         return url;

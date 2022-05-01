@@ -12,8 +12,8 @@
   "context": {
     "IsSupplementTo": [
       {
-        "id": "http://localhost/handle/123456789/3",
-        "ietf:cite-as": "http://localhost/handle/123456789/3",
+        "id": "http://localhost:4000/handle/123456789/3",
+        "ietf:cite-as": "http://localhost:4000/handle/123456789/3",
         "type": "sorg:ScholarlyArticle"
       }
     ]
@@ -30,8 +30,8 @@
     "type": "Service"
   },
   "target": {
-    "id": "http://localhost/",
-    "inbox": "http://localhost/server/ldn/inbox",
+    "id": "http://localhost:8080/",
+    "inbox": "http://localhost:8080/server/ldn/inbox",
     "type": "Service"
   },
   "type": [
