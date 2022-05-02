@@ -51,7 +51,7 @@ public class ActuatorConfiguration {
 
     @EventListener(ApplicationReadyEvent.class)
     public void registerActuatorEndpoints() {
-        discoverableEndpointsService.register(this, Arrays.asList(new Link(actuatorBasePath, "actuator")));
+        discoverableEndpointsService.register(this, Arrays.asList(Link.of(actuatorBasePath, "actuator")));
     }
 
     @Bean
