@@ -40,6 +40,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletionCli"/>
     </bean>
 
+    <bean id="item-database-status" class="org.dspace.app.itemdbstatus.ItemDatabaseStatusCliScriptConfiguration">
+        <property name="description" value="Update the database status of Items in solr"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.itemdbstatus.ItemDatabaseStatusCli"/>
+    </bean>
+
     <bean id="another-mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
         <property name="description" value="Mocking a script for testing purposes" />
         <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
@@ -48,11 +53,6 @@
     <bean id="mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
         <property name="description" value="Mocking a script for testing purposes" />
         <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
-    </bean>
-
-    <bean id="item-database-status" class="org.dspace.app.itemdbstatus.ItemDatabaseStatusCliScriptConfiguration">
-        <property name="description" value="Update the database status of Items in solr"/>
-        <property name="dspaceRunnableClass" value="org.dspace.app.itemdbstatus.ItemDatabaseStatusCli"/>
     </bean>
 
 </beans>
