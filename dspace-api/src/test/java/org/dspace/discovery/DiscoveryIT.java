@@ -371,7 +371,8 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         collectionService.delete(context, col1);
         context.restoreAuthSystemState();
         assertSearchQuery(IndexableCollection.TYPE, 2);
-        assertSearchQuery(IndexableItem.TYPE, 2);
+        // Deleted item contained within totalFound due to predb status (ItemDatabaseStatusCli takes care of this)
+        assertSearchQuery(IndexableItem.TYPE, 2, 3, 0, -1);
     }
 
     @Test
@@ -453,11 +454,11 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         assertSearchQuery(IndexableCollection.TYPE, 2, 2, 0, -1);
         // check Item type with start=0 and limit=2, we expect: indexableObjects=2, totalFound=6
         assertSearchQuery(IndexableItem.TYPE, 2, 6, 0, 2);
-        // check Item type with start=2 and limit=4, we expect: indexableObjects=1, totalFound=3
-        assertSearchQuery(IndexableItem.TYPE, 1, 3, 2, 4);
-        // check Item type with start=0 and limit=default, we expect: indexableObjects=3, totalFound=3
-        // totalFound now is 3 because stale objects deleted
-        assertSearchQuery(IndexableItem.TYPE, 3, 3, 0, -1);
+        // check Item type with start=2 and limit=4, we expect: indexableObjects=1, totalFound=6
+        assertSearchQuery(IndexableItem.TYPE, 1, 6, 2, 4);
+        // check Item type with start=0 and limit=default, we expect: indexableObjects=3, totalFound=6
+        // totalFound is still 6 because stale objects contain predb status (prior to running ItemDatabaseStatusCli)
+        assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, -1);
     }
 
     @Test
@@ -639,8 +640,8 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         // check Item type with start=0 and limit=default,
         // we expect: indexableObjects=3, totalFound=6 (3 stale objects here)
         assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, -1);
-        // as the previous query hit the stale objects running a new query should lead to a clean situation
-        assertSearchQuery(IndexableItem.TYPE, 3, 3, 0, -1);
+        // no stale objects should be removed, due to the predb status (ItemDatabaseStatusCli takes care of this)
+        assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, -1);
     }
 
     private void assertSearchQuery(String resourceType, int size) throws SearchServiceException {
