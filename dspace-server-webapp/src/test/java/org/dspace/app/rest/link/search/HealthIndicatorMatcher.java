@@ -33,8 +33,8 @@ public final class HealthIndicatorMatcher {
             hasJsonPath("$.db"),
             hasJsonPath("$.db.status", is(status.getCode())),
             hasJsonPath("$.db.components", allOf(
-                match("dspaceDataSource", status, Map.of("database", "H2", "result", 1, "validationQuery", "SELECT 1")),
-                match("dataSource", status, Map.of("database", "H2", "result", 1, "validationQuery", "SELECT 1")))));
+                match("dspaceDataSource", status, Map.of("database", "H2", "validationQuery", "isValid()")),
+                match("dataSource", status, Map.of("database", "H2", "validationQuery", "isValid()")))));
     }
 
     public static Matcher<? super Object> match(String name, Status status, Map<String, Object> details) {

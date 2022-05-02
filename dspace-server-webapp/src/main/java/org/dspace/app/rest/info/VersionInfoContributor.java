@@ -9,10 +9,9 @@ package org.dspace.app.rest.info;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.dspace.app.util.Util;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.info.Info.Builder;
 import org.springframework.boot.actuate.info.InfoContributor;
 
@@ -24,31 +23,16 @@ import org.springframework.boot.actuate.info.InfoContributor;
  */
 public class VersionInfoContributor implements InfoContributor {
 
-    private static final String APP_INFO = "app";
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Override
     public void contribute(Builder builder) {
         String sourceVersion = Util.getSourceVersion();
         if (isNotBlank(sourceVersion)) {
-            Map<String, Object> appMap = getAppInfoMap(builder);
-            builder.withDetails(buildAppWithVersion(appMap, sourceVersion));
+            String versionAttribute = configurationService.getProperty("actuator.info.version-attribute", "version");
+            builder.withDetail(versionAttribute, sourceVersion);
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> getAppInfoMap(Builder builder) {
-        Object app = builder.build().get(APP_INFO);
-        return isMap(app) ? (Map<String, Object>) app : Map.of();
-    }
-
-    private boolean isMap(Object object) {
-        return object != null && object instanceof Map;
-    }
-
-    private Map<String, Object> buildAppWithVersion(Map<String, Object> map, String sourceVersion) {
-        Map<String, Object> appWithVersion = new LinkedHashMap<String, Object>(map);
-        appWithVersion.put("version", sourceVersion);
-        return Map.of(APP_INFO, appWithVersion);
     }
 
 }
