@@ -14,10 +14,11 @@ import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping
 
 /**
  * An implementation of {@link AbstractMetadataFieldMapping}
- * Responsible for defining the mapping of the ArXiv metadatum fields on the DSpace metadatum fields
+ * Responsible for defining the mapping of the CrossRef metadatum fields on the DSpace metadatum fields
  *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
+@SuppressWarnings("rawtypes")
 public class CrossRefFieldMapping extends AbstractMetadataFieldMapping {
 
     /**
@@ -29,6 +30,7 @@ public class CrossRefFieldMapping extends AbstractMetadataFieldMapping {
      *                         the item.
      */
     @Override
+    @SuppressWarnings("unchecked")
     @Resource(name = "crossrefMetadataFieldMap")
     public void setMetadataFieldMap(Map metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);

@@ -26,7 +26,7 @@ import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
-import org.dspace.importer.external.scopus.service.LiveImportClient;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.DoiCheck;
 import org.dspace.importer.external.service.components.QuerySource;
@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<String>
         implements QuerySource {
 
-    private static final String ENDPOINT_WORKS = "https://api.crossref.org/works";
+    private String url;
 
     @Autowired
     private LiveImportClient liveImportClient;
@@ -135,6 +135,14 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
         return StringUtils.EMPTY;
     }
 
+    /**
+     * This class is a Callable implementation to get CrossRef entries based on query object.
+     * This Callable use as query value the string queryString passed to constructor.
+     * If the object will be construct through Query.class instance, a Query's map entry with key "query" will be used.
+     * Pagination is supported too, using the value of the Query's map with keys "start" and "count".
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
 
         private Query query;
@@ -156,7 +164,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             Integer count = query.getParameterAsClass("count", Integer.class);
             Integer start = query.getParameterAsClass("start", Integer.class);
 
-            URIBuilder uriBuilder = new URIBuilder(ENDPOINT_WORKS);
+            URIBuilder uriBuilder = new URIBuilder(url);
             uriBuilder.addParameter("query", query.getParameterAsClass("query", String.class));
             if (Objects.nonNull(count)) {
                 uriBuilder.addParameter("rows", count.toString());
@@ -185,6 +193,12 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
     }
 
+    /**
+     * This class is a Callable implementation to get an CrossRef entry using DOI
+     * The DOI to use can be passed through the constructor as a String or as Query's map entry, with the key "id".
+     *
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class SearchByIdCallable implements Callable<List<ImportRecord>> {
         private Query query;
 
@@ -200,8 +214,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
         @Override
         public List<ImportRecord> call() throws Exception {
             List<ImportRecord> results = new ArrayList<>();
-            URIBuilder uriBuilder = new URIBuilder(
-                    ENDPOINT_WORKS + "/" + query.getParameterAsClass("id", String.class));
+            URIBuilder uriBuilder = new URIBuilder(url + "/" + query.getParameterAsClass("id", String.class));
             String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
                     new HashMap<String, String>());
             ReadContext ctx = JsonPath.parse(responseString);
@@ -222,6 +235,13 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
         }
     }
 
+    /**
+     * This class is a Callable implementation to search CrossRef entries using author and title.
+     * There are two field in the Query map to pass, with keys "title" and "author"
+     * (at least one must be used).
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class FindMatchingRecordCallable implements Callable<List<ImportRecord>> {
 
         private Query query;
@@ -239,7 +259,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             String title = query.getParameterAsClass("title", String.class);
             String bibliographics = query.getParameterAsClass("bibliographics", String.class);
             List<ImportRecord> results = new ArrayList<>();
-            URIBuilder uriBuilder = new URIBuilder(ENDPOINT_WORKS);
+            URIBuilder uriBuilder = new URIBuilder(url);
             if (Objects.nonNull(queryValue)) {
                 uriBuilder.addParameter("query", queryValue);
             }
@@ -279,9 +299,17 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
     }
 
+    /**
+     * This class is a Callable implementation to count the number of entries for an CrossRef query.
+     * This Callable use as query value to CrossRef the string queryString passed to constructor.
+     * If the object will be construct through Query.class instance, the value of the Query's
+     * map with the key "query" will be used.
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class CountByQueryCallable implements Callable<Integer> {
-        private Query query;
 
+        private Query query;
 
         private CountByQueryCallable(String queryString) {
             query = new Query();
@@ -292,10 +320,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             this.query = query;
         }
 
-
         @Override
         public Integer call() throws Exception {
-            URIBuilder uriBuilder = new URIBuilder(ENDPOINT_WORKS);
+            URIBuilder uriBuilder = new URIBuilder(url);
             uriBuilder.addParameter("query", query.getParameterAsClass("query", String.class));
             String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
                     new HashMap<String, String>());
@@ -304,6 +331,13 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
         }
     }
 
+    /**
+     * This class is a Callable implementation to check if exist an CrossRef entry using DOI.
+     * The DOI to use can be passed through the constructor as a String or as Query's map entry, with the key "id".
+     * return 1 if CrossRef entry exists otherwise 0
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class DoiCheckCallable implements Callable<Integer> {
 
         private final Query query;
@@ -320,13 +354,16 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
         @Override
         public Integer call() throws Exception {
-            URIBuilder uriBuilder = new URIBuilder(
-                    ENDPOINT_WORKS + "/" + query.getParameterAsClass("id", String.class));
+            URIBuilder uriBuilder = new URIBuilder(url + "/" + query.getParameterAsClass("id", String.class));
             String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
                     new HashMap<String, String>());
             ReadContext ctx = JsonPath.parse(responseString);
             return StringUtils.equals(ctx.read("$.status"), "ok") ? 1 : 0;
         }
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
 }

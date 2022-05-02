@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.importer.external.scopus.service;
+package org.dspace.importer.external.liveimportclient.service;
 
 import java.util.Map;
 
