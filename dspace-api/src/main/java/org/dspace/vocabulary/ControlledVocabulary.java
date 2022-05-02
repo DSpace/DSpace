@@ -15,8 +15,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
-import org.apache.xpath.XPathAPI;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Document;
@@ -56,7 +59,7 @@ public class ControlledVocabulary {
      *                                      TODO: add some caching !
      */
     public static ControlledVocabulary loadVocabulary(String fileName)
-        throws IOException, SAXException, ParserConfigurationException, TransformerException {
+        throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
         StringBuilder filePath = new StringBuilder();
         ConfigurationService configurationService
                 = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -70,7 +73,9 @@ public class ControlledVocabulary {
         if (controlledVocFile.exists()) {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.parse(controlledVocFile);
-            return loadVocabularyNode(XPathAPI.selectSingleNode(document, "node"), "");
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            Node node = (Node) xPath.compile("node").evaluate(document, XPathConstants.NODE);
+            return loadVocabularyNode(node, "");
         } else {
             return null;
         }
@@ -85,7 +90,8 @@ public class ControlledVocabulary {
      * @return a vocabulary node with all its children
      * @throws TransformerException should something go wrong with loading the xml
      */
-    private static ControlledVocabulary loadVocabularyNode(Node node, String initialValue) throws TransformerException {
+    private static ControlledVocabulary loadVocabularyNode(Node node, String initialValue)
+        throws XPathExpressionException {
         Node idNode = node.getAttributes().getNamedItem("id");
         String id = null;
         if (idNode != null) {
@@ -102,7 +108,9 @@ public class ControlledVocabulary {
         } else {
             value = label;
         }
-        NodeList subNodes = XPathAPI.selectNodeList(node, "isComposedBy/node");
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        NodeList subNodes = (NodeList) xPath.compile("isComposedBy/node").evaluate(node,
+                                                                                   XPathConstants.NODESET);
 
         List<ControlledVocabulary> subVocabularies = new ArrayList<>(subNodes.getLength());
         for (int i = 0; i < subNodes.getLength(); i++) {
