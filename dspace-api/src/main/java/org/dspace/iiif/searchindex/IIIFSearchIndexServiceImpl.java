@@ -51,6 +51,25 @@ public class IIIFSearchIndexServiceImpl implements IIIFSearchIndexService {
     boolean isQuiet = true;
 
     @Override
+    public boolean checkStatus() {
+        String indexingService = configurationService.getProperty("iiif.search.index.service");
+        HttpClient httpclient = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(indexingService + "/status");
+        try {
+            HttpResponse response = httpclient.execute(httpGet);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (IOException e) {
+            log.warn(e.getMessage(), e);
+        }
+        // Should not reach this point
+        return false;
+    }
+
+    @Override
     public void setSkipList(List<String> skipList) {
         this.skipList = skipList;
     }

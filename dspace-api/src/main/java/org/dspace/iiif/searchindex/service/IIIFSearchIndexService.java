@@ -22,6 +22,13 @@ import org.dspace.core.Context;
 public interface IIIFSearchIndexService {
 
     /**
+     * Checks to see if the OCR processor service
+     * is running at the location specified in
+     * iiif.cfg.
+     */
+    boolean checkStatus();
+
+    /**
      * Set dso identifiers to skip.
      * @param skipList
      */

@@ -50,13 +50,12 @@ public class IIIFSearchIndexCLI {
 
         boolean iiifEnabled = configurationService.getBooleanProperty("iiif.enabled");
         if (!iiifEnabled) {
-            System.out.println("WARNING: IIIF is not enabled on this DSpace server.");
+            System.out.println("ERROR: IIIF is not enabled on this DSpace server.");
+            System.exit(1);
         }
 
         String action = "";
 
-        // default to not updating existing dimensions
-        //boolean force = false;
         // default to printing messages
         boolean isQuiet = false;
         // default to no limit
@@ -68,6 +67,16 @@ public class IIIFSearchIndexCLI {
         Context context = new Context();
         IIIFSearchIndexService iiifSearchIndexService = IIIFSearchIndexServiceFactoryImpl.getInstance()
                                                                                          .getIiifSearchIndexService();
+
+        if (!iiifSearchIndexService.checkStatus()) {
+            String serviceLocation = configurationService.getProperty("iiif.search.index.service");
+            System.out.println("\nERROR: The IIIF indexing service for OCR files was not found at the location\n" +
+                "specified in iiif.cfg: " + serviceLocation);
+            System.out.println("\nSee documentation for configuring and using the IIIF indexing service.");
+            System.out.println("\n<Link to the documentation here>\n");
+            System.exit(1);
+        }
+
 
         CommandLineParser parser = new DefaultParser();
 
@@ -254,7 +263,11 @@ public class IIIFSearchIndexCLI {
         }
 
         // Always print summary to standard out.
-        System.out.println(processed + " IIIF items were processed.");
+        if (action.contentEquals("delete")) {
+            System.out.println(processed + " items were removed from the IIIF search index.");
+        } else {
+            System.out.println(processed + " items were added to the IIIF search index.");
+        }
 
     }
 
