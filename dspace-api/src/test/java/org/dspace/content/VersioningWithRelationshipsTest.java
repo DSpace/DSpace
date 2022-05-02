@@ -27,10 +27,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.function.FailableRunnable;
+import org.apache.commons.lang3.function.FailableSupplier;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
@@ -46,6 +50,8 @@ import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.content.virtual.Collected;
+import org.dspace.content.virtual.VirtualMetadataConfiguration;
+import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
@@ -54,6 +60,7 @@ import org.dspace.versioning.service.VersioningService;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWithDatabase {
 
@@ -84,6 +91,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
     protected RelationshipType isMemberOfProject;
     protected RelationshipType isMemberOfOrgUnit;
     protected RelationshipType isIssueOfJournalVolume;
+    protected RelationshipType isProjectOfPerson;
 
     @Override
     @Before
@@ -167,6 +175,15 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
             context, journalVolumeEntityType, journalIssueEntityType,
             "isIssueOfJournalVolume", "isJournalVolumeOfIssue",
             null, null, 1, 1
+        )
+            .withCopyToLeft(false)
+            .withCopyToRight(false)
+            .build();
+
+        isProjectOfPerson = RelationshipTypeBuilder.createRelationshipTypeBuilder(
+            context, personEntityType, projectEntityType,
+            "isProjectOfPerson", "isPersonOfProject",
+            null, null, null, null
         )
             .withCopyToLeft(false)
             .withCopyToRight(false)
@@ -1530,7 +1547,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         }
     }
 
-    public void removeProject(Item newPublication, int place, List<Item> newProjects)
+    protected void removeProject(Item newPublication, int place, List<Item> newProjects)
             throws SQLException, AuthorizeException {
         List<Relationship> projectRels = relationshipService
                 .findByItemAndRelationshipType(context, newProjects.get(place), isProjectOfPublication, -1, -1, false)
@@ -1544,7 +1561,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         newProjects.remove(newProjects.get(place));
     }
 
-    public void moveProject(Item newPublication, int oldPlace, int newPlace, List<Item> newProjects)
+    protected void moveProject(Item newPublication, int oldPlace, int newPlace, List<Item> newProjects)
             throws SQLException, AuthorizeException {
         Item project = newProjects.get(oldPlace);
         List<Relationship> projectRels = relationshipService
@@ -1560,7 +1577,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         newProjects.add(newPlace, project);
     }
 
-    private void verifyProjectsMatch(Item originalPublication, List<Item> originalProjects,
+    protected void verifyProjectsMatch(Item originalPublication, List<Item> originalProjects,
                                      Item newPublication, List<Item> newProjects, boolean newPublicationArchived)
             throws SQLException {
 
@@ -1620,6 +1637,49 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
                 relationshipService.findByItem(context, newPublication, -1, -1, false, false),
                 containsInAnyOrder(listNewPublication)
         );
+    }
+
+    /**
+     * NOTE: If Spring bean classes would be created with the new keyword, nothing would be autowired.
+     */
+    protected <T> T createBean(Class<T> beanClass) throws Exception {
+        AutowireCapableBeanFactory factory = DSpaceServicesFactory.getInstance().getServiceManager()
+            .getApplicationContext().getAutowireCapableBeanFactory();
+
+        T bean = beanClass.getDeclaredConstructor().newInstance();
+
+        factory.autowireBean(bean);
+
+        return bean;
+    }
+
+    /**
+     * Run the given callback with a virtual metadata config that's different from virtual-metadata.xml,
+     * and clean up after the callback has terminated.
+     * @param configModifier lambda that generates the temporary virtual metadata config.
+     * @param callback the callback that will be executed with the temporary virtual metadata config.
+     */
+    protected void runWithVirtualMetadataConfig(// TODO is this config cached??
+        FailableSupplier<Map<String, HashMap<String, VirtualMetadataConfiguration>>, Exception> configModifier,
+        FailableRunnable<Exception> callback
+    ) throws Exception {
+        VirtualMetadataPopulator virtualMetadataPopulator = DSpaceServicesFactory.getInstance()
+            .getServiceManager().getServicesByType(VirtualMetadataPopulator.class).get(0);
+
+        // keep reference to old config
+        Map<String, HashMap<String, VirtualMetadataConfiguration>> oldConfig = virtualMetadataPopulator.getMap();
+
+        try {
+            // set new config
+            Map<String, HashMap<String, VirtualMetadataConfiguration>> newConfig = configModifier.get();
+            virtualMetadataPopulator.setMap(newConfig);
+
+            // run the callback
+            callback.run();
+        } finally {
+            // reset handlers
+            virtualMetadataPopulator.setMap(oldConfig);
+        }
     }
 
     @Test
@@ -2043,6 +2103,878 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         /////////////////////////////
 
         issueVmd.setUseForPlace(ogIssueVmdUseForPlace);
+    }
+
+    @Test
+    public void test_placeRecalculationAfterDelete_complex() throws Exception {
+        runWithVirtualMetadataConfig(
+            () -> {
+                // config summary:
+                // on the Project items, metadata field dc.contributor.author will appear with the Authors' titles
+                // on the Person items, metadata field dc.relation will appear with the Projects' titles
+
+                Collected dcRelation = createBean(Collected.class);
+                dcRelation.setFields(List.of("dc.title"));
+                dcRelation.setUseForPlace(true);
+
+                Collected dcContributorAuthor = createBean(Collected.class);
+                dcContributorAuthor.setFields(List.of("dc.title"));
+                dcContributorAuthor.setUseForPlace(true);
+
+                return Map.of(
+                    "isProjectOfPerson", new HashMap<>(Map.of(
+                        "dc.relation", dcRelation
+                    )),
+                    "isPersonOfProject", new HashMap<>(Map.of(
+                        "dc.contributor.author", dcContributorAuthor
+                    ))
+                );
+            },
+            () -> {
+                //////////////////
+                // create items //
+                //////////////////
+
+                // person 1.1
+                Item pe1_1 = ItemBuilder.createItem(context, collection)
+                    .withTitle("person 1 (item)")
+                    .withMetadata("dspace", "entity", "type", personEntityType.getLabel())
+                    .build();
+
+                // person 3.1
+                Item pe3_1 = ItemBuilder.createItem(context, collection)
+                    .withTitle("person 3 (item)")
+                    .withMetadata("dspace", "entity", "type", personEntityType.getLabel())
+                    .build();
+
+                // person 5.1
+                Item pe5_1 = ItemBuilder.createItem(context, collection)
+                    .withTitle("person 5 (item)")
+                    .withMetadata("dspace", "entity", "type", personEntityType.getLabel())
+                    .build();
+
+                // project 1.1
+                Item pr1_1 = ItemBuilder.createItem(context, collection)
+                    .withTitle("project 1 (item)")
+                    .withMetadata("dspace", "entity", "type", projectEntityType.getLabel())
+                    .build();
+
+                // project 3.1
+                Item pr3_1 = ItemBuilder.createItem(context, collection)
+                    .withTitle("project 3 (item)")
+                    .withMetadata("dspace", "entity", "type", projectEntityType.getLabel())
+                    .build();
+
+                // project 5.1
+                Item pr5_1 = ItemBuilder.createItem(context, collection)
+                    .withTitle("project 5 (item)")
+                    .withMetadata("dspace", "entity", "type", projectEntityType.getLabel())
+                    .build();
+
+                //////////////////////////////////////////////
+                // create relationships and metadata values //
+                //////////////////////////////////////////////
+
+                // relationship - person 3 & project 1
+                RelationshipBuilder.createRelationshipBuilder(context, pe3_1, pr1_1, isProjectOfPerson)
+                    .build();
+
+                // metadata - person 3 & project 2
+                itemService.addMetadata(context, pe3_1, "dc", "relation", null, null, "project 2 (mdv)");
+
+                // relationship - person 1 & project 3
+                RelationshipBuilder.createRelationshipBuilder(context, pe1_1, pr3_1, isProjectOfPerson)
+                    .build();
+
+                // metadata - person 2 & project 3
+                itemService.addMetadata(context, pr3_1, "dc", "contributor", "author", null, "person 2 (mdv)");
+
+                // relationship - person 3 & project 3
+                RelationshipBuilder.createRelationshipBuilder(context, pe3_1, pr3_1, isProjectOfPerson)
+                    .build();
+
+                // metadata - person 4 & project 3
+                itemService.addMetadata(context, pr3_1, "dc", "contributor", "author", null, "person 4 (mdv)");
+
+                // relationship - person 5 & project 3
+                RelationshipBuilder.createRelationshipBuilder(context, pe5_1, pr3_1, isProjectOfPerson)
+                    .build();
+
+                // metadata - person 6 & project 3
+                itemService.addMetadata(context, pr3_1, "dc", "contributor", "author", null, "person 6 (mdv)");
+
+                // metadata - person 7 & project 5
+                itemService.addMetadata(context, pr5_1, "dc", "contributor", "author", null, "person 7 (mdv)");
+
+                // relationship - person 5 & project 5
+                RelationshipBuilder.createRelationshipBuilder(context, pe5_1, pr5_1, isProjectOfPerson)
+                    .build();
+
+                // metadata - person 3 & project 4
+                itemService.addMetadata(context, pe3_1, "dc", "relation", null, null, "project 4 (mdv)");
+
+                // relationship - person 3 & project 5
+                RelationshipBuilder.createRelationshipBuilder(context, pe3_1, pr5_1, isProjectOfPerson)
+                    .build();
+
+                // metadata - person 3 & project 6
+                itemService.addMetadata(context, pe3_1, "dc", "relation", null, null, "project 6 (mdv)");
+
+                // SUMMARY
+                //
+                // person 3
+                // - pos 0: project 1 (item)
+                // - pos 1: project 2 (mdv)
+                // - pos 2: project 3 (item)     [A]
+                // - pos 3: project 4 (mdv)
+                // - pos 4: project 5 (item)     [B]
+                // - pos 5: project 6 (mdv)
+                //
+                // project 3
+                // - pos 0: person 1 (item)
+                // - pos 1: person 2 (mdv)
+                // - pos 2: person 3 (item)    [A]
+                // - pos 3: person 4 (mdv)
+                // - pos 4: person 5 (item)
+                // - pos 5: person 6 (mdv)
+                //
+                // project 5
+                // - pos 0: person 7 (mdv)
+                // - pos 1: person 5 (item)
+                // - pos 2: person 3 (item)    [B]
+
+                /////////////////////////////////
+                // initial - verify person 3.1 //
+                /////////////////////////////////
+
+                List<MetadataValue> mdvs1 = itemService.getMetadata(
+                    pe3_1, "dc", "relation", null, Item.ANY
+                );
+                assertEquals(6, mdvs1.size());
+
+                assertTrue(mdvs1.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("project 1 (item)", mdvs1.get(0).getValue());
+                assertEquals(0, mdvs1.get(0).getPlace());
+
+                assertFalse(mdvs1.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("project 2 (mdv)", mdvs1.get(1).getValue());
+                assertEquals(1, mdvs1.get(1).getPlace());
+
+                assertTrue(mdvs1.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("project 3 (item)", mdvs1.get(2).getValue());
+                assertEquals(2, mdvs1.get(2).getPlace());
+
+                assertFalse(mdvs1.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("project 4 (mdv)", mdvs1.get(3).getValue());
+                assertEquals(3, mdvs1.get(3).getPlace());
+
+                assertTrue(mdvs1.get(4) instanceof RelationshipMetadataValue);
+                assertEquals("project 5 (item)", mdvs1.get(4).getValue());
+                assertEquals(4, mdvs1.get(4).getPlace());
+
+                assertFalse(mdvs1.get(5) instanceof RelationshipMetadataValue);
+                assertEquals("project 6 (mdv)", mdvs1.get(5).getValue());
+                assertEquals(5, mdvs1.get(5).getPlace());
+
+                //////////////////////////////////
+                // initial - verify project 3.1 //
+                //////////////////////////////////
+
+                List<MetadataValue> mdvs2 = itemService.getMetadata(
+                    pr3_1, "dc", "contributor", "author", Item.ANY
+                );
+                assertEquals(6, mdvs2.size());
+
+                assertTrue(mdvs2.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("person 1 (item)", mdvs2.get(0).getValue());
+                assertEquals(0, mdvs2.get(0).getPlace());
+
+                assertFalse(mdvs2.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("person 2 (mdv)", mdvs2.get(1).getValue());
+                assertEquals(1, mdvs2.get(1).getPlace());
+
+                assertTrue(mdvs2.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("person 3 (item)", mdvs2.get(2).getValue());
+                assertEquals(2, mdvs2.get(2).getPlace());
+
+                assertFalse(mdvs2.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("person 4 (mdv)", mdvs2.get(3).getValue());
+                assertEquals(3, mdvs2.get(3).getPlace());
+
+                assertTrue(mdvs2.get(4) instanceof RelationshipMetadataValue);
+                assertEquals("person 5 (item)", mdvs2.get(4).getValue());
+                assertEquals(4, mdvs2.get(4).getPlace());
+
+                assertFalse(mdvs2.get(5) instanceof RelationshipMetadataValue);
+                assertEquals("person 6 (mdv)", mdvs2.get(5).getValue());
+                assertEquals(5, mdvs2.get(5).getPlace());
+
+                //////////////////////////////////
+                // initial - verify project 5.1 //
+                //////////////////////////////////
+
+                List<MetadataValue> mdvs3 = itemService.getMetadata(
+                    pr5_1, "dc", "contributor", "author", Item.ANY
+                );
+                assertEquals(3, mdvs3.size());
+
+                assertFalse(mdvs3.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("person 7 (mdv)", mdvs3.get(0).getValue());
+                assertEquals(0, mdvs3.get(0).getPlace());
+
+                assertTrue(mdvs3.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("person 5 (item)", mdvs3.get(1).getValue());
+                assertEquals(1, mdvs3.get(1).getPlace());
+
+                assertTrue(mdvs3.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("person 3 (item)", mdvs3.get(2).getValue());
+                assertEquals(2, mdvs3.get(2).getPlace());
+
+                /////////////////////////////////////
+                // create new version - person 3.2 //
+                /////////////////////////////////////
+
+                Item pe3_2 = versioningService.createNewVersion(context, pe3_1).getItem();
+                installItemService.installItem(context, workspaceItemService.findByItem(context, pe3_2));
+                context.commit();
+
+                //////////////////////////////////////
+                // create new version - project 3.2 //
+                //////////////////////////////////////
+
+                Item pr3_2 = versioningService.createNewVersion(context, pr3_1).getItem();
+                installItemService.installItem(context, workspaceItemService.findByItem(context, pr3_2));
+                context.commit();
+
+                ////////////////////////////////////////////////
+                // after version creation - verify person 3.1 //
+                ////////////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pe3_1, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe3_1, isProjectOfPerson, pr1_1, RIGHT_ONLY, 0, 0),
+                        isRel(pe3_1, isProjectOfPerson, pr3_1, RIGHT_ONLY, 2, 2),
+                        isRel(pe3_1, isProjectOfPerson, pr5_1, RIGHT_ONLY, 4, 2)
+                    ))
+                );
+
+                List<MetadataValue> mdvs4 = itemService.getMetadata(
+                    pe3_1, "dc", "relation", null, Item.ANY
+                );
+                assertEquals(6, mdvs4.size());
+
+                assertTrue(mdvs4.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("project 1 (item)", mdvs4.get(0).getValue());
+                assertEquals(0, mdvs4.get(0).getPlace());
+
+                assertFalse(mdvs4.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("project 2 (mdv)", mdvs4.get(1).getValue());
+                assertEquals(1, mdvs4.get(1).getPlace());
+
+                assertTrue(mdvs4.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("project 3 (item)", mdvs4.get(2).getValue());
+                assertEquals(2, mdvs4.get(2).getPlace());
+
+                assertFalse(mdvs4.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("project 4 (mdv)", mdvs4.get(3).getValue());
+                assertEquals(3, mdvs4.get(3).getPlace());
+
+                assertTrue(mdvs4.get(4) instanceof RelationshipMetadataValue);
+                assertEquals("project 5 (item)", mdvs4.get(4).getValue());
+                assertEquals(4, mdvs4.get(4).getPlace());
+
+                assertFalse(mdvs4.get(5) instanceof RelationshipMetadataValue);
+                assertEquals("project 6 (mdv)", mdvs4.get(5).getValue());
+                assertEquals(5, mdvs4.get(5).getPlace());
+
+                /////////////////////////////////////////////////
+                // after version creation - verify project 3.1 //
+                /////////////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pr3_1, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe1_1, isProjectOfPerson, pr3_1, LEFT_ONLY, 0, 0),
+                        isRel(pe3_1, isProjectOfPerson, pr3_1, RIGHT_ONLY, 2, 2),
+                        isRel(pe5_1, isProjectOfPerson, pr3_1, LEFT_ONLY, 0, 4),
+                        isRel(pe3_2, isProjectOfPerson, pr3_1, LEFT_ONLY, 2, 2)
+                    ))
+                );
+
+                List<MetadataValue> mdvs5 = itemService.getMetadata(
+                    pr3_1, "dc", "contributor", "author", Item.ANY
+                );
+                assertEquals(6, mdvs5.size());
+
+                assertTrue(mdvs5.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("person 1 (item)", mdvs5.get(0).getValue());
+                assertEquals(0, mdvs5.get(0).getPlace());
+
+                assertFalse(mdvs5.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("person 2 (mdv)", mdvs5.get(1).getValue());
+                assertEquals(1, mdvs5.get(1).getPlace());
+
+                assertTrue(mdvs5.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("person 3 (item)", mdvs5.get(2).getValue());
+                assertEquals(2, mdvs5.get(2).getPlace());
+
+                assertFalse(mdvs5.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("person 4 (mdv)", mdvs5.get(3).getValue());
+                assertEquals(3, mdvs5.get(3).getPlace());
+
+                assertTrue(mdvs5.get(4) instanceof RelationshipMetadataValue);
+                assertEquals("person 5 (item)", mdvs5.get(4).getValue());
+                assertEquals(4, mdvs5.get(4).getPlace());
+
+                assertFalse(mdvs5.get(5) instanceof RelationshipMetadataValue);
+                assertEquals("person 6 (mdv)", mdvs5.get(5).getValue());
+                assertEquals(5, mdvs5.get(5).getPlace());
+
+                /////////////////////////////////////////////////
+                // after version creation - verify project 5.1 //
+                /////////////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pr5_1, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe5_1, isProjectOfPerson, pr5_1, BOTH, 1, 1),
+                        isRel(pe3_1, isProjectOfPerson, pr5_1, RIGHT_ONLY, 4, 2),
+                        isRel(pe3_2, isProjectOfPerson, pr5_1, BOTH, 4, 2)
+                    ))
+                );
+
+                List<MetadataValue> mdvs6 = itemService.getMetadata(
+                    pr5_1, "dc", "contributor", "author", Item.ANY
+                );
+                assertEquals(3, mdvs6.size());
+
+                assertFalse(mdvs6.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("person 7 (mdv)", mdvs6.get(0).getValue());
+                assertEquals(0, mdvs6.get(0).getPlace());
+
+                assertTrue(mdvs6.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("person 5 (item)", mdvs6.get(1).getValue());
+                assertEquals(1, mdvs6.get(1).getPlace());
+
+                assertTrue(mdvs6.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("person 3 (item)", mdvs6.get(2).getValue());
+                assertEquals(2, mdvs6.get(2).getPlace());
+
+                ////////////////////////////////////////////////
+                // after version creation - verify volume 3.2 //
+                ////////////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pe3_2, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe3_2, isProjectOfPerson, pr1_1, BOTH, 0, 0),
+                        isRel(pe3_2, isProjectOfPerson, pr3_1, LEFT_ONLY, 2, 2),
+                        isRel(pe3_2, isProjectOfPerson, pr3_2, BOTH, 2, 2),
+                        isRel(pe3_2, isProjectOfPerson, pr5_1, BOTH, 4, 2)
+                    ))
+                );
+
+                List<MetadataValue> mdvs7 = itemService.getMetadata(
+                    pe3_2, "dc", "relation", null, Item.ANY
+                );
+                assertEquals(6, mdvs7.size());
+
+                assertTrue(mdvs7.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("project 1 (item)", mdvs7.get(0).getValue());
+                assertEquals(0, mdvs7.get(0).getPlace());
+
+                assertFalse(mdvs7.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("project 2 (mdv)", mdvs7.get(1).getValue());
+                assertEquals(1, mdvs7.get(1).getPlace());
+
+                assertTrue(mdvs7.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("project 3 (item)", mdvs7.get(2).getValue());
+                assertEquals(2, mdvs7.get(2).getPlace());
+
+                assertFalse(mdvs7.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("project 4 (mdv)", mdvs7.get(3).getValue());
+                assertEquals(3, mdvs7.get(3).getPlace());
+
+                assertTrue(mdvs7.get(4) instanceof RelationshipMetadataValue);
+                assertEquals("project 5 (item)", mdvs7.get(4).getValue());
+                assertEquals(4, mdvs7.get(4).getPlace());
+
+                assertFalse(mdvs7.get(5) instanceof RelationshipMetadataValue);
+                assertEquals("project 6 (mdv)", mdvs7.get(5).getValue());
+                assertEquals(5, mdvs7.get(5).getPlace());
+
+                /////////////////////////////////////////////////
+                // after version creation - verify project 3.2 //
+                /////////////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pr3_2, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe1_1, isProjectOfPerson, pr3_2, BOTH, 0, 0),
+                        isRel(pe5_1, isProjectOfPerson, pr3_2, BOTH, 0, 4),
+                        isRel(pe3_2, isProjectOfPerson, pr3_2, BOTH, 2, 2)
+                    ))
+                );
+
+                List<MetadataValue> mdvs8 = itemService.getMetadata(
+                    pr3_2, "dc", "contributor", "author", Item.ANY
+                );
+                assertEquals(6, mdvs8.size());
+
+                assertTrue(mdvs8.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("person 1 (item)", mdvs8.get(0).getValue());
+                assertEquals(0, mdvs8.get(0).getPlace());
+
+                assertFalse(mdvs8.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("person 2 (mdv)", mdvs8.get(1).getValue());
+                assertEquals(1, mdvs8.get(1).getPlace());
+
+                assertTrue(mdvs8.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("person 3 (item)", mdvs8.get(2).getValue());
+                assertEquals(2, mdvs8.get(2).getPlace());
+
+                assertFalse(mdvs8.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("person 4 (mdv)", mdvs8.get(3).getValue());
+                assertEquals(3, mdvs8.get(3).getPlace());
+
+                assertTrue(mdvs8.get(4) instanceof RelationshipMetadataValue);
+                assertEquals("person 5 (item)", mdvs8.get(4).getValue());
+                assertEquals(4, mdvs8.get(4).getPlace());
+
+                assertFalse(mdvs8.get(5) instanceof RelationshipMetadataValue);
+                assertEquals("person 6 (mdv)", mdvs8.get(5).getValue());
+                assertEquals(5, mdvs8.get(5).getPlace());
+
+                ////////////////////////////////////////////////////
+                // remove relationship - person 3.2 & project 3.2 //
+                ////////////////////////////////////////////////////
+
+                Relationship rel1 = getRelationship(pe3_2, isProjectOfPerson, pr3_2);
+                assertNotNull(rel1);
+
+                relationshipService.delete(context, rel1, false, false);
+                context.commit();
+
+                ////////////////////////////////////
+                // after remove 1 - cache busting //
+                ////////////////////////////////////
+
+                pe3_2.setMetadataModified();
+                pe3_2 = context.reloadEntity(pe3_2);
+
+                pr3_2.setMetadataModified();
+                pr3_2 = context.reloadEntity(pr3_2);
+
+                ////////////////////////////////////////
+                // after remove 1 - verify person 3.1 //
+                ////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pe3_1, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe3_1, isProjectOfPerson, pr1_1, RIGHT_ONLY, 0, 0),
+                        isRel(pe3_1, isProjectOfPerson, pr3_1, RIGHT_ONLY, 2, 2),
+                        isRel(pe3_1, isProjectOfPerson, pr5_1, RIGHT_ONLY, 4, 2)
+                    ))
+                );
+
+                List<MetadataValue> mdvs9 = itemService.getMetadata(
+                    pe3_1, "dc", "relation", null, Item.ANY
+                );
+                assertEquals(6, mdvs9.size());
+
+                assertTrue(mdvs9.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("project 1 (item)", mdvs9.get(0).getValue());
+                assertEquals(0, mdvs9.get(0).getPlace());
+
+                assertFalse(mdvs9.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("project 2 (mdv)", mdvs9.get(1).getValue());
+                assertEquals(1, mdvs9.get(1).getPlace());
+
+                assertTrue(mdvs9.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("project 3 (item)", mdvs9.get(2).getValue());
+                assertEquals(2, mdvs9.get(2).getPlace());
+
+                assertFalse(mdvs9.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("project 4 (mdv)", mdvs9.get(3).getValue());
+                assertEquals(3, mdvs9.get(3).getPlace());
+
+                assertTrue(mdvs9.get(4) instanceof RelationshipMetadataValue);
+                assertEquals("project 5 (item)", mdvs9.get(4).getValue());
+                assertEquals(4, mdvs9.get(4).getPlace());
+
+                assertFalse(mdvs9.get(5) instanceof RelationshipMetadataValue);
+                assertEquals("project 6 (mdv)", mdvs9.get(5).getValue());
+                assertEquals(5, mdvs9.get(5).getPlace());
+
+                /////////////////////////////////////////
+                // after remove 1 - verify project 3.1 //
+                /////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pr3_1, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe1_1, isProjectOfPerson, pr3_1, LEFT_ONLY, 0, 0),
+                        isRel(pe3_1, isProjectOfPerson, pr3_1, RIGHT_ONLY, 2, 2),
+                        isRel(pe3_2, isProjectOfPerson, pr3_1, LEFT_ONLY, 2, 2),
+                        isRel(pe5_1, isProjectOfPerson, pr3_1, LEFT_ONLY, 0, 4)
+                    ))
+                );
+
+                List<MetadataValue> mdvs10 = itemService.getMetadata(
+                    pr3_1, "dc", "contributor", "author", Item.ANY
+                );
+                assertEquals(6, mdvs10.size());
+
+                assertTrue(mdvs10.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("person 1 (item)", mdvs10.get(0).getValue());
+                assertEquals(0, mdvs10.get(0).getPlace());
+
+                assertFalse(mdvs10.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("person 2 (mdv)", mdvs10.get(1).getValue());
+                assertEquals(1, mdvs10.get(1).getPlace());
+
+                assertTrue(mdvs10.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("person 3 (item)", mdvs10.get(2).getValue());
+                assertEquals(2, mdvs10.get(2).getPlace());
+
+                assertFalse(mdvs10.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("person 4 (mdv)", mdvs10.get(3).getValue());
+                assertEquals(3, mdvs10.get(3).getPlace());
+
+                assertTrue(mdvs10.get(4) instanceof RelationshipMetadataValue);
+                assertEquals("person 5 (item)", mdvs10.get(4).getValue());
+                assertEquals(4, mdvs10.get(4).getPlace());
+
+                assertFalse(mdvs10.get(5) instanceof RelationshipMetadataValue);
+                assertEquals("person 6 (mdv)", mdvs10.get(5).getValue());
+                assertEquals(5, mdvs10.get(5).getPlace());
+
+                /////////////////////////////////////////
+                // after remove 1 - verify project 5.1 //
+                /////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pr5_1, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe5_1, isProjectOfPerson, pr5_1, BOTH, 1, 1),
+                        isRel(pe3_1, isProjectOfPerson, pr5_1, RIGHT_ONLY, 4, 2),
+                        // NOTE: left place was reduced by one
+                        isRel(pe3_2, isProjectOfPerson, pr5_1, BOTH, 3, 2)
+                    ))
+                );
+
+                List<MetadataValue> mdvs11 = itemService.getMetadata(
+                    pr5_1, "dc", "contributor", "author", Item.ANY
+                );
+                assertEquals(3, mdvs11.size());
+
+                assertFalse(mdvs11.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("person 7 (mdv)", mdvs11.get(0).getValue());
+                assertEquals(0, mdvs11.get(0).getPlace());
+
+                assertTrue(mdvs11.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("person 5 (item)", mdvs11.get(1).getValue());
+                assertEquals(1, mdvs11.get(1).getPlace());
+
+                assertTrue(mdvs11.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("person 3 (item)", mdvs11.get(2).getValue());
+                assertEquals(2, mdvs11.get(2).getPlace());
+
+                ////////////////////////////////////////
+                // after remove 1 - verify person 3.2 //
+                ////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pe3_2, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe3_2, isProjectOfPerson, pr1_1, BOTH, 0, 0),
+                        isRel(pe3_2, isProjectOfPerson, pr3_1, LEFT_ONLY, 2, 2),
+                        // NOTE: left place was reduced by one
+                        isRel(pe3_2, isProjectOfPerson, pr5_1, BOTH, 3, 2)
+                    ))
+                );
+
+                List<MetadataValue> mdvs12 = itemService.getMetadata(
+                    pe3_2, "dc", "relation", null, Item.ANY
+                );
+                assertEquals(5, mdvs12.size());
+
+                assertTrue(mdvs12.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("project 1 (item)", mdvs12.get(0).getValue());
+                assertEquals(0, mdvs12.get(0).getPlace());
+
+                assertFalse(mdvs12.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("project 2 (mdv)", mdvs12.get(1).getValue());
+                assertEquals(1, mdvs12.get(1).getPlace());
+
+                assertFalse(mdvs12.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("project 4 (mdv)", mdvs12.get(2).getValue());
+                assertEquals(2, mdvs12.get(2).getPlace());
+
+                assertTrue(mdvs12.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("project 5 (item)", mdvs12.get(3).getValue());
+                assertEquals(3, mdvs12.get(3).getPlace());
+
+                assertFalse(mdvs12.get(4) instanceof RelationshipMetadataValue);
+                assertEquals("project 6 (mdv)", mdvs12.get(4).getValue());
+                assertEquals(4, mdvs12.get(4).getPlace());
+
+                /////////////////////////////////////////
+                // after remove 1 - verify project 3.2 //
+                /////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pr3_2, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe1_1, isProjectOfPerson, pr3_2, BOTH, 0, 0),
+                        // NOTE: right place was reduced by one
+                        isRel(pe5_1, isProjectOfPerson, pr3_2, BOTH, 0, 3)
+                    ))
+                );
+
+                List<MetadataValue> mdvs13 = itemService.getMetadata(
+                    pr3_2, "dc", "contributor", "author", Item.ANY
+                );
+                assertEquals(5, mdvs13.size());
+
+                assertTrue(mdvs13.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("person 1 (item)", mdvs13.get(0).getValue());
+                assertEquals(0, mdvs13.get(0).getPlace());
+
+                assertFalse(mdvs13.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("person 2 (mdv)", mdvs13.get(1).getValue());
+                assertEquals(1, mdvs13.get(1).getPlace());
+
+                assertFalse(mdvs13.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("person 4 (mdv)", mdvs13.get(2).getValue());
+                assertEquals(2, mdvs13.get(2).getPlace());
+
+                assertTrue(mdvs13.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("person 5 (item)", mdvs13.get(3).getValue());
+                assertEquals(3, mdvs13.get(3).getPlace());
+
+                assertFalse(mdvs13.get(4) instanceof RelationshipMetadataValue);
+                assertEquals("person 6 (mdv)", mdvs13.get(4).getValue());
+                assertEquals(4, mdvs13.get(4).getPlace());
+
+                ////////////////////////////////////////
+                // remove metadata value - person 3.2 //
+                ////////////////////////////////////////
+
+                MetadataValue removeMdv1 = mdvs12.get(2);
+
+                // let's make sure we have the metadata value that we intended to remove
+                assertFalse(removeMdv1 instanceof RelationshipMetadataValue);
+                assertEquals("project 4 (mdv)", removeMdv1.getValue());
+                assertEquals(2, removeMdv1.getPlace());
+                assertEquals(pe3_2, removeMdv1.getDSpaceObject());
+
+                itemService.removeMetadataValues(context, pe3_2, List.of(removeMdv1));
+                itemService.update(context, pe3_2);
+                context.commit();
+
+                // TODO cache busting?
+
+                ////////////////////////////////////////
+                // after remove 2 - verify person 3.1 //
+                ////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pe3_1, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe3_1, isProjectOfPerson, pr1_1, RIGHT_ONLY, 0, 0),
+                        isRel(pe3_1, isProjectOfPerson, pr3_1, RIGHT_ONLY, 2, 2),
+                        isRel(pe3_1, isProjectOfPerson, pr5_1, RIGHT_ONLY, 4, 2)
+                    ))
+                );
+
+                List<MetadataValue> mdvs14 = itemService.getMetadata(
+                    pe3_1, "dc", "relation", null, Item.ANY
+                );
+                assertEquals(6, mdvs14.size());
+
+                assertTrue(mdvs14.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("project 1 (item)", mdvs14.get(0).getValue());
+                assertEquals(0, mdvs14.get(0).getPlace());
+
+                assertFalse(mdvs14.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("project 2 (mdv)", mdvs14.get(1).getValue());
+                assertEquals(1, mdvs14.get(1).getPlace());
+
+                assertTrue(mdvs14.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("project 3 (item)", mdvs14.get(2).getValue());
+                assertEquals(2, mdvs14.get(2).getPlace());
+
+                assertFalse(mdvs14.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("project 4 (mdv)", mdvs14.get(3).getValue());
+                assertEquals(3, mdvs14.get(3).getPlace());
+
+                assertTrue(mdvs14.get(4) instanceof RelationshipMetadataValue);
+                assertEquals("project 5 (item)", mdvs14.get(4).getValue());
+                assertEquals(4, mdvs14.get(4).getPlace());
+
+                assertFalse(mdvs14.get(5) instanceof RelationshipMetadataValue);
+                assertEquals("project 6 (mdv)", mdvs14.get(5).getValue());
+                assertEquals(5, mdvs14.get(5).getPlace());
+
+                /////////////////////////////////////////
+                // after remove 2 - verify project 3.1 //
+                /////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pr3_1, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe1_1, isProjectOfPerson, pr3_1, LEFT_ONLY, 0, 0),
+                        isRel(pe3_1, isProjectOfPerson, pr3_1, RIGHT_ONLY, 2, 2),
+                        isRel(pe3_2, isProjectOfPerson, pr3_1, LEFT_ONLY, 2, 2),
+                        isRel(pe5_1, isProjectOfPerson, pr3_1, LEFT_ONLY, 0, 4)
+                    ))
+                );
+
+                List<MetadataValue> mdvs15 = itemService.getMetadata(
+                    pr3_1, "dc", "contributor", "author", Item.ANY
+                );
+                assertEquals(6, mdvs15.size());
+
+                assertTrue(mdvs15.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("person 1 (item)", mdvs15.get(0).getValue());
+                assertEquals(0, mdvs15.get(0).getPlace());
+
+                assertFalse(mdvs15.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("person 2 (mdv)", mdvs15.get(1).getValue());
+                assertEquals(1, mdvs15.get(1).getPlace());
+
+                assertTrue(mdvs15.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("person 3 (item)", mdvs15.get(2).getValue());
+                assertEquals(2, mdvs15.get(2).getPlace());
+
+                assertFalse(mdvs15.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("person 4 (mdv)", mdvs15.get(3).getValue());
+                assertEquals(3, mdvs15.get(3).getPlace());
+
+                assertTrue(mdvs15.get(4) instanceof RelationshipMetadataValue);
+                assertEquals("person 5 (item)", mdvs15.get(4).getValue());
+                assertEquals(4, mdvs15.get(4).getPlace());
+
+                assertFalse(mdvs15.get(5) instanceof RelationshipMetadataValue);
+                assertEquals("person 6 (mdv)", mdvs15.get(5).getValue());
+                assertEquals(5, mdvs15.get(5).getPlace());
+
+                /////////////////////////////////////////
+                // after remove 2 - verify project 5.1 //
+                /////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pr5_1, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe5_1, isProjectOfPerson, pr5_1, BOTH, 1, 1),
+                        isRel(pe3_1, isProjectOfPerson, pr5_1, RIGHT_ONLY, 4, 2),
+                        // NOTE: left place was reduced by one
+                        isRel(pe3_2, isProjectOfPerson, pr5_1, BOTH, 2, 2)
+                    ))
+                );
+
+                List<MetadataValue> mdvs16 = itemService.getMetadata(
+                    pr5_1, "dc", "contributor", "author", Item.ANY
+                );
+                assertEquals(3, mdvs16.size());
+
+                assertFalse(mdvs16.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("person 7 (mdv)", mdvs16.get(0).getValue());
+                assertEquals(0, mdvs16.get(0).getPlace());
+
+                assertTrue(mdvs16.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("person 5 (item)", mdvs16.get(1).getValue());
+                assertEquals(1, mdvs16.get(1).getPlace());
+
+                assertTrue(mdvs16.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("person 3 (item)", mdvs16.get(2).getValue());
+                assertEquals(2, mdvs16.get(2).getPlace());
+
+                ////////////////////////////////////////
+                // after remove 2 - verify person 3.2 // TODO continue verifying here!!!
+                ////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pe3_2, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe3_2, isProjectOfPerson, pr1_1, BOTH, 0, 0),
+                        isRel(pe3_2, isProjectOfPerson, pr3_1, LEFT_ONLY, 2, 2),
+                        // NOTE: left place was reduced by one
+                        isRel(pe3_2, isProjectOfPerson, pr5_1, BOTH, 3, 2)
+                    ))
+                );
+
+                List<MetadataValue> mdvs17 = itemService.getMetadata(
+                    pe3_2, "dc", "relation", null, Item.ANY
+                );
+                assertEquals(5, mdvs17.size());
+
+                assertTrue(mdvs17.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("project 1 (item)", mdvs17.get(0).getValue());
+                assertEquals(0, mdvs17.get(0).getPlace());
+
+                assertFalse(mdvs17.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("project 2 (mdv)", mdvs17.get(1).getValue());
+                assertEquals(1, mdvs17.get(1).getPlace());
+
+                assertFalse(mdvs17.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("project 4 (mdv)", mdvs17.get(2).getValue());
+                assertEquals(2, mdvs17.get(2).getPlace());
+
+                assertTrue(mdvs17.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("project 5 (item)", mdvs17.get(3).getValue());
+                assertEquals(3, mdvs17.get(3).getPlace());
+
+                assertFalse(mdvs17.get(4) instanceof RelationshipMetadataValue);
+                assertEquals("project 6 (mdv)", mdvs17.get(4).getValue());
+                assertEquals(4, mdvs17.get(4).getPlace());
+
+                /////////////////////////////////////////
+                // after remove 2 - verify project 3.2 //
+                /////////////////////////////////////////
+
+                assertThat(
+                    relationshipService.findByItem(context, pr3_2, -1, -1, false, false),
+                    containsInAnyOrder(List.of(
+                        isRel(pe1_1, isProjectOfPerson, pr3_2, BOTH, 0, 0),
+                        // NOTE: right place was reduced by one
+                        isRel(pe5_1, isProjectOfPerson, pr3_2, BOTH, 0, 3)
+                    ))
+                );
+
+                List<MetadataValue> mdvs18 = itemService.getMetadata(
+                    pr3_2, "dc", "contributor", "author", Item.ANY
+                );
+                assertEquals(5, mdvs18.size());
+
+                assertTrue(mdvs18.get(0) instanceof RelationshipMetadataValue);
+                assertEquals("person 1 (item)", mdvs18.get(0).getValue());
+                assertEquals(0, mdvs18.get(0).getPlace());
+
+                assertFalse(mdvs18.get(1) instanceof RelationshipMetadataValue);
+                assertEquals("person 2 (mdv)", mdvs18.get(1).getValue());
+                assertEquals(1, mdvs18.get(1).getPlace());
+
+                assertFalse(mdvs18.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("person 4 (mdv)", mdvs18.get(2).getValue());
+                assertEquals(2, mdvs18.get(2).getPlace());
+
+                assertTrue(mdvs18.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("person 5 (item)", mdvs18.get(3).getValue());
+                assertEquals(3, mdvs18.get(3).getPlace());
+
+                assertFalse(mdvs18.get(4) instanceof RelationshipMetadataValue);
+                assertEquals("person 6 (mdv)", mdvs18.get(4).getValue());
+                assertEquals(4, mdvs18.get(4).getPlace());
+
+                // TODO
+                // delete mdv from older
+                // delete rel from older
+            }
+        );
     }
 
     @Test
