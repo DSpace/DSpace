@@ -10,7 +10,7 @@ package org.dspace.license;
 import java.io.IOException;
 import java.util.Map;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 
 /**
  * Service interface class for the Creative commons license connector service.

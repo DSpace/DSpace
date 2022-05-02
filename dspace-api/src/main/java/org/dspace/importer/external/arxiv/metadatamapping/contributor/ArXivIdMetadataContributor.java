@@ -9,10 +9,10 @@ package org.dspace.importer.external.arxiv.metadatamapping.contributor;
 
 import java.util.Collection;
 
-import org.apache.axiom.om.OMElement;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
 import org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor;
+import org.jdom2.Element;
 
 /**
  * Arxiv specific implementation of {@link MetadataContributor}
@@ -32,7 +32,7 @@ public class ArXivIdMetadataContributor extends SimpleXpathMetadatumContributor 
      * @return a collection of import records. Only the identifier of the found records may be put in the record.
      */
     @Override
-    public Collection<MetadatumDTO> contributeMetadata(OMElement t) {
+    public Collection<MetadatumDTO> contributeMetadata(Element t) {
         Collection<MetadatumDTO> values = super.contributeMetadata(t);
         parseValue(values);
         return values;

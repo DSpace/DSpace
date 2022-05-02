@@ -1,0 +1,13 @@
+﻿A Text Extraction Test Document
+for
+DSpace
+
+This is a text.  For the next sixty seconds this software will conduct a test of the DSpace text extraction facility.  This is only a text.
+
+This is a paragraph that followed the first that lived in the document that Jack built.
+
+Lorem ipsum dolor sit amet.  The quick brown fox jumped over the lazy dog.  Yow! Are we having fun yet?
+
+This has been a test of the DSpace text extraction system.  In the event of actual content you would care what is written here.
+
+Tip o’ the hat to the U.S. Emergency Broadcast System for the format that I have irreverently borrowed.

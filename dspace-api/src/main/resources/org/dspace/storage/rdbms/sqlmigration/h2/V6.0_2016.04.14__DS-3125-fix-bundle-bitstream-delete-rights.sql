@@ -17,7 +17,7 @@
 INSERT INTO resourcepolicy (policy_id, resource_type_id, resource_id, action_id, start_date, end_date, rpname,
 rptype, rpdescription, eperson_id, epersongroup_id, dspace_object)
 SELECT
-resourcepolicy_seq.nextval AS policy_id,
+NEXT VALUE FOR resourcepolicy_seq AS policy_id,
 resource_type_id,
 resource_id,
 -- Insert the Constants.DELETE action

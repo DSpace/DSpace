@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 /**
  * This class provides extra configuration for our Spring Boot Application
@@ -23,7 +22,6 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
  * @author Tim Donohue
  */
 @Configuration
-@EnableSpringDataWebSupport
 @ComponentScan( {"org.dspace.app.rest.converter", "org.dspace.app.rest.repository", "org.dspace.app.rest.utils",
         "org.dspace.app.configuration", "org.dspace.iiif", "org.dspace.app.iiif"})
 public class ApplicationConfig {
