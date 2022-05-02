@@ -245,13 +245,13 @@ insert into most_recent_checksum
 )
 select 
     bitstream.bitstream_id, 
-    '1', 
+    true,
     CASE WHEN bitstream.checksum IS NULL THEN '' ELSE bitstream.checksum END, 
     CASE WHEN bitstream.checksum IS NULL THEN '' ELSE bitstream.checksum END, 
     FORMATDATETIME(NOW(),'DD-MM-RRRR HH24:MI:SS'),
     FORMATDATETIME(NOW(),'DD-MM-RRRR HH24:MI:SS'),
     CASE WHEN bitstream.checksum_algorithm IS NULL THEN 'MD5' ELSE bitstream.checksum_algorithm END,
-    '1'
+    true
 from bitstream; 
 
 -- Update all the deleted checksums
@@ -263,7 +263,7 @@ update most_recent_checksum
 set to_be_processed = 0
 where most_recent_checksum.bitstream_id in (
 select bitstream_id
-from bitstream where deleted = '1' );
+from bitstream where deleted = true );
 
 -- this will insert into history table
 -- for the initial start 

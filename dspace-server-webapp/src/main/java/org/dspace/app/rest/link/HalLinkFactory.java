@@ -56,9 +56,7 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
     }
 
     protected Link buildLink(String rel, String href) {
-        Link link = new Link(href, rel);
-
-        return link;
+        return Link.of(href, rel);
     }
 
     protected CONTROLLER getMethodOn(Object... parameters) {

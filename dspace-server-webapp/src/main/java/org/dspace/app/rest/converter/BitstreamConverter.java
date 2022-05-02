@@ -15,7 +15,6 @@ import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
@@ -26,9 +25,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BitstreamConverter extends DSpaceObjectConverter<Bitstream, BitstreamRest> {
-
-    @Autowired
-    ConverterService converter;
 
     @Override
     public BitstreamRest convert(org.dspace.content.Bitstream obj, Projection projection) {

@@ -7,8 +7,10 @@
  */
 package org.dspace.importer.external.openaire.service;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -19,10 +21,6 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMXMLBuilderFactory;
-import org.apache.axiom.om.OMXMLParserWrapper;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -30,14 +28,21 @@ import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
-import org.jaxen.JaxenException;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 
 /**
  * Implements a data source for querying OpenAIRE
  *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
-public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement>
+public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Element>
         implements QuerySource {
 
     private String baseAddress;
@@ -205,9 +210,9 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
             Response response = invocationBuilder.get();
             if (response.getStatus() == 200) {
                 String responseString = response.readEntity(String.class);
-                List<OMElement> omElements = splitToRecords(responseString);
+                List<Element> omElements = splitToRecords(responseString);
                 if (omElements != null) {
-                    for (OMElement record : omElements) {
+                    for (Element record : omElements) {
                         results.add(filterMultipleTitles(transformSourceRecords(record)));
                     }
                 }
@@ -237,16 +242,17 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
             Response response = invocationBuilder.get();
             if (response.getStatus() == 200) {
                 String responseString = response.readEntity(String.class);
-                OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(responseString));
-                OMElement element = records.getDocumentElement();
-                AXIOMXPath xpath = null;
-                try {
-                    xpath = new AXIOMXPath("/response/header/total");
-                    OMElement totalItem = (OMElement) xpath.selectSingleNode(element);
-                    return totalItem != null ? Integer.parseInt(totalItem.getText()) : null;
-                } catch (JaxenException e) {
-                    return 0;
-                }
+
+                SAXBuilder saxBuilder = new SAXBuilder();
+                Document document = saxBuilder.build(new StringReader(responseString));
+                Element root = document.getRootElement();
+
+                XPathExpression<Element> xpath = XPathFactory.instance().compile("/header/total",
+                    Filters.element(), null);
+
+                Element totalItem = (Element) xpath.evaluateFirst(root);
+                return totalItem != null ? Integer.parseInt(totalItem.getText()) : null;
+
             } else {
                 return 0;
             }
@@ -282,9 +288,9 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
             Response response = invocationBuilder.get();
             if (response.getStatus() == 200) {
                 String responseString = response.readEntity(String.class);
-                List<OMElement> omElements = splitToRecords(responseString);
+                List<Element> omElements = splitToRecords(responseString);
                 if (omElements != null) {
-                    for (OMElement record : omElements) {
+                    for (Element record : omElements) {
                         results.add(filterMultipleTitles(transformSourceRecords(record)));
                     }
                 }
@@ -316,18 +322,23 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
         return new ImportRecord(nextSourceRecord);
     }
 
-    private List<OMElement> splitToRecords(String recordsSrc) {
-        OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(recordsSrc));
-        OMElement element = records.getDocumentElement();
-        AXIOMXPath xpath = null;
+    private List<Element> splitToRecords(String recordsSrc) {
+
         try {
-            xpath = new AXIOMXPath("/response/results/result");
-            xpath.addNamespace("dri", "http://www.driver-repository.eu/namespace/dri");
-            xpath.addNamespace("oaf", "http://namespace.openaire.eu/oaf");
-            xpath.addNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-            List<OMElement> recordsList = xpath.selectNodes(element);
+            SAXBuilder saxBuilder = new SAXBuilder();
+            Document document = saxBuilder.build(new StringReader(recordsSrc));
+            Element root = document.getRootElement();
+
+            List namespaces = Arrays.asList(
+                Namespace.getNamespace("dri", "http://www.driver-repository.eu/namespace/dri"),
+                Namespace.getNamespace("oaf", "http://namespace.openaire.eu/oaf"),
+                Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance"));
+            XPathExpression<Element> xpath = XPathFactory.instance().compile("/results/result",
+                Filters.element(), null, namespaces);
+
+            List<Element> recordsList = xpath.evaluate(root);
             return recordsList;
-        } catch (JaxenException e) {
+        } catch (JDOMException | IOException e) {
             return null;
         }
     }

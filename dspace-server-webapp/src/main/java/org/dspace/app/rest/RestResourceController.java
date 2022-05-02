@@ -127,7 +127,7 @@ public class RestResourceController implements InitializingBean {
             // Link l = linkTo(this.getClass(), r).withRel(r);
             String[] split = r.split("\\.", 2);
             String plural = English.plural(split[1]);
-            Link l = new Link("/api/" + split[0] + "/" + plural, plural);
+            Link l = Link.of("/api/" + split[0] + "/" + plural, plural);
             links.add(l);
             log.debug(l.getRel().value() + " " + l.getHref());
         }
@@ -821,7 +821,7 @@ public class RestResourceController implements InitializingBean {
                         link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath).withSelfRel();
                     }
 
-                    return new EntityModel(new EmbeddedPage(link.getHref(),
+                    return EntityModel.of(new EmbeddedPage(link.getHref(),
                             pageResult.map(converter::toResource), null, subpath));
                 } else {
                     RestModel object = (RestModel) linkMethod.invoke(linkRepository, request,
