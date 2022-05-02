@@ -50,4 +50,9 @@
         <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
     </bean>
 
+    <bean id="item-database-status" class="org.dspace.app.itemdbstatus.ItemDatabaseStatusCliScriptConfiguration">
+        <property name="description" value="Update the database status of Items in solr"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.itemdbstatus.ItemDatabaseStatusCli"/>
+    </bean>
+
 </beans>

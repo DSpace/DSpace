@@ -65,7 +65,7 @@ public class ItemDatabaseStatusCli extends DSpaceRunnable<ItemDatabaseStatusCliS
         indexingService = DSpaceServicesFactory.getInstance().getServiceManager()
                             .getServiceByName(IndexingService.class.getName(), IndexingService.class);
         solrSearchCore = DSpaceServicesFactory.getInstance().getServiceManager()
-                            .getServiceByName(SolrSearchCore.class.getName(), SolrSearchCore.class);
+                            .getServicesByType(SolrSearchCore.class).get(0);
         indexObjectServiceFactory = IndexObjectFactoryFactory.getInstance();
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     }
