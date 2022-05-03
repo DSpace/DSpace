@@ -37,7 +37,13 @@ using docker.
 
 4. Follow the instructions at [DRUM7DBMigration.md](./DRUM7DBMigration.md) to migrate DRUM's DSpace 6 DB dump to DSpace 7.
 
-5. Start all the containers
+5. Create the local configuration file
+
+    ```bash
+    cp dspace/config/local.cfg.TEMPLATE dspace/config/local.cfg
+    ```
+
+6. Start all the containers
 
     ```bash
     docker compose -p d7 up
