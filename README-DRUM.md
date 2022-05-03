@@ -13,7 +13,7 @@ The original DSpace documentation:
 
 ### Development Environment
 
-Instructions for building and running drum locally can be found at: [Drum7DockerDevelopmentEnvironment.md](dspace/docs/Drum7DockerDevelopmentEnvironment.md)
+Instructions for building and running drum locally can be found at: [Drum7DockerDevelopmentEnvironment.md](/dspace/docs/Drum7DockerDevelopmentEnvironment.md)
 
 ### Building Images for K8s Deployment
 
