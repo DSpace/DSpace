@@ -42,9 +42,9 @@ solr.authority.server=${solr.server}/drum-authority
 ##########################
 # DATABASE CONFIGURATION #
 ##########################
-db.url=jdbc:postgresql://dspacedb:5432/dspace
-db.username=dspace
-db.password=dspace
+db.url=jdbc:postgresql://dspacedb:5432/drum
+db.username=drum
+db.password=drum
 db.driver=org.postgresql.Driver
 
 #######################
