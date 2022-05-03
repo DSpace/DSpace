@@ -43,6 +43,7 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -130,6 +131,7 @@ public class OpenSearchController {
             queryArgs.setQuery(query);
             queryArgs.setStart(start);
             queryArgs.setMaxResults(count);
+            queryArgs.setDSpaceObjectFilter(IndexableItem.TYPE);
             if (sort != null) {
                 if (sortDirection == null || sortDirection.equals("DESC")) {
                     queryArgs.setSortField(sort + "_sort", SORT_ORDER.desc);
