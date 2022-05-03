@@ -1146,6 +1146,50 @@ prevent the generation of resource policy entry values with null dspace_object a
      * @throws AuthorizeException if authorization error
      *                            Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
+     */
+    @Override
+    public Iterator<Item> findArchivedByMetadataField(Context context,
+                                                      String schema, String element, String qualifier, String value)
+            throws SQLException, AuthorizeException {
+        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        if (mds == null) {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
+        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        if (mdf == null) {
+            throw new IllegalArgumentException(
+                    "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
+
+        if (Item.ANY.equals(value)) {
+            return itemDAO.findByMetadataField(context, mdf, null, true);
+        } else {
+            return itemDAO.findByMetadataField(context, mdf, value, true);
+        }
+    }
+
+    @Override
+    public Iterator<Item> findArchivedByMetadataField(Context context, String metadataField, String value)
+            throws SQLException, AuthorizeException {
+        String[] mdValueByField = getMDValueByField(metadataField);
+        return findArchivedByMetadataField(context, mdValueByField[0], mdValueByField[1], mdValueByField[2], value);
+    }
+
+    /**
+     * Returns an iterator of Items possessing the passed metadata field, or only
+     * those matching the passed value, if value is not Item.ANY
+     *
+     * @param context   DSpace context object
+     * @param schema    metadata field schema
+     * @param element   metadata field element
+     * @param qualifier metadata field qualifier
+     * @param value     field value or Item.ANY to match any value
+     * @return an iterator over the items matching that authority value
+     * @throws SQLException       if database error
+     *                            An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException if authorization error
+     *                            Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
      * @throws IOException        if IO error
      *                            A general class of exceptions produced by failed or interrupted I/O operations.
      */
@@ -1535,5 +1579,9 @@ prevent the generation of resource policy entry values with null dspace_object a
                 .stream().findFirst().orElse(null);
     }
 
+    @Override
+    public String getEntityType(Item item) {
+        return getMetadataFirstValue(item, new MetadataFieldName("dspace.entity.type"), Item.ANY);
+    }
 
 }

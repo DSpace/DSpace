@@ -21,6 +21,8 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.util.UUIDUtils;
 
 /**
+ * Implementation of {@link ChoiceAuthority} based on EPerson. Allows you to set
+ * the id of an eperson as authority.
  *
  * @author Mykhaylo Boychuk (4science.it)
  */
