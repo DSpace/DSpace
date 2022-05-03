@@ -280,7 +280,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
         item = installItemService.installItem(context, workspaceItem);
 
-        if (isNewProfilePrivateByDefault()) {
+        if (isNewProfileNotVisibleByDefault()) {
             Group anonymous = groupService.findByName(context, ANONYMOUS);
             authorizeService.removeGroupPolicies(context, item, anonymous);
         }
@@ -294,8 +294,8 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         return configurationService.getBooleanProperty("researcher-profile.hard-delete.enabled");
     }
 
-    private boolean isNewProfilePrivateByDefault() {
-        return configurationService.getBooleanProperty("researcher-profile.set-new-profile-private");
+    private boolean isNewProfileNotVisibleByDefault() {
+        return !configurationService.getBooleanProperty("researcher-profile.set-new-profile-visible");
     }
 
     private void removeOwnerMetadata(Context context, Item profileItem) throws SQLException {

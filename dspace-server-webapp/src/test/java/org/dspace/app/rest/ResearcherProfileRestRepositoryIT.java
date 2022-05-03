@@ -15,7 +15,9 @@ import static org.dspace.app.rest.matcher.HalMatcher.matchLinks;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataNotEmpty;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -43,8 +45,10 @@ import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.UUIDUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -60,6 +64,9 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ItemService itemService;
 
     private EPerson user;
 
@@ -259,7 +266,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     @Test
     public void testCreateAndReturnWithPublicProfile() throws Exception {
 
-        configurationService.setProperty("researcher-profile.set-new-profile-private", false);
+        configurationService.setProperty("researcher-profile.set-new-profile-visible", true);
         String id = user.getID().toString();
 
         String authToken = getAuthToken(user.getEmail(), password);
@@ -320,6 +327,30 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(jsonPath("$.visible", is(false)))
             .andExpect(jsonPath("$.type", is("profile")))
             .andExpect(jsonPath("$", matchLinks("http://localhost/api/eperson/profiles/" + id, "item", "eperson")));
+    }
+
+    @Test
+    public void testCreateAndReturnWithoutCollectionIdSet() throws Exception {
+
+        String id = user.getID().toString();
+
+        configurationService.setProperty("researcher-profile.collection.uuid", null);
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id", is(id)))
+            .andExpect(jsonPath("$.visible", is(false)))
+            .andExpect(jsonPath("$.type", is("profile")))
+            .andExpect(jsonPath("$", matchLinks("http://localhost/api/eperson/profiles/" + id, "item", "eperson")));
+
+        String itemId = getItemIdByProfileId(authToken, id);
+        Item profileItem = itemService.find(context, UUIDUtils.fromString(itemId));
+        assertThat(profileItem, notNullValue());
+        assertThat(profileItem.getOwningCollection(), is(personCollection));
+
     }
 
     /**
@@ -571,6 +602,11 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.visible", is(false)));
 
+        String itemId = getItemIdByProfileId(authToken, id);
+
+        getClient().perform(get("/api/core/items/{id}", itemId))
+            .andExpect(status().isUnauthorized());
+
         // change the visibility to true
         List<Operation> operations = asList(new ReplaceOperation("/visible", true));
 
@@ -584,6 +620,9 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.visible", is(true)));
 
+        getClient().perform(get("/api/core/items/{id}", itemId))
+            .andExpect(status().isOk());
+
         // change the visibility to false
         operations = asList(new ReplaceOperation("/visible", false));
 
@@ -596,6 +635,9 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         getClient(authToken).perform(get("/api/eperson/profiles/{id}", id))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.visible", is(false)));
+
+        getClient().perform(get("/api/core/items/{id}", itemId))
+            .andExpect(status().isUnauthorized());
 
     }
 

@@ -32,7 +32,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @AuthorizationFeatureDocumentation(name = CanClaimItemFeature.NAME,
-    description = "Used to verify if the given user can request the claim of an item")
+    description = "Used to verify if the current user is able to claim this item as their profile. "
+        + "Only available if the current item is not already claimed.")
 public class CanClaimItemFeature implements AuthorizationFeature {
 
     public static final String NAME = "canClaimItem";
