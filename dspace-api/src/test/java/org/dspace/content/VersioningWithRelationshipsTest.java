@@ -1659,7 +1659,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
      * @param configModifier lambda that generates the temporary virtual metadata config.
      * @param callback the callback that will be executed with the temporary virtual metadata config.
      */
-    protected void runWithVirtualMetadataConfig(// TODO is this config cached??
+    protected void runWithVirtualMetadataConfig(
         FailableSupplier<Map<String, HashMap<String, VirtualMetadataConfiguration>>, Exception> configModifier,
         FailableRunnable<Exception> callback
     ) throws Exception {
@@ -2691,7 +2691,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
                     containsInAnyOrder(List.of(
                         isRel(pe3_2, isProjectOfPerson, pr1_1, BOTH, 0, 0),
                         isRel(pe3_2, isProjectOfPerson, pr3_1, LEFT_ONLY, 2, 2),
-                        // NOTE: left place was reduced by one
+                        // NOTE: left place was reduced by one (from 4 to 3)
                         isRel(pe3_2, isProjectOfPerson, pr5_1, BOTH, 3, 2)
                     ))
                 );
@@ -2729,7 +2729,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
                     relationshipService.findByItem(context, pr3_2, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe1_1, isProjectOfPerson, pr3_2, BOTH, 0, 0),
-                        // NOTE: right place was reduced by one
+                        // NOTE: right place was reduced by one (from 4 to 3)
                         isRel(pe5_1, isProjectOfPerson, pr3_2, BOTH, 0, 3)
                     ))
                 );
@@ -2774,8 +2774,6 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
                 itemService.removeMetadataValues(context, pe3_2, List.of(removeMdv1));
                 itemService.update(context, pe3_2);
                 context.commit();
-
-                // TODO cache busting?
 
                 ////////////////////////////////////////
                 // after remove 2 - verify person 3.1 //
@@ -2894,7 +2892,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
                 assertEquals(2, mdvs16.get(2).getPlace());
 
                 ////////////////////////////////////////
-                // after remove 2 - verify person 3.2 // TODO continue verifying here!!!
+                // after remove 2 - verify person 3.2 //
                 ////////////////////////////////////////
 
                 assertThat(
@@ -2902,15 +2900,15 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
                     containsInAnyOrder(List.of(
                         isRel(pe3_2, isProjectOfPerson, pr1_1, BOTH, 0, 0),
                         isRel(pe3_2, isProjectOfPerson, pr3_1, LEFT_ONLY, 2, 2),
-                        // NOTE: left place was reduced by one
-                        isRel(pe3_2, isProjectOfPerson, pr5_1, BOTH, 3, 2)
+                        // NOTE: left place was reduced by one (from 3 to 2)
+                        isRel(pe3_2, isProjectOfPerson, pr5_1, BOTH, 2, 2)
                     ))
                 );
 
                 List<MetadataValue> mdvs17 = itemService.getMetadata(
                     pe3_2, "dc", "relation", null, Item.ANY
                 );
-                assertEquals(5, mdvs17.size());
+                assertEquals(4, mdvs17.size());
 
                 assertTrue(mdvs17.get(0) instanceof RelationshipMetadataValue);
                 assertEquals("project 1 (item)", mdvs17.get(0).getValue());
@@ -2920,17 +2918,13 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
                 assertEquals("project 2 (mdv)", mdvs17.get(1).getValue());
                 assertEquals(1, mdvs17.get(1).getPlace());
 
-                assertFalse(mdvs17.get(2) instanceof RelationshipMetadataValue);
-                assertEquals("project 4 (mdv)", mdvs17.get(2).getValue());
+                assertTrue(mdvs17.get(2) instanceof RelationshipMetadataValue);
+                assertEquals("project 5 (item)", mdvs17.get(2).getValue());
                 assertEquals(2, mdvs17.get(2).getPlace());
 
-                assertTrue(mdvs17.get(3) instanceof RelationshipMetadataValue);
-                assertEquals("project 5 (item)", mdvs17.get(3).getValue());
+                assertFalse(mdvs17.get(3) instanceof RelationshipMetadataValue);
+                assertEquals("project 6 (mdv)", mdvs17.get(3).getValue());
                 assertEquals(3, mdvs17.get(3).getPlace());
-
-                assertFalse(mdvs17.get(4) instanceof RelationshipMetadataValue);
-                assertEquals("project 6 (mdv)", mdvs17.get(4).getValue());
-                assertEquals(4, mdvs17.get(4).getPlace());
 
                 /////////////////////////////////////////
                 // after remove 2 - verify project 3.2 //
@@ -2940,7 +2934,6 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
                     relationshipService.findByItem(context, pr3_2, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe1_1, isProjectOfPerson, pr3_2, BOTH, 0, 0),
-                        // NOTE: right place was reduced by one
                         isRel(pe5_1, isProjectOfPerson, pr3_2, BOTH, 0, 3)
                     ))
                 );
@@ -2969,10 +2962,6 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
                 assertFalse(mdvs18.get(4) instanceof RelationshipMetadataValue);
                 assertEquals("person 6 (mdv)", mdvs18.get(4).getValue());
                 assertEquals(4, mdvs18.get(4).getPlace());
-
-                // TODO
-                // delete mdv from older
-                // delete rel from older
             }
         );
     }
