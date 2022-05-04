@@ -22,7 +22,10 @@ The only tested way right now is to run this webapp inside your IDE (Eclipse). J
 > dspace.dir = d:/install/dspace7
 
 ## HAL Browser
-The modified version of the HAL Browser from the Spring Data REST project is included, the index.html file is overriden locally to support the /api baseURL (see [DATAREST-971](https://jira.spring.io/browse/DATAREST-971))
+
+The modified version of the HAL Browser from https://github.com/mikekelly/hal-browser
+
+We've updated/customized the HAL Browser to integrate better with our authentication system, provide CSRF support, and use a more recent version of its dependencies.
 
 ## Packages and main classes
 *[org.dspace.app.rest.Application](src/main/java/org/dspace/app/rest/Application.java)* is the spring boot main class it initializes

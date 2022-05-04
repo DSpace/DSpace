@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.submit.step.validation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,8 +21,6 @@ public abstract class AbstractValidation implements Validation {
 
     private String name;
 
-    private List<ErrorRest> errors = new ArrayList<ErrorRest>();
-
     /**
      * An unique name to identify the validation implementation
      */
@@ -36,39 +33,34 @@ public abstract class AbstractValidation implements Validation {
     }
 
     /**
-     * Add an error message (i18nKey) for a specific json path
-     * 
-     * @param i18nKey
-     *            the validation error message as a key to internationalize
-     * @param path
-     *            the json path that identify the wrong data in the submission. It could be as specific as a single
-     *            value in a multivalued attribute or general of a "whole" section
+     * Add an error message (i18nKey) for a specific json path, to list provided in input.
+     *
+     * @param errors  the list to which error must be added
+     * @param i18nKey the validation error message as a key to internationalize
+     * @param path    the json path that identify the wrong data in the submission.
+     *                It could be as specific as a single value in a multivalued
+     *                attribute or general of a "whole" section
      */
-    public void addError(String i18nKey, String path) {
+    public void addError(List<ErrorRest> errors, String i18nKey, String path) {
+
+        if (StringUtils.isBlank(i18nKey)) {
+            return;
+        }
+
         boolean found = false;
-        if (StringUtils.isNotBlank(i18nKey)) {
-            for (ErrorRest error : errors) {
-                if (i18nKey.equals(error.getMessage())) {
-                    error.getPaths().add(path);
-                    found = true;
-                    break;
-                }
+        for (ErrorRest error : errors) {
+            if (i18nKey.equals(error.getMessage())) {
+                error.getPaths().add(path);
+                found = true;
+                break;
             }
         }
+
         if (!found) {
             ErrorRest error = new ErrorRest();
             error.setMessage(i18nKey);
             error.getPaths().add(path);
             errors.add(error);
         }
-    }
-
-    /**
-     * Expose the identified errors
-     * 
-     * @return the list of identified {@link ErrorRest}
-     */
-    public List<ErrorRest> getErrors() {
-        return errors;
     }
 }

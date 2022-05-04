@@ -11,7 +11,8 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -26,7 +27,7 @@ import org.dspace.versioning.service.VersioningService;
  */
 public class VersionBuilder extends AbstractBuilder<Version, VersioningService> {
 
-    private static final Logger log = Logger.getLogger(VersionBuilder.class);
+    private static final Logger log = LogManager.getLogger(VersionBuilder.class);
 
     private Version version;
 
@@ -85,6 +86,7 @@ public class VersionBuilder extends AbstractBuilder<Version, VersioningService> 
     public void delete(Version version) throws Exception {
         try (Context context = new Context()) {
             context.turnOffAuthorisationSystem();
+            context.setDispatcher("noindex");
             Version attachedTab = context.reloadEntity(version);
             if (attachedTab != null) {
                 getService().delete(context, attachedTab);

@@ -6,51 +6,54 @@
 * This DSpace version has be customized to include:
 *     * Download file functionality (see new downloadFile() method)
 *     * Improved AuthorizationHeader parsing (see new getAuthorizationHeader() method)
-*     * Upgraded third party dependencies (JQuery)
+*     * Upgraded third party dependencies via WebJars
+*     * Updated to use Bootstrap 4, based loosely on this PR to HAL Browser:
+        https://github.com/mikekelly/hal-browser/pull/102
 -->
 <!doctype html>
 <head>
     <meta charset="utf-8">
-    <title>The HAL Browser (customized for DSpace Server Webapp)</title>
-    <link rel="stylesheet" media="screen" href="browser/vendor/css/bootstrap.css" />
+    <title>The HAL Browser (customized for DSpace)</title>
+    <link rel="stylesheet" media="screen" href="webjars/bootstrap/dist/css/bootstrap.min.css" />
     <style type="text/css">
         body {
-            padding-top: 60px;
-            padding-bottom: 40px;
+           height: 100vh;
         }
         .sidebar-nav {
             padding: 9px 0;
         }
     </style>
-    <link rel="stylesheet" media="screen" href="browser/vendor/css/bootstrap-responsive.css" />
-    <link rel="stylesheet" media="screen" href="browser/styles.css" />
+    <link rel="stylesheet" media="screen" href="styles.css" />
 </head>
 
 <body>
 
-<div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container-fluid">
-            <a class="brand">The HAL Browser</a>
-            <div class="nav-collapse">
-                <ul class="nav">
-                    <li><a href="#/" id="entryPointLink">Go To Entry Point</a></li>
-                    <li><a href="https://github.com/mikekelly/hal-browser">About The HAL Browser</a></li>
-                    <li><a href="login.html">Login</a></li>
-                </ul>
-            </div>
-        </div>
+<nav class="navbar sticky-top navbar-expand-md navbar-light bg-light">
+    <a class="navbar-brand" href="#">The HAL Browser</a>
+    <div class="collapse navbar-collapse">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="#/" id="entryPointLink">Go To Entry Point</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="https://github.com/mikekelly/hal-browser">About The HAL Browser</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="login.html">Login</a>
+            </li>
+        </ul>
     </div>
-</div>
+</nav>
 
 <div id="browser" class="container-fluid"></div>
 
 <script id="location-bar-template" type="text/template">
     <form>
-        <div class="input-append span12 location-bar-container">
-            <input class="span11" id="appendedInputButton" type="text" value="<%= _.escape(url) %>">
-            <button class="btn" type="submit">Go!</button>
-            <span class="ajax-loader"></span>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="appendedInputButton" type="text" value="<%= _.escape(url) %>">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary input-group-text" type="submit">Go!</button>
+            </div>
         </div>
     </form>
 </script>
@@ -60,12 +63,12 @@
     <table class="table">
         <thead>
         <tr>
-            <th>rel</th>
-            <th>title</th>
-            <th>name / index</th>
-            <th>docs</th>
-            <th>GET</th>
-            <th>NON-GET</th>
+            <th scope="col">rel</th>
+            <th scope="col">title</th>
+            <th scope="col">name / index</th>
+            <th scope="col">docs</th>
+            <th scope="col">GET</th>
+            <th scope="col">NON-GET</th>
         </tr>
         </thead>
         <tbody>
@@ -78,14 +81,14 @@
             <td><%= link.name ? 'name: ' + link.name : 'index: ' + i %></td>
             <td>
                 <% if (HAL.isUrl(rel)) { %>
-                <a class="dox" href="<%= HAL.normalizeUrl(HAL.buildUrl(rel)) %>"><i class="icon-book"></i></a>
+                <a class="dox" href="<%= HAL.normalizeUrl(HAL.buildUrl(rel)) %>">&#128366;</a>
                 <% } %>
             </td>
             <td>
                 <% if (link.templated === true) { %>
-                <a class="query btn btn-success" href="<%= HAL.normalizeUrl(link.href) %>" title="Query URI template"><i class="icon-question-sign"></i></a>
+                <a class="query btn btn-success" href="<%= HAL.normalizeUrl(link.href) %>" title="Query URI template">?</a>
                 <% } else { %>
-                <a class="follow btn btn-success" href="<%= HAL.normalizeUrl(link.href) %>" title="Follow link"><i class="icon-arrow-right"></i></a>
+                <a class="follow btn btn-success" href="<%= HAL.normalizeUrl(link.href) %>" title="Follow link">&#10140;</a>
                 <% } %>
             </td>
             <td>
@@ -100,14 +103,14 @@
             <td><%= obj.name || '' %></td>
             <td>
                 <% if (HAL.isUrl(rel)) { %>
-                <a class="dox" href="<%= HAL.normalizeUrl(HAL.buildUrl(rel)) %>"><i class="icon-book"></i></a>
+                <a class="dox btn btn-success" href="<%= HAL.normalizeUrl(HAL.buildUrl(rel)) %>">&#128366;</a>
                 <% } %>
             </td>
             <td>
                 <% if (obj.templated === true) { %>
-                <a class="query btn btn-success" href="<%= HAL.normalizeUrl(obj.href) %>" title="Query URI template"><i class="icon-question-sign"></i></a>
+                <a class="query btn btn-success" href="<%= HAL.normalizeUrl(obj.href) %>" title="Query URI template">?</a>
                 <% } else { %>
-                <a class="follow btn btn-success" href="<%= HAL.normalizeUrl(obj.href) %>" title="Follow link"><i class="icon-arrow-right"></i></a>
+                <a class="follow btn btn-success" href="<%= HAL.normalizeUrl(obj.href) %>" title="Follow link">&#10140;</a>
                 <% } %>
             </td>
             <td>
@@ -122,17 +125,25 @@
 
 <script id="properties-template" type="text/template">
     <h2>Properties</h2>
-    <pre><%= properties %></pre>
+    <div class="card read-only">
+        <div class="card-body">
+            <pre><%= properties %></pre>
+        </div>
+    </div>
 </script>
 
 <script id="request-headers-template" type="text/template">
     <h2>Custom Request Headers</h2>
-    <textarea class="span12"></textarea>
+    <div class="input-group">
+        <textarea class="form-control"></textarea>
+    </div>
 </script>
 
 <script id="response-headers-template" type="text/template">
     <h2>Response Headers</h2>
-    <pre><%= status.code %> <%= status.text %>
+    <div class="card read-only">
+        <div class="card-body">
+            <pre><%= status.code %> <%= status.text %>
 
 <% _.each(headers, function(value, name) {
       %><%= _.escape(name) %>: <%
@@ -143,96 +154,118 @@
             %><% if(HAL.isFollowableHeader(name)) {
             %></a><%
            } %>
-<% }) %></pre>
+<% }) %>
+            </pre>
+        </div>
+    </div>
 </script>
 
 <script id="response-body-template" type="text/template">
     <h2>Response Body</h2>
-    <pre><%= _.escape(body) %></pre>
+    <div class="card read-only">
+        <div class="card-body">
+            <pre><%= _.escape(body) %></pre>
+        </div>
+    </div>
 </script>
 
 <script id="query-uri-template" type="text/template">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Expand URI Template</h3>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>Expand URI Template</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <form id="query" action="<%= href %>">
+                <div class="modal-body">
+                    <label for="uri">URI Template:</label>
+                    <div class="card read-only" id="uri">
+                        <div class="card-body">
+                            <pre><%- href %></pre>
+                        </div>
+                    </div>
+                    <label for="input">Input (JSON):</label>
+                    <textarea class="form-control" id="input"><%= input %></textarea>
+                    <label for="preview">Expanded URI:</label>
+                    <div class="card read-only" id="preview">
+                        <div class="card-body">
+                            <pre class="preview">&nbsp;</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Follow URI</button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <form id="query" action="<%= href %>">
-        <div class="modal-body">
-            <p>URI Template:</p>
-            <pre><%- href %></pre>
-            <p>Input (JSON):</p>
-            <textarea><%= input %></textarea>
-            <p>Expanded URI:</p>
-            <pre class="preview">&nbsp;</pre>
-        </div>
-
-        <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Follow URI</button>
-        </div>
-    </form>
 </script>
 
 
 <script id="non-safe-request-template" type="text/template">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Make a non-GET request</h3>
-    </div>
-
-    <form class="non-safe" action="<%= _.escape(href) %>">
-        <div class="modal-body">
-            <p>Target URI</p>
-            <input name="url" type="text" class="url" value="<%= _.escape(href) %>" />
-            <p>Method:</p>
-            <input name="method" type="text" class="method" value="POST" />
-            <p>Headers:</p>
-<textarea name="headers" class="headers" style="height: 100px">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Make a NON-GET request</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <form class="non-safe" action="<%= href %>">
+                <div class="modal-body">
+                    <label for="url">Target URI</label>
+                    <input name="url" type="text" class="url form-control" id="url" value="<%= href %>" />
+                    <label for="method">Method:</label>
+                    <input name="method" type="text" class="method form-control" id="method" value="POST" />
+                    <label for="headers">Headers:</label>
+                    <textarea name="headers" class="headers form-control" style="height: 100px" id="headers">
 Content-Type: application/json
 <%= user_defined_headers %>
-</textarea>
-            <p>Body:</p>
-<textarea name="body" class="body" style="height: 200px">
+                    </textarea>
+                    <label for="body">Body:</label>
+                    <textarea name="body" class="body form-control" style="height: 200px" id="body">
 {
 
 }
-</textarea>
+                    </textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Make Request</button>
+                </div>
+            </form>
         </div>
-
-        <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Make Request</button>
-        </div>
-    </form>
+    </div>
 </script>
 
 <script id="dynamic-request-template" type="text/template">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Create/Update</h3>
-    </div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Create/Update</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
 
-    <form class="non-safe" action="<%= href %>">
-        <div class="modal-body" style="padding-top: 0px">
-            <div id="jsoneditor"></div>
+            <form class="non-safe" action="<%= href %>">
+                <div class="modal-body">
+                    <div id="jsoneditor"></div>
 
-            <div class="well well-small" style="padding-bottom: 0px;">
-                <div class="container-fluid">
-                    <div class="row-fluid">
-                        <div class="control-group">
-                            <label class="control-label" style="display: inline-block; font-weight: bold;">Action:</label>
-                            <input name="method" type="text" class="method controls" style="width: 98%" value="POST" />
-                            <input name="url" type="text" class="url controls" style="width: 98%" value="<%= href %>" />
+                    <div class="card card-body bg-light">
+                        <div class="container-fluid">
+                            <div class="row-fluid">
+                                <div class="form-group">
+                                    <label class="col-form-label" style="display: inline-block; font-weight: bold;">Action:</label>
+                                    <input name="method" type="text" class="method form-control" style="width: 98%" value="POST" />
+                                    <input name="url" type="text" class="url form-control" style="width: 98%" value="<%= href %>" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Make Request</button>
+                </div>
+            </form>
         </div>
-        <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Make Request</button>
-        </div>
-    </form>
+    </div>
 </script>
-
 
 <script id="embedded-resources-template" type="text/template">
     <h2>Embedded Resources</h2>
@@ -250,13 +283,13 @@ Content-Type: application/json
     </div>
 </script>
 
-<!-- Customized (to use WebJars) for DSpace -->
+<!-- Pull in updated versions of "vendor" libraries using WebJars -->
 <script src="webjars/jquery/dist/jquery.min.js"></script>
-<script src="browser/vendor/js/underscore.js"></script>
-<script src="browser/vendor/js/backbone.js"></script>
+<script src="webjars/underscore/underscore-min.js"></script>
+<script src="webjars/backbone/backbone-min.js"></script>
 <script src="browser/vendor/js/uritemplates.js"></script>
-<script src="browser/vendor/js/URI.min.js"></script>
-<script src="browser/vendor/js/bootstrap.js"></script>
+<script src="webjars/urijs/src/URI.min.js"></script>
+<script src="webjars/bootstrap/dist/js/bootstrap.min.js"></script>
 
 <script src="browser/js/hal.js"></script>
 <script src="browser/js/hal/browser.js"></script>
@@ -288,8 +321,8 @@ Content-Type: application/json
 
 <script src="browser/js/hal/views/documentation.js"></script>
 
-<script src="browser/vendor/js/jsoneditor.js"></script>
-<script src="browser/js/CustomPostForm.js"></script>
+<script src="webjars/json-editor__json-editor/2.6.1/dist/jsoneditor.js"></script>
+<script src="js/vendor/CustomPostForm.js"></script>
 
 <script>
     var browser = new HAL.Browser({

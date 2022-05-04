@@ -8,103 +8,141 @@
     http://www.dspace.org/license/
 
 -->
-<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="ehcache.xsd"
-         updateCheck='false'
-         name='org.dspace.hibernate'>
+<config xmlns="http://www.ehcache.org/v3"
+        xmlns:jsr107='http://www.ehcache.org/v3/jsr107'
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.ehcache.org/v3 https://www.ehcache.org/schema/ehcache-core-3.0.xsd
+                            http://www.ehcache.org/v3/jsr107 https://www.ehcache.org/schema/ehcache-107-ext-3.0.xsd">
 
-    <diskStore path="java.io.tmpdir"/>
+    <service>
+        <jsr107:defaults default-template="default"/>
+    </service>
 
     <!--
-    Mandatory Default Cache configuration. These settings will be applied to caches
-    created programmtically using CacheManager.add(String cacheName).
-
-    The defaultCache has an implicit name "default" which is a reserved cache name.
+    Mandatory Default Cache configuration. These settings will be applied to
+    caches created programmatically using CacheManager.add(String cacheName).
     -->
-    <defaultCache
-         maxElementsInMemory="3000"
-         eternal="false"
-         timeToIdleSeconds="1"
-         timeToLiveSeconds="1200"
-         overflowToDisk="true"
-         diskSpoolBufferSizeMB="30"
-         maxElementsOnDisk="10000"
-         diskPersistent="false"
-         diskExpiryThreadIntervalSeconds="120"
-         memoryStoreEvictionPolicy="LRU">
-     </defaultCache>
+    <cache-template name="default">
+      <expiry>
+        <ttl unit='seconds'>1200</ttl>
+      </expiry>
+      <resources>
+        <heap unit='entries'>3000</heap>
+      </resources>
+    </cache-template>
 
-   <!-- this cache tracks the timestamps of the most recent updates to particular tables. 
-     It is important that the cache timeout of the underlying cache implementation be set to a 
-     higher value than the timeouts of any of the query caches. In fact, it is recommended that 
-     the the underlying cache not be configured for expiry at all. -->
-    <cache name="org.hibernate.cache.spi.UpdateTimestampsCache"
-           maxElementsInMemory="6000" eternal="true" overflowToDisk="false" />
+   <!-- This cache tracks the timestamps of the most recent updates to
+        particular tables.  It is important that the cache timeout of
+        the underlying cache implementation be set to a higher value
+        than the timeouts of any of the query caches.  In fact, it is
+        recommended that the the underlying cache not be configured
+        for expiry at all. -->
+    <cache alias='default-update-timestamps-region'>
+      <expiry>
+        <none/>
+      </expiry>
+      <heap unit='entries'>6000</heap>
+    </cache>
 
-    <!-- this cache stores the actual objects pulled out of the DB by hibernate -->
-    <cache name="org.hibernate.cache.internal.StandardQueryCache"
-           maxElementsInMemory="2000" eternal="false" timeToIdleSeconds="1800"
-           timeToLiveSeconds="600" overflowToDisk="false" diskExpiryThreadIntervalSeconds="60"
-           memoryStoreEvictionPolicy="LRU"/>
+    <!-- This cache stores the actual objects pulled out of the DB by
+         Hibernate. -->
+    <cache alias='default-query-results-region'>
+      <expiry>
+        <ttl>600</ttl>
+      </expiry>
+      <heap unit='entries'>2000</heap>
+    </cache>
 
     <!-- DSpace classes in the second level cache -->
 
-    <!-- We only have 1 site object, so it is best to cache it -->
-    <cache name="org.dspace.content.Site"
-           maxElementsInMemory="1" eternal="false" timeToIdleSeconds="86400"
-           timeToLiveSeconds="86400" overflowToDisk="false"
-           memoryStoreEvictionPolicy="LRU"/>
+    <!-- We only have 1 site object, so it is best to cache it. -->
+    <cache alias="org.dspace.content.Site">
+      <expiry>
+        <ttl>86400</ttl>
+      </expiry>
+      <heap unit='entries'>1</heap>
+    </cache>
 
-    <!-- The number of metadata schemas is limited and not updated frequently, so if we cache them
-         the likelihood of a cache hit is very high -->
-    <cache name="org.dspace.content.MetadataSchema"
-           maxElementsInMemory="100" eternal="false" timeToIdleSeconds="3600"
-           timeToLiveSeconds="3600" overflowToDisk="true" diskExpiryThreadIntervalSeconds="60"
-           memoryStoreEvictionPolicy="LRU"/>
+    <!-- The number of metadata schemas is limited and not updated frequently,
+         so if we cache them the likelihood of a cache hit is very high. -->
+    <cache alias="org.dspace.content.MetadataSchema"
+           uses-template="default">
+      <expiry>
+        <ttl>3600</ttl>
+      </expiry>
+      <heap unit='entries'>100</heap>
+    </cache>
 
-    <!-- The number of metadata fields is limited and not updated frequently, so if we cache them
-         the likelihood of a cache hit is very high -->
-    <cache name="org.dspace.content.MetadataField"
-           maxElementsInMemory="2000" eternal="false"  timeToIdleSeconds="3600"
-           timeToLiveSeconds="3600" overflowToDisk="true" diskExpiryThreadIntervalSeconds="60"
-           memoryStoreEvictionPolicy="LRU"/>
+    <!-- The number of metadata fields is limited and not updated frequently,
+         so if we cache them the likelihood of a cache hit is very high. -->
+    <cache alias="org.dspace.content.MetadataField"
+           uses-template="default">
+      <expiry>
+        <ttl>3600</ttl>
+      </expiry>
+      <heap unit='entries'>2000</heap>
+    </cache>
 
-    <!-- It is not a good idea to cache Item records. Most repositories have a large number of items
-         so the cache would have to be updated frequently. In addition there are many processes that
-         touch a lot of different items (discovery search, filter media, curation tasks...) which also makes
-         the cache less efficient. The probably of having a cache hit is thus very low and that is why Items
-         should not be cached. The same reasoning applies to Metadata values, Bundles, Bitstreams and Handles. -->
+    <!-- It is not a good idea to cache Item records. Most repositories have a
+         large number of items so the cache would have to be updated frequently.
+         In addition there are many processes that touch a lot of different
+         items (discovery search, filter media, curation tasks...) which also
+         makes the cache less efficient. The probably of having a cache hit is
+         thus very low and that is why Items should not be cached. The same
+         reasoning applies to Metadata values, Bundles, Bitstreams and Handles. -->
 
-    <!-- The number of groups in a repository can be very big, but only a small percentage of them is used
-         very frequently. So it makes sense to cache Group records because the cache hit rate is likely to be high -->
-    <cache name="org.dspace.eperson.Group"
-           maxElementsInMemory="5000" eternal="false" timeToIdleSeconds="1800"
-           timeToLiveSeconds="3600" overflowToDisk="false"
-           memoryStoreEvictionPolicy="LRU"/>
+    <!-- The number of groups in a repository can be very big, but only a small
+         percentage of them is used very frequently. So it makes sense to cache
+         Group records because the cache hit rate is likely to be high. -->
+    <cache alias="org.dspace.eperson.Group"
+           uses-template="default">
+      <expiry>
+        <ttl>3600</ttl>
+      </expiry>
+      <heap unit='entries'>5000</heap>
+    </cache>
 
-    <!-- Like items, there are too many different Resource policy records for the cache to work efficiently.
-         In addition, resource policies are the core security mechanism in DSpace so want need to be 100% we
-         do not receive a stale policy when querying them. -->
+    <!-- Like items, there are too many different Resource policy records for
+         the cache to work efficiently.  In addition, resource policies are the
+         core security mechanism in DSpace so want need to be 100% we do not
+         receive a stale policy when querying them. -->
 
-    <!-- The total number of epersons in DSpace can be very large, but the number of concurrent authenticated users is mostly
-         limited. Therefor having the authenticated users data cached will increase performance as the cache hit rate will
-         be high. -->
-    <cache name="org.dspace.eperson.EPerson"
-           maxElementsInMemory="1000" eternal="false" timeToIdleSeconds="1800"
-           timeToLiveSeconds="1800" overflowToDisk="false"
-           memoryStoreEvictionPolicy="LRU"/>
+    <!-- The total number of epersons in DSpace can be very large, but the
+         number of concurrent authenticated users is mostly limited. Therefor
+         having the authenticated users data cached will increase performance as
+         the cache hit rate will be high. -->
+    <cache alias="org.dspace.eperson.EPerson"
+           uses-template="default">
+      <expiry>
+        <ttl>1800</ttl>
+      </expiry>
+      <heap unit='entries'>1000</heap>
+    </cache>
 
-    <!-- The number of collections is mostly a fixed set in a repository which is not updated frequently. This means that
-         most queries for a collection will be able to use the cached version. So adding caching here makes sense. -->
-    <cache name="org.dspace.content.Collection"
-           maxElementsInMemory="4000" eternal="false" timeToIdleSeconds="1800"
-           timeToLiveSeconds="1800" overflowToDisk="true" diskExpiryThreadIntervalSeconds="60"
-           memoryStoreEvictionPolicy="LRU"/>
+    <!-- The number of collections is mostly a fixed set in a repository which
+         is not updated frequently. This means that most queries for a
+         collection will be able to use the cached version. So adding caching
+         here makes sense. -->
+    <cache alias="org.dspace.content.Collection"
+           uses-template="default">
+      <expiry>
+        <ttl>1800</ttl>
+      </expiry>
+      <resources>
+        <heap unit='entries'>4000</heap>
+      </resources>
+    </cache>
 
-    <!-- Like collections, the same applies to communities. So we also setup a cache for communities. -->
-    <cache name="org.dspace.content.Community"
-           maxElementsInMemory="2000" eternal="false" timeToIdleSeconds="1800"
-           timeToLiveSeconds="1800" overflowToDisk="true" diskExpiryThreadIntervalSeconds="60"
-           memoryStoreEvictionPolicy="LRU"/>
+    <!-- Like collections, the same applies to communities. So we also setup a
+         cache for communities. -->
+    <cache alias="org.dspace.content.Community"
+           uses-template="default">
+      <expiry>
+        <ttl>1800</ttl>
+      </expiry>
+      <resources>
+        <heap unit='entries'>2000</heap>
+      </resources>
+    </cache>
 
-</ehcache>
+</config>

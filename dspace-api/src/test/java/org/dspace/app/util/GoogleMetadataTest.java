@@ -8,18 +8,25 @@
 package org.dspace.app.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.base.Splitter;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -30,6 +37,14 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
+import org.dspace.core.Constants;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.MutablePeriod;
+import org.joda.time.format.PeriodFormat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +66,10 @@ public class GoogleMetadataTest extends AbstractUnitTest {
     private BitstreamFormatService bitstreamFormatService;
 
     private BitstreamService bitstreamService;
+
+    private ResourcePolicyService resourcePolicyService;
+
+    private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
     private Community community;
 
@@ -80,6 +99,8 @@ public class GoogleMetadataTest extends AbstractUnitTest {
             bundleService = ContentServiceFactory.getInstance().getBundleService();
             bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
             bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+            resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+            groupService = EPersonServiceFactory.getInstance().getGroupService();
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
             fail("Authorization Error in init: " + ex.getMessage());
@@ -324,6 +345,45 @@ public class GoogleMetadataTest extends AbstractUnitTest {
         GoogleMetadata gm = new GoogleMetadata(this.context, it);
         List<String> urlSplitted = Splitter.on("/").splitToList(gm.getPDFURL().get(0));
         assertEquals("small", urlSplitted.get(urlSplitted.size() - 1));
+    }
+
+    /**
+     * Verify there is no mapping for {@link GoogleMetadata#PDF} if there are only embargoed (non-publically accessible
+     * bitstream) files
+     */
+    @Test
+    public void testGetPdfUrlOfEmbargoed() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Bundle bundle = ContentServiceFactory.getInstance().getBundleService().create(context, it, "ORIGINAL");
+
+        Bitstream b = bitstreamService.create(
+            context, new ByteArrayInputStream("Larger file than primary".getBytes(StandardCharsets.UTF_8)));
+        b.setName(context, "first");
+        b.setFormat(context, bitstreamFormatService.create(context));
+        b.getFormat(context).setMIMEType("unknown");
+        bundleService.addBitstream(context, bundle, b);
+        // Set 3 month embargo on pdf
+        MutablePeriod period = PeriodFormat.getDefault().parseMutablePeriod("3 months");
+        Date embargoDate = DateTime.now(DateTimeZone.UTC).plus(period).toDate();
+        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+        authorizeService.removeAllPolicies(context, b);
+        resourcePolicyService.removeAllPolicies(context, b);
+        ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, anonGroup,
+            null, embargoDate, Constants.READ, "GoogleMetadataTest", b);
+        if (rp != null) {
+            resourcePolicyService.update(context, rp);
+        }
+
+        GoogleMetadata gm = new GoogleMetadata(this.context, it);
+        assertTrue(gm.getPDFURL().isEmpty());
+        // No value for citation_pdf_url because only one embargoed bitstream
+        boolean containsPdfUrl = false;
+        for (Map.Entry<String, String> mapping: gm.getMappings()) {
+            if (mapping.getKey().equalsIgnoreCase(gm.PDF)) {
+                containsPdfUrl = true;
+            }
+        }
+        assertFalse(containsPdfUrl);
     }
 
     @After

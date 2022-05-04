@@ -6,7 +6,7 @@
 * This DSpace version has be customized to include:
 *     * Shibboleth login functionality
 *     * Other customization to use DSpace's login endpoint
-*     * Upgraded third party dependencies (JQuery)
+*     * Upgraded third party dependencies (Bootstrap, JQuery, Toastr) using webjars
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -14,9 +14,9 @@
     <meta charset="utf-8">
     <title>Sign in - HAL Browser</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="webjars/toastr/build/toastr.min.css" rel="stylesheet"/>
-    <link href="browser/vendor/css/bootstrap.css" rel="stylesheet">
-    <link href="browser/vendor/css/bootstrap-responsive.css" rel="stylesheet">
+    <link rel="stylesheet" media="screen" href="webjars/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Toastr CSS must be loaded after Bootstrap -->
+    <link rel="stylesheet" href="webjars/toastr/build/toastr.min.css"/>
     <style type="text/css">
         body {
             padding-top: 40px;
@@ -24,16 +24,12 @@
             background-color: #f5f5f5;
         }
         .form-signin {
-            max-width: 300px;
+            max-width: 350px;
             padding: 19px 29px 29px;
             margin: 0 auto 20px;
             background-color: #fff;
             border: 1px solid #e5e5e5;
-            -webkit-border-radius: 5px;
-            -moz-border-radius: 5px;
             border-radius: 5px;
-            -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
-            -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
             box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
         }
         .form-signin .form-signin-heading, .form-signin .checkbox {
@@ -51,17 +47,17 @@
         }
     </style>
     <script src="webjars/jquery/dist/jquery.min.js"></script>
-    <script src="browser/vendor/js/bootstrap.js"></script>
+    <script src="webjars/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="webjars/toastr/build/toastr.min.js"></script>
 </head>
 <body>
 <div class="container">
     <form id="login-form" class="form-signin">
         <h2 class="form-signin-heading">HAL Browser</h2>
-        <input type="text" class="input-block-level" placeholder="Username" id="username">
-        <input type="password" class="input-block-level" placeholder="Password" id="password">
-        <button type="submit" class="btn btn-large btn-primary" id="login">Sign in</button>
-        <div class="other-login-methods hidden">
+        <input type="text" class="form-control" placeholder="Username" id="username">
+        <input type="password" class="form-control" placeholder="Password" id="password">
+        <button type="submit" class="btn btn-large btn-primary form-signin-btn" id="login">Sign in</button>
+        <div class="other-login-methods d-none">
             <h3>Other login methods:</h3>
 
         </div>
@@ -158,7 +154,7 @@
         });
 
         function addLocationButton(realm, element){
-            element.removeClass("hidden");
+            element.removeClass("d-none");
             var loc = /location="([^,]*)"/.exec(realm);
             var name = /(\w+) (\w+=((".*?")|[^,]*)(, )?)*/.exec(realm);
             if (loc !== null && loc.length === 2) {

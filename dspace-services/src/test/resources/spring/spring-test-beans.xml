@@ -22,17 +22,6 @@
          @Configuration annotations, e.g. see org.dspace.servicemanager.config.TestDynamicAnnotationConfiguration -->
     <context:component-scan base-package="org.dspace.servicemanager.config" />
 
-    <!-- sample cache bean -->
-    <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean">
-        <property name="cacheManager" ref="org.dspace.caching.ehcache.CacheManager"/>
-        <property name="cacheName" value="org.dspace.caching.ehcache.SampleCache"/>
-        <property name="maxElementsInMemory" value="1000"/>
-        <property name="diskPersistent" value="false"/>
-        <property name="eternal" value="false"/>
-        <property name="timeToLive" value="10"/>
-        <property name="timeToIdle" value="30"/>
-    </bean>
-
     <!-- Test bean for property substitution from configuration service (used by DSpaceConfigurationBeanTest)
          The value of "testDynamicBean.property" should be auto-substituted from config/local.properties -->
     <bean id="dynamicPropertyBean" class="org.dspace.servicemanager.config.TestDynamicPropertyBean">

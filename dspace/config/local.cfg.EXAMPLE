@@ -59,6 +59,11 @@ dspace.name = DSpace at My University
 # Since DSpace 7, SOLR must be installed as a stand-alone service
 #solr.server = http://localhost:8983/solr
 
+# Solr core name prefix.
+# If you connect multiple instances of DSpace to a single Solr instance, you
+# can organize them with a common core name prefix.
+#solr.multicorePrefix =
+
 ##########################
 # DATABASE CONFIGURATION #
 ##########################
@@ -75,9 +80,9 @@ db.url = jdbc:postgresql://localhost:5432/dspace
 db.driver = org.postgresql.Driver
 
 # Database Dialect (for Hibernate)
-#    * For Postgres: org.dspace.storage.rdbms.hibernate.postgres.DSpacePostgreSQL82Dialect
+#    * For Postgres: org.hibernate.dialect.PostgreSQL94Dialect
 #    * For Oracle:   org.hibernate.dialect.Oracle10gDialect
-db.dialect = org.dspace.storage.rdbms.hibernate.postgres.DSpacePostgreSQL82Dialect
+db.dialect = org.hibernate.dialect.PostgreSQL94Dialect
 
 # Database username and password
 db.username = dspace
@@ -127,6 +132,10 @@ db.schema = public
 
 # General site administration (Webmaster) e-mail
 #mail.admin = dspace-help@myu.edu
+
+# Helpdesk E-mail
+#mail.helpdesk = ${mail.admin}
+#mail.helpdesk.name = Help Desk
 
 # Recipient for server errors and alerts (defaults to mail.admin)
 #alert.recipient = ${mail.admin}

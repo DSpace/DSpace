@@ -9,7 +9,7 @@ package org.dspace.app.rest.csv;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
@@ -76,9 +76,8 @@ public class CsvExportIT extends AbstractControllerIntegrationTest {
             String token = getAuthToken(admin.getEmail(), password);
 
             getClient(token)
-                .perform(fileUpload("/api/system/scripts/metadata-export/processes")
-                                                                                    .param("properties",
-                                                                                           new Gson().toJson(list)))
+                .perform(multipart("/api/system/scripts/metadata-export/processes")
+                             .param("properties", new ObjectMapper().writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("metadata-export",
@@ -128,9 +127,8 @@ public class CsvExportIT extends AbstractControllerIntegrationTest {
             String token = getAuthToken(admin.getEmail(), password);
 
             getClient(token)
-                .perform(fileUpload("/api/system/scripts/metadata-export/processes")
-                             .param("properties",
-                                    new Gson().toJson(list)))
+                .perform(multipart("/api/system/scripts/metadata-export/processes")
+                             .param("properties", new ObjectMapper().writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("metadata-export",
