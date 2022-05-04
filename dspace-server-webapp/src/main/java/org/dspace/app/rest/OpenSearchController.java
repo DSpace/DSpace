@@ -133,12 +133,12 @@ public class OpenSearchController {
             queryArgs.setMaxResults(count);
             queryArgs.setDSpaceObjectFilter(IndexableItem.TYPE);
             if (sort != null) {
-                if (sortDirection == null || sortDirection.equals("DESC")) {
+                if (sortDirection != null && sortDirection.equals("DESC")) {
                     queryArgs.setSortField(sort + "_sort", SORT_ORDER.desc);
                 }
                 queryArgs.setSortField(sort + "_sort", SORT_ORDER.asc);
             } else {
-                queryArgs.setSortField("dc.date.accessioned_sort", SORT_ORDER.desc);
+                queryArgs.setSortField("dc.date.accessioned_sort", SORT_ORDER.asc);
             }
             if (dsoObject != null) {
                 container = scopeResolver.resolveScope(context, dsoObject);
