@@ -79,6 +79,8 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
     private List<LDNMetadataChange> changes = new ArrayList<>();
 
+    private List<String> allowedExternalResolverUrls = new ArrayList<>();
+
     private String dspaceUIUrl;
 
     /**
@@ -94,6 +96,13 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
     @PostConstruct
     public void init() {
+        String resolverUrls = configurationService.getProperty("ldn.notify.allowed-external-resolver-urls");
+        if (resolverUrls != null) {
+            for (String allowedExternalResolverUrl : resolverUrls.split(",")) {
+                this.allowedExternalResolverUrls.add(allowedExternalResolverUrl.trim());
+            }
+        }
+
         this.dspaceUIUrl = configurationService.getProperty("dspace.ui.url");
     }
 
@@ -343,24 +352,36 @@ public class LDNMetadataProcessor implements LDNProcessor {
      */
     private String resolveContext(Notification notification) {
         String url = notification.getContext().getId();
-        if (!url.startsWith(this.dspaceUIUrl)) {
-            log.info("Attempting to resolve external context id {}", url);
-            try {
-                HttpHeaders headers = this.restTemplate.headForHeaders(url);
-                if (headers.containsKey(LOCATION_HEADER_KEY)) {
-                    return headers.getFirst(LOCATION_HEADER_KEY);
-                } else {
-                    log.error("External context id {} HEAD response did not contain Location header", url);
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            format("Invalid context id %s", url));
-                }
-            } catch (RestClientException e) {
-                log.error(format("Failed to resolve context id %s.", url), e);
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        format("Failed to resolve context id %s. %s", url, e.getMessage()));
+        if (url.startsWith(this.dspaceUIUrl)) {
+            return url;
+        }
+        boolean allowExternalContextId = false;
+        for (String allowedExternalResolverUrl : this.allowedExternalResolverUrls) {
+            if (url.startsWith(allowedExternalResolverUrl)) {
+                allowExternalContextId = true;
+                break;
             }
         }
-        return url;
+        if (!allowExternalContextId) {
+            String message = format("Context id %s not allowed for external dereference.", url);
+            log.error(message);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+        }
+        log.info("Attempting to resolve external context id {}", url);
+        try {
+            HttpHeaders headers = this.restTemplate.headForHeaders(url);
+            if (headers.containsKey(LOCATION_HEADER_KEY)) {
+                return headers.getFirst(LOCATION_HEADER_KEY);
+            } else {
+                log.error("External context id {} HEAD response did not contain Location header", url);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        format("Invalid context id %s", url));
+            }
+        } catch (RestClientException e) {
+            log.error(format("Failed to resolve context id %s.", url), e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    format("Failed to resolve context id %s. %s", url, e.getMessage()));
+        }
     }
 
     /**
