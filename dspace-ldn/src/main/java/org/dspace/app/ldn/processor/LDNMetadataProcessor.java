@@ -10,6 +10,8 @@ package org.dspace.app.ldn.processor;
 import static java.lang.String.format;
 
 import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -354,9 +356,10 @@ public class LDNMetadataProcessor implements LDNProcessor {
         String url = notification.getContext().getId();
         if (isExternalContextId(url)) {
             try {
+                URI uri = new URI(url);
                 if (isAllowedExternalContextId(url)) {
                     log.info("Attempting to resolve external context id {}", url);
-                    HttpHeaders headers = this.restTemplate.headForHeaders(url);
+                    HttpHeaders headers = this.restTemplate.headForHeaders(uri);
                     if (headers.containsKey(LOCATION_HEADER_KEY)) {
                         url = headers.getFirst(LOCATION_HEADER_KEY);
                     } else {
@@ -369,7 +372,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
                     log.error(message);
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
                 }
-            } catch (RestClientException e) {
+            } catch (NullPointerException | URISyntaxException | RestClientException e) {
                 log.error(format("Failed to resolve context id %s", url), e);
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         format("Failed to resolve context id %s: %s", url, e.getMessage()));
