@@ -333,7 +333,7 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
                 Namespace.getNamespace("dri", "http://www.driver-repository.eu/namespace/dri"),
                 Namespace.getNamespace("oaf", "http://namespace.openaire.eu/oaf"),
                 Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance"));
-            XPathExpression<Element> xpath = XPathFactory.instance().compile("/results/result",
+            XPathExpression<Element> xpath = XPathFactory.instance().compile("//results/result",
                 Filters.element(), null, namespaces);
 
             List<Element> recordsList = xpath.evaluate(root);

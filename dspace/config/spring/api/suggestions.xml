@@ -32,9 +32,6 @@
         <property name="names">
             <list>
                 <value>dc.title</value>
-                <value>crisrp.name</value>
-                <value>crisrp.name.translated</value>
-                <value>crisrp.name.variant</value>
             </list>
         </property>
         <property name="pipeline">
@@ -49,9 +46,6 @@
                     <property name="names">
                         <list>
                             <value>dc.title</value>
-                            <value>crisrp.name</value>
-                            <value>crisrp.name.translated</value>
-                            <value>crisrp.name.variant</value>
                         </list>
                     </property>
                 </bean>
