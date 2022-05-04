@@ -236,11 +236,14 @@ public class ConfigurationIT
             "--first"
         };
         expectedSystemExit.expectSystemExitWithStatus(0);
-        expectedSystemExit.checkAssertionAfterwards(() -> {
-            String outputs = systemOutRule.getLogWithNormalizedLineSeparator();
-            String[] output = outputs.split("\n");
-            assertThat(output, arrayWithSize(1));
-            assertEquals("--first should return first value", output[0], ARRAY_VALUE[0]);
+        expectedSystemExit.checkAssertionAfterwards(new Assertion() {
+            @Override
+            public void checkAssertion() {
+                String outputs = systemOutRule.getLogWithNormalizedLineSeparator();
+                String[] output = outputs.split("\n");
+                assertThat(output, arrayWithSize(1));
+                assertEquals("--first should return first value", output[0], ARRAY_VALUE[0]);
+            }
         });
         systemOutRule.enableLog();
         Configuration.main(argv);
@@ -256,11 +259,14 @@ public class ConfigurationIT
             "--first"
         };
         expectedSystemExit.expectSystemExitWithStatus(0);
-        expectedSystemExit.checkAssertionAfterwards(() -> {
-            String outputs = systemOutRule.getLogWithNormalizedLineSeparator();
-            String[] output = outputs.split("\n");
-            assertThat(output, arrayWithSize(1));
-            assertEquals("--first should return only value", output[0], SINGLE_VALUE);
+        expectedSystemExit.checkAssertionAfterwards(new Assertion() {
+            @Override
+            public void checkAssertion() {
+                String outputs = systemOutRule.getLogWithNormalizedLineSeparator();
+                String[] output = outputs.split("\n");
+                assertThat(output, arrayWithSize(1));
+                assertEquals("--first should return only value", output[0], SINGLE_VALUE);
+            }
         });
         systemOutRule.enableLog();
         Configuration.main(argv);
