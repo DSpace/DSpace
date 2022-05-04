@@ -11,6 +11,8 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
+import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -2723,4 +2725,102 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                              .andExpect(jsonPath("$._links.resource.href", Matchers.allOf(
                                         Matchers.containsString("/api/authz/resourcepolicies/search/resource"))));
     }
+
+    @Test
+    public void patchReplaceEPersonAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson newEPerson = EPersonBuilder.createEPerson(context)
+                                           .withEmail("newEPerson@mail.com")
+                                           .withPassword(password)
+                                           .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection 1")
+                                          .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                                            .withAction(Constants.ADD)
+                                            .withDspaceObject(col)
+                                            .withUser(eperson)
+                                            .withDescription("My Description")
+                                            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                                            .build();
+
+        context.restoreAuthSystemState();
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        // verify origin resourcepolicy
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.eperson.id", is(eperson.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.group", nullValue()));
+
+        // update eperson of the resourcePolicy
+        getClient(tokenAdmin).perform(post("/api/authz/resourcepolicies/" + resourcePolicy.getID() + "/eperson")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content("/api/eperson/epersons/" + newEPerson.getID()))
+                             .andExpect(status().isNoContent());
+
+        // verify that the resourcePolicy is related to new eperson
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.eperson.id", is(newEPerson.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.group", nullValue()));
+    }
+
+    @Test
+    public void patchReplaceGroupAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group originGroup = GroupBuilder.createGroup(context)
+                                        .withName("origin Test Group")
+                                        .build();
+
+        Group newGroup = GroupBuilder.createGroup(context)
+                                     .withName("testGroupName")
+                                     .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection 1")
+                                          .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                                            .withAction(Constants.ADD)
+                                            .withDspaceObject(col)
+                                            .withGroup(originGroup)
+                                            .withDescription("My Description")
+                                            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                                            .build();
+
+        context.restoreAuthSystemState();
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        // verify origin resourcepolicy
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.group.id", is(originGroup.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.eperson", nullValue()));
+
+        // update group of the resourcePolicy
+        getClient(tokenAdmin).perform(post("/api/authz/resourcepolicies/" + resourcePolicy.getID() + "/group")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content("/api/eperson/groups/" + newGroup.getID()))
+                             .andExpect(status().isNoContent());
+
+        // verify that the resourcePolicy is related to new group
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.group.id", is(newGroup.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.eperson", nullValue()));
+    }
+
 }
