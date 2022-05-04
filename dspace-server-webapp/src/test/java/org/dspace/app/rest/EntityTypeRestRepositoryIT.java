@@ -416,6 +416,8 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                     .setSupportedEntityTypes(Arrays.asList("Publication"));
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("pubmed"))
                     .setSupportedEntityTypes(Arrays.asList("Publication"));
+            ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("suggestion"))
+                    .setSupportedEntityTypes(Arrays.asList("Publication"));
 
             // these are similar to the previous checks but now we have restricted the mock and pubmed providers
             // to support only publication, this mean that there are no providers suitable for funding
@@ -438,6 +440,8 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("mock"))
                     .setSupportedEntityTypes(null);
             ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("pubmed"))
+                    .setSupportedEntityTypes(null);
+            ((AbstractExternalDataProvider) externalDataService.getExternalDataProvider("suggestion"))
                     .setSupportedEntityTypes(null);
         }
 
