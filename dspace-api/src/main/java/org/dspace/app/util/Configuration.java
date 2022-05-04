@@ -24,6 +24,8 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class Configuration
 {
+    private Configuration() { }
+
     /**
      * Command-line interface for running configuration tasks. Possible
      * arguments:
@@ -40,8 +42,6 @@ public class Configuration
      * @param argv
      *            command-line arguments
      */
-
-    private Configuration() { }
 
     public static void main(String[] argv)
     {
