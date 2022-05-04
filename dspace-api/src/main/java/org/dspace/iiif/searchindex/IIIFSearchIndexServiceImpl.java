@@ -120,13 +120,14 @@ public class IIIFSearchIndexServiceImpl implements IIIFSearchIndexService {
             if (action == "add") {
                 if (!checkIndex(url)) {
                     post(url, dso.getID().toString());
+                    ++processed;
                 } else {
                     System.out.println("An index entry already exists. Skipping: " + dso.getID());
                 }
             } else if (action == "delete") {
                 delete(url, dso.getID().toString());
+                ++processed;
             }
-            ++processed;
         }
     }
 
@@ -153,9 +154,10 @@ public class IIIFSearchIndexServiceImpl implements IIIFSearchIndexService {
         try {
             HttpResponse response = httpclient.execute(httppost);
             if (response.getStatusLine().getStatusCode() != 200) {
-                log.warn("Post to Solr preprocessor failed with status code: "
+                log.warn("Post to OCR processor failed with status code: "
                     + response.getStatusLine().getStatusCode());
                 System.out.println("Indexing failed for: " + id);
+                System.out.println("Check the DSpace log and the Solr OCR processor log for details.");
             }
         } catch (IOException e) {
             log.warn(e.getMessage(), e);

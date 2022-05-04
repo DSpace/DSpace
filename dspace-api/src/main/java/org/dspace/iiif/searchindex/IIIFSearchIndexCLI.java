@@ -241,6 +241,7 @@ public class IIIFSearchIndexCLI {
         iiifSearchIndexService.setMax2Process(max2Process);
         iiifSearchIndexService.setIsQuiet(isQuiet);
 
+        System.out.println("Processing started.");
         int processed = 0;
         switch (dso.getType()) {
             case Constants.COMMUNITY:
@@ -266,8 +267,13 @@ public class IIIFSearchIndexCLI {
         if (action.contentEquals("delete")) {
             System.out.println(processed + " items were removed from the IIIF search index.");
         } else {
-            System.out.println(processed + " items were added to the IIIF search index.");
+            // When processing a single item don't bother showing the trivial item count; if the item was
+            // skipped because it is in the index already the count is confusing.
+            if (dso.getType() != Constants.ITEM) {
+                System.out.println(processed + " items were added to the IIIF search index.");
+            }
         }
+        System.out.println("Processing was successfully completed.");
 
     }
 
