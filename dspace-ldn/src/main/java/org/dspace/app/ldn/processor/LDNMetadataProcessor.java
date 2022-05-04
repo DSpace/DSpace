@@ -352,9 +352,52 @@ public class LDNMetadataProcessor implements LDNProcessor {
      */
     private String resolveContext(Notification notification) {
         String url = notification.getContext().getId();
-        if (url.startsWith(this.dspaceUIUrl)) {
-            return url;
+        if (isExternalContextId(url)) {
+            try {
+                if (isAllowedExternalContextId(url)) {
+                    log.info("Attempting to resolve external context id {}", url);
+                    HttpHeaders headers = this.restTemplate.headForHeaders(url);
+                    if (headers.containsKey(LOCATION_HEADER_KEY)) {
+                        url = headers.getFirst(LOCATION_HEADER_KEY);
+                    } else {
+                        log.error("External context id {} HEAD response did not contain Location header", url);
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                format("Invalid context id %s", url));
+                    }
+                } else {
+                    String message = format("Context id %s not allowed for external dereference", url);
+                    log.error(message);
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+                }
+            } catch (RestClientException e) {
+                log.error(format("Failed to resolve context id %s", url), e);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        format("Failed to resolve context id %s: %s", url, e.getMessage()));
+            }
         }
+
+        return url;
+    }
+
+    /**
+     * Determine if the context id is an external context id by checking if it does
+     * not start with the DSpace UI URL.
+     * 
+     * @param url context id
+     * @return whether context id is external
+     */
+    private boolean isExternalContextId(String url) {
+        return !url.startsWith(this.dspaceUIUrl);
+    }
+
+    /**
+     * Determine if external context id is allowed by checking if starts with one of
+     * the allowed external resolver urls.
+     * 
+     * @param url external context id
+     * @return whether external context id is allowed
+     */
+    private boolean isAllowedExternalContextId(String url) {
         boolean allowExternalContextId = false;
         for (String allowedExternalResolverUrl : this.allowedExternalResolverUrls) {
             if (url.startsWith(allowedExternalResolverUrl)) {
@@ -362,26 +405,8 @@ public class LDNMetadataProcessor implements LDNProcessor {
                 break;
             }
         }
-        if (!allowExternalContextId) {
-            String message = format("Context id %s not allowed for external dereference.", url);
-            log.error(message);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
-        }
-        log.info("Attempting to resolve external context id {}", url);
-        try {
-            HttpHeaders headers = this.restTemplate.headForHeaders(url);
-            if (headers.containsKey(LOCATION_HEADER_KEY)) {
-                return headers.getFirst(LOCATION_HEADER_KEY);
-            } else {
-                log.error("External context id {} HEAD response did not contain Location header", url);
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        format("Invalid context id %s", url));
-            }
-        } catch (RestClientException e) {
-            log.error(format("Failed to resolve context id %s.", url), e);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    format("Failed to resolve context id %s. %s", url, e.getMessage()));
-        }
+
+        return allowExternalContextId;
     }
 
     /**
