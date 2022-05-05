@@ -27,7 +27,7 @@
         <sass.version>3.4.25</sass.version>
         <compass.version>1.0.1</compass.version>
         <node.version>12.22.4</node.version>
-        <npm.version>6.14.14</npm.version>
+        <yarn.version>0.21.3</yarn.version>
         <!-- Override version of JRuby that gem-maven-plugin installs when "mirage2.deps.included=true" -->
         <jruby.version>9.1.17.0</jruby.version>
     </properties>
@@ -179,8 +179,10 @@
                                             <goal>copy-resources</goal>
                                             <configuration>
                                                 <outputDirectory>${project.build.directory}/themes/@item@</outputDirectory>
+                                                <overwrite>false</overwrite>
                                                 <resources>
                                                     <resource>
+                                                        <!--  this is in dspace/modules/xmlui-mirage2/target/mirage2-source-extracted -->
                                                         <directory>${project.build.directory}/mirage2-source-extracted</directory>
                                                         <filtering>false</filtering>
                                                         <excludes>
@@ -231,7 +233,7 @@
                                             </plugin>
                                             <goal>exec</goal>
                                             <configuration>
-                                                <executable>npm</executable>
+                                                <executable>yarn</executable>
                                                 <arguments>
                                                     <argument>install</argument>
                                                 </arguments>
@@ -317,7 +319,7 @@
                         <plugin>
                             <groupId>com.github.eirslett</groupId>
                             <artifactId>frontend-maven-plugin</artifactId>
-                            <version>1.0</version>
+                            <version>1.3</version>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -354,6 +356,7 @@
                                             <goal>copy-resources</goal>
                                             <configuration>
                                                 <outputDirectory>${project.build.directory}/themes/@item@</outputDirectory>
+                                                <overwrite>false</overwrite>
                                                 <resources>
                                                     <resource>
                                                         <directory>${project.build.directory}/mirage2-source-extracted</directory>
@@ -405,12 +408,13 @@
                                                 <groupId>com.github.eirslett</groupId>
                                                 <artifactId>frontend-maven-plugin</artifactId>
                                             </plugin>
-                                            <goal>install-node-and-npm</goal>
+                                            <goal>install-node-and-yarn</goal>
                                             <!--<phase>process-resources</phase>-->
                                             <configuration>
                                                 <workingDirectory>${project.build.directory}/themes/@item@</workingDirectory>
                                                 <nodeVersion>v${node.version}</nodeVersion>
-                                                <npmVersion>${npm.version}</npmVersion>
+                                                <!--yarn needs the 'v' before the version, otherwise frontend-maven-plugin can't download it-->
+                                                <yarnVersion>v${yarn.version}</yarnVersion>
                                             </configuration>
                                         </pluginExecutor>
                                         <pluginExecutor>
@@ -419,7 +423,7 @@
                                                 <groupId>com.github.eirslett</groupId>
                                                 <artifactId>frontend-maven-plugin</artifactId>
                                             </plugin>
-                                            <goal>npm</goal>
+                                            <goal>yarn</goal>
                                             <!--<phase>prepare-package</phase>-->
                                             <configuration>
                                                 <arguments>install</arguments>
