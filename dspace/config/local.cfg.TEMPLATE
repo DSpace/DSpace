@@ -34,10 +34,6 @@ assetstore.incoming = 0
 # SOLR CONFIGURATION #
 ######################
 solr.server=http://dspacesolr:8983/solr
-discovery.search.server = ${solr.server}/drum-search
-solr-statistics.server = ${solr.server}/drum-statistics
-oai.solr.url=${solr.server}/drum-oai
-solr.authority.server=${solr.server}/drum-authority
 
 ##########################
 # DATABASE CONFIGURATION #
