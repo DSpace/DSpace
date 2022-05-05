@@ -32,50 +32,50 @@ import org.springframework.stereotype.Component;
 @Component
 public class ResourcePolicyPolicyTypeAddOperation<R> extends PatchOperation<R> {
 
-	@Autowired
-	ResourcePolicyUtils resourcePolicyUtils;
+    @Autowired
+    ResourcePolicyUtils resourcePolicyUtils;
 
-	@Override
-	public R perform(Context context, R resource, Operation operation) {
-		checkOperationValue(operation.getValue());
-		if (this.supports(resource, operation)) {
-			ResourcePolicy resourcePolicy = (ResourcePolicy) resource;
-			this.checkResourcePolicyForNonExistingPolicyTypeValue(resourcePolicy);
-			this.add(resourcePolicy, operation);
-			return resource;
-		} else {
-			throw new DSpaceBadRequestException(this.getClass() + " does not support this operation");
-		}
-	}
+    @Override
+    public R perform(Context context, R resource, Operation operation) {
+        checkOperationValue(operation.getValue());
+        if (this.supports(resource, operation)) {
+            ResourcePolicy resourcePolicy = (ResourcePolicy) resource;
+            this.checkResourcePolicyForNonExistingPolicyTypeValue(resourcePolicy);
+            this.add(resourcePolicy, operation);
+            return resource;
+        } else {
+            throw new DSpaceBadRequestException(this.getClass() + " does not support this operation");
+        }
+    }
 
-	/**
-    * Performs the actual add policyType of resourcePolicy operation
-    *
-    * @param resourcePolicy resourcePolicy being patched
-    * @param operation      patch operation
-    */
-	private void add(ResourcePolicy resourcePolicy, Operation operation) {
-		String policyType = (String) operation.getValue();
-		resourcePolicy.setRpType(policyType);
-	}
+    /**
+     * Performs the actual add policyType of resourcePolicy operation
+     *
+     * @param resourcePolicy resourcePolicy being patched
+     * @param operation      patch operation
+     */
+    private void add(ResourcePolicy resourcePolicy, Operation operation) {
+        String policyType = (String) operation.getValue();
+        resourcePolicy.setRpType(policyType);
+    }
 
-	@Override
-	public boolean supports(Object objectToMatch, Operation operation) {
-		return (objectToMatch instanceof ResourcePolicy && operation.getOp().trim().equalsIgnoreCase(OPERATION_ADD)
-				&& operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_POLICY_TYPE));
-	}
+    @Override
+    public boolean supports(Object objectToMatch, Operation operation) {
+        return (objectToMatch instanceof ResourcePolicy && operation.getOp().trim().equalsIgnoreCase(OPERATION_ADD)
+                && operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_POLICY_TYPE));
+    }
 
-	/**
-	 * Throws DSpaceBadRequestException if a value is already set in the /policyType
-	 * path.
-	 *
-	 * @param resource the resource to update
-	 * 
-	 */
-	void checkResourcePolicyForNonExistingPolicyTypeValue(ResourcePolicy resource) {
-		if (resource.getRpType() != null) {
-			throw new DSpaceBadRequestException("Attempting to add a value to an already existing path.");
-		}
-	}
+    /**
+     * Throws DSpaceBadRequestException if a value is already set in the /policyType
+     * path.
+     *
+     * @param resource the resource to update
+     * 
+     */
+    void checkResourcePolicyForNonExistingPolicyTypeValue(ResourcePolicy resource) {
+        if (resource.getRpType() != null) {
+            throw new DSpaceBadRequestException("Attempting to add a value to an already existing path.");
+        }
+    }
 
 }

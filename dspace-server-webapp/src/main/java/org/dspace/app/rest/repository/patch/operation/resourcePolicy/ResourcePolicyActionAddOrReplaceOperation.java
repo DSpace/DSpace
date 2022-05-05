@@ -33,38 +33,38 @@ import org.springframework.stereotype.Component;
 @Component
 public class ResourcePolicyActionAddOrReplaceOperation<R> extends PatchOperation<R> {
 
-	@Override
-	public R perform(Context context, R resource, Operation operation) {
-		checkOperationValue(operation.getValue());
-		if (this.supports(resource, operation)) {
-			ResourcePolicy resourcePolicy = (ResourcePolicy) resource;
-			this.replace(resourcePolicy, operation);
-			return resource;
-		} else {
-			throw new DSpaceBadRequestException(this.getClass() + " does not support this operation");
-		}
-	}
+    @Override
+    public R perform(Context context, R resource, Operation operation) {
+        checkOperationValue(operation.getValue());
+        if (this.supports(resource, operation)) {
+            ResourcePolicy resourcePolicy = (ResourcePolicy) resource;
+            this.replace(resourcePolicy, operation);
+            return resource;
+        } else {
+            throw new DSpaceBadRequestException(this.getClass() + " does not support this operation");
+        }
+    }
 
-	/**
-     * Performs the actual add or replace action of resourcePolicy operation.
-     * Both actions are allowed since the starting value of action is a defined int.
+    /**
+     * Performs the actual add or replace action of resourcePolicy operation. Both
+     * actions are allowed since the starting value of action is a defined int.
      * 
      * @param resourcePolicy resourcePolicy being patched
      * @param operation      patch operation
      */
-	private void replace(ResourcePolicy resourcePolicy, Operation operation) {
-		int action = (int) operation.getValue();
-		if (action < 0 || action > Constants.actionText.length) {
-			throw new UnprocessableEntityException(action + "is not defined");
-		}
-		resourcePolicy.setAction(action);
-	}
+    private void replace(ResourcePolicy resourcePolicy, Operation operation) {
+        int action = (int) operation.getValue();
+        if (action < 0 || action > Constants.actionText.length) {
+            throw new UnprocessableEntityException(action + "is not defined");
+        }
+        resourcePolicy.setAction(action);
+    }
 
-	@Override
-	public boolean supports(Object objectToMatch, Operation operation) {
-		return (objectToMatch instanceof ResourcePolicy
-				&& (operation.getOp().trim().equalsIgnoreCase(OPERATION_ADD)
-						|| operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE))
-				&& operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_ACTION));
-	}
+    @Override
+    public boolean supports(Object objectToMatch, Operation operation) {
+        return (objectToMatch instanceof ResourcePolicy
+                && (operation.getOp().trim().equalsIgnoreCase(OPERATION_ADD)
+                        || operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE))
+                && operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_ACTION));
+    }
 }

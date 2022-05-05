@@ -19,8 +19,7 @@ import org.springframework.stereotype.Component;
 /**
  * Implementation for ResourcePolicy policyType DELETE patch.
  *
- * Example:
- * <code>
+ * Example: <code>
  * curl -X PATCH http://${dspace.server.url}/api/authz/resourcepolicies/<:id-resourcepolicy> -H "
  * Content-Type: application/json" -d '[{ "op": "remove", "path": "
  * /policyType"]'
@@ -32,42 +31,43 @@ import org.springframework.stereotype.Component;
 @Component
 public class ResourcePolicyPolicyTypeRemoveOperation<R> extends PatchOperation<R> {
 
-	@Override
-	public R perform(Context context, R resource, Operation operation) {
-		if (this.supports(resource, operation)) {
-			ResourcePolicy resourcePolicy = (ResourcePolicy) resource;
-			this.checkResourcePolicyForExistingPolicyTypeValue(resourcePolicy, operation);
-			this.delete(resourcePolicy);
-			return resource;
-		} else {
-			throw new DSpaceBadRequestException(this.getClass() + " does not support this operation");
-		}
-	}
-
-	/**
-	 * Performs the actual delete policyType of resourcePolicy operation
-	 * 
-	 * @param resourcePolicy resourcePolicy being patched
-	 */
-	private void delete(ResourcePolicy resourcePolicy) {
-		resourcePolicy.setRpType(null);
-	}
-
-	@Override
-	public boolean supports(Object objectToMatch, Operation operation) {
-		return (objectToMatch instanceof ResourcePolicy && operation.getOp().trim().equalsIgnoreCase(OPERATION_REMOVE)
-				&& operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_POLICY_TYPE));
-	}
+    @Override
+    public R perform(Context context, R resource, Operation operation) {
+        if (this.supports(resource, operation)) {
+            ResourcePolicy resourcePolicy = (ResourcePolicy) resource;
+            this.checkResourcePolicyForExistingPolicyTypeValue(resourcePolicy, operation);
+            this.delete(resourcePolicy);
+            return resource;
+        } else {
+            throw new DSpaceBadRequestException(this.getClass() + " does not support this operation");
+        }
+    }
 
     /**
-     * Throws DSpaceBadRequestException if attempting to delete a non-existent value in /policyType path.
+     * Performs the actual delete policyType of resourcePolicy operation
+     * 
+     * @param resourcePolicy resourcePolicy being patched
+     */
+    private void delete(ResourcePolicy resourcePolicy) {
+        resourcePolicy.setRpType(null);
+    }
+
+    @Override
+    public boolean supports(Object objectToMatch, Operation operation) {
+        return (objectToMatch instanceof ResourcePolicy && operation.getOp().trim().equalsIgnoreCase(OPERATION_REMOVE)
+                && operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_POLICY_TYPE));
+    }
+
+    /**
+     * Throws DSpaceBadRequestException if attempting to delete a non-existent value
+     * in /policyType path.
      *
      * @param resource the resource to update
      */
-	void checkResourcePolicyForExistingPolicyTypeValue(ResourcePolicy resource, Operation operation) {
-		if (resource.getRpType() == null) {
-			throw new DSpaceBadRequestException(
-					"Attempting to " + operation.getOp() + " a non-existent policyType value.");
-		}
-	}
+    void checkResourcePolicyForExistingPolicyTypeValue(ResourcePolicy resource, Operation operation) {
+        if (resource.getRpType() == null) {
+            throw new DSpaceBadRequestException(
+                    "Attempting to " + operation.getOp() + " a non-existent policyType value.");
+        }
+    }
 }

@@ -19,8 +19,7 @@ import org.springframework.stereotype.Component;
 /**
  * Implementation for ResourcePolicy policyType REPLACE patch.
  *
- * Example:
- * Example: <code>
+ * Example: Example: <code>
  * curl -X PATCH http://${dspace.server.url}/api/authz/resourcepolicies/<:id-resourcepolicy> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /policyType", "value": "TYPE_CUSTOM"]'
@@ -32,46 +31,47 @@ import org.springframework.stereotype.Component;
 @Component
 public class ResourcePolicyPolicyTypeReplaceOperation<R> extends PatchOperation<R> {
 
-	@Override
-	public R perform(Context context, R resource, Operation operation) {
-		checkOperationValue(operation.getValue());
-		if (this.supports(resource, operation)) {
-			ResourcePolicy resourcePolicy = (ResourcePolicy) resource;
-			this.checkResourcePolicyForExistingPolicyTypeValue(resourcePolicy, operation);
-			this.replace(resourcePolicy, operation);
-			return resource;
-		} else {
-			throw new DSpaceBadRequestException(this.getClass() + " does not support this operation");
-		}
-	}
+    @Override
+    public R perform(Context context, R resource, Operation operation) {
+        checkOperationValue(operation.getValue());
+        if (this.supports(resource, operation)) {
+            ResourcePolicy resourcePolicy = (ResourcePolicy) resource;
+            this.checkResourcePolicyForExistingPolicyTypeValue(resourcePolicy, operation);
+            this.replace(resourcePolicy, operation);
+            return resource;
+        } else {
+            throw new DSpaceBadRequestException(this.getClass() + " does not support this operation");
+        }
+    }
 
-	/**
-	 * Performs the actual replace policyType of resourcePolicy operation
-	 * 
-	 * @param resourcePolicy resourcePolicy being patched
-	 * @param operation      patch operation
-	 */
-	private void replace(ResourcePolicy resourcePolicy, Operation operation) {
-		String newPolicyType = (String) operation.getValue();
-		resourcePolicy.setRpType(newPolicyType);
-	}
+    /**
+     * Performs the actual replace policyType of resourcePolicy operation
+     * 
+     * @param resourcePolicy resourcePolicy being patched
+     * @param operation      patch operation
+     */
+    private void replace(ResourcePolicy resourcePolicy, Operation operation) {
+        String newPolicyType = (String) operation.getValue();
+        resourcePolicy.setRpType(newPolicyType);
+    }
 
-	@Override
-	public boolean supports(Object objectToMatch, Operation operation) {
-		return (objectToMatch instanceof ResourcePolicy && operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE)
-				&& operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_POLICY_TYPE));
-	}
-	
-	/**
-	 * Throws DSpaceBadRequestException when attempting to replace a non-existent value in /policyType path
-	 * 
-	 * @param resource
-	 * @param operation
-	 */
-	private void checkResourcePolicyForExistingPolicyTypeValue(ResourcePolicy resource, Operation operation) {
+    @Override
+    public boolean supports(Object objectToMatch, Operation operation) {
+        return (objectToMatch instanceof ResourcePolicy && operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE)
+                && operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_POLICY_TYPE));
+    }
+
+    /**
+     * Throws DSpaceBadRequestException when attempting to replace a non-existent
+     * value in /policyType path
+     * 
+     * @param resource
+     * @param operation
+     */
+    private void checkResourcePolicyForExistingPolicyTypeValue(ResourcePolicy resource, Operation operation) {
         if (resource.getRpType() == null) {
-            throw new DSpaceBadRequestException("Attempting to " + operation.getOp()
-                + " a non-existent policyType value.");
+            throw new DSpaceBadRequestException(
+                    "Attempting to " + operation.getOp() + " a non-existent policyType value.");
         }
     }
 }
