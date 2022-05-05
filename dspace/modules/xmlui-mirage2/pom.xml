@@ -27,7 +27,6 @@
         <sass.version>3.4.25</sass.version>
         <compass.version>1.0.1</compass.version>
         <node.version>12.22.4</node.version>
-        <npm.version>6.14.14</npm.version>
         <!-- Override version of JRuby that gem-maven-plugin installs when "mirage2.deps.included=true" -->
         <jruby.version>9.1.17.0</jruby.version>
     </properties>
@@ -179,8 +178,10 @@
                                             <goal>copy-resources</goal>
                                             <configuration>
                                                 <outputDirectory>${project.build.directory}/themes/@item@</outputDirectory>
+                                                <overwrite>false</overwrite>
                                                 <resources>
                                                     <resource>
+                                                        <!--  this is in dspace/modules/xmlui-mirage2/target/mirage2-source-extracted -->
                                                         <directory>${project.build.directory}/mirage2-source-extracted</directory>
                                                         <filtering>false</filtering>
                                                         <excludes>
@@ -317,7 +318,7 @@
                         <plugin>
                             <groupId>com.github.eirslett</groupId>
                             <artifactId>frontend-maven-plugin</artifactId>
-                            <version>1.0</version>
+                            <version>1.12.1</version>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -354,6 +355,7 @@
                                             <goal>copy-resources</goal>
                                             <configuration>
                                                 <outputDirectory>${project.build.directory}/themes/@item@</outputDirectory>
+                                                <overwrite>false</overwrite>
                                                 <resources>
                                                     <resource>
                                                         <directory>${project.build.directory}/mirage2-source-extracted</directory>
@@ -410,7 +412,6 @@
                                             <configuration>
                                                 <workingDirectory>${project.build.directory}/themes/@item@</workingDirectory>
                                                 <nodeVersion>v${node.version}</nodeVersion>
-                                                <npmVersion>${npm.version}</npmVersion>
                                             </configuration>
                                         </pluginExecutor>
                                         <pluginExecutor>
