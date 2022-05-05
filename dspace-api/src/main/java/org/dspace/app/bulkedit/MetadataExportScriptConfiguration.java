@@ -54,12 +54,9 @@ public class MetadataExportScriptConfiguration<T extends MetadataExport> extends
             Options options = new Options();
 
             options.addOption("i", "id", true, "ID or handle of thing to export (item, collection, or community)");
-            options.getOption("i").setType(String.class);
             options.addOption("a", "all", false,
                               "include all metadata fields that are not normally changed (e.g. provenance)");
-            options.getOption("a").setType(boolean.class);
             options.addOption("h", "help", false, "help");
-            options.getOption("h").setType(boolean.class);
 
 
             super.options = options;

@@ -7,10 +7,12 @@
  */
 package org.dspace.eperson;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
 import javax.mail.MessagingException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -30,16 +32,17 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * Recommended filter:  EPerson+Create
  *
  * @author Stuart Lewis
- * @version $Revision$
  */
 public class EPersonConsumer implements Consumer {
     /**
      * log4j logger
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(EPersonConsumer.class);
+    private static final Logger log
+            = org.apache.logging.log4j.LogManager.getLogger(EPersonConsumer.class);
 
     protected EPersonService ePersonService
             = EPersonServiceFactory.getInstance().getEPersonService();
+
     protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
@@ -74,6 +77,7 @@ public class EPersonConsumer implements Consumer {
                 if (et == Event.CREATE) {
                     // Notify of new user registration
                     String notifyRecipient = configurationService.getProperty("registration.notify");
+                    EPerson eperson = ePersonService.find(context, id);
                     if (notifyRecipient == null) {
                         notifyRecipient = "";
                     }
@@ -81,7 +85,6 @@ public class EPersonConsumer implements Consumer {
 
                     if (!notifyRecipient.equals("")) {
                         try {
-                            EPerson eperson = ePersonService.find(context, id);
                             Email adminEmail = Email
                                 .getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "registration_notify"));
                             adminEmail.addRecipient(notifyRecipient);
@@ -101,6 +104,26 @@ public class EPersonConsumer implements Consumer {
                         } catch (MessagingException me) {
                             log.warn(LogHelper.getHeader(context,
                                                           "error_emailing_administrator", ""), me);
+                        }
+                    }
+
+                    // If enabled, send a "welcome" message to the new EPerson.
+                    if (configurationService.getBooleanProperty("mail.welcome.enabled", false)) {
+                        String addressee = eperson.getEmail();
+                        if (StringUtils.isNotBlank(addressee)) {
+                            log.debug("Sending welcome email to {}", addressee);
+                            try {
+                                Email message = Email.getEmail(
+                                        I18nUtil.getEmailFilename(context.getCurrentLocale(), "welcome"));
+                                message.addRecipient(addressee);
+                                message.send();
+                            } catch (IOException | MessagingException ex) {
+                                log.warn("Welcome message not sent to {}:  {}",
+                                        addressee, ex.getMessage());
+                            }
+                        } else {
+                            log.warn("Welcome message not sent to EPerson {} because it has no email address.",
+                                    eperson.getID().toString());
                         }
                     }
                 } else if (et == Event.DELETE) {
