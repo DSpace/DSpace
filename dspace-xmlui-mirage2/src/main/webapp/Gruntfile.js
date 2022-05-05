@@ -9,6 +9,8 @@
 'use strict';
 
 module.exports = function (grunt) {
+    grunt.loadNpmTasks('grunt-node-sass');
+
     // show elapsed time at the end
     require('time-grunt')(grunt);
     // load all grunt tasks
@@ -39,20 +41,22 @@ module.exports = function (grunt) {
                         dest: 'scripts-dist.xml'
                     }
                 ]
+            },
+            fonts: {
+                files: [
+                    {
+                        src: 'node_modules/bootstrap-sass/assets/fonts/bootstrap/*',
+                        expand: true,
+                        flatten: true,
+                        dest: 'fonts/bootstrap'
+                    }
+                ]
             }
         },
-        compass: {
-            prod: {
-                options: {
-                    config: 'config-prod.rb'
-                }
-
-            },
-            dev: {
-                options: {
-                    config: 'config-dev.rb'
-                }
-
+        sass: {
+            dist: {
+                src: 'styles/main.scss',
+                dest: 'styles/main.css',
             }
         },
         coffee: {
@@ -100,7 +104,7 @@ module.exports = function (grunt) {
         'copy:bootstrap_color_scheme'
     ]);
     grunt.registerTask('shared-steps', [
-        'copy:scriptsxml', 'coffee', 'handlebars', 'useminPrepare','concat'
+        'copy:scriptsxml', 'coffee', 'handlebars', 'useminPrepare','concat', 'copy:fonts'
     ]);
     grunt.registerTask('no-compass-prod', [
         'shared-steps','uglify','usemin'
@@ -109,10 +113,10 @@ module.exports = function (grunt) {
         'shared-steps','uglify:generated'
     ]);
     grunt.registerTask('prod', [
-        'compass:prod', 'no-compass-prod'
+        'sass', 'no-compass-prod'
     ]);
     grunt.registerTask('dev', [
-        'compass:dev', 'no-compass-dev'
+        'classic_mirage_color_scheme', 'sass', 'no-compass-dev'
     ]);
     grunt.registerTask('default', [
         'classic_mirage_color_scheme',
