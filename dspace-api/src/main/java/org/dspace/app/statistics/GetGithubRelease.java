@@ -9,7 +9,6 @@ package org.dspace.app.statistics;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,16 +18,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.inject.Inject;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.dspace.discovery.IndexClientOptions;
-import org.dspace.discovery.IndexDiscoveryScriptConfiguration;
 import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.utils.DSpace;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -42,55 +34,32 @@ public class GetGithubRelease
     @Inject
     GetGithubReleaseScriptConfiguration configuration;
 
-    private Options options;
-
-    private static final String OPT_HELP = "h";
-    private static final String OPT_FILE = "f";
-    private static final String OPT_OWNER = "o";
-    private static final String OPT_REPO = "r";
-    private static final String OPT_VERBOSE = "v";
-
     private static boolean verbose;
 
     @Override
     public GetGithubReleaseScriptConfiguration getScriptConfiguration() {
-        return new DSpace()
-                .getServiceManager()
-                .getServiceByName("index-discovery",
-                        GetGithubReleaseScriptConfiguration.class);
+        return configuration;
     }
 
     @Override
     public void setup() {
-        options = GetGithubReleaseOptions.getOption(commandLine);
+        // XXX This method intentionally left blank.
     }
 
     @Override
     public void internalRun() throws Exception {
-        // Parse the command line.
-        DefaultParser commandParser = new DefaultParser();
-        @SuppressWarnings("UnusedAssignment")
-        CommandLine command = null;
-        try {
-            command = commandParser.parse(options, argv);
-        } catch (ParseException e) {
-            System.err.println(e.getMessage());
-            printHelp(options);
-            System.exit(1);
-        }
-
         // If asked, display help and exit.
-        if (command.hasOption(OPT_HELP)) {
-            printHelp(options);
+        if (commandLine.hasOption(GetGithubReleaseOptions.OPT_HELP)) {
+            printHelp(GetGithubReleaseOptions.constructOptions());
             System.exit(0);
         }
 
         // Not help.  Remember whether verbose was required.
-        verbose = command.hasOption(OPT_VERBOSE);
+        verbose = commandLine.hasOption(GetGithubReleaseOptions.OPT_VERBOSE);
 
         // Identify the latest release.
-        String owner = command.getOptionValue(OPT_OWNER);
-        String repo = command.getOptionValue(OPT_REPO);
+        String owner = commandLine.getOptionValue(GetGithubReleaseOptions.OPT_OWNER);
+        String repo = commandLine.getOptionValue(GetGithubReleaseOptions.OPT_REPO);
         URL releaseConnection = new URL(String.format("https://api.github.com/repos/%s/%s/releases/latest",
                 owner, repo));
         @SuppressWarnings("UnusedAssignment")
@@ -107,9 +76,9 @@ public class GetGithubRelease
         // Get the release's Zip archive and save it or extract members.
         URL archiveConnection = new URL(archiveUrl);
         try (InputStream archiveStream = archiveConnection.openStream();) {
-            if (command.hasOption(OPT_FILE)) {
+            if (commandLine.hasOption(GetGithubReleaseOptions.OPT_FILE)) {
                 extractZipMembers(new ZipInputStream(archiveStream),
-                        command.getOptionValues(OPT_FILE));
+                        commandLine.getOptionValues(GetGithubReleaseOptions.OPT_FILE));
             } else {
                 String archiveDate = releaseParsed.getString("published_at");
                 Path archiveFilePath = Paths.get(owner + "-" + repo + "_" + archiveDate + ".zip");
