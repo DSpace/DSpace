@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -296,9 +296,14 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     protected MetadataFieldRest put(Context context, HttpServletRequest request, String apiCategory, String model,
         Integer id, JsonNode jsonNode) throws SQLException, AuthorizeException {
 
-        MetadataFieldRest metadataFieldRest = new Gson().fromJson(jsonNode.toString(), MetadataFieldRest.class);
+        MetadataFieldRest metadataFieldRest;
+        try {
+            metadataFieldRest = new ObjectMapper().readValue(jsonNode.toString(), MetadataFieldRest.class);
+        } catch (JsonProcessingException e) {
+            throw new UnprocessableEntityException("Cannot parse JSON in request body", e);
+        }
 
-        if (isBlank(metadataFieldRest.getElement())) {
+        if (metadataFieldRest == null || isBlank(metadataFieldRest.getElement())) {
             throw new UnprocessableEntityException("metadata element (in request body) cannot be blank");
         }
 

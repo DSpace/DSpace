@@ -31,7 +31,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -55,7 +56,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
     // 20 is the event max set by the GA API
     private static final int GA_MAX_EVENTS = 20;
     private static final String ANALYTICS_BATCH_ENDPOINT = "https://www.google-analytics.com/batch";
-    private static Logger log = Logger.getLogger(GoogleAsyncEventListener.class);
+    private final static Logger log = LogManager.getLogger();
     private static String analyticsKey;
     private static CloseableHttpClient httpclient;
     private static Buffer buffer;
