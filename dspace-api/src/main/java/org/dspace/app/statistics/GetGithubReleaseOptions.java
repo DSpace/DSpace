@@ -3,12 +3,23 @@
  */
 package org.dspace.app.statistics;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+
 /**
  *
  * @author mwood
  */
 public enum GetGithubReleaseOptions {
+    GET,
     HELP;
+
+    static final String OPT_HELP = "h";
+    static final String OPT_FILE = "f";
+    static final String OPT_OWNER = "o";
+    static final String OPT_REPO = "r";
+    static final String OPT_VERBOSE = "v";
 
     protected static Options constructOptions() {
         Options options = new Options();
@@ -41,13 +52,8 @@ public enum GetGithubReleaseOptions {
                 .build();
         options.addOption(option);
 
-        options.addOption("v", "verbose", false, "Show lots of debugging information");
+        options.addOption(OPT_VERBOSE, "verbose", false, "Show lots of debugging information");
 
         return options;
-    }
-
-    protected static GetGithubReleaseOptions getOption(CommandLine command) {
-        if (command.hasOption("h")) {
-            return GetGithubReleaseOptions.HELP;
     }
 }

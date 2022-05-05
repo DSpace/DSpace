@@ -1,10 +1,7 @@
-/*
- * Copyright 2022 Indiana University.
- */
 package org.dspace.app.statistics;
 
+import org.apache.commons.cli.Options;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexClientOptions;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
@@ -32,11 +29,10 @@ public class GetGithubReleaseScriptConfiguration<T extends GetGithubRelease>
     }
 
     @Override
-    public Object getOptions() {
+    public Options getOptions() {
         if (options == null) {
             super.options = GetGithubReleaseOptions.constructOptions();
         }
         return options;
     }
-
 }
