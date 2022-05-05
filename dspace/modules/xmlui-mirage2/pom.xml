@@ -393,7 +393,7 @@
                                             <goal>grunt</goal>
                                             <!--<phase>prepare-package</phase>-->
                                             <configuration>
-                                                <arguments>${grunt.color.scheme} no-compass-${grunt.environment}
+                                                <arguments>${grunt.color.scheme} ${grunt.environment}
                                                 </arguments>
                                                 <workingDirectory>${project.build.directory}/themes/@item@</workingDirectory>
                                             </configuration>
