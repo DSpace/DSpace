@@ -38,6 +38,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.data.domain.Page;
@@ -52,9 +53,12 @@ import org.springframework.stereotype.Service;
 /**
  * Converts domain objects from the DSpace service layer to rest objects, and from rest objects to resource
  * objects, applying {@link Projection}s where applicable.
- *
+ * <P>
+ * MUST be loaded @Lazy, as this service requires other services to be preloaded (especially DSpaceConverter components)
+ * and that can result in circular references if those services need this ConverterService (and many do).
  * @author Luca Giamminonni (luca.giamminonni at 4science dot it)
  */
+@Lazy
 @Service
 public class ConverterService {
 

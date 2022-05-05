@@ -15,6 +15,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProcessConverter implements DSpaceConverter<Process, ProcessRest> {
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
     @Autowired
     private ConverterService converter;
 
