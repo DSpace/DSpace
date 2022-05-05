@@ -24,7 +24,6 @@
         <mirage2.deps.included>true</mirage2.deps.included>
         <!-- Versions of build dependencies to be auto-installed when "mirage2.deps.included=true" -->
         <!-- These versions should be kept in sync with ./.travis.yml -->
-        <sass.version>3.4.25</sass.version>
         <node.version>12.22.4</node.version>
     </properties>
 
