@@ -26,8 +26,6 @@
         <!-- These versions should be kept in sync with ./.travis.yml -->
         <sass.version>3.4.25</sass.version>
         <node.version>12.22.4</node.version>
-        <!-- Override version of JRuby that gem-maven-plugin installs when "mirage2.deps.included=true" -->
-        <jruby.version>9.1.17.0</jruby.version>
     </properties>
 
     <build>
@@ -77,8 +75,6 @@
                         <configuration>
                             <tasks>
                                 <echo>PATH=${env.PATH}</echo>
-                                <echo>GEM_PATH=${env.GEM_PATH}</echo>
-                                <echo>GEM_HOME=${env.GEM_HOME}</echo>
                                 <echo>mirage2.deps.included=${mirage2.deps.included}</echo>
                                 <echo>grunt.color.scheme=${grunt.color.scheme}</echo>
                                 <echo>grunt.environment=${grunt.environment}</echo>
@@ -258,8 +254,6 @@
                                                 </workingDirectory>
                                                 <environmentVariables>
                                                     <PATH>${env.PATH}</PATH>
-                                                    <GEM_PATH>${env.GEM_PATH}</GEM_PATH>
-                                                    <GEM_HOME>${env.GEM_HOME}</GEM_HOME>
                                                     <LC_CTYPE>UTF-8</LC_CTYPE>
                                                 </environmentVariables>
                                             </configuration>
@@ -290,11 +284,6 @@
                 <pluginManagement>
                     <plugins>
                         <plugin>
-                            <groupId>de.saumya.mojo</groupId>
-                            <artifactId>gem-maven-plugin</artifactId>
-                            <version>1.0.6</version>
-                        </plugin>
-                        <plugin>
                             <groupId>com.github.eirslett</groupId>
                             <artifactId>frontend-maven-plugin</artifactId>
                             <version>1.12.1</version>
@@ -302,17 +291,6 @@
                     </plugins>
                 </pluginManagement>
                 <plugins>
-                    <plugin>
-                        <groupId>de.saumya.mojo</groupId>
-                        <artifactId>gem-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>initialize</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>com.soebes.maven.plugins</groupId>
                         <artifactId>iterator-maven-plugin</artifactId>
@@ -418,19 +396,6 @@
                                                 <arguments>${grunt.color.scheme} no-compass-${grunt.environment}
                                                 </arguments>
                                                 <workingDirectory>${project.build.directory}/themes/@item@</workingDirectory>
-                                            </configuration>
-                                        </pluginExecutor>
-                                        <pluginExecutor>
-                                            <plugin>
-                                                <groupId>de.saumya.mojo</groupId>
-                                                <artifactId>gem-maven-plugin</artifactId>
-                                            </plugin>
-                                            <goal>exec</goal>
-                                            <configuration>
-                                                <launchDirectory>${project.build.directory}/themes/@item@</launchDirectory>
-                                                <execArgs>${project.build.directory}/rubygems/bin/compass compile -c
-                                                    config-${grunt.environment}.rb
-                                                </execArgs>
                                             </configuration>
                                         </pluginExecutor>
                                     </pluginExecutors>
