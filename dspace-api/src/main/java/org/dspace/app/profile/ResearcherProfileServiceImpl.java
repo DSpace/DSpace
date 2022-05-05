@@ -256,11 +256,6 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
             return empty();
         }
 
-        if (indexableObjects.size() > 1) {
-            log.warn("Multiple " + profileType + " type collections were found during profile creation");
-            return empty();
-        }
-
         return ofNullable((Collection) indexableObjects.get(0).getIndexedObject());
     }
 
