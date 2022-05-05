@@ -10,7 +10,7 @@ package org.dspace.app.rest.model;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.dspace.access.status.DefaultAccessStatusBuilder;
+import org.dspace.access.status.DefaultAccessStatusHelper;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,7 +33,7 @@ public class AccessStatusRestTest {
 
     @Test
     public void testAccessStatusIsNotNullAfterStatusSet() throws Exception {
-        accessStatusRest.setStatus(DefaultAccessStatusBuilder.UNKNOWN);
+        accessStatusRest.setStatus(DefaultAccessStatusHelper.UNKNOWN);
         assertNotNull(accessStatusRest.getStatus());
     }
 }

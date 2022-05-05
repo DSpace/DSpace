@@ -121,6 +121,6 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
     @Test
     public void testGetAccessStatus() throws Exception {
         String status = accessStatusService.getAccessStatus(context, item);
-        assertNotEquals("testGetAccessStatus 0", status, DefaultAccessStatusBuilder.UNKNOWN);
+        assertNotEquals("testGetAccessStatus 0", status, DefaultAccessStatusHelper.UNKNOWN);
     }
 }

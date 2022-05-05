@@ -12,13 +12,13 @@
  * </p>
  * <p>
  * The access status is calculated through a pluggable class:
- * {@link org.dspace.access.status.AccessStatusBuilder}.
+ * {@link org.dspace.access.status.AccessStatusHelper}.
  * The {@link org.dspace.access.status.AccessStatusServiceImpl}
  * must be configured to specify this class, as well as a forever embargo date
  * threshold year, month and day.
  * </p>
  * <p>
- * See {@link org.dspace.access.status.DefaultAccessStatusBuilder} for a simple calculation
+ * See {@link org.dspace.access.status.DefaultAccessStatusHelper} for a simple calculation
  * based on the primary or the first bitstream of the original bundle. You can
  * supply your own class to implement more complex access statuses.
  * </p>

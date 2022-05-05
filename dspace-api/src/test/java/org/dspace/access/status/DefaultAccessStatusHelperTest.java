@@ -47,9 +47,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
+public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
 
-    private static final Logger log = LogManager.getLogger(DefaultAccessStatusBuilderTest.class);
+    private static final Logger log = LogManager.getLogger(DefaultAccessStatusHelperTest.class);
 
     private Collection collection;
     private Community owningCommunity;
@@ -61,7 +61,9 @@ public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
     private Item itemWithGroupRestriction;
     private Item itemWithoutPolicy;
     private Item itemWithoutPrimaryBitstream;
-    private DefaultAccessStatusBuilder builder;
+    private Item itemWithPrimaryAndMultipleBitstreams;
+    private Item itemWithoutPrimaryAndMultipleBitstreams;
+    private DefaultAccessStatusHelper helper;
     private Date threshold;
 
     protected CommunityService communityService =
@@ -114,6 +116,10 @@ public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
                     workspaceItemService.create(context, collection, true));
             itemWithoutPrimaryBitstream = installItemService.installItem(context,
                     workspaceItemService.create(context, collection, true));
+            itemWithPrimaryAndMultipleBitstreams = installItemService.installItem(context,
+                    workspaceItemService.create(context, collection, true));
+            itemWithoutPrimaryAndMultipleBitstreams = installItemService.installItem(context,
+                    workspaceItemService.create(context, collection, true));
             context.restoreAuthSystemState();
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
@@ -122,7 +128,7 @@ public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
         }
-        builder = new DefaultAccessStatusBuilder();
+        helper = new DefaultAccessStatusHelper();
         threshold = new LocalDate(10000, 1, 1).toDate();
     }
 
@@ -146,6 +152,8 @@ public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
             itemService.delete(context, itemWithGroupRestriction);
             itemService.delete(context, itemWithoutPolicy);
             itemService.delete(context, itemWithoutPrimaryBitstream);
+            itemService.delete(context, itemWithPrimaryAndMultipleBitstreams);
+            itemService.delete(context, itemWithoutPrimaryAndMultipleBitstreams);
         } catch (Exception e) {
             // ignore
         }
@@ -168,9 +176,11 @@ public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
         itemWithGroupRestriction = null;
         itemWithoutPolicy = null;
         itemWithoutPrimaryBitstream = null;
+        itemWithPrimaryAndMultipleBitstreams = null;
+        itemWithoutPrimaryAndMultipleBitstreams = null;
         collection = null;
         owningCommunity = null;
-        builder = null;
+        helper = null;
         threshold = null;
         communityService = null;
         collectionService = null;
@@ -194,8 +204,8 @@ public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
      */
     @Test
     public void testWithNullItem() throws Exception {
-        String status = builder.getAccessStatusFromItem(context, null, threshold);
-        assertThat("testWithNullItem 0", status, equalTo(DefaultAccessStatusBuilder.UNKNOWN));
+        String status = helper.getAccessStatusFromItem(context, null, threshold);
+        assertThat("testWithNullItem 0", status, equalTo(DefaultAccessStatusHelper.UNKNOWN));
     }
 
     /**
@@ -204,8 +214,8 @@ public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
      */
     @Test
     public void testWithoutBundle() throws Exception {
-        String status = builder.getAccessStatusFromItem(context, itemWithoutBundle, threshold);
-        assertThat("testWithoutBundle 0", status, equalTo(DefaultAccessStatusBuilder.METADATA_ONLY));
+        String status = helper.getAccessStatusFromItem(context, itemWithoutBundle, threshold);
+        assertThat("testWithoutBundle 0", status, equalTo(DefaultAccessStatusHelper.METADATA_ONLY));
     }
 
     /**
@@ -217,8 +227,8 @@ public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
         bundleService.create(context, itemWithoutBitstream, Constants.CONTENT_BUNDLE_NAME);
         context.restoreAuthSystemState();
-        String status = builder.getAccessStatusFromItem(context, itemWithoutBitstream, threshold);
-        assertThat("testWithoutBitstream 0", status, equalTo(DefaultAccessStatusBuilder.METADATA_ONLY));
+        String status = helper.getAccessStatusFromItem(context, itemWithoutBitstream, threshold);
+        assertThat("testWithoutBitstream 0", status, equalTo(DefaultAccessStatusHelper.METADATA_ONLY));
     }
 
     /**
@@ -234,8 +244,8 @@ public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
         bitstream.setName(context, "primary");
         bundle.setPrimaryBitstreamID(bitstream);
         context.restoreAuthSystemState();
-        String status = builder.getAccessStatusFromItem(context, itemWithBitstream, threshold);
-        assertThat("testWithBitstream 0", status, equalTo(DefaultAccessStatusBuilder.OPEN_ACCESS));
+        String status = helper.getAccessStatusFromItem(context, itemWithBitstream, threshold);
+        assertThat("testWithBitstream 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
     }
 
     /**
@@ -261,8 +271,8 @@ public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
         authorizeService.removeAllPolicies(context, bitstream);
         authorizeService.addPolicies(context, policies, bitstream);
         context.restoreAuthSystemState();
-        String status = builder.getAccessStatusFromItem(context, itemWithEmbargo, threshold);
-        assertThat("testWithEmbargo 0", status, equalTo(DefaultAccessStatusBuilder.EMBARGO));
+        String status = helper.getAccessStatusFromItem(context, itemWithEmbargo, threshold);
+        assertThat("testWithEmbargo 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
     }
 
     /**
@@ -288,8 +298,8 @@ public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
         authorizeService.removeAllPolicies(context, bitstream);
         authorizeService.addPolicies(context, policies, bitstream);
         context.restoreAuthSystemState();
-        String status = builder.getAccessStatusFromItem(context, itemWithDateRestriction, threshold);
-        assertThat("testWithDateRestriction 0", status, equalTo(DefaultAccessStatusBuilder.RESTRICTED));
+        String status = helper.getAccessStatusFromItem(context, itemWithDateRestriction, threshold);
+        assertThat("testWithDateRestriction 0", status, equalTo(DefaultAccessStatusHelper.RESTRICTED));
     }
 
     /**
@@ -314,8 +324,8 @@ public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
         authorizeService.removeAllPolicies(context, bitstream);
         authorizeService.addPolicies(context, policies, bitstream);
         context.restoreAuthSystemState();
-        String status = builder.getAccessStatusFromItem(context, itemWithGroupRestriction, threshold);
-        assertThat("testWithGroupRestriction 0", status, equalTo(DefaultAccessStatusBuilder.RESTRICTED));
+        String status = helper.getAccessStatusFromItem(context, itemWithGroupRestriction, threshold);
+        assertThat("testWithGroupRestriction 0", status, equalTo(DefaultAccessStatusHelper.RESTRICTED));
     }
 
     /**
@@ -332,8 +342,8 @@ public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
         bundle.setPrimaryBitstreamID(bitstream);
         authorizeService.removeAllPolicies(context, bitstream);
         context.restoreAuthSystemState();
-        String status = builder.getAccessStatusFromItem(context, itemWithoutPolicy, threshold);
-        assertThat("testWithoutPolicy 0", status, equalTo(DefaultAccessStatusBuilder.RESTRICTED));
+        String status = helper.getAccessStatusFromItem(context, itemWithoutPolicy, threshold);
+        assertThat("testWithoutPolicy 0", status, equalTo(DefaultAccessStatusHelper.RESTRICTED));
     }
 
     /**
@@ -348,7 +358,66 @@ public class DefaultAccessStatusBuilderTest  extends AbstractUnitTest {
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
         bitstream.setName(context, "first");
         context.restoreAuthSystemState();
-        String status = builder.getAccessStatusFromItem(context, itemWithoutPrimaryBitstream, threshold);
-        assertThat("testWithoutPrimaryBitstream 0", status, equalTo(DefaultAccessStatusBuilder.OPEN_ACCESS));
+        String status = helper.getAccessStatusFromItem(context, itemWithoutPrimaryBitstream, threshold);
+        assertThat("testWithoutPrimaryBitstream 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+    }
+
+    /**
+     * Test for an item with an open access bitstream
+     * and another primary bitstream on embargo
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testWithPrimaryAndMultipleBitstreams() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Bundle bundle = bundleService.create(context, itemWithPrimaryAndMultipleBitstreams,
+                Constants.CONTENT_BUNDLE_NAME);
+        bitstreamService.create(context, bundle,
+                new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
+        Bitstream primaryBitstream = bitstreamService.create(context, bundle,
+                new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
+        bundle.setPrimaryBitstreamID(primaryBitstream);
+        List<ResourcePolicy> policies = new ArrayList<>();
+        ResourcePolicy policy = resourcePolicyService.create(context);
+        policy.setRpName("Embargo");
+        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        policy.setGroup(group);
+        policy.setAction(Constants.READ);
+        policy.setStartDate(new LocalDate(9999, 12, 31).toDate());
+        policies.add(policy);
+        authorizeService.removeAllPolicies(context, primaryBitstream);
+        authorizeService.addPolicies(context, policies, primaryBitstream);
+        context.restoreAuthSystemState();
+        String status = helper.getAccessStatusFromItem(context, itemWithPrimaryAndMultipleBitstreams, threshold);
+        assertThat("testWithPrimaryAndMultipleBitstreams 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
+    }
+
+    /**
+     * Test for an item with an open access bitstream
+     * and another bitstream on embargo
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testWithNoPrimaryAndMultipleBitstreams() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Bundle bundle = bundleService.create(context, itemWithoutPrimaryAndMultipleBitstreams,
+                Constants.CONTENT_BUNDLE_NAME);
+        bitstreamService.create(context, bundle,
+                new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
+        Bitstream anotherBitstream = bitstreamService.create(context, bundle,
+                new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
+        List<ResourcePolicy> policies = new ArrayList<>();
+        ResourcePolicy policy = resourcePolicyService.create(context);
+        policy.setRpName("Embargo");
+        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        policy.setGroup(group);
+        policy.setAction(Constants.READ);
+        policy.setStartDate(new LocalDate(9999, 12, 31).toDate());
+        policies.add(policy);
+        authorizeService.removeAllPolicies(context, anotherBitstream);
+        authorizeService.addPolicies(context, policies, anotherBitstream);
+        context.restoreAuthSystemState();
+        String status = helper.getAccessStatusFromItem(context, itemWithoutPrimaryAndMultipleBitstreams, threshold);
+        assertThat("testWithNoPrimaryAndMultipleBitstreams 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
     }
 }

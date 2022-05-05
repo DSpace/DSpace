@@ -28,13 +28,13 @@ import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
 /**
- * Default plugin implementation of the access status builder.
+ * Default plugin implementation of the access status helper.
  * The getAccessStatusFromItem method provides a simple logic to
  * calculate the access status of an item based on the policies of
  * the primary or the first bitstream in the original bundle.
  * Users can override this method for enhanced functionality.
  */
-public class DefaultAccessStatusBuilder implements AccessStatusBuilder {
+public class DefaultAccessStatusHelper implements AccessStatusHelper {
     public static final String EMBARGO = "embargo";
     public static final String METADATA_ONLY = "metadata.only";
     public static final String OPEN_ACCESS = "open.access";
@@ -48,7 +48,7 @@ public class DefaultAccessStatusBuilder implements AccessStatusBuilder {
     protected AuthorizeService authorizeService =
             AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
-    public DefaultAccessStatusBuilder() {
+    public DefaultAccessStatusHelper() {
         super();
     }
 

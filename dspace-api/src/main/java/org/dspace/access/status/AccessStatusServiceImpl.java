@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class AccessStatusServiceImpl implements AccessStatusService {
     // Plugin implementation, set from the DSpace configuration by init().
-    protected AccessStatusBuilder builder = null;
+    protected AccessStatusHelper helper = null;
 
     protected Date forever_date = null;
 
@@ -42,10 +42,10 @@ public class AccessStatusServiceImpl implements AccessStatusService {
      * @throws Exception on generic exception
      */
     public void init() throws Exception {
-        if (builder == null) {
-            builder = (AccessStatusBuilder) pluginService.getSinglePlugin(AccessStatusBuilder.class);
-            if (builder == null) {
-                throw new IllegalStateException("The AccessStatusBuilder plugin was not defined in "
+        if (helper == null) {
+            helper = (AccessStatusHelper) pluginService.getSinglePlugin(AccessStatusHelper.class);
+            if (helper == null) {
+                throw new IllegalStateException("The AccessStatusHelper plugin was not defined in "
                         + "DSpace configuration.");
             }
 
@@ -61,6 +61,6 @@ public class AccessStatusServiceImpl implements AccessStatusService {
 
     @Override
     public String getAccessStatus(Context context, Item item) throws SQLException {
-        return builder.getAccessStatusFromItem(context, item, forever_date);
+        return helper.getAccessStatusFromItem(context, item, forever_date);
     }
 }

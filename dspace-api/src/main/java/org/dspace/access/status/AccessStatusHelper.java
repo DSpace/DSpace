@@ -16,7 +16,7 @@ import org.dspace.core.Context;
 /**
  * Plugin interface for the access status calculation.
  */
-public interface AccessStatusBuilder {
+public interface AccessStatusHelper {
     /**
      * Calculate the access status for the item.
      *
