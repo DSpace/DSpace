@@ -272,9 +272,6 @@
                 &lt;script src="</xsl:text><xsl:value-of select="concat($theme-path, 'vendor/respond/dest/respond.min.js')"/><xsl:text disable-output-escaping="yes">"&gt;&#160;&lt;/script&gt;
                 &lt;![endif]--&gt;</xsl:text>
 
-            <!-- Modernizr enables HTML5 elements & feature detects -->
-            <script src="{concat($theme-path, 'vendor/modernizr/modernizr.js')}">&#160;</script>
-
             <!-- Add the title in -->
             <xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title'][last()]" />
             <title>
