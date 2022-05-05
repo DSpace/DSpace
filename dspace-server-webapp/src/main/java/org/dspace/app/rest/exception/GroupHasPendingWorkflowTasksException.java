@@ -20,7 +20,7 @@ import org.dspace.core.I18nUtil;
 public class GroupHasPendingWorkflowTasksException
         extends UnprocessableEntityException implements TranslatableException {
     public static final String MESSAGE_KEY =
-        "org.dspace.app.rest.exception.GroupHasPendingTasksException.message";
+        "org.dspace.app.rest.exception.GroupHasPendingWorkflowTasksException.message";
 
     public GroupHasPendingWorkflowTasksException() {
         super(I18nUtil.getMessage(MESSAGE_KEY));
