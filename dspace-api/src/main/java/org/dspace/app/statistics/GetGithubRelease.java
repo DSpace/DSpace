@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.inject.Inject;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -24,6 +25,10 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.dspace.discovery.IndexClientOptions;
+import org.dspace.discovery.IndexDiscoveryScriptConfiguration;
+import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.utils.DSpace;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -32,7 +37,13 @@ import org.json.JSONTokener;
  *
  * @author mwood
  */
-public class GetGithubRelease {
+public class GetGithubRelease
+        extends DSpaceRunnable<GetGithubReleaseScriptConfiguration> {
+    @Inject
+    GetGithubReleaseScriptConfiguration configuration;
+
+    private Options options;
+
     private static final String OPT_HELP = "h";
     private static final String OPT_FILE = "f";
     private static final String OPT_OWNER = "o";
@@ -41,42 +52,22 @@ public class GetGithubRelease {
 
     private static boolean verbose;
 
-    private GetGithubRelease() { }
+    @Override
+    public GetGithubReleaseScriptConfiguration getScriptConfiguration() {
+        return new DSpace()
+                .getServiceManager()
+                .getServiceByName("index-discovery",
+                        GetGithubReleaseScriptConfiguration.class);
+    }
 
-    public static void main(String[] argv) throws MalformedURLException {
+    @Override
+    public void setup() {
+        options = GetGithubReleaseOptions.getOption(commandLine);
+    }
+
+    @Override
+    public void internalRun() throws Exception {
         // Parse the command line.
-        Options options = new Options();
-        Option option;
-
-        options.addOption(OPT_HELP, "help", false, "describe options");
-
-        option = Option.builder(OPT_FILE)
-                .longOpt("file")
-                .hasArg()
-                .hasArgs() // Repeatable
-                .desc("path to extract from archive (repeatable)")
-                .argName("path")
-                .build();
-        options.addOption(option);
-
-        option = Option.builder(OPT_OWNER)
-                .longOpt("owner")
-                .hasArg()
-                .desc("Owner of the repository")
-                .required()
-                .build();
-        options.addOption(option);
-
-        option = Option.builder(OPT_REPO)
-                .longOpt("repository")
-                .hasArg()
-                .desc("Repository having the release")
-                .required()
-                .build();
-        options.addOption(option);
-
-        options.addOption("v", "verbose", false, "Show lots of debugging information");
-
         DefaultParser commandParser = new DefaultParser();
         @SuppressWarnings("UnusedAssignment")
         CommandLine command = null;
@@ -146,7 +137,7 @@ public class GetGithubRelease {
      * Pick zero or more elements out of the archive and write copies of them to
      * the current directory.
      * <em>Any existing version of a selected file will be replaced.</em>
-     * 
+     *
      * <p>
      * For some reason, Github invents an unpredictable parent directory for the
      * release content.  This method strips that leading path element when
