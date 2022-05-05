@@ -25,7 +25,6 @@
         <!-- Versions of build dependencies to be auto-installed when "mirage2.deps.included=true" -->
         <!-- These versions should be kept in sync with ./.travis.yml -->
         <sass.version>3.4.25</sass.version>
-        <compass.version>1.0.1</compass.version>
         <node.version>12.22.4</node.version>
         <!-- Override version of JRuby that gem-maven-plugin installs when "mirage2.deps.included=true" -->
         <jruby.version>9.1.17.0</jruby.version>
@@ -286,26 +285,6 @@
                     <value>true</value>
                 </property>
             </activation>
-            <repositories>
-                <repository>
-                    <id>rubygems-release</id>
-                    <url>http://rubygems-proxy.torquebox.org/releases</url>
-                </repository>
-            </repositories>
-            <dependencies>
-                <dependency>
-                    <groupId>rubygems</groupId>
-                    <artifactId>sass</artifactId>
-                    <version>${sass.version}</version>
-                    <type>gem</type>
-                </dependency>
-                <dependency>
-                    <groupId>rubygems</groupId>
-                    <artifactId>compass</artifactId>
-                    <version>${compass.version}</version>
-                    <type>gem</type>
-                </dependency>
-            </dependencies>
             <build>
                 <!-- Centrally manage the versions of all plugins used by this profile -->
                 <pluginManagement>
