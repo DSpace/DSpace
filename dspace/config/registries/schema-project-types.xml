@@ -40,5 +40,11 @@
         <scope_note>Unique identifier of the funding entity.</scope_note>
     </dc-type>
     
+    <dc-type>
+        <schema>project</schema>
+        <element>investigator</element>
+        <scope_note>Project investigator</scope_note>
+    </dc-type>
+    
 
 </dspace-dc-types>

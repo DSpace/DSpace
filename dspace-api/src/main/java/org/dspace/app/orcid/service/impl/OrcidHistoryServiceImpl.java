@@ -271,7 +271,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     private OrcidResponse deleteEntityOnOrcid(Context context, String orcid, String token, OrcidQueue orcidQueue) {
-        OrcidEntityType recordType = OrcidEntityType.fromString(orcidQueue.getRecordType());
+        OrcidEntityType recordType = OrcidEntityType.fromEntityType(orcidQueue.getRecordType());
         return orcidClient.deleteByPutCode(token, orcid, orcidQueue.getPutCode(), recordType.getPath());
     }
 
@@ -321,7 +321,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     private boolean isEntityType(OrcidQueue orcidQueue) {
-        return OrcidEntityType.isValid(orcidQueue.getRecordType());
+        return OrcidEntityType.isValidEntityType(orcidQueue.getRecordType());
     }
 
     private Optional<String> findLastPutCode(List<OrcidHistory> orcidHistoryRecords, Item owner) {

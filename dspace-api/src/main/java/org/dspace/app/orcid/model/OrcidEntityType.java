@@ -7,7 +7,7 @@
  */
 package org.dspace.app.orcid.model;
 
-import org.apache.commons.lang3.EnumUtils;
+import java.util.Arrays;
 
 /**
  * The entity types of the ORCID objects that can be synchronized.
@@ -17,24 +17,35 @@ import org.apache.commons.lang3.EnumUtils;
  */
 public enum OrcidEntityType {
 
-    PUBLICATION("/work"),
-    FUNDING("/funding");
+    PUBLICATION("Publication", "/work"),
+    FUNDING("Project", "/funding");
+
+    private final String entityType;
 
     private final String path;
 
-    private OrcidEntityType(String path) {
+    private OrcidEntityType(String entityType, String path) {
+        this.entityType = entityType;
         this.path = path;
+    }
+
+    public String getEntityType() {
+        return entityType;
     }
 
     public String getPath() {
         return path;
     }
 
-    public static boolean isValid(String entityType) {
-        return entityType != null ? EnumUtils.isValidEnum(OrcidEntityType.class, entityType.toUpperCase()) : false;
+    public static boolean isValidEntityType(String entityType) {
+        return Arrays.stream(OrcidEntityType.values())
+            .anyMatch(orcidEntityType -> orcidEntityType.getEntityType().equalsIgnoreCase(entityType));
     }
 
-    public static OrcidEntityType fromString(String entityType) {
-        return isValid(entityType) ? OrcidEntityType.valueOf(entityType.toUpperCase()) : null;
+    public static OrcidEntityType fromEntityType(String entityType) {
+        return Arrays.stream(OrcidEntityType.values())
+            .filter(orcidEntityType -> orcidEntityType.getEntityType().equalsIgnoreCase(entityType))
+            .findFirst()
+            .orElse(null);
     }
 }

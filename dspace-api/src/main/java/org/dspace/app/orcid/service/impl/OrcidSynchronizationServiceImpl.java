@@ -151,8 +151,8 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             return false;
         }
 
-        if (OrcidEntityType.isValid(entityType)) {
-            return getEntityPreference(profile, OrcidEntityType.fromString(entityType))
+        if (OrcidEntityType.isValidEntityType(entityType)) {
+            return getEntityPreference(profile, OrcidEntityType.fromEntityType(entityType))
                 .filter(pref -> pref != DISABLED)
                 .isPresent();
         }

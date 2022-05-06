@@ -18,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidOperation;
@@ -35,15 +35,15 @@ import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
-import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.util.UUIDUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +69,8 @@ public class OrcidQueueConsumer implements Consumer {
 
     private ConfigurationService configurationService;
 
+    private RelationshipService relationshipService;
+
     private List<UUID> alreadyConsumedItems = new ArrayList<>();
 
     @Override
@@ -81,6 +83,7 @@ public class OrcidQueueConsumer implements Consumer {
         this.orcidSynchronizationService = orcidServiceFactory.getOrcidSynchronizationService();
         this.profileSectionFactoryService = orcidServiceFactory.getOrcidProfileSectionFactoryService();
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        this.relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
 
         this.itemService = ContentServiceFactory.getInstance().getItemService();
     }
@@ -115,7 +118,7 @@ public class OrcidQueueConsumer implements Consumer {
             return;
         }
 
-        if (OrcidEntityType.isValid(entityType)) {
+        if (OrcidEntityType.isValidEntityType(entityType)) {
             consumeEntity(context, item);
         } else if (entityType.equals(getProfileType())) {
             consumeProfile(context, item);
@@ -126,35 +129,33 @@ public class OrcidQueueConsumer implements Consumer {
     }
 
     private void consumeEntity(Context context, Item entity) throws SQLException {
-        List<MetadataValue> metadataValues = entity.getMetadata();
 
-        for (MetadataValue metadata : metadataValues) {
+        List<Item> relatedItems = findAllRelatedItems(context, entity);
 
-            String authority = metadata.getAuthority();
+        for (Item relatedItem : relatedItems) {
 
-            if (shouldBeIgnoredForOrcid(metadata)) {
+            if (isNotProfileItem(relatedItem) || isNotLinkedToOrcid(relatedItem)) {
                 continue;
             }
 
-            UUID relatedItemUuid = UUIDUtils.fromString(authority);
-            if (relatedItemUuid == null) {
+            if (shouldNotBeSynchronized(relatedItem, entity) || isAlreadyQueued(context, relatedItem, entity)) {
                 continue;
             }
 
-            Item owner = itemService.find(context, relatedItemUuid);
-
-            if (isNotProfileItem(owner) || isNotLinkedToOrcid(owner)) {
-                continue;
-            }
-
-            if (shouldNotBeSynchronized(owner, entity) || isAlreadyQueued(context, owner, entity)) {
-                continue;
-            }
-
-            orcidQueueService.create(context, owner, entity);
+            orcidQueueService.create(context, relatedItem, entity);
 
         }
 
+    }
+
+    private List<Item> findAllRelatedItems(Context context, Item entity) throws SQLException {
+        return relationshipService.findByItem(context, entity).stream()
+            .map(relationship -> getRelatedItem(entity, relationship))
+            .collect(Collectors.toList());
+    }
+
+    private Item getRelatedItem(Item item, Relationship relationship) {
+        return item.equals(relationship.getLeftItem()) ? relationship.getRightItem() : relationship.getLeftItem();
     }
 
     private void consumeProfile(Context context, Item item) throws SQLException {
@@ -282,11 +283,6 @@ public class OrcidQueueConsumer implements Consumer {
         return !getProfileType().equals(itemService.getEntityType(ownerItem));
     }
 
-    private boolean shouldBeIgnoredForOrcid(MetadataValue metadata) {
-        String[] metadataFieldToIgnore = configurationService.getArrayProperty("orcid.linkable-metadata-fields.ignore");
-        return ArrayUtils.contains(metadataFieldToIgnore, metadata.getMetadataField().toString('.'));
-    }
-
     private String getMetadataValue(Item item, String metadataField) {
         return itemService.getMetadataFirstValue(item, new MetadataFieldName(metadataField), Item.ANY);
     }
@@ -296,7 +292,7 @@ public class OrcidQueueConsumer implements Consumer {
     }
 
     private String getProfileType() {
-        return configurationService.getProperty("researcher-profile.type", "Person");
+        return configurationService.getProperty("researcher-profile.entity-type", "Person");
     }
 
     @Override
