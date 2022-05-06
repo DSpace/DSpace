@@ -34,7 +34,9 @@ public class GetGithubRelease
     @Inject
     GetGithubReleaseScriptConfiguration configuration;
 
-    private static boolean verbose;
+    private boolean verbose;
+
+    Path archiveFilePath;
 
     @Override
     public GetGithubReleaseScriptConfiguration getScriptConfiguration() {
@@ -50,8 +52,8 @@ public class GetGithubRelease
     public void internalRun() throws Exception {
         // If asked, display help and exit.
         if (commandLine.hasOption(GetGithubReleaseOptions.OPT_HELP)) {
-            printHelp(GetGithubReleaseOptions.constructOptions());
-            System.exit(0);
+            printHelp();
+            return;
         }
 
         // Not help.  Remember whether verbose was required.
@@ -68,7 +70,7 @@ public class GetGithubRelease
             releaseParsed = new JSONObject(new JSONTokener(releaseStream));
         } catch (IOException e) {
             System.err.println(e.getMessage());
-            System.exit(1);
+            return;
         }
 
         String archiveUrl = releaseParsed.getString("zipball_url");
@@ -77,16 +79,18 @@ public class GetGithubRelease
         URL archiveConnection = new URL(archiveUrl);
         try (InputStream archiveStream = archiveConnection.openStream();) {
             if (commandLine.hasOption(GetGithubReleaseOptions.OPT_FILE)) {
-                extractZipMembers(new ZipInputStream(archiveStream),
-                        commandLine.getOptionValues(GetGithubReleaseOptions.OPT_FILE));
+                try (ZipInputStream zipStream = new ZipInputStream(archiveStream);) {
+                    extractZipMembers(zipStream,
+                            commandLine.getOptionValues(GetGithubReleaseOptions.OPT_FILE));
+                }
             } else {
                 String archiveDate = releaseParsed.getString("published_at");
-                Path archiveFilePath = Paths.get(owner + "-" + repo + "_" + archiveDate + ".zip");
+                archiveFilePath = Paths.get(owner + "-" + repo + "_" + archiveDate + ".zip");
                 saveArchive(archiveStream, archiveFilePath);
             }
         } catch (IOException e) {
             System.err.format("%s:  %s%n", e.getClass().getSimpleName(), e.getMessage());
-            System.exit(1);
+            return;
         }
     }
 
@@ -116,7 +120,7 @@ public class GetGithubRelease
      * @param paths paths to desired elements within the bogus parent directory.
      * @throws IOException passed through.
      */
-    private static void extractZipMembers(ZipInputStream archive, String... paths)
+    private void extractZipMembers(ZipInputStream archive, String... paths)
             throws IOException {
         while (true) {
             ZipEntry entry = archive.getNextEntry();
@@ -151,11 +155,11 @@ public class GetGithubRelease
     }
 
     /**
-     * Help the user understand the command line options.
+     * Helper method for testing.
      *
-     * @param options all known options.
+     * @return path to where the retrieved archive was stored.
      */
-    private static void printHelp(Options options) {
-        new HelpFormatter().printHelp(GetGithubRelease.class.getCanonicalName(), options);
+    Path getArchiveFilePath() {
+        return archiveFilePath;
     }
 }
