@@ -47,7 +47,8 @@ public class GetGithubRelease
     }
 
     @Override
-    public void internalRun() throws Exception {
+    public void internalRun()
+            throws Exception {
         // If asked, display help and exit.
         if (commandLine.hasOption(GetGithubReleaseOptions.OPT_HELP)) {
             printHelp();
@@ -66,9 +67,6 @@ public class GetGithubRelease
         JSONObject releaseParsed = null;
         try (InputStream releaseStream = releaseConnection.openStream();) {
             releaseParsed = new JSONObject(new JSONTokener(releaseStream));
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            return;
         }
 
         String archiveUrl = releaseParsed.getString("zipball_url");
@@ -86,9 +84,6 @@ public class GetGithubRelease
                 archiveFilePath = Paths.get(owner + "-" + repo + "_" + archiveDate + ".zip");
                 saveArchive(archiveStream, archiveFilePath);
             }
-        } catch (IOException e) {
-            System.err.format("%s:  %s%n", e.getClass().getSimpleName(), e.getMessage());
-            return;
         }
     }
 
@@ -137,12 +132,14 @@ public class GetGithubRelease
             // See if this entry is wanted, and save a copy if so.
             for (String candidateName : paths) {
                 if (verbose) {
-                    System.err.format("entryName = %s; trimmedPath = %s; candidateName = %s%n",
-                            entryName, trimmedPath.toString(), candidateName);
+                    handler.logDebug(String.format(
+                            "entryName = %s; trimmedPath = %s; candidateName = %s%n",
+                            entryName, trimmedPath.toString(), candidateName));
                 }
                 if (trimmedPath.equals(Paths.get(candidateName))) {
                     if (verbose) {
-                        System.err.format("Writing %s%n", trimmedPath.getFileName());
+                        handler.logInfo(String.format("Writing %s%n",
+                                trimmedPath.getFileName()));
                     }
                     Files.copy(archive, trimmedPath.getFileName(),
                             StandardCopyOption.REPLACE_EXISTING);
