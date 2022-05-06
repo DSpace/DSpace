@@ -51,7 +51,8 @@ public class GetGithubReleaseIT
     }
 
     /**
-     * Test of internalRun method, of class GetGithubRelease.
+     * Test fetching the zip archive.
+     *
      * @throws Exception passed through.
      */
     @Test
@@ -69,7 +70,7 @@ public class GetGithubReleaseIT
         instance.initialize(args, new CommandLineDSpaceRunnableHandler(), eperson);
 
         // Test!
-        instance.internalRun();
+        instance.run();
 
         // Interpret results.
         Path archiveFilePath = instance.getArchiveFilePath();
