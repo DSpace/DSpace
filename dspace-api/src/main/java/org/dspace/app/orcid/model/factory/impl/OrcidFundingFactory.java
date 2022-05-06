@@ -10,11 +10,13 @@ package org.dspace.app.orcid.model.factory.impl;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.dspace.app.orcid.model.OrcidEntityType;
 import org.dspace.app.orcid.model.OrcidFundingFieldMapping;
@@ -22,11 +24,14 @@ import org.dspace.app.orcid.model.factory.OrcidCommonObjectFactory;
 import org.dspace.app.orcid.model.factory.OrcidEntityFactory;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
 import org.orcid.jaxb.model.common.FundingContributorRole;
 import org.orcid.jaxb.model.common.FundingType;
-import org.orcid.jaxb.model.common.Relationship;
 import org.orcid.jaxb.model.v3.release.common.Amount;
 import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
 import org.orcid.jaxb.model.v3.release.common.Organization;
@@ -59,6 +64,12 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
 
     @Autowired
     private OrcidCommonObjectFactory orcidCommonObjectFactory;
+
+    @Autowired
+    private RelationshipTypeService relationshipTypeService;
+
+    @Autowired
+    private RelationshipService relationshipService;
 
     private OrcidFundingFieldMapping fieldMapping;
 
@@ -131,14 +142,38 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
         ExternalID externalID = new ExternalID();
         externalID.setType(type);
         externalID.setValue(value);
-        externalID.setRelationship(Relationship.SELF);
+        externalID.setRelationship(org.orcid.jaxb.model.common.Relationship.SELF);
         return externalID;
     }
 
     private Organization getOrganization(Context context, Item item) {
-        return getMetadataValue(context, item, fieldMapping.getOrganizationField())
-            .flatMap(metadataValue -> orcidCommonObjectFactory.createOrganization(context, metadataValue))
-            .orElse(null);
+
+        try {
+
+            return relationshipTypeService.findByLeftwardOrRightwardTypeName(context,
+                fieldMapping.getOrganizationRelationshipType()).stream()
+                .flatMap(relationshipType -> getRelationship(context, item, relationshipType))
+                .map(relationship -> getRelatedItem(item, relationship))
+                .flatMap(orgUnit -> orcidCommonObjectFactory.createOrganization(context, orgUnit).stream())
+                .findFirst()
+                .orElse(null);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private Stream<Relationship> getRelationship(Context context, Item item, RelationshipType relationshipType) {
+        try {
+            return relationshipService.findByItemAndRelationshipType(context, item, relationshipType).stream();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Item getRelatedItem(Item item, Relationship relationship) {
+        return item.equals(relationship.getLeftItem()) ? relationship.getRightItem() : relationship.getLeftItem();
     }
 
     private FuzzyDate getStartDate(Context context, Item item) {

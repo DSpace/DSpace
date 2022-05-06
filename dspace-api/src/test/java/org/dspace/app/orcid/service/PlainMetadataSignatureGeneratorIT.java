@@ -70,7 +70,7 @@ public class PlainMetadataSignatureGeneratorIT extends AbstractIntegrationTestWi
         Item item = ItemBuilder.createItem(context, collection)
             .withTitle("Item title")
             .withIssueDate("2020-01-01")
-            .withAuthor("Jesse Pinkman", "d285b110-e8fd-4f71-80b5-2e9267c27dfb")
+            .withAuthor("Jesse Pinkman")
             .withAuthorAffiliation("Affiliation")
             .build();
 
@@ -82,7 +82,7 @@ public class PlainMetadataSignatureGeneratorIT extends AbstractIntegrationTestWi
         String signature = generator.generate(context, List.of(author, affiliation));
         assertThat(signature, notNullValue());
 
-        String expectedSignature = "dc.contributor.author::Jesse Pinkman::d285b110-e8fd-4f71-80b5-2e9267c27dfb§§"
+        String expectedSignature = "dc.contributor.author::Jesse Pinkman§§"
             + "oairecerif.author.affiliation::Affiliation";
 
         assertThat(signature, equalTo(expectedSignature));

@@ -407,7 +407,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item publication = ItemBuilder.createItem(context, publicationCollection)
             .withTitle("Test publication")
-            .withAuthor("Test User", profile.getID().toString())
+            .withAuthor("Test User")
             .build();
 
         EntityType publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
@@ -489,8 +489,16 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item publication = ItemBuilder.createItem(context, publicationCollection)
             .withTitle("Test publication")
-            .withAuthor("Test User", profile.getID().toString())
+            .withAuthor("Test User")
             .build();
+
+        EntityType publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isAuthorOfPublication = createRelationshipTypeBuilder(context, personType, publicationType,
+            "isAuthorOfPublication", "isPublicationOfAuthor", 0, null, 0, null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, profile, publication, isAuthorOfPublication).build();
 
         context.restoreAuthSystemState();
         context.commit();
@@ -555,10 +563,18 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Collection projectCollection = createCollection("Projects", "Project");
 
-        ItemBuilder.createItem(context, projectCollection)
+        Item project = ItemBuilder.createItem(context, projectCollection)
             .withTitle("Test project")
-            .withAuthor("Test User", profile.getID().toString())
+            .withProjectInvestigator("Test User")
             .build();
+
+        EntityType projectType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isProjectOfPerson = createRelationshipTypeBuilder(context, projectType, personType,
+            "isProjectOfPerson", "isPersonOfProject", 0, null, 0, null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, project, profile, isProjectOfPerson).build();
 
         context.restoreAuthSystemState();
         context.commit();

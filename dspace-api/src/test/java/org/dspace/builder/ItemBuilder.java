@@ -83,10 +83,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }
 
-    public ItemBuilder withAuthor(final String authorName, final String authority) {
-        return addMetadataValue(item, DC.getName(), "contributor", "author", null, authorName, authority, 600);
-    }
-
     public ItemBuilder withAuthor(final String authorName, final String authority, final int confidence) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author",
                                 null, authorName, authority, confidence);
@@ -300,8 +296,8 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "oairecerif", "funding", "identifier", identifier);
     }
 
-    public ItemBuilder withFundingAwardUrl(String url) {
-        return addMetadataValue(item, "funding", "award", "url", url);
+    public ItemBuilder withOrgUnitLegalName(String name) {
+        return addMetadataValue(item, "organization", "legalName", null, name);
     }
 
     public ItemBuilder withOrgUnitCountry(String addressCountry) {
@@ -332,20 +328,8 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "oairecerif", "funder", null, null, funder, authority, 600);
     }
 
-    public ItemBuilder withFundingInvestigator(String investigator) {
-        return addMetadataValue(item, "funding", "investigators", null, investigator);
-    }
-
-    public ItemBuilder withFundingInvestigator(String investigator, String authority) {
-        return addMetadataValue(item, "funding", "investigators", null, null, investigator, authority, 600);
-    }
-
-    public ItemBuilder withFundingCoInvestigator(String investigator) {
-        return addMetadataValue(item, "funding", "coinvestigators", null, investigator);
-    }
-
-    public ItemBuilder withFundingCoInvestigator(String investigator, String authority) {
-        return addMetadataValue(item, "funding", "coinvestigators", null, null, investigator, authority, 600);
+    public ItemBuilder withProjectInvestigator(String investigator) {
+        return addMetadataValue(item, "project", "investigator", null, investigator);
     }
 
     public ItemBuilder withInternalId(String internalId) {
