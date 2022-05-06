@@ -171,6 +171,10 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     }
 
     protected Item createNewVersion(Item currentItem, String newTitle) throws Exception {
+        return createNewVersion(currentItem, newTitle, null);
+    }
+
+    protected Item createNewVersion(Item currentItem, String newTitle, Boolean isDiscoverable) throws Exception {
         context.turnOffAuthorisationSystem();
 
         // create a new version, the resulting item is not yet archived
@@ -178,6 +182,10 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
             .build();
         Item newItem = v2.getItem();
         Assert.assertNotEquals(currentItem, newItem);
+
+        if (isDiscoverable != null) {
+            newItem.setDiscoverable(isDiscoverable);
+        }
 
         // modify the new version
         itemService.replaceMetadata(
@@ -272,6 +280,10 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_workspace_expectLatestVersionsOnly() throws Exception {
         final String configuration = "workspace";
 
+        // NOTE: this makes sure that the admin user is the creator of the item, so the "submitter_authority"
+        //       filter passes (see SolrServiceWorkspaceWorkflowRestrictionPlugin)
+        context.setCurrentUser(admin);
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
@@ -282,10 +294,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
-        // verify item 1.1 appears in /api/discover/search/objects// TODO in reality no items here
+        // verify item 1.1 appears in /api/discover/search/objects
         verifyRestSearchObjects(getAuthToken(admin.getEmail(), password), configuration, List.of(
-            matchSearchResult(community),
-            matchSearchResult(collection),
             matchSearchResult(i1_1, "item 1.1")
         ));
 
@@ -298,8 +308,6 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // verify only item 1.2 appears in /api/discover/search/objects
         verifyRestSearchObjects(getAuthToken(admin.getEmail(), password), configuration, List.of(
-            matchSearchResult(community),
-            matchSearchResult(collection),
             matchSearchResult(i1_2, "item 1.2")
         ));
     }
@@ -312,43 +320,37 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_undiscoverable_expectLatestVersionsOnly() throws Exception {
         final String configuration = "undiscoverable";
 
+        // NOTE: needed to avoid NOT(discoverable:false) filter on solr queries (see SolrServicePrivateItemPlugin)
+        //       when using the searchService directly
+        context.setCurrentUser(admin);
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
+            // NOTE: necessary to get past the default filter query
+            .makeUnDiscoverable()
             .build();
-        context.restoreAuthSystemState();
-
-        // NOTE: necessary to get past the default filter query
-        context.turnOffAuthorisationSystem();
-        itemService.withdraw(context, i1_1);
-        context.commit();// TODO seems necessary
-        indexingService.commit();
         context.restoreAuthSystemState();
 
         // verify item 1.1 appears in the solr core
         verifyIndexed(i1_1);
 
         // verify item 1.1 appears in /api/discover/search/objects
-        verifyRestSearchObjects(configuration, List.of(
+        verifyRestSearchObjects(getAuthToken(admin.getEmail(), password), configuration, List.of(
             matchSearchResult(i1_1, "item 1.1")
         ));
 
         // create item 1.2 (second version of item 1)
-        Item i1_2 = createNewVersion(i1_1, "item 1.2");
-
-        // NOTE: necessary to get past the default filter query
-        context.turnOffAuthorisationSystem();
-        itemService.withdraw(context, i1_2);
-        indexingService.commit();
-        context.restoreAuthSystemState();
+        // NOTE: necessary to force discoverable = false, to get past the default filter query
+        Item i1_2 = createNewVersion(i1_1, "item 1.2", false);
 
         // verify only item 1.2 appears in the solr core
         verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
-        verifyRestSearchObjects(configuration, List.of(
+        verifyRestSearchObjects(getAuthToken(admin.getEmail(), password), configuration, List.of(
             matchSearchResult(i1_2, "item 1.2")
         ));
     }
