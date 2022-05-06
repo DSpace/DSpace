@@ -8,14 +8,12 @@
 package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.io.FileInputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -58,10 +56,10 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
-            Collection<ImportRecord> collection2match = getRecords();
+            ArrayList<ImportRecord> collection2match = getRecords();
             Collection<ImportRecord> recordsImported = crossRefServiceImpl.getRecords("test query", 0, 2);
             assertEquals(2, recordsImported.size());
-            assertTrue(matchRecords(recordsImported, collection2match));
+            matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
         }
@@ -88,13 +86,14 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         }
     }
 
-    private Collection<ImportRecord> getRecords() {
-        Collection<ImportRecord> records = new LinkedList<ImportRecord>();
+    private ArrayList<ImportRecord> getRecords() {
+        ArrayList<ImportRecord> records = new ArrayList<>();
         //define first record
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
         MetadatumDTO title = createMetadatumDTO("dc", "title", null,
                 "State of Awareness of Freshers’ Groups Chortkiv State"
                 + " Medical College of Prevention of Iodine Deficiency Diseases");
+        MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "L.V. Senyuk");
         MetadatumDTO type = createMetadatumDTO("dc", "type", null, "journal-article");
         MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2016");
         MetadatumDTO ispartof = createMetadatumDTO("dc", "relation", "ispartof",
@@ -105,6 +104,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         MetadatumDTO issue = createMetadatumDTO("oaire", "citation", "issue", "2");
 
         metadatums.add(title);
+        metadatums.add(author);
         metadatums.add(type);
         metadatums.add(date);
         metadatums.add(ispartof);
@@ -119,6 +119,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         List<MetadatumDTO> metadatums2  = new ArrayList<MetadatumDTO>();
         MetadatumDTO title2 = createMetadatumDTO("dc", "title", null,
                 "Ischemic Heart Disease and Role of Nurse of Cardiology Department");
+        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "K. І. Kozak");
         MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "journal-article");
         MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2016");
         MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof",
@@ -129,6 +130,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         MetadatumDTO issue2 = createMetadatumDTO("oaire", "citation", "issue", "2");
 
         metadatums2.add(title2);
+        metadatums2.add(author2);
         metadatums2.add(type2);
         metadatums2.add(date2);
         metadatums2.add(ispartof2);

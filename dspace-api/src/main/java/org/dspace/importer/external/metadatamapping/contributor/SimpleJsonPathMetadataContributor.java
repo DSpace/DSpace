@@ -9,15 +9,24 @@ package org.dspace.importer.external.metadatamapping.contributor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.ReadContext;
-import net.minidev.json.JSONArray;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 
+/**
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+ */
 public class SimpleJsonPathMetadataContributor implements MetadataContributor<String> {
+
+    private final static Logger log = LogManager.getLogger();
 
     private String query;
 
@@ -112,16 +121,21 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
         if (metadataProcessor != null) {
             metadataValue = metadataProcessor.processMetadata(fullJson);
         } else {
-            ReadContext ctx = JsonPath.parse(fullJson);
-            Object o = ctx.read(query);
-            if (o.getClass().isAssignableFrom(JSONArray.class)) {
-                JSONArray results = (JSONArray)o;
-                for (int i = 0; i < results.size(); i++) {
-                    String value = results.get(i).toString();
-                    metadataValue.add(value);
+            JsonNode jsonNode = convertStringJsonToJsonNode(fullJson);
+            JsonNode node = jsonNode.at(query);
+            if (node.isArray()) {
+                Iterator<JsonNode> nodes = node.iterator();
+                while (nodes.hasNext()) {
+                    String nodeValue = nodes.next().textValue();
+                    if (StringUtils.isNotBlank(nodeValue)) {
+                        metadataValue.add(nodeValue);
+                    }
                 }
             } else {
-                metadataValue.add(o.toString());
+                String nodeValue = node.textValue();
+                if (StringUtils.isNotBlank(nodeValue)) {
+                    metadataValue.add(nodeValue);
+                }
             }
         }
         for (String value : metadataValue) {
@@ -133,6 +147,17 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
             metadata.add(metadatumDto);
         }
         return metadata;
+    }
+
+    private JsonNode convertStringJsonToJsonNode(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode body = null;
+        try {
+            body = mapper.readTree(json);
+        } catch (JsonProcessingException e) {
+            log.error("Unable to process json response.", e);
+        }
+        return body;
     }
 
 }

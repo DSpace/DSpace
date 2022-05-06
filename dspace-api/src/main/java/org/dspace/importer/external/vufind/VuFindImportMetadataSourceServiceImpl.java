@@ -10,15 +10,14 @@ package org.dspace.importer.external.vufind;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import javax.el.MethodNotFoundException;
 
-import com.google.gson.Gson;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.ReadContext;
-import net.minidev.json.JSONArray;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -27,7 +26,7 @@ import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
-import org.dspace.importer.external.scopus.service.LiveImportClient;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +41,8 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private final static Logger log = LogManager.getLogger();
 
-    private static final String ENDPOINT_SEARCH = "https://vufind.org/advanced_demo/api/v1/search";
-    private static final String ENDPOINT_RECORD = "https://vufind.org/advanced_demo/api/v1/record";
+    private String url;
+    private String urlSearch;
 
     private String fields;
 
@@ -127,7 +126,7 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
             Integer start = 0;
             Integer count = 1;
             int page = start / count + 1;
-            URIBuilder uriBuilder = new URIBuilder(ENDPOINT_SEARCH);
+            URIBuilder uriBuilder = new URIBuilder(urlSearch);
             uriBuilder.addParameter("type", "AllField");
             uriBuilder.addParameter("page", String.valueOf(page));
             uriBuilder.addParameter("limit", count.toString());
@@ -135,8 +134,9 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
             uriBuilder.addParameter("lookfor", query.getParameterAsClass("query", String.class));
             String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
                     new HashMap<String, String>());
-            ReadContext ctx = JsonPath.parse(responseString);
-            return ctx.read("$.resultCount");
+            JsonNode node = convertStringJsonToJsonNode(responseString);
+            JsonNode resultCountNode = node.get("resultCount");
+            return resultCountNode.intValue();
         }
     }
 
@@ -157,7 +157,7 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
         @Override
         public String call() throws Exception {
-            URIBuilder uriBuilder = new URIBuilder(ENDPOINT_RECORD);
+            URIBuilder uriBuilder = new URIBuilder(url);
             uriBuilder.addParameter("id", id);
             uriBuilder.addParameter("prettyPrint", "false");
             if (StringUtils.isNotBlank(fields)) {
@@ -203,7 +203,7 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
             Integer start = query.getParameterAsClass("start", Integer.class);
             Integer count = query.getParameterAsClass("count", Integer.class);
             int page = count != 0 ? start / count : 0;
-            URIBuilder uriBuilder = new URIBuilder(ENDPOINT_SEARCH);
+            URIBuilder uriBuilder = new URIBuilder(urlSearch);
             uriBuilder.addParameter("type", "AllField");
             //page looks 1 based (start = 0, count = 20 -> page = 0)
             uriBuilder.addParameter("page", String.valueOf(page + 1));
@@ -237,7 +237,7 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
             Integer start = query.getParameterAsClass("start", Integer.class);
             Integer count = query.getParameterAsClass("count", Integer.class);
             int page = count != 0 ? start / count : 0;
-            URIBuilder uriBuilder = new URIBuilder(ENDPOINT_RECORD);
+            URIBuilder uriBuilder = new URIBuilder(url);
             uriBuilder.addParameter("type", "AllField");
             //pagination is 1 based (first page: start = 0, count = 20 -> page = 0 -> +1 = 1)
             uriBuilder.addParameter("page", String.valueOf(page ++));
@@ -265,26 +265,42 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     }
 
+    private JsonNode convertStringJsonToJsonNode(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode body = null;
+        try {
+            body = mapper.readTree(json);
+        } catch (JsonProcessingException e) {
+            log.error("Unable to process json response.", e);
+        }
+        return body;
+    }
+
     private List<ImportRecord> extractMetadataFromRecordList(String records) {
         List<ImportRecord> recordsResult = new ArrayList<>();
-        ReadContext ctx = JsonPath.parse(records);
-        try {
-            Object o = ctx.read("$.records[*]");
-            if (o.getClass().isAssignableFrom(JSONArray.class)) {
-                JSONArray array = (JSONArray)o;
-                int size = array.size();
-                for (int index = 0; index < size; index++) {
-                    Gson gson = new Gson();
-                    String innerJson = gson.toJson(array.get(index), LinkedHashMap.class);
-                    recordsResult.add(transformSourceRecords(innerJson));
-                }
-            } else {
-                recordsResult.add(transformSourceRecords(o.toString()));
-            }
-        } catch (Exception e) {
-            log.error("Error reading data from VuFind " + e.getMessage(), e);
+        JsonNode jsonNode = convertStringJsonToJsonNode(records);
+        Iterator<JsonNode> nodes = jsonNode.get("records").iterator();
+        while (nodes.hasNext()) {
+            JsonNode node = nodes.next();
+            recordsResult.add(transformSourceRecords(node.toString()));
         }
         return recordsResult;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getUrlSearch() {
+        return urlSearch;
+    }
+
+    public void setUrlSearch(String urlSearch) {
+        this.urlSearch = urlSearch;
     }
 
 }

@@ -10,18 +10,19 @@ package org.dspace.importer.external.crossref;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import javax.el.MethodNotFoundException;
 
-import com.google.gson.Gson;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.ReadContext;
-import net.minidev.json.JSONArray;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -39,6 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<String>
         implements QuerySource {
+
+    private final static Logger log = LogManager.getLogger();
 
     private String url;
 
@@ -175,18 +178,11 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
             String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
                     new HashMap<String, String>());
-            ReadContext ctx = JsonPath.parse(response);
-            Object o = ctx.read("$.message.items");
-            if (o.getClass().isAssignableFrom(JSONArray.class)) {
-                JSONArray array = (JSONArray) o;
-                int size = array.size();
-                for (int index = 0; index < size; index++) {
-                    Gson gson = new Gson();
-                    String innerJson = gson.toJson(array.get(index), LinkedHashMap.class);
-                    results.add(transformSourceRecords(innerJson));
-                }
-            } else {
-                results.add(transformSourceRecords(o.toString()));
+            JsonNode jsonNode = convertStringJsonToJsonNode(response);
+            Iterator<JsonNode> nodes = jsonNode.at("/message/items").iterator();
+            while (nodes.hasNext()) {
+                JsonNode node = nodes.next();
+                results.add(transformSourceRecords(node.toString()));
             }
             return results;
         }
@@ -217,20 +213,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             URIBuilder uriBuilder = new URIBuilder(url + "/" + query.getParameterAsClass("id", String.class));
             String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
                     new HashMap<String, String>());
-            ReadContext ctx = JsonPath.parse(responseString);
-            Object o = ctx.read("$.message");
-            if (o.getClass().isAssignableFrom(JSONArray.class)) {
-                JSONArray array = (JSONArray) o;
-                int size = array.size();
-                for (int index = 0; index < size; index++) {
-                    Gson gson = new Gson();
-                    String innerJson = gson.toJson(array.get(index), LinkedHashMap.class);
-                    results.add(transformSourceRecords(innerJson));
-                }
-            } else {
-                Gson gson = new Gson();
-                results.add(transformSourceRecords(gson.toJson(o, Object.class)));
-            }
+            JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
+            JsonNode messageNode = jsonNode.at("/message");
+            results.add(transformSourceRecords(messageNode.toString()));
             return results;
         }
     }
@@ -281,18 +266,11 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
             String resp = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
                     new HashMap<String, String>());
-            ReadContext ctx = JsonPath.parse(resp);
-            Object o = ctx.read("$.message.items[*]");
-            if (o.getClass().isAssignableFrom(JSONArray.class)) {
-                JSONArray array = (JSONArray) o;
-                int size = array.size();
-                for (int index = 0; index < size; index++) {
-                    Gson gson = new Gson();
-                    String innerJson = gson.toJson(array.get(index), LinkedHashMap.class);
-                    results.add(transformSourceRecords(innerJson));
-                }
-            } else {
-                results.add(transformSourceRecords(o.toString()));
+            JsonNode jsonNode = convertStringJsonToJsonNode(resp);
+            Iterator<JsonNode> nodes = jsonNode.at("/message/items").iterator();
+            while (nodes.hasNext()) {
+                JsonNode node = nodes.next();
+                results.add(transformSourceRecords(node.toString()));
             }
             return results;
         }
@@ -326,8 +304,8 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             uriBuilder.addParameter("query", query.getParameterAsClass("query", String.class));
             String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
                     new HashMap<String, String>());
-            ReadContext ctx = JsonPath.parse(responseString);
-            return ctx.read("$.message.total-results");
+            JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
+            return jsonNode.at("/message/total-results").asInt();
         }
     }
 
@@ -357,9 +335,20 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             URIBuilder uriBuilder = new URIBuilder(url + "/" + query.getParameterAsClass("id", String.class));
             String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
                     new HashMap<String, String>());
-            ReadContext ctx = JsonPath.parse(responseString);
-            return StringUtils.equals(ctx.read("$.status"), "ok") ? 1 : 0;
+            JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
+            return StringUtils.equals(jsonNode.at("/status").toString(), "ok") ? 1 : 0;
         }
+    }
+
+    private JsonNode convertStringJsonToJsonNode(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode body = null;
+        try {
+            body = mapper.readTree(json);
+        } catch (JsonProcessingException e) {
+            log.error("Unable to process json response.", e);
+        }
+        return body;
     }
 
     public void setUrl(String url) {

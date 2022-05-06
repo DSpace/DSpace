@@ -6,7 +6,7 @@
 
     <bean class="org.dspace.external.service.impl.ExternalDataServiceImpl"/>
 
-    <bean class="org.dspace.importer.external.scopus.service.LiveImportClientImpl"/>
+    <bean class="org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl"/>
 
     <bean class="org.dspace.external.provider.impl.MockDataProvider" init-method="init">
         <property name="sourceIdentifier" value="mock"/>
