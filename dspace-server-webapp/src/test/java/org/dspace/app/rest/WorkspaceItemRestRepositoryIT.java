@@ -2030,7 +2030,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
-                        // Check this - we should match an item with no series or type
+                        // Check this - we should match an item with the expected series and type
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem,
                                 "Technical Report", "New Series"))));
 
@@ -2039,7 +2039,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$",
-                        // Check this - we should match an item with no series or type
+                        // Check this - we should match an item with the expected series and type
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem,
                                 "Technical Report", "New Series"))));
 

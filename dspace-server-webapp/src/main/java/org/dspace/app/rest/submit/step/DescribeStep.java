@@ -31,6 +31,7 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -44,11 +45,11 @@ public class DescribeStep extends AbstractProcessingStep {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DescribeStep.class);
 
+    // Input reader for form configuration
     private DCInputsReader inputReader;
-
-    private static final String DOCUMENT_TYPE_FIELD =
-            DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("submit.type-bind.field",
-                    "dc.type");
+    // Configuration service
+    private final ConfigurationService configurationService =
+            DSpaceServicesFactory.getInstance().getConfigurationService();
 
     public DescribeStep() throws DCInputsReaderException {
         inputReader = new DCInputsReader();
@@ -70,7 +71,8 @@ public class DescribeStep extends AbstractProcessingStep {
     private void readField(InProgressSubmission obj, SubmissionStepConfig config, DataDescribe data,
                            DCInputSet inputConfig) throws DCInputsReaderException {
         String documentTypeValue = "";
-        List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(), DOCUMENT_TYPE_FIELD);
+        List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(),
+                configurationService.getProperty("submit.type-bind.field", "dc.type"));
         if (documentType.size() > 0) {
             documentTypeValue = documentType.get(0).getValue();
         }

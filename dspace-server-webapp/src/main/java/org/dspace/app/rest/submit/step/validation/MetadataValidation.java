@@ -26,7 +26,7 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.services.ConfigurationService;
 
 /**
  * Execute three validation check on fields validation:
@@ -44,10 +44,6 @@ public class MetadataValidation extends AbstractValidation {
 
     private static final String ERROR_VALIDATION_REGEX = "error.validation.regex";
 
-    private static final String DOCUMENT_TYPE_FIELD =
-            DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("submit.type-bind.field",
-                    "dc.type");
-
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataValidation.class);
 
     private DCInputsReader inputReader;
@@ -56,6 +52,8 @@ public class MetadataValidation extends AbstractValidation {
 
     private MetadataAuthorityService metadataAuthorityService;
 
+    private ConfigurationService configurationService;
+
     @Override
     public List<ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
                                     SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
@@ -63,7 +61,8 @@ public class MetadataValidation extends AbstractValidation {
         List<ErrorRest> errors = new ArrayList<>();
         String documentTypeValue = "";
         DCInputSet inputConfig = getInputReader().getInputsByFormName(config.getId());
-        List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(), DOCUMENT_TYPE_FIELD);
+        List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(),
+                configurationService.getProperty("submit.type-bind.field", "dc.type"));
         if (documentType.size() > 0) {
             documentTypeValue = documentType.get(0).getValue();
         }
@@ -148,6 +147,10 @@ public class MetadataValidation extends AbstractValidation {
                 }
             }
         }
+    }
+
+    public void setConfigurationService(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
     }
 
     public void setItemService(ItemService itemService) {
