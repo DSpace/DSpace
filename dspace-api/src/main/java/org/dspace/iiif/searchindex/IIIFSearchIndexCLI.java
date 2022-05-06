@@ -123,10 +123,10 @@ public class IIIFSearchIndexCLI {
             HelpFormatter help = new HelpFormatter();
             help.printHelp("CanvasDimension processor\n", options);
             System.out
-                .println("\nUUID example:    iiif-canvas-dimensions -e user@email.org " +
+                .println("\nUUID example:    iiif-canvas-dimensions -a -e user@email.org " +
                     "-i 1086306d-8a51-43c3-98b9-c3b00f49105f");
             System.out
-                .println("\nHandle example:    iiif-canvas-dimensions -e user@email.org " +
+                .println("\nHandle example:    iiif-canvas-dimensions -a -e user@email.org " +
                     "-i 123456789/12");
             System.exit(0);
         }
