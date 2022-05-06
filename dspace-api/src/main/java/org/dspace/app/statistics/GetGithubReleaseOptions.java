@@ -1,13 +1,17 @@
-/*
- * Copyright 2022 Indiana University.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.statistics;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 /**
+ * "Script" options for {@link GetGithubReleaseOptions}.
  *
  * @author mwood
  */
