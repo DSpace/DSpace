@@ -10,7 +10,6 @@ package org.dspace.discovery.indexobject;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,7 +42,6 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.discovery.FullTextContentStreams;
-import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
@@ -64,6 +62,9 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.MultiFormatDateParser;
 import org.dspace.util.SolrUtils;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.VersionHistory;
+import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +97,8 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     protected WorkflowItemIndexFactory workflowItemIndexFactory;
     @Autowired
     protected WorkspaceItemIndexFactory workspaceItemIndexFactory;
+    @Autowired
+    protected VersionHistoryService versionHistoryService;
 
 
     @Override
@@ -139,6 +142,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
         doc.addField("withdrawn", item.isWithdrawn());
         doc.addField("discoverable", item.isDiscoverable());
         doc.addField("lastModified", SolrUtils.getDateFormatter().format(item.getLastModified()));
+        doc.addField("latestVersion", isLatestVersion(context, item));
 
         EPerson submitter = item.getSubmitter();
         if (submitter != null) {
@@ -167,6 +171,32 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                     + e.getMessage(), e);
         }
         return doc;
+    }
+
+    /**
+     * Check whether the given item is the latest version.
+     * If the latest item cannot be determined, because either the version history or the latest version is not present,
+     * assume the item is latest.
+     * @param context the DSpace context.
+     * @param item the item that should be checked.
+     * @return true if the item is the latest version, false otherwise.
+     */
+    protected boolean isLatestVersion(Context context, Item item) throws SQLException {
+        VersionHistory history = versionHistoryService.findByItem(context, item);
+        if (history == null) {
+            // not all items have a version history
+            // if an item does not have a version history, it is by definition the latest version
+            return true;
+        }
+
+        Version latestVersion = versionHistoryService.getLatestVersion(context, history);
+        if (latestVersion == null) {
+            // this scenario should never happen, but let's err on the side of showing too many items vs. to little
+            // (see discovery.xml, a lot of discovery configs filter out all items that are not the latest version)
+            return true;
+        }
+
+        return item.equals(latestVersion.getItem());
     }
 
     @Override
@@ -713,26 +743,31 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     }
 
     @Override
-    public List getIndexableObjects(Context context, Item object) throws SQLException {
-        List<IndexableObject> results = new ArrayList<>();
-        if (object.isArchived() || object.isWithdrawn()) {
-            // We only want to index an item as an item if it is not in workflow
-            results.addAll(Arrays.asList(new IndexableItem(object)));
-        } else {
-            // Check if we have a workflow / workspace item
-            final WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, object);
-            if (workspaceItem != null) {
-                results.addAll(workspaceItemIndexFactory.getIndexableObjects(context, workspaceItem));
-            } else {
-                // Check if we a workflow item
-                final XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, object);
-                if (xmlWorkflowItem != null) {
-                    results.addAll(workflowItemIndexFactory.getIndexableObjects(context, xmlWorkflowItem));
-                }
-            }
+    public List getIndexableObjects(Context context, Item item) throws SQLException {
+        if (item.isArchived() || item.isWithdrawn()) {
+            // we only want to index an item as an item if it is not in workflow
+            return List.of(new IndexableItem(item));
         }
 
-        return results;
+        final WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, item);
+        if (workspaceItem != null) {
+            // a workspace item is linked to the given item
+            return List.copyOf(workspaceItemIndexFactory.getIndexableObjects(context, workspaceItem));
+        }
+
+        final XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, item);
+        if (xmlWorkflowItem != null) {
+            // a workflow item is linked to the given item
+            return List.copyOf(workflowItemIndexFactory.getIndexableObjects(context, xmlWorkflowItem));
+        }
+
+        if (!isLatestVersion(context, item)) {
+            // the given item is an older version of another item
+            return List.of(new IndexableItem(item));
+        }
+
+        // nothing to index
+        return List.of();
     }
 
     @Override

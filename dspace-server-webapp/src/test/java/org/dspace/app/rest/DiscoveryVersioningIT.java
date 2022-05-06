@@ -229,7 +229,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
         // verify only item 1.2 appears in the solr core
-        verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
+        verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
@@ -265,7 +265,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
         // verify only item 1.2 appears in the solr core
-        verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
+        verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
@@ -303,7 +303,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
         // verify only item 1.2 appears in the solr core
-        verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
+        verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
@@ -346,7 +346,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Item i1_2 = createNewVersion(i1_1, "item 1.2", false);
 
         // verify only item 1.2 appears in the solr core
-        verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
+        verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
@@ -378,7 +378,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
         // verify only item 1.2 appears in the solr core
-        verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
+        verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
@@ -412,7 +412,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
         // verify only item 1.2 appears in the solr core
-        verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
+        verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
@@ -446,7 +446,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
         // verify only item 1.2 appears in the solr core
-        verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
+        verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
@@ -480,7 +480,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
         // verify only item 1.2 appears in the solr core
-        verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
+        verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
@@ -514,7 +514,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
         // verify only item 1.2 appears in the solr core
-        verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
+        verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
@@ -548,7 +548,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
         // verify only item 1.2 appears in the solr core
-        verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
+        verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
@@ -582,7 +582,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
         // verify only item 1.2 appears in the solr core
-        verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
+        verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
@@ -616,7 +616,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
         // verify only item 1.2 appears in the solr core
-        verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
+        verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
@@ -650,7 +650,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
         // verify only item 1.2 appears in the solr core
-        verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
+        verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
@@ -686,7 +686,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
         // verify only item 1.2 appears in the solr core
-        verifyNotIndexed(i1_1);// TODO goal is to edit ItemIndexFactoryImpl such that version 1 is still indexed
+        verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
         // verify only item 1.2 appears in /api/discover/search/objects
