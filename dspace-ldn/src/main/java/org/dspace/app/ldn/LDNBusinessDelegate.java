@@ -29,7 +29,6 @@ import org.dspace.app.ldn.model.Service;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
-import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -46,9 +45,6 @@ public class LDNBusinessDelegate {
 
     @Autowired
     private ConfigurationService configurationService;
-
-    @Autowired
-    private HandleService handleService;
 
     private final RestTemplate restTemplate;
 
@@ -113,6 +109,10 @@ public class LDNBusinessDelegate {
         actor.setName(dspaceName);
         actor.addType("Service");
 
+        Object object = new Object();
+        object.setTitle(item.getName());
+        object.addType("sorg:ScholarlyArticle");
+
         Context context = new Context();
 
         List<Context> isSupplementedBy = new ArrayList<>();
@@ -138,22 +138,17 @@ public class LDNBusinessDelegate {
 
                 isSupplementedBy.add(supplement);
             }
+            if (field.getMetadataSchema().getName().equals("dc") &&
+                    field.getElement().equals("identifier") &&
+                    field.getQualifier().equals("uri")) {
+                String itemIdentifierUri = metadatum.getValue();
+                log.info("Item Identifier URI {}", itemIdentifierUri);
+                object.setId(itemIdentifierUri);
+                object.setIetfCiteAs(itemIdentifierUri);
+            }
         }
 
         context.setIsSupplementedBy(isSupplementedBy);
-
-        Object object = new Object();
-
-        String itemUrl = handleService.getCanonicalForm(item.getHandle());
-
-        log.info("Item Handle URL {}", itemUrl);
-
-        log.info("Item URL {}", itemUrl);
-
-        object.setId(itemUrl);
-        object.setIetfCiteAs(itemUrl);
-        object.setTitle(item.getName());
-        object.addType("sorg:ScholarlyArticle");
 
         Service origin = new Service();
         origin.setId(dspaceUIUrl);
