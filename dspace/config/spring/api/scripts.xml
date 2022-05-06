@@ -90,6 +90,13 @@
     <bean id="export" class="org.dspace.app.itemexport.ItemExportCLIScriptConfiguration" primary="true">
         <property name="description" value="Batch Export to Simple Archive Format (SAF)"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.itemexport.ItemExportCLI"/>
+
+    <bean id="get-github-release"
+          class="org.dspace.app.statistics.GetGithubReleaseScriptConfiguration">
+        <property name="description"
+                  value="Fetch a release from Github"/>
+        <property name="dspaceRunnableClass"
+                  value="org.dspace.app.statistics.GetGithubRelease"/>
     </bean>
 
     <bean id="subscription-send" class="org.dspace.subscriptions.SubscriptionEmailNotificationCliScriptConfiguration">
