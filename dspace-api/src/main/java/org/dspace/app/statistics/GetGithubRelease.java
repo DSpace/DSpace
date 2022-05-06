@@ -18,8 +18,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.inject.Inject;
 
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
 import org.dspace.scripts.DSpaceRunnable;
 import org.json.JSONObject;
 import org.json.JSONTokener;
