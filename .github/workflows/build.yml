@@ -26,30 +26,18 @@ jobs:
         with:
           java-version: 8
 
-      # https://github.com/actions/setup-ruby
-      - name: Install Ruby v2.4 (for Mirage 2)
-        uses: actions/setup-ruby@v1
-        with:
-          ruby-version: 2.4
-
       - name: Install Node.js v12 (for Mirage 2)
         shell: bash -l {0}
         run: nvm install 12.22.4
 
       # Install prerequisites for building Mirage2 more rapidly
-      # Includes NPM, Bower, Ruby, Sass, Compass
+      # Includes NPM
       # These versions should be kept in sync with ./dspace/modules/xml-mirage2/pom.xml
       - name: Install Mirage 2 prerequisites
         run: |
           sudo npm install -g npm@6.14.14
           npm --version
-          sudo npm install -g bower
           grunt --version
-          gem install sass -v 3.4.25
-          sass -v
-          gem install compass -v 1.0.1
-          compass version
-          gem env
 
       # https://github.com/actions/cache
       - name: Cache Maven dependencies
@@ -78,7 +66,3 @@ jobs:
       #   -P !assembly => SKIP the actual building of [src]/dspace/dspace-installer (as it can be memory intensive)
       - name: Assemble DSpace & Build Mirage 2
         run: cd dspace && mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2
-        env:
-          # Set GEM env variables (for Mirage 2) based on output of 'gem env' in "Install Mirage 2 prerequisites" step
-          GEM_HOME: "/home/runner/.gem/ruby/2.4.0"
-          GEM_PATH: "/home/runner/.gem/ruby/2.4.0:/opt/hostedtoolcache/Ruby/2.4.10/x64/lib/ruby/gems/2.4.0"
