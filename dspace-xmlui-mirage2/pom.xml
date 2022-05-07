@@ -53,6 +53,7 @@
                         <exclude>**/readme.txt</exclude>
                         <exclude>**/.bowerrc</exclude>
                         <exclude>**/dataTables.jqueryui.js</exclude>
+                        <exclude>**/modernizr.min.js</exclude>
                     </excludes>
                     <mapping>
                         <!-- File extensions which are not recognized by license-maven-plugin:
