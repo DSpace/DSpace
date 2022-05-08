@@ -19,7 +19,7 @@
     "grunt-sass": "^3.1.0",
     "node-sass": "^7.0.1",
     "grunt-usemin": "~3.1.1",
-    "jquery": "~1.12.4",
+    "jquery": "~3.4.1",
     "jquery-ui-dist": "^1.12.1",
     "respond.min.js": "1.4.2",
     "load-grunt-tasks": "~3.5.2",
