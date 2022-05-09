@@ -26,12 +26,15 @@ import com.opencsv.exceptions.CsvException;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
+import org.dspace.app.util.Configuration;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,9 +46,10 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
     private int numberItemsSubject2 = 2;
     private Item[] itemsSubject1 = new Item[numberItemsSubject1];
     private Item[] itemsSubject2 = new Item[numberItemsSubject2];
-    private String filename = "metadataExportSearch.csv";
+    private String filename;
     private Collection collection;
     TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
 
     @Override
@@ -56,6 +60,9 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         collection = CollectionBuilder.createCollection(context, community).build();
+        String dspaceDir = configurationService.getProperty("dspace.dir");
+        filename = String.format("%s%smetadataExportSearch.csv", dspaceDir, File.separator);
+
 
         for (int i = 0; i < numberItemsSubject1; i++) {
             itemsSubject1[i] = ItemBuilder.createItem(context, collection)
