@@ -241,6 +241,42 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void test_discoveryXml_defaultRelationships_allVersions() throws Exception {
+        final String configuration = null;
+
+        // create item 1.1 (first version of item 1)
+        context.turnOffAuthorisationSystem();
+        Item i1_1 = ItemBuilder.createItem(context, collection)
+            .withTitle("item 1.1")
+            .build();
+        context.restoreAuthSystemState();
+
+        // verify item 1.1 appears in the solr core
+        verifyIndexed(i1_1);
+
+        // verify item 1.1 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(community),
+            matchSearchResult(collection),
+            matchSearchResult(i1_1, "item 1.1")
+        ));
+
+        // create item 1.2 (second version of item 1)
+        Item i1_2 = createNewVersion(i1_1, "item 1.2");
+
+        // verify only item 1.2 appears in the solr core
+        verifyIndexed(i1_1);
+        verifyIndexed(i1_2);
+
+        // verify only item 1.2 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(community),
+            matchSearchResult(collection),
+            matchSearchResult(i1_2, "item 1.2")
+        ));
+    }
+
+    @Test
     public void test_discoveryXml_site_expectLatestVersionsOnly() throws Exception {
         final String configuration = "site";
 
@@ -422,7 +458,75 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void test_discoveryXml_publicationRelationships_allVersions() throws Exception {
+        final String configuration = "publication";
+
+        // create item 1.1 (first version of item 1)
+        context.turnOffAuthorisationSystem();
+        Item i1_1 = ItemBuilder.createItem(context, collection)
+            .withTitle("item 1.1")
+            // NOTE: necessary to get past the default filter query
+            .withEntityType("Publication")
+            .build();
+        context.restoreAuthSystemState();
+
+        // verify item 1.1 appears in the solr core
+        verifyIndexed(i1_1);
+
+        // verify item 1.1 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_1, "item 1.1")
+        ));
+
+        // create item 1.2 (second version of item 1)
+        Item i1_2 = createNewVersion(i1_1, "item 1.2");
+
+        // verify only item 1.2 appears in the solr core
+        verifyIndexed(i1_1);
+        verifyIndexed(i1_2);
+
+        // verify only item 1.2 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_2, "item 1.2")
+        ));
+    }
+
+    @Test
     public void test_discoveryXml_person_expectLatestVersionsOnly() throws Exception {
+        final String configuration = "person";
+
+        // create item 1.1 (first version of item 1)
+        context.turnOffAuthorisationSystem();
+        Item i1_1 = ItemBuilder.createItem(context, collection)
+            .withTitle("item 1.1")
+            // NOTE: necessary to get past the default filter query
+            .withEntityType("Person")
+            .build();
+        context.restoreAuthSystemState();
+
+        // verify item 1.1 appears in the solr core
+        verifyIndexed(i1_1);
+
+        // verify item 1.1 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_1, "item 1.1")
+        ));
+
+        // create item 1.2 (second version of item 1)
+        Item i1_2 = createNewVersion(i1_1, "item 1.2");
+
+        // verify only item 1.2 appears in the solr core
+        verifyIndexed(i1_1);
+        verifyIndexed(i1_2);
+
+        // verify only item 1.2 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_2, "item 1.2")
+        ));
+    }
+
+    @Test
+    public void test_discoveryXml_personRelationships_allVersions() throws Exception {
         final String configuration = "person";
 
         // create item 1.1 (first version of item 1)
@@ -490,7 +594,75 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void test_discoveryXml_orgunitRelationships_allVersions() throws Exception {
+        final String configuration = "orgunit";
+
+        // create item 1.1 (first version of item 1)
+        context.turnOffAuthorisationSystem();
+        Item i1_1 = ItemBuilder.createItem(context, collection)
+            .withTitle("item 1.1")
+            // NOTE: necessary to get past the default filter query
+            .withEntityType("OrgUnit")
+            .build();
+        context.restoreAuthSystemState();
+
+        // verify item 1.1 appears in the solr core
+        verifyIndexed(i1_1);
+
+        // verify item 1.1 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_1, "item 1.1")
+        ));
+
+        // create item 1.2 (second version of item 1)
+        Item i1_2 = createNewVersion(i1_1, "item 1.2");
+
+        // verify only item 1.2 appears in the solr core
+        verifyIndexed(i1_1);
+        verifyIndexed(i1_2);
+
+        // verify only item 1.2 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_2, "item 1.2")
+        ));
+    }
+
+    @Test
     public void test_discoveryXml_journalissue_expectLatestVersionsOnly() throws Exception {
+        final String configuration = "journalissue";
+
+        // create item 1.1 (first version of item 1)
+        context.turnOffAuthorisationSystem();
+        Item i1_1 = ItemBuilder.createItem(context, collection)
+            .withTitle("item 1.1")
+            // NOTE: necessary to get past the default filter query
+            .withEntityType("JournalIssue")
+            .build();
+        context.restoreAuthSystemState();
+
+        // verify item 1.1 appears in the solr core
+        verifyIndexed(i1_1);
+
+        // verify item 1.1 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_1, "item 1.1")
+        ));
+
+        // create item 1.2 (second version of item 1)
+        Item i1_2 = createNewVersion(i1_1, "item 1.2");
+
+        // verify only item 1.2 appears in the solr core
+        verifyIndexed(i1_1);
+        verifyIndexed(i1_2);
+
+        // verify only item 1.2 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_2, "item 1.2")
+        ));
+    }
+
+    @Test
+    public void test_discoveryXml_journalissueRelationships_allVersions() throws Exception {
         final String configuration = "journalissue";
 
         // create item 1.1 (first version of item 1)
@@ -558,6 +730,40 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void test_discoveryXml_journalvolumeRelationships_allVersions() throws Exception {
+        final String configuration = "journalvolume";
+
+        // create item 1.1 (first version of item 1)
+        context.turnOffAuthorisationSystem();
+        Item i1_1 = ItemBuilder.createItem(context, collection)
+            .withTitle("item 1.1")
+            // NOTE: necessary to get past the default filter query
+            .withEntityType("JournalVolume")
+            .build();
+        context.restoreAuthSystemState();
+
+        // verify item 1.1 appears in the solr core
+        verifyIndexed(i1_1);
+
+        // verify item 1.1 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_1, "item 1.1")
+        ));
+
+        // create item 1.2 (second version of item 1)
+        Item i1_2 = createNewVersion(i1_1, "item 1.2");
+
+        // verify only item 1.2 appears in the solr core
+        verifyIndexed(i1_1);
+        verifyIndexed(i1_2);
+
+        // verify only item 1.2 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_2, "item 1.2")
+        ));
+    }
+
+    @Test
     public void test_discoveryXml_journal_expectLatestVersionsOnly() throws Exception {
         final String configuration = "journal";
 
@@ -592,7 +798,75 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void test_discoveryXml_journalRelationships_allVersions() throws Exception {
+        final String configuration = "journal";
+
+        // create item 1.1 (first version of item 1)
+        context.turnOffAuthorisationSystem();
+        Item i1_1 = ItemBuilder.createItem(context, collection)
+            .withTitle("item 1.1")
+            // NOTE: necessary to get past the default filter query
+            .withEntityType("Journal")
+            .build();
+        context.restoreAuthSystemState();
+
+        // verify item 1.1 appears in the solr core
+        verifyIndexed(i1_1);
+
+        // verify item 1.1 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_1, "item 1.1")
+        ));
+
+        // create item 1.2 (second version of item 1)
+        Item i1_2 = createNewVersion(i1_1, "item 1.2");
+
+        // verify only item 1.2 appears in the solr core
+        verifyIndexed(i1_1);
+        verifyIndexed(i1_2);
+
+        // verify only item 1.2 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_2, "item 1.2")
+        ));
+    }
+
+    @Test
     public void test_discoveryXml_project_expectLatestVersionsOnly() throws Exception {
+        final String configuration = "project";
+
+        // create item 1.1 (first version of item 1)
+        context.turnOffAuthorisationSystem();
+        Item i1_1 = ItemBuilder.createItem(context, collection)
+            .withTitle("item 1.1")
+            // NOTE: necessary to get past the default filter query
+            .withEntityType("Project")
+            .build();
+        context.restoreAuthSystemState();
+
+        // verify item 1.1 appears in the solr core
+        verifyIndexed(i1_1);
+
+        // verify item 1.1 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_1, "item 1.1")
+        ));
+
+        // create item 1.2 (second version of item 1)
+        Item i1_2 = createNewVersion(i1_1, "item 1.2");
+
+        // verify only item 1.2 appears in the solr core
+        verifyIndexed(i1_1);
+        verifyIndexed(i1_2);
+
+        // verify only item 1.2 appears in /api/discover/search/objects
+        verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_2, "item 1.2")
+        ));
+    }
+
+    @Test
+    public void test_discoveryXml_projectRelationships_allVersions() throws Exception {
         final String configuration = "project";
 
         // create item 1.1 (first version of item 1)
