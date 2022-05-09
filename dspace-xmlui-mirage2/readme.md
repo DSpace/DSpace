@@ -1,32 +1,34 @@
 # Introduction #
 
-Mirage 2 is a responsive XMLUI theme for DSpace 4. It is based on the responsive theme for the [Open Knowledge Repository](https://openknowledge.worldbank.org/) by The World Bank. 
+Mirage 2 is a responsive XMLUI theme for DSpace 4. It is based on the responsive theme for the [Open Knowledge Repository](https://openknowledge.worldbank.org/) by The World Bank.
 
 Like the original Mirage theme, we started from [HTML5 boilerplate](http://h5bp.com) for the basic structure of each page and best practices with regards to cross browser compatibility, accessibility and performance.
 
-We used [Bootstrap 3](http://getbootstrap.com/) to have a sturdy responsive grid to base everything on. We chose the SASS version ([bootstrap-sass](https://github.com/twbs/bootstrap-sass)) because that allows us to use it in conjunction with the [Compass](http://compass-style.org/) framework, which provides a great library of SASS classes and mixins. Compass also comes with a custom version of the [SASS preprocessor](http://sass-lang.com/) we can use to concatenate and minify all stylesheets. We also included the [Handlebars](http://handlebarsjs.com/) templating framework to create more robust Javascript views.
+We used [Bootstrap 3](https://getbootstrap.com/) to have a sturdy responsive grid to base everything on. We chose the Sass version ([bootstrap-sass](https://github.com/twbs/bootstrap-sass)) because that allowed us to use it in conjunction with the [Compass](http://compass-style.org/) framework, which provides a great library of Sass classes and mixins. We also included the [Handlebars](https://handlebarsjs.com/) templating framework to create more robust Javascript views.
 
-All these extra dependencies made us reconsider the way front-end dependencies were managed in Mirage 2. A common problem with themes based on the first Mirage was that its dependencies (jQuery, Modernizr, …) were outdated. The versions that came with the theme kept on being used because no-one remembered to update them when creating a new Mirage based theme. So we decided to no longer include 3rd party dependencies with the theme and instead go for a combination of [Bower](http://bower.io/) and [Grunt](http://gruntjs.com/) to fetch and combine dependencies at build time.
+All these extra dependencies made us reconsider the way front-end dependencies were managed in Mirage 2. A common problem with themes based on the first Mirage was that its dependencies (jQuery, Modernizr, …) were outdated. The versions that came with the theme kept on being used because no-one remembered to update them when creating a new Mirage based theme. So we decided to no longer include 3rd party dependencies with the theme and instead go for a combination of [bower](https://bower.io/) and [Grunt](https://gruntjs.com/) to fetch and combine dependencies at build time.
 
-These new technologies are put in place to make it easier for the theme developer to produce great themes, but they come with a few new dependencies: node js and ruby. In order to make it easier to get started customizing Mirage2 we added a way to install them automatically durng a maven build.
+**Note: as of DSpace 6.4 the build used npm instead of bower for dependency resolution.**
+
+These new technologies are put in place to make it easier for the theme developer to produce great themes, but they come with a new dependency: Node.js. In order to make it easier to get started customizing Mirage 2 we added a way to install them automatically during a maven build.
 
 # Installation #
 
 Mirage 2 has been integrated into the standard maven build as an optional feature. It has to be explicitly enabled by setting the `mirage2.on` to `true`.
 
 ```bash
-    mvn package -Dmirage2.on=true
+mvn package -Dmirage2.on=true
 ```
 
-All extra tools in the Mirage 2 build process run on either Node.js or Ruby, so you'll need both to be able to build the theme. By default, the maven build will assume you don't have either installed and install them in a temporary sandbox every time you build the project. That's convenient, but also quite a bit slower than installing them natively. So we recommend you only use that feature to try out the theme. Afterwards, install the prerequisites and build DSpace with the `mirage2.deps.included` property set to `false`:
+All extra tools in the Mirage 2 build process run on Node.js, so you'll need that to be able to build the theme. By default, the maven build will assume you don't have Node.js installed and install it in a temporary sandbox every time you build the project. That's convenient, but also quite a bit slower than installing them natively. So we recommend you only use that feature to try out the theme. Afterwards, install the prerequisites and build DSpace with the `mirage2.deps.included` property set to `false`:
 
 ```bash
-    mvn package -Dmirage2.on=true -Dmirage2.deps.included=false
+mvn package -Dmirage2.on=true -Dmirage2.deps.included=false
 ```
 
 > *WARNING:* Git will need to be installed on the machine running the build in all cases. It will not be installed automatically
 
-## Prerequisites for OSX / Linux ##
+## Prerequisites for macOS / Linux ##
 
 ### Git ###
 If you don't have git installed, go to the [git downloads page](http://git-scm.com/downloads) and follow the instructions for your OS
@@ -38,159 +40,61 @@ We recommend using [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager) t
 First download and install nvm:
 
 ```bash
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 ```
 
 Then, close and reopen your terminal, and install a node version. We used v6.5.0 during the development of the theme, but it builds successfully with current [long-term support version](https://github.com/nodejs/Release#release-schedule) 12.x as well.
 
 ```bash
-    nvm install 12
+nvm install 12
 ```
 
 Set the node version you installed as the default version.
 
 ```bash
-    nvm alias default 12
+nvm alias default 12
 ```
-
-
-### Bower ###
-
-You can install [Bower](http://bower.io/) using the node package manager. The `-g` means install it globally, not as part of a specific project.
-
-```bash
-    npm install -g bower
-```
-Afterwards the command `bower` should show a help message.
 
 ### Grunt ###
 
-[Grunt](http://gruntjs.com/) should also be installed globally using the node package manager:
+[Grunt](https://gruntjs.com/) should also be installed globally using the node package manager:
 
 ```bash
-    npm install -g grunt && npm install -g grunt-cli 
+npm install -g grunt && npm install -g grunt-cli 
 ```
 
 Afterwards the command `grunt --version` should show the grunt-cli version number
-
-### Ruby ###
-
-For the same reasons as with Node, we’d advise using ruby via [RVM](http://rvm.io/)  (Ruby Version Manager). Even on OSX, which comes with a version of ruby preinstalled, you can save yourself a lot of hassle by using RVM instead. (In most cases there is no need to uninstall the system ruby first). Note that **you need sudo rights to perform the RVM installation**. You won't need sudo again to use RVM, ruby or gem later on
-
-Ruby 2.2.x (or JRuby 9.1.x.x) or above when pre-installing dependencies locally.
-
-#### OSX Ruby Note ####
-On OSX, you need to have the XCode command line tools installed. To test if they're installed try to type `make` in your terminal, if it says "command not found" follow [these instructions](http://www.computersnyou.com/2025/2013/06/install-command-line-tools-in-osx-10-9-mavericks-how-to/) to install them  
-(If this should fail, then you can find and download the Xcode command line tools directly from [Apple Developer site](https://developer.apple.com/downloads/index.action) - You will need an Apple id for this)
-
-Install RVM and ruby:
-
-```bash
-    curl -sSL https://get.rvm.io | bash -s stable --ruby
-```
-
-### Compass ###
-
-> *WARNING:* **Make sure you are using compatible versions of SASS and Compass.** For example, [Compass v0.12.0 was incompatible with SASS v3.3](https://github.com/Compass/compass/issues/1544). But, Compass v1.0.0 is compatible with SASS v3.3
-
-> *WARNING:* At this time, we do NOT recommend using SASS v3.4.x. The Mirage2 theme is based on [bootstrap-sass](https://github.com/twbs/bootstrap-sass), which currently has a [minor Internet Explorer breadcrumb display bug when using SASS v3.4](https://github.com/twbs/bootstrap-sass/issues/803)
-
-[Compass](http://compass-style.org/) is built on the [SASS CSS preprocessor](http://sass-lang.com/). At the time of writing, we recommend using SASS v3.3.14 with Compass v1.0.1 (see warnings above):
-
-```bash
-    gem install sass -v 3.3.14
-```
-
-Then you can install compass:
-
-```bash
-    gem install compass -v 1.0.1
-```
-
-Afterwards the command `compass` should show a help message.
 
 ## Prerequisites for Windows ##
 
 ### Git ###
-If you don't have git installed, you can download the installer [here](http://git-scm.com/download/win).
+If you don't have git installed, you can download the installer [here](https://git-scm.com/download/win).
 
 ### Node ###
 
-Download and install [Node.js](http://nodejs.org/) using the Windows installer version.
-
-### Bower ###
-
-You can install [Bower](http://bower.io/) using the node package manager. The `-g` means install it globally, not as part of a specific project.
-
-Execute following command in Windows command prompt:
-(Open a Windows command prompt by pressing cmd-R, then type 'cmd' and enter.)
-
-```bash
-    npm install -g bower
-```
-Afterwards the command `bower` should show a help message.
+Download and install [Node.js](https://nodejs.org/) using the Windows installer version.
 
 ### Grunt ###
 
-[Grunt](http://gruntjs.com/) should also be installed globally using the node package manager:
+[Grunt](https://gruntjs.com/) should also be installed globally using the node package manager:
 
 Perform the following in a Windows command prompt:
 
 ```bash
-    npm install -g grunt && npm install -g grunt-cli 
+npm install -g grunt && npm install -g grunt-cli 
 ```
 
 Afterwards the command `grunt --version` should show the grunt-cli version number
 
-### Ruby ###
-
-Download and install: [Ruby Installer](http://rubyinstaller.org/)
-
-Ruby 2.2.x (or JRuby 9.1.x.x) or above when pre-installing dependencies locally.
-
-Make sure its environment variables are set in system variables
-
-Open computer properties:
-
-![Step 1](documentation/sysvars1.png)
-
-Open "advanced sytem settings". Open "Advanced" tab, and click "environment variables":
-
-![Step 2](documentation/sysvars2.png)
-
-Add new variables `GEM_HOME` and `GEM_PATH` pointing to your Ruby gems directory.
-
-### Compass ###
-
-> *WARNING:* **Make sure you are using compatible versions of SASS and Compass.** For example, [Compass v0.12.0 was incompatible with SASS v3.3](https://github.com/Compass/compass/issues/1544). But, Compass v1.0.0 is compatible with SASS v3.3
-
-> *WARNING:* At this time, we do NOT recommend using SASS v3.4.x. The Mirage2 theme is based on [bootstrap-sass](https://github.com/twbs/bootstrap-sass), which currently has a [minor Internet Explorer breadcrumb display bug when using SASS v3.4](https://github.com/twbs/bootstrap-sass/issues/803)
-
-[Compass](http://compass-style.org/) is built on the [SASS CSS preprocessor](http://sass-lang.com/). At the time of writing, we recommend using SASS v3.3.14 with Compass v1.0.1 (see warnings above):
-
-Perform the following in a Windows command prompt:
-
-```bash
-    gem install sass -v 3.3.14
-```
-
-Then you can install compass:
-
-```bash
-    gem install compass -v 1.0.1
-```
-
-Afterwards the command `compass` should show a help message.
-
 # Enabling the theme #
 
-Add the following to the `<themes>` section of  `src/dspace/config/xmlui.xconf`, replacing the currently active theme.
+Add the following to the `<themes>` section of `src/dspace/config/xmlui.xconf`, replacing the currently active theme.
 
 ```xml
-    <theme name="Mirage 2" regex=".*" path="Mirage2/" /> 
+<theme name="Mirage 2" regex=".*" path="Mirage2/" /> 
 ```
 
-Now, if you run `mvn package -Dmirage2.on=true` in the dspace project root, bower will download all Mirage 2 dependencies, and Grunt will trigger a number of plugins to preprocess, concatenate and minify all the theme's resources. 
+Now, if you run `mvn package -Dmirage2.on=true` in the dspace project root, npm will download all Mirage 2 dependencies, and Grunt will trigger a number of plugins to preprocess, concatenate and minify all the theme's resources.
 
 
 # Customizing the theme #
@@ -223,13 +127,13 @@ So we added an additional XSL transformation step in the theme’s sitemap: `pre
 
 ### Tip: ###
 
-When working with a DRI that has been changed by the preprocess XSLs, it is often useful to see the differences between the original DRI and the version after preprocessing. To see the original DRI you can add `DRI/` after the contextpath in a page’s URL, to see the preprocessed DRI add `?XML` after the page’s URL
+When working with a DRI that has been changed by the preprocess XSLs, it is often useful to see the differences between the original DRI and the version after preprocessing. To see the original DRI you can add `DRI/` after the contextpath in a page’s URL, to see the preprocessed DRI add `?XML` after the page’s URL.
 
 # Style #
 
 Mirage 2 contains two color schemes to choose from. The classic Mirage color scheme or the standard Bootstrap color scheme. By default, Grunt will build CSS to get the classic Mirage color scheme. However, by activating the `mirage2_bootstrap_color_scheme` maven profile, this can be changed to get the standard Bootstrap color scheme. 
 
-The stylesheets are written in [SASS](http://sass-lang.com/). You can find them in the folder `Mirage2/styles`. Each color scheme has its own subfolder, and a `_main.scss` file that imports all others. These files will import the Compass library first. Next, all Bootstrap scss files and finally the DSpace specific files. Both color schemes also import the file `_style.scss`. It contains some example SCSS by default, and is meant to add your own style. Note that CSS is also valid SCSS, so if you don't want to learn SASS, just add plain old CSS to that file and it will work just fine.   
+The stylesheets are written in [Sass](https://sass-lang.com/). You can find them in the folder `Mirage2/styles`. Each color scheme has its own subfolder, and a `_main.scss` file that imports all others. These files will import the Compass library first. Next, all Bootstrap scss files and finally the DSpace specific files. Both color schemes also import the file `_style.scss`. It contains some example SCSS by default, and is meant to add your own style. Note that CSS is also valid SCSS, so if you don't want to learn Sass, just add plain old CSS to that file and it will work just fine.
 
 The goal of the standard Bootstrap color scheme was to add as little extra style on top of Bootstrap as possible and instead force ourselves to solve most issues in XSL; by creating the right HTML structure and adding the right bootstrap CSS classes. But try as we might, a few additional style rules were still needed. Those can be found in `shared/_dspace-bootstrap-tweaks.scss`, most of it is limited to styles to improve the sidebar behavior on mobile devices.
 
@@ -237,16 +141,16 @@ The classic Mirage color scheme contains more modifications and also overwrites 
 
 Take a look at [bootstrap's own variables file](https://github.com/twbs/bootstrap-sass/blob/master/assets/stylesheets/bootstrap/_variables.scss) to see which others you can overwrite.
 
-If you want to base your theme on an existing Bootstrap theme (like the ones at [bootswatch.com](http://bootswatch.com)) you can do so by using the standard Bootstrap color scheme and replacing the import of Bootstrap in `bootstrap_color_scheme/_main.scss`:
+If you want to base your theme on an existing Bootstrap theme (like the ones at [bootswatch.com](https://bootswatch.com)) you can do so by using the standard Bootstrap color scheme and replacing the import of Bootstrap in `bootstrap_color_scheme/_main.scss`:
 
 ```less
-    @import "../vendor/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap";
+@import "../vendor/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap";
 ```
 
 with an import of just its `_variables.sccs` file (those variables need to be defined, because they are used in `_dspace-bootstrap-tweaks.scss`):
 
 ```less
-    @import "../vendor/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap/_variables";
+@import "../vendor/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap/_variables";
 ```
 
 Then import the the css file(s) of your Bootstrap theme of choice below it. Depending on the theme you may also need to update the `twbs-font-path` function right above that import statement.
@@ -269,9 +173,9 @@ The theme also comes with built in support for [CoffeeScript](http://coffeescrip
 
 # Managing dependencies #
 
-Mirage 2's dependencies are specified in the file `Mirage2/bower.json`. Dependencies in this file should be specified according to the rules in the [Bower documentation](http://bower.io/|). Note that Bower only downloads the dependencies, nothing more. So if you add other dependencies, you'll still have to reference them. That means if it’s a CSS file, import it in `Mirage2/styles/_style.scss`, if it's a javascript file, add it to `Mirage2/scripts.xml`.
+Mirage 2's dependencies are specified in the file `Mirage2/package.json`. Dependencies in this file should be specified according to the rules in the [NPM documentation](https://docs.npmjs.com/cli/v7/configuring-npm/package-json|). Note that npm only downloads the dependencies, nothing more. So if you add other dependencies, you'll still have to reference them. That means if it’s a CSS file, import it in `Mirage2/styles/_style.scss`, if it's a javascript file, add it to `Mirage2/scripts.xml`.
 
-We've used the the `latest` keyword to specify dependency versions in `bower.json` wherever possible because that ensures you're starting with up to date versions when creating a new theme. However once your theme is going in to production, we strongly recommend replacing `latest` with the actual version numbers being used at that moment. That way your production build won't break when a version of a dependency is released that isn't backwards compatible.
+We've used the the `latest` keyword to specify dependency versions in `package.json` wherever possible because that ensures you're starting with up to date versions when creating a new theme. However once your theme is going in to production, we strongly recommend replacing `latest` with the actual version numbers being used at that moment. That way your production build won't break when a version of a dependency is released that isn't backwards compatible.
 
 # Multiple themes #
 
