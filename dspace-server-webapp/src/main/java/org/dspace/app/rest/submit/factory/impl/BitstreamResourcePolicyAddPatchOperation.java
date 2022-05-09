@@ -14,9 +14,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.dspace.app.rest.model.UploadBitstreamAccessConditionDTO;
+import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
-import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
@@ -33,14 +34,14 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<UploadBitstreamAccessConditionDTO> {
+public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<AccessConditionDTO> {
 
 
     @Autowired
     ItemService itemService;
 
     @Autowired
-    AuthorizeService authorizeService;
+    private ResourcePolicyService resourcePolicyService;
 
     @Autowired
     UploadConfigurationService uploadConfigurationService;
@@ -61,10 +62,9 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
             for (Bitstream bitstream : bb.getBitstreams()) {
                 if (idx == Integer.parseInt(split[1])) {
 
-                    List<UploadBitstreamAccessConditionDTO> newAccessConditions =
-                                                            new ArrayList<UploadBitstreamAccessConditionDTO>();
+                    List<AccessConditionDTO> newAccessConditions = new ArrayList<AccessConditionDTO>();
                     if (split.length == 3) {
-                        authorizeService.removePoliciesActionFilter(context, bitstream, Constants.READ);
+                        resourcePolicyService.removePolicies(context, bitstream, ResourcePolicy.TYPE_CUSTOM);
                         newAccessConditions = evaluateArrayObject((LateObjectEvaluator) value);
                     } else if (split.length == 4) {
                         // contains "-", call index-based accessConditions it make not sense
@@ -83,12 +83,12 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
     }
 
     @Override
-    protected Class<UploadBitstreamAccessConditionDTO[]> getArrayClassForEvaluation() {
-        return UploadBitstreamAccessConditionDTO[].class;
+    protected Class<AccessConditionDTO[]> getArrayClassForEvaluation() {
+        return AccessConditionDTO[].class;
     }
 
     @Override
-    protected Class<UploadBitstreamAccessConditionDTO> getClassForEvaluation() {
-        return UploadBitstreamAccessConditionDTO.class;
+    protected Class<AccessConditionDTO> getClassForEvaluation() {
+        return AccessConditionDTO.class;
     }
 }

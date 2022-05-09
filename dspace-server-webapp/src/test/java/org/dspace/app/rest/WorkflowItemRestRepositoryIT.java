@@ -15,10 +15,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +31,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.CharEncoding;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.WorkflowItemMatcher;
@@ -644,7 +646,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         //Add a bitstream to the item
         String bitstreamContent = "ThisIsSomeDummyText";
         Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, Charset.defaultCharset())) {
             bitstream = BitstreamBuilder
                     .createBitstream(context, item, is)
                     .withName("Bitstream1")
@@ -766,6 +768,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             WorkspaceItem wsitem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                     .withTitle("Submission Item")
                     .withIssueDate("2017-10-17")
+                    .grantLicense()
                     .build();
 
             context.restoreAuthSystemState();
@@ -924,6 +927,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .withIssueDate("2017-10-17")
             .withAuthor("Smith, Donald").withAuthor("Doe, John")
             .withSubject("ExtraEntry")
+            .grantLicense()
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
@@ -1051,6 +1055,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .withTitle("Workflow Item 1")
             .withIssueDate("2017-10-17")
             .withSubject("ExtraEntry")
+            .grantLicense()
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
@@ -1120,6 +1125,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .withIssueDate("2017-10-17")
             .withAuthor("Smith, Donald").withAuthor("Doe, John")
             .withSubject("ExtraEntry")
+            .grantLicense()
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
@@ -1132,6 +1138,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .withSubject("Subject2")
             .withSubject("Subject3")
             .withSubject("Subject4")
+            .grantLicense()
             .build();
         claimedTask2.setStepID("editstep");
         claimedTask2.setActionID("editaction");
@@ -1144,6 +1151,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .withSubject("Subject2")
             .withSubject("Subject3")
             .withSubject("Subject4")
+            .grantLicense()
             .build();
         claimedTask3.setStepID("editstep");
         claimedTask3.setActionID("editaction");
@@ -1318,6 +1326,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, eperson)
             .withIssueDate("2017-10-17")
             .withSubject("ExtraEntry")
+            .grantLicense()
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
@@ -1388,6 +1397,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .withIssueDate("2017-10-17")
             .withAuthor("Smith, Donald").withAuthor("Doe, John")
             .withSubject("ExtraEntry")
+            .grantLicense()
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
@@ -1858,4 +1868,259 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                             .andExpect(jsonPath("$._embedded.collection._embedded.adminGroup", nullValue()));
 
     }
+
+    @Test
+    public void whenWorkspaceitemBecomeWorkflowitemWithAccessConditionsTheBitstreamMustBeDownloableTest()
+            throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password)
+                                          .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                                  .withName("Collection 1")
+                                                  .withWorkflowGroup(1, reviewer1)
+                                                  .build();
+
+        Bitstream bitstream = null;
+        WorkspaceItem witem = null;
+
+        String bitstreamContent = "0123456789";
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, Charset.defaultCharset())) {
+
+            context.setCurrentUser(submitter);
+            witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
+                                        .withTitle("Test WorkspaceItem")
+                                        .withIssueDate("2019-10-01")
+                                        .grantLicense()
+                                        .build();
+
+            bitstream = BitstreamBuilder.createBitstream(context, witem.getItem(), is)
+                                        .withName("Test bitstream")
+                                        .withDescription("This is a bitstream to test range requests")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        String tokenSubmitter = getAuthToken(submitter.getEmail(), password);
+        String tokenReviewer1 = getAuthToken(reviewer1.getEmail(), password);
+
+        // submitter can download the bitstream
+        getClient(tokenSubmitter).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                 .andExpect(status().isOk())
+                                 .andExpect(header().string("Accept-Ranges", "bytes"))
+                                 .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
+                                 .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                                 .andExpect(content().bytes(bitstreamContent.getBytes()));
+
+        // reviewer can't still download the bitstream
+        getClient(tokenReviewer1).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                 .andExpect(status().isForbidden());
+
+        // others can't download the bitstream
+        getClient(tokenEPerson).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                               .andExpect(status().isForbidden());
+
+        // create a list of values to use in add operation
+        List<Operation> addAccessCondition = new ArrayList<>();
+        List<Map<String, String>> accessConditions = new ArrayList<Map<String,String>>();
+
+        Map<String, String> value = new HashMap<>();
+        value.put("name", "administrator");
+
+        accessConditions.add(value);
+
+        addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions", accessConditions));
+
+        String patchBody = getPatchContent(addAccessCondition);
+        getClient(tokenSubmitter).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name",is("administrator")))
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate",nullValue()))
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
+
+        // verify that the patch changes have been persisted
+        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name",is("administrator")))
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate",nullValue()))
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        try {
+            // submit the workspaceitem to start the workflow
+            getClient(tokenSubmitter).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                     .content("/api/submission/workspaceitems/" + witem.getID())
+                     .contentType(textUriContentType))
+                     .andExpect(status().isCreated())
+                     .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            // check that the workflowitem is persisted
+            getClient(tokenSubmitter).perform(get("/api/workflow/workflowitems/" + idRef.get()))
+                     .andExpect(status().isOk())
+                     .andExpect(jsonPath("$",Matchers.is(WorkflowItemMatcher.
+                           matchItemWithTitleAndDateIssued(null, "Test WorkspaceItem", "2019-10-01"))))
+                     .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name",is("administrator")))
+                     .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate",nullValue()))
+                     .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
+
+            // reviewer can download the bitstream
+            getClient(tokenReviewer1).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                     .andExpect(status().isOk())
+                     .andExpect(header().string("Accept-Ranges", "bytes"))
+                     .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
+                     .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                     .andExpect(content().bytes(bitstreamContent.getBytes()));
+
+            // submitter can download the bitstream
+            getClient(tokenSubmitter).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                     .andExpect(status().isOk())
+                     .andExpect(header().string("Accept-Ranges", "bytes"))
+                     .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
+                     .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                     .andExpect(content().bytes(bitstreamContent.getBytes()));
+
+            // others can't download the bitstream
+            getClient(tokenEPerson).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                   .andExpect(status().isForbidden());
+        } finally {
+            // remove the workflowitem if any
+            WorkflowItemBuilder.deleteWorkflowItem(idRef.get());
+        }
+    }
+
+    @Test
+    public void whenWorkspaceitemBecomeWorkflowitemWithAccessConditionsTheItemMustBeAccessibleTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("submitter@example.com")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("reviewer1@example.com")
+                                          .withPassword(password)
+                                          .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                                  .withName("Collection 1")
+                                                  .withWorkflowGroup(1, reviewer1)
+                                                  .build();
+
+        context.setCurrentUser(submitter);
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
+                                    .withTitle("Test WorkspaceItem")
+                                    .withIssueDate("2019-10-01")
+                                    .grantLicense()
+                                    .build();
+
+        UUID itemUuid = witem.getItem().getID();
+
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        String tokenSubmitter = getAuthToken(submitter.getEmail(), password);
+        String tokenReviewer1 = getAuthToken(reviewer1.getEmail(), password);
+
+        // submitter can see the item
+        getClient(tokenSubmitter).perform(get("/api/core/items/" + itemUuid))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$",  ItemMatcher.matchItemWithTitleAndDateIssued(witem.getItem(),
+                                                     "Test WorkspaceItem", "2019-10-01")));
+
+        // reviewer can't still see the item
+        getClient(tokenReviewer1).perform(get("/api/core/items/" + itemUuid))
+                                 .andExpect(status().isForbidden());
+
+        // others can't see the item
+        getClient(tokenEPerson).perform(get("/api/core/items/" + itemUuid))
+                               .andExpect(status().isForbidden());
+
+        // create a list of values to use in add operation
+        List<Operation> addAccessCondition = new ArrayList<Operation>();
+        List<Map<String, String>> accessConditions = new ArrayList<Map<String,String>>();
+
+        Map<String, String> accessCondition2 = new HashMap<String, String>();
+        accessCondition2.put("name", "administrator");
+        accessConditions.add(accessCondition2);
+
+        addAccessCondition.add(new AddOperation("/sections/defaultAC/accessConditions",
+                               accessConditions));
+
+        String patchBody = getPatchContent(addAccessCondition);
+        getClient(tokenSubmitter).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                 .content(patchBody)
+                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                                 .andExpect(status().isOk());
+
+            // verify that the patch changes have been persisted
+        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
+                 .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name", is("administrator")))
+                 .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name").doesNotExist());
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+            // submit the workspaceitem to start the workflow
+            getClient(tokenSubmitter).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                     .content("/api/submission/workspaceitems/" + witem.getID())
+                     .contentType(textUriContentType))
+                     .andExpect(status().isCreated())
+                     .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            // check that the workflowitem is persisted
+            getClient(tokenSubmitter).perform(get("/api/workflow/workflowitems/" + idRef.get()))
+                     .andExpect(status().isOk())
+                     .andExpect(jsonPath("$",Matchers.is(WorkflowItemMatcher.
+                                   matchItemWithTitleAndDateIssued(null, "Test WorkspaceItem", "2019-10-01"))))
+                     .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)))
+                     .andExpect(jsonPath("$.sections.defaultAC.accessConditions[0].name", is("administrator")))
+                     .andExpect(jsonPath("$.sections.defaultAC.accessConditions[1].name").doesNotExist());
+
+            // submitter can see the item
+            getClient(tokenSubmitter).perform(get("/api/core/items/" + itemUuid))
+                     .andExpect(status().isOk())
+                     .andExpect(jsonPath("$", ItemMatcher.
+                                matchItemWithTitleAndDateIssued(witem.getItem(), "Test WorkspaceItem", "2019-10-01")));
+
+            // now reviewer can see the item
+            getClient(tokenReviewer1).perform(get("/api/core/items/" + itemUuid))
+                     .andExpect(status().isOk())
+                     .andExpect(jsonPath("$", ItemMatcher.
+                               matchItemWithTitleAndDateIssued(witem.getItem(), "Test WorkspaceItem", "2019-10-01")));
+
+            // others can't see the item
+            getClient(tokenEPerson).perform(get("/api/core/items/" + itemUuid))
+                                   .andExpect(status().isForbidden());
+        } finally {
+            // remove the workflowitem if any
+            WorkflowItemBuilder.deleteWorkflowItem(idRef.get());
+        }
+    }
+
 }

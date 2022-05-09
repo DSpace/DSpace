@@ -30,6 +30,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -38,7 +42,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -52,9 +55,9 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -137,8 +140,8 @@ public class StructBuilder {
      * @throws TransformerException if the input document is invalid.
      */
     public static void main(String[] argv)
-            throws ParserConfigurationException, SQLException,
-            FileNotFoundException, IOException, TransformerException {
+        throws ParserConfigurationException, SQLException,
+        IOException, TransformerException, XPathExpressionException {
         // Define command line options.
         Options options = new Options();
 
@@ -240,7 +243,7 @@ public class StructBuilder {
      * @throws SQLException
      */
     static void importStructure(Context context, InputStream input, OutputStream output)
-            throws IOException, ParserConfigurationException, SQLException, TransformerException {
+        throws IOException, ParserConfigurationException, SQLException, TransformerException, XPathExpressionException {
 
         // load the XML
         Document document = null;
@@ -258,13 +261,15 @@ public class StructBuilder {
         // is properly structured.
         try {
             validate(document);
-        } catch (TransformerException ex) {
+        } catch (XPathExpressionException ex) {
             System.err.format("The input document is invalid:  %s%n", ex.getMessage());
             System.exit(1);
         }
 
         // Check for 'identifier' attributes -- possibly output by this class.
-        NodeList identifierNodes = XPathAPI.selectNodeList(document, "//*[@identifier]");
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        NodeList identifierNodes = (NodeList) xPath.compile("//*[@identifier]")
+                                                   .evaluate(document, XPathConstants.NODESET);
         if (identifierNodes.getLength() > 0) {
             System.err.println("The input document has 'identifier' attributes, which will be ignored.");
         }
@@ -287,7 +292,8 @@ public class StructBuilder {
         Element[] elements = new Element[]{};
         try {
             // get the top level community list
-            NodeList first = XPathAPI.selectNodeList(document, "/import_structure/community");
+            NodeList first = (NodeList) xPath.compile("/import_structure/community")
+                                             .evaluate(document, XPathConstants.NODESET);
 
             // run the import starting with the top level communities
             elements = handleCommunities(context, first, null);
@@ -307,7 +313,7 @@ public class StructBuilder {
         }
 
         // finally write the string into the output file.
-        final org.jdom.Document xmlOutput = new org.jdom.Document(root);
+        final org.jdom2.Document xmlOutput = new org.jdom2.Document(root);
         try {
             new XMLOutputter().output(xmlOutput, output);
         } catch (IOException e) {
@@ -411,7 +417,7 @@ public class StructBuilder {
         }
 
         // Now write the structure out.
-        org.jdom.Document xmlOutput = new org.jdom.Document(rootElement);
+        org.jdom2.Document xmlOutput = new org.jdom2.Document(rootElement);
         try {
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
             outputter.output(xmlOutput, output);
@@ -456,14 +462,16 @@ public class StructBuilder {
      * @throws TransformerException if transformer error
      */
     private static void validate(org.w3c.dom.Document document)
-        throws TransformerException {
+        throws XPathExpressionException {
         StringBuilder err = new StringBuilder();
         boolean trip = false;
 
         err.append("The following errors were encountered parsing the source XML.\n");
         err.append("No changes have been made to the DSpace instance.\n\n");
 
-        NodeList first = XPathAPI.selectNodeList(document, "/import_structure/community");
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        NodeList first = (NodeList) xPath.compile("/import_structure/community")
+                                         .evaluate(document, XPathConstants.NODESET);
         if (first.getLength() == 0) {
             err.append("-There are no top level communities in the source document.");
             System.out.println(err.toString());
@@ -493,14 +501,15 @@ public class StructBuilder {
      * no errors.
      */
     private static String validateCommunities(NodeList communities, int level)
-        throws TransformerException {
+        throws XPathExpressionException {
         StringBuilder err = new StringBuilder();
         boolean trip = false;
         String errs = null;
+        XPath xPath = XPathFactory.newInstance().newXPath();
 
         for (int i = 0; i < communities.getLength(); i++) {
             Node n = communities.item(i);
-            NodeList name = XPathAPI.selectNodeList(n, "name");
+            NodeList name = (NodeList) xPath.compile("name").evaluate(n, XPathConstants.NODESET);
             if (name.getLength() != 1) {
                 String pos = Integer.toString(i + 1);
                 err.append("-The level ").append(level)
@@ -510,7 +519,7 @@ public class StructBuilder {
             }
 
             // validate sub communities
-            NodeList subCommunities = XPathAPI.selectNodeList(n, "community");
+            NodeList subCommunities = (NodeList) xPath.compile("community").evaluate(n, XPathConstants.NODESET);
             String comErrs = validateCommunities(subCommunities, level + 1);
             if (comErrs != null) {
                 err.append(comErrs);
@@ -518,7 +527,7 @@ public class StructBuilder {
             }
 
             // validate collections
-            NodeList collections = XPathAPI.selectNodeList(n, "collection");
+            NodeList collections = (NodeList) xPath.compile("collection").evaluate(n, XPathConstants.NODESET);
             String colErrs = validateCollections(collections, level + 1);
             if (colErrs != null) {
                 err.append(colErrs);
@@ -542,14 +551,15 @@ public class StructBuilder {
      * @return the errors to be generated by the calling method, or null if none
      */
     private static String validateCollections(NodeList collections, int level)
-        throws TransformerException {
+        throws XPathExpressionException {
         StringBuilder err = new StringBuilder();
         boolean trip = false;
         String errs = null;
+        XPath xPath = XPathFactory.newInstance().newXPath();
 
         for (int i = 0; i < collections.getLength(); i++) {
             Node n = collections.item(i);
-            NodeList name = XPathAPI.selectNodeList(n, "name");
+            NodeList name = (NodeList) xPath.compile("name").evaluate(n, XPathConstants.NODESET);
             if (name.getLength() != 1) {
                 String pos = Integer.toString(i + 1);
                 err.append("-The level ").append(level)
@@ -613,8 +623,9 @@ public class StructBuilder {
      * created communities (e.g. the handles they have been assigned)
      */
     private static Element[] handleCommunities(Context context, NodeList communities, Community parent)
-        throws TransformerException, SQLException, AuthorizeException {
+        throws TransformerException, SQLException, AuthorizeException, XPathExpressionException {
         Element[] elements = new Element[communities.getLength()];
+        XPath xPath = XPathFactory.newInstance().newXPath();
 
         for (int i = 0; i < communities.getLength(); i++) {
             Community community;
@@ -634,7 +645,7 @@ public class StructBuilder {
             // now update the metadata
             Node tn = communities.item(i);
             for (Map.Entry<String, MetadataFieldName> entry : communityMap.entrySet()) {
-                NodeList nl = XPathAPI.selectNodeList(tn, entry.getKey());
+                NodeList nl = (NodeList) xPath.compile(entry.getKey()).evaluate(tn, XPathConstants.NODESET);
                 if (nl.getLength() == 1) {
                     communityService.setMetadataSingleValue(context, community,
                             entry.getValue(), null, getStringValue(nl.item(0)));
@@ -700,11 +711,11 @@ public class StructBuilder {
             }
 
             // handle sub communities
-            NodeList subCommunities = XPathAPI.selectNodeList(tn, "community");
+            NodeList subCommunities = (NodeList) xPath.compile("community").evaluate(tn, XPathConstants.NODESET);
             Element[] subCommunityElements = handleCommunities(context, subCommunities, community);
 
             // handle collections
-            NodeList collections = XPathAPI.selectNodeList(tn, "collection");
+            NodeList collections = (NodeList) xPath.compile("collection").evaluate(tn, XPathConstants.NODESET);
             Element[] collectionElements = handleCollections(context, collections, community);
 
             int j;
@@ -731,8 +742,9 @@ public class StructBuilder {
      * created collections (e.g. the handle)
      */
     private static Element[] handleCollections(Context context, NodeList collections, Community parent)
-        throws TransformerException, SQLException, AuthorizeException {
+        throws SQLException, AuthorizeException, XPathExpressionException {
         Element[] elements = new Element[collections.getLength()];
+        XPath xPath = XPathFactory.newInstance().newXPath();
 
         for (int i = 0; i < collections.getLength(); i++) {
             Element element = new Element("collection");
@@ -745,7 +757,7 @@ public class StructBuilder {
             // import the rest of the metadata
             Node tn = collections.item(i);
             for (Map.Entry<String, MetadataFieldName> entry : collectionMap.entrySet()) {
-                NodeList nl = XPathAPI.selectNodeList(tn, entry.getKey());
+                NodeList nl = (NodeList) xPath.compile(entry.getKey()).evaluate(tn, XPathConstants.NODESET);
                 if (nl.getLength() == 1) {
                     collectionService.setMetadataSingleValue(context, collection,
                             entry.getValue(), null, getStringValue(nl.item(0)));

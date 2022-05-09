@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.dspace.administer.MetadataImporter;
 import org.dspace.administer.RegistryImportException;
@@ -89,7 +90,7 @@ public class RegistryUpdater implements Callback {
         } catch (IOException | SQLException | ParserConfigurationException
                 | TransformerException | RegistryImportException
                 | AuthorizeException | NonUniqueMetadataException
-                | SAXException e) {
+                | SAXException | XPathExpressionException e) {
             log.error("Error attempting to update Bitstream Format and/or Metadata Registries", e);
             throw new RuntimeException("Error attempting to update Bitstream Format and/or Metadata Registries", e);
         } finally {
@@ -100,6 +101,16 @@ public class RegistryUpdater implements Callback {
         }
     }
 
+
+    /**
+     * The callback name, Flyway will use this to sort the callbacks alphabetically before executing them
+     * @return The callback name
+     */
+    @Override
+    public String getCallbackName() {
+        // Return class name only (not prepended by package)
+        return RegistryUpdater.class.getSimpleName();
+    }
 
     /**
      * Events supported by this callback.

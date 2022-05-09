@@ -397,25 +397,23 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void getBitstreamsForBundle() throws Exception {
         context.turnOffAuthorisationSystem();
 
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("testname")
+                               .build();
+
         String bitstreamContent = "Dummy content";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is, bundle1.getName())
                                          .withName("Bitstream")
                                          .withDescription("Description")
                                          .withMimeType("text/plain")
                                          .build();
-            bitstream2 = BitstreamBuilder.createBitstream(context, item, is)
+            bitstream2 = BitstreamBuilder.createBitstream(context, item, is, bundle1.getName())
                                          .withName("Bitstream2")
                                          .withDescription("Description2")
                                          .withMimeType("text/plain")
                                          .build();
         }
-
-        bundle1 = BundleBuilder.createBundle(context, item)
-                               .withName("testname")
-                               .withBitstream(bitstream1)
-                               .withBitstream(bitstream2)
-                               .build();
 
         context.restoreAuthSystemState();
 
@@ -465,25 +463,23 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void patchMoveBitstreams() throws Exception {
         context.turnOffAuthorisationSystem();
 
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("testname")
+                               .build();
+
         String bitstreamContent = "Dummy content";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is, bundle1.getName())
                     .withName("Bitstream")
                     .withDescription("Description")
                     .withMimeType("text/plain")
                     .build();
-            bitstream2 = BitstreamBuilder.createBitstream(context, item, is)
+            bitstream2 = BitstreamBuilder.createBitstream(context, item, is, bundle1.getName())
                     .withName("Bitstream2")
                     .withDescription("Description2")
                     .withMimeType("text/plain")
                     .build();
         }
-
-        bundle1 = BundleBuilder.createBundle(context, item)
-                .withName("testname")
-                .withBitstream(bitstream1)
-                .withBitstream(bitstream2)
-                .build();
 
         context.restoreAuthSystemState();
 

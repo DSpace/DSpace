@@ -9,10 +9,9 @@ package org.dspace.app.rest.utils;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static javax.mail.internet.MimeUtility.encodeText;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
@@ -64,7 +63,6 @@ public class HttpHeadersInitializer {
     //no-cache so request is always performed for logging
     private static final String CACHE_CONTROL_SETTING = "private,no-cache";
 
-    private BufferedInputStream inputStream;
     private HttpServletRequest request;
     private HttpServletResponse response;
     private String contentType;
@@ -74,14 +72,8 @@ public class HttpHeadersInitializer {
     private String fileName;
     private String checksum;
 
-    public HttpHeadersInitializer(final InputStream inputStream) {
+    public HttpHeadersInitializer() {
         //Convert to BufferedInputStream so we can re-read the stream
-        this.inputStream = new BufferedInputStream(inputStream);
-    }
-
-
-    public static HttpHeadersInitializer fromInputStream(InputStream inputStream) {
-        return new HttpHeadersInitializer(inputStream);
     }
 
     public HttpHeadersInitializer with(HttpServletRequest httpRequest) {
@@ -172,7 +164,8 @@ public class HttpHeadersInitializer {
         }
 
         httpHeaders.put(CONTENT_DISPOSITION, Collections.singletonList(String.format(CONTENT_DISPOSITION_FORMAT,
-                                                                                     disposition, fileName)));
+                                                                                     disposition,
+                                                                                     encodeText(fileName))));
         log.debug("Content-Disposition : {}", disposition);
 
         // Content phase
@@ -195,12 +188,6 @@ public class HttpHeadersInitializer {
      */
     public boolean isValid() throws IOException {
         if (response == null || request == null) {
-            return false;
-        }
-
-        if (inputStream == null) {
-            log.error("Input stream has no content");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return false;
         }
 

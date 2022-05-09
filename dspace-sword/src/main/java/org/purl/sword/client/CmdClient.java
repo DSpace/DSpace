@@ -161,7 +161,7 @@ public class CmdClient implements ClientType {
                     for (Iterator i = acceptsPackaging.iterator(); i.hasNext(); ) {
                         SwordAcceptPackaging accept = (SwordAcceptPackaging) i.next();
                         acceptPackagingList.append(accept.getContent()).append(" (").append(accept.getQualityValue())
-                                           .append("), ").toString();
+                                           .append("), ");
                     }
 
                     System.out.println("Accepts Packaging: " + acceptPackagingList.toString());
