@@ -336,7 +336,8 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>(search.resourcetype:Item AND latestVersion:true) OR search.resourcetype:Collection OR search.resourcetype:Community</value>
+                <!-- NOTE: NOT filtered on latestVersion = true -->
+                <value>search.resourcetype:Item OR search.resourcetype:Collection OR search.resourcetype:Community</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -1158,7 +1159,8 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:Publication</value>
+                <!-- NOTE: NOT filtered on latestVersion = true -->
+                <value>search.resourcetype:Item AND entityType_keyword:Publication</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -1280,7 +1282,8 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:Person</value>
+                <!-- NOTE: NOT filtered on latestVersion = true -->
+                <value>search.resourcetype:Item AND entityType_keyword:Person</value>
             </list>
         </property>
         <!--Default result per page  -->
@@ -1386,7 +1389,8 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:Project</value>
+                <!-- NOTE: NOT filtered on latestVersion = true -->
+                <value>search.resourcetype:Item AND entityType_keyword:Project</value>
             </list>
         </property>
         <!--Default result per page  -->
@@ -1511,7 +1515,8 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:OrgUnit</value>
+                <!-- NOTE: NOT filtered on latestVersion = true -->
+                <value>search.resourcetype:Item AND entityType_keyword:OrgUnit</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -1629,7 +1634,8 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:JournalIssue</value>
+                <!-- NOTE: NOT filtered on latestVersion = true -->
+                <value>search.resourcetype:Item AND entityType_keyword:JournalIssue</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -1745,7 +1751,8 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:JournalVolume</value>
+                <!-- NOTE: NOT filtered on latestVersion = true -->
+                <value>search.resourcetype:Item AND entityType_keyword:JournalVolume</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -1861,7 +1868,8 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:Journal</value>
+                <!-- NOTE: NOT filtered on latestVersion = true -->
+                <value>search.resourcetype:Item AND entityType_keyword:Journal</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
