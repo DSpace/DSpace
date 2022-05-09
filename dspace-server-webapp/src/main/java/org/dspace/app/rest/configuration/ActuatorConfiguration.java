@@ -14,7 +14,6 @@ import java.util.Arrays;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.health.GeoIpHealthIndicator;
-import org.dspace.app.rest.info.VersionInfoContributor;
 import org.dspace.authority.AuthoritySolrServiceImpl;
 import org.dspace.discovery.SolrSearchCore;
 import org.dspace.statistics.SolrStatisticsCore;
@@ -87,11 +86,6 @@ public class ActuatorConfiguration {
     @ConditionalOnEnabledHealthIndicator("geoIp")
     public GeoIpHealthIndicator geoIpHealthIndicator() {
         return new GeoIpHealthIndicator();
-    }
-
-    @Bean
-    public VersionInfoContributor versionInfoContributor() {
-        return new VersionInfoContributor();
     }
 
     public String getActuatorBasePath() {
