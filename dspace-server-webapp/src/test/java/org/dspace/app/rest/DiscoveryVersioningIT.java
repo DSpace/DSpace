@@ -228,7 +228,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
@@ -242,7 +242,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void test_discoveryXml_defaultRelationships_allVersions() throws Exception {
-        final String configuration = null;
+        final String configuration = "default-relationships";
 
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
@@ -264,14 +264,15 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify both items appear in /api/discover/search/objects
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(community),
             matchSearchResult(collection),
+            matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
         ));
     }
@@ -447,7 +448,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
@@ -459,7 +460,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void test_discoveryXml_publicationRelationships_allVersions() throws Exception {
-        final String configuration = "publication";
+        final String configuration = "publication-relationships";
 
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
@@ -481,12 +482,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify both items appear in /api/discover/search/objects
         verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
         ));
     }
@@ -515,7 +517,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
@@ -527,7 +529,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void test_discoveryXml_personRelationships_allVersions() throws Exception {
-        final String configuration = "person";
+        final String configuration = "person-relationships";
 
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
@@ -549,12 +551,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify both items appear in /api/discover/search/objects
         verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
         ));
     }
@@ -583,7 +586,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
@@ -595,7 +598,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void test_discoveryXml_orgunitRelationships_allVersions() throws Exception {
-        final String configuration = "orgunit";
+        final String configuration = "orgunit-relationships";
 
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
@@ -617,12 +620,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify both items appear in /api/discover/search/objects
         verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
         ));
     }
@@ -651,7 +655,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
@@ -663,7 +667,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void test_discoveryXml_journalissueRelationships_allVersions() throws Exception {
-        final String configuration = "journalissue";
+        final String configuration = "journalissue-relationships";
 
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
@@ -685,12 +689,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify both items appear in /api/discover/search/objects
         verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
         ));
     }
@@ -719,7 +724,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
@@ -731,7 +736,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void test_discoveryXml_journalvolumeRelationships_allVersions() throws Exception {
-        final String configuration = "journalvolume";
+        final String configuration = "journalvolume-relationships";
 
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
@@ -753,12 +758,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify both items appear in /api/discover/search/objects
         verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
         ));
     }
@@ -787,7 +793,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
@@ -799,7 +805,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void test_discoveryXml_journalRelationships_allVersions() throws Exception {
-        final String configuration = "journal";
+        final String configuration = "journal-relationships";
 
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
@@ -821,12 +827,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify both items appear in /api/discover/search/objects
         verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
         ));
     }
@@ -855,7 +862,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
@@ -867,7 +874,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void test_discoveryXml_projectRelationships_allVersions() throws Exception {
-        final String configuration = "project";
+        final String configuration = "project-relationships";
 
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
@@ -889,12 +896,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // create item 1.2 (second version of item 1)
         Item i1_2 = createNewVersion(i1_1, "item 1.2");
 
-        // verify only item 1.2 appears in the solr core
+        // verify both items appear in the solr core
         verifyIndexed(i1_1);
         verifyIndexed(i1_2);
 
-        // verify only item 1.2 appears in /api/discover/search/objects
+        // verify both items appear in /api/discover/search/objects
         verifyRestSearchObjects(configuration, List.of(
+            matchSearchResult(i1_1, "item 1.1"),
             matchSearchResult(i1_2, "item 1.2")
         ));
     }
