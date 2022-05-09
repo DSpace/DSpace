@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.collections4.IteratorUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
@@ -93,15 +94,33 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void metadataImportIntoCollectionWithEntityTypeTest() throws Exception {
+    public void metadataImportIntoCollectionWithEntityTypeWithTemplateEnabledTest() throws Exception {
         String[] csv = {"id,collection,dc.title,dc.contributor.author",
             "+," + publicationCollection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
-        performImportScript(csv);
+        performImportScript(csv, true);
         Item importedItem = findItemByName("Test Import 1");
         assertTrue(StringUtils.equals(itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY)
                               .get(0).getValue(), "Donald, SmithImported"));
         assertTrue(StringUtils.equals(itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
                               .get(0).getValue(), "Publication"));
+        eperson = ePersonService.findByEmail(context, eperson.getEmail());
+        assertEquals(importedItem.getSubmitter(), eperson);
+
+        context.turnOffAuthorisationSystem();
+        itemService.delete(context, itemService.find(context, importedItem.getID()));
+        context.restoreAuthSystemState();
+    }
+
+    @Test
+    public void metadataImportIntoCollectionWithEntityTypeWithTemplateDisabledTest() throws Exception {
+        String[] csv = {"id,collection,dc.title,dc.contributor.author",
+            "+," + publicationCollection.getHandle() + ",\"Test Import 1\"," + "\"Donald, SmithImported\""};
+        performImportScript(csv, false);
+        Item importedItem = findItemByName("Test Import 1");
+        assertTrue(StringUtils.equals(itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY)
+            .get(0).getValue(), "Donald, SmithImported"));
+        assertEquals(0, itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
+            .size());
         eperson = ePersonService.findByEmail(context, eperson.getEmail());
         assertEquals(importedItem.getSubmitter(), eperson);
 
@@ -227,12 +246,16 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         return importedItem;
     }
 
+    public void performImportScript(String[] csv) throws Exception {
+        performImportScript(csv, false);
+    }
+
     /**
      * Import mocked CSVs to test item creation behavior, deleting temporary file afterward.
      * @param csv content for test file.
      * @throws java.lang.Exception passed through.
      */
-    public void performImportScript(String[] csv) throws Exception {
+    public void performImportScript(String[] csv, boolean useTemplate) throws Exception {
         File csvFile = File.createTempFile("dspace-test-import", "csv");
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csvFile), "UTF-8"));
         for (String csvLine : csv) {
@@ -243,6 +266,9 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         String fileLocation = csvFile.getAbsolutePath();
         try {
             String[] args = new String[] {"metadata-import", "-f", fileLocation, "-e", eperson.getEmail(), "-s"};
+            if (useTemplate) {
+                args = ArrayUtils.add(args, "-t");
+            }
             TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
             ScriptLauncher
                 .handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
