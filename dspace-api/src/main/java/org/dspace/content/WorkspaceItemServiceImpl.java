@@ -139,8 +139,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
             MetadataValue original = colEntityType.get();
             MetadataField metadataField = original.getMetadataField();
             MetadataSchema metadataSchema = metadataField.getMetadataSchema();
-            itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
-                                    metadataField.getQualifier(), original.getLanguage(), original.getValue());
+            // NOTE: dspace.entity.type = <blank> does not make sense
+            //       the collection entity type is by default blank when a collection is first created
+            if (StringUtils.isNotBlank(original.getValue())) {
+                itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
+                                        metadataField.getQualifier(), original.getLanguage(), original.getValue());
+            }
         }
 
         if (template && (templateItem != null)) {
