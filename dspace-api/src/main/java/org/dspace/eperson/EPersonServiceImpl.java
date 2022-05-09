@@ -576,10 +576,10 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public EPerson findByProfileItem(Context context, Item profile) throws SQLException {
-        List<MetadataValue> crisOwners = itemService.getMetadata(profile, "dspace", "object", "owner", ANY);
-        if (CollectionUtils.isEmpty(crisOwners)) {
+        List<MetadataValue> owners = itemService.getMetadata(profile, "dspace", "object", "owner", ANY);
+        if (CollectionUtils.isEmpty(owners)) {
             return null;
         }
-        return find(context, UUIDUtils.fromString(crisOwners.get(0).getAuthority()));
+        return find(context, UUIDUtils.fromString(owners.get(0).getAuthority()));
     }
 }
