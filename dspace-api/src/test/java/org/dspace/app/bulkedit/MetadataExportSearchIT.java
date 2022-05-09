@@ -26,7 +26,6 @@ import com.opencsv.exceptions.CsvException;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
-import org.dspace.app.util.Configuration;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
