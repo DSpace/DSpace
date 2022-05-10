@@ -636,14 +636,14 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         // we expect: indexableObjects=2, totalFound=should be 2 but we have 3 ->(1 stale object here)
         assertSearchQuery(IndexableCollection.TYPE, 2, 3, 0, -1);
         // as the previous query hit the stale object running a new query should lead to a clean situation
-        assertSearchQuery(IndexableCollection.TYPE, 2, 2, 0, - 1);
+        assertSearchQuery(IndexableCollection.TYPE, 2, 2, 0, -1);
 
         // similar test over the items
         // check Item type with start=0 and limit=default,
         // we expect: indexableObjects=3, totalFound=6 (3 stale objects here)
-        assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, - 1);
+        assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, -1);
         // as the previous query hit the stale objects running a new query should lead to a clean situation
-        assertSearchQuery(IndexableItem.TYPE, 3, 3, 0, - 1);
+        assertSearchQuery(IndexableItem.TYPE, 3, 3, 0, -1);
     }
 
     @Test
