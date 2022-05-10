@@ -1223,7 +1223,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void patchReplaceStartDataTest() throws Exception {
+    public void patchReplaceStartDateTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -1293,7 +1293,77 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void patchAddStartDataTest() throws Exception {
+    public void patchReplaceEndDateTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("eperson1@mail.com")
+                                         .withPassword("qwerty01")
+                                         .build();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                 .withAdminGroup(eperson1)
+                                                 .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item")
+                                      .build();
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.YEAR, 2019);
+        calendar.set(Calendar.MONTH, 9);
+        calendar.set(Calendar.DATE, 31);
+
+        Date date = calendar.getTime();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withAction(Constants.READ)
+            .withDspaceObject(publicItem1)
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withEndDate(date)
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        Calendar newCalendar = Calendar.getInstance();
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+
+        newCalendar.set(Calendar.YEAR, 2020);
+        newCalendar.set(Calendar.MONTH, 0);
+        newCalendar.set(Calendar.DATE, 1);
+
+        Date newDate = newCalendar.getTime();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/endDate", formatDate.format(newDate));
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+                                         .content(patchBody)
+                                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.name", is(resourcePolicy.getRpName())),
+                                hasJsonPath("$.description", is(resourcePolicy.getRpDescription())),
+                                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                hasJsonPath("$.endDate", is(formatDate.format(newDate))),
+                                hasJsonPath("$.startDate", is(resourcePolicy.getStartDate())))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                                hasJsonPath("$.endDate", is(formatDate.format(newDate))))));
+    }
+
+    @Test
+    public void patchAddStartDateTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -1354,7 +1424,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void patchAddEndDataTest() throws Exception {
+    public void patchAddEndDateTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -1413,7 +1483,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void patchRemoveStartDataTest() throws Exception {
+    public void patchRemoveStartDateTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -1534,7 +1604,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void patchReplaceStartDataUnAuthenticatedTest() throws Exception {
+    public void patchReplaceStartDateUnAuthenticatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Community community = CommunityBuilder.createCommunity(context).build();
@@ -1589,7 +1659,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void patchReplaceStartDataForbiddenTest() throws Exception {
+    public void patchReplaceStartDateForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -1685,7 +1755,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void patchReplaceEndDateBeforeStartDataTest() throws Exception {
+    public void patchReplaceEndDateBeforeStartDateTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)

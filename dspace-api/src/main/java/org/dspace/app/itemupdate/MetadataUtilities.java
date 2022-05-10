@@ -27,10 +27,12 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.xpath.XPathAPI;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
@@ -170,24 +172,21 @@ public class MetadataUtilities {
      * @param docBuilder DocumentBuilder
      * @param is         - InputStream of dublin_core.xml
      * @return list of DtoMetadata representing the metadata fields relating to an Item
-     * @throws SQLException                 if database error
      * @throws IOException                  if IO error
      * @throws ParserConfigurationException if parser config error
      * @throws SAXException                 if XML error
-     * @throws TransformerException         if transformer error
-     * @throws AuthorizeException           if authorization error
      */
     public static List<DtoMetadata> loadDublinCore(DocumentBuilder docBuilder, InputStream is)
-        throws SQLException, IOException, ParserConfigurationException,
-        SAXException, TransformerException, AuthorizeException {
+        throws IOException, XPathExpressionException, SAXException {
         Document document = docBuilder.parse(is);
 
         List<DtoMetadata> dtomList = new ArrayList<DtoMetadata>();
 
         // Get the schema, for backward compatibility we will default to the
         // dublin core schema if the schema name is not available in the import file
-        String schema = null;
-        NodeList metadata = XPathAPI.selectNodeList(document, "/dublin_core");
+        String schema;
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        NodeList metadata = (NodeList) xPath.compile("/dublin_core").evaluate(document, XPathConstants.NODESET);
         Node schemaAttr = metadata.item(0).getAttributes().getNamedItem("schema");
         if (schemaAttr == null) {
             schema = MetadataSchemaEnum.DC.getName();
@@ -196,7 +195,7 @@ public class MetadataUtilities {
         }
 
         // Get the nodes corresponding to formats
-        NodeList dcNodes = XPathAPI.selectNodeList(document, "/dublin_core/dcvalue");
+        NodeList dcNodes = (NodeList) xPath.compile("/dublin_core/dcvalue").evaluate(document, XPathConstants.NODESET);
 
         for (int i = 0; i < dcNodes.getLength(); i++) {
             Node n = dcNodes.item(i);
