@@ -9,7 +9,6 @@ package org.dspace.app.ldn.processor;
 
 import static java.lang.String.format;
 
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -29,14 +28,12 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
-import org.apache.velocity.runtime.resource.util.StringResourceRepository;
 import org.dspace.app.ldn.action.ActionStatus;
 import org.dspace.app.ldn.action.LDNAction;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.utility.LDNUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -53,6 +50,10 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Linked Data Notification metadata processor for consuming notifications. The
  * storage of notification details are within item metadata.
+ * 
+ * @author William Welling
+ * @author Stefano Maffei (4Science.com)
+ * 
  */
 public class LDNMetadataProcessor implements LDNProcessor {
 
@@ -142,10 +143,8 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
         Item item = lookupItem(context, notification);
 
-        List<MetadataValue> metadataValuesToRemove = new ArrayList<>();
-
         for (LDNMetadataChange change : changes) {
-            String condition = renderTemplate(velocityContext, change.getConditionTemplate());
+            String condition = change.renderTemplate(velocityContext, velocityEngine, change.getConditionTemplate());
 
             boolean proceed = Boolean.parseBoolean(condition);
 
@@ -153,62 +152,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
                 continue;
             }
 
-            if (change instanceof LDNMetadataAdd) {
-                LDNMetadataAdd add = ((LDNMetadataAdd) change);
-                String value = renderTemplate(velocityContext, add.getValueTemplate());
-                log.info(
-                        "Adding {}.{}.{} {} {}",
-                        add.getSchema(),
-                        add.getElement(),
-                        add.getQualifier(),
-                        add.getLanguage(),
-                        value);
-
-                itemService.addMetadata(
-                        context,
-                        item,
-                        add.getSchema(),
-                        add.getElement(),
-                        add.getQualifier(),
-                        add.getLanguage(),
-                        value);
-
-            } else if (change instanceof LDNMetadataRemove) {
-                LDNMetadataRemove remove = (LDNMetadataRemove) change;
-
-                for (String qualifier : remove.getQualifiers()) {
-                    List<MetadataValue> itemMetadata = itemService.getMetadata(
-                            item,
-                            change.getSchema(),
-                            change.getElement(),
-                            qualifier,
-                            Item.ANY);
-
-                    for (MetadataValue metadatum : itemMetadata) {
-                        boolean delete = true;
-                        for (String valueTemplate : remove.getValueTemplates()) {
-                            String value = renderTemplate(velocityContext, valueTemplate);
-                            if (!metadatum.getValue().contains(value)) {
-                                delete = false;
-                            }
-                        }
-                        if (delete) {
-                            log.info("Removing {}.{}.{} {} {}",
-                                    remove.getSchema(),
-                                    remove.getElement(),
-                                    qualifier,
-                                    remove.getLanguage(),
-                                    metadatum.getValue());
-
-                            metadataValuesToRemove.add(metadatum);
-                        }
-                    }
-                }
-            }
-        }
-
-        if (!metadataValuesToRemove.isEmpty()) {
-            itemService.removeMetadataValues(context, item, metadataValuesToRemove);
+            change.doAction(velocityContext, velocityEngine, context, item);
         }
 
         context.turnOffAuthorisationSystem();
@@ -433,20 +377,5 @@ public class LDNMetadataProcessor implements LDNProcessor {
         return velocityContext;
     }
 
-    /**
-     * Render velocity template with provided context.
-     *
-     * @param context  velocity context
-     * @param template template to render
-     * @return String results of rendering
-     */
-    private String renderTemplate(VelocityContext context, String template) {
-        StringWriter writer = new StringWriter();
-        StringResourceRepository repository = StringResourceLoader.getRepository();
-        repository.putStringResource("template", template);
-        velocityEngine.getTemplate("template").merge(context, writer);
-
-        return writer.toString();
-    }
 
 }
