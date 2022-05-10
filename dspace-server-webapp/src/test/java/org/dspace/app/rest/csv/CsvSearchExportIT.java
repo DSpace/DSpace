@@ -58,4 +58,48 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
             ProcessBuilder.deleteProcess(idRef.get());
         }
     }
+
+    @Test
+    public void exportSearchUnauthorizedTest() throws Exception {
+        List<DSpaceCommandLineParameter> parameterList = new ArrayList<>();
+        parameterList.add(new DSpaceCommandLineParameter("-q", "subject:subject1"));
+        List<ParameterValueRest> restparams = parameterList.stream()
+            .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter.convert(dSpaceCommandLineParameter,
+                Projection.DEFAULT)).collect(
+                Collectors.toList());
+
+        getClient().perform(fileUpload("/api/system/scripts/metadata-export-search/processes")
+                .param("properties", new ObjectMapper().writeValueAsString(restparams)))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void exportSearchForbiddenTest() throws Exception {
+        List<DSpaceCommandLineParameter> parameterList = new ArrayList<>();
+        parameterList.add(new DSpaceCommandLineParameter("-q", "subject:subject1"));
+        List<ParameterValueRest> restparams = parameterList.stream()
+            .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter.convert(dSpaceCommandLineParameter,
+                Projection.DEFAULT)).collect(
+                Collectors.toList());
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(fileUpload("/api/system/scripts/metadata-export-search/processes")
+                .param("properties", new ObjectMapper().writeValueAsString(restparams)))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void exportSearchInvalidQuery() throws Exception {
+        List<DSpaceCommandLineParameter> parameterList = new ArrayList<>();
+        parameterList.add(new DSpaceCommandLineParameter("-q", "blabla"));
+        List<ParameterValueRest> restparams = parameterList.stream()
+            .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter.convert(dSpaceCommandLineParameter,
+                Projection.DEFAULT)).collect(
+                Collectors.toList());
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(fileUpload("/api/system/scripts/metadata-export-search/processes")
+                .param("properties", new ObjectMapper().writeValueAsString(restparams)))
+            .andExpect(status().isAccepted());
+    }
 }
