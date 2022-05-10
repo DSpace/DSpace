@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,9 +30,9 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.scielo.service.ScieloImportMetadataSourceServiceImpl;
-import org.dspace.importer.external.scopus.service.LiveImportClientImpl;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -56,8 +56,7 @@ public class ScieloImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.scielo").toString();
-        try (FileInputStream scieloResp = new FileInputStream(path)) {
+        try (InputStream scieloResp = getClass().getResourceAsStream("scielo-test.txt")) {
 
             String scieloRipResp = IOUtils.toString(scieloResp, Charset.defaultCharset());
 
@@ -80,8 +79,7 @@ public class ScieloImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.scielo").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
+        try (InputStream file = getClass().getResourceAsStream("scielo-test.txt")) {
             String scieloResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
@@ -127,8 +125,7 @@ public class ScieloImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.sciello-single").toString();
-        try (FileInputStream scieloResp = new FileInputStream(path)) {
+        try (InputStream scieloResp = getClass().getResourceAsStream("scielo-single-record.txt")) {
 
             String scieloRipResp = IOUtils.toString(scieloResp, Charset.defaultCharset());
 

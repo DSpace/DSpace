@@ -23,13 +23,14 @@ import java.util.regex.Pattern;
 import javax.el.MethodNotFoundException;
 import javax.ws.rs.BadRequestException;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.FileSourceException;
 import org.dspace.importer.external.exception.MetadataSourceException;
-import org.dspace.importer.external.scopus.service.LiveImportClient;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,13 +43,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ScieloImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Map<String,List<String>>>
         implements QuerySource {
 
-    private static final String ENDPOINT_SEARCH_SCIELO = "https://search.scielo.org/?output=ris&q=";
-
+    /**
+     * This pattern is used when reading the Scielo response,
+     * to check if the fields you are reading is in rid format
+     */
     private static final String PATTERN = "^([A-Z][A-Z0-9])  - (.*)$";
 
+    /**
+     * This pattern is used to verify correct format of ScieloId
+     */
     private static final String ID_PATTERN  = "^(.....)-(.*)-(...)$";
 
     private int timeout = 1000;
+
+    private String url;
 
     @Autowired
     private LiveImportClient liveImportClient;
@@ -75,13 +83,13 @@ public class ScieloImportMetadataSourceServiceImpl extends AbstractImportMetadat
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
         List<ImportRecord> records = retry(new SearchByQueryCallable(query));
-        return records == null || records.isEmpty() ? null : records.get(0);
+        return CollectionUtils.isEmpty(records) ? null : records.get(0);
     }
 
     @Override
     public ImportRecord getRecord(String id) throws MetadataSourceException {
         List<ImportRecord> records = retry(new FindByIdCallable(id));
-        return records == null || records.isEmpty() ? null : records.get(0);
+        return CollectionUtils.isEmpty(records) ? null : records.get(0);
     }
 
     @Override
@@ -104,6 +112,11 @@ public class ScieloImportMetadataSourceServiceImpl extends AbstractImportMetadat
         throw new MethodNotFoundException("This method is not implemented for Scielo");
     }
 
+    /**
+     * This class is a Callable implementation to count the number of entries for an Scielo query
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class SearchNBByQueryCallable implements Callable<Integer> {
 
         private String query;
@@ -118,13 +131,21 @@ public class ScieloImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
         @Override
         public Integer call() throws Exception {
-            String url = ENDPOINT_SEARCH_SCIELO + URLEncoder.encode(query, StandardCharsets.UTF_8);
-            String resp = liveImportClient.executeHttpGetRequest(timeout, url, new HashMap<String, String>());
+            URIBuilder uriBuilder = new URIBuilder(url + URLEncoder.encode(query, StandardCharsets.UTF_8));
+            String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(),
+                          new HashMap<String, String>());
             Map<Integer, Map<String, List<String>>> records = getRecords(resp);
             return Objects.nonNull(records.size()) ? records.size() : 0;
         }
     }
 
+    /**
+     * This class is a Callable implementation to get an Scielo entry using ScieloID
+     * The ScieloID to use can be passed through the constructor as a String
+     * or as Query's map entry, with the key "id".
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class FindByIdCallable implements Callable<List<ImportRecord>> {
 
         private String id;
@@ -140,8 +161,9 @@ public class ScieloImportMetadataSourceServiceImpl extends AbstractImportMetadat
             Pattern risPattern = Pattern.compile(ID_PATTERN);
             Matcher risMatcher = risPattern.matcher(scieloId);
             if (risMatcher.matches()) {
-                String url = ENDPOINT_SEARCH_SCIELO + URLEncoder.encode(scieloId, StandardCharsets.UTF_8);
-                String resp = liveImportClient.executeHttpGetRequest(timeout, url, new HashMap<String, String>());
+                URIBuilder uriBuilder = new URIBuilder(url + URLEncoder.encode(scieloId, StandardCharsets.UTF_8));
+                String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(),
+                              new HashMap<String, String>());
                 Map<Integer, Map<String, List<String>>> records = getRecords(resp);
                 if (Objects.nonNull(records) & !records.isEmpty()) {
                     results.add(transformSourceRecords(records.get(1)));
@@ -153,6 +175,14 @@ public class ScieloImportMetadataSourceServiceImpl extends AbstractImportMetadat
         }
     }
 
+    /**
+     * This class is a Callable implementation to get Scielo entries based on query object.
+     * This Callable use as query value the string queryString passed to constructor.
+     * If the object will be construct through Query.class instance, a Query's map entry with key "query" will be used.
+     * Pagination is supported too, using the value of the Query's map with keys "start" and "count".
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
 
         private Query query;
@@ -174,8 +204,7 @@ public class ScieloImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String q = query.getParameterAsClass("query", String.class);
             Integer count = query.getParameterAsClass("count", Integer.class);
             Integer start = query.getParameterAsClass("start", Integer.class);
-            URIBuilder uriBuilder = new URIBuilder(
-                    ENDPOINT_SEARCH_SCIELO + URLEncoder.encode(q, StandardCharsets.UTF_8));
+            URIBuilder uriBuilder = new URIBuilder(url + URLEncoder.encode(q, StandardCharsets.UTF_8));
             uriBuilder.addParameter("start", start.toString());
             uriBuilder.addParameter("count", count.toString());
             String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(),
@@ -225,6 +254,10 @@ public class ScieloImportMetadataSourceServiceImpl extends AbstractImportMetadat
             throw new FileSourceException("Cannot parse RIS file", e);
         }
         return records;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
 }
