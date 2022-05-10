@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,21 +40,18 @@ public class AbstractLiveImportIntegrationTest extends AbstractControllerIntegra
         }
     }
 
-    private boolean checkMetadataValue(List<MetadatumDTO> list, List<MetadatumDTO> list2) {
-        for (MetadatumDTO metadatum : list) {
-            for (MetadatumDTO metadatum2 : list2) {
-               if (sameMetadatum(metadatum, metadatum2)) {
-                   assertEquals(metadatum.getValue(), metadatum2.getValue());
-               }
-            }
+    private void checkMetadataValue(List<MetadatumDTO> list, List<MetadatumDTO> list2) {
+        assertEquals(list.size(), list2.size());
+        for (int i = 0; i < list.size(); i++) {
+            assertTrue(sameMetadatum(list.get(i), list2.get(i)));
         }
-        return true;
     }
 
     private boolean sameMetadatum(MetadatumDTO metadatum, MetadatumDTO metadatum2) {
         if (StringUtils.equals(metadatum.getSchema(), metadatum2.getSchema()) &&
             StringUtils.equals(metadatum.getElement(), metadatum2.getElement()) &&
-            StringUtils.equals(metadatum.getQualifier(), metadatum2.getQualifier())) {
+            StringUtils.equals(metadatum.getQualifier(), metadatum2.getQualifier()) &&
+            StringUtils.equals(metadatum.getValue(), metadatum2.getValue())) {
             return true;
         }
         return false;

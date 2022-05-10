@@ -21,7 +21,7 @@
         <entry key-ref="crossref.title" value-ref="crossrefTitleContrib"/>
         <entry key-ref="crossref.authors" value-ref="crossrefAuthorContrib"/>
         <entry key-ref="crossref.isbn" value-ref="crossrefISBNContrib"/>
-        <entry key-ref="crossref.year" value-ref="crossrefYearContrib"/> <!-- rivedere -->
+        <entry key-ref="crossref.year" value-ref="crossrefYearContrib"/>
         <entry key-ref="crossref.editors" value-ref="crossrefEditorsContrib"/>
         <entry key-ref="crossref.type" value-ref="crossrefDoiTypeContrib"/>
         <entry key-ref="crossref.journal" value-ref="crossrefJournalContrib"/>

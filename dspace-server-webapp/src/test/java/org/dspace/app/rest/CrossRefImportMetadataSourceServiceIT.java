@@ -105,8 +105,8 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
 
         metadatums.add(title);
         metadatums.add(author);
-        metadatums.add(type);
         metadatums.add(date);
+        metadatums.add(type);
         metadatums.add(ispartof);
         metadatums.add(doi);
         metadatums.add(issn);
@@ -131,8 +131,8 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
 
         metadatums2.add(title2);
         metadatums2.add(author2);
-        metadatums2.add(type2);
         metadatums2.add(date2);
+        metadatums2.add(type2);
         metadatums2.add(ispartof2);
         metadatums2.add(doi2);
         metadatums2.add(issn2);

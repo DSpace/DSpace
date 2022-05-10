@@ -58,16 +58,23 @@
 
     <bean id="vufindIdentifier" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="vufind.dc.identifier"/>
-        <property name="query" value="/urls/url"/>
+        <property name="metadataProcessor" ref="vufindUriProcessor"></property>
     </bean>
+    <bean name="vufindUriProcessor" class="org.dspace.importer.external.crossref.ArrayElementAttributeProcessor">
+        <property name="pathToArray" value="/urls"></property>
+        <property name="elementAttribute" value="/url"></property>
+	</bean>
     <bean id="vufind.dc.identifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier"/>
     </bean>
 
     <bean id="vufindSubject" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="vufind.dc.subject"/>
-        <property name="query" value="$.subjects[*][*]"/>
+        <property name="metadataProcessor" ref="vufindSubjectsProcessor"></property>
     </bean>
+    <bean name="vufindSubjectsProcessor" class="org.dspace.importer.external.crossref.MatrixElementProcessor">
+        <property name="pathToMatrix" value="/subjects"></property>
+	</bean>
     <bean id="vufind.dc.subject" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.subject"/>
     </bean>

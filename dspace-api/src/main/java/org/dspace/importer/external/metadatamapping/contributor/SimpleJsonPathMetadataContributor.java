@@ -10,6 +10,7 @@ package org.dspace.importer.external.metadatamapping.contributor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -118,7 +119,7 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
     public Collection<MetadatumDTO> contributeMetadata(String fullJson) {
         Collection<MetadatumDTO> metadata = new ArrayList<>();
         Collection<String> metadataValue = new ArrayList<>();
-        if (metadataProcessor != null) {
+        if (Objects.nonNull(metadataProcessor)) {
             metadataValue = metadataProcessor.processMetadata(fullJson);
         } else {
             JsonNode jsonNode = convertStringJsonToJsonNode(fullJson);
@@ -126,13 +127,13 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
             if (node.isArray()) {
                 Iterator<JsonNode> nodes = node.iterator();
                 while (nodes.hasNext()) {
-                    String nodeValue = nodes.next().textValue();
+                    String nodeValue = getStringValue(nodes.next());
                     if (StringUtils.isNotBlank(nodeValue)) {
                         metadataValue.add(nodeValue);
                     }
                 }
             } else {
-                String nodeValue = node.textValue();
+                String nodeValue = getStringValue(node);
                 if (StringUtils.isNotBlank(nodeValue)) {
                     metadataValue.add(nodeValue);
                 }
@@ -147,6 +148,16 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
             metadata.add(metadatumDto);
         }
         return metadata;
+    }
+
+    private String getStringValue(JsonNode node) {
+        if (node.isTextual()) {
+            return node.textValue();
+        } else if (node.isNumber()) {
+            return node.numberValue().toString();
+        }
+        log.error("It wasn't possible to convert the value of the following JsonNode:" + node.asText());
+        return StringUtils.EMPTY;
     }
 
     private JsonNode convertStringJsonToJsonNode(String json) {
