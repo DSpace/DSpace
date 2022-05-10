@@ -7,34 +7,22 @@
  */
 package org.dspace.app.orcid.model;
 
-import org.apache.commons.lang3.EnumUtils;
-
 /**
- * The entity types of the ORCID objects that can be synchronized.
+ * The types of activities defined on ORCID that can be synchronized.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
 public enum OrcidEntityType {
 
-    PUBLICATION("/work"),
-    FUNDING("/funding");
+    /**
+     * The publication/work activity.
+     */
+    PUBLICATION,
 
-    private final String path;
+    /**
+     * The funding activity.
+     */
+    FUNDING;
 
-    private OrcidEntityType(String path) {
-        this.path = path;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public static boolean isValid(String entityType) {
-        return entityType != null ? EnumUtils.isValidEnum(OrcidEntityType.class, entityType.toUpperCase()) : false;
-    }
-
-    public static OrcidEntityType fromString(String entityType) {
-        return isValid(entityType) ? OrcidEntityType.valueOf(entityType.toUpperCase()) : null;
-    }
 }

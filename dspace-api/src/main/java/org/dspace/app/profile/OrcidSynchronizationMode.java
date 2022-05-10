@@ -16,6 +16,14 @@ package org.dspace.app.profile;
  */
 public enum OrcidSynchronizationMode {
 
+    /**
+     * Mode in which the user can manually decide when to synchronize data with
+     * ORCID.
+     */
     MANUAL,
+
+    /**
+     * Mode in which synchronizations with ORCID occur through an automatic process.
+     */
     BATCH;
 }
