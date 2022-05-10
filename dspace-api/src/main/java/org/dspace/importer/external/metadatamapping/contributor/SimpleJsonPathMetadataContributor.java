@@ -23,6 +23,12 @@ import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 
 /**
+ * A simple JsonPath Metadata processor
+ * that allow extract value from json object
+ * by configuring the path in the query variable via the bean.
+ * moreover this can also perform more compact extractions
+ * by configuring specific json processor in "metadataProcessor"
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
 public class SimpleJsonPathMetadataContributor implements MetadataContributor<String> {

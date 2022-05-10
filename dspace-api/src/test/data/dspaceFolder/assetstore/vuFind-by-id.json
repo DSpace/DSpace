@@ -32,7 +32,12 @@
                 ]
             ],
             "title": "La pianta marmorea di Roma antica: Forma urbis Romae /",
-            "urls": []
+            "urls": [
+                            {
+                    "url": "http://hdl.handle.net/20.500.12390/231",
+                    "desc": "http://hdl.handle.net/20.500.12390/231"
+                }
+                ]
         }
     ],
     "status": "OK"

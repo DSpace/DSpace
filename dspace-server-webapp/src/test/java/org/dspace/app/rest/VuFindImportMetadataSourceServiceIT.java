@@ -152,9 +152,12 @@ public class VuFindImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO subject4 = createMetadatumDTO("dc", "subject", null, "Rome (Italy)");
         MetadatumDTO subject5 = createMetadatumDTO("dc", "subject", null, "Antiquities");
         MetadatumDTO subject6 = createMetadatumDTO("dc", "subject", null, "Maps.");
+        MetadatumDTO identifier = createMetadatumDTO("dc", "identifier", null,
+                                                     "http://hdl.handle.net/20.500.12390/231");
         metadatums.add(identifierOther);
         metadatums.add(language);
         metadatums.add(title);
+        metadatums.add(identifier);
         metadatums.add(subject);
         metadatums.add(subject2);
         metadatums.add(subject3);
@@ -175,12 +178,12 @@ public class VuFindImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO subject9 = createMetadatumDTO("dc", "subject", null, "Stereotypes (Social psychology)");
         MetadatumDTO subject10 = createMetadatumDTO("dc", "subject", null, "Romanies");
         MetadatumDTO subject11 = createMetadatumDTO("dc", "subject", null, "Public opinion.");
-        MetadatumDTO identifier = createMetadatumDTO("dc", "identifier", null,
+        MetadatumDTO identifier2 = createMetadatumDTO("dc", "identifier", null,
                 "http://ezproxy.villanova.edu/login?URL=http://www.jstor.org/stable/10.7829/j.ctt1ggjj08");
         metadatums2.add(identifierOther2);
         metadatums2.add(language2);
         metadatums2.add(title2);
-        metadatums2.add(identifier);
+        metadatums2.add(identifier2);
         metadatums2.add(subject7);
         metadatums2.add(subject8);
         metadatums2.add(subject9);
