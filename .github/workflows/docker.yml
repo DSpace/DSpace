@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - dtq-dev
+      - dtq-dev-present
   pull_request:
 
 jobs:
