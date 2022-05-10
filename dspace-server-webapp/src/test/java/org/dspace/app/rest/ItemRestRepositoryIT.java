@@ -12,6 +12,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.core.Constants.WRITE;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -3861,6 +3862,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                  .andExpect(jsonPath("$.inArchive", Matchers.is(false)))
                  .andExpect(jsonPath("$._links.self.href",
                      Matchers.containsString("/api/core/items/" + item.getID().toString())))
+                 .andExpect(jsonPath("$._links.accessStatus.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/accessStatus")))
                  .andExpect(jsonPath("$._links.bundles.href",
                      Matchers.containsString("/api/core/items/" + item.getID().toString() + "/bundles")))
                  .andExpect(jsonPath("$._links.mappedCollections.href",
@@ -3893,6 +3896,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                  .andExpect(jsonPath("$.inArchive", Matchers.is(false)))
                  .andExpect(jsonPath("$._links.self.href",
                      Matchers.containsString("/api/core/items/" + item.getID().toString())))
+                 .andExpect(jsonPath("$._links.accessStatus.href",
+                     Matchers.containsString("/api/core/items/" + item.getID().toString() + "/accessStatus")))
                  .andExpect(jsonPath("$._links.bundles.href",
                      Matchers.containsString("/api/core/items/" + item.getID().toString() + "/bundles")))
                  .andExpect(jsonPath("$._links.mappedCollections.href",
@@ -3926,6 +3931,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                        Matchers.containsString("/api/core/items/" + item.getID().toString())))
                    .andExpect(jsonPath("$._links.self.href",
                        Matchers.containsString("/api/core/items/" + item.getID().toString())))
+                   .andExpect(jsonPath("$._links.accessStatus.href",
+                       Matchers.containsString("/api/core/items/" + item.getID().toString() + "/accessStatus")))
                    .andExpect(jsonPath("$._links.bundles.href",
                        Matchers.containsString("/api/core/items/" + item.getID().toString() + "/bundles")))
                    .andExpect(jsonPath("$._links.mappedCollections.href",
@@ -4374,6 +4381,37 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/core/items/" + item.getID() + "/version"))
                    .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findAccessStatusForItemBadRequestTest() throws Exception {
+        getClient().perform(get("/api/core/items/{uuid}/accessStatus", "1"))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findAccessStatusForItemNotFoundTest() throws Exception {
+        UUID fakeUUID = UUID.randomUUID();
+        getClient().perform(get("/api/core/items/{uuid}/accessStatus", fakeUUID))
+                   .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void findAccessStatusForItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection owningCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                       .withName("Owning Collection")
+                                                       .build();
+        Item item = ItemBuilder.createItem(context, owningCollection)
+                               .withTitle("Test item")
+                               .build();
+        context.restoreAuthSystemState();
+        getClient().perform(get("/api/core/items/{uuid}/accessStatus", item.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.status", notNullValue()));
     }
 
 }

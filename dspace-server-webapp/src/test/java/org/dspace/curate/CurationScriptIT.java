@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
@@ -88,7 +88,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         // Request with -t <invalidTaskOption>
         getClient(token)
             .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                         .param("properties", new Gson().toJson(list)))
+                         .param("properties", new ObjectMapper().writeValueAsString(list)))
             // Illegal Argument Exception
             .andExpect(status().isBadRequest());
     }
@@ -109,7 +109,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         // Request with missing required -i <handle>
         getClient(token)
             .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                         .param("properties", new Gson().toJson(list)))
+                         .param("properties", new ObjectMapper().writeValueAsString(list)))
             // Illegal Argument Exception
             .andExpect(status().isBadRequest());
     }
@@ -131,7 +131,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         // Request with missing required -i <handle>
         getClient(token)
             .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                         .param("properties", new Gson().toJson(list)))
+                         .param("properties", new ObjectMapper().writeValueAsString(list)))
             // Illegal Argument Exception
             .andExpect(status().isBadRequest());
     }
@@ -171,7 +171,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         // Request without -t <task> or -T <taskFile> (and no -q <queue>)
         getClient(token)
             .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                         .param("properties", new Gson().toJson(list)))
+                         .param("properties", new ObjectMapper().writeValueAsString(list)))
             // Illegal Argument Exception
             .andExpect(status().isBadRequest());
     }
@@ -193,7 +193,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         // Request with invalid -s <scope>; must be object, curation or open
         getClient(token)
             .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                         .param("properties", new Gson().toJson(list)))
+                         .param("properties", new ObjectMapper().writeValueAsString(list)))
             // Illegal Argument Exception
             .andExpect(status().isBadRequest());
     }
@@ -215,7 +215,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         // Request with invalid -s <scope>; must be object, curation or open
         getClient(token)
             .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                         .param("properties", new Gson().toJson(list)))
+                         .param("properties", new ObjectMapper().writeValueAsString(list)))
             // Illegal Argument Exception
             .andExpect(status().isBadRequest());
     }
@@ -257,7 +257,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         try {
             getClient(token)
                 .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                             .param("properties", new Gson().toJson(list)))
+                             .param("properties", new ObjectMapper().writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("curate",
@@ -308,7 +308,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         try {
             getClient(token)
                 .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                             .param("properties", new Gson().toJson(list)))
+                             .param("properties", new ObjectMapper().writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("curate",
@@ -359,7 +359,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
 
             getClient(token)
                 .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                             .param("properties", new Gson().toJson(list)))
+                             .param("properties", new ObjectMapper().writeValueAsString(list)))
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("curate",
                                                 String.valueOf(admin.getID()), parameters,
