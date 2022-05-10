@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
@@ -48,7 +48,7 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
         try {
             String token = getAuthToken(admin.getEmail(), password);
             getClient(token).perform(fileUpload("/api/system/scripts/metadata-export-search/processes")
-                    .param("properties", new Gson().toJson(restparams)))
+                    .param("properties", new ObjectMapper().writeValueAsString(restparams)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$",
                     ProcessMatcher.matchProcess("metadata-export-search", admin.getID().toString(), parameterList,
