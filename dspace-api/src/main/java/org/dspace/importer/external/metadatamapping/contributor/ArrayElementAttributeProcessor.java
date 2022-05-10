@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.importer.external.crossref;
+package org.dspace.importer.external.metadatamapping.contributor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,54 +17,44 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.importer.external.metadatamapping.contributor.JsonPathMetadataProcessor;
 
 /**
- * This Processor allows to extract all values of a matrix.
- * Only need to configure the path to the matrix in "pathToMatrix"
- * For exaple to extract all values
- * "matrix": [
- *     [
- *      "first",
- *      "second"
- *     ],
- *     [
- *      "third"
- *     ],
- *     [
- *      "fourth",
- *      "fifth"
- *     ]
- *   ],
+ * This Processor allows to extract attribute values of an array.
+ * For exaple to extract all values of secondAttribute,
+ * "array":[
+ *       {
+ *        "firstAttribute":"first value",
+ *        "secondAttribute":"second value"
+ *       },
+ *       {
+ *        "firstAttribute":"first value",
+ *        "secondAttribute":"second value"
+ *        }
+ * ]
  * 
+ * it's possible configure a bean with
+ * pathToArray=/array and elementAttribute=/secondAttribute
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
-public class MatrixElementProcessor implements JsonPathMetadataProcessor {
+public class ArrayElementAttributeProcessor implements JsonPathMetadataProcessor {
 
     private final static Logger log = LogManager.getLogger();
 
-    private String pathToMatrix;
+    private String pathToArray;
+
+    private String elementAttribute;
 
     @Override
     public Collection<String> processMetadata(String json) {
         JsonNode rootNode = convertStringJsonToJsonNode(json);
-        Iterator<JsonNode> array = rootNode.at(pathToMatrix).elements();
+        Iterator<JsonNode> array = rootNode.at(pathToArray).iterator();
         Collection<String> values = new ArrayList<>();
         while (array.hasNext()) {
             JsonNode element = array.next();
-            if (element.isArray()) {
-                Iterator<JsonNode> nodes = element.iterator();
-                while (nodes.hasNext()) {
-                    String nodeValue = nodes.next().textValue();
-                    if (StringUtils.isNotBlank(nodeValue)) {
-                        values.add(nodeValue);
-                    }
-                }
-            } else {
-                String nodeValue = element.textValue();
-                if (StringUtils.isNotBlank(nodeValue)) {
-                    values.add(nodeValue);
-                }
+            String value = element.at(elementAttribute).textValue();
+            if (StringUtils.isNoneBlank(value)) {
+                values.add(value);
             }
         }
         return values;
@@ -81,8 +71,12 @@ public class MatrixElementProcessor implements JsonPathMetadataProcessor {
         return body;
     }
 
-    public void setPathToMatrix(String pathToMatrix) {
-        this.pathToMatrix = pathToMatrix;
+    public void setPathToArray(String pathToArray) {
+        this.pathToArray = pathToArray;
+    }
+
+    public void setElementAttribute(String elementAttribute) {
+        this.elementAttribute = elementAttribute;
     }
 
 }

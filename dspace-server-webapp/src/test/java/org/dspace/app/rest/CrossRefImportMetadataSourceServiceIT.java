@@ -8,17 +8,24 @@
 package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import javax.el.MethodNotFoundException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.content.Item;
 import org.dspace.importer.external.crossref.CrossRefImportMetadataSourceServiceImpl;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
@@ -46,8 +53,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.crossRef").toString();
-        try (FileInputStream crossRefResp = new FileInputStream(path)) {
+        try (InputStream crossRefResp = getClass().getResourceAsStream("crossRef-test.json")) {
 
             String crossRefRespXmlResp = IOUtils.toString(crossRefResp, Charset.defaultCharset());
 
@@ -70,9 +76,8 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.crossRef").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
-            String crossRefRespXmlResp = IOUtils.toString(file, Charset.defaultCharset());
+        try (InputStream crossRefResp = getClass().getResourceAsStream("crossRef-test.json")) {
+            String crossRefRespXmlResp = IOUtils.toString(crossRefResp, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
             CloseableHttpResponse response = mockResponse(crossRefRespXmlResp, 200, "OK");
@@ -84,6 +89,52 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
         }
+    }
+
+    @Test
+    public void crossRefImportMetadataGetRecordByIdTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+
+        try (InputStream crossRefResp = getClass().getResourceAsStream("crossRef-by-id.json")) {
+
+            String crossRefRespXmlResp = IOUtils.toString(crossRefResp, Charset.defaultCharset());
+
+            liveImportClientImpl.setHttpClient(httpClient);
+            CloseableHttpResponse response = mockResponse(crossRefRespXmlResp, 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
+
+            context.restoreAuthSystemState();
+            ArrayList<ImportRecord> collection2match = getRecords();
+            collection2match.remove(1);
+            ImportRecord recordImported = crossRefServiceImpl.getRecord("10.26693/jmbs01.02.184");
+            assertNotNull(recordImported);
+            Collection<ImportRecord> recordsImported = Arrays.asList(recordImported);
+            matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
+        } finally {
+            liveImportClientImpl.setHttpClient(originalHttpClient);
+        }
+    }
+
+    @Test(expected = MethodNotFoundException.class)
+    public void crossRefImportMetadataFindMatchingRecordsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        org.dspace.content.Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                                              .withName("Collection 1")
+                                                              .build();
+
+        Item testItem = ItemBuilder.createItem(context, col1)
+                                   .withTitle("test item")
+                                   .withIssueDate("2021")
+                                   .build();
+
+        context.restoreAuthSystemState();
+        crossRefServiceImpl.findMatchingRecords(testItem);
     }
 
     private ArrayList<ImportRecord> getRecords() {

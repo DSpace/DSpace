@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,10 +53,10 @@ public class VuFindImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.vufind").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
 
-            String vuFindResp = IOUtils.toString(file, Charset.defaultCharset());
+        try (InputStream vuFindRespIS = getClass().getResourceAsStream("vuFind-generic.json")) {
+
+            String vuFindResp = IOUtils.toString(vuFindRespIS, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
             CloseableHttpResponse response = mockResponse(vuFindResp, 200, "OK");
@@ -77,9 +77,9 @@ public class VuFindImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.vufind").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
-            String vuFindResp = IOUtils.toString(file, Charset.defaultCharset());
+
+        try (InputStream vuFindRespIS = getClass().getResourceAsStream("vuFind-generic.json")) {
+            String vuFindResp = IOUtils.toString(vuFindRespIS, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
             CloseableHttpResponse response = mockResponse(vuFindResp, 200, "OK");
@@ -98,10 +98,10 @@ public class VuFindImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.vufind-by-id").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
 
-            String vuFindResp = IOUtils.toString(file, Charset.defaultCharset());
+        try (InputStream vuFindByIdResp = getClass().getResourceAsStream("vuFind-by-id.json")) {
+
+            String vuFindResp = IOUtils.toString(vuFindByIdResp, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
             CloseableHttpResponse response = mockResponse(vuFindResp, 200, "OK");

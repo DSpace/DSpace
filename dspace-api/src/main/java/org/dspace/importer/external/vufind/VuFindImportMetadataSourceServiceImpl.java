@@ -108,6 +108,14 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
     @Override
     public void init() throws Exception {}
 
+    /**
+     * This class is a Callable implementation to count the number of entries for an VuFind query.
+     * This Callable use as query value to CrossRef the string queryString passed to constructor.
+     * If the object will be construct through Query.class instance, the value of the Query's
+     * map with the key "query" will be used.
+     *
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class CountByQueryCallable implements Callable<Integer> {
 
         private Query query;
@@ -140,6 +148,12 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
         }
     }
 
+    /**
+     * This class is a Callable implementation to get an VuFind entry using VuFind id
+     * The id to use can be passed through the constructor as a String or as Query's map entry, with the key "id".
+     *
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class GetByVuFindIdCallable implements Callable<String> {
 
         private String id;
@@ -171,6 +185,14 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
         }
     }
 
+    /**
+     * This class is a Callable implementation to get VuFind entries based on query object.
+     * This Callable use as query value the string queryString passed to constructor.
+     * If the object will be construct through Query.class instance, a Query's map entry with key "query" will be used.
+     * Pagination is supported too, using the value of the Query's map with keys "start" and "count".
+     *
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class SearchByQueryCallable implements Callable<String> {
 
         private Query query;
@@ -220,6 +242,11 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     }
 
+    /**
+     * This class is a Callable implementation to search VuFind entries using author and title.
+     *
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     public class FindMatchingRecordsCallable implements Callable<String> {
 
         private Query query;

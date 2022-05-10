@@ -19,6 +19,7 @@ import javax.el.MethodNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -58,41 +59,29 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
     @Override
     public ImportRecord getRecord(String recordId) throws MetadataSourceException {
-        List<ImportRecord> records = null;
         String id = getID(recordId);
-        if (StringUtils.isNotBlank(id)) {
-            records = retry(new SearchByIdCallable(id));
-        } else {
-            records = retry(new SearchByIdCallable(recordId));
-        }
-        return records == null || records.isEmpty() ? null : records.get(0);
+        List<ImportRecord> records = StringUtils.isNotBlank(id) ? retry(new SearchByIdCallable(id))
+                                                                : retry(new SearchByIdCallable(recordId));
+        return CollectionUtils.isEmpty(records) ? null : records.get(0);
     }
 
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
         String id = getID(query);
-        if (StringUtils.isNotBlank(id)) {
-            return retry(new DoiCheckCallable(id));
-        }
-        return retry(new CountByQueryCallable(query));
+        return StringUtils.isNotBlank(id) ? retry(new DoiCheckCallable(id)) : retry(new CountByQueryCallable(query));
     }
 
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
         String id = getID(query.toString());
-        if (StringUtils.isNotBlank(id)) {
-            return retry(new DoiCheckCallable(id));
-        }
-        return retry(new CountByQueryCallable(query));
+        return StringUtils.isNotBlank(id) ? retry(new DoiCheckCallable(id)) : retry(new CountByQueryCallable(query));
     }
 
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
         String id = getID(query.toString());
-        if (StringUtils.isNotBlank(id)) {
-            return retry(new SearchByIdCallable(id));
-        }
-        return retry(new SearchByQueryCallable(query, count, start));
+        return StringUtils.isNotBlank(id) ? retry(new SearchByIdCallable(id))
+                                          : retry(new SearchByQueryCallable(query, count, start));
     }
 
     @Override
@@ -106,36 +95,26 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
-        List<ImportRecord> records = null;
         String id = getID(query.toString());
-        if (StringUtils.isNotBlank(id)) {
-            records = retry(new SearchByIdCallable(id));
-        } else {
-            records = retry(new SearchByIdCallable(query));
-        }
-        return records == null || records.isEmpty() ? null : records.get(0);
+        List<ImportRecord> records = StringUtils.isNotBlank(id) ? retry(new SearchByIdCallable(id))
+                                                                : retry(new SearchByIdCallable(query));
+        return CollectionUtils.isEmpty(records) ? null : records.get(0);
     }
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
         String id = getID(query.toString());
-        if (StringUtils.isNotBlank(id)) {
-            return retry(new SearchByIdCallable(id));
-        }
-        return retry(new FindMatchingRecordCallable(query));
+        return StringUtils.isNotBlank(id) ? retry(new SearchByIdCallable(id))
+                                          : retry(new FindMatchingRecordCallable(query));
     }
-
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
         throw new MethodNotFoundException("This method is not implemented for CrossRef");
     }
 
-    public String getID(String query) {
-        if (DoiCheck.isDoi(query)) {
-            return "filter=doi:" + query;
-        }
-        return StringUtils.EMPTY;
+    public String getID(String id) {
+        return DoiCheck.isDoi(id) ? "filter=doi:" + id : StringUtils.EMPTY;
     }
 
     /**
@@ -341,14 +320,12 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
     }
 
     private JsonNode convertStringJsonToJsonNode(String json) {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode body = null;
         try {
-            body = mapper.readTree(json);
+            return new ObjectMapper().readTree(json);
         } catch (JsonProcessingException e) {
             log.error("Unable to process json response.", e);
         }
-        return body;
+        return null;
     }
 
     public void setUrl(String url) {

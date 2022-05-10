@@ -60,7 +60,7 @@
         <property name="field" ref="vufind.dc.identifier"/>
         <property name="metadataProcessor" ref="vufindUriProcessor"></property>
     </bean>
-    <bean name="vufindUriProcessor" class="org.dspace.importer.external.crossref.ArrayElementAttributeProcessor">
+    <bean name="vufindUriProcessor" class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
         <property name="pathToArray" value="/urls"></property>
         <property name="elementAttribute" value="/url"></property>
 	</bean>
@@ -72,7 +72,7 @@
         <property name="field" ref="vufind.dc.subject"/>
         <property name="metadataProcessor" ref="vufindSubjectsProcessor"></property>
     </bean>
-    <bean name="vufindSubjectsProcessor" class="org.dspace.importer.external.crossref.MatrixElementProcessor">
+    <bean name="vufindSubjectsProcessor" class="org.dspace.importer.external.metadatamapping.contributor.MatrixElementProcessor">
         <property name="pathToMatrix" value="/subjects"></property>
 	</bean>
     <bean id="vufind.dc.subject" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
