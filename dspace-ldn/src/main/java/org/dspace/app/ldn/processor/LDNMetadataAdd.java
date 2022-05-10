@@ -7,8 +7,17 @@
  */
 package org.dspace.app.ldn.processor;
 
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
+import org.dspace.content.Item;
+import org.dspace.core.Context;
+
 /**
  * Instuctions for adding metadata during notification processing.
+ * 
+ * @author William Welling
+ * @author Stefano Maffei (4Science.com)
+ * 
  */
 public class LDNMetadataAdd extends LDNMetadataChange {
 
@@ -43,6 +52,30 @@ public class LDNMetadataAdd extends LDNMetadataChange {
      */
     public void setValueTemplate(String valueTemplate) {
         this.valueTemplate = valueTemplate;
+    }
+
+
+    @Override
+    public void doAction(VelocityContext velocityContext, VelocityEngine velocityEngine,
+        Context context, Item item) throws Exception {
+        String value = renderTemplate(velocityContext, velocityEngine, getValueTemplate());
+        log.info(
+                "Adding {}.{}.{} {} {}",
+                getSchema(),
+                getElement(),
+                getQualifier(),
+                getLanguage(),
+                value);
+
+        itemService.addMetadata(
+                context,
+                item,
+                getSchema(),
+                getElement(),
+                getQualifier(),
+                getLanguage(),
+                value);
+
     }
 
 }

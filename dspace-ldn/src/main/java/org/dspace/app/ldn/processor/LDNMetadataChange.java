@@ -11,8 +11,25 @@ import static org.dspace.app.ldn.LDNMetadataFields.ELEMENT;
 import static org.dspace.app.ldn.LDNMetadataFields.SCHEMA;
 import static org.dspace.content.Item.ANY;
 
+import java.io.StringWriter;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
+import org.apache.velocity.runtime.resource.util.StringResourceRepository;
+import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * Base instructions for metadata change during notification processing.
+ * 
+ * @author William Welling
+ * @author Stefano Maffei (4Science.com)
+ * 
  */
 public abstract class LDNMetadataChange {
 
@@ -24,6 +41,11 @@ public abstract class LDNMetadataChange {
 
     // velocity template with notification as its context
     private String conditionTemplate;
+
+    protected final static Logger log = LogManager.getLogger(LDNMetadataChange.class);
+
+    @Autowired
+    protected ItemService itemService;
 
     /**
      * Default coar schema, notify element, any language, and true condition to
@@ -90,6 +112,34 @@ public abstract class LDNMetadataChange {
      */
     public void setConditionTemplate(String conditionTemplate) {
         this.conditionTemplate = conditionTemplate;
+    }
+
+    /**
+     * Render velocity template with provided context.
+     *
+     * @param velocityContext Velocity Context
+     * @param velocityEngine Velocity Engine
+     * @param context DSpace Context
+     * @param item DSpace Item
+     */
+    public abstract void doAction(VelocityContext velocityContext, VelocityEngine velocityEngine,
+        Context context, Item item) throws Exception;
+
+
+    /**
+     * Render velocity template with provided context.
+     *
+     * @param context  velocity context
+     * @param template template to render
+     * @return String results of rendering
+     */
+    protected String renderTemplate(VelocityContext context, VelocityEngine velocityEngine, String template) {
+        StringWriter writer = new StringWriter();
+        StringResourceRepository repository = StringResourceLoader.getRepository();
+        repository.putStringResource("template", template);
+        velocityEngine.getTemplate("template").merge(context, writer);
+
+        return writer.toString();
     }
 
 }
