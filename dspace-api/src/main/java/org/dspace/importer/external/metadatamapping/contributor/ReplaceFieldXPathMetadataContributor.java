@@ -14,7 +14,7 @@ import java.util.Objects;
 
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-import org.dspace.util.SimpleMapConverter;
+import org.dspace.util.SimpleConverter;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
@@ -29,7 +29,7 @@ public class ReplaceFieldXPathMetadataContributor extends SimpleXpathMetadatumCo
 
     private static final String UNSPECIFIED = "Unspecified";
 
-    private SimpleMapConverter simpleMapConverter;
+    private SimpleConverter simpleConverter;
 
     /**
      * Retrieve the metadata associated with the given element object.
@@ -57,7 +57,7 @@ public class ReplaceFieldXPathMetadataContributor extends SimpleXpathMetadatumCo
     }
 
     private MetadatumDTO getMetadatum(MetadataFieldConfig field, String value) {
-        String convertedValue = simpleMapConverter.getValue(value);
+        String convertedValue = simpleConverter.getValue(value);
         if (UNSPECIFIED.equals(convertedValue)) {
             return null;
         }
@@ -72,12 +72,8 @@ public class ReplaceFieldXPathMetadataContributor extends SimpleXpathMetadatumCo
         return dcValue;
     }
 
-    public SimpleMapConverter getSimpleMapConverter() {
-        return simpleMapConverter;
-    }
-
-    public void setSimpleMapConverter(SimpleMapConverter simpleMapConverter) {
-        this.simpleMapConverter = simpleMapConverter;
+    public void setSimpleMapConverter(SimpleConverter simpleConverter) {
+        this.simpleConverter = simpleConverter;
     }
 
 }

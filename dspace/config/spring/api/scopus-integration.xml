@@ -58,7 +58,7 @@
         <property name="field" ref="scopus.openaccessFlag"/>
         <property name="query" value="openaccessFlag"/>
         <property name="prefixToNamespaceMapping" ref="scopusNs"/>
-        <property name="simpleMapConverter" ref="mapConverterOpenAccessScopus"/>
+        <property name="simpleConverter" ref="mapConverterOpenAccessScopus"/>
     </bean>
 
     <bean id="scopus.openaccessFlag" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
