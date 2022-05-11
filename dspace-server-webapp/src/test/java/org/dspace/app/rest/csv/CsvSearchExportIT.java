@@ -27,6 +27,9 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.ProcessBuilder;
 import org.dspace.content.ProcessStatus;
 import org.dspace.scripts.DSpaceCommandLineParameter;
+import org.dspace.scripts.Process;
+import org.dspace.scripts.factory.ScriptServiceFactory;
+import org.dspace.scripts.service.ProcessService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,6 +37,7 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
+    private ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
 
     @Test
     public void exportSearchQueryTest() throws Exception {
@@ -90,6 +94,7 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void exportSearchInvalidQuery() throws Exception {
+        AtomicReference<Integer> idRef = new AtomicReference<>();
         List<DSpaceCommandLineParameter> parameterList = new ArrayList<>();
         parameterList.add(new DSpaceCommandLineParameter("-q", "blabla"));
         List<ParameterValueRest> restparams = parameterList.stream()
@@ -97,9 +102,32 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
                 Projection.DEFAULT)).collect(
                 Collectors.toList());
 
+
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(fileUpload("/api/system/scripts/metadata-export-search/processes")
                 .param("properties", new ObjectMapper().writeValueAsString(restparams)))
-            .andExpect(status().isAccepted());
+            .andExpect(status().isAccepted())
+            .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
+            .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.processId")));
+        ProcessBuilder.deleteProcess(idRef.get());
+    }
+
+    @Test
+    public void exportSearchInvalidDiscoveryFacets() throws Exception {
+        List<DSpaceCommandLineParameter> parameterList = new ArrayList<>();
+        parameterList.add(new DSpaceCommandLineParameter("-f", "nonExisting,equals=bla"));
+        List<ParameterValueRest> restparams = parameterList.stream()
+            .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter.convert(dSpaceCommandLineParameter,
+                Projection.DEFAULT)).collect(
+                Collectors.toList());
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(fileUpload("/api/system/scripts/metadata-export-search/processes")
+                .param("properties", new ObjectMapper().writeValueAsString(restparams)))
+            .andExpect(status().isInternalServerError());
+
+        Process process = processService.findAll(context).get(0);
+        ProcessBuilder.deleteProcess(process.getID());
     }
 }
