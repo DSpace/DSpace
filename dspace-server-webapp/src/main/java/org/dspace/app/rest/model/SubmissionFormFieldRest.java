@@ -84,6 +84,11 @@ public class SubmissionFormFieldRest {
     private List<LanguageFormField> languageCodes;
 
     /**
+     * The list of type bind value
+     */
+    private List<String> typeBind;
+
+    /**
      * Getter for {@link #selectableMetadata}
      * 
      * @return {@link #selectableMetadata}
@@ -264,6 +269,14 @@ public class SubmissionFormFieldRest {
         if (visibility != null && (visibility.getMain() != null || visibility.getOther() != null)) {
             this.visibility = visibility;
         }
+    }
+
+    public List<String> getTypeBind() {
+        return typeBind;
+    }
+
+    public void setTypeBind(List<String> typeBind) {
+        this.typeBind = typeBind;
     }
 
     public SelectableRelationship getSelectableRelationship() {
