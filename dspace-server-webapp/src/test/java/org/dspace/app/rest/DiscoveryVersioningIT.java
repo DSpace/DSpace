@@ -9,33 +9,45 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.content.Relationship.LatestVersionStatus.BOTH;
+import static org.dspace.util.RelationshipVersioningUtils.isRel;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
 
+import org.apache.commons.lang3.function.FailableFunction;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RelationshipBuilder;
+import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.VersionBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchService;
 import org.dspace.versioning.Version;
-import org.dspace.versioning.service.VersioningService;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -43,6 +55,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
  * The purpose of this test class is to verify how the built-in discovery configurations behave
@@ -59,9 +72,6 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     private IndexingService indexingService;
 
     @Autowired
-    private VersioningService versioningService;
-
-    @Autowired
     private ItemService itemService;
 
     @Autowired
@@ -69,6 +79,9 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private WorkspaceItemService workspaceItemService;
+
+    @Autowired
+    private RelationshipService relationshipService;
 
     protected Community community;
     protected Collection collection;
@@ -139,8 +152,20 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     protected void verifyRestSearchObjects(
         String authToken, String configuration, List<Matcher<? super Object>> searchResultMatchers
     ) throws Exception {
-        getClient(authToken).perform(get("/api/discover/search/objects")
-                .param("configuration", configuration))
+        verifyRestSearchObjects(authToken, configuration, (r) -> r, searchResultMatchers);
+    }
+
+    protected void verifyRestSearchObjects(
+        String authToken, String configuration,
+        FailableFunction<MockHttpServletRequestBuilder, MockHttpServletRequestBuilder, Exception> modifyRequest,
+        List<Matcher<? super Object>> searchResultMatchers
+    ) throws Exception {
+        MockHttpServletRequestBuilder minRequest = get("/api/discover/search/objects")
+            .param("configuration", configuration);
+
+        MockHttpServletRequestBuilder modifiedRequest = modifyRequest.apply(minRequest);
+
+        getClient(authToken).perform(modifiedRequest)
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("discover")))
             .andExpect(jsonPath("$._embedded.searchResult.page", is(
@@ -975,6 +1000,102 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         verifyRestSearchObjects(configuration, List.of(
             matchSearchResult(i1_2, "item 1.2")
         ));
+    }
+
+    @Test
+    public void test_reindexAfterUpdatingLatestVersionStatus() throws Exception {
+        // NOTE: VersioningConsumer updates the latest version status of relationships
+        //       this implies the relation.* fields change so the relevant items should be re-indexed
+
+        context.turnOffAuthorisationSystem();
+
+        EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication")
+            .build();
+
+        EntityType projectEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project")
+            .build();
+
+        RelationshipType isProjectOfPublication = RelationshipTypeBuilder.createRelationshipTypeBuilder(
+                context, publicationEntityType, projectEntityType,
+                "isProjectOfPublication", "isPublicationOfProject",
+                null, null, null, null
+            )
+            .withCopyToLeft(false)
+            .withCopyToRight(false)
+            .build();
+
+        // create publication 1.1
+        Item pub1_1 = ItemBuilder.createItem(context, collection)
+            .withTitle("publication 1")
+            .withMetadata("dspace", "entity", "type", publicationEntityType.getLabel())
+            .build();
+
+        // create project 1.1
+        Item pro1_1 = ItemBuilder.createItem(context, collection)
+            .withTitle("project 1")
+            .withMetadata("dspace", "entity", "type", projectEntityType.getLabel())
+            .build();
+
+        // create relationship between publication 1.1 and project 1.1
+        RelationshipBuilder.createRelationshipBuilder(context, pub1_1, pro1_1, isProjectOfPublication)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        // init - test relationships of publication 1.1
+        assertThat(
+            relationshipService.findByItem(context, pub1_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(pub1_1, isProjectOfPublication, pro1_1, BOTH, 0, 0)
+            ))
+        );
+
+        // init - test relationships of project 1.1
+        assertThat(
+            relationshipService.findByItem(context, pro1_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(pub1_1, isProjectOfPublication, pro1_1, BOTH, 0, 0)
+            ))
+        );
+
+        // init - test relation.* metadata of publication 1.1
+        List<MetadataValue> mdvs1 = itemService
+            .getMetadata(pub1_1, "relation", "isProjectOfPublication", null, Item.ANY);
+        Assert.assertEquals(1, mdvs1.size());
+        assertEquals(pro1_1.getID().toString(), mdvs1.get(0).getValue());
+        assertEquals(0, mdvs1.get(0).getPlace());
+
+        // init - test relation.* metadata of project 1.1
+        List<MetadataValue> mdvs2 = itemService
+            .getMetadata(pro1_1, "relation", "isPublicationOfProject", null, Item.ANY);
+        Assert.assertEquals(1, mdvs2.size());
+        assertEquals(pub1_1.getID().toString(), mdvs2.get(0).getValue());
+        assertEquals(0, mdvs2.get(0).getPlace());
+
+        // init - search for related items of publication 1.1
+        verifyRestSearchObjects(
+            null, "project-relationships",
+            (r) -> r.param("f.isPublicationOfProject", pub1_1.getID() + ",equals"),
+            List.of(
+                matchSearchResult(pro1_1, "project 1")
+            )
+        );
+
+        // init - search for related items of project 1.1
+        verifyRestSearchObjects(
+            null, "publication-relationships",
+            (r) -> r.param("f.isProjectOfPublication", pro1_1.getID() + ",equals"),
+            List.of(
+                matchSearchResult(pub1_1, "publication 1")
+            )
+        );
+
+        // TODO create pub1.2 => create pro1.2
+
+        // TODO test relationships
+        // TODO test relation.* mdvs via itemService
+        // TODO test discovery endpoint
+
     }
 
 }
