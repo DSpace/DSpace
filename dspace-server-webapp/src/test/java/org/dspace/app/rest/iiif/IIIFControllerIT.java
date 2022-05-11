@@ -134,7 +134,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
                         Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Page 1")))
-                .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(1200)))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(2200)))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].images[0].resource.service.@id",
                         Matchers.endsWith(bitstream1.getID().toString())))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].metadata[0].label", is("File name")))
@@ -407,6 +407,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.structures[0].@id",
                         Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0")))
                 .andExpect(jsonPath("$.structures[0].label", is("Table of Contents")))
+                .andExpect(jsonPath("$.structures[0].viewingHint", is("top")))
                 .andExpect(jsonPath("$.structures[0].ranges[0]",
                         Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-0")))
                 .andExpect(jsonPath("$.structures[0].ranges[1]",
@@ -468,39 +469,39 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                     .withMimeType("image/tiff")
                     .build();
         }
-
         context.restoreAuthSystemState();
-        // expect structures elements with label and canvas id.
+
+        // Expected structures elements based on the above test content
+        // NOTE: we cannot guarantee the order of Bundles in the Manifest, therefore this test has to simply check
+        // that each Bundle exists in the manifest with Canvases corresponding to each bitstream.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
-                .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
-                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
-                .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Global 1")))
-                .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(2000)))
-                .andExpect(jsonPath("$.sequences[0].canvases[0].height", is(3000)))
-                .andExpect(jsonPath("$.sequences[0].canvases[1].label", is("Global 2")))
-                .andExpect(jsonPath("$.sequences[0].canvases[2].label", is("Global 3")))
-                .andExpect(jsonPath("$.structures[0].@id",
-                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0")))
-                .andExpect(jsonPath("$.structures[0].label", is("Table of Contents")))
-                .andExpect(jsonPath("$.structures[0].ranges[0]",
-                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-0")))
-                .andExpect(jsonPath("$.structures[0].ranges[1]",
-                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-1")))
-                .andExpect(jsonPath("$.structures[1].@id",
-                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-0")))
-                .andExpect(jsonPath("$.structures[1].label", is("ORIGINAL")))
-                .andExpect(jsonPath("$.structures[1].canvases[0]",
-                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
-                .andExpect(jsonPath("$.structures[2].@id",
-                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-1")))
-                .andExpect(jsonPath("$.structures[2].label", is("IIIF")))
-                .andExpect(jsonPath("$.structures[2].canvases[0]",
-                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c1")))
-                .andExpect(jsonPath("$.structures[2].canvases[1]",
-                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c2")))
-                .andExpect(jsonPath("$.service").exists());
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
+                   // should contain 3 canvases, corresponding to each bitstream
+                   .andExpect(jsonPath("$.sequences[0].canvases[*].label",
+                                       Matchers.contains("Global 1", "Global 2", "Global 3")))
+
+                   // First structure should be a Table of Contents
+                   .andExpect(jsonPath("$.structures[0].@id",
+                                       Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0")))
+                   .andExpect(jsonPath("$.structures[0].label", is("Table of Contents")))
+                   .andExpect(jsonPath("$.structures[0].viewingHint", is("top")))
+                   .andExpect(jsonPath("$.structures[0].ranges[0]",
+                                       Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-0")))
+                   .andExpect(jsonPath("$.structures[0].ranges[1]",
+                                       Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-1")))
+
+                   // Should contain a structure with label=IIIF, corresponding to IIIF bundle
+                   // It should have exactly 2 canvases (corresponding to 2 bitstreams)
+                   .andExpect(jsonPath("$.structures[?(@.label=='IIIF')].canvases[0]").exists())
+                   .andExpect(jsonPath("$.structures[?(@.label=='IIIF')].canvases[1]").exists())
+                   .andExpect(jsonPath("$.structures[?(@.label=='IIIF')].canvases[2]").doesNotExist())
+
+                   // Should contain a structure with label=ORIGINAL, corresponding to ORIGINAL bundle
+                   // It should have exactly 1 canvas (corresponding to 1 bitstream)
+                   .andExpect(jsonPath("$.structures[?(@.label=='ORIGINAL')].canvases[0]").exists())
+                   .andExpect(jsonPath("$.structures[?(@.label=='ORIGINAL')].canvases[1]").doesNotExist())
+                   .andExpect(jsonPath("$.service").exists());
     }
 
     @Test
@@ -636,6 +637,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                         Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0")))
                 // the toc contains two top sections 1 & 2 without direct children canvases
                 .andExpect(jsonPath("$.structures[0].label", is("Table of Contents")))
+                .andExpect(jsonPath("$.structures[0].viewingHint", is("top")))
                 .andExpect(jsonPath("$.structures[0].ranges", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.structures[0].ranges[0]",
                         Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-0")))

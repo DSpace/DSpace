@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 
+import de.digitalcollections.iiif.model.enums.ViewingHint;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
 import de.digitalcollections.iiif.model.sharedcanvas.Range;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
@@ -32,6 +33,7 @@ public class RangeGenerator implements IIIFResource {
 
     private String identifier;
     private String label;
+    private final List<ViewingHint> viewingHint = new ArrayList<>();
     private final List<Canvas> canvasList = new ArrayList<>();
     private final List<Range> rangesList = new ArrayList<>();
     private final RangeService rangeService;
@@ -69,6 +71,11 @@ public class RangeGenerator implements IIIFResource {
         return this;
     }
 
+    public RangeGenerator addViewingHint(String hint) {
+        viewingHint.add(new BehaviorGenerator().setType(hint).generateValue());
+        return this;
+    }
+
     /**
      * Adds canvas to range canvas list.
      * @param canvas list of canvas generators
@@ -98,6 +105,9 @@ public class RangeGenerator implements IIIFResource {
             range = new Range(identifier, label);
         } else {
             range = new Range(identifier);
+        }
+        if (viewingHint.size() > 0) {
+            range.setViewingHints(viewingHint);
         }
         for (Canvas canvas : canvasList) {
             range.addCanvas(canvas);

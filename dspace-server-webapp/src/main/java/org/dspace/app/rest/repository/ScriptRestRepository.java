@@ -147,8 +147,10 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         DSpaceRunnable dSpaceRunnable = scriptService.createDSpaceRunnableForScriptConfiguration(scriptToExecute);
         try {
             dSpaceRunnable.initialize(args.toArray(new String[0]), restDSpaceRunnableHandler, context.getCurrentUser());
-            checkFileNames(dSpaceRunnable, files);
-            processFiles(context, restDSpaceRunnableHandler, files);
+            if (files != null && !files.isEmpty()) {
+                checkFileNames(dSpaceRunnable, files);
+                processFiles(context, restDSpaceRunnableHandler, files);
+            }
             restDSpaceRunnableHandler.schedule(dSpaceRunnable);
         } catch (ParseException e) {
             dSpaceRunnable.printHelp();

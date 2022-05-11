@@ -40,6 +40,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -193,12 +194,30 @@ public class Application extends SpringBootServletInitializer {
             }
 
             /**
+             * Add a ViewController for the root path, to load HAL Browser
+             * @param registry ViewControllerRegistry
+             */
+            @Override
+            public void addViewControllers(ViewControllerRegistry registry) {
+                // Ensure accessing the root path will load the index.html of the HAL Browser
+                registry.addViewController("/").setViewName("forward:/index.html");
+            }
+
+            /**
              * Add a new ResourceHandler to allow us to use WebJars.org to pull in web dependencies
-             * dynamically for HAL Browser, and access them off the /webjars path.
+             * dynamically for HAL Browser, etc.
              * @param registry ResourceHandlerRegistry
              */
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
+                // First, "mount" the Hal Browser resources at the /browser path
+                // NOTE: the hal-browser directory uses the version of the Hal browser, so this needs to be synced
+                // with the org.webjars.hal-browser version in the POM
+                registry
+                    .addResourceHandler("/browser/**")
+                    .addResourceLocations("/webjars/hal-browser/ad9b865/");
+
+                // Make all other Webjars available off the /webjars path
                 registry
                     .addResourceHandler("/webjars/**")
                     .addResourceLocations("/webjars/");

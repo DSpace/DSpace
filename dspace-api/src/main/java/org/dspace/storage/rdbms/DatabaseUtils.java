@@ -1327,7 +1327,7 @@ public class DatabaseUtils {
 
                         // Reindex Discovery completely
                         // Force clean all content
-                        this.indexer.cleanIndex(true);
+                        this.indexer.deleteIndex();
                         // Recreate the entire index (overwriting existing one)
                         this.indexer.createIndex(context);
                         // Rebuild spell checker (which is based on index)

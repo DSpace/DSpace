@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -202,6 +203,8 @@ public class BrowseEngine {
             // get the table name that we are going to be getting our data from
             dao.setTable(browseIndex.getTableName());
 
+            dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
+
             // tell the browse query whether we are ascending or descending on the value
             dao.setAscending(scope.isAscending());
 
@@ -248,15 +251,15 @@ public class BrowseEngine {
                 }
             }
 
-            // this is the total number of results in answer to the query
-            int total = getTotalResults();
-
             // assemble the ORDER BY clause
             String orderBy = browseIndex.getSortField(scope.isSecondLevel());
             if (scope.getSortBy() > 0) {
                 orderBy = "sort_" + Integer.toString(scope.getSortBy());
             }
             dao.setOrderField(orderBy);
+
+            // this is the total number of results in answer to the query
+            int total = getTotalResults();
 
             int offset = scope.getOffset();
             String rawFocusValue = null;
@@ -269,9 +272,6 @@ public class BrowseEngine {
                 String focusValue = normalizeJumpToValue(rawFocusValue);
 
                 log.debug("browsing using focus: " + focusValue);
-
-                // Convert the focus value into an offset
-                offset = getOffsetForValue(focusValue);
             }
 
             dao.setOffset(offset);
@@ -684,13 +684,11 @@ public class BrowseEngine {
         // our count, storing them locally to reinstate later
         String focusField = dao.getJumpToField();
         String focusValue = dao.getJumpToValue();
-        String orderField = dao.getOrderField();
         int limit = dao.getLimit();
         int offset = dao.getOffset();
 
         dao.setJumpToField(null);
         dao.setJumpToValue(null);
-        dao.setOrderField(null);
         dao.setLimit(-1);
         dao.setOffset(-1);
 
@@ -700,7 +698,6 @@ public class BrowseEngine {
         // now put back the values we removed for this method
         dao.setJumpToField(focusField);
         dao.setJumpToValue(focusValue);
-        dao.setOrderField(orderField);
         dao.setLimit(limit);
         dao.setOffset(offset);
         dao.setCountValues(null);

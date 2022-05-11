@@ -34,8 +34,6 @@ public class DOI
     implements Identifier, ReloadableEntity<Integer> {
     public static final String SCHEME = "doi:";
 
-    public static final String RESOLVER = "http://dx.doi.org";
-
     @Id
     @Column(name = "doi_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doi_seq")

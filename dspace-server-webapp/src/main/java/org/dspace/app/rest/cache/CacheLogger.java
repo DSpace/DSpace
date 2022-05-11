@@ -18,7 +18,7 @@ public class CacheLogger implements CacheEventListener<Object, Object> {
 
     @Override
     public void onEvent(CacheEvent<?, ?> cacheEvent) {
-        log.info("Cache Event Type: {} | Manifest Key: {} ",
+        log.info("Cache Event Type: {} | Key: {} ",
             cacheEvent.getType(), cacheEvent.getKey());
     }
 

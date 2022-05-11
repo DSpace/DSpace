@@ -7,6 +7,11 @@
  */
 package org.dspace.app.iiif.service.utils;
 
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_HEIGHT_QUALIFIER;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE_ELEMENT;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_SCHEMA;
+import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_WIDTH_QUALIFIER;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +32,12 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.license.CreativeCommonsServiceImpl;
+import org.dspace.iiif.IIIFApiQueryService;
+import org.dspace.iiif.util.IIIFSharedUtils;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -59,9 +66,11 @@ public class IIIFUtils {
     // metadata used to set the iiif viewing hint
     public static final String METADATA_IIIF_VIEWING_HINT  = "iiif.viewing.hint";
     // metadata used to set the width of the canvas that has not an explicit name
-    public static final String METADATA_IMAGE_WIDTH = "iiif.image.width";
+    public static final String METADATA_IMAGE_WIDTH = METADATA_IIIF_SCHEMA + "." + METADATA_IIIF_IMAGE_ELEMENT
+        + "." + METADATA_IIIF_WIDTH_QUALIFIER;
     // metadata used to set the height of the canvas that has not an explicit name
-    public static final String METADATA_IMAGE_HEIGTH = "iiif.image.height";
+    public static final String METADATA_IMAGE_HEIGHT = METADATA_IIIF_SCHEMA + "." + METADATA_IIIF_IMAGE_ELEMENT
+        + "." + METADATA_IIIF_HEIGHT_QUALIFIER;
 
     // string used in the metadata toc as separator among the different levels
     public static final String TOC_SEPARATOR = "|||";
@@ -76,54 +85,24 @@ public class IIIFUtils {
     @Autowired
     protected BitstreamService bitstreamService;
 
-    /**
-     * This method returns the bundles holding IIIF resources if any.
-     * If there is no IIIF content available an empty bundle list is returned.
-     * @param item the DSpace item
-     * 
-     * @return list of DSpace bundles with IIIF content
-     */
+    @Autowired
+    ConfigurationService configurationService;
+
+    @Autowired
+    IIIFApiQueryService iiifApiQueryService;
+
+
     public List<Bundle> getIIIFBundles(Item item) {
-        boolean iiif = isIIIFEnabled(item);
-        List<Bundle> bundles = new ArrayList<>();
-        if (iiif) {
-            bundles = item.getBundles().stream().filter(b -> isIIIFBundle(b)).collect(Collectors.toList());
-        }
-        return bundles;
+        return IIIFSharedUtils.getIIIFBundles(item);
     }
 
-    /**
-     * This method verify if the IIIF feature is enabled on the item
-     * 
-     * @param item the dspace item
-     * @return true if the item supports IIIF
-     */
     public boolean isIIIFEnabled(Item item) {
-        return item.getMetadata().stream()
-                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
-                .anyMatch(m -> m.getValue().equalsIgnoreCase("true")  ||
-                        m.getValue().equalsIgnoreCase("yes"));
-    }
-
-    /**
-     * Utility method to check is a bundle can contain bitstreams to use as IIIF
-     * resources
-     * 
-     * @param b the DSpace bundle to check
-     * @return true if the bundle can contain bitstreams to use as IIIF resources
-     */
-    private boolean isIIIFBundle(Bundle b) {
-        return !StringUtils.equalsAnyIgnoreCase(b.getName(), Constants.LICENSE_BUNDLE_NAME,
-                Constants.METADATA_BUNDLE_NAME, CreativeCommonsServiceImpl.CC_BUNDLE_NAME, "THUMBNAIL",
-                "BRANDED_PREVIEW", "TEXT", OTHER_CONTENT_BUNDLE)
-                && b.getMetadata().stream()
-                        .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
-                        .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
+        return IIIFSharedUtils.isIIIFEnabled(item);
     }
 
     /**
      * Return all the bitstreams in the item to be used as IIIF resources
-     * 
+     *
      * @param context the DSpace Context
      * @param item    the DSpace item
      * @return a not null list of bitstreams to use as IIIF resources in the
@@ -131,7 +110,7 @@ public class IIIFUtils {
      */
     public List<Bitstream> getIIIFBitstreams(Context context, Item item) {
         List<Bitstream> bitstreams = new ArrayList<Bitstream>();
-        for (Bundle bnd : getIIIFBundles(item)) {
+        for (Bundle bnd : IIIFSharedUtils.getIIIFBundles(item)) {
             bitstreams
                     .addAll(getIIIFBitstreams(context, bnd));
         }
@@ -140,7 +119,7 @@ public class IIIFUtils {
 
     /**
      * Return all the bitstreams in the bundle to be used as IIIF resources
-     * 
+     *
      * @param context the DSpace Context
      * @param bundle    the DSpace Bundle
      * @return a not null list of bitstreams to use as IIIF resources in the
@@ -153,7 +132,7 @@ public class IIIFUtils {
 
     /**
      * Utility method to check is a bitstream can be used as IIIF resources
-     * 
+     *
      * @param b the DSpace bitstream to check
      * @return true if the bitstream can be used as IIIF resource
      */
@@ -165,7 +144,7 @@ public class IIIFUtils {
 
     /**
      * Returns the bitstream mime type
-     * 
+     *
      * @param bitstream DSpace bitstream
      * @param context   DSpace context
      * @return mime type
@@ -183,7 +162,7 @@ public class IIIFUtils {
     /**
      * Checks to see if the item is searchable. Based on the
      * {@link #METADATA_IIIF_SEARCH_ENABLED} metadata.
-     * 
+     *
      * @param item DSpace item
      * @return true if the iiif search is enabled
      */
@@ -196,7 +175,7 @@ public class IIIFUtils {
 
     /**
      * Retrives a bitstream based on its position in the IIIF bundle.
-     * 
+     *
      * @param context        DSpace Context
      * @param item           DSpace Item
      * @param canvasPosition bitstream position
@@ -276,7 +255,7 @@ public class IIIFUtils {
 
     /**
      * Return the custom iiif label for the resource or the provided default if none
-     * 
+     *
      * @param dso          the dspace object to use as iiif resource
      * @param defaultLabel the default label to return if none is specified in the
      *                     metadata
@@ -290,7 +269,7 @@ public class IIIFUtils {
 
     /**
      * Return the custom iiif description for the resource or the provided default if none
-     * 
+     *
      * @param dso          the dspace object to use as iiif resource
      * @param defaultDescription the default description to return if none is specified in the
      *                     metadata
@@ -307,7 +286,7 @@ public class IIIFUtils {
      * resource appears. Please note that the same resource can belong to multiple
      * ranges (i.e. a page that contains the last paragraph of a section and start
      * the new section)
-     * 
+     *
      * @param bitstream    the dspace bitstream
      * @param prefix a string to add to all the returned toc inherited from the
      *               parent dspace object
@@ -323,6 +302,28 @@ public class IIIFUtils {
         } else {
             return tocs;
         }
+    }
+
+    /**
+     * Retrieves image dimensions from the image server (IIIF Image API v.2.1.1).
+     * @param bitstream the bitstream DSO
+     * @return image dimensions
+     */
+    @Cacheable(key = "#bitstream.getID().toString()", cacheNames = "canvasdimensions")
+    public int[] getImageDimensions(Bitstream bitstream) {
+        return iiifApiQueryService.getImageDimensions(bitstream);
+    }
+
+    /**
+     * Test to see if the bitstream contains iiif image width metadata.
+     * @param bitstream the bitstream DSo
+     * @return true if width metadata was found
+     */
+    public boolean hasWidthMetadata(Bitstream bitstream) {
+        return bitstream.getMetadata().stream()
+                  .filter(m -> m.getMetadataField().toString('.').contentEquals("iiif.image.width"))
+                  .findFirst().map(m -> m != null).orElse(false);
+
     }
 
     /**
@@ -385,9 +386,9 @@ public class IIIFUtils {
      * @return the height in pixel for the canvas associated with the bitstream
      */
     public int getCanvasHeight(Bitstream bitstream, Bundle bundle, Item item, int defaultHeight) {
-        return getSizeFromMetadata(bitstream, METADATA_IMAGE_HEIGTH,
-                getSizeFromMetadata(bundle, METADATA_IMAGE_HEIGTH,
-                    getSizeFromMetadata(item, METADATA_IMAGE_HEIGTH, defaultHeight)));
+        return getSizeFromMetadata(bitstream, METADATA_IMAGE_HEIGHT,
+                getSizeFromMetadata(bundle, METADATA_IMAGE_HEIGHT,
+                    getSizeFromMetadata(item, METADATA_IMAGE_HEIGHT, defaultHeight)));
     }
 
     /**
@@ -403,7 +404,8 @@ public class IIIFUtils {
     private int getSizeFromMetadata(DSpaceObject dso, String metadata, int defaultValue) {
         return dso.getMetadata().stream()
                 .filter(m -> m.getMetadataField().toString('.').contentEquals(metadata))
-                .findFirst().map(m -> castToInt(m, defaultValue)).orElse(defaultValue);
+                .findFirst().map(m -> castToInt(m, defaultValue))
+                  .orElse(defaultValue);
     }
 
     /**

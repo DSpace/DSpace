@@ -9,7 +9,6 @@ package org.dspace.statistics;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -29,6 +28,7 @@ import com.maxmind.geoip2.record.Postal;
 import com.maxmind.geoip2.record.RepresentedCountry;
 import com.maxmind.geoip2.record.Traits;
 import org.dspace.solr.MockSolrServer;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
@@ -55,7 +55,7 @@ public class MockSolrLoggerServiceImpl
         // Mock GeoIP's DatabaseReader
         DatabaseReader reader = mock(DatabaseReader.class);
         // Ensure that any tests requesting a city() get a mock/fake CityResponse
-        when(reader.city(any(InetAddress.class))).thenReturn(mockCityResponse());
+        Mockito.lenient().when(reader.city(any(InetAddress.class))).thenReturn(mockCityResponse());
         // Save this mock DatabaseReader to be used by SolrLoggerService
         locationService = reader;
     }

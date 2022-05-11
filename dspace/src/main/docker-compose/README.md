@@ -36,6 +36,12 @@ docker-compose -f docker-compose.yml -f docker-compose-cli.yml pull
 docker-compose -f docker-compose.yml -f docker-compose-cli.yml build
 ```
 
+OPTIONALLY, you can build DSpace images using a different JDK_VERSION like this:
+```
+docker-compose -f docker-compose.yml -f docker-compose-cli.yml build --build-arg JDK_VERSION=17
+```
+Default is Java 11, but other LTS releases (e.g. 17) are also supported.
+
 ## Run DSpace 7 REST from your current branch
 ```
 docker-compose -p d7 up -d
