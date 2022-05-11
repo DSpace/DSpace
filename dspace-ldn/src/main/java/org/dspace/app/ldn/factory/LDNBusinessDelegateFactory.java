@@ -7,7 +7,7 @@
  */
 package org.dspace.app.ldn.factory;
 
-import org.dspace.app.ldn.LDNBusinessDelegate;
+import org.dspace.app.ldn.service.LDNBusinessDelegate;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**

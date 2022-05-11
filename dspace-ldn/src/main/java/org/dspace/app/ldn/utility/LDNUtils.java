@@ -9,9 +9,15 @@ package org.dspace.app.ldn.utility;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 
 /**
  * Some linked data notification utilities.
@@ -78,6 +84,21 @@ public class LDNUtils {
         resolverId = resolverId.replace("https://doi.org/", "doi:");
 
         return resolverId;
+    }
+    
+    public static List<MetadataValue> getMetadataValuesLdnInitialize(Item item) {
+        List<MetadataValue> metadataValues = item.getMetadata();
+        return metadataValues.stream().filter(metadataValue -> {
+            return metadataValue.getMetadataField().getMetadataSchema().getName().equals("coar") &&
+                metadataValue.getMetadataField().getElement().equals("notify") &&
+                metadataValue.getMetadataField().getQualifier().equals("initialize");
+        }).collect(Collectors.toList());
+    }
+    
+    public static Set<String> getMetadataLdnInitialize(Item item) {
+        Set<String> typeSet = getMetadataValuesLdnInitialize(item).stream()
+            .map(MetadataValue::getValue).collect(Collectors.toSet());
+        return typeSet;
     }
 
 }
