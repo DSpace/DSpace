@@ -13,8 +13,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
-import org.apache.xpath.XPathAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -72,9 +75,10 @@ public class RegistryImporter {
      * @throws TransformerException if error
      */
     public static String getElementData(Node parentElement, String childName)
-        throws TransformerException {
+        throws XPathExpressionException {
         // Grab the child node
-        Node childNode = XPathAPI.selectSingleNode(parentElement, childName);
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        Node childNode = (Node) xPath.compile(childName).evaluate(parentElement, XPathConstants.NODE);
 
         if (childNode == null) {
             // No child node, so no values
@@ -115,9 +119,10 @@ public class RegistryImporter {
      * @throws TransformerException if error
      */
     public static String[] getRepeatedElementData(Node parentElement,
-                                                  String childName) throws TransformerException {
+                                                  String childName) throws XPathExpressionException {
         // Grab the child node
-        NodeList childNodes = XPathAPI.selectNodeList(parentElement, childName);
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        NodeList childNodes = (NodeList) xPath.compile(childName).evaluate(parentElement, XPathConstants.NODESET);
 
         String[] data = new String[childNodes.getLength()];
 
