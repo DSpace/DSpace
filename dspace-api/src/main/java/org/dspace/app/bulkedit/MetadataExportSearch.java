@@ -8,6 +8,7 @@
 
 package org.dspace.app.bulkedit;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,6 +36,8 @@ import org.dspace.discovery.utils.parameter.QueryBuilderSearchFilter;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
 /**
@@ -59,6 +62,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     private DiscoverQueryBuilder queryBuilder = SearchUtils.getQueryBuilder();
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     @Override
     public MetadataExportSearchScriptConfiguration getScriptConfiguration() {
@@ -140,7 +144,9 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     }
 
     protected String getFileNameOrExportFile() {
-        return "metadataExportSearch.csv";
+        String dspaceDir = configurationService.getProperty("dspace.dir");
+        String path = String.format("%s%smetadataExportSearch.csv", dspaceDir, File.separator);
+        return path;
     }
 
     public IndexableObject resolveScope(Context context, String id) throws SQLException {
