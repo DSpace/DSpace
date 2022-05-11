@@ -137,7 +137,11 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
                         output = createAuthentication(newContext);
 
                         for (PostLoggedInAction action : postLoggedInActions) {
-                            action.loggedIn(newContext);
+                            try {
+                                action.loggedIn(newContext);
+                            } catch (Exception ex) {
+                                log.error("An error occurs performing post logged in action", ex);
+                            }
                         }
 
                     } else {
