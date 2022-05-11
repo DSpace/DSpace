@@ -70,7 +70,7 @@ public class ResourcePolicyGroupReplaceRestController {
         }
 
         if (Objects.isNull(resourcePolicy.getGroup())) {
-            throw new UnprocessableEntityException("");
+            throw new UnprocessableEntityException("ResourcePolicy doesn't linked to Group");
         }
 
         Group newGroup = (Group) dsoList.get(0);
