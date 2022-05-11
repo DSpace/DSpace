@@ -12,14 +12,11 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -35,7 +32,6 @@ import org.dspace.app.iiif.model.generator.ContentAsTextGenerator;
 import org.dspace.app.iiif.model.generator.ManifestGenerator;
 import org.dspace.app.iiif.model.generator.SearchResultGenerator;
 import org.dspace.app.iiif.service.utils.IIIFUtils;
-import org.dspace.discovery.SolrSearchCore;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,9 +61,6 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
 
     @Autowired
     SearchResultGenerator searchResult;
-
-    @Autowired
-    SolrSearchCore solrSearchCore;
 
     @Autowired
     ManifestGenerator manifestGenerator;
@@ -167,26 +160,49 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
     private String getAnnotationList(UUID uuid, String json, String query) {
         searchResult.setIdentifier(manifestId + "/search?q="
                 + URLEncoder.encode(query, StandardCharsets.UTF_8));
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
-        JsonObject body = gson.fromJson(json, JsonObject.class);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode body = null;
+        try {
+            body = mapper.readTree(json);
+        } catch (JsonProcessingException e) {
+            log.error("Unable to process json response.", e);
+        }
+        // If error occurred or no body, return immediately
         if (body == null) {
-            log.warn("Unable to process json response.");
             return utils.asJson(searchResult.generateResource());
         }
-        // outer ocr highlight element
-        JsonObject highs = body.getAsJsonObject("ocrHighlighting");
-        // highlight entries
-        for (Map.Entry<String, JsonElement> ocrIds: highs.entrySet()) {
-            // ocr_text
-            JsonObject ocrObj = ocrIds.getValue().getAsJsonObject().getAsJsonObject("ocr_text");
-            // snippets array
-            if (ocrObj != null) {
-                for (JsonElement snippetArray : ocrObj.getAsJsonObject().get("snippets").getAsJsonArray()) {
-                    String pageId = getCanvasId(snippetArray.getAsJsonObject().get("pages"));
-                    for (JsonElement highlights : snippetArray.getAsJsonObject().getAsJsonArray("highlights")) {
-                        for (JsonElement highlight : highlights.getAsJsonArray()) {
-                            searchResult.addResource(getAnnotation(highlight, pageId, uuid));
+
+        // Example structure of Solr response available at
+        // https://github.com/dbmdz/solr-ocrhighlighting/blob/main/docs/query.md
+        // Get the outer ocrHighlighting node
+        JsonNode highs = body.get("ocrHighlighting");
+        if (highs != null) {
+            // Loop through each highlight entry under ocrHighlighting
+            for (final JsonNode highEntry : highs) {
+                // Get the ocr_text node under the entry
+                JsonNode ocrNode = highEntry.get("ocr_text");
+                if (ocrNode != null) {
+                    // Loop through the snippets array under that
+                    for (final JsonNode snippet : ocrNode.get("snippets")) {
+                        if (snippet != null) {
+                            // Get a canvas ID based on snippet's pages
+                            String pageId = getCanvasId(snippet.get("pages"));
+                            if (pageId != null) {
+                                // Loop through array of highlights for each snippet.
+                                for (final JsonNode highlights : snippet.get("highlights")) {
+                                    if (highlights != null) {
+                                        // May be multiple word highlights on a page, so loop through them.
+                                        for (int i = 0; i < highlights.size(); i++) {
+                                            // Add annotation associated with each highlight
+                                            AnnotationGenerator anno = getAnnotation(highlights.get(i), pageId, uuid);
+                                            if (anno != null) {
+                                                searchResult.addResource(anno);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -198,21 +214,24 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
 
     /**
      * Returns the annotation generator for the highlight.
-     * @param highlight highlight element from solor response
+     * @param highlight highlight node from Solr response
      * @param pageId page id from solr response
      * @return generator for a single annotation
      */
-    private AnnotationGenerator getAnnotation(JsonElement highlight, String pageId, UUID uuid) {
-        JsonObject hcoords = highlight.getAsJsonObject();
-        String text = (hcoords.get("text").getAsString());
-        int ulx = hcoords.get("ulx").getAsInt();
-        int uly = hcoords.get("uly").getAsInt();
-        int lrx = hcoords.get("lrx").getAsInt();
-        int lry = hcoords.get("lry").getAsInt();
-        String w = Integer.toString(lrx - ulx);
-        String h = Integer.toString(lry - uly);
-        String params = ulx + "," + uly + "," + w + "," + h;
-        return createSearchResultAnnotation(params, text, pageId, uuid);
+    private AnnotationGenerator getAnnotation(JsonNode highlight, String pageId, UUID uuid) {
+        String text = highlight.get("text") != null ? highlight.get("text").asText() : null;
+        int ulx = highlight.get("ulx") != null ? highlight.get("ulx").asInt() : -1;
+        int uly = highlight.get("uly") != null ? highlight.get("uly").asInt() : -1;
+        int lrx = highlight.get("lrx") != null ? highlight.get("lrx").asInt() : -1;
+        int lry = highlight.get("lry") != null ? highlight.get("lry").asInt() : -1;
+        String w = (lrx >= 0 && ulx >= 0) ? Integer.toString(lrx - ulx) : null;
+        String h = (lry >= 0 && uly >= 0) ? Integer.toString(lry - uly) : null;
+
+        if (text != null && w != null && h != null) {
+            String params = ulx + "," + uly + "," + w + "," + h;
+            return createSearchResultAnnotation(params, text, pageId, uuid);
+        }
+        return null;
     }
 
     /**
@@ -221,15 +240,22 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
      * delimited with a "." and that the integer corresponds to the
      * canvas identifier in the manifest. For METS/ALTO documents, the page
      * order can be derived from the METS file when loading the solr index.
-     * @param element the pages element
-     * @return canvas id
+     * @param pagesNode the pages node
+     * @return canvas id or null if node was null
      */
-    private String getCanvasId(JsonElement element) {
-        JsonArray pages = element.getAsJsonArray();
-        JsonObject page = pages.get(0).getAsJsonObject();
-        String[] identArr = page.get("id").getAsString().split("\\.");
-        // the canvas id.
-        return "c" + identArr[1];
+    private String getCanvasId(JsonNode pagesNode) {
+        if (pagesNode != null) {
+            JsonNode page = pagesNode.get(0);
+            if (page != null) {
+                JsonNode pageId = page.get("id");
+                if (pageId != null) {
+                    String[] identArr = pageId.asText().split("\\.");
+                    // the canvas id.
+                    return "c" + identArr[1];
+                }
+            }
+        }
+        return null;
     }
 
     /**

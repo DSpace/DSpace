@@ -12,9 +12,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dspace.app.rest.security.WebSecurityConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -40,8 +40,9 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 @Component
 public class DSpaceAccessDeniedHandler implements AccessDeniedHandler {
 
+    @Lazy
     @Autowired
-    private WebSecurityConfiguration webSecurityConfiguration;
+    private CsrfTokenRepository csrfTokenRepository;
 
     @Autowired
     @Qualifier("handlerExceptionResolver")
@@ -69,9 +70,6 @@ public class DSpaceAccessDeniedHandler implements AccessDeniedHandler {
         // switched clients (from HAL Browser to UI or visa versa) and has an out-of-sync token.
         // NOTE: this logic is tested in AuthenticationRestControllerIT.testRefreshTokenWithInvalidCSRF()
         if (ex instanceof InvalidCsrfTokenException) {
-            // Get access to our enabled CSRF token repository
-            CsrfTokenRepository csrfTokenRepository = webSecurityConfiguration.getCsrfTokenRepository();
-
             // Remove current token & generate a new one
             csrfTokenRepository.saveToken(null, request, response);
             CsrfToken newToken = csrfTokenRepository.generateToken(request);

@@ -12,6 +12,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.authorize.ResourcePolicy.TYPE_CUSTOM;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -19,8 +20,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -331,16 +332,16 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(workspaceItem2, "Workspace Item 2",
                                         "2016-02-13"))))
                 .andExpect(jsonPath("$._embedded.workspaceitems",
-                        Matchers.not(Matchers.contains(WorkspaceItemMatcher
+                        Matchers.not(contains(WorkspaceItemMatcher
                                 .matchItemWithTitleAndDateIssued(workspaceItem3, "Workspace Item 3", "2016-02-13")))));
 
         getClient(token).perform(get("/api/submission/workspaceitems").param("size", "2").param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems",
-                        Matchers.contains(WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(workspaceItem3,
+                        contains(WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(workspaceItem3,
                                 "Workspace Item 3", "2016-02-13"))))
                 .andExpect(jsonPath("$._embedded.workspaceitems",
-                        Matchers.not(Matchers.contains(
+                        Matchers.not(contains(
                                 WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(workspaceItem1, "Workspace Item 1",
                                         "2017-10-17"),
                                 WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(workspaceItem2, "Workspace Item 2",
@@ -725,7 +726,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(workspaceItem2, "Workspace Item 2",
                                     "2016-02-13"))))
             .andExpect(jsonPath("$._embedded.workspaceitems",
-                    Matchers.not(Matchers.contains(WorkspaceItemMatcher
+                    Matchers.not(contains(WorkspaceItemMatcher
                             .matchItemWithTitleAndDateIssued(workspaceItem3, "Workspace Item 3", "2016-02-13")))))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(2)));
@@ -738,10 +739,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .param("uuid", submitter1.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.workspaceitems",
-                    Matchers.contains(WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(workspaceItem2,
+                    contains(WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(workspaceItem2,
                             "Workspace Item 2", "2016-02-13"))))
             .andExpect(jsonPath("$._embedded.workspaceitems",
-                    Matchers.not(Matchers.contains(
+                    Matchers.not(contains(
                             WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(workspaceItem1, "Workspace Item 1",
                                     "2017-10-17"),
                             WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(workspaceItem3, "Workspace Item 3",
@@ -756,7 +757,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .param("uuid", submitter2.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.workspaceitems",
-                    Matchers.contains(
+                    contains(
                             WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(workspaceItem3, "Workspace Item 3",
                                     "2016-02-13"))))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -934,7 +935,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(eperson.getEmail(), password);
         try {
             // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(bibtexFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -962,7 +963,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the col2
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(bibtexFile)
                     .param("owningCollection", col2.getID().toString()))
                 .andExpect(status().isOk())
@@ -1026,7 +1027,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // create workspaceitems in the default collection (col1)
         AtomicReference<List<Integer>> idRef = new AtomicReference<>();
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(csvFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1065,7 +1066,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create workspaceitems explicitly in the col2
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(csvFile)
                     .param("owningCollection", col2.getID().toString()))
                     .andExpect(status().isOk())
@@ -1143,7 +1144,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // create workspaceitems in the default collection (col1)
 
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                 .file(csvFile))
             // create should return 200, 201 (created) is better for single resource
             .andExpect(status().isOk())
@@ -1221,7 +1222,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create workspaceitems in the default collection (col1)
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(tsvFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1297,7 +1298,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create workspaceitems in the default collection (col1)
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(tsvFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1374,7 +1375,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         AtomicReference<List<Integer>> idRef = new AtomicReference<>();
         // create workspaceitems in the default collection (col1)
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(endnoteFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1453,7 +1454,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create workspaceitems in the default collection (col1)
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                 .file(csvFile))
             // create should return 200, 201 (created) is better for single resource
             .andExpect(status().isOk())
@@ -1534,7 +1535,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(bibtexFile).file(pubmedFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1568,7 +1569,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the col2
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(bibtexFile).file(pubmedFile)
                     .param("owningCollection", col2.getID().toString()))
                 .andExpect(status().isOk())
@@ -1640,7 +1641,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(eperson.getEmail(), password);
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(bibtexFile))
                   // create should return return a 422 because we don't allow/support bibliographic files
                  // that have multiple metadata records
@@ -1685,7 +1686,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(pubmedFile))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
@@ -1716,7 +1717,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the col2
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(pubmedFile)
                     .param("owningCollection", col2.getID().toString()))
             .andExpect(status().isOk())
@@ -1776,7 +1777,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         // create a workspaceitem
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                     .file(pdfFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1824,10 +1825,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         WorkspaceItem workspaceItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                 .withTitle("Workspace Item 1")
                 .withIssueDate("2017-10-17")
+                .grantLicense()
                 .build();
 
         WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                 .withTitle("Workspace Item 2")
+                .grantLicense()
                 .build();
 
         //disable file upload mandatory
@@ -1846,8 +1849,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + workspaceItem2.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
-                        Matchers.contains(
-                                hasJsonPath("$.paths", Matchers.contains(
+                        contains(
+                                hasJsonPath("$.paths", contains(
                                         hasJsonPath("$", Matchers.is("/sections/traditionalpageone/dc.date.issued"))
                                 )))))
         ;
@@ -1860,7 +1863,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 // title and dateissued are required in the first panel
                 // the json path with a @ selector always return an array
                 .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
-                        Matchers.contains(
+                        contains(
                                 hasJsonPath("$.paths", Matchers.containsInAnyOrder(
                                         hasJsonPath("$", Matchers.is("/sections/traditionalpageone/dc.title")),
                                         hasJsonPath("$", Matchers.is("/sections/traditionalpageone/dc.date.issued"))
@@ -1896,6 +1899,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withTitle("Workspace Item 1")
                 .withIssueDate("2017-10-17")
                 .withSubject("ExtraEntry")
+                .grantLicense()
                 .build();
 
         //disable file upload mandatory
@@ -1929,6 +1933,141 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     Matchers.is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
                             "New Title", "2017-10-17", "ExtraEntry"))))
         ;
+    }
+
+    @Test
+    /**
+     * Test the update of metadata for fields configured with type-bind
+     *
+     * @throws Exception
+     */
+    public void patchUpdateMetadataWithBindTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("Workspace Item 1")
+                .withIssueDate("2017-10-17")
+                .withSubject("ExtraEntry")
+                .grantLicense()
+                .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.restoreAuthSystemState();
+
+        // Try to add isPartOfSeries (type bound to technical report) - this should not work and instead we'll get
+        // no JSON path for that field
+        List<Operation> updateSeries = new ArrayList<Operation>();
+        List<Map<String, String>> seriesValues = new ArrayList<>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Series");
+        seriesValues.add(value);
+        updateSeries.add(new AddOperation("/sections/traditionalpageone/dc.relation.ispartofseries", seriesValues));
+
+        String patchBody = getPatchContent(updateSeries);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        // Check this - we should match an item with no series or type
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, null, null))));
+
+        // Verify that the metadata isn't in the workspace item
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        // Check this - we should match an item with no series or type
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, null, null))));
+
+        // Set the type to Technical Report confirm it worked
+        List<Operation> updateType = new ArrayList<>();
+        List<Map<String, String>> typeValues = new ArrayList<>();
+        value = new HashMap<String, String>();
+        value.put("value", "Technical Report");
+        typeValues.add(value);
+        updateType.add(new AddOperation("/sections/traditionalpageone/dc.type", typeValues));
+        patchBody = getPatchContent(updateType);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        // Check this - we should now match an item with the expected type and series
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, "Technical Report",
+                                null))));
+
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, "Technical Report",
+                                null))));
+
+        // Another test, this time adding the series value should be successful and we'll see the value
+        patchBody = getPatchContent(updateSeries);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        // Check this - we should match an item with the expected series and type
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem,
+                                "Technical Report", "New Series"))));
+
+        // Verify that the metadata isn't in the workspace item
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        // Check this - we should match an item with the expected series and type
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem,
+                                "Technical Report", "New Series"))));
+
+        // One final update, to a different type, this should lose the series as we're back to a non-matching type
+        updateType = new ArrayList<>();
+        typeValues = new ArrayList<>();
+        value = new HashMap<String, String>();
+        value.put("value", "Article");
+        typeValues.add(value);
+        updateType.add(new AddOperation("/sections/traditionalpageone/dc.type", typeValues));
+        patchBody = getPatchContent(updateType);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        // Check this - we should NOT match an item with the series "New Series"
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, "Article",
+                                null))));
+
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, "Article",
+                                null))));
     }
 
     @Test
@@ -2188,6 +2327,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withTitle("Workspace Item 1")
                 .withIssueDate("2017-10-17")
                 .withSubject("ExtraEntry")
+                .grantLicense()
                 .build();
 
         WorkspaceItem witemMultipleSubjects = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
@@ -2197,6 +2337,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withSubject("Subject2")
                 .withSubject("Subject3")
                 .withSubject("Subject4")
+                .grantLicense()
                 .build();
 
         WorkspaceItem witemWithTitleDateAndSubjects = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
@@ -2206,6 +2347,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withSubject("Subject2")
                 .withSubject("Subject3")
                 .withSubject("Subject4")
+                .grantLicense()
                 .build();
 
         context.restoreAuthSystemState();
@@ -2220,8 +2362,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
                             .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
-                                Matchers.contains(hasJsonPath("$.paths",
-                                        Matchers.contains(
+                                contains(hasJsonPath("$.paths",
+                                        contains(
                                                 hasJsonPath("$",
                                                         Matchers.is("/sections/traditionalpageone/dc.title")))))))
                             .andExpect(jsonPath("$",
@@ -2233,8 +2375,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
-                    Matchers.contains(
-                            hasJsonPath("$.paths", Matchers.contains(
+                    contains(
+                            hasJsonPath("$.paths", contains(
                                     hasJsonPath("$", Matchers.is("/sections/traditionalpageone/dc.title"))
                             )))))
             .andExpect(jsonPath("$",
@@ -2468,6 +2610,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                 .withIssueDate("2017-10-17")
                 .withSubject("ExtraEntry")
+                .grantLicense()
                 .build();
 
         //disable file upload mandatory
@@ -2539,6 +2682,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                 .withIssueDate("2017-10-17")
                 .withSubject("ExtraEntry")
+                .grantLicense()
                 .build();
 
         //disable file upload mandatory
@@ -2749,6 +2893,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                 .withTitle("Test WorkspaceItem")
                 .withIssueDate("2017-10-17")
+                .grantLicense()
                 .build();
 
         //disable file upload mandatory
@@ -3154,7 +3299,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
+                                contains( hasJsonPath("$.paths",
+                                    contains(hasJsonPath("$", is("/sections/license")))))))
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3164,7 +3311,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
+                    contains( hasJsonPath("$.paths",
+                        contains(hasJsonPath("$", is("/sections/license")))))))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3180,7 +3329,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
+                                    contains( hasJsonPath("$.paths",
+                                        contains(hasJsonPath("$", is("/sections/license")))))))
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3190,7 +3341,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem2.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
+                    contains( hasJsonPath("$.paths",
+                        contains(hasJsonPath("$", is("/sections/license")))))))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3206,7 +3359,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
+                                contains( hasJsonPath("$.paths",
+                                    contains(hasJsonPath("$", is("/sections/license")))))))
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3216,7 +3371,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem3.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
+                    contains( hasJsonPath("$.paths",
+                        contains(hasJsonPath("$", is("/sections/license")))))))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3232,7 +3389,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(
+                                jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
+                                    contains( hasJsonPath("$.paths",
+                                        contains(hasJsonPath("$", is("/sections/license")))))))
                             .andExpect(jsonPath("$.sections.license.granted",
                                     is(false)))
                             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3242,7 +3402,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem4.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.license.notgranted')]",
+                contains( hasJsonPath("$.paths",
+                    contains(hasJsonPath("$", is("/sections/license")))))))
             .andExpect(jsonPath("$.sections.license.granted",
                     is(false)))
             .andExpect(jsonPath("$.sections.license.acceptanceDate").isEmpty())
@@ -3491,7 +3653,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         // upload the file in our workspaceitem
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
+        getClient(authToken).perform(multipart("/api/submission/workspaceitems/" + witem.getID())
                 .file(pdfFile))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
@@ -3534,7 +3696,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         // upload the file in our workspaceitem
-        getClient().perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
+        getClient().perform(multipart("/api/submission/workspaceitems/" + witem.getID())
                 .file(pdfFile))
                 .andExpect(status().isUnauthorized());
 
@@ -3570,6 +3732,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                 .withTitle("WorkspaceItem")
                 .withIssueDate("2019-10-27")
+                .grantLicense()
                 .build();
 
         InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
@@ -3580,7 +3743,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // upload the file in our workspaceitem
         String authToken = getAuthToken(eperson2.getEmail(), "qwerty02");
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
+        getClient(authToken).perform(multipart("/api/submission/workspaceitems/" + witem.getID())
                 .file(pdfFile))
                 .andExpect(status().isForbidden());
 
@@ -3609,6 +3772,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
             .withTitle("Test WorkspaceItem")
             .withIssueDate("2017-10-17")
+            .grantLicense()
             .build();
 
         InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
@@ -3617,7 +3781,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
         // upload the file in our workspaceitem
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
+        getClient(authToken).perform(multipart("/api/submission/workspaceitems/" + witem.getID())
             .file(pdfFile))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
@@ -3659,8 +3823,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.errors").isNotEmpty())
             .andExpect(jsonPath("$.errors[?(@.message=='error.validation.filerequired')]",
-                Matchers.contains(
-                    hasJsonPath("$.paths", Matchers.contains(
+                contains(
+                    hasJsonPath("$.paths", contains(
                         hasJsonPath("$", Matchers.is("/sections/upload"))
                     )))));
     }
@@ -4386,7 +4550,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         try {
             // adding a bibtex file with a single entry should automatically put the metadata in the bibtex file into
             // the item
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems/" + witem.getID())
                         .file(bibtexFile))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
@@ -4403,7 +4567,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             is("bibtex-test.bib")));
 
             // do again over a submission that already has a title, the manual input should be preserved
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem2.getID())
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems/" + witem2.getID())
                         .file(bibtexFile))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
@@ -4944,7 +5108,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // upload file and verify response
         getClient(authToken)
-            .perform(fileUpload("/api/submission/workspaceitems/" + wItem.getID()).file(pdfFile))
+            .perform(multipart("/api/submission/workspaceitems/" + wItem.getID()).file(pdfFile))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.sections.upload.files[0].accessConditions", empty()));
 
@@ -5415,7 +5579,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         try {
-            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
                                 .file(pdfFile))
                                 .andExpect(status().is(500));
         } finally {
@@ -5435,6 +5599,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                       "Test Item patchUploadAddAdminRPInstallAndVerifyOnlyAdminCanView")
                                                   .withIssueDate("2019-03-06")
                                                   .withFulltext("upload2.pdf", "/local/path/simple-article.pdf", pdf)
+                                                  .grantLicense()
                                                   .build();
         context.restoreAuthSystemState();
 
@@ -5513,6 +5678,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 .withTitle("Test Item patchUploadAddOpenAccessRPInstallAndVerifyOnlyAdminCanView")
                                 .withIssueDate("2019-03-06")
                                 .withFulltext("upload2.pdf", "/local/path/simple-article.pdf", pdf)
+                                .grantLicense()
                                 .build();
         context.restoreAuthSystemState();
 
@@ -5579,6 +5745,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 .withTitle("Test Item patchUploadAddOpenAccessRPInstallAndVerifyOnlyAdminCanView")
                                 .withIssueDate("2019-03-06")
                                 .withFulltext("upload2.pdf", "/local/path/simple-article.pdf", pdf)
+                                .grantLicense()
                                 .build();
         context.restoreAuthSystemState();
 
@@ -5672,6 +5839,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withTitle("Test wsItem")
                                                   .withIssueDate("2019-03-06")
                                                   .withFulltext("upload2.pdf", "/local/path/simple-article.pdf", pdf)
+                                                  .grantLicense()
                                                   .build();
         context.restoreAuthSystemState();
 
@@ -5745,6 +5913,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withTitle("Test wsItem")
                                                   .withIssueDate("2019-03-06")
                                                   .withFulltext("upload2.pdf", "/local/path/simple-article.pdf", pdf)
+                                                  .grantLicense()
                                                   .build();
         context.restoreAuthSystemState();
 
@@ -5808,6 +5977,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withTitle("Test wsItem")
                                                   .withIssueDate("2019-03-06")
                                                   .withFulltext("upload2.pdf", "/local/path/simple-article.pdf", pdf)
+                                                  .grantLicense()
                                                   .build();
         context.restoreAuthSystemState();
 
@@ -5890,6 +6060,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withTitle("Test wsItem")
                                                   .withIssueDate("2019-03-06")
                                                   .withFulltext("upload2.pdf", "/local/path/simple-article.pdf", pdf)
+                                                  .grantLicense()
                                                   .build();
         context.restoreAuthSystemState();
 
@@ -5954,6 +6125,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withTitle("Test wsItem")
                                                   .withIssueDate("2019-03-06")
                                                   .withFulltext("upload2.pdf", "/local/path/simple-article.pdf", pdf)
+                                                  .grantLicense()
                                                   .build();
         context.restoreAuthSystemState();
 
@@ -6049,8 +6221,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         getClient(authToken).perform(get(workspaceItemsUri + workspaceItem3.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.errors[?(@.message=='error.validation.required')]",
-                Matchers.contains(
-                    hasJsonPath("$.paths", Matchers.contains(
+                contains(
+                    hasJsonPath("$.paths", contains(
                         hasJsonPath("$", Matchers.is("/sections/qualdroptest/dc.identifier"))
                     )))));
     }
@@ -6976,7 +7148,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                      .andExpect(status().isOk())
                                      .andExpect(header().string("Accept-Ranges", "bytes"))
                                      .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
-                                     .andExpect(content().contentType("text/plain"))
+                                     .andExpect(content().contentType("text/plain;charset=UTF-8"))
                                      .andExpect(content().bytes(bitstreamContent.getBytes()));
 
             // others can't download the bitstream
@@ -7014,7 +7186,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                      .andExpect(status().isOk())
                                      .andExpect(header().string("Accept-Ranges", "bytes"))
                                      .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
-                                     .andExpect(content().contentType("text/plain"))
+                                     .andExpect(content().contentType("text/plain;charset=UTF-8"))
                                      .andExpect(content().bytes(bitstreamContent.getBytes()));
 
             // others can't download the bitstream
@@ -7127,6 +7299,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                              .withTitle("My Article")
                              .withIssueDate("2019-03-16")
                              .withFulltext("upload.pdf", "/local/path/simple-article.pdf", pdf)
+                             .grantLicense()
                              .build();
 
         Bundle bundle = wItem.getItem().getBundles().get(0);
@@ -7171,7 +7344,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                .andExpect(jsonPath("$.sections.upload.files[1]").doesNotExist());
 
         // upload second file
-        getClient(tokenEPerson).perform(fileUpload("/api/submission/workspaceitems/" + wItem.getID())
+        getClient(tokenEPerson).perform(multipart("/api/submission/workspaceitems/" + wItem.getID())
                                .file(xmlFile))
                                .andExpect(status().isCreated());
 
@@ -7255,7 +7428,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/search/resource")
                              .param("uuid", bitstream2.getID().toString()))
                              .andExpect(status().isOk())
-                             .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.contains(
+                             .andExpect(jsonPath("$._embedded.resourcepolicies", contains(
                                      ResourcePolicyMatcher.matchResourcePolicyProperties(anonymousGroup, null,
                                              bitstream2, ResourcePolicy.TYPE_CUSTOM, Constants.READ, "embargo")
                               )))
