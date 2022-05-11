@@ -74,12 +74,12 @@ public class ResearcherProfileAutomaticClaim implements PostLoggedInAction {
     @Override
     public void loggedIn(Context context) {
 
-        EPerson currentUser = context.getCurrentUser();
-        if (currentUser == null) {
+        if (isBlank(researcherProfileService.getProfileType())) {
             return;
         }
 
-        if (isBlank(researcherProfileService.getProfileType())) {
+        EPerson currentUser = context.getCurrentUser();
+        if (currentUser == null) {
             return;
         }
 

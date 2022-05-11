@@ -23,7 +23,6 @@ public class ResourceAlreadyExistsException extends RuntimeException {
      * existing resource.
      *
      * @param message  the error message
-     * @param resource the resource that caused the conflict
      */
     public ResourceAlreadyExistsException(String message) {
         super(message);

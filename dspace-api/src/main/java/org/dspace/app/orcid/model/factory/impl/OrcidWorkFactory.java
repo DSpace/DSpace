@@ -11,14 +11,11 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.orcid.jaxb.model.common.Relationship.SELF;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.EnumUtils;
@@ -161,10 +158,6 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
         return selfExternalIds;
     }
 
-    private boolean isAuthoritySet(String authority) {
-        return isNotBlank(authority);
-    }
-
     private ExternalID getSelfExternalId(MetadataValue metadataValue) {
         Map<String, String> externalIdentifierFields = fieldMapping.getExternalIdentifierFields();
         String metadataField = metadataValue.getMetadataField().toString('.');
@@ -227,17 +220,6 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
         return orcidCommonObjectFactory.createUrl(context, item).orElse(null);
     }
 
-    private List<MetadataValue> getMetadataValues(Context context, Item item, String metadataField) {
-        if (isBlank(metadataField)) {
-            return Collections.emptyList();
-        }
-        return itemService.getMetadataByMetadataString(item, metadataField);
-    }
-
-    private boolean isNotPlaceholder(MetadataValue metadata) {
-        return metadata != null && metadata.getValue() != null;
-    }
-
     private List<MetadataValue> getMetadataValues(Context context, Item item, Collection<String> metadataFields) {
         return metadataFields.stream()
             .flatMap(metadataField -> itemService.getMetadataByMetadataString(item, metadataField).stream())
@@ -253,14 +235,6 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
         return itemService.getMetadataByMetadataString(item, metadataField).stream()
             .filter(metadataValue -> isNotBlank(metadataValue.getValue()))
             .findFirst();
-    }
-
-    private Optional<Item> findItemById(Context context, UUID id) {
-        try {
-            return Optional.ofNullable(itemService.find(context, id));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public ItemService getItemService() {

@@ -17,6 +17,7 @@ import static org.dspace.app.profile.OrcidEntitySyncPreference.DISABLED;
 import static org.dspace.app.profile.OrcidProfileSyncPreference.BIOGRAPHICAL;
 import static org.dspace.app.profile.OrcidProfileSyncPreference.IDENTIFIERS;
 import static org.dspace.builder.OrcidHistoryBuilder.createOrcidHistory;
+import static org.dspace.builder.RelationshipTypeBuilder.createRelationshipTypeBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -35,11 +36,15 @@ import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.OrcidHistoryBuilder;
+import org.dspace.builder.RelationshipBuilder;
 import org.dspace.content.Collection;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.junit.After;
@@ -402,8 +407,16 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item publication = ItemBuilder.createItem(context, publicationCollection)
             .withTitle("Test publication")
-            .withAuthor("Test User", profile.getID().toString())
+            .withAuthor("Test User")
             .build();
+
+        EntityType publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isAuthorOfPublication = createRelationshipTypeBuilder(context, personType, publicationType,
+            "isAuthorOfPublication", "isPublicationOfAuthor", 0, null, 0, null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, profile, publication, isAuthorOfPublication).build();
 
         context.restoreAuthSystemState();
         context.commit();
@@ -437,6 +450,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item publication = ItemBuilder.createItem(context, publicationCollection)
             .withTitle("Test publication")
+            .withAuthor("Test User")
             .build();
 
         createOrcidHistory(context, profile, publication)
@@ -444,7 +458,13 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withOperation(INSERT)
             .build();
 
-        addMetadata(publication, "dc", "contributor", "author", "Test User", profile.getID().toString());
+        EntityType publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isAuthorOfPublication = createRelationshipTypeBuilder(context, personType, publicationType,
+            "isAuthorOfPublication", "isPublicationOfAuthor", 0, null, 0, null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, profile, publication, isAuthorOfPublication).build();
 
         context.restoreAuthSystemState();
         context.commit();
@@ -469,8 +489,16 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         Item publication = ItemBuilder.createItem(context, publicationCollection)
             .withTitle("Test publication")
-            .withAuthor("Test User", profile.getID().toString())
+            .withAuthor("Test User")
             .build();
+
+        EntityType publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isAuthorOfPublication = createRelationshipTypeBuilder(context, personType, publicationType,
+            "isAuthorOfPublication", "isPublicationOfAuthor", 0, null, 0, null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, profile, publication, isAuthorOfPublication).build();
 
         context.restoreAuthSystemState();
         context.commit();
@@ -485,7 +513,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void testOrcidQueueRecordCreationToUpdateFunding() throws Exception {
+    public void testOrcidQueueRecordCreationToUpdateProject() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -496,24 +524,30 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withOrcidSynchronizationFundingsPreference(ALL)
             .build();
 
-        Collection fundingCollection = createCollection("Fundings", "Funding");
+        Collection projectCollection = createCollection("Projects", "Project");
 
-        Item funding = ItemBuilder.createItem(context, fundingCollection)
-            .withTitle("Test funding")
+        Item project = ItemBuilder.createItem(context, projectCollection)
+            .withTitle("Test project")
             .build();
 
-        createOrcidHistory(context, profile, funding)
+        createOrcidHistory(context, profile, project)
             .withPutCode("123456")
             .build();
 
-        addMetadata(funding, "funding", "coinvestigators", null, "Test User", profile.getID().toString());
+        EntityType projectType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isProjectOfPerson = createRelationshipTypeBuilder(context, projectType, personType,
+            "isProjectOfPerson", "isPersonOfProject", 0, null, 0, null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, project, profile, isProjectOfPerson).build();
 
         context.restoreAuthSystemState();
         context.commit();
 
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(1));
-        assertThat(orcidQueueRecords.get(0), matches(profile, funding, "Funding", "123456", UPDATE));
+        assertThat(orcidQueueRecords.get(0), matches(profile, project, "Project", "123456", UPDATE));
     }
 
     @Test
@@ -527,12 +561,20 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20")
             .build();
 
-        Collection fundingCollection = createCollection("Fundings", "Funding");
+        Collection projectCollection = createCollection("Projects", "Project");
 
-        ItemBuilder.createItem(context, fundingCollection)
-            .withTitle("Test funding")
-            .withAuthor("Test User", profile.getID().toString())
+        Item project = ItemBuilder.createItem(context, projectCollection)
+            .withTitle("Test project")
+            .withProjectInvestigator("Test User")
             .build();
+
+        EntityType projectType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isProjectOfPerson = createRelationshipTypeBuilder(context, projectType, personType,
+            "isProjectOfPerson", "isPersonOfProject", 0, null, 0, null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, project, profile, isProjectOfPerson).build();
 
         context.restoreAuthSystemState();
         context.commit();

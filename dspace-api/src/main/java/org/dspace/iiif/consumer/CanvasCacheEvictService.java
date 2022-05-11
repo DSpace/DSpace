@@ -23,7 +23,7 @@ public class CanvasCacheEvictService {
     CacheManager cacheManager;
 
     public void evictSingleCacheValue(String cacheKey) {
-        Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).evict(cacheKey);
+        Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).evictIfPresent(cacheKey);
     }
 
 }

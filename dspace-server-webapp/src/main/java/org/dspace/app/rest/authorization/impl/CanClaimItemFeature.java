@@ -8,17 +8,20 @@
 package org.dspace.app.rest.authorization.impl;
 
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,33 +35,41 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @AuthorizationFeatureDocumentation(name = CanClaimItemFeature.NAME,
-    description = "Used to verify if the given user can request the claim of an item")
+    description = "Used to verify if the current user is able to claim this item as their profile. "
+        + "Only available if the current item is not already claimed.")
 public class CanClaimItemFeature implements AuthorizationFeature {
 
     public static final String NAME = "canClaimItem";
+
+    private static final Logger LOG = LoggerFactory.getLogger(CanClaimItemFeature.class);
 
     @Autowired
     private ItemService itemService;
 
     @Autowired
-    private ShowClaimItemFeature showClaimItemFeature;
+    private ResearcherProfileService researcherProfileService;
 
     @Override
     @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
 
-        if (!showClaimItemFeature.isAuthorized(context, object)) {
-            return false;
-        }
-
-        if (!(object instanceof ItemRest) || Objects.isNull(context.getCurrentUser())) {
+        if (!(object instanceof ItemRest) || context.getCurrentUser() == null) {
             return false;
         }
 
         String id = ((ItemRest) object).getId();
         Item item = itemService.find(context, UUID.fromString(id));
 
-        return hasNotOwner(item);
+        return researcherProfileService.hasProfileType(item) && hasNotOwner(item) && hasNotAlreadyAProfile(context);
+    }
+
+    private boolean hasNotAlreadyAProfile(Context context) {
+        try {
+            return researcherProfileService.findById(context, context.getCurrentUser().getID()) == null;
+        } catch (SQLException | AuthorizeException e) {
+            LOG.warn("Error while checking if eperson has a ResearcherProfileAssociated: {}", e.getMessage(), e);
+            return false;
+        }
     }
 
     private boolean hasNotOwner(Item item) {

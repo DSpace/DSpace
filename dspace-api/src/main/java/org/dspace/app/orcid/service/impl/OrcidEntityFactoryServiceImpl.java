@@ -52,7 +52,7 @@ public class OrcidEntityFactoryServiceImpl implements OrcidEntityFactoryService 
     }
 
     private Optional<OrcidEntityType> getOrcidEntityType(Item item) {
-        return Optional.ofNullable(OrcidEntityType.fromString(itemService.getEntityType(item)));
+        return Optional.ofNullable(OrcidEntityType.fromEntityType(itemService.getEntityType(item)));
     }
 
 }

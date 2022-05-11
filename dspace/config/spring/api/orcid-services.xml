@@ -79,12 +79,13 @@
 		<property name="descriptionField" value="${orcid.mapping.funding.description}" />
 		<property name="startDateField" value="${orcid.mapping.funding.start-date}" />
 		<property name="endDateField" value="${orcid.mapping.funding.end-date}" />
-		<property name="organizationField" value="${orcid.mapping.funding.organization}" />
+		<property name="organizationRelationshipType" value="${orcid.mapping.funding.organization-relationship-type}" />
 	</bean>
     
     <bean class="org.dspace.app.orcid.model.factory.impl.OrcidCommonObjectFactoryImpl">
     	<property name="contributorEmailField" value="${orcid.mapping.contributor.email}" />
     	<property name="contributorOrcidField" value="${orcid.mapping.contributor.orcid}" />
+        <property name="organizationTitleField" value="${orcid.mapping.organization.title}" />
     	<property name="organizationCityField" value="${orcid.mapping.organization.city}" />
     	<property name="organizationCountryField" value="${orcid.mapping.organization.country}" />
     	<property name="disambiguatedOrganizationIdentifierFields" value="${orcid.mapping.organization.identifiers}" />

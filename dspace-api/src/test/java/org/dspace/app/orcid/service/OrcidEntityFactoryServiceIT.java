@@ -10,6 +10,7 @@ package org.dspace.app.orcid.service;
 import static org.apache.commons.lang.StringUtils.endsWith;
 import static org.dspace.app.matcher.LambdaMatcher.has;
 import static org.dspace.app.matcher.LambdaMatcher.matches;
+import static org.dspace.builder.RelationshipTypeBuilder.createRelationshipTypeBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -19,7 +20,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.orcid.jaxb.model.common.ContributorRole.AUTHOR;
 import static org.orcid.jaxb.model.common.ContributorRole.EDITOR;
-import static org.orcid.jaxb.model.common.FundingContributorRole.CO_LEAD;
 import static org.orcid.jaxb.model.common.FundingContributorRole.LEAD;
 import static org.orcid.jaxb.model.common.SequenceType.ADDITIONAL;
 import static org.orcid.jaxb.model.common.SequenceType.FIRST;
@@ -31,21 +31,22 @@ import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.orcid.factory.OrcidServiceFactory;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RelationshipBuilder;
 import org.dspace.content.Collection;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.RelationshipType;
 import org.junit.Before;
 import org.junit.Test;
 import org.orcid.jaxb.model.common.ContributorRole;
 import org.orcid.jaxb.model.common.FundingContributorRole;
-import org.orcid.jaxb.model.common.FundingType;
 import org.orcid.jaxb.model.common.Iso3166Country;
 import org.orcid.jaxb.model.common.Relationship;
 import org.orcid.jaxb.model.common.SequenceType;
 import org.orcid.jaxb.model.common.WorkType;
 import org.orcid.jaxb.model.v3.release.common.Contributor;
-import org.orcid.jaxb.model.v3.release.common.ContributorEmail;
-import org.orcid.jaxb.model.v3.release.common.ContributorOrcid;
 import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
 import org.orcid.jaxb.model.v3.release.common.Organization;
 import org.orcid.jaxb.model.v3.release.common.Url;
@@ -66,13 +67,11 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
     private OrcidEntityFactoryService entityFactoryService;
 
-    private Collection persons;
-
     private Collection orgUnits;
 
     private Collection publications;
 
-    private Collection fundings;
+    private Collection projects;
 
     @Before
     public void setup() {
@@ -85,11 +84,6 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
             .withTitle("Parent community")
             .build();
 
-        persons = CollectionBuilder.createCollection(context, parentCommunity)
-            .withName("Collection")
-            .withEntityType("Person")
-            .build();
-
         orgUnits = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
             .withEntityType("OrgUnit")
@@ -100,9 +94,9 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
             .withEntityType("Publication")
             .build();
 
-        fundings = CollectionBuilder.createCollection(context, parentCommunity)
+        projects = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection")
-            .withEntityType("Funding")
+            .withEntityType("Project")
             .build();
 
         context.restoreAuthSystemState();
@@ -113,16 +107,10 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
         context.turnOffAuthorisationSystem();
 
-        Item author = ItemBuilder.createItem(context, persons)
-            .withTitle("Jesse Pinkman")
-            .withOrcidIdentifier("0000-1111-2222-3333")
-            .withPersonEmail("test@test.it")
-            .build();
-
         Item publication = ItemBuilder.createItem(context, publications)
             .withTitle("Test publication")
             .withAuthor("Walter White")
-            .withAuthor("Jesse Pinkman", author.getID().toString())
+            .withAuthor("Jesse Pinkman")
             .withEditor("Editor")
             .withIssueDate("2021-04-30")
             .withDescriptionAbstract("Publication description")
@@ -156,8 +144,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(contributors, hasSize(3));
         assertThat(contributors, has(contributor("Walter White", AUTHOR, FIRST)));
         assertThat(contributors, has(contributor("Editor", EDITOR, FIRST)));
-        assertThat(contributors, has(contributor("Jesse Pinkman", AUTHOR, ADDITIONAL,
-            "0000-1111-2222-3333", "test@test.it")));
+        assertThat(contributors, has(contributor("Jesse Pinkman", AUTHOR, ADDITIONAL)));
 
         assertThat(work.getExternalIdentifiers(), notNullValue());
 
@@ -313,7 +300,6 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
             .withHandle("123456789/0001")
             .withTitle("Test funding")
             .withFundingIdentifier("987654")
-            .withFundingAwardUrl("http://test-funding")
             .build();
 
         Item publication = ItemBuilder.createItem(context, publications)
@@ -372,38 +358,36 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
     public void testFundingCreation() {
         context.turnOffAuthorisationSystem();
 
-        Item investigator = ItemBuilder.createItem(context, persons)
-            .withTitle("Jesse Pinkman")
-            .withPersonEmail("test@test.it")
-            .build();
-
         Item orgUnit = ItemBuilder.createItem(context, orgUnits)
-            .withTitle("4Science")
+            .withOrgUnitLegalName("4Science")
             .withOrgUnitCountry("IT")
             .withOrgUnitLocality("Milan")
             .withOrgUnitCrossrefIdentifier("12345")
             .build();
 
-        Item fundingItem = ItemBuilder.createItem(context, fundings)
+        Item projectItem = ItemBuilder.createItem(context, projects)
             .withTitle("Test funding")
-            .withType("Contract")
             .withFundingStartDate("2001-03")
             .withFundingEndDate("2010-03-25")
             .withFunder("4Science", orgUnit.getID().toString())
-            .withFundingInvestigator("Walter White")
-            .withFundingInvestigator("Jesse Pinkman", investigator.getID().toString())
-            .withFundingCoInvestigator("Mario Rossi")
+            .withProjectInvestigator("Walter White")
+            .withProjectInvestigator("Jesse Pinkman")
             .withInternalId("888-666-444")
-            .withFundingAwardUrl("www.test.com")
             .withFundingIdentifier("000-111-333")
             .withDescription("This is a funding to test orcid mapping")
-            .withAmount("200000")
-            .withAmountCurrency("Euro")
             .build();
+
+        EntityType projectType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        EntityType orgUnitType = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
+
+        RelationshipType isAuthorOfPublication = createRelationshipTypeBuilder(context, orgUnitType, projectType,
+            "isOrgUnitOfProject", "isProjectOfOrgUnit", 0, null, 0, null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, orgUnit, projectItem, isAuthorOfPublication).build();
 
         context.restoreAuthSystemState();
 
-        Activity activity = entityFactoryService.createOrcidObject(context, fundingItem);
+        Activity activity = entityFactoryService.createOrcidObject(context, projectItem);
         assertThat(activity, instanceOf(Funding.class));
 
         Funding funding = (Funding) activity;
@@ -413,11 +397,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(funding.getStartDate(), matches(date("2001", "03", "01")));
         assertThat(funding.getEndDate(), matches(date("2010", "03", "25")));
         assertThat(funding.getDescription(), is("This is a funding to test orcid mapping"));
-        assertThat(funding.getType(), is(FundingType.CONTRACT));
-        assertThat(funding.getUrl(), matches(urlEndsWith(fundingItem.getHandle())));
-        assertThat(funding.getAmount(), notNullValue());
-        assertThat(funding.getAmount().getContent(), is("200000"));
-        assertThat(funding.getAmount().getCurrencyCode(), is("EUR"));
+        assertThat(funding.getUrl(), matches(urlEndsWith(projectItem.getHandle())));
 
         Organization organization = funding.getOrganization();
         assertThat(organization, notNullValue());
@@ -433,59 +413,16 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(fundingContributors, notNullValue());
 
         List<FundingContributor> contributors = fundingContributors.getContributor();
-        assertThat(contributors, hasSize(3));
+        assertThat(contributors, hasSize(2));
         assertThat(contributors, has(fundingContributor("Walter White", LEAD)));
-        assertThat(contributors, has(fundingContributor("Jesse Pinkman", LEAD, "test@test.it")));
-        assertThat(contributors, has(fundingContributor("Mario Rossi", CO_LEAD)));
+        assertThat(contributors, has(fundingContributor("Jesse Pinkman", LEAD)));
 
         assertThat(funding.getExternalIdentifiers(), notNullValue());
 
         List<ExternalID> externalIds = funding.getExternalIdentifiers().getExternalIdentifier();
-        assertThat(externalIds, hasSize(3));
+        assertThat(externalIds, hasSize(2));
         assertThat(externalIds, has(selfExternalId("other-id", "888-666-444")));
-        assertThat(externalIds, has(selfExternalId("uri", "www.test.com")));
         assertThat(externalIds, has(selfExternalId("grant_number", "000-111-333")));
-    }
-
-    @Test
-    public void testFundingCreationWithoutAmountCurrency() {
-        context.turnOffAuthorisationSystem();
-
-        Item fundingItem = ItemBuilder.createItem(context, fundings)
-            .withTitle("Test funding")
-            .withType("Gift")
-            .withFundingStartDate("2001-03")
-            .withFundingEndDate("2010-03-25")
-            .withFundingInvestigator("Walter White")
-            .withAmount("200000")
-            .build();
-
-        context.restoreAuthSystemState();
-
-        Activity activity = entityFactoryService.createOrcidObject(context, fundingItem);
-        assertThat(activity, instanceOf(Funding.class));
-
-        Funding funding = (Funding) activity;
-        assertThat(funding.getTitle(), notNullValue());
-        assertThat(funding.getTitle().getTitle(), notNullValue());
-        assertThat(funding.getTitle().getTitle().getContent(), is("Test funding"));
-        assertThat(funding.getStartDate(), matches(date("2001", "03", "01")));
-        assertThat(funding.getEndDate(), matches(date("2010", "03", "25")));
-        assertThat(funding.getDescription(), nullValue());
-        assertThat(funding.getType(), is(FundingType.GRANT));
-        assertThat(funding.getUrl(), matches(urlEndsWith(fundingItem.getHandle())));
-        assertThat(funding.getAmount(), nullValue());
-        assertThat(funding.getOrganization(), nullValue());
-
-        FundingContributors fundingContributors = funding.getContributors();
-        assertThat(fundingContributors, notNullValue());
-
-        List<FundingContributor> contributors = fundingContributors.getContributor();
-        assertThat(contributors, hasSize(1));
-        assertThat(contributors, has(fundingContributor("Walter White", LEAD)));
-
-        assertThat(funding.getExternalIdentifiers(), notNullValue());
-        assertThat(funding.getExternalIdentifiers().getExternalIdentifier(), empty());
     }
 
     private Predicate<ExternalID> selfExternalId(String type, String value) {
@@ -507,33 +444,6 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
     private Predicate<FundingContributor> fundingContributor(String name, FundingContributorRole role) {
         return contributor -> contributor.getCreditName().getContent().equals(name)
             && role.equals(contributor.getContributorAttributes().getContributorRole());
-    }
-
-    private Predicate<FundingContributor> fundingContributor(String name, FundingContributorRole role, String email) {
-        return fundingContributor(name, role)
-            .and(fundingContributor -> sameEmail(fundingContributor.getContributorEmail(), email))
-            .and(fundingContributor -> fundingContributor.getContributorOrcid() == null);
-    }
-
-    private Predicate<Contributor> contributor(String orcid, String email) {
-        return contributor -> sameEmail(contributor.getContributorEmail(), email)
-            && sameOrcid(contributor.getContributorOrcid(), orcid);
-    }
-
-    private boolean sameEmail(ContributorEmail contributorEmail, String email) {
-        return contributorEmail != null && email.equals(contributorEmail.getValue());
-    }
-
-    private boolean sameOrcid(ContributorOrcid contributorOrcid, String orcid) {
-        return contributorOrcid != null
-            && orcid.equals(contributorOrcid.getPath())
-            && "https://sandbox.orcid.org".equals(contributorOrcid.getHost())
-            && ("https://sandbox.orcid.org/" + orcid).equals(contributorOrcid.getUri());
-    }
-
-    private Predicate<Contributor> contributor(String name, ContributorRole role, SequenceType sequence,
-        String orcid, String email) {
-        return contributor(name, role, sequence).and(contributor(orcid, email));
     }
 
     private Predicate<? super FuzzyDate> date(String year, String month, String days) {

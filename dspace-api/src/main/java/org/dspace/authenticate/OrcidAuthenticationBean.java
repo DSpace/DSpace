@@ -206,12 +206,16 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
         try {
             context.turnOffAuthorisationSystem();
 
+            String email = getEmail(person)
+                .orElseThrow(() -> new IllegalStateException("The email is configured private on orcid"));
+
             String orcid = token.getOrcid();
 
             EPerson eperson = ePersonService.create(context);
 
             eperson.setNetid(orcid);
-            eperson.setEmail(getEmail(person).orElse(orcid));
+
+            eperson.setEmail(email);
             eperson.setFirstName(context, getFirstName(person));
             eperson.setLastName(context, getLastName(person));
             eperson.setCanLogIn(true);

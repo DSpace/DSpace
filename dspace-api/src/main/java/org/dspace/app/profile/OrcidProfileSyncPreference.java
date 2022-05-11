@@ -16,6 +16,14 @@ package org.dspace.app.profile;
  */
 public enum OrcidProfileSyncPreference {
 
+    /**
+     * Data relating to the name, country and keywords of the ORCID profile.
+     */
     BIOGRAPHICAL,
+
+    /**
+     * Data relating to external identifiers and researcher urls of the ORCID
+     * profile.
+     */
     IDENTIFIERS;
 }

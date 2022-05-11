@@ -157,30 +157,13 @@ public class OrcidAuthenticationRestControllerIT extends AbstractControllerInteg
         when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
         when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(buildPerson("Test", "User"));
 
-        MvcResult mvcResult = getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
-                                                      .param("code", CODE))
-                                         .andExpect(status().is3xxRedirection())
-                                         .andExpect(redirectedUrl(configurationService.getProperty("dspace.ui.url")))
-                                         .andExpect(cookie().exists("Authorization-cookie"))
-                                         .andReturn();
+        getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
+            .param("code", CODE))
+            .andExpect(status().isUnauthorized());
 
         verify(orcidClientMock).getAccessToken(CODE);
         verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
         verifyNoMoreInteractions(orcidClientMock);
-
-        String ePersonId = getEPersonIdFromAuthorizationCookie(mvcResult);
-
-        createdEperson = ePersonService.find(context, UUIDUtils.fromString(ePersonId));
-        assertThat(createdEperson, notNullValue());
-        assertThat(createdEperson.getEmail(), equalTo(ORCID));
-        assertThat(createdEperson.getFullName(), equalTo("Test User"));
-        assertThat(createdEperson.getNetid(), equalTo(ORCID));
-        assertThat(createdEperson.canLogIn(), equalTo(true));
-        assertThat(createdEperson.getMetadata(), hasItem(with("eperson.orcid", ORCID)));
-        assertThat(createdEperson.getMetadata(), hasItem(with("eperson.orcid.access-token", ACCESS_TOKEN)));
-        assertThat(createdEperson.getMetadata(), hasItem(with("eperson.orcid.refresh-token", REFRESH_TOKEN)));
-        assertThat(createdEperson.getMetadata(), hasItem(with("eperson.orcid.scope", ORCID_SCOPES[0], 0)));
-        assertThat(createdEperson.getMetadata(), hasItem(with("eperson.orcid.scope", ORCID_SCOPES[1], 1)));
     }
 
     @Test

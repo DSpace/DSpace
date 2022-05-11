@@ -158,8 +158,8 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             return false;
         }
 
-        if (OrcidEntityType.isValid(entityType)) {
-            return getEntityPreference(profile, OrcidEntityType.fromString(entityType))
+        if (OrcidEntityType.isValidEntityType(entityType)) {
+            return getEntityPreference(profile, OrcidEntityType.fromEntityType(entityType))
                 .filter(pref -> pref != DISABLED)
                 .isPresent();
         }
@@ -261,9 +261,6 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
                    .filter(metadata -> metadataField.equals(metadata.getMetadataField().toString('.')));
     }
 
-    private String getProfileType() {
-        return configurationService.getProperty("researcher-profile.type", "Person");
-    }
 
     private void updateItem(Context context, Item item) throws SQLException {
         try {

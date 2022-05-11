@@ -515,6 +515,21 @@
 <!--                </field>-->
 <!--            </row>-->
             <row>
+                <relation-field>
+                    <relationship-type>isProjectOfPerson</relationship-type>
+                    <search-configuration>person</search-configuration>
+                    <repeatable>true</repeatable>
+                    <label>Investigator</label>
+                    <hint>Enter the investigator's name (Family name, Given names).</hint>
+                    <linked-metadata-field>
+                        <dc-schema>project</dc-schema>
+                        <dc-element>investigator</dc-element>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                    <externalsources>orcid</externalsources>
+                </relation-field>
+            </row>
+            <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>subject</dc-element>

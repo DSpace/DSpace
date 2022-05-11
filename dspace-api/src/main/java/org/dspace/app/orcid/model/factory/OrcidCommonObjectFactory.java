@@ -39,13 +39,13 @@ public interface OrcidCommonObjectFactory {
     public Optional<FuzzyDate> createFuzzyDate(MetadataValue metadataValue);
 
     /**
-     * Creates an instance of {@link Organization} from the given metadata value.
+     * Creates an instance of {@link Organization} from the given orgUnit item.
      *
-     * @param  context       the DSpace context
-     * @param  metadataValue the metadata value
-     * @return               the created Organization's instance, if any
+     * @param  context the DSpace context
+     * @param  orgUnit the orgUnit item
+     * @return         the created Organization's instance, if any
      */
-    public Optional<Organization> createOrganization(Context context, MetadataValue metadataValue);
+    public Optional<Organization> createOrganization(Context context, Item orgUnit);
 
     /**
      * Creates an instance of {@link Contributor} from the given metadata value.
