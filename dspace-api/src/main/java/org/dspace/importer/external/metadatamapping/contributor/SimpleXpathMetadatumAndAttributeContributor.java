@@ -15,7 +15,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.core.Constants;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -52,9 +51,6 @@ public class SimpleXpathMetadatumAndAttributeContributor extends SimpleXpathMeta
                 String attributeValue = element.getAttributeValue(this.attribute);
                 if (StringUtils.isNotBlank(attributeValue)) {
                     values.add(metadataFieldMapping.toDCValue(this.field, attributeValue));
-                } else {
-                    values.add(metadataFieldMapping.toDCValue(this.field,
-                            Constants.PLACEHOLDER_PARENT_METADATA_VALUE));
                 }
             } else {
                 log.warn("node of type: " + el.getClass());

@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.core.Constants;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.jaxen.JaxenException;
@@ -87,13 +86,18 @@ public class AuthorMetadataContributor extends SimpleXpathMetadatumContributor {
         Element orcid = element.getChild("orcid", NAMESPACE);
         Element afid = element.getChild("afid", NAMESPACE);
 
-        metadatums.add(getMetadata(getElementValue(authname), this.authname));
-        metadatums.add(getMetadata(getElementValue(scopusId), this.scopusId));
-        metadatums.add(getMetadata(getElementValue(orcid), this.orcid));
-        metadatums.add(getMetadata(StringUtils.isNotBlank(afid.getValue())
-                                   ? this.affId2affName.get(afid.getValue())
-                                   : null, this.affiliation));
+        addMetadatum(metadatums, getMetadata(getElementValue(authname), this.authname));
+        addMetadatum(metadatums, getMetadata(getElementValue(scopusId), this.scopusId));
+        addMetadatum(metadatums, getMetadata(getElementValue(orcid), this.orcid));
+        addMetadatum(metadatums, getMetadata(StringUtils.isNotBlank(afid.getValue())
+                                 ? this.affId2affName.get(afid.getValue()) : null, this.affiliation));
         return metadatums;
+    }
+
+    private void addMetadatum(List<MetadatumDTO> list, MetadatumDTO metadatum) {
+        if (Objects.nonNull(metadatum)) {
+            list.add(metadatum);
+        }
     }
 
     private String getElementValue(Element element) {
@@ -104,12 +108,10 @@ public class AuthorMetadataContributor extends SimpleXpathMetadatumContributor {
     }
 
     private MetadatumDTO getMetadata(String value, MetadataFieldConfig metadaConfig) {
-        MetadatumDTO metadata = new MetadatumDTO();
-        if (StringUtils.isNotBlank(value)) {
-            metadata.setValue(value);
-        } else {
-            metadata.setValue(Constants.PLACEHOLDER_PARENT_METADATA_VALUE);
+        if (StringUtils.isBlank(value)) {
+            return null;
         }
+        MetadatumDTO metadata = new MetadatumDTO();
         metadata.setElement(metadaConfig.getElement());
         metadata.setQualifier(metadaConfig.getQualifier());
         metadata.setSchema(metadaConfig.getSchema());

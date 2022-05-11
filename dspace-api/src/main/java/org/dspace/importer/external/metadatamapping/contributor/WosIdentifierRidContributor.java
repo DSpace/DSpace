@@ -16,7 +16,6 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.core.Constants;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -62,9 +61,6 @@ public class WosIdentifierRidContributor extends SimpleXpathMetadatumContributor
             String value = el.getAttributeValue("r_id");
             if (StringUtils.isNotBlank(value)) {
                 values.add(metadataFieldMapping.toDCValue(this.field, value));
-            } else {
-                values.add(metadataFieldMapping.toDCValue(this.field,
-                           Constants.PLACEHOLDER_PARENT_METADATA_VALUE));
             }
         }
     }
