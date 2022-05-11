@@ -7,17 +7,13 @@
  */
 package org.dspace.content;
 
-import static org.dspace.content.Relationship.LatestVersionStatus;
 import static org.dspace.content.Relationship.LatestVersionStatus.BOTH;
 import static org.dspace.content.Relationship.LatestVersionStatus.LEFT_ONLY;
 import static org.dspace.content.Relationship.LatestVersionStatus.RIGHT_ONLY;
+import static org.dspace.util.RelationshipVersioningUtils.isRel;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -188,32 +184,6 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
             .withCopyToLeft(false)
             .withCopyToRight(false)
             .build();
-    }
-
-    protected Matcher<Object> isRel(
-        Item leftItem, RelationshipType relationshipType, Item rightItem, LatestVersionStatus latestVersionStatus,
-        int leftPlace, int rightPlace
-    ) {
-        return isRel(leftItem, relationshipType, rightItem, latestVersionStatus, null, null, leftPlace, rightPlace);
-    }
-
-    protected Matcher<Object> isRel(
-        Item leftItem, RelationshipType relationshipType, Item rightItem, LatestVersionStatus latestVersionStatus,
-        String leftwardValue, String rightwardValue, int leftPlace, int rightPlace
-    ) {
-        return allOf(
-            hasProperty("leftItem", is(leftItem)),
-            // NOTE: this is a painful one... class RelationshipType does not implement the equals method, so we cannot
-            //       rely on object equality and have to compare ids instead. It has to be in capital letters,
-            //       because the getter has been implemented inconsistently (#id vs #setId() vs #getID()).
-            hasProperty("relationshipType", hasProperty("ID", is(relationshipType.getID()))),
-            hasProperty("rightItem", is(rightItem)),
-            hasProperty("leftPlace", is(leftPlace)),
-            hasProperty("rightPlace", is(rightPlace)),
-            hasProperty("leftwardValue", leftwardValue == null ? nullValue() : is(leftwardValue)),
-            hasProperty("rightwardValue", rightwardValue == null ? nullValue() : is(rightwardValue)),
-            hasProperty("latestVersionStatus", is(latestVersionStatus))
-        );
     }
 
     protected Relationship getRelationship(
