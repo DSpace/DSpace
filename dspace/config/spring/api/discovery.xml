@@ -1438,7 +1438,7 @@
             <list>
                 <!--Only find items into claimable collection defined in cfg-->
                 <value>search.resourcetype:Item</value>
-                <value>search.entitytype:${researcher-profile.entity-type}</value>
+                <value>search.entitytype:${researcher-profile.entity-type:Person}</value>
             </list>
         </property>
         <!--Default result per page  -->

@@ -10,14 +10,21 @@ package org.dspace.app.orcid.model;
 import java.util.Arrays;
 
 /**
- * The entity types of the ORCID objects that can be synchronized.
+ * The types of activities defined on ORCID that can be synchronized.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
 public enum OrcidEntityType {
 
+    /**
+     * The publication/work activity.
+     */
     PUBLICATION("Publication", "/work"),
+
+    /**
+     * The funding activity.
+     */
     FUNDING("Project", "/funding");
 
     private final String entityType;

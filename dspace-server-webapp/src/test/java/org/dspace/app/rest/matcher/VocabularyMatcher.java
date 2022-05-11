@@ -41,4 +41,14 @@ public class VocabularyMatcher {
                 hasJsonPath("$.type", is(type))
         );
     }
+
+    public static Matcher<? super Object> matchVocabularyEntry(String display, String value, String type,
+        String authority) {
+        return allOf(
+                hasJsonPath("$.display", is(display)),
+                hasJsonPath("$.value", is(value)),
+                hasJsonPath("$.type", is(type)),
+                hasJsonPath("$.authority", is(authority))
+        );
+    }
 }

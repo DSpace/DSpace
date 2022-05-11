@@ -254,9 +254,6 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
                    .filter(metadata -> metadataField.equals(metadata.getMetadataField().toString('.')));
     }
 
-    private String getProfileType() {
-        return configurationService.getProperty("researcher-profile.type", "Person");
-    }
 
     private void updateItem(Context context, Item item) throws SQLException {
         try {

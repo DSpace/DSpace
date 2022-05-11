@@ -117,7 +117,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
-    @ExceptionHandler( {UnprocessableEntityException.class})
+    @ExceptionHandler({ UnprocessableEntityException.class, ResourceAlreadyExistsException.class })
     protected void handleUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
                                                       Exception ex) throws IOException {
         //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
@@ -172,12 +172,6 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         sendErrorResponse(request, response, null,
                           "A required parameter is invalid",
                           HttpStatus.BAD_REQUEST.value());
-    }
-
-    @ExceptionHandler(ResourceAlreadyExistsException.class)
-    protected void resourceConflictException(HttpServletRequest request, HttpServletResponse response,
-        ResourceAlreadyExistsException ex) throws IOException {
-        sendErrorResponse(request, response, null, ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     @ExceptionHandler(MissingParameterException.class)

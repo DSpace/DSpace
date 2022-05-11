@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -566,13 +566,14 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    .andExpect(jsonPath("$.leftwardValue", is(nullValue())))
                    .andExpect(jsonPath("$.rightwardValue", is(nullValue())));
 
-        JsonObject contentObj = new JsonObject();
-        contentObj.addProperty("leftwardValue", leftwardValue);
+        Map<String, String> map = new HashMap<>();
+        map.put("leftwardValue", leftwardValue);
+        String json = new ObjectMapper().writeValueAsString(map);
 
         // Add leftwardValue
         getClient(token).perform(put("/api/core/relationships/" + idRef)
                                      .contentType("application/json")
-                                     .content(contentObj.toString()))
+                                     .content(json))
                         .andExpect(status().isOk());
 
         // Verify leftwardValue is present and rightwardValue not
@@ -624,14 +625,15 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    .andExpect(jsonPath("$.leftwardValue", is(nullValue())))
                    .andExpect(jsonPath("$.rightwardValue", is(nullValue())));
 
-        JsonObject contentObj = new JsonObject();
-        contentObj.addProperty("leftwardValue", leftwardValue);
-        contentObj.addProperty("rightwardValue", rightwardValue);
+        Map<String, String> map = new HashMap<>();
+        map.put("leftwardValue", leftwardValue);
+        map.put("rightwardValue", rightwardValue);
+        String json = new ObjectMapper().writeValueAsString(map);
 
         // Add leftwardValue and rightwardValue
         getClient(token).perform(put("/api/core/relationships/" + idRef)
                                      .contentType("application/json")
-                                     .content(contentObj.toString()))
+                                     .content(json))
                         .andExpect(status().isOk());
 
         // Verify leftwardValue and rightwardValue are present

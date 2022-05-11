@@ -275,7 +275,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     @Test
     public void testCreateAndReturnWithPublicProfile() throws Exception {
 
-        configurationService.setProperty("researcher-profile.set-new-profile-private", false);
+        configurationService.setProperty("researcher-profile.set-new-profile-visible", true);
         String id = user.getID().toString();
 
         String authToken = getAuthToken(user.getEmail(), password);
@@ -336,6 +336,30 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(jsonPath("$.visible", is(false)))
             .andExpect(jsonPath("$.type", is("profile")))
             .andExpect(jsonPath("$", matchLinks("http://localhost/api/eperson/profiles/" + id, "item", "eperson")));
+    }
+
+    @Test
+    public void testCreateAndReturnWithoutCollectionIdSet() throws Exception {
+
+        String id = user.getID().toString();
+
+        configurationService.setProperty("researcher-profile.collection.uuid", null);
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id", is(id)))
+            .andExpect(jsonPath("$.visible", is(false)))
+            .andExpect(jsonPath("$.type", is("profile")))
+            .andExpect(jsonPath("$", matchLinks("http://localhost/api/eperson/profiles/" + id, "item", "eperson")));
+
+        String itemId = getItemIdByProfileId(authToken, id);
+        Item profileItem = itemService.find(context, UUIDUtils.fromString(itemId));
+        assertThat(profileItem, notNullValue());
+        assertThat(profileItem.getOwningCollection(), is(personCollection));
+
     }
 
     /**
@@ -587,6 +611,11 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.visible", is(false)));
 
+        String itemId = getItemIdByProfileId(authToken, id);
+
+        getClient().perform(get("/api/core/items/{id}", itemId))
+            .andExpect(status().isUnauthorized());
+
         // change the visibility to true
         List<Operation> operations = asList(new ReplaceOperation("/visible", true));
 
@@ -600,6 +629,9 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.visible", is(true)));
 
+        getClient().perform(get("/api/core/items/{id}", itemId))
+            .andExpect(status().isOk());
+
         // change the visibility to false
         operations = asList(new ReplaceOperation("/visible", false));
 
@@ -612,6 +644,9 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         getClient(authToken).perform(get("/api/eperson/profiles/{id}", id))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.visible", is(false)));
+
+        getClient().perform(get("/api/core/items/{id}", itemId))
+            .andExpect(status().isUnauthorized());
 
     }
 
