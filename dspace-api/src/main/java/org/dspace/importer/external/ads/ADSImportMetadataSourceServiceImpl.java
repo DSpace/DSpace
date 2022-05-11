@@ -7,52 +7,53 @@
  */
 package org.dspace.importer.external.ads;
 
-import static org.dspace.importer.external.scopus.service.LiveImportClientImpl.HEADER_PARAMETERS;
+import static org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl.HEADER_PARAMETERS;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import javax.el.MethodNotFoundException;
 
-import com.google.gson.Gson;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.ReadContext;
-import net.minidev.json.JSONArray;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
-import org.dspace.importer.external.scopus.service.LiveImportClient;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * Implements a data source for querying ADS
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 public class ADSImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<String>
         implements QuerySource {
 
-    private String apiKey;
+    private final static Logger log = LogManager.getLogger();
 
+    private String url;
+    private String resultFieldList;
+
+    private String apiKey;
     private int timeout = 1000;
 
     @Autowired
     private LiveImportClient liveImportClient;
-
-    private static final String END_POINT = "https://api.adsabs.harvard.edu/v1/search/query";
-    private static final String RESULT_FIELD_LIST = "abstract,ack,aff,alternate_bibcode,alternate_title,arxiv_class," +
-            "author,bibcode,bibgroup,bibstem,citation_count,copyright,database,doi,doctype,first_author,grant,id," +
-            "indexstamp,issue,keyword,lang,orcid_pub,orcid_user,orcid_other,page,property,pub,pubdate,read_count," +
-            "title,vizier,volume,year";
 
     @Override
     public String getImportSource() {
@@ -236,15 +237,15 @@ public class ADSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             headerParameters.put("Authorization", "Bearer " + token);
             params.put(HEADER_PARAMETERS, headerParameters);
 
-            URIBuilder uriBuilder = new URIBuilder(END_POINT);
+            URIBuilder uriBuilder = new URIBuilder(this.url);
             uriBuilder.addParameter("q", query);
             uriBuilder.addParameter("rows", "1");
             uriBuilder.addParameter("start", "0");
-            uriBuilder.addParameter("fl", RESULT_FIELD_LIST);
+            uriBuilder.addParameter("fl", this.resultFieldList);
 
             String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(), params);
-            ReadContext ctx = JsonPath.parse(resp);
-            return ctx.read("$.response.numFound");
+            JsonNode jsonNode = convertStringJsonToJsonNode(resp);
+            return jsonNode.at("/response/numFound").asInt();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -259,31 +260,46 @@ public class ADSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             headerParameters.put("Authorization", "Bearer " + token);
             params.put(HEADER_PARAMETERS, headerParameters);
 
-            URIBuilder uriBuilder = new URIBuilder(END_POINT);
+            URIBuilder uriBuilder = new URIBuilder(this.url);
             uriBuilder.addParameter("q", query);
             uriBuilder.addParameter("rows", count.toString());
             uriBuilder.addParameter("start", start.toString());
-            uriBuilder.addParameter("fl", RESULT_FIELD_LIST);
+            uriBuilder.addParameter("fl", this.resultFieldList);
 
             String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(), params);
 
-            ReadContext ctx = JsonPath.parse(resp);
-            Object o = ctx.read("$.response.docs[*]");
-            if (o.getClass().isAssignableFrom(JSONArray.class)) {
-                JSONArray array = (JSONArray)o;
-                int size = array.size();
-                for (int index = 0; index < size; index++) {
-                    Gson gson = new Gson();
-                    String innerJson = gson.toJson(array.get(index), LinkedHashMap.class);
-                    adsResults.add(transformSourceRecords(innerJson));
+            JsonNode jsonNode = convertStringJsonToJsonNode(resp);
+            JsonNode docs = jsonNode.at("/response/docs");
+            if (docs.isArray()) {
+                Iterator<JsonNode> nodes = docs.elements();
+                while (nodes.hasNext()) {
+                    JsonNode node = nodes.next();
+                    adsResults.add(transformSourceRecords(node.toString()));
                 }
             } else {
-                adsResults.add(transformSourceRecords(o.toString()));
+                adsResults.add(transformSourceRecords(docs.toString()));
             }
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
         return adsResults;
+    }
+
+    private JsonNode convertStringJsonToJsonNode(String json) {
+        try {
+            return new ObjectMapper().readTree(json);
+        } catch (JsonProcessingException e) {
+            log.error("Unable to process json response.", e);
+        }
+        return null;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setResultFieldList(String resultFieldList) {
+        this.resultFieldList = resultFieldList;
     }
 
 }

@@ -7,7 +7,7 @@
  */
 package org.dspace.importer.external.epo.service;
 
-import static org.dspace.importer.external.scopus.service.LiveImportClientImpl.HEADER_PARAMETERS;
+import static org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl.HEADER_PARAMETERS;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -36,9 +36,9 @@ import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.contributor.EpoIdMetadataContributor.EpoDocumentId;
-import org.dspace.importer.external.scopus.service.LiveImportClient;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
 import org.jaxen.JaxenException;
@@ -62,20 +62,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Element>
         implements QuerySource {
 
+    private final static Logger log = LogManager.getLogger();
+
+    private String url;
+    private String authUrl;
+    private String searchUrl;
+
     private String consumerKey;
     private String consumerSecret;
 
     private MetadataFieldConfig dateFiled;
     private MetadataFieldConfig applicationNumber;
-
-    private final static Logger log = LogManager.getLogger();
-
-    private static final String endPointAuthService =
-            "https://ops.epo.org/3.2/auth/accesstoken";
-    private static final String endPointPublisherDataSearchService =
-            "http://ops.epo.org/rest-services/published-data/search";
-    private static final String endPointPublisherDataRetriveService =
-            "http://ops.epo.org/rest-services/published-data/publication/$(doctype)/$(id)/biblio";
 
     public static final String APP_NO_DATE_SEPARATOR = "$$$";
     private static final String APP_NO_DATE_SEPARATOR_REGEX = "\\$\\$\\$";
@@ -148,7 +145,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     protected String login() throws IOException, HttpException {
         Map<String, Map<String, String>> params = getLoginParams();
         String entity = "grant_type=client_credentials";
-        String json = liveImportClient.executeHttpPostRequest(endPointAuthService, params, entity);
+        String json = liveImportClient.executeHttpPostRequest(this.authUrl, params, entity);
         ObjectMapper mapper = new ObjectMapper(new JsonFactory());
         JsonNode rootNode = mapper.readTree(json);
         JsonNode accessTokenNode = rootNode.get("access_token");
@@ -371,7 +368,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             headerParameters.put("X-OPS-Range", "1-1");
             params.put(HEADER_PARAMETERS, headerParameters);
 
-            URIBuilder uriBuilder = new URIBuilder(endPointPublisherDataSearchService);
+            URIBuilder uriBuilder = new URIBuilder(this.searchUrl);
             uriBuilder.addParameter("q", query);
 
             String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
@@ -408,7 +405,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             }
             params.put(HEADER_PARAMETERS, headerParameters);
 
-            URIBuilder uriBuilder = new URIBuilder(endPointPublisherDataSearchService);
+            URIBuilder uriBuilder = new URIBuilder(this.searchUrl);
             uriBuilder.addParameter("q", query);
 
             String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
@@ -449,7 +446,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             headerParameters.put("Authorization", "Bearer " + bearer);
             params.put(HEADER_PARAMETERS, headerParameters);
 
-            String url = this.endPointPublisherDataRetriveService.replace("$(doctype)", docType).replace("$(id)", id);
+            String url = this.url.replace("$(doctype)", docType).replace("$(id)", id);
 
             String response = liveImportClient.executeHttpGetRequest(1000, url, params);
             List<Element> elements = splitToRecords(response);
@@ -503,6 +500,18 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             log.error("node of type: " + el.getClass());
             return "";
         }
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setAuthUrl(String authUrl) {
+        this.authUrl = authUrl;
+    }
+
+    public void setSearchUrl(String searchUrl) {
+        this.searchUrl = searchUrl;
     }
 
 }

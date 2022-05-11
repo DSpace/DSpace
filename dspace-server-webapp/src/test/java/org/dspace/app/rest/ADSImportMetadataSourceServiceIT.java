@@ -9,15 +9,13 @@ package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import javax.el.MethodNotFoundException;
 
@@ -31,8 +29,8 @@ import org.dspace.content.Item;
 import org.dspace.importer.external.ads.ADSImportMetadataSourceServiceImpl;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-import org.dspace.importer.external.scopus.service.LiveImportClientImpl;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -56,8 +54,8 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClient.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.ads-resp").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
+
+        try (InputStream file = getClass().getResourceAsStream("ads-ex.json")) {
 
             String adsJsonResp = IOUtils.toString(file, Charset.defaultCharset());
 
@@ -66,10 +64,10 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
-            Collection<ImportRecord> collection2match = getRecords();
+            ArrayList<ImportRecord> collection2match = getRecords();
             Collection<ImportRecord> recordsImported = adsServiceImpl.getRecords("test query", 0, 2);
             assertEquals(2, recordsImported.size());
-            assertTrue(matchRecords(recordsImported, collection2match));
+            matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
         } finally {
             liveImportClient.setHttpClient(originalHttpClient);
         }
@@ -80,8 +78,8 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClient.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.ads-resp").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
+
+        try (InputStream file = getClass().getResourceAsStream("ads-ex.json")) {
             String adsResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClient.setHttpClient(httpClient);
@@ -101,8 +99,8 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClient.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.ads-resp").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
+
+        try (InputStream file = getClass().getResourceAsStream("ads-ex.json")) {
             String adsResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClient.setHttpClient(httpClient);
@@ -143,8 +141,8 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClient.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.ads-single").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
+
+        try (InputStream file = getClass().getResourceAsStream("ads-single-obj.json")) {
 
             String adsJsonResp = IOUtils.toString(file, Charset.defaultCharset());
 
@@ -153,19 +151,18 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
-            Collection<ImportRecord> collection2match = getRecords();
-            Collection<ImportRecord> firstRecord = Arrays.asList(collection2match.iterator().next());
+            ArrayList<ImportRecord> collection2match = getRecords();
+            collection2match.remove(1);
             ImportRecord recordImported = adsServiceImpl.getRecord("2017PhRvL.119p1101A");
             assertNotNull(recordImported);
-            Collection<ImportRecord> recordsImported = Arrays.asList(recordImported);
-            assertTrue(matchRecords(recordsImported, firstRecord));
+            matchRecords(new ArrayList<ImportRecord>(Arrays.asList(recordImported)), collection2match);
         } finally {
             liveImportClient.setHttpClient(originalHttpClient);
         }
     }
 
-    private Collection<ImportRecord> getRecords() {
-        Collection<ImportRecord> records = new LinkedList<ImportRecord>();
+    private ArrayList<ImportRecord> getRecords() {
+        ArrayList<ImportRecord> records = new ArrayList<>();
         //define first record
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
         MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "Abbott, B. P.");
@@ -180,7 +177,7 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO subject2 = createMetadatumDTO("dc", "subject", null,
                 "Astrophysics - High Energy Astrophysical Phenomena");
         MetadatumDTO source = createMetadatumDTO("dc", "source", null, "Physical Review Letters");
-        MetadatumDTO title = createMetadatumDTO("dc", "title", "author",
+        MetadatumDTO title = createMetadatumDTO("dc", "title", null,
                 "Observation of Gravitational Waves from a Binary Black Hole Merger");
         MetadatumDTO description = createMetadatumDTO("dc", "description", "abstract",
                 "On September 14, 2015 at 09:50:45 UTC the two detectors of the Laser"
@@ -201,6 +198,7 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
               + " This is the first direct detection of gravitational waves and the first observation of a binary"
               + " black hole merger.");
 
+        metadatums.add(description);
         metadatums.add(author);
         metadatums.add(author2);
         metadatums.add(author3);
@@ -213,7 +211,6 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         metadatums.add(subject2);
         metadatums.add(source);
         metadatums.add(title);
-        metadatums.add(description);
 
         ImportRecord firstrRecord = new ImportRecord(metadatums);
 
@@ -231,7 +228,7 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO subject4 = createMetadatumDTO("dc", "subject", null,
                 "Astrophysics - High Energy Astrophysical Phenomena");
         MetadatumDTO source2 = createMetadatumDTO("dc", "source", null, "Physical Review Letters");
-        MetadatumDTO title2 = createMetadatumDTO("dc", "title", "author",
+        MetadatumDTO title2 = createMetadatumDTO("dc", "title", null,
                 "GW170817: Observation of Gravitational Waves from a Binary Neutron Star Inspiral");
         MetadatumDTO description2 = createMetadatumDTO("dc", "description", "abstract",
                 "On August 17, 2017 at 12∶41:04 UTC the Advanced LIGO and Advanced Virgo"
@@ -254,6 +251,7 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
               + " electromagnetic observation provides insight into astrophysics, dense matter,"
               + " gravitation, and cosmology.");
 
+        metadatums2.add(description2);
         metadatums2.add(author5);
         metadatums2.add(author6);
         metadatums2.add(author7);
@@ -266,7 +264,6 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         metadatums2.add(subject4);
         metadatums2.add(source2);
         metadatums2.add(title2);
-        metadatums2.add(description2);
 
         ImportRecord secondRecord = new ImportRecord(metadatums2);
         records.add(firstrRecord);

@@ -8,14 +8,12 @@
 package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,8 +22,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.epo.service.EpoImportMetadataSourceServiceImpl;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-import org.dspace.importer.external.scopus.service.LiveImportClientImpl;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -47,44 +45,43 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
     @Test
     public void epoImportMetadataGetRecordsTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        FileInputStream file2token = null;
-        FileInputStream file = null;
-        FileInputStream file2 = null;
-        FileInputStream file3 = null;
+        InputStream file2token = null;
+        InputStream file = null;
+        InputStream file2 = null;
+        InputStream file3 = null;
         String originKey = epoServiceImpl.getConsumerKey();
         String originSecret = epoServiceImpl.getConsumerSecret();
         CloseableHttpClient originalHttpClient = liveImportClient.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path2token = testProps.get("test.epo-token").toString();
-        String path = testProps.get("test.epo-resp").toString();
-        String path1 = testProps.get("test.epo-first").toString();
-        String path2 = testProps.get("test.epo-second").toString();
+
         try {
-            epoServiceImpl.setConsumerKey("test-key");
-            epoServiceImpl.setConsumerSecret("test-secret");
-            file2token = new FileInputStream(path2token);
-            file = new FileInputStream(path);
-            file2 = new FileInputStream(path1);
-            file3 = new FileInputStream(path2);
+            file2token = getClass().getResourceAsStream("epo-token.json");
+            file = getClass().getResourceAsStream("epo-resp.xml");
+            file2 = getClass().getResourceAsStream("epo-first.xml");
+            file3 = getClass().getResourceAsStream("epo-second.xml");
 
             String tokenResp = IOUtils.toString(file2token, Charset.defaultCharset());
             String epoResp = IOUtils.toString(file, Charset.defaultCharset());
             String epoResp2 = IOUtils.toString(file2, Charset.defaultCharset());
             String epoResp3 = IOUtils.toString(file3, Charset.defaultCharset());
 
+            epoServiceImpl.setConsumerKey("test-key");
+            epoServiceImpl.setConsumerSecret("test-secret");
             liveImportClient.setHttpClient(httpClient);
+
             CloseableHttpResponse responseWithToken = mockResponse(tokenResp, 200, "OK");
             CloseableHttpResponse response1 = mockResponse(epoResp, 200, "OK");
             CloseableHttpResponse response2 = mockResponse(epoResp2, 200, "OK");
             CloseableHttpResponse response3 = mockResponse(epoResp3, 200, "OK");
+
             when(httpClient.execute(ArgumentMatchers.any()))
                            .thenReturn(responseWithToken, response1, response2, response3);
 
             context.restoreAuthSystemState();
-            Collection<ImportRecord> collection2match = getRecords();
+            ArrayList<ImportRecord> collection2match = getRecords();
             Collection<ImportRecord> recordsImported = epoServiceImpl.getRecords("test query", 0, 2);
             assertEquals(2, recordsImported.size());
-            assertTrue(matchRecords(recordsImported, collection2match));
+            matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
         } finally {
             if (Objects.nonNull(file2token)) {
                 file2token.close();
@@ -107,25 +104,26 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
     @Test
     public void epoImportMetadataGetRecordsCountTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        FileInputStream file = null;
-        FileInputStream file2 = null;
+        InputStream file = null;
+        InputStream file2 = null;
         String originKey = epoServiceImpl.getConsumerKey();
         String originSecret = epoServiceImpl.getConsumerSecret();
         CloseableHttpClient originalHttpClient = liveImportClient.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path2token = testProps.get("test.epo-token").toString();
-        String path = testProps.get("test.epo-resp").toString();
+
         try {
-            file = new FileInputStream(path2token);
-            file2 = new FileInputStream(path);
+            file = getClass().getResourceAsStream("epo-token.json");
+            file2 = getClass().getResourceAsStream("epo-resp.xml");
             String token = IOUtils.toString(file, Charset.defaultCharset());
             String epoResp = IOUtils.toString(file2, Charset.defaultCharset());
 
             epoServiceImpl.setConsumerKey("test-key");
             epoServiceImpl.setConsumerSecret("test-secret");
             liveImportClient.setHttpClient(httpClient);
+
             CloseableHttpResponse responseWithToken = mockResponse(token, 200, "OK");
             CloseableHttpResponse response1 = mockResponse(epoResp, 200, "OK");
+
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(responseWithToken, response1);
 
             context.restoreAuthSystemState();
@@ -144,8 +142,8 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         }
     }
 
-    private Collection<ImportRecord> getRecords() {
-        Collection<ImportRecord> records = new LinkedList<ImportRecord>();
+    private ArrayList<ImportRecord> getRecords() {
+        ArrayList<ImportRecord> records = new ArrayList<>();
         //define first record
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
         MetadatumDTO identifierOther = createMetadatumDTO("dc", "identifier", "other", "epodoc:ES2902749T");
@@ -156,7 +154,7 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO applicant = createMetadatumDTO("dc", "contributor", "applicant", "PANKA BLOOD TEST GMBH");
         MetadatumDTO applicant2 = createMetadatumDTO("dc", "contributor", "applicant", "Panka Blood Test GmbH");
         MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "PANTEL KLAUS");
-        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "BARTKOWIAK KAI");
+        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", " BARTKOWIAK KAI");
         MetadatumDTO author3 = createMetadatumDTO("dc", "contributor", "author", "PANTEL, Klaus, ");
         MetadatumDTO author4 = createMetadatumDTO("dc", "contributor", "author", "BARTKOWIAK, Kai");
         MetadatumDTO title = createMetadatumDTO("dc", "title", null, "Método para el diagnóstico del cáncer de mama");
@@ -189,8 +187,8 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO applicant3 = createMetadatumDTO("dc", "contributor", "applicant", "ADVANTEST CORP [JP]");
         MetadatumDTO applicant4 = createMetadatumDTO("dc", "contributor", "applicant", "ADVANTEST CORPORATION");
         MetadatumDTO author5 = createMetadatumDTO("dc", "contributor", "author", "POEPPE OLAF [DE]");
-        MetadatumDTO author6 = createMetadatumDTO("dc", "contributor", "author", "HILLIGES KLAUS-DIETER [DE]");
-        MetadatumDTO author7 = createMetadatumDTO("dc", "contributor", "author", "KRECH ALAN [US]");
+        MetadatumDTO author6 = createMetadatumDTO("dc", "contributor", "author", " HILLIGES KLAUS-DIETER [DE]");
+        MetadatumDTO author7 = createMetadatumDTO("dc", "contributor", "author", " KRECH ALAN [US]");
         MetadatumDTO author8 = createMetadatumDTO("dc", "contributor", "author", "POEPPE, OLAF, ");
         MetadatumDTO author9 = createMetadatumDTO("dc", "contributor", "author", "HILLIGES, KLAUS-DIETER, ");
         MetadatumDTO author10 = createMetadatumDTO("dc", "contributor", "author", "KRECH, ALAN");
@@ -198,7 +196,7 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
                 "Automated test equipment for testing one or more devices under test, method for automated"
               + " testing of one or more devices under test, and computer program using a buffer memory");
         MetadatumDTO ipc2 = createMetadatumDTO("dc", "subject", "ipc",
-                "KG01R  31/   319            A I                    ");
+                "G01R  31/   319            A I                    ");
         MetadatumDTO ipc3 = createMetadatumDTO("dc", "subject", "ipc",
                 "G01R  31/  3193            A I                    ");
         metadatums2.add(identifierOther2);

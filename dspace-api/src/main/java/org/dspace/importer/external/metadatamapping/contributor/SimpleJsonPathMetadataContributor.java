@@ -9,15 +9,31 @@ package org.dspace.importer.external.metadatamapping.contributor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Objects;
 
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.ReadContext;
-import net.minidev.json.JSONArray;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 
+/**
+ * A simple JsonPath Metadata processor
+ * that allow extract value from json object
+ * by configuring the path in the query variable via the bean.
+ * moreover this can also perform more compact extractions
+ * by configuring specific json processor in "metadataProcessor"
+ *
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+ */
 public class SimpleJsonPathMetadataContributor implements MetadataContributor<String> {
+
+    private final static Logger log = LogManager.getLogger();
 
     private String query;
 
@@ -105,19 +121,24 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
     public Collection<MetadatumDTO> contributeMetadata(String fullJson) {
         Collection<MetadatumDTO> metadata = new ArrayList<>();
         Collection<String> metadataValue = new ArrayList<>();
-        if (metadataProcessor != null) {
+        if (Objects.nonNull(metadataProcessor)) {
             metadataValue = metadataProcessor.processMetadata(fullJson);
         } else {
-            ReadContext ctx = JsonPath.parse(fullJson);
-            Object o = ctx.read(query);
-            if (o.getClass().isAssignableFrom(JSONArray.class)) {
-                JSONArray results = (JSONArray)o;
-                for (int i = 0; i < results.size(); i++) {
-                    String value = results.get(i).toString();
-                    metadataValue.add(value);
+            JsonNode jsonNode = convertStringJsonToJsonNode(fullJson);
+            JsonNode node = jsonNode.at(query);
+            if (node.isArray()) {
+                Iterator<JsonNode> nodes = node.iterator();
+                while (nodes.hasNext()) {
+                    String nodeValue = getStringValue(nodes.next());
+                    if (StringUtils.isNotBlank(nodeValue)) {
+                        metadataValue.add(nodeValue);
+                    }
                 }
             } else {
-                metadataValue.add(o.toString());
+                String nodeValue = getStringValue(node);
+                if (StringUtils.isNotBlank(nodeValue)) {
+                    metadataValue.add(nodeValue);
+                }
             }
         }
         for (String value : metadataValue) {
@@ -129,6 +150,25 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
             metadata.add(metadatumDto);
         }
         return metadata;
+    }
+
+    private String getStringValue(JsonNode node) {
+        if (node.isTextual()) {
+            return node.textValue();
+        } else if (node.isNumber()) {
+            return node.numberValue().toString();
+        }
+        log.error("It wasn't possible to convert the value of the following JsonNode:" + node.asText());
+        return StringUtils.EMPTY;
+    }
+
+    private JsonNode convertStringJsonToJsonNode(String json) {
+        try {
+            return new ObjectMapper().readTree(json);
+        } catch (JsonProcessingException e) {
+            log.error("Unable to process json response.", e);
+        }
+        return null;
     }
 
 }
