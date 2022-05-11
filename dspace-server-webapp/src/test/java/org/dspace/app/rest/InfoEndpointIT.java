@@ -13,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.app.util.Util;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matcher;
 import org.junit.Test;
@@ -57,7 +56,6 @@ public class InfoEndpointIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get(INFO_PATH))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.app.name", matchProperty("dspace.name")))
-            .andExpect(jsonPath("$.app.version", is(Util.getSourceVersion())))
             .andExpect(jsonPath("$.app.dir", matchProperty("dspace.dir")))
             .andExpect(jsonPath("$.app.url", matchProperty("dspace.server.url")))
             .andExpect(jsonPath("$.app.db", matchProperty("db.url")))
