@@ -257,10 +257,18 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         return null;
     }
 
+    /**
+     * This class is a Callable implementation to count the number of entries for an EPO query.
+     * This Callable use as query value to EPO the string queryString passed to constructor.
+     * If the object will be construct through Query.class instance, the value of the Query's
+     * map with the key "query" will be used.
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class CountRecordsCallable implements Callable<Integer> {
 
-        String bearer;
-        String query;
+        private String bearer;
+        private String query;
 
         private CountRecordsCallable(Query query, String bearer) {
             this.query = query.getParameterAsClass("query", String.class);
@@ -277,9 +285,16 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         }
     }
 
+    /**
+     * This class is a Callable implementation to get an EPO entry using epodocID (epodoc:AB1234567T)
+     * The epodocID to use can be passed through the constructor as a String or as Query's map entry, with the key "id".
+     *
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class SearchByIdCallable implements Callable<List<ImportRecord>> {
-        String bearer;
-        String id;
+
+        private String id;
+        private String bearer;
 
         private SearchByIdCallable(String id, String bearer) {
             this.id = id;
@@ -315,11 +330,20 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         }
     }
 
+    /**
+     * This class is a Callable implementation to get EPO entries based on query object.
+     * This Callable use as query value the string queryString passed to constructor.
+     * If the object will be construct through Query.class instance, a Query's map entry with key "query" will be used.
+     * Pagination is supported too, using the value of the Query's map with keys "start" and "count".
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
+
         private Query query;
-        private String bearer;
         private Integer start;
         private Integer count;
+        private String bearer;
 
         private SearchByQueryCallable(Query query, String bearer) {
             this.query = query;
@@ -481,7 +505,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         List<Object> nodes = xpath.evaluate(document);
         //exactly one element expected for any field
         if (CollectionUtils.isEmpty(nodes)) {
-            return "";
+            return StringUtils.EMPTY;
         } else {
             return getValue(nodes.get(0));
         }

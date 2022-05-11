@@ -113,6 +113,14 @@ public class ADSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         this.apiKey = apiKey;
     }
 
+    /**
+     * This class is a Callable implementation to get ADS entries based on query object.
+     * This Callable use as query value the string queryString passed to constructor.
+     * If the object will be construct through Query.class instance, a Query's map entry with key "query" will be used.
+     * Pagination is supported too, using the value of the Query's map with keys "start" and "count".
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
 
         private Query query;
@@ -137,6 +145,12 @@ public class ADSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         }
     }
 
+    /**
+     * This class is a Callable implementation to get an ADS entry using bibcode
+     * The bibcode to use can be passed through the constructor as a String or as Query's map entry, with the key "id".
+     *
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class SearchByIdCallable implements Callable<List<ImportRecord>> {
         private Query query;
 
@@ -156,6 +170,13 @@ public class ADSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         }
     }
 
+    /**
+     * This class is a Callable implementation to search ADS entries
+     * using author and title and year.
+     * Pagination is supported too, using the value of the Query's map with keys "start" and "count".
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class FindMatchingRecordCallable implements Callable<List<ImportRecord>> {
 
         private Query query;
@@ -176,6 +197,14 @@ public class ADSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     }
 
+    /**
+     * This class is a Callable implementation to count the number of entries for an ADS query.
+     * This Callable use as query value to ADS the string queryString passed to constructor.
+     * If the object will be construct through Query.class instance, the value of the Query's
+     * map with the key "query" will be used.
+     * 
+     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     */
     private class CountByQueryCallable implements Callable<Integer> {
         private Query query;
 

@@ -60,7 +60,7 @@ public class LiveImportClientImpl implements LiveImportClient {
             requestConfigBuilder.setConnectionRequestTimeout(timeout);
             RequestConfig defaultRequestConfig = requestConfigBuilder.build();
 
-            method = new HttpGet(getSearchUrl(URL, params.get(URI_PARAMETERS)));
+            method = new HttpGet(buildUrl(URL, params.get(URI_PARAMETERS)));
             method.setConfig(defaultRequestConfig);
 
             Map<String, String> headerParams = params.get(HEADER_PARAMETERS);
@@ -97,7 +97,7 @@ public class LiveImportClientImpl implements LiveImportClient {
             Builder requestConfigBuilder = RequestConfig.custom();
             RequestConfig defaultRequestConfig = requestConfigBuilder.build();
 
-            method = new HttpPost(getSearchUrl(URL, params.get(URI_PARAMETERS)));
+            method = new HttpPost(buildUrl(URL, params.get(URI_PARAMETERS)));
             method.setConfig(defaultRequestConfig);
             if (StringUtils.isNotBlank(entry)) {
                 method.setEntity(new StringEntity(entry));
@@ -133,6 +133,12 @@ public class LiveImportClientImpl implements LiveImportClient {
         }
     }
 
+    /**
+     * Allows to set the header parameters to the HTTP Post method
+     * 
+     * @param method  HttpPost method
+     * @param params  This map contains the header params to be included in the request.
+     */
     private void setHeaderParams(HttpPost method, Map<String, Map<String, String>> params) {
         Map<String, String> headerParams = params.get(HEADER_PARAMETERS);
         if (MapUtils.isNotEmpty(headerParams)) {
@@ -142,7 +148,16 @@ public class LiveImportClientImpl implements LiveImportClient {
         }
     }
 
-    private String getSearchUrl(String URL, Map<String, String> requestParams) throws URISyntaxException {
+    /**
+     * This method allows you to add the parameters contained in the requestParams map to the URL
+     * 
+     * @param URL                   URL
+     * @param requestParams         This map contains the parameters to be included in the request.
+     *                              Each parameter will be added to the url?(key=value)
+     * @return
+     * @throws URISyntaxException
+     */
+    private String buildUrl(String URL, Map<String, String> requestParams) throws URISyntaxException {
         URIBuilder uriBuilder = new URIBuilder(URL);
         if (MapUtils.isNotEmpty(requestParams)) {
             for (String param : requestParams.keySet()) {

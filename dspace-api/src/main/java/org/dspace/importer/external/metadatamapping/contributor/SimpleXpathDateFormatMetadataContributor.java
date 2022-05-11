@@ -26,6 +26,11 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
 /**
+ * This contributor can be used when parsing an XML file,
+ * particularly to extract a date and convert it to a specific format.
+ * In the variable dateFormatFrom the read format should be configured,
+ * instead in the variable dateFormatTo the format you want to obtain.
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 public class SimpleXpathDateFormatMetadataContributor extends SimpleXpathMetadatumContributor {
