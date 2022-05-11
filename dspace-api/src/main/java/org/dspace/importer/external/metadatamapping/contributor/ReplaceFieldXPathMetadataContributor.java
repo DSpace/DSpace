@@ -72,7 +72,7 @@ public class ReplaceFieldXPathMetadataContributor extends SimpleXpathMetadatumCo
         return dcValue;
     }
 
-    public void setSimpleMapConverter(SimpleConverter simpleConverter) {
+    public void setSimpleConverter(SimpleConverter simpleConverter) {
         this.simpleConverter = simpleConverter;
     }
 
