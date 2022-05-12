@@ -1,4 +1,4 @@
-# Steps to migrate drum 6 database dump to DSpace 7
+# Steps to restore drum 6 database dump to DSpace 7
 
 1. Place the database dump in the `postgres-init` dir
 
@@ -15,13 +15,13 @@
     Check the logs:
 
     ```bash
-    $ docker logs dspacedb
+    $ docker logs -f dspacedb
     ...
     ...
     ... LOG:  database system is ready to accept connections
     ```
 
-3. In a separate terminal, run the migration with ignored migrations enabled using the client image.
+3. In a separate terminal, remove the IRUS migration and related changes.
 
     ```bash
     # To workaround IRUS-UK Patch db migration conflict (LIBDRUM-652)
@@ -29,6 +29,4 @@
     docker exec -it dspacedb psql -U drum -c "DROP TABLE OpenUrlTracker;"
     docker exec -it dspacedb psql -U drum -c "DROP SEQUENCE openurltracker_seq;"
 
-    # Run the migration
-    docker compose -p d7 -f docker-compose-cli.yml run dspace-cli database migrate ignored
     ```

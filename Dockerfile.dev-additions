@@ -7,26 +7,26 @@
 # - maven:3-jdk-8
 # - note:
 # - default tag for branch: dspace/dspace: dspace/dspace:dspace-6_x-jdk8
+#
+# Build: docker build -f Dockerfile.dev-additions -t docker.lib.umd.edu/drum:7_x-dev .
+#
 
 ARG JDK_VERSION=11
 
 # Step 1 - Run Maven Build
-FROM docker.lib.umd.edu/drum-dependencies-7_x:latest as build
+FROM docker.lib.umd.edu/drum:7_x-dev-base as build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
-
-# The dspace-install directory will be written to /install
-RUN mkdir /install \
-    && chown -Rv dspace: /install
 
 USER dspace
 
 # Copy the DSpace source code into the workdir (excluding .dockerignore contents)
-ADD --chown=dspace . /app/
+ADD --chown=dspace dspace/modules/additions /app/dspace/modules/additions
 COPY dspace/src/main/docker/local.cfg /app/local.cfg
 
 # Build DSpace.  Copy the dspace-install directory to /install.  Clean up the build to keep the docker image small
-RUN mvn package -Pdspace-rest && \
+RUN mvn package -rf org.dspace.modules:additions -pl '!org.dspace:dspace-iiif,!org.dspace:dspace-oai,!org.dspace:dspace-rdf,!org.dspace:dspace-sword,!org.dspace:dspace-swordv2' && \
+# RUN mvn package -Pdspace-rest && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
 
