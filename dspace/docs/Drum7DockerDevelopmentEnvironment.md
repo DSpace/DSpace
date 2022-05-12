@@ -31,17 +31,12 @@ using docker.
 4. Build the application and client docker images:
 
     ```bash
-    # Build both images
-    docker compose -f docker-compose.yml -f docker-compose-cli.yml build
-
-    # Build application image only
+    # Build the dspace image
     docker compose -f docker-compose.yml build
 
-    # Build client image only
-    docker compose -f docker-compose-cli.yml build
     ```
 
-5. Follow the instructions at [DRUM7DBMigration.md](./DRUM7DBMigration.md) to migrate DRUM's DSpace 6 DB dump to DSpace 7.
+5. Follow the instructions at [DRUM7DBRestore.md](./DRUM7DBRestore.md) to restore DRUM's DSpace 6 DB dump to DSpace 7.
 
 6. Start all the containers
 
@@ -50,6 +45,32 @@ using docker.
     ```
 
     Once the REST API starts, it should be accessible at [http://localhost:8080/server]
+
+## Quick Builds for development
+
+The cut-short the long build time that is needed to build the entire project, we can do a two stage build where the base build does a full maven build, and for subsequent changes, we can do a build only builds the overlays modules that contain our overriding customization Java classes.
+
+```bash
+# Base build
+docker build -f Dockerfile.dev-base -t docker.lib.umd.edu/drum:7_x-dev-base .
+
+# Overlay modules build
+docker build -f Dockerfile.dev-additions -t docker.lib.umd.edu/drum:7_x-dev .
+```
+
+Also, we can start the dspace container and the dependencies (db & solr) in separate commands. This would allow us to individually stop and start the dspace container.
+
+```bash
+# Start the db and solr container in detached mode
+docker compose -p d7 up -d dspacedb dspacesolr
+
+# Start the dspace container
+docker compose -p d7 up dspace
+```
+
+## Debugging
+
+The `JAVA_TOOL_OPTIONS` configuration included in the docker compose starts the jpda debugger for tomcat. The [.vscode/launch.json](.vscode/launch.json) contains the VS Code debug configuration needed to attach to the tomcat. Follow the instructions at <https://confluence.umd.edu/display/LIB/DSpace+Development+IDE+Setup> to install the necessary extensions to be able to debug.
 
 ## Useful commands
 
@@ -71,6 +92,7 @@ docker exec -it dspace bash
 
 ```bash
 $ docker compose -p d7 -f docker-compose-cli.yml run dspace-cli create-administrator
+$ docker exec -it dspace /dspace/bin/dspace create-administrator
 Creating d7_dspace-cli_run ... done
 Creating an initial administrator account
 E-mail address: <EMAIL_ADDRESS>
@@ -86,7 +108,7 @@ Administrator account created
 ## Populate the Solr search index
 
 ```bash
-$ docker compose -p d7 -f docker-compose-cli.yml run dspace-cli index-discovery
+$ docker exec -it dspace /dspace/bin/dspace index-discovery
 The script has started
 Updating Index
 Done with indexing

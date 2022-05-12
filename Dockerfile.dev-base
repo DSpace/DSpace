@@ -1,0 +1,34 @@
+# This image will be published as dspace/dspace
+# See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
+#
+# This version is JDK8 compatible
+# - maven:3-jdk-8
+# - note:
+# - default tag: docker.lib.umd.edu/drum:7_x-dev-base
+#
+# Build: docker build -f Dockerfile.dev-base -t docker.lib.umd.edu/drum:7_x-dev-base .
+#
+
+ARG JDK_VERSION=11
+
+# Step 1 - Run Maven Build
+FROM docker.lib.umd.edu/drum-dependencies-7_x:latest
+ARG TARGET_DIR=dspace-installer
+WORKDIR /app
+
+# The dspace-install directory will be written to /install
+RUN mkdir /install \
+    && chown -Rv dspace: /install
+
+USER dspace
+
+# Copy the DSpace source code into the workdir (excluding .dockerignore contents)
+ADD --chown=dspace . /app/
+COPY dspace/src/main/docker/local.cfg /app/local.cfg
+
+# Build DSpace.
+# RUN mvn package
+RUN mvn install -Dlicense.skip=true -Dcheckstyle.skip
+
+# RUN mvn install -pl '!org.dspace.modules:additions'
+# RUN mvn package -rf org.dspace.modules:additions
