@@ -8,19 +8,25 @@
 package org.dspace.app.ldn.service;
 
 import static java.lang.String.format;
+
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.ldn.LDNMetadataFields;
 import org.dspace.app.ldn.converter.JsonLdHttpMessageConverter;
 import org.dspace.app.ldn.model.Actor;
 import org.dspace.app.ldn.model.Notification;
@@ -37,6 +43,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
@@ -47,8 +54,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * The service used for requesting to get in touch with 
- * external Review/Endorsement services 
+ * The service used for requesting to get in touch with external
+ * Review/Endorsement services
  * 
  * @author Stefano Maffei (steph-ieffam @ 4Science)
  *
@@ -78,9 +85,16 @@ public class OfferReviewService implements BusinessService {
     }
 
     @Override
-    public void doProcessing(Item item) {
-        Set<String> endpoints = LDNUtils.getMetadataLdnInitialize(item);
-        endpoints.forEach(endpoint -> {
+    public void doProcessing(Context ctx, Item item) {
+        List<MetadataValue> services = LDNUtils.getMetadataValuesLdnInitialize(item);
+        Map<String, MetadataValue> endpoints = new HashMap<>();
+        services.forEach(metadatavalue -> {
+            String serviceInbox = configurationService
+                .getProperty("service." + metadatavalue.getValue() + ".inbox.url");
+            endpoints.put(serviceInbox, metadatavalue);
+        });
+
+        endpoints.forEach((endpoint, metadatum) -> {
 
             log.info("Target LDN Inbox URL {}", endpoint);
             log.info("Requesting review for item {}", item.getID());
@@ -94,6 +108,9 @@ public class OfferReviewService implements BusinessService {
             log.info("DSpace UI URL {}", dspaceUIUrl);
             log.info("DSpace Name {}", dspaceName);
             log.info("DSpace LDN Inbox URL {}", dspaceLdnInboxUrl);
+
+            boolean isEndorsementSupported = configurationService
+                .getBooleanProperty("service." + metadatum.getValue() + ".endorsement.supported", false);
 
             // Build Notification
 
@@ -126,8 +143,10 @@ public class OfferReviewService implements BusinessService {
             origin.setInbox(dspaceLdnInboxUrl);
             origin.addType("Service");
 
+            String serviceName = configurationService
+                .getProperty("service." + metadatum.getValue() + ".name");
             Service target = new Service();
-            target.setId(endpoint);
+            target.setId(serviceName);
             target.setInbox(endpoint);
             target.addType("Service");
 
@@ -141,8 +160,56 @@ public class OfferReviewService implements BusinessService {
 
             log.info("Requesting review {}", request);
 
-            restTemplate.postForLocation(URI.create(target.getInbox()), request);
+            try {
+                restTemplate.postForLocation(URI.create(target.getInbox()), request);
+                itemService.removeMetadataValues(ctx, item, List.of(metadatum));
+                String initializeMessageID = notification.getId();
+                addMetadata(ctx, item, metadatum.getValue(), isEndorsementSupported, initializeMessageID);
+            } catch (Exception e) {
+                log.error("An error occurred while handling metadata or network request on item {}", item);
+                log.error("Error information", e);
+            }
         });
+    }
+
+    /**
+     * @param  ctx
+     * @param  item
+     * @param  value
+     * @param  isEndorsementSupported
+     * @throws SQLException
+     */
+    private void addMetadata(Context ctx, Item item, String service, boolean isEndorsementSupported,
+        String initializeMessageID) throws SQLException {
+
+        String metadataValue = generateMetadataValueForRequestQualifier(service, initializeMessageID);
+        itemService.addMetadata(ctx, item, LDNMetadataFields.SCHEMA, LDNMetadataFields.ELEMENT,
+            LDNMetadataFields.REQUEST_REVIEW, "*", metadataValue);
+        if (isEndorsementSupported) {
+            itemService.addMetadata(ctx, item, LDNMetadataFields.SCHEMA, LDNMetadataFields.ELEMENT,
+                LDNMetadataFields.REQUEST_ENDORSEMENT, "*", metadataValue);
+        }
+    }
+
+    private static String generateMetadataValueForRequestQualifier(String serviceId, String initializeMessageID) {
+        // coar.notify.request
+        StringBuilder builder = new StringBuilder();
+
+        String timestamp = new SimpleDateFormat(LDNUtils.DATE_PATTERN).format(Calendar.getInstance().getTime());
+
+        builder.append(timestamp);
+        builder.append(LDNUtils.METADATA_DELIMITER);
+
+        builder.append(serviceId);
+        builder.append(LDNUtils.METADATA_DELIMITER);
+
+        builder.append(initializeMessageID);
+
+        return builder.toString();
+    }
+
+    public static String generateRandomUrnUUID() {
+        return "urn:uuid:" + UUID.randomUUID().toString();
     }
 
     @Override
@@ -251,8 +318,8 @@ public class OfferReviewService implements BusinessService {
     /**
      * Retrieves the dc.type metadata
      * 
-     * @param item the dspace item 
-     * @return Set<String> the set of metadata values as string
+     * @param  item the dspace item
+     * @return      Set<String> the set of metadata values as string
      */
     private Set<String> getMetadataType(Item item) {
         List<MetadataValue> metadataValues = item.getMetadata();
@@ -268,8 +335,8 @@ public class OfferReviewService implements BusinessService {
     /**
      * Return the mediatype for the given resource
      * 
-     * @param stringPath
-     * @return String the mediatype for the current 
+     * @param  stringPath
+     * @return            String the mediatype for the current
      */
     public String retrieveMimeTypeFromFilePath(String stringPath) {
         String mimeType = "";

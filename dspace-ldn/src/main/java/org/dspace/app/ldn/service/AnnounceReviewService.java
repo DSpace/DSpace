@@ -51,7 +51,7 @@ public class AnnounceReviewService implements BusinessService {
 
     @Autowired
     private ConfigurationService configurationService;
-    
+
     private final RestTemplate restTemplate;
 
     /**
@@ -61,7 +61,7 @@ public class AnnounceReviewService implements BusinessService {
         restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new JsonLdHttpMessageConverter());
     }
-    
+
     /**
      * Announce item release notification.
      * Build and POST announce release notification to configured service LDN
@@ -71,7 +71,7 @@ public class AnnounceReviewService implements BusinessService {
      * @param serviceId service id for targer inbox
      */
     @Override
-    public void doProcessing(Item item) {
+    public void doProcessing(org.dspace.core.Context ctx, Item item) {
         String[] serviceIds = configurationService.getArrayProperty("service.service-id.ldn");
         for (String serviceId : serviceIds) {
             log.info("Announcing release of item {}", item.getID());

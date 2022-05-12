@@ -7,9 +7,7 @@
  */
 package org.dspace.app.ldn.consumer;
 
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -19,8 +17,6 @@ import org.dspace.app.ldn.factory.LDNBusinessDelegateFactory;
 import org.dspace.app.ldn.service.LDNBusinessDelegate;
 import org.dspace.app.ldn.utility.LDNUtils;
 import org.dspace.content.Item;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
@@ -36,8 +32,6 @@ public class LDNOfferConsumer implements Consumer {
 
     private static Set<Item> items;
 
-    private ItemService itemService;
-
     private LDNBusinessDelegate ldnBusinessDelegate;
 
     /**
@@ -47,7 +41,6 @@ public class LDNOfferConsumer implements Consumer {
      */
     @Override
     public void initialize() throws Exception {
-        itemService = ContentServiceFactory.getInstance().getItemService();
         ldnBusinessDelegate = LDNBusinessDelegateFactory.getInstance().getLDNBusinessDelegate();
         if (items == null) {
             items = new HashSet<Item>();
@@ -102,8 +95,7 @@ public class LDNOfferConsumer implements Consumer {
     public void end(Context ctx) throws Exception {
         items.forEach(item -> {
             try {
-                ldnBusinessDelegate.handleRequest("Offer:ReviewAction", item);
-                itemService.removeMetadataValues(ctx, item, LDNUtils.getMetadataValuesLdnInitialize(item));
+                ldnBusinessDelegate.handleRequest("Offer:ReviewAction", ctx, item);
             } catch (Exception e) {
                 log.error("An error occurred while asking review for item {}", item.getID());
             }

@@ -8,6 +8,7 @@
 package org.dspace.app.ldn.service;
 
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -20,13 +21,14 @@ public class LDNBusinessDelegate {
     private BusinessLookUp businessLookUp;
 
     /**
-     * @param serviceName the service name to use
-     * @param item the dspace item
+     * @param  serviceName the service name to use
+     * @param  ctx         the dspace context
+     * @param  item        the dspace item
      * @throws Exception
      */
-    public void handleRequest(String serviceName, Item item) throws Exception{
+    public void handleRequest(String serviceName, Context ctx, Item item) throws Exception {
         BusinessService businessService = businessLookUp.getBusinessService(serviceName);
-        
-        businessService.doProcessing(item); 
+
+        businessService.doProcessing(ctx, item);
     }
 }

@@ -16,11 +16,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.dspace.app.ldn.LDNMetadataFields;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Some linked data notification utilities.
+ * 
+ * @author William Welling
+ * @author Stefano Maffei (4Science.com)
  */
 public class LDNUtils {
 
@@ -28,6 +33,15 @@ public class LDNUtils {
             "\\p{XDigit}{8}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{12}");
 
     private final static String SIMPLE_PROTOCOL_REGEX = "^(http[s]?://www\\.|http[s]?://|www\\.)";
+
+    public final static String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+
+    public final static String METADATA_DELIMITER;
+
+    static {
+        METADATA_DELIMITER = DSpaceServicesFactory.getInstance()
+            .getConfigurationService().getProperty("ldn.metadata.delimiter");
+    }
 
     /**
      * 
@@ -85,16 +99,16 @@ public class LDNUtils {
 
         return resolverId;
     }
-    
+
     public static List<MetadataValue> getMetadataValuesLdnInitialize(Item item) {
         List<MetadataValue> metadataValues = item.getMetadata();
         return metadataValues.stream().filter(metadataValue -> {
-            return metadataValue.getMetadataField().getMetadataSchema().getName().equals("coar") &&
-                metadataValue.getMetadataField().getElement().equals("notify") &&
-                metadataValue.getMetadataField().getQualifier().equals("initialize");
+            return metadataValue.getMetadataField().getMetadataSchema().getName().equals(LDNMetadataFields.SCHEMA) &&
+                metadataValue.getMetadataField().getElement().equals(LDNMetadataFields.ELEMENT) &&
+                metadataValue.getMetadataField().getQualifier().equals(LDNMetadataFields.INITIALIZE);
         }).collect(Collectors.toList());
     }
-    
+
     public static Set<String> getMetadataLdnInitialize(Item item) {
         Set<String> typeSet = getMetadataValuesLdnInitialize(item).stream()
             .map(MetadataValue::getValue).collect(Collectors.toSet());

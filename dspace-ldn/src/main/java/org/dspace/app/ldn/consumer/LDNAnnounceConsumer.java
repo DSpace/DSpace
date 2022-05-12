@@ -145,7 +145,7 @@ public class LDNAnnounceConsumer implements Consumer {
             for (Item item : itemsToRelease) {
                 log.info("Item for release {} {}", item.getID(), item.getName());
                 try {
-                    ldnBusinessDelegate.handleRequest("Announce:ReviewAction", item);
+                    ldnBusinessDelegate.handleRequest("Announce:ReviewAction", context, item);
                 } catch (Exception e) {
                     log.error(format("Failed to announce item %s %s for release",
                             item.getID(), item.getName()), e);

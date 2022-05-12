@@ -8,6 +8,7 @@
 package org.dspace.app.ldn.service;
 
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 
 /**
  * The BusinessService interface defines common methods
@@ -21,10 +22,11 @@ interface BusinessService {
     /**
      * The Service logic
      * 
+     * @param ctx the dspace context
      * @param item the dspace item
      * @throws Exception in any error occurs
      */
-    public void doProcessing(Item item) throws Exception;
+    public void doProcessing(Context ctx, Item item) throws Exception;
 
     /**
      * Returns the service name that identifies the service
