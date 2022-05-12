@@ -60,6 +60,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class MetadataExposureServiceImpl implements MetadataExposureService {
     protected Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataExposureServiceImpl.class);
 
+    private final static Set<String> HARDCODED_HIDDEN_ELEMENTS = Set.of(
+        "dspace.orcid.access-token",
+        "dspace.orcid.refresh-token",
+        "eperson.orcid.access-token",
+        "eperson.orcid.refresh-token");
+
     protected Map<String, Set<String>> hiddenElementSets = null;
     protected Map<String, Map<String, Set<String>>> hiddenElementMaps = null;
 
@@ -132,31 +138,38 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
                 if (key.startsWith(CONFIG_PREFIX)) {
                     if (configurationService.getBooleanProperty(key, true)) {
                         String mdField = key.substring(CONFIG_PREFIX.length());
-                        String segment[] = mdField.split("\\.", 3);
-
-                        // got schema.element.qualifier
-                        if (segment.length == 3) {
-                            Map<String, Set<String>> eltMap = hiddenElementMaps.get(segment[0]);
-                            if (eltMap == null) {
-                                eltMap = new HashMap<String, Set<String>>();
-                                hiddenElementMaps.put(segment[0], eltMap);
-                            }
-                            if (!eltMap.containsKey(segment[1])) {
-                                eltMap.put(segment[1], new HashSet<String>());
-                            }
-                            eltMap.get(segment[1]).add(segment[2]);
-                        } else if (segment.length == 2) { // got schema.element
-                            if (!hiddenElementSets.containsKey(segment[0])) {
-                                hiddenElementSets.put(segment[0], new HashSet<String>());
-                            }
-                            hiddenElementSets.get(segment[0]).add(segment[1]);
-                        } else { // oops..
-                            log.warn("Bad format in hidden metadata directive, field=\"" + mdField + "\", " +
-                                    "config property=" + key);
-                        }
+                        addHiddenElement(key, mdField);
                     }
                 }
             }
+
+            HARDCODED_HIDDEN_ELEMENTS.forEach(element -> addHiddenElement(element, element));
+
+        }
+    }
+
+    private void addHiddenElement(String key, String mdField) {
+        String segment[] = mdField.split("\\.", 3);
+
+        // got schema.element.qualifier
+        if (segment.length == 3) {
+            Map<String, Set<String>> eltMap = hiddenElementMaps.get(segment[0]);
+            if (eltMap == null) {
+                eltMap = new HashMap<String, Set<String>>();
+                hiddenElementMaps.put(segment[0], eltMap);
+            }
+            if (!eltMap.containsKey(segment[1])) {
+                eltMap.put(segment[1], new HashSet<String>());
+            }
+            eltMap.get(segment[1]).add(segment[2]);
+        } else if (segment.length == 2) { // got schema.element
+            if (!hiddenElementSets.containsKey(segment[0])) {
+                hiddenElementSets.put(segment[0], new HashSet<String>());
+            }
+            hiddenElementSets.get(segment[0]).add(segment[1]);
+        } else { // oops..
+            log.warn("Bad format in hidden metadata directive, field=\"" + mdField + "\", " +
+                "config property=" + key);
         }
     }
 }
