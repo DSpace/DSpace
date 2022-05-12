@@ -281,6 +281,9 @@
     <field name="SolrIndexer.lastIndexed" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
     <field name="lastModified" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
 
+    <!-- used to filter out items that are older versions of another item -->
+    <field name="latestVersion" type="boolean" indexed="true" stored="true" default="true" multiValued="false" omitNorms="true"/>
+
      <!-- Dynamic field used to store the relation metadata as a keywordFilter -->
      <dynamicField name="relation.*" type="keywordFilter" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
 
