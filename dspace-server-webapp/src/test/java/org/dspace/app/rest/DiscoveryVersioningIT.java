@@ -10,6 +10,8 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.content.Relationship.LatestVersionStatus.BOTH;
+import static org.dspace.content.Relationship.LatestVersionStatus.LEFT_ONLY;
+import static org.dspace.content.Relationship.LatestVersionStatus.RIGHT_ONLY;
 import static org.dspace.util.RelationshipVersioningUtils.isRel;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -24,6 +26,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 
 import org.apache.commons.lang3.function.FailableFunction;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
@@ -47,6 +53,8 @@ import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SolrSearchCore;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.versioning.Version;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -70,6 +78,9 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private IndexingService indexingService;
+
+    @Autowired
+    private SolrSearchCore solrSearchCore;
 
     @Autowired
     private ItemService itemService;
@@ -170,7 +181,9 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.type", is("discover")))
             .andExpect(jsonPath("$._embedded.searchResult.page", is(
                 // assume everything fits on one page
-                PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, searchResultMatchers.size())
+                PageMatcher.pageEntryWithTotalPagesAndElements(
+                    0, 20, searchResultMatchers.size() == 0 ? 0 : 1, searchResultMatchers.size()
+                )
             )))
             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                 searchResultMatchers
@@ -193,6 +206,20 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     protected void verifyNotIndexed(Item item) throws Exception {
         DiscoverResult searchResult = getItemSearchResult(item);
         Assert.assertEquals(0, searchResult.getTotalSearchResults());
+    }
+
+    protected void verifySolrField(Item item, String fieldName, List<Object> expectedValues) throws Exception {
+        QueryResponse result = solrSearchCore.getSolr().query(new SolrQuery(String.format(
+            "search.resourcetype:\"Item\" AND search.resourceid:\"%s\"", item.getID()
+        )));
+
+        SolrDocumentList docs = result.getResults();
+        Assert.assertEquals(1, docs.size());
+        SolrDocument doc = docs.get(0);
+
+        java.util.Collection<Object> actualValues = doc.getFieldValues(fieldName);
+
+        assertThat(actualValues, containsInAnyOrder(expectedValues.toArray()));
     }
 
     protected Item createNewVersion(Item currentItem, String newTitle) throws Exception {
@@ -1029,12 +1056,14 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
             .withTitle("publication 1")
             .withMetadata("dspace", "entity", "type", publicationEntityType.getLabel())
             .build();
+        String idPub1_1 = pub1_1.getID().toString();
 
         // create project 1.1
         Item pro1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("project 1")
             .withMetadata("dspace", "entity", "type", projectEntityType.getLabel())
             .build();
+        String idPro1_1 = pro1_1.getID().toString();
 
         // create relationship between publication 1.1 and project 1.1
         RelationshipBuilder.createRelationshipBuilder(context, pub1_1, pro1_1, isProjectOfPublication)
@@ -1075,7 +1104,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // init - search for related items of publication 1.1
         verifyRestSearchObjects(
             null, "project-relationships",
-            (r) -> r.param("f.isPublicationOfProject", pub1_1.getID() + ",equals"),
+            (r) -> r.param("f.isPublicationOfProject", idPub1_1 + ",equals"),
             List.of(
                 matchSearchResult(pro1_1, "project 1")
             )
@@ -1084,18 +1113,369 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         // init - search for related items of project 1.1
         verifyRestSearchObjects(
             null, "publication-relationships",
-            (r) -> r.param("f.isProjectOfPublication", pro1_1.getID() + ",equals"),
+            (r) -> r.param("f.isProjectOfPublication", idPro1_1 + ",equals"),
             List.of(
                 matchSearchResult(pub1_1, "publication 1")
             )
         );
 
-        // TODO create pub1.2 => create pro1.2
+        // create new version of publication 1.1 => publication 1.2
+        context.turnOffAuthorisationSystem();
+        Item pub1_2 = VersionBuilder.createVersion(context, pub1_1, "pub 1.2").build().getItem();
+        String idPub1_2 = pub1_2.getID().toString();
+        context.commit();
+        indexingService.commit();
+        Assert.assertNotEquals(pub1_1, pub1_2);
+        installItemService.installItem(context, workspaceItemService.findByItem(context, pub1_2));
+        context.commit();
+        indexingService.commit();
+        context.restoreAuthSystemState();
 
-        // TODO test relationships
-        // TODO test relation.* mdvs via itemService
-        // TODO test discovery endpoint
+        // TODO temp => force reindex
+        indexingService.indexContent(context, new IndexableItem(pub1_1));
+        indexingService.indexContent(context, new IndexableItem(pub1_2));
+        indexingService.indexContent(context, new IndexableItem(pro1_1));
+        indexingService.updateIndex(context, true);
+        context.commit();
+        indexingService.commit();
 
+        // cache busting
+        pub1_1 = context.reloadEntity(pub1_1);
+        pub1_2 = context.reloadEntity(pub1_2);
+        pro1_1 = context.reloadEntity(pro1_1);
+
+        // after archive pub 1.2 - test relationships of publication 1.1
+        assertThat(
+            relationshipService.findByItem(context, pub1_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0)
+            ))
+        );
+
+        // after archive pub 1.2 - test relationships of publication 1.2
+        assertThat(
+            relationshipService.findByItem(context, pub1_2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(pub1_2, isProjectOfPublication, pro1_1, BOTH, 0, 0)
+            ))
+        );
+
+        // after archive pub 1.2 - test relationships of project 1.1
+        assertThat(
+            relationshipService.findByItem(context, pro1_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0),
+                isRel(pub1_2, isProjectOfPublication, pro1_1, BOTH, 0, 0)
+            ))
+        );
+
+        // after archive pub 1.2 - test relation.* metadata of publication 1.1
+        List<MetadataValue> mdvs3 = itemService
+            .getMetadata(pub1_1, "relation", "isProjectOfPublication", null, Item.ANY);
+        Assert.assertEquals(1, mdvs3.size());
+        assertEquals(pro1_1.getID().toString(), mdvs3.get(0).getValue());
+        assertEquals(0, mdvs3.get(0).getPlace());
+        verifySolrField(pub1_1, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
+
+        // after archive pub 1.2 - test relation.* metadata of publication 1.2
+        List<MetadataValue> mdvs4 = itemService
+            .getMetadata(pub1_2, "relation", "isProjectOfPublication", null, Item.ANY);
+        Assert.assertEquals(1, mdvs4.size());
+        assertEquals(pro1_1.getID().toString(), mdvs4.get(0).getValue());
+        assertEquals(0, mdvs4.get(0).getPlace());
+        verifySolrField(pub1_2, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
+
+        // after archive pub 1.2 - test relation.* metadata of project 1.1
+        List<MetadataValue> mdvs5 = itemService
+            .getMetadata(pro1_1, "relation", "isPublicationOfProject", null, Item.ANY);
+        Assert.assertEquals(1, mdvs5.size());
+        assertEquals(pub1_2.getID().toString(), mdvs5.get(0).getValue());
+        assertEquals(0, mdvs5.get(0).getPlace());
+        verifySolrField(pro1_1, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
+
+        // after archive pub 1.2 - search for related items of publication 1.1
+        verifyRestSearchObjects(
+            null, "project-relationships",
+            (r) -> r.param("f.isPublicationOfProject", idPub1_1 + ",equals"),
+            List.of()
+        );
+
+        // after archive pub 1.2 - search for related items of publication 1.2
+        verifyRestSearchObjects(
+            null, "project-relationships",
+            (r) -> r.param("f.isPublicationOfProject", idPub1_2 + ",equals"),
+            List.of(
+                matchSearchResult(pro1_1, "project 1")
+            )
+        );
+
+        // after archive pub 1.2 - search for related items of project 1.1
+        verifyRestSearchObjects(
+            null, "publication-relationships",
+            (r) -> r.param("f.isProjectOfPublication", idPro1_1 + ",equals"),
+            List.of(
+                matchSearchResult(pub1_1, "publication 1"),
+                matchSearchResult(pub1_2, "publication 1")
+            )
+        );
+
+        // create new version of project 1.1 => project 1.2 BUT DON'T ARCHIVE YET
+        context.turnOffAuthorisationSystem();
+        Item pro1_2 = VersionBuilder.createVersion(context, context.reloadEntity(pro1_1), "pro 1.2").build().getItem();
+        String idPro1_2 = pro1_2.getID().toString();
+        context.commit();
+        indexingService.commit();
+        Assert.assertNotEquals(pro1_1, pro1_2);
+        context.restoreAuthSystemState();
+
+        // TODO temp => force reindex
+        indexingService.indexContent(context, new IndexableItem(pub1_1));
+        indexingService.indexContent(context, new IndexableItem(pub1_2));
+        indexingService.indexContent(context, new IndexableItem(pro1_1));
+        indexingService.indexContent(context, new IndexableItem(context.reloadEntity(pro1_2)));
+        indexingService.updateIndex(context, true);
+        context.commit();
+        indexingService.commit();
+
+        // cache busting
+        pub1_1 = context.reloadEntity(pub1_1);
+        pub1_2 = context.reloadEntity(pub1_2);
+        pro1_1 = context.reloadEntity(pro1_1);
+        pro1_2 = context.reloadEntity(pro1_2);
+
+        // after create pro 1.2 - test relationships of publication 1.1
+        assertThat(
+            relationshipService.findByItem(context, pub1_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0)
+            ))
+        );
+
+        // after create pro 1.2 - test relationships of publication 1.2
+        assertThat(
+            relationshipService.findByItem(context, pub1_2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(pub1_2, isProjectOfPublication, pro1_1, BOTH, 0, 0),
+                isRel(pub1_2, isProjectOfPublication, pro1_2, LEFT_ONLY, 0, 0)
+            ))
+        );
+
+        // after create pro 1.2 - test relationships of project 1.1
+        assertThat(
+            relationshipService.findByItem(context, pro1_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0),
+                isRel(pub1_2, isProjectOfPublication, pro1_1, BOTH, 0, 0)
+            ))
+        );
+
+        // after create pro 1.2 - test relationships of project 1.2
+        assertThat(
+            relationshipService.findByItem(context, pro1_2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(pub1_2, isProjectOfPublication, pro1_2, LEFT_ONLY, 0, 0)
+            ))
+        );
+
+        // after create pro 1.2 - test relation.* metadata of publication 1.1
+        List<MetadataValue> mdvs6 = itemService
+            .getMetadata(pub1_1, "relation", "isProjectOfPublication", null, Item.ANY);
+        Assert.assertEquals(1, mdvs6.size());
+        assertEquals(pro1_1.getID().toString(), mdvs6.get(0).getValue());
+        assertEquals(0, mdvs6.get(0).getPlace());
+        verifySolrField(pub1_1, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
+
+        // after create pro 1.2 - test relation.* metadata of publication 1.2
+        List<MetadataValue> mdvs7 = itemService
+            .getMetadata(pub1_2, "relation", "isProjectOfPublication", null, Item.ANY);
+        Assert.assertEquals(1, mdvs7.size());
+        assertEquals(pro1_1.getID().toString(), mdvs7.get(0).getValue());
+        assertEquals(0, mdvs7.get(0).getPlace());
+        verifySolrField(pub1_2, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
+
+        // after create pro 1.2 - test relation.* metadata of project 1.1
+        List<MetadataValue> mdvs8 = itemService
+            .getMetadata(pro1_1, "relation", "isPublicationOfProject", null, Item.ANY);
+        Assert.assertEquals(1, mdvs8.size());
+        assertEquals(pub1_2.getID().toString(), mdvs8.get(0).getValue());
+        assertEquals(0, mdvs8.get(0).getPlace());
+        verifySolrField(pro1_1, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
+
+        // after create pro 1.2 - test relation.* metadata of project 1.2
+        List<MetadataValue> mdvs9 = itemService
+            .getMetadata(pro1_2, "relation", "isPublicationOfProject", null, Item.ANY);
+        Assert.assertEquals(1, mdvs9.size());
+        assertEquals(pub1_2.getID().toString(), mdvs9.get(0).getValue());
+        assertEquals(0, mdvs9.get(0).getPlace());
+        verifySolrField(pro1_2, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
+
+        // after create pro 1.2 - search for related items of publication 1.1
+        verifyRestSearchObjects(
+            null, "project-relationships",
+            (r) -> r.param("f.isPublicationOfProject", idPub1_1 + ",equals"),
+            List.of()
+        );
+
+        // after create pro 1.2 - search for related items of publication 1.2 (ANONYMOUS)
+        verifyRestSearchObjects(
+            null, "project-relationships",
+            (r) -> r.param("f.isPublicationOfProject", idPub1_2 + ",equals"),
+            List.of(
+                matchSearchResult(pro1_1, "project 1")
+                // NOTE: project 1.2 is not yet visible for anonymous users
+            )
+        );
+
+        // after create pro 1.2 - search for related items of publication 1.2 (ADMIN)
+        verifyRestSearchObjects(
+            getAuthToken(admin.getEmail(), password), "project-relationships",
+            (r) -> r.param("f.isPublicationOfProject", idPub1_2 + ",equals"),
+            List.of(
+                matchSearchResult(pro1_1, "project 1"),
+                // NOTE: project 1.2 is already visible for admin users
+                matchSearchResult(pro1_2, "project 1")
+            )
+        );
+
+        // after create pro 1.2 - search for related items of project 1.1
+        verifyRestSearchObjects(
+            null, "publication-relationships",
+            (r) -> r.param("f.isProjectOfPublication", idPro1_1 + ",equals"),
+            List.of(
+                matchSearchResult(pub1_1, "publication 1"),
+                matchSearchResult(pub1_2, "publication 1")
+            )
+        );
+
+        // after create pro 1.2 - search for related items of project 1.2
+        verifyRestSearchObjects(
+            null, "publication-relationships",
+            (r) -> r.param("f.isProjectOfPublication", idPro1_2 + ",equals"),
+            List.of()
+        );
+
+        // archive project 1.2
+        context.turnOffAuthorisationSystem();
+        installItemService.installItem(context, workspaceItemService.findByItem(context, pro1_2));
+        context.commit();
+        indexingService.commit();
+        context.restoreAuthSystemState();
+
+        // TODO temp => force reindex
+        indexingService.indexContent(context, new IndexableItem(pub1_1));
+        indexingService.indexContent(context, new IndexableItem(pub1_2));
+        indexingService.indexContent(context, new IndexableItem(pro1_1));
+        indexingService.indexContent(context, new IndexableItem(pro1_2));
+        indexingService.updateIndex(context, true);
+        context.commit();
+        indexingService.commit();
+
+        // cache busting
+        pub1_1 = context.reloadEntity(pub1_1);
+        pub1_2 = context.reloadEntity(pub1_2);
+        pro1_1 = context.reloadEntity(pro1_1);
+        pro1_2 = context.reloadEntity(pro1_2);
+
+        // after archive pro 1.2 - test relationships of publication 1.1
+        assertThat(
+            relationshipService.findByItem(context, pub1_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0)
+            ))
+        );
+
+        // after archive pro 1.2 - test relationships of publication 1.2
+        assertThat(
+            relationshipService.findByItem(context, pub1_2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(pub1_2, isProjectOfPublication, pro1_1, LEFT_ONLY, 0, 0),
+                isRel(pub1_2, isProjectOfPublication, pro1_2, BOTH, 0, 0)
+            ))
+        );
+
+        // after archive pro 1.2 - test relationships of project 1.1
+        assertThat(
+            relationshipService.findByItem(context, pro1_1, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0),
+                isRel(pub1_2, isProjectOfPublication, pro1_1, LEFT_ONLY, 0, 0)
+            ))
+        );
+
+        // after archive pro 1.2 - test relationships of project 1.2
+        assertThat(
+            relationshipService.findByItem(context, pro1_2, -1, -1, false, false),
+            containsInAnyOrder(List.of(
+                isRel(pub1_2, isProjectOfPublication, pro1_2, BOTH, 0, 0)
+            ))
+        );
+
+        // after archive pro 1.2 - test relation.* metadata of publication 1.1
+        List<MetadataValue> mdvs10 = itemService
+            .getMetadata(pub1_1, "relation", "isProjectOfPublication", null, Item.ANY);
+        Assert.assertEquals(1, mdvs10.size());
+        assertEquals(pro1_1.getID().toString(), mdvs10.get(0).getValue());
+        assertEquals(0, mdvs10.get(0).getPlace());
+        verifySolrField(pub1_1, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
+
+        // after archive pro 1.2 - test relation.* metadata of publication 1.2
+        List<MetadataValue> mdvs11 = itemService
+            .getMetadata(pub1_2, "relation", "isProjectOfPublication", null, Item.ANY);
+        Assert.assertEquals(1, mdvs11.size());
+        assertEquals(pro1_2.getID().toString(), mdvs11.get(0).getValue());
+        assertEquals(0, mdvs11.get(0).getPlace());
+        verifySolrField(pub1_2, "relation.isProjectOfPublication", List.of(pro1_2.getID().toString()));
+
+        // after archive pro 1.2 - test relation.* metadata of project 1.1
+        List<MetadataValue> mdvs12 = itemService
+            .getMetadata(pro1_1, "relation", "isPublicationOfProject", null, Item.ANY);
+        Assert.assertEquals(1, mdvs12.size());
+        assertEquals(pub1_2.getID().toString(), mdvs12.get(0).getValue());
+        assertEquals(0, mdvs12.get(0).getPlace());
+        verifySolrField(pro1_1, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
+
+        // after archive pro 1.2 - test relation.* metadata of project 1.2
+        List<MetadataValue> mdvs13 = itemService
+            .getMetadata(pro1_2, "relation", "isPublicationOfProject", null, Item.ANY);
+        Assert.assertEquals(1, mdvs13.size());
+        assertEquals(pub1_2.getID().toString(), mdvs13.get(0).getValue());
+        assertEquals(0, mdvs13.get(0).getPlace());
+        verifySolrField(pro1_2, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
+
+        // after archive pro 1.2 - search for related items of publication 1.1
+        verifyRestSearchObjects(
+            null, "project-relationships",
+            (r) -> r.param("f.isPublicationOfProject", idPub1_1 + ",equals"),
+            List.of()
+        );
+
+        // after archive pro 1.2 - search for related items of publication 1.2
+        verifyRestSearchObjects(
+            null, "project-relationships",
+            (r) -> r.param("f.isPublicationOfProject", idPub1_2 + ",equals"),
+            List.of(
+                matchSearchResult(pro1_1, "project 1"),
+                matchSearchResult(pro1_2, "project 1")
+            )
+        );
+
+        // after archive pro 1.2 - search for related items of project 1.1
+        verifyRestSearchObjects(
+            null, "publication-relationships",
+            (r) -> r.param("f.isProjectOfPublication", idPro1_1 + ",equals"),
+            List.of(
+                matchSearchResult(pub1_1, "publication 1")
+            )
+        );
+
+        // after archive pro 1.2 - search for related items of project 1.2
+        verifyRestSearchObjects(
+            null, "publication-relationships",
+            (r) -> r.param("f.isProjectOfPublication", idPro1_2 + ",equals"),
+            List.of(
+                matchSearchResult(pub1_2, "publication 1")
+            )
+        );
     }
 
 }
