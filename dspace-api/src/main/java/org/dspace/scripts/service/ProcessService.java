@@ -33,7 +33,8 @@ public interface ProcessService {
      * @param ePerson       The ePerson for which this process will be created on
      * @param scriptName    The script name to be used for the process
      * @param parameters    The parameters to be used for the process
-     * @param specialGroups List Of special groups to be stored together with the process
+     * @param specialGroups Allows to set special groups, associated with application context when process is created,
+     *                      other than the ones derived from the eperson membership.
      * @return The created process
      * @throws SQLException If something goes wrong
      */
