@@ -15,7 +15,7 @@
     Check the logs:
 
     ```bash
-    $ docker logs dspacedb
+    $ docker logs -f dspacedb
     ...
     ...
     ... LOG:  database system is ready to accept connections
