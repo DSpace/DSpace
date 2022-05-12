@@ -33,8 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * This test suite includes static test with mock data and end to end test to
  * verify the integration with ORCID as an External Source. The end to end test
- * run only if the orcid.clientid property is configured but of course also
- * orcid.clientsecret is needed to successful run the tests. This can be enabled
+ * run only if the orcid.application-client-id property is configured but of course also
+ * orcid.application-client-secret is needed to successful run the tests. This can be enabled
  * setting the orcid credentials via env variables, see the comments in the
  * override section of the config-definition.xml
  * 
@@ -50,7 +50,7 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
     private OrcidV3AuthorDataProvider orcidV3AuthorDataProvider;
 
     public void onlyRunIfConfigExists() {
-        if (StringUtils.isBlank(configurationService.getProperty("orcid.clientid"))) {
+        if (StringUtils.isBlank(configurationService.getProperty("orcid.application-client-id"))) {
             Assume.assumeNoException(new IllegalStateException("Missing ORCID credentials"));
         }
     }

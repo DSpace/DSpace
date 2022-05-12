@@ -256,7 +256,8 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
     private Optional<Collection> findProfileCollection(Context context) throws SQLException, SearchServiceException {
         UUID uuid = UUIDUtils.fromString(configurationService.getProperty("researcher-profile.collection.uuid"));
         if (uuid != null) {
-            return ofNullable(collectionService.find(context, uuid));
+            return ofNullable(collectionService.find(context, uuid))
+                .filter(this::isProfileCollection);
         }
 
         String profileType = getProfileType();
@@ -299,6 +300,11 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         authorizeService.addPolicy(context, item, READ, ePerson);
 
         return reloadItem(context, item);
+    }
+
+    private boolean isProfileCollection(Collection collection) {
+        String entityType = collectionService.getMetadataFirstValue(collection, "dspace", "entity", "type", Item.ANY);
+        return entityType != null && entityType.equals(getProfileType());
     }
 
     private boolean isHardDeleteEnabled() {
