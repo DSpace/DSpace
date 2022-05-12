@@ -138,7 +138,7 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
                         metadataValue.add(nodeValue);
                     }
                 }
-            } else if (StringUtils.isNotBlank(node.toString())) {
+            } else if (!node.isNull() && StringUtils.isNotBlank(node.toString())) {
                 String nodeValue = getStringValue(node);
                 if (StringUtils.isNotBlank(nodeValue)) {
                     metadataValue.add(nodeValue);
