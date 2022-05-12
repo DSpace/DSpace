@@ -73,8 +73,7 @@ public class LDNOfferConsumer implements Consumer {
 
         if (subjectType == Constants.ITEM) {
 
-            if (eventType == Event.MODIFY ||
-                eventType == Event.MODIFY_METADATA ||
+            if (eventType == Event.MODIFY_METADATA ||
                 eventType == Event.INSTALL) {
 
                 Item item = (Item) event.getSubject(ctx);
