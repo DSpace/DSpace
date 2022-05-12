@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import javax.el.MethodNotFoundException;
 
@@ -306,10 +307,12 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
     private List<ImportRecord> extractMetadataFromRecordList(String records) {
         List<ImportRecord> recordsResult = new ArrayList<>();
         JsonNode jsonNode = convertStringJsonToJsonNode(records);
-        Iterator<JsonNode> nodes = jsonNode.get("records").iterator();
-        while (nodes.hasNext()) {
-            JsonNode node = nodes.next();
-            recordsResult.add(transformSourceRecords(node.toString()));
+        JsonNode node = jsonNode.get("records");
+        if (Objects.nonNull(node) && node.isArray()) {
+            Iterator<JsonNode> nodes = node.iterator();
+            while (nodes.hasNext()) {
+                recordsResult.add(transformSourceRecords(nodes.next().toString()));
+            }
         }
         return recordsResult;
     }
