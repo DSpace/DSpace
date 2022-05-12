@@ -28,7 +28,7 @@ services:
       # proxies.trusted.ipranges: This setting is required for a REST API running in Docker to trust requests
       # from the host machine. This IP range MUST correspond to the 'dspacenet' subnet defined above.
       proxies__P__trusted__P__ipranges: '172.23.0'
-      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+      JPDA_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
     image: "docker.lib.umd.edu/drum:${DSPACE_VER:-7_x-dev}"
     build:
       context: .
@@ -60,7 +60,7 @@ services:
     - |
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate ignored
-      catalina.sh run
+      catalina.sh jpda run
   # DSpace database container
   dspacedb:
     container_name: dspacedb
