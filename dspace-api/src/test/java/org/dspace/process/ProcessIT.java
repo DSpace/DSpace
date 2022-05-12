@@ -51,13 +51,7 @@ public class ProcessIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         Process process = processService.find(context, processA.getID());
         List<Group> groups = process.getGroups();
-        boolean isPresent = false;
-
-        for (Group group : groups) {
-            if (group.getID().equals(groupA.getID())) {
-                isPresent = true;
-            }
-        }
+        boolean isPresent = groups.stream().anyMatch(g -> g.getID().equals(groupA.getID()));
         assertTrue(isPresent);
     }
 
@@ -70,7 +64,6 @@ public class ProcessIT extends AbstractIntegrationTestWithDatabase {
             .addMember(admin).build();
 
         UUID groupUuid = groupA.getID();
-//        context.setSpecialGroup(groupA.getID());
         Process processA = ProcessBuilder.createProcess(context, admin, "mock-script", new LinkedList<>(),
                                                         Collections.singletonList(groupA)).build();
 
@@ -83,12 +76,7 @@ public class ProcessIT extends AbstractIntegrationTestWithDatabase {
 
         Process process = processService.find(context, processA.getID());
         List<Group> groups = process.getGroups();
-        boolean isPresent = false;
-        for (Group group : groups) {
-            if (group.getID().equals(groupUuid)) {
-                isPresent = true;
-            }
-        }
+        boolean isPresent = groups.stream().anyMatch(g -> g.getID().equals(groupUuid));
         assertFalse(isPresent);
 
     }

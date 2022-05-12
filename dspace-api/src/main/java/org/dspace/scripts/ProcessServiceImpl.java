@@ -86,10 +86,9 @@ public class ProcessServiceImpl implements ProcessService {
         process.setCreationTime(new Date());
         Optional.ofNullable(specialGroups)
             .ifPresent(sg -> {
+                // we use a set to be sure no duplicated special groups are stored with process
                 Set<Group> specialGroupsSet = new HashSet<>(sg);
-                for (Group group : specialGroupsSet) {
-                    process.addGroup(group);
-                }
+                process.setGroups(new ArrayList<>(specialGroupsSet));
             });
 
         Process createdProcess = processDAO.create(context, process);

@@ -85,7 +85,7 @@ public class Process implements ReloadableEntity<Integer> {
         joinColumns = {@JoinColumn(name = "process_id")},
         inverseJoinColumns = {@JoinColumn(name = "group_id")}
     )
-    private final List<Group> groups = new ArrayList<>();
+    private List<Group> groups;
 
     @Column(name = "creation_time", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -225,8 +225,8 @@ public class Process implements ReloadableEntity<Integer> {
         return groups;
     }
 
-    public void addGroup(Group group) {
-        this.groups.add(group);
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
     }
 
     /**
