@@ -54,7 +54,6 @@ import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SolrSearchCore;
-import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.versioning.Version;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -1131,14 +1130,6 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         indexingService.commit();
         context.restoreAuthSystemState();
 
-        // TODO temp => force reindex
-        indexingService.indexContent(context, new IndexableItem(pub1_1));
-        indexingService.indexContent(context, new IndexableItem(pub1_2));
-        indexingService.indexContent(context, new IndexableItem(pro1_1));
-        indexingService.updateIndex(context, true);
-        context.commit();
-        indexingService.commit();
-
         // cache busting
         pub1_1 = context.reloadEntity(pub1_1);
         pub1_2 = context.reloadEntity(pub1_2);
@@ -1227,15 +1218,6 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         indexingService.commit();
         Assert.assertNotEquals(pro1_1, pro1_2);
         context.restoreAuthSystemState();
-
-        // TODO temp => force reindex
-        indexingService.indexContent(context, new IndexableItem(pub1_1));
-        indexingService.indexContent(context, new IndexableItem(pub1_2));
-        indexingService.indexContent(context, new IndexableItem(pro1_1));
-        indexingService.indexContent(context, new IndexableItem(context.reloadEntity(pro1_2)));
-        indexingService.updateIndex(context, true);
-        context.commit();
-        indexingService.commit();
 
         // cache busting
         pub1_1 = context.reloadEntity(pub1_1);
@@ -1360,15 +1342,6 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         context.commit();
         indexingService.commit();
         context.restoreAuthSystemState();
-
-        // TODO temp => force reindex
-        indexingService.indexContent(context, new IndexableItem(pub1_1));
-        indexingService.indexContent(context, new IndexableItem(pub1_2));
-        indexingService.indexContent(context, new IndexableItem(pro1_1));
-        indexingService.indexContent(context, new IndexableItem(pro1_2));
-        indexingService.updateIndex(context, true);
-        context.commit();
-        indexingService.commit();
 
         // cache busting
         pub1_1 = context.reloadEntity(pub1_1);
