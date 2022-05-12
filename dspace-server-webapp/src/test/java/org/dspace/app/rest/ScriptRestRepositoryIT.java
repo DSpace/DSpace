@@ -564,7 +564,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             getClient(token).perform(post("/api/system/scripts/mock-script/processes")
                                          .contentType("multipart/form-data")
-                                         .param("properties", new Gson().toJson(list)))
+                                         .param("properties", new ObjectMapper().writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(ProcessMatcher.matchProcess("mock-script",
                                                                         String.valueOf(admin.getID()),
@@ -573,12 +573,12 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
             Process process = processService.find(context, idRef.get());
             List<Group> groups = process.getGroups();
-            boolean isPresent = false;
-            for (Group group : groups) {
-                if (group.getID().equals(specialGroup.getID())) {
-                    isPresent = true;
-                }
-            }
+            boolean isPresent = groups.stream().anyMatch(g -> g.getID().equals(specialGroup.getID()));
+//            for (Group group : groups) {
+//                if (group.getID().equals(specialGroup.getID())) {
+//                    isPresent = true;
+//                }
+//            }
             assertTrue(isPresent);
 
         } finally {
