@@ -1289,7 +1289,9 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         Assert.assertEquals(1, mdvs9.size());
         assertEquals(pub1_2.getID().toString(), mdvs9.get(0).getValue());
         assertEquals(0, mdvs9.get(0).getPlace());
-        verifySolrField(pro1_2, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
+        // NOTE: project 1.2 is still in the workspace,
+        //       so it should not be indexed as an item (see ItemIndexFactory#getIndexableObjects)
+        verifyNotIndexed(pro1_2);
 
         // after create pro 1.2 - search for related items of publication 1.1
         verifyRestSearchObjects(
@@ -1304,18 +1306,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
             (r) -> r.param("f.isPublicationOfProject", idPub1_2 + ",equals"),
             List.of(
                 matchSearchResult(pro1_1, "project 1")
-                // NOTE: project 1.2 is not yet visible for anonymous users
-            )
-        );
-
-        // after create pro 1.2 - search for related items of publication 1.2 (ADMIN)
-        verifyRestSearchObjects(
-            getAuthToken(admin.getEmail(), password), "project-relationships",
-            (r) -> r.param("f.isPublicationOfProject", idPub1_2 + ",equals"),
-            List.of(
-                matchSearchResult(pro1_1, "project 1"),
-                // NOTE: project 1.2 is already visible for admin users
-                matchSearchResult(pro1_2, "project 1")
+                // NOTE: project 1.2 is still in the workspace
             )
         );
 

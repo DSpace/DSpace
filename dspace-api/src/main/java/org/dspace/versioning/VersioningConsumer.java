@@ -7,6 +7,9 @@
  */
 package org.dspace.versioning;
 
+import static org.dspace.versioning.utils.RelationshipVersioningUtils.LatestVersionStatusChangelog.LEFT_SIDE_CHANGED;
+import static org.dspace.versioning.utils.RelationshipVersioningUtils.LatestVersionStatusChangelog.RIGHT_SIDE_CHANGED;
+
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
@@ -29,11 +32,13 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexEventConsumer;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.utils.RelationshipVersioningUtils;
+import org.dspace.versioning.utils.RelationshipVersioningUtils.LatestVersionStatusChangelog;
 
 /**
  * When a new version of an item is published, unarchive the previous version and
@@ -235,7 +240,9 @@ public class VersioningConsumer implements Consumer {
                     // because either the relationship has been deleted from the new version of the item (no match),
                     // or the matching relationship (linked to new version) will receive "latest" status in
                     // the next step.
-                    relationshipVersioningUtils.updateLatestVersionStatus(previousItemRelationship, isLeft, false);
+                    LatestVersionStatusChangelog changelog =
+                        relationshipVersioningUtils.updateLatestVersionStatus(previousItemRelationship, isLeft, false);
+                    reindexRelationship(ctx, changelog, previousItemRelationship);
                 }
 
                 if (latestItemRelationship != null) {
@@ -243,9 +250,41 @@ public class VersioningConsumer implements Consumer {
                     // This implies that the new version of the item will appear on the page of the third-party item.
                     // The old version of the item will not appear anymore on the page of the third-party item,
                     // see previous step.
-                    relationshipVersioningUtils.updateLatestVersionStatus(latestItemRelationship, isLeft, true);
+                    LatestVersionStatusChangelog changelog =
+                        relationshipVersioningUtils.updateLatestVersionStatus(latestItemRelationship, isLeft, true);
+                    reindexRelationship(ctx, changelog, latestItemRelationship);
                 }
             }
+        }
+    }
+
+    /**
+     * Fire an "item modified" event for the left or right item of the given relationship,
+     * based on how {@link Relationship#latestVersionStatus} of the relationship has changed.
+     * The event will cause the item to be re-indexed by the {@link IndexEventConsumer}.
+     * @param ctx the DSpace context.
+     * @param changelog indicates which side of the relationship has changed.
+     * @param relationship the relationship.
+     */
+    protected void reindexRelationship(
+        Context ctx, LatestVersionStatusChangelog changelog, Relationship relationship
+    ) {
+        if (changelog == LEFT_SIDE_CHANGED) {
+            // latest status of left item has been modified => reindex right item
+            Item rightItem = relationship.getRightItem();
+            itemsToProcess.add(rightItem);
+            ctx.addEvent(new Event(
+                Event.MODIFY, rightItem.getType(), rightItem.getID(), null, itemService.getIdentifiers(ctx, rightItem)
+            ));
+        }
+
+        if (changelog == RIGHT_SIDE_CHANGED) {
+            // latest status of right item has been modified => reindex left item
+            Item leftItem = relationship.getLeftItem();
+            itemsToProcess.add(leftItem);
+            ctx.addEvent(new Event(
+                Event.MODIFY, leftItem.getType(), leftItem.getID(), null, itemService.getIdentifiers(ctx, leftItem)
+            ));
         }
     }
 
