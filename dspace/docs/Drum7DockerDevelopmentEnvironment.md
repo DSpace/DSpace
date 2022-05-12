@@ -72,6 +72,12 @@ docker compose -p d7 up dspace
 
 The `JAVA_TOOL_OPTIONS` configuration included in the docker compose starts the jpda debugger for tomcat. The [.vscode/launch.json](.vscode/launch.json) contains the VS Code debug configuration needed to attach to the tomcat. Follow the instructions at <https://confluence.umd.edu/display/LIB/DSpace+Development+IDE+Setup> to install the necessary extensions to be able to debug.
 
+To start debugging,
+
+1. Ensure that the dspace docker container is up and running.
+2. Open to the "Run and Debug" panel (CMD + SHIFT + D) on VS Code.
+3. Click the green triange (Play)  "Debug (Attach to Tomcat)" button on top of the debug panel.
+
 ## Useful commands
 
 ```bash
