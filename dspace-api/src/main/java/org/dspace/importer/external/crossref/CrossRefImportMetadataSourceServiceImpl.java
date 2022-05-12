@@ -7,6 +7,7 @@
  */
 package org.dspace.importer.external.crossref;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -189,7 +190,8 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
         @Override
         public List<ImportRecord> call() throws Exception {
             List<ImportRecord> results = new ArrayList<>();
-            URIBuilder uriBuilder = new URIBuilder(url + "/" + query.getParameterAsClass("id", String.class));
+            String ID = URLDecoder.decode(query.getParameterAsClass("id", String.class), "UTF-8");
+            URIBuilder uriBuilder = new URIBuilder(url + "/" + ID);
             String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
                     new HashMap<String, String>());
             JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
