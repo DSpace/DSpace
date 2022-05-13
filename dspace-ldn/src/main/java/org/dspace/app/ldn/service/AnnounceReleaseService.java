@@ -45,9 +45,9 @@ import org.springframework.web.client.RestTemplate;
  *
  */
 @Component
-public class AnnounceReviewService implements BusinessService {
+public class AnnounceReleaseService implements BusinessService {
 
-    private final static Logger log = LogManager.getLogger(AnnounceReviewService.class);
+    private final static Logger log = LogManager.getLogger(AnnounceReleaseService.class);
 
     @Autowired
     private ConfigurationService configurationService;
@@ -57,7 +57,7 @@ public class AnnounceReviewService implements BusinessService {
     /**
      * Initialize rest template with appropriate message converters.
      */
-    public AnnounceReviewService() {
+    public AnnounceReleaseService() {
         restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new JsonLdHttpMessageConverter());
     }
@@ -182,7 +182,7 @@ public class AnnounceReviewService implements BusinessService {
 
     @Override
     public String getServiceName() {
-        return "Announce:ReviewAction";
+        return "Announce:ReleaseAction";
     }
 
 }

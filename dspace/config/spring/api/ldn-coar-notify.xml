@@ -19,9 +19,9 @@
 
     <bean class="org.dspace.app.ldn.service.LDNBusinessDelegate" />
 
-    <bean class="org.dspace.app.ldn.service.BusinessLookUp" name="businessLookUp"/>
+    <bean class="org.dspace.app.ldn.service.BusinessLookUp"/>
 
-    <bean class="org.dspace.app.ldn.service.AnnounceReviewService" />
+    <bean class="org.dspace.app.ldn.service.AnnounceReleaseService" />
 
     <bean class="org.dspace.app.ldn.service.OfferReviewService" />
 

@@ -28,7 +28,7 @@ import org.dspace.event.Event;
  */
 public class LDNOfferConsumer implements Consumer {
 
-    private final static Logger log = LogManager.getLogger(LDNAnnounceConsumer.class);
+    private final static Logger log = LogManager.getLogger(LDNReleaseConsumer.class);
 
     private static Set<Item> items;
 
