@@ -143,9 +143,7 @@ public class OpenSearchController {
             queryArgs.setDSpaceObjectFilter(IndexableItem.TYPE);
             if (sort != null) {
                 //this is the default sort so we want to switch this to date accessioned
-                if (sort.equals("id")) {
-                    queryArgs.setSortField("dc.date.accessioned_dt", SORT_ORDER.desc);
-                } else if (sortDirection != null && sortDirection.equals("DESC")) {
+                if (sortDirection != null && sortDirection.equals("DESC")) {
                     queryArgs.setSortField(sort + "_sort", SORT_ORDER.desc);
                 } else {
                     queryArgs.setSortField(sort + "_sort", SORT_ORDER.asc);
