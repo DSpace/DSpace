@@ -141,7 +141,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                              LogoutFilter.class)
             //Add a filter before our ORCID endpoints to do the authentication based on the data in the
             // HTTP request
-            .addFilterBefore(new OrcidAuthenticationFilter("/api/authn/orcid", authenticationManager(),
+            .addFilterBefore(new OrcidLoginFilter("/api/authn/orcid", authenticationManager(),
                                                        restAuthenticationService),
                              LogoutFilter.class)
             //Add a filter before our OIDC endpoints to do the authentication based on the data in the

@@ -87,7 +87,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
             LOGGER.warn("The incoming request has not code parameter");
             return NO_SUCH_USER;
         }
-
+        request.setAttribute(ORCID_AUTH_ATTRIBUTE, true);
         return authenticateWithOrcid(context, code, request);
     }
 

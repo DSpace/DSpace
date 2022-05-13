@@ -40,6 +40,7 @@ import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.exception.OrcidClientException;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.rest.model.AuthnRest;
+import org.dspace.app.rest.security.OrcidLoginFilter;
 import org.dspace.app.rest.security.jwt.EPersonClaimProvider;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authenticate.OrcidAuthenticationBean;
@@ -67,12 +68,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
 /**
- * Integration tests for {@link OrcidAuthenticationRestController}.
+ * Integration tests for {@link OrcidLoginFilter}.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class OrcidAuthenticationRestControllerIT extends AbstractControllerIntegrationTest {
+public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
+
+    public static final String[] PASSWORD_ONLY = { "org.dspace.authenticate.PasswordAuthentication" };
 
     private final static String ORCID = "0000-1111-2222-3333";
     private final static String CODE = "123456";
@@ -117,6 +120,15 @@ public class OrcidAuthenticationRestControllerIT extends AbstractControllerInteg
             ePersonService.delete(context, createdEperson);
             context.restoreAuthSystemState();
         }
+    }
+
+    @Test
+    public void testNoRedirectIfOrcidDisabled() throws Exception {
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASSWORD_ONLY);
+
+        getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
+            .param("code", CODE))
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -433,6 +445,65 @@ public class OrcidAuthenticationRestControllerIT extends AbstractControllerInteg
         assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.refresh-token", REFRESH_TOKEN)));
         assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.scope", ORCID_SCOPES[0], 0)));
         assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.scope", ORCID_SCOPES[1], 1)));
+
+    }
+
+    @Test
+    public void testRedirectToGivenTrustedUrl() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPersonBuilder.createEPerson(context)
+            .withEmail("test@email.it")
+            .withNetId(ORCID)
+            .withNameInMetadata("Test", "User")
+            .withCanLogin(true)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
+
+        String token = getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
+            .param("redirectUrl", "http://localhost:8080/server/api/authn/status")
+            .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("http://localhost:8080/server/api/authn/status"))
+            .andReturn().getResponse().getHeader("Authorization");
+
+        getClient(token).perform(get("/api/authn/status"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.authenticated", is(true)))
+            .andExpect(jsonPath("$.authenticationMethod", is("orcid")));
+
+        verify(orcidClientMock).getAccessToken(CODE);
+        verifyNoMoreInteractions(orcidClientMock);
+
+    }
+
+    @Test
+    public void testRedirectToGivenUntrustedUrl() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPersonBuilder.createEPerson(context)
+            .withEmail("test@email.it")
+            .withNetId(ORCID)
+            .withNameInMetadata("Test", "User")
+            .withCanLogin(true)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
+
+        getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
+            .param("redirectUrl", "http://dspace.org")
+            .param("code", CODE))
+            .andExpect(status().isBadRequest());
+
+        verify(orcidClientMock).getAccessToken(CODE);
+        verifyNoMoreInteractions(orcidClientMock);
 
     }
 
