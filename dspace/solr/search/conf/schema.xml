@@ -282,7 +282,7 @@
     <field name="lastModified" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
 
      <!-- The database status of the current item -->
-     <field name="status" type="string" indexed="true" stored="true" omitNorms="true" docValues="true" />
+     <field name="database_status" type="string" indexed="true" stored="true" omitNorms="true" docValues="true" />
 
      <!-- Dynamic field used to store the relation metadata as a keywordFilter -->
      <dynamicField name="relation.*" type="keywordFilter" indexed="true" stored="true" omitNorms="true" multiValued="true"/>

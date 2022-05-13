@@ -30,6 +30,14 @@ public interface IndexingService {
     void indexContent(Context context, IndexableObject dso,
                       boolean force, boolean commit) throws SQLException, SearchServiceException;
 
+    /**
+     * Index a given DSO
+     * @param context   The DSpace Context
+     * @param dso       The DSpace Object to index
+     * @param force     Force update even if not stale
+     * @param commit    Commit the changes
+     * @param preDb     Add a "preDB" status to the index (only applicable to Items)
+     */
     void indexContent(Context context, IndexableObject dso,
                       boolean force, boolean commit, boolean preDb) throws SQLException, SearchServiceException;
 

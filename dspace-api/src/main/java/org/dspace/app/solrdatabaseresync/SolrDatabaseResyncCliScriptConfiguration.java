@@ -5,25 +5,25 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.itemdbstatus;
+package org.dspace.app.solrdatabaseresync;
 
 import org.apache.commons.cli.Options;
 import org.dspace.core.Context;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
- * The {@link ScriptConfiguration} for the {@link ItemDatabaseStatusCli} script.
+ * The {@link ScriptConfiguration} for the {@link SolrDatabaseResyncCli} script.
  */
-public class ItemDatabaseStatusCliScriptConfiguration extends ScriptConfiguration<ItemDatabaseStatusCli> {
-    private Class<ItemDatabaseStatusCli> dspaceRunnableClass;
+public class SolrDatabaseResyncCliScriptConfiguration extends ScriptConfiguration<SolrDatabaseResyncCli> {
+    private Class<SolrDatabaseResyncCli> dspaceRunnableClass;
 
     @Override
-    public Class<ItemDatabaseStatusCli> getDspaceRunnableClass() {
+    public Class<SolrDatabaseResyncCli> getDspaceRunnableClass() {
         return dspaceRunnableClass;
     }
 
     @Override
-    public void setDspaceRunnableClass(Class<ItemDatabaseStatusCli> dspaceRunnableClass) {
+    public void setDspaceRunnableClass(Class<SolrDatabaseResyncCli> dspaceRunnableClass) {
         this.dspaceRunnableClass = dspaceRunnableClass;
     }
 

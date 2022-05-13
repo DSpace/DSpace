@@ -78,7 +78,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemIndexFactoryImpl.class);
     public static final String VARIANTS_STORE_SEPARATOR = "###";
     public static final String STORE_SEPARATOR = "\n|||\n";
-    public static final String STATUS_FIELD = "status";
+    public static final String STATUS_FIELD = "database_status";
     public static final String STATUS_FIELD_PREDB = "predb";
 
 

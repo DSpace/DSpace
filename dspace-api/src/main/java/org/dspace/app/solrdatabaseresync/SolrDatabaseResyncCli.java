@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.itemdbstatus;
+package org.dspace.app.solrdatabaseresync;
 
 import static org.dspace.discovery.indexobject.ItemIndexFactoryImpl.STATUS_FIELD;
 import static org.dspace.discovery.indexobject.ItemIndexFactoryImpl.STATUS_FIELD_PREDB;
@@ -40,11 +40,11 @@ import org.dspace.utils.DSpace;
  * - Delete them from solr if they're not present in the database
  * - Remove their status if they're present in the database
  */
-public class ItemDatabaseStatusCli extends DSpaceRunnable<ItemDatabaseStatusCliScriptConfiguration> {
+public class SolrDatabaseResyncCli extends DSpaceRunnable<SolrDatabaseResyncCliScriptConfiguration> {
     /* Log4j logger */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemDatabaseStatusCli.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrDatabaseResyncCli.class);
 
-    public static final String TIME_UNTIL_REINDEX_PROPERTY = "item-database-status.time-until-reindex";
+    public static final String TIME_UNTIL_REINDEX_PROPERTY = "solr-database-resync.time-until-reindex";
 
     private IndexingService indexingService;
     private SolrSearchCore solrSearchCore;
@@ -55,9 +55,15 @@ public class ItemDatabaseStatusCli extends DSpaceRunnable<ItemDatabaseStatusCliS
     private String maxTime;
 
     @Override
-    public ItemDatabaseStatusCliScriptConfiguration getScriptConfiguration() {
+    public SolrDatabaseResyncCliScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager()
-                .getServiceByName("item-database-status", ItemDatabaseStatusCliScriptConfiguration.class);
+                .getServiceByName("solr-database-resync", SolrDatabaseResyncCliScriptConfiguration.class);
+    }
+
+    public static void runScheduled() throws Exception {
+        SolrDatabaseResyncCli script = new SolrDatabaseResyncCli();
+        script.setup();
+        script.internalRun();
     }
 
     @Override

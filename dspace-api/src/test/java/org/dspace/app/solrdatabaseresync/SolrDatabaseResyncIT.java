@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.itemdbstatus;
+package org.dspace.app.solrdatabaseresync;
 
 import static org.dspace.discovery.indexobject.ItemIndexFactoryImpl.STATUS_FIELD;
 import static org.dspace.discovery.indexobject.ItemIndexFactoryImpl.STATUS_FIELD_PREDB;
@@ -35,7 +35,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ItemDatabaseStatusIT extends AbstractIntegrationTestWithDatabase {
+public class SolrDatabaseResyncIT extends AbstractIntegrationTestWithDatabase {
 
     private final ConfigurationService configurationService =
             DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -52,7 +52,7 @@ public class ItemDatabaseStatusIT extends AbstractIntegrationTestWithDatabase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        configurationService.setProperty("item-database-status.time-until-reindex", 1);
+        configurationService.setProperty("solr-database-resync.time-until-reindex", 1);
 
         ServiceManager serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
         searchService = serviceManager.getServiceByName(null, MockSolrSearchCore.class);
@@ -84,7 +84,7 @@ public class ItemDatabaseStatusIT extends AbstractIntegrationTestWithDatabase {
         assertHasPreDBStatus(item1);
         assertHasPreDBStatus(item2);
 
-        performDatabaseStatusScript();
+        performSolrDatabaseResyncScript();
 
         // Database status script was performed, their predb status should be removed
         assertHasNoPreDBStatus(item1);
@@ -105,7 +105,7 @@ public class ItemDatabaseStatusIT extends AbstractIntegrationTestWithDatabase {
         assertHasPreDBStatus(item1);
         assertHasPreDBStatus(item2);
 
-        performDatabaseStatusScript();
+        performSolrDatabaseResyncScript();
 
         // Database status script was performed, their solr document should have been removed
         assertNoSolrDocument(item1);
@@ -144,8 +144,8 @@ public class ItemDatabaseStatusIT extends AbstractIntegrationTestWithDatabase {
         return queryResponse.getResults();
     }
 
-    public void performDatabaseStatusScript() throws Exception {
-        String[] args = new String[] {"item-database-status"};
+    public void performSolrDatabaseResyncScript() throws Exception {
+        String[] args = new String[] {"solr-database-resync"};
         TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
         ScriptLauncher
                 .handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
