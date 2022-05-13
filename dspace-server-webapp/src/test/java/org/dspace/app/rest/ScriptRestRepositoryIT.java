@@ -574,11 +574,6 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
             Process process = processService.find(context, idRef.get());
             List<Group> groups = process.getGroups();
             boolean isPresent = groups.stream().anyMatch(g -> g.getID().equals(specialGroup.getID()));
-//            for (Group group : groups) {
-//                if (group.getID().equals(specialGroup.getID())) {
-//                    isPresent = true;
-//                }
-//            }
             assertTrue(isPresent);
 
         } finally {
