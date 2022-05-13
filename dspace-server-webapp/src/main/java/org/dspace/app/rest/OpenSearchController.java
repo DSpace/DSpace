@@ -39,9 +39,11 @@ import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +72,12 @@ public class OpenSearchController {
     private CollectionService collectionService;
     private AuthorizeService authorizeService;
     private OpenSearchService openSearchService;
+
+    @Autowired
+    private SearchService searchService;
+
+    @Autowired
+    private DiscoveryConfigurationService searchConfigurationService;
 
     private Context context;
 
@@ -127,21 +135,33 @@ public class OpenSearchController {
             DiscoverQuery queryArgs = new DiscoverQuery();
             if (query == null) {
                 query = "";
+            } else {
+                queryArgs.setQuery(query);
             }
-            queryArgs.setQuery(query);
             queryArgs.setStart(start);
             queryArgs.setMaxResults(count);
             queryArgs.setDSpaceObjectFilter(IndexableItem.TYPE);
             if (sort != null) {
-                if (sortDirection != null && sortDirection.equals("DESC")) {
+                //this is the default sort so we want to switch this to date accessioned
+                if (sort.equals("id")) {
+                    queryArgs.setSortField("dc.date.accessioned_dt", SORT_ORDER.desc);
+                } else if (sortDirection != null && sortDirection.equals("DESC")) {
                     queryArgs.setSortField(sort + "_sort", SORT_ORDER.desc);
+                } else {
+                    queryArgs.setSortField(sort + "_sort", SORT_ORDER.asc);
                 }
-                queryArgs.setSortField(sort + "_sort", SORT_ORDER.asc);
             } else {
-                queryArgs.setSortField("dc.date.accessioned_sort", SORT_ORDER.asc);
+                queryArgs.setSortField("dc.date.accessioned_dt", SORT_ORDER.desc);
             }
             if (dsoObject != null) {
                 container = scopeResolver.resolveScope(context, dsoObject);
+                DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
+                        .getDiscoveryConfigurationByNameOrDso("site", container);
+                queryArgs.setDiscoveryConfigurationName(discoveryConfiguration.getId());
+                queryArgs.addFilterQueries(discoveryConfiguration.getDefaultFilterQueries()
+                        .toArray(
+                                new String[discoveryConfiguration.getDefaultFilterQueries()
+                                        .size()]));
             }
 
             // Perform the search
