@@ -193,6 +193,18 @@
                     <required></required>
                 </field>
             </row>
+            <row>
+                <field>
+                    <dc-schema>coar</dc-schema>
+                    <dc-element>notify</dc-element>
+                    <dc-qualifier>initialize</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Review Service</label>
+                    <input-type value-pairs-name="notify_review_services">list</input-type>
+                    <hint>Review Service</hint>
+                    <required></required>
+                </field>
+            </row>
         </form>
 
         <!-- Form which defines the second page/section of the "traditional" DSpace submission process,
@@ -1943,6 +1955,17 @@
             <pair>
                 <displayed-value>Is a Funding Organization</displayed-value>
                 <stored-value>FundingOrganization</stored-value>
+            </pair>
+        </value-pairs>
+        
+        <value-pairs value-pairs-name="notify_review_services">
+            <pair>
+                <displayed-value>Service example Rev/End</displayed-value>
+                <stored-value>test</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Service example Rev</displayed-value>
+                <stored-value>test2</stored-value>
             </pair>
         </value-pairs>
 

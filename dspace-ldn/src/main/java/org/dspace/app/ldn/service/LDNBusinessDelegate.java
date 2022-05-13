@@ -14,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Linked Data Notification business delegate to facilitate sending
  * notification.
+ * 
+ * @author Stefano Maffei (steph-ieffam @ 4Science)
+ * @author William Welling
+ * 
  */
 public class LDNBusinessDelegate {
 
