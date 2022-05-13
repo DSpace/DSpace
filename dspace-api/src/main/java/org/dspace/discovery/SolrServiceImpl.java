@@ -168,6 +168,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         indexableObjectService.writeDocument(context, indexableObject, solrInputDocument);
     }
 
+    /**
+     * Update the given indexable object using a given service
+     * @param context                   The DSpace Context
+     * @param indexableObjectService    The service to index the object with
+     * @param indexableObject           The object to index
+     * @param preDB                     Add a "preDB" status to the document
+     */
     protected void update(Context context, IndexFactory indexableObjectService, IndexableObject indexableObject,
                           boolean preDB) throws IOException, SQLException, SolrServerException {
         if (preDB) {

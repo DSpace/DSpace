@@ -41,8 +41,8 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletionCli"/>
     </bean>
 
-    <bean id="item-database-status" class="org.dspace.app.itemdbstatus.ItemDatabaseStatusCliScriptConfiguration">
+    <bean id="solr-database-resync" class="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCliScriptConfiguration">
         <property name="description" value="Update the database status of Items in solr"/>
-        <property name="dspaceRunnableClass" value="org.dspace.app.itemdbstatus.ItemDatabaseStatusCli"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCli"/>
     </bean>
 </beans>
