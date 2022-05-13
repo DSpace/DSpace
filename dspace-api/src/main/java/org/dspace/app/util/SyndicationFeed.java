@@ -193,13 +193,11 @@ public class SyndicationFeed {
         String defaultTitle = null;
         boolean podcastFeed = false;
         this.request = request;
-
         // dso is null for the whole site, or a search without scope
         if (dso == null) {
             defaultTitle = configurationService.getProperty("dspace.name");
             feed.setDescription(localize(labels, MSG_FEED_DESCRIPTION));
             objectURL = resolveURL(request, null);
-            logoURL = configurationService.getProperty("webui.feed.logo.url");
         } else {
             Bitstream logo = null;
             if (dso instanceof IndexableCollection) {
@@ -329,7 +327,8 @@ public class SyndicationFeed {
                     dcDescriptionField != null) {
                     DCModule dc = new DCModuleImpl();
                     if (dcCreatorField != null) {
-                        List<MetadataValue> dcAuthors = itemService.getMetadataByMetadataString(item, dcCreatorField);
+                        List<MetadataValue> dcAuthors = itemService
+                                .getMetadataByMetadataString(item, dcCreatorField);
                         if (dcAuthors.size() > 0) {
                             List<String> creators = new ArrayList<>();
                             for (MetadataValue author : dcAuthors) {
@@ -345,7 +344,8 @@ public class SyndicationFeed {
                         }
                     }
                     if (dcDescriptionField != null) {
-                        List<MetadataValue> v = itemService.getMetadataByMetadataString(item, dcDescriptionField);
+                        List<MetadataValue> v = itemService
+                                .getMetadataByMetadataString(item, dcDescriptionField);
                         if (v.size() > 0) {
                             StringBuilder descs = new StringBuilder();
                             for (MetadataValue d : v) {
@@ -376,6 +376,7 @@ public class SyndicationFeed {
                                     enc.setLength(bit.getSizeBytes());
                                     enc.setUrl(urlOfBitstream(request, bit));
                                     enclosures.add(enc);
+
                                 }
                             }
                         }
