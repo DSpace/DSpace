@@ -24,6 +24,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Relationship.LatestVersionStatus;
 import org.dspace.content.dao.RelationshipDAO;
+import org.dspace.content.dao.RelationshipDAO.ItemUuidAndRelationshipId;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
@@ -864,11 +865,11 @@ public class RelationshipServiceImpl implements RelationshipService {
                                     boolean copyToRightItem)
         throws SQLException, AuthorizeException {
         if (copyToLeftItem) {
-            String entityTypeString = relationshipMetadataService
-                .getEntityTypeStringFromMetadata(relationship.getLeftItem());
+            EntityType entityType = relationshipMetadataService
+                .getEntityTypeFromMetadata(context, relationship.getLeftItem());
             List<RelationshipMetadataValue> relationshipMetadataValues =
                 relationshipMetadataService.findRelationshipMetadataValueForItemRelationship(context,
-                    relationship.getLeftItem(), entityTypeString, relationship, true);
+                    relationship.getLeftItem(), entityType, relationship, true);
             for (RelationshipMetadataValue relationshipMetadataValue : relationshipMetadataValues) {
                 // This adds the plain text metadata values on the same spot as the virtual values.
                 // This will be overruled in org.dspace.content.DSpaceObjectServiceImpl.update
@@ -891,11 +892,11 @@ public class RelationshipServiceImpl implements RelationshipService {
             itemService.update(context, relationship.getLeftItem());
         }
         if (copyToRightItem) {
-            String entityTypeString = relationshipMetadataService
-                .getEntityTypeStringFromMetadata(relationship.getRightItem());
+            EntityType entityType = relationshipMetadataService
+                .getEntityTypeFromMetadata(context, relationship.getRightItem());
             List<RelationshipMetadataValue> relationshipMetadataValues =
                 relationshipMetadataService.findRelationshipMetadataValueForItemRelationship(context,
-                    relationship.getRightItem(), entityTypeString, relationship, true);
+                    relationship.getRightItem(), entityType, relationship, true);
             for (RelationshipMetadataValue relationshipMetadataValue : relationshipMetadataValues) {
                 itemService.addMetadata(context, relationship.getRightItem(),
                                                      relationshipMetadataValue.getMetadataField().
@@ -1023,6 +1024,14 @@ public class RelationshipServiceImpl implements RelationshipService {
     ) throws SQLException {
         return relationshipDAO
             .findByItemAndRelationshipType(context, item, relationshipType, isLeft, limit, offset, excludeNonLatest);
+    }
+
+    @Override
+    public List<ItemUuidAndRelationshipId> findByLatestItemAndRelationshipType(
+        Context context, Item latestItem, RelationshipType relationshipType, boolean isLeft
+    ) throws SQLException {
+        return relationshipDAO
+            .findByLatestItemAndRelationshipType(context, latestItem, relationshipType, isLeft);
     }
 
     @Override

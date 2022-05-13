@@ -16,6 +16,7 @@ import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
+import org.springframework.lang.NonNull;
 
 /**
  * Database Access Object Interface class for the Relationship object
@@ -127,6 +128,57 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
     List<Relationship> findByItemAndRelationshipType(
         Context context, Item item, RelationshipType relationshipType, boolean isLeft, Integer limit, Integer offset,
         boolean excludeNonLatest
+    ) throws SQLException;
+
+    /**
+     * Used by {@link #findByLatestItemAndRelationshipType} to avoid creating {@link Relationship}s.
+     */
+    class ItemUuidAndRelationshipId {
+
+        private final UUID itemUuid;
+        private final int relationshipId;
+
+        public ItemUuidAndRelationshipId(@NonNull UUID itemUuid, @NonNull int relationshipId) {
+            this.itemUuid = itemUuid;
+            this.relationshipId = relationshipId;
+        }
+
+        public UUID getItemUuid() {
+            return this.itemUuid;
+        }
+
+        public int getRelationshipId() {
+            return this.relationshipId;
+        }
+
+    }
+
+    /**
+     * This method returns the UUIDs of all items that have a relationship with the given item, from the perspective
+     * of the other item. In other words, given a relationship with the given item, the given item should have
+     * "latest status" in order for the other item uuid to be returned.
+     *
+     * This method differs from the "excludeNonLatest" property in other methods,
+     * because in this method the current item should have "latest status" to return the other item,
+     * whereas with "excludeNonLatest" the other item should have "latest status" to be returned.
+     *
+     * This method is used to index items in solr; when searching for related items of one of the returned uuids,
+     * the given item should appear as a search result.
+     *
+     * NOTE: This method does not return {@link Relationship}s for performance, because doing so would eagerly fetch
+     *       the items on both sides, which is unnecessary.
+     * NOTE: tilted relationships are NEVER excluded when fetching one relationship type.
+     * @param context the DSpace context.
+     * @param latestItem the target item; only relationships where this item has "latest status" should be considered.
+     * @param relationshipType the relationship type for which relationships should be selected.
+     * @param isLeft whether the entity type of the item occurs on the left or right side of the relationship type.
+     *               This is redundant in most cases, but necessary because relationship types my have
+     *               the same entity type on both sides.
+     * @return a list containing pairs of relationship ids and item uuids.
+     * @throws SQLException if something goes wrong.
+     */
+    public List<ItemUuidAndRelationshipId> findByLatestItemAndRelationshipType(
+        Context context, Item latestItem, RelationshipType relationshipType, boolean isLeft
     ) throws SQLException;
 
     /**

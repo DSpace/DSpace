@@ -238,7 +238,16 @@ public class Relationship implements ReloadableEntity<Integer> {
      * @param latestVersionStatus the new latest version status for this relationship.
      */
     public void setLatestVersionStatus(LatestVersionStatus latestVersionStatus) {
+        if (this.latestVersionStatus == latestVersionStatus) {
+            return; // no change or cache reset needed
+        }
+
         this.latestVersionStatus = latestVersionStatus;
+
+        // on one item, relation.* fields will change
+        // on the other item, relation.*.latestForDiscovery will change
+        leftItem.setMetadataModified();
+        rightItem.setMetadataModified();
     }
 
     public enum LatestVersionStatus {

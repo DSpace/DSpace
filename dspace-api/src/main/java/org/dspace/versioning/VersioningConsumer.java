@@ -7,8 +7,7 @@
  */
 package org.dspace.versioning;
 
-import static org.dspace.versioning.utils.RelationshipVersioningUtils.LatestVersionStatusChangelog.LEFT_SIDE_CHANGED;
-import static org.dspace.versioning.utils.RelationshipVersioningUtils.LatestVersionStatusChangelog.RIGHT_SIDE_CHANGED;
+import static org.dspace.versioning.utils.RelationshipVersioningUtils.LatestVersionStatusChangelog.NO_CHANGES;
 
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -259,9 +258,10 @@ public class VersioningConsumer implements Consumer {
     }
 
     /**
-     * Fire an "item modified" event for the left or right item of the given relationship,
-     * based on how {@link Relationship#latestVersionStatus} of the relationship has changed.
-     * The event will cause the item to be re-indexed by the {@link IndexEventConsumer}.
+     * If the {@link Relationship#latestVersionStatus} of the relationship has changed,
+     * an "item modified" event should be fired for both the left and right item of the relationship.
+     * On one item the relation.* fields will change. On the other item the relation.*.latestForDiscovery will change.
+     * The event will cause the items to be re-indexed by the {@link IndexEventConsumer}.
      * @param ctx the DSpace context.
      * @param changelog indicates which side of the relationship has changed.
      * @param relationship the relationship.
@@ -269,23 +269,26 @@ public class VersioningConsumer implements Consumer {
     protected void reindexRelationship(
         Context ctx, LatestVersionStatusChangelog changelog, Relationship relationship
     ) {
-        if (changelog == LEFT_SIDE_CHANGED) {
-            // latest status of left item has been modified => reindex right item
-            Item rightItem = relationship.getRightItem();
-            itemsToProcess.add(rightItem);
-            ctx.addEvent(new Event(
-                Event.MODIFY, rightItem.getType(), rightItem.getID(), null, itemService.getIdentifiers(ctx, rightItem)
-            ));
+        if (changelog == NO_CHANGES) {
+            return;
         }
 
-        if (changelog == RIGHT_SIDE_CHANGED) {
-            // latest status of right item has been modified => reindex left item
-            Item leftItem = relationship.getLeftItem();
-            itemsToProcess.add(leftItem);
-            ctx.addEvent(new Event(
-                Event.MODIFY, leftItem.getType(), leftItem.getID(), null, itemService.getIdentifiers(ctx, leftItem)
-            ));
-        }
+        // on one item, relation.* fields will change
+        // on the other item, relation.*.latestForDiscovery will change
+
+        // reindex left item
+        Item leftItem = relationship.getLeftItem();
+        itemsToProcess.add(leftItem);
+        ctx.addEvent(new Event(
+            Event.MODIFY, leftItem.getType(), leftItem.getID(), null, itemService.getIdentifiers(ctx, leftItem)
+        ));
+
+        // reindex right item
+        Item rightItem = relationship.getRightItem();
+        itemsToProcess.add(rightItem);
+        ctx.addEvent(new Event(
+            Event.MODIFY, rightItem.getType(), rightItem.getID(), null, itemService.getIdentifiers(ctx, rightItem)
+        ));
     }
 
     /**

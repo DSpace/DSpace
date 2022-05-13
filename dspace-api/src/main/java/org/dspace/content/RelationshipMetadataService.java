@@ -49,7 +49,7 @@ public interface RelationshipMetadataService {
      * @return                      The list of virtual metadata values
      */
     public List<RelationshipMetadataValue> findRelationshipMetadataValueForItemRelationship(
-        Context context, Item item, String entityType, Relationship relationship, boolean enableVirtualMetadata)
+        Context context, Item item, EntityType entityType, Relationship relationship, boolean enableVirtualMetadata)
         throws SQLException;
 
     /**
@@ -58,5 +58,12 @@ public interface RelationshipMetadataService {
      * @return      A String value indicating the entityType
      */
     public String getEntityTypeStringFromMetadata(Item item);
+
+    /**
+     * This method will retrieve the EntityType from an item
+     * @param item  The Item for which the entityType will be returned
+     * @return      The entity type
+     */
+    public EntityType getEntityTypeFromMetadata(Context context, Item item) throws SQLException;
 
 }
