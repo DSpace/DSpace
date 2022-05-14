@@ -8,6 +8,7 @@
 package org.dspace.app.ldn.processor;
 
 import static java.lang.String.format;
+import static org.dspace.app.ldn.utility.LDNUtils.DATE_PATTERN;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -58,8 +59,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class LDNMetadataProcessor implements LDNProcessor {
 
     private final static Logger log = LogManager.getLogger(LDNMetadataProcessor.class);
-
-    private final static String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     private final static String LOCATION_HEADER_KEY = "Location";
 

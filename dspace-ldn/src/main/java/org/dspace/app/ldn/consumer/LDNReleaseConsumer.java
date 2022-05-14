@@ -19,8 +19,8 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.ldn.LDNBusinessDelegate;
 import org.dspace.app.ldn.factory.LDNBusinessDelegateFactory;
+import org.dspace.app.ldn.service.LDNBusinessDelegate;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -34,9 +34,9 @@ import org.dspace.event.Event;
  * Consumer listening for item deposit or update to announce release
  * notification.
  */
-public class LDNConsumer implements Consumer {
+public class LDNReleaseConsumer implements Consumer {
 
-    private final static Logger log = LogManager.getLogger(LDNConsumer.class);
+    private final static Logger log = LogManager.getLogger(LDNReleaseConsumer.class);
 
     private static Set<Item> itemsToRelease;
 
@@ -145,7 +145,7 @@ public class LDNConsumer implements Consumer {
             for (Item item : itemsToRelease) {
                 log.info("Item for release {} {}", item.getID(), item.getName());
                 try {
-                    ldnBusinessDelegate.announceRelease(item);
+                    ldnBusinessDelegate.handleRequest("Announce:ReleaseAction", context, item);
                 } catch (Exception e) {
                     log.error(format("Failed to announce item %s %s for release",
                             item.getID(), item.getName()), e);

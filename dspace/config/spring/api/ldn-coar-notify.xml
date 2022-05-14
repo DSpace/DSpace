@@ -17,7 +17,13 @@
     <context:annotation-config />
     <!-- allows us to use spring annotations in beans -->
 
-    <bean class="org.dspace.app.ldn.LDNBusinessDelegate"></bean>
+    <bean class="org.dspace.app.ldn.service.LDNBusinessDelegate" />
+
+    <bean class="org.dspace.app.ldn.service.BusinessLookUp"/>
+
+    <bean class="org.dspace.app.ldn.service.AnnounceReleaseService" />
+
+    <bean class="org.dspace.app.ldn.service.OfferReviewService" />
 
     <bean name="ldnRouter" class="org.dspace.app.ldn.LDNRouter">
         <property name="processors">
@@ -91,7 +97,7 @@
                 </bean>
                 <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
                     <property name="qualifier" value="review" />
-                    <property name="valueTemplate" value="$timestamp||$LDNUtils.removedProtocol($notification.origin.id)||$notification.inReplyTo||$notification.object.id" />
+                    <property name="valueTemplate" value="$timestamp${ldn.metadata.delimiter}$LDNUtils.removedProtocol($notification.origin.id)${ldn.metadata.delimiter}$notification.inReplyTo${ldn.metadata.delimiter}$notification.object.id" />
                 </bean>
             </list>
         </property>
@@ -125,7 +131,7 @@
                 </bean>
                 <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
                     <property name="qualifier" value="endorsement" />
-                    <property name="valueTemplate" value="$timestamp||$LDNUtils.removedProtocol($notification.origin.id)||$notification.inReplyTo||$notification.object.id" />
+                    <property name="valueTemplate" value="$timestamp${ldn.metadata.delimiter}$LDNUtils.removedProtocol($notification.origin.id)${ldn.metadata.delimiter}$notification.inReplyTo${ldn.metadata.delimiter}$notification.object.id" />
                 </bean>
             </list>
         </property>
@@ -172,7 +178,7 @@
                 <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
                     <property name="conditionTemplate" value="$StringUtils.isNotEmpty($notification.inReplyTo)" />
                     <property name="qualifier" value="examination" />
-                    <property name="valueTemplate" value="$timestamp||$LDNUtils.removedProtocol($notification.origin.id)||$notification.inReplyTo" />
+                    <property name="valueTemplate" value="$timestamp${ldn.metadata.delimiter}$LDNUtils.removedProtocol($notification.origin.id)${ldn.metadata.delimiter}$notification.inReplyTo" />
                 </bean>
             </list>
         </property>
@@ -207,7 +213,7 @@
                 </bean>
                 <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
                     <property name="qualifier" value="refused" />
-                    <property name="valueTemplate" value="$timestamp||$LDNUtils.removedProtocol($notification.origin.id)||$notification.inReplyTo" />
+                    <property name="valueTemplate" value="$timestamp${ldn.metadata.delimiter}$LDNUtils.removedProtocol($notification.origin.id)${ldn.metadata.delimiter}$notification.inReplyTo" />
                 </bean>
             </list>
         </property>
@@ -244,7 +250,7 @@
                 </bean>
                 <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
                     <property name="qualifier" value="release" />
-                    <property name="valueTemplate" value="$timestamp||$notification.object.ietfCiteAs||$LDNUtils.removedProtocol($notification.object.id)" />
+                    <property name="valueTemplate" value="$timestamp${ldn.metadata.delimiter}$notification.object.ietfCiteAs${ldn.metadata.delimiter}$LDNUtils.removedProtocol($notification.object.id)" />
                 </bean>
             </list>
         </property>
