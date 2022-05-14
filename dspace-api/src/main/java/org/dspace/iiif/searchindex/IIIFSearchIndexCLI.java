@@ -130,10 +130,7 @@ public class IIIFSearchIndexCLI {
                     "-i 123456789/12");
             System.exit(0);
         }
-//
-//        if (line.hasOption('f')) {
-//            force = true;
-//        }
+
         if (line.hasOption('q')) {
             isQuiet = true;
         }
