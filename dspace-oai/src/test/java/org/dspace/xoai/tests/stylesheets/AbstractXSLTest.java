@@ -19,8 +19,9 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.io.IOUtils;
 
 public abstract class AbstractXSLTest {
+    // Requires usage of Saxon as OAI-PMH uses some XSLT 2 functions
     private static final TransformerFactory factory = TransformerFactory
-            .newInstance();
+            .newInstance("net.sf.saxon.TransformerFactoryImpl", null);
 
     protected TransformBuilder apply(String xslLocation) throws Exception {
         return new TransformBuilder(xslLocation);
