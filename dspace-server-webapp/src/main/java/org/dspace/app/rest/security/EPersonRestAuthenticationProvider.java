@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.login.PostLoggedInAction;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.service.AuthorizeService;
@@ -198,20 +197,15 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
         EPerson eperson = context.getCurrentUser();
         if (eperson != null) {
             boolean isAdmin = false;
-            boolean isCommunityAdmin = false;
-            boolean isCollectionAdmin = false;
             try {
                 isAdmin = authorizeService.isAdmin(context, eperson);
-                isCommunityAdmin = authorizeService.isCommunityAdmin(context);
-                isCollectionAdmin = authorizeService.isCollectionAdmin(context);
             } catch (SQLException e) {
                 log.error("SQL error while checking for admin rights", e);
             }
 
             if (isAdmin) {
                 authorities.add(new SimpleGrantedAuthority(ADMIN_GRANT));
-            } else if ((isCommunityAdmin && AuthorizeUtil.canCommunityAdminManageAccounts())
-                       || (isCollectionAdmin && AuthorizeUtil.canCollectionAdminManageAccounts())) {
+            } else if (authorizeService.isAccountManager(context)) {
                 authorities.add(new SimpleGrantedAuthority(MANAGE_ACCESS_GROUP));
             }
 

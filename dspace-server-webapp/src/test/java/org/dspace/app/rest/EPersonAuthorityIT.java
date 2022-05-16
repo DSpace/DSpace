@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static org.dspace.app.rest.matcher.VocabularyMatcher.matchVocabularyEntry;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -38,7 +39,7 @@ public class EPersonAuthorityIT extends AbstractControllerIntegrationTest {
         String thirdEPersonId = createEPerson("Luca", "Bollini");
         context.restoreAuthSystemState();
 
-        String token = getAuthToken(eperson.getEmail(), password);
+        String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
             .param("filter", "Luca"))
             .andExpect(status().isOk())
@@ -65,7 +66,7 @@ public class EPersonAuthorityIT extends AbstractControllerIntegrationTest {
         String thirdEPersonId = createEPerson("Luca", "Bollini");
         context.restoreAuthSystemState();
 
-        String token = getAuthToken(eperson.getEmail(), password);
+        String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
             .param("filter", "Giamminonni"))
             .andExpect(status().isOk())
@@ -91,7 +92,7 @@ public class EPersonAuthorityIT extends AbstractControllerIntegrationTest {
         String secondEPersonId = createEPerson("Andrea", "Bollini");
         context.restoreAuthSystemState();
 
-        String token = getAuthToken(eperson.getEmail(), password);
+        String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
             .param("filter", firstEPersonId))
             .andExpect(status().isOk())
@@ -105,6 +106,38 @@ public class EPersonAuthorityIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._embedded.entries", containsInAnyOrder(
                 matchVocabularyEntry("Andrea Bollini", "Andrea Bollini", "vocabularyEntry", secondEPersonId))))
             .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+
+    }
+
+    @Test
+    public void testEPersonAuthorityWithAnonymousUser() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        createEPerson("Luca", "Giamminonni");
+        createEPerson("Andrea", "Bollini");
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
+            .param("filter", "Luca"))
+            .andExpect(status().isUnauthorized());
+
+    }
+
+    @Test
+    public void testEPersonAuthorityWithNotAdminUser() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        createEPerson("Luca", "Giamminonni");
+        createEPerson("Andrea", "Bollini");
+        createEPerson("Luca", "Bollini");
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
+            .param("filter", "Luca"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.entries", empty()))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
 
     }
 
