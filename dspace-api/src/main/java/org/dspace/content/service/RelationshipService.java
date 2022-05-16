@@ -16,7 +16,7 @@ import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.Relationship.LatestVersionStatus;
 import org.dspace.content.RelationshipType;
-import org.dspace.content.dao.RelationshipDAO.ItemUuidAndRelationshipId;
+import org.dspace.content.dao.pojo.ItemUuidAndRelationshipId;
 import org.dspace.core.Context;
 import org.dspace.service.DSpaceCRUDService;
 

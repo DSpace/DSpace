@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.dao.RelationshipDAO.ItemUuidAndRelationshipId;
+import org.dspace.content.dao.pojo.ItemUuidAndRelationshipId;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.RelationshipService;

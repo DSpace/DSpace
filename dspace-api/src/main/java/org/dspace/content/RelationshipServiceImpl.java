@@ -24,7 +24,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Relationship.LatestVersionStatus;
 import org.dspace.content.dao.RelationshipDAO;
-import org.dspace.content.dao.RelationshipDAO.ItemUuidAndRelationshipId;
+import org.dspace.content.dao.pojo.ItemUuidAndRelationshipId;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;

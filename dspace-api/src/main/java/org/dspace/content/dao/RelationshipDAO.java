@@ -14,9 +14,9 @@ import java.util.UUID;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
+import org.dspace.content.dao.pojo.ItemUuidAndRelationshipId;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
-import org.springframework.lang.NonNull;
 
 /**
  * Database Access Object Interface class for the Relationship object
@@ -129,29 +129,6 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
         Context context, Item item, RelationshipType relationshipType, boolean isLeft, Integer limit, Integer offset,
         boolean excludeNonLatest
     ) throws SQLException;
-
-    /**
-     * Used by {@link #findByLatestItemAndRelationshipType} to avoid creating {@link Relationship}s.
-     */
-    class ItemUuidAndRelationshipId {
-
-        private final UUID itemUuid;
-        private final int relationshipId;
-
-        public ItemUuidAndRelationshipId(@NonNull UUID itemUuid, @NonNull int relationshipId) {
-            this.itemUuid = itemUuid;
-            this.relationshipId = relationshipId;
-        }
-
-        public UUID getItemUuid() {
-            return this.itemUuid;
-        }
-
-        public int getRelationshipId() {
-            return this.relationshipId;
-        }
-
-    }
 
     /**
      * This method returns the UUIDs of all items that have a relationship with the given item, from the perspective

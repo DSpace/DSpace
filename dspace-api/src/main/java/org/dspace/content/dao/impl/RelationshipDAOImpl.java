@@ -26,6 +26,7 @@ import org.dspace.content.RelationshipType;
 import org.dspace.content.RelationshipType_;
 import org.dspace.content.Relationship_;
 import org.dspace.content.dao.RelationshipDAO;
+import org.dspace.content.dao.pojo.ItemUuidAndRelationshipId;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.AbstractHibernateDAO;
