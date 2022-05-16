@@ -362,6 +362,41 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     }
 
+    @Test
+    public void testCreateAndReturnWithCollectionHavingInvalidEntityTypeSet() throws Exception {
+
+        String id = user.getID().toString();
+
+        context.turnOffAuthorisationSystem();
+
+        Collection orgUnitCollection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("OrgUnit Collection")
+            .withEntityType("OrgUnit")
+            .withSubmitterGroup(user)
+            .withTemplateItem()
+            .build();
+
+        context.restoreAuthSystemState();
+
+        configurationService.setProperty("researcher-profile.collection.uuid", orgUnitCollection.getID().toString());
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id", is(id)))
+            .andExpect(jsonPath("$.visible", is(false)))
+            .andExpect(jsonPath("$.type", is("profile")))
+            .andExpect(jsonPath("$", matchLinks("http://localhost/api/eperson/profiles/" + id, "item", "eperson")));
+
+        String itemId = getItemIdByProfileId(authToken, id);
+        Item profileItem = itemService.find(context, UUIDUtils.fromString(itemId));
+        assertThat(profileItem, notNullValue());
+        assertThat(profileItem.getOwningCollection(), is(personCollection));
+
+    }
+
     /**
      * Verify that a standard user can't call the createAndReturn endpoint to store
      * a new researcher profile related to another user.
@@ -870,11 +905,11 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .build();
 
         ItemBuilder.createItem(context, personCollection)
-            .withTitle("Test User")
+            .withPersonEmail("test@email.it")
             .build();
 
         ItemBuilder.createItem(context, personCollection)
-            .withTitle("Test User 2")
+            .withPersonEmail("test@email.it")
             .build();
 
         context.restoreAuthSystemState();
@@ -917,7 +952,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         context.turnOffAuthorisationSystem();
 
         ItemBuilder.createItem(context, personCollection)
-            .withTitle("Test User")
+            .withPersonEmail("test@email.it")
             .build();
 
         context.restoreAuthSystemState();
