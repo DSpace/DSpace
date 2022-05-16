@@ -4414,32 +4414,4 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$.status", notNullValue()));
     }
 
-    @Test
-    public void hiddenOrcidMetadataFieldsTest() throws Exception {
-
-        context.turnOffAuthorisationSystem();
-
-        parentCommunity = CommunityBuilder.createCommunity(context)
-            .withName("Parent Community")
-            .build();
-
-        Collection owningCollection = CollectionBuilder.createCollection(context, parentCommunity)
-            .withName("Owning Collection")
-            .build();
-
-        Item item = ItemBuilder.createItem(context, owningCollection)
-            .withTitle("Test item")
-            .withOrcidAccessToken("23bc2f69-b7c7-4e55-9dc4-d4e09382f687")
-            .withOrcidRefreshToken("a6c6dbdc-41b3-4e86-8aaf-2ac50253dc74")
-            .build();
-
-        context.restoreAuthSystemState();
-
-        getClient().perform(get("/api/core/items/{uuid}", item.getID()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.metadata.['dspace.orcid.access-token']").doesNotExist())
-            .andExpect(jsonPath("$.metadata.['dspace.orcid.refresh-token']").doesNotExist());
-
-    }
-
 }

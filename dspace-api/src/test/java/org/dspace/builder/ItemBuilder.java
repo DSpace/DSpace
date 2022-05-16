@@ -158,14 +158,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dspace", "object", "owner", null, value, authority, CF_ACCEPTED);
     }
 
-    public ItemBuilder withOrcidAccessToken(String accessToken) {
-        return addMetadataValue(item, "dspace", "orcid", "access-token", accessToken);
-    }
-
-    public ItemBuilder withOrcidRefreshToken(String refreshToken) {
-        return addMetadataValue(item, "dspace", "orcid", "refresh-token", refreshToken);
-    }
-
     public ItemBuilder makeUnDiscoverable() {
         item.setDiscoverable(false);
         return this;

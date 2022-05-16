@@ -3129,27 +3129,4 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     }
 
-    @Test
-    public void hiddenOrcidMetadataFieldsTest() throws Exception {
-
-        context.turnOffAuthorisationSystem();
-
-        EPerson ePerson = EPersonBuilder.createEPerson(context)
-            .withEmail("test@user.it")
-            .withPassword(password)
-            .withNameInMetadata("Test", "User")
-            .withOrcidAccessToken("23bc2f69-b7c7-4e55-9dc4-d4e09382f687")
-            .withOrcidRefreshToken("a6c6dbdc-41b3-4e86-8aaf-2ac50253dc74")
-            .build();
-
-        context.restoreAuthSystemState();
-
-        String authToken = getAuthToken(ePerson.getEmail(), password);
-        getClient(authToken).perform(get("/api/eperson/epersons/{uuid}", ePerson.getID()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.metadata.['eperson.orcid.access-token']").doesNotExist())
-            .andExpect(jsonPath("$.metadata.['eperson.orcid.refresh-token']").doesNotExist());
-
-    }
-
 }
