@@ -8,6 +8,7 @@
 package org.dspace.app.profile;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 import static org.dspace.core.Constants.READ;
@@ -236,27 +237,9 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
      * Returns a Profile collection based on a configuration or searching for a
      * collection of researcher profile type.
      */
-    @SuppressWarnings("rawtypes")
     private Optional<Collection> findProfileCollection(Context context) throws SQLException, SearchServiceException {
-        UUID uuid = UUIDUtils.fromString(configurationService.getProperty("researcher-profile.collection.uuid"));
-        if (uuid != null) {
-            return ofNullable(collectionService.find(context, uuid));
-        }
-
-        String profileType = getProfileType();
-
-        DiscoverQuery discoverQuery = new DiscoverQuery();
-        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
-        discoverQuery.addFilterQueries("dspace.entity.type:" + profileType);
-
-        DiscoverResult discoverResult = searchService.search(context, discoverQuery);
-        List<IndexableObject> indexableObjects = discoverResult.getIndexableObjects();
-
-        if (CollectionUtils.isEmpty(indexableObjects)) {
-            return empty();
-        }
-
-        return ofNullable((Collection) indexableObjects.get(0).getIndexedObject());
+        return findConfiguredProfileCollection(context)
+            .or(() -> findFirstCollectionByProfileEntityType(context));
     }
 
     /**
@@ -285,12 +268,56 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         return reloadItem(context, item);
     }
 
+    private Optional<Collection> findConfiguredProfileCollection(Context context) throws SQLException {
+        UUID uuid = UUIDUtils.fromString(configurationService.getProperty("researcher-profile.collection.uuid"));
+        if (uuid == null) {
+            return Optional.empty();
+        }
+
+        Collection collection = collectionService.find(context, uuid);
+        if (collection == null) {
+            return Optional.empty();
+        }
+
+        if (isNotProfileCollection(collection)) {
+            log.warn("The configured researcher-profile.collection.uuid "
+                + "has an invalid entity type, expected " + getProfileType());
+            return Optional.empty();
+        }
+
+        return of(collection);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private Optional<Collection> findFirstCollectionByProfileEntityType(Context context) {
+
+        String profileType = getProfileType();
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        discoverQuery.addFilterQueries("dspace.entity.type:" + profileType);
+
+        DiscoverResult discoverResult = search(context, discoverQuery);
+        List<IndexableObject> indexableObjects = discoverResult.getIndexableObjects();
+
+        if (CollectionUtils.isEmpty(indexableObjects)) {
+            return empty();
+        }
+
+        return ofNullable((Collection) indexableObjects.get(0).getIndexedObject());
+    }
+
     private boolean isHardDeleteEnabled() {
         return configurationService.getBooleanProperty("researcher-profile.hard-delete.enabled");
     }
 
     private boolean isNewProfileNotVisibleByDefault() {
         return !configurationService.getBooleanProperty("researcher-profile.set-new-profile-visible");
+    }
+
+    private boolean isNotProfileCollection(Collection collection) {
+        String entityType = collectionService.getMetadataFirstValue(collection, "dspace", "entity", "type", Item.ANY);
+        return entityType == null || !entityType.equals(getProfileType());
     }
 
     private void removeOwnerMetadata(Context context, Item profileItem) throws SQLException {
@@ -311,6 +338,14 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
             throw new RuntimeException(e);
         } finally {
             context.restoreAuthSystemState();
+        }
+    }
+
+    private DiscoverResult search(Context context, DiscoverQuery discoverQuery) {
+        try {
+            return searchService.search(context, discoverQuery);
+        } catch (SearchServiceException e) {
+            throw new RuntimeException(e);
         }
     }
 
