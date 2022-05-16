@@ -76,7 +76,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
                 List<Relationship> relationships = relationshipService.findByItem(context, item, -1, -1, true);
                 for (Relationship relationship : relationships) {
                     fullMetadataValueList
-                        .addAll(findRelationshipMetadataValueForItemRelationship(context, item, entityType,
+                        .addAll(findRelationshipMetadataValueForItemRelationship(context, item, entityType.getLabel(),
                                 relationship, enableVirtualMetadata));
                 }
 
@@ -190,7 +190,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
 
     @Override
     public List<RelationshipMetadataValue> findRelationshipMetadataValueForItemRelationship(
-            Context context, Item item, EntityType entityType, Relationship relationship, boolean enableVirtualMetadata)
+            Context context, Item item, String entityType, Relationship relationship, boolean enableVirtualMetadata)
         throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
         RelationshipType relationshipType = relationship.getRelationshipType();
@@ -199,7 +199,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         Item otherItem;
         int place = 0;
         boolean isLeftwards;
-        if (relationshipType.getLeftType().equals(entityType) &&
+        if (StringUtils.equals(relationshipType.getLeftType().getLabel(), entityType) &&
                 item.getID().equals(relationship.getLeftItem().getID())) {
             hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getLeftwardType());
             otherItem = relationship.getRightItem();
@@ -207,7 +207,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
             place = relationship.getLeftPlace();
             isLeftwards = false; //if the current item is stored on the left,
             // the name variant is retrieved from the rightwards label
-        } else if (relationshipType.getRightType().equals(entityType) &&
+        } else if (StringUtils.equals(relationshipType.getRightType().getLabel(), entityType) &&
                 item.getID().equals(relationship.getRightItem().getID())) {
             hashMaps = virtualMetadataPopulator.getMap().get(relationshipType.getRightwardType());
             otherItem = relationship.getLeftItem();

@@ -49,7 +49,7 @@ public interface RelationshipMetadataService {
      * @return                      The list of virtual metadata values
      */
     public List<RelationshipMetadataValue> findRelationshipMetadataValueForItemRelationship(
-        Context context, Item item, EntityType entityType, Relationship relationship, boolean enableVirtualMetadata)
+        Context context, Item item, String entityType, Relationship relationship, boolean enableVirtualMetadata)
         throws SQLException;
 
     /**

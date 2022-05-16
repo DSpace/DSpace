@@ -865,11 +865,11 @@ public class RelationshipServiceImpl implements RelationshipService {
                                     boolean copyToRightItem)
         throws SQLException, AuthorizeException {
         if (copyToLeftItem) {
-            EntityType entityType = relationshipMetadataService
-                .getEntityTypeFromMetadata(context, relationship.getLeftItem());
+            String entityTypeString = relationshipMetadataService
+                .getEntityTypeStringFromMetadata(relationship.getLeftItem());
             List<RelationshipMetadataValue> relationshipMetadataValues =
                 relationshipMetadataService.findRelationshipMetadataValueForItemRelationship(context,
-                    relationship.getLeftItem(), entityType, relationship, true);
+                    relationship.getLeftItem(), entityTypeString, relationship, true);
             for (RelationshipMetadataValue relationshipMetadataValue : relationshipMetadataValues) {
                 // This adds the plain text metadata values on the same spot as the virtual values.
                 // This will be overruled in org.dspace.content.DSpaceObjectServiceImpl.update
@@ -892,11 +892,11 @@ public class RelationshipServiceImpl implements RelationshipService {
             itemService.update(context, relationship.getLeftItem());
         }
         if (copyToRightItem) {
-            EntityType entityType = relationshipMetadataService
-                .getEntityTypeFromMetadata(context, relationship.getRightItem());
+            String entityTypeString = relationshipMetadataService
+                .getEntityTypeStringFromMetadata(relationship.getRightItem());
             List<RelationshipMetadataValue> relationshipMetadataValues =
                 relationshipMetadataService.findRelationshipMetadataValueForItemRelationship(context,
-                    relationship.getRightItem(), entityType, relationship, true);
+                    relationship.getRightItem(), entityTypeString, relationship, true);
             for (RelationshipMetadataValue relationshipMetadataValue : relationshipMetadataValues) {
                 itemService.addMetadata(context, relationship.getRightItem(),
                                                      relationshipMetadataValue.getMetadataField().
