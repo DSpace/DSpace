@@ -109,8 +109,6 @@ You can use Maven profiles to have Grunt build the theme in production or develo
 
 In production mode, Grunt will concatenate and minify all javascript files referenced in the `Mirage2/scripts.xml` file (for more details see the javascript section of this document) in to a single `theme.js` file, to improve the performance of the theme. In development mode all javascript files will be separate and untouched, to make debugging easier.
 
-Similarly for CSS, Compass will compile the CSS either using `Mirage2/config-dev.rb` or `Mirage2/config-prod.rb`. Both will yield a single css file: `main.css`, but the dev version won't be minified and will contain the scss file name and line number as a comment above each CSS rule.
-
 By default, Grunt will build the javascript and CSS in production mode. Use the `mirage2_dev` maven profile, or run Grunt with the `dev` task to build the theme in development mode.
 
 ### Note: ###
@@ -133,7 +131,7 @@ When working with a DRI that has been changed by the preprocess XSLs, it is ofte
 
 Mirage 2 contains two color schemes to choose from. The classic Mirage color scheme or the standard Bootstrap color scheme. By default, Grunt will build CSS to get the classic Mirage color scheme. However, by activating the `mirage2_bootstrap_color_scheme` maven profile, this can be changed to get the standard Bootstrap color scheme. 
 
-The stylesheets are written in [Sass](https://sass-lang.com/). You can find them in the folder `Mirage2/styles`. Each color scheme has its own subfolder, and a `_main.scss` file that imports all others. These files will import the Compass library first. Next, all Bootstrap scss files and finally the DSpace specific files. Both color schemes also import the file `_style.scss`. It contains some example SCSS by default, and is meant to add your own style. Note that CSS is also valid SCSS, so if you don't want to learn Sass, just add plain old CSS to that file and it will work just fine.
+The stylesheets are written in [Sass](https://sass-lang.com/). You can find them in the folder `Mirage2/styles`. Each color scheme has its own subfolder, and a `_main.scss` file that imports all others. These files will import the legacy Compass library mixins first. Next, all Bootstrap scss files and finally the DSpace specific files. Both color schemes also import the file `_style.scss`. It contains some example SCSS by default, and is meant to add your own style. Note that CSS is also valid SCSS, so if you don't want to learn Sass, just add plain old CSS to that file and it will work just fine.
 
 The goal of the standard Bootstrap color scheme was to add as little extra style on top of Bootstrap as possible and instead force ourselves to solve most issues in XSL; by creating the right HTML structure and adding the right bootstrap CSS classes. But try as we might, a few additional style rules were still needed. Those can be found in `shared/_dspace-bootstrap-tweaks.scss`, most of it is limited to styles to improve the sidebar behavior on mobile devices.
 
@@ -144,19 +142,16 @@ Take a look at [bootstrap's own variables file](https://github.com/twbs/bootstra
 If you want to base your theme on an existing Bootstrap theme (like the ones at [bootswatch.com](https://bootswatch.com)) you can do so by using the standard Bootstrap color scheme and replacing the import of Bootstrap in `bootstrap_color_scheme/_main.scss`:
 
 ```less
-@import "../vendor/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 ```
 
 with an import of just its `_variables.sccs` file (those variables need to be defined, because they are used in `_dspace-bootstrap-tweaks.scss`):
 
 ```less
-@import "../vendor/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap/_variables";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap_variables";
 ```
 
 Then import the the css file(s) of your Bootstrap theme of choice below it. Depending on the theme you may also need to update the `twbs-font-path` function right above that import statement.
-
-### Tip: ###
-During development it is a hassle to always have to run `mvn package` to re-compile the style and see the result of a CSS change. Luckily Compass comes with a `watch` feature that automatically recompiles when the scss files change. If your editor can update the running webapp when you save an scss file, and you run `compass watch` in that webapp's `xmlui/themes/Mirage2` folder, changes to the style will show up nearly instantaneous.
 
 
 # Scripts #
@@ -174,6 +169,8 @@ The theme also comes with built in support for [CoffeeScript](http://coffeescrip
 # Managing dependencies #
 
 Mirage 2's dependencies are specified in the file `Mirage2/package.json`. Dependencies in this file should be specified according to the rules in the [NPM documentation](https://docs.npmjs.com/cli/v7/configuring-npm/package-json|). Note that npm only downloads the dependencies, nothing more. So if you add other dependencies, you'll still have to reference them. That means if it’s a CSS file, import it in `Mirage2/styles/_style.scss`, if it's a javascript file, add it to `Mirage2/scripts.xml`.
+
+**Note: as of DSpace 6.4 dependencies are managed by npm in package.json. If your theme had custom packages in bower.json you should move them to package.json and update the imports accordingly (usually `vendor` to `node_modules`).**
 
 We've used the the `latest` keyword to specify dependency versions in `package.json` wherever possible because that ensures you're starting with up to date versions when creating a new theme. However once your theme is going in to production, we strongly recommend replacing `latest` with the actual version numbers being used at that moment. That way your production build won't break when a version of a dependency is released that isn't backwards compatible.
 
