@@ -7,6 +7,9 @@
  */
 package org.dspace.content;
 
+import static org.dspace.content.RelationshipType.Tilted.LEFT;
+import static org.dspace.content.RelationshipType.Tilted.RIGHT;
+
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -102,7 +105,12 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         List<RelationshipType> relationshipTypes = relationshipTypeService.findByEntityType(context, itemEntityType);
         for (RelationshipType relationshipType : relationshipTypes) {
             // item is on left side of this relationship type
-            if (relationshipType.getLeftType().equals(itemEntityType)) {
+            // NOTE: On the left item, we should index the uuids of the right items. If the relationship type is
+            //       "tilted right", it means that we expect a huge amount of right items, so we don't index their uuids
+            //       on the left item as a storage/performance improvement.
+            //       As a consequence, when searching for related items (using discovery)
+            //       on the pages of the right items you won't be able to find the left item.
+            if (relationshipType.getTilted() != RIGHT && relationshipType.getLeftType().equals(itemEntityType)) {
                 String element = relationshipType.getLeftwardType();
                 List<ItemUuidAndRelationshipId> data = relationshipService
                     .findByLatestItemAndRelationshipType(context, item, relationshipType, true);
@@ -110,7 +118,12 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
             }
 
             // item is on right side of this relationship type
-            if (relationshipType.getRightType().equals(itemEntityType)) {
+            // NOTE: On the right item, we should index the uuids of the left items. If the relationship type is
+            //       "tilted left", it means that we expect a huge amount of left items, so we don't index their uuids
+            //       on the right item as a storage/performance improvement.
+            //       As a consequence, when searching for related items (using discovery)
+            //       on the pages of the left items you won't be able to find the right item.
+            if (relationshipType.getTilted() != LEFT && relationshipType.getRightType().equals(itemEntityType)) {
                 String element = relationshipType.getRightwardType();
                 List<ItemUuidAndRelationshipId> data = relationshipService
                     .findByLatestItemAndRelationshipType(context, item, relationshipType, false);
