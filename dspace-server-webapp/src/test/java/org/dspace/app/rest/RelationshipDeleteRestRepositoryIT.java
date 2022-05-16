@@ -232,7 +232,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(publicationAuthorList.get(0).getAuthority(), startsWith("virtual::"));
         List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
             "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
-        assertThat(publicationRelationships.size(), equalTo(1));
+        assertThat(publicationRelationships.size(), equalTo(2));
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList =

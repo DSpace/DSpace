@@ -1035,7 +1035,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         list = itemService.getMetadata(publication1, "dc", Item.ANY, Item.ANY, Item.ANY);
         assertEquals(16, list.size()); //also includes title, 4 date fields, uri
         list = itemService.getMetadata(publication1, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        assertEquals(20, list.size()); //also includes type and 3 relation.isAuthorOfPublication values
+        // also includes type, 3 relation.isAuthorOfPublication and 3 relation.isAuthorOfPublication.latestForDiscovery
+        // values
+        assertEquals(23, list.size());
 
         } finally {
             RelationshipBuilder.deleteRelationship(idRef1.get());
