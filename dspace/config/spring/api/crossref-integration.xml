@@ -107,7 +107,7 @@
         <property name="query" value="/ISSN"/>
     </bean>
     <bean id="crossref.issn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.relation.issn"/>
+        <constructor-arg value="dc.identifier.issn"/>
     </bean>
 
     <bean id="crossrefVolume" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
