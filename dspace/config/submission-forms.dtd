@@ -8,7 +8,7 @@
  <!ELEMENT row (field|relation-field)+ >
  <!ATTLIST form name NMTOKEN #REQUIRED>
 
- <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, style?, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?, readonly?) >
+ <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, style?, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?, readonly?, acl?) >
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
  <!ELEMENT dc-qualifier (#PCDATA) >
@@ -24,6 +24,13 @@
  <!ELEMENT required (#PCDATA)>
  <!ELEMENT name-variants (#PCDATA)>
  <!ELEMENT regex (#PCDATA) >
+
+ <!--
+      ACL element for fine-grained access control
+      the content should be semicolon separated list of entries in format matching the following regexp:
+      policy=(allow|deny),action=(read|write),grantee-type=(user|group),grantee-id=(<UUID>)
+ -->
+ <!ELEMENT acl (#PCDATA)>
 
  <!ELEMENT form-value-pairs (value-pairs)* >
  <!ELEMENT value-pairs (pair)+ >

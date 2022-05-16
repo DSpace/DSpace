@@ -25,8 +25,11 @@ import org.dspace.app.rest.model.submit.SelectableRelationship;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.SubmissionFormRestRepository;
 import org.dspace.app.rest.utils.AuthorityUtils;
+import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.util.ACL;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
+import org.dspace.core.Context;
 import org.dspace.submit.model.LanguageFormField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -71,6 +74,10 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
             rowRest.setFields(fields);
             rows.add(rowRest);
             for (DCInput dcinput : row) {
+                //skip if acl says no
+                if (!isInputAuthorized(ContextUtil.obtainCurrentRequestContext() ,dcinput)) {
+                    continue;
+                }
                 fields.add(getField(dcinput, formName));
             }
         }
@@ -225,6 +232,17 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
             return true;
         }
         return authorityUtils.isChoice(schema, element, qualifier);
+    }
+
+    /**
+     * should we render the metadata field based on authorization?
+     */
+    protected boolean isInputAuthorized(Context c, DCInput dcInput) {
+        // If the input is not allowed according to ACL, skip it.
+        if (!dcInput.isAllowedAction(c, ACL.ACTION_READ) && !dcInput.isAllowedAction(c, ACL.ACTION_WRITE)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
