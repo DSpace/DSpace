@@ -25,6 +25,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -100,6 +101,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     protected VersionDAO versionDAO;
     @Autowired(required = true)
     protected ClaimedTaskService claimedTaskService;
+    @Autowired
+    protected OrcidTokenService orcidTokenService;
 
     protected EPersonServiceImpl() {
         super();
@@ -382,6 +385,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             groups.remove();
             group.getMembers().remove(ePerson);
         }
+
+        orcidTokenService.deleteByEPerson(context, ePerson);
 
         // Remove any subscriptions
         subscribeService.deleteByEPerson(context, ePerson);

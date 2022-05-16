@@ -22,8 +22,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.dspace.app.orcid.OrcidToken;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
@@ -51,7 +53,6 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
     private final static String CODE = "123456";
 
     private final static String ACCESS_TOKEN = "c41e37e5-c2de-4177-91d6-ed9e9d1f31bf";
-    private final static String REFRESH_TOKEN = "0062a9eb-d4ec-4d94-9491-95dd75376d3e";
     private final static String[] ORCID_SCOPES = { "FirstScope", "SecondScope" };
     @Autowired
     private OrcidClient orcidClient;
@@ -63,6 +64,9 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private OrcidTokenService orcidTokenService;
 
     private Collection profileCollection;
 
@@ -95,6 +99,7 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
     @After
     public void after() throws Exception {
         orcidRestController.setOrcidClient(orcidClient);
+        orcidTokenService.deleteAll(context);
     }
 
     @Test
@@ -123,10 +128,10 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
         profileItem = context.reloadEntity(profileItem);
         assertThat(profileItem, notNullValue());
         assertThat(profileItem.getMetadata(), hasItem(with("person.identifier.orcid", ORCID)));
-        assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.access-token", ACCESS_TOKEN)));
-        assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.refresh-token", REFRESH_TOKEN)));
         assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.scope", ORCID_SCOPES[0], 0)));
         assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.scope", ORCID_SCOPES[1], 1)));
+
+        assertThat(getOrcidAccessToken(profileItem), is(ACCESS_TOKEN));
 
         user = context.reloadEntity(user);
         assertThat(user.getNetid(), is(ORCID));
@@ -165,10 +170,10 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
         profileItem = context.reloadEntity(profileItem);
         assertThat(profileItem, notNullValue());
         assertThat(profileItem.getMetadata(), hasItem(with("person.identifier.orcid", ORCID)));
-        assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.access-token", ACCESS_TOKEN)));
-        assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.refresh-token", REFRESH_TOKEN)));
         assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.scope", ORCID_SCOPES[0], 0)));
         assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.scope", ORCID_SCOPES[1], 1)));
+
+        assertThat(getOrcidAccessToken(profileItem), is(ACCESS_TOKEN));
 
         user = context.reloadEntity(user);
         assertThat(user.getNetid(), nullValue());
@@ -255,9 +260,13 @@ public class OrcidRestControllerIT extends AbstractControllerIntegrationTest {
         token.setAccessToken(accessToken);
         token.setOrcid(orcid);
         token.setTokenType("Bearer");
-        token.setRefreshToken(REFRESH_TOKEN);
         token.setName("Test User");
         token.setScope(String.join(" ", ORCID_SCOPES));
         return token;
+    }
+
+    private String getOrcidAccessToken(Item item) {
+        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context, item);
+        return orcidToken != null ? orcidToken.getAccessToken() : null;
     }
 }

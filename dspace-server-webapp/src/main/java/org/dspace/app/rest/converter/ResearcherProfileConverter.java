@@ -22,6 +22,8 @@ import org.dspace.app.rest.model.ResearcherProfileRest;
 import org.dspace.app.rest.model.ResearcherProfileRest.OrcidSynchronizationRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
+import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -48,7 +50,9 @@ public class ResearcherProfileConverter implements DSpaceConverter<ResearcherPro
 
         Item item = profile.getItem();
 
-        if (orcidSynchronizationService.isLinkedToOrcid(item)) {
+        Context context = ContextUtil.obtainCurrentRequestContext();
+
+        if (orcidSynchronizationService.isLinkedToOrcid(context, item)) {
             profile.getOrcid().ifPresent(researcherProfileRest::setOrcid);
 
             OrcidSynchronizationRest orcidSynchronization = new OrcidSynchronizationRest();

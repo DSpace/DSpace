@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.authorize.AuthorizeException;
@@ -45,6 +46,7 @@ import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
@@ -95,6 +97,7 @@ public abstract class AbstractBuilder<T, S> {
     static ProcessService processService;
     static RequestItemService requestItemService;
     static VersioningService versioningService;
+    static OrcidTokenService orcidTokenService;
 
     protected Context context;
 
@@ -151,6 +154,7 @@ public abstract class AbstractBuilder<T, S> {
         inProgressUserService = XmlWorkflowServiceFactory.getInstance().getInProgressUserService();
         poolTaskService = XmlWorkflowServiceFactory.getInstance().getPoolTaskService();
         workflowItemRoleService = XmlWorkflowServiceFactory.getInstance().getWorkflowItemRoleService();
+        orcidTokenService = new DSpace().getSingletonService(OrcidTokenService.class);
     }
 
 
@@ -183,6 +187,7 @@ public abstract class AbstractBuilder<T, S> {
         processService = null;
         requestItemService = null;
         versioningService = null;
+        orcidTokenService = null;
 
     }
 

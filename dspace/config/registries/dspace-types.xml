@@ -54,20 +54,6 @@
     <dc-type>
         <schema>dspace</schema>
         <element>orcid</element>
-        <qualifier>access-token</qualifier>
-        <scope_note>Stores the access token retrieved from user authentication on ORCID</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>dspace</schema>
-        <element>orcid</element>
-        <qualifier>refresh-token</qualifier>
-        <scope_note>Stores the refresh token retrieved from user authentication on ORCID</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>dspace</schema>
-        <element>orcid</element>
         <qualifier>scope</qualifier>
         <scope_note>Stores the scopes/authorizations granted by the user during authentication on ORCID</scope_note>
     </dc-type>

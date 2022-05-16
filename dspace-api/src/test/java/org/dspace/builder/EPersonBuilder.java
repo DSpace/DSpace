@@ -134,16 +134,6 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         return this;
     }
 
-    public EPersonBuilder withOrcidAccessToken(final String accessToken) {
-        setMetadataSingleValue(ePerson, "eperson", "orcid", "access-token", accessToken);
-        return this;
-    }
-
-    public EPersonBuilder withOrcidRefreshToken(final String refreshToken) {
-        setMetadataSingleValue(ePerson, "eperson", "orcid", "refresh-token", refreshToken);
-        return this;
-    }
-
     public EPersonBuilder withOrcidScope(final String scope) {
         addMetadataValue(ePerson, "eperson", "orcid", "scope", scope);
         return this;
