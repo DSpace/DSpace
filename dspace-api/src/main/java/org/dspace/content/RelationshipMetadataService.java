@@ -59,4 +59,11 @@ public interface RelationshipMetadataService {
      */
     public String getEntityTypeStringFromMetadata(Item item);
 
+    /**
+     * This method will retrieve the EntityType from an item
+     * @param item  The Item for which the entityType will be returned
+     * @return      The entity type
+     */
+    public EntityType getEntityTypeFromMetadata(Context context, Item item) throws SQLException;
+
 }

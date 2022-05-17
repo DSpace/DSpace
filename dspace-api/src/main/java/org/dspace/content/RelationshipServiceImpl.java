@@ -24,6 +24,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Relationship.LatestVersionStatus;
 import org.dspace.content.dao.RelationshipDAO;
+import org.dspace.content.dao.pojo.ItemUuidAndRelationshipId;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
@@ -1023,6 +1024,14 @@ public class RelationshipServiceImpl implements RelationshipService {
     ) throws SQLException {
         return relationshipDAO
             .findByItemAndRelationshipType(context, item, relationshipType, isLeft, limit, offset, excludeNonLatest);
+    }
+
+    @Override
+    public List<ItemUuidAndRelationshipId> findByLatestItemAndRelationshipType(
+        Context context, Item latestItem, RelationshipType relationshipType, boolean isLeft
+    ) throws SQLException {
+        return relationshipDAO
+            .findByLatestItemAndRelationshipType(context, latestItem, relationshipType, isLeft);
     }
 
     @Override

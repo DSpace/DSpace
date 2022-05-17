@@ -7,6 +7,10 @@
  */
 package org.dspace.versioning.utils;
 
+import static org.dspace.versioning.utils.RelationshipVersioningUtils.LatestVersionStatusChangelog.LEFT_SIDE_CHANGED;
+import static org.dspace.versioning.utils.RelationshipVersioningUtils.LatestVersionStatusChangelog.NO_CHANGES;
+import static org.dspace.versioning.utils.RelationshipVersioningUtils.LatestVersionStatusChangelog.RIGHT_SIDE_CHANGED;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Relationship;
@@ -37,6 +41,12 @@ public class RelationshipVersioningUtils {
         return latestVersionStatus == (isLeft ? LatestVersionStatus.RIGHT_ONLY : LatestVersionStatus.LEFT_ONLY);
     }
 
+    public enum LatestVersionStatusChangelog {
+        NO_CHANGES,
+        LEFT_SIDE_CHANGED,
+        RIGHT_SIDE_CHANGED
+    }
+
     /**
      * Update {@link Relationship#latestVersionStatus} of the given relationship.
      * If isLatest = true, this method will never throw IllegalStateException.
@@ -48,7 +58,7 @@ public class RelationshipVersioningUtils {
      * @throws IllegalStateException if the operation would result in both the left side and the right side
      *                               being set to non-latest.
      */
-    public void updateLatestVersionStatus(
+    public LatestVersionStatusChangelog updateLatestVersionStatus(
         Relationship relationship, boolean updateLeftSide, boolean isLatest
     ) throws IllegalStateException {
         LatestVersionStatus lvs = relationship.getLatestVersionStatus();
@@ -58,12 +68,12 @@ public class RelationshipVersioningUtils {
 
         if (updateLeftSide) {
             if (leftSideIsLatest == isLatest) {
-                return; // no change needed
+                return NO_CHANGES; // no change needed
             }
             leftSideIsLatest = isLatest;
         } else {
             if (rightSideIsLatest == isLatest) {
-                return; // no change needed
+                return NO_CHANGES; // no change needed
             }
             rightSideIsLatest = isLatest;
         }
@@ -97,6 +107,8 @@ public class RelationshipVersioningUtils {
             relationship.getRightItem().getID(), relationship.getRightItem().getHandle()
         ));
         relationship.setLatestVersionStatus(newVersionStatus);
+
+        return updateLeftSide ? LEFT_SIDE_CHANGED : RIGHT_SIDE_CHANGED;
     }
 
 }

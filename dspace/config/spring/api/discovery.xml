@@ -2137,7 +2137,7 @@
         <property name="indexFieldName" value="isAuthorOfPublication"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isAuthorOfPublication</value>
+                <value>relation.isAuthorOfPublication.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2148,7 +2148,7 @@
         <property name="indexFieldName" value="isProjectOfPublication"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isProjectOfPublication</value>
+                <value>relation.isProjectOfPublication.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2160,7 +2160,7 @@
         <property name="indexFieldName" value="isOrgUnitOfPublication"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isOrgUnitOfPublication</value>
+                <value>relation.isOrgUnitOfPublication.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2171,7 +2171,7 @@
         <property name="indexFieldName" value="isPublicationOfJournalIssue"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isPublicationOfJournalIssue</value>
+                <value>relation.isPublicationOfJournalIssue.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2182,7 +2182,7 @@
         <property name="indexFieldName" value="isJournalOfPublication"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isJournalOfPublication</value>
+                <value>relation.isJournalOfPublication.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2388,7 +2388,7 @@
         <property name="indexFieldName" value="isOrgUnitOfPerson"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isOrgUnitOfPerson</value>
+                <value>relation.isOrgUnitOfPerson.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2399,7 +2399,7 @@
         <property name="indexFieldName" value="isProjectOfPerson"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isProjectOfPerson</value>
+                <value>relation.isProjectOfPerson.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2411,7 +2411,7 @@
         <property name="indexFieldName" value="isPublicationOfAuthor"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isPublicationOfAuthor</value>
+                <value>relation.isPublicationOfAuthor.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2483,7 +2483,7 @@
         <property name="indexFieldName" value="isPersonOfOrgUnit"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isPersonOfOrgUnit</value>
+                <value>relation.isPersonOfOrgUnit.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2494,7 +2494,7 @@
         <property name="indexFieldName" value="isProjectOfOrgUnit"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isProjectOfOrgUnit</value>
+                <value>relation.isProjectOfOrgUnit.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2506,7 +2506,7 @@
         <property name="indexFieldName" value="isPublicationOfOrgUnit"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isPublicationOfOrgUnit</value>
+                <value>relation.isPublicationOfOrgUnit.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2560,7 +2560,7 @@
         <property name="indexFieldName" value="isPublicationOfJournalIssue"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isPublicationOfJournalIssue</value>
+                <value>relation.isPublicationOfJournalIssue.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2583,7 +2583,7 @@
         <property name="indexFieldName" value="isIssueOfJournalVolumeRelation"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isIssueOfJournalVolume</value>
+                <value>relation.isIssueOfJournalVolume.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2594,7 +2594,7 @@
         <property name="indexFieldName" value="isJournalVolumeRelation"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isJournalOfVolume</value>
+                <value>relation.isJournalOfVolume.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2635,7 +2635,7 @@
         <property name="indexFieldName" value="isVolumeOfJournalRelation"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isVolumeOfJournal</value>
+                <value>relation.isVolumeOfJournal.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2660,7 +2660,7 @@
         <property name="indexFieldName" value="isOrgUnitOfProject"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isOrgUnitOfProject</value>
+                <value>relation.isOrgUnitOfProject.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2672,7 +2672,7 @@
         <property name="indexFieldName" value="isPersonOfProject"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isPersonOfProject</value>
+                <value>relation.isPersonOfProject.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2684,7 +2684,7 @@
         <property name="indexFieldName" value="isPublicationOfProject"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isPublicationOfProject</value>
+                <value>relation.isPublicationOfProject.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2695,7 +2695,7 @@
         <property name="indexFieldName" value="isContributorOfPublication"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isContributorOfPublication</value>
+                <value>relation.isContributorOfPublication.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2706,7 +2706,7 @@
         <property name="indexFieldName" value="isPublicationOfContributor"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isPublicationOfContributor</value>
+                <value>relation.isPublicationOfContributor.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2717,7 +2717,7 @@
         <property name="indexFieldName" value="isFundingAgencyOfProject"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isFundingAgencyOfProject</value>
+                <value>relation.isFundingAgencyOfProject.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>
@@ -2728,7 +2728,7 @@
         <property name="indexFieldName" value="isProjectOfFundingAgency"/>
         <property name="metadataFields">
             <list>
-                <value>relation.isProjectOfFundingAgency</value>
+                <value>relation.isProjectOfFundingAgency.latestForDiscovery</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="false"/>

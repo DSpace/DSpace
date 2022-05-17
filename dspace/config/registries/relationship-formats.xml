@@ -14,6 +14,12 @@
         <element>isAuthorOfPublication</element>
         <scope_note></scope_note>
     </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isAuthorOfPublication</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
 
     <dc-type>
         <schema>relation</schema>
@@ -22,9 +28,23 @@
     </dc-type>
     <dc-type>
         <schema>relation</schema>
+        <element>isPublicationOfAuthor</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
         <element>isProjectOfPublication</element>
         <scope_note></scope_note>
     </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProjectOfPublication</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
     <dc-type>
         <schema>relation</schema>
         <element>isPublicationOfProject</element>
@@ -32,9 +52,23 @@
     </dc-type>
     <dc-type>
         <schema>relation</schema>
+        <element>isPublicationOfProject</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
         <element>isOrgUnitOfPublication</element>
         <scope_note></scope_note>
     </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isOrgUnitOfPublication</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
     <dc-type>
         <schema>relation</schema>
         <element>isPublicationOfOrgUnit</element>
@@ -42,9 +76,23 @@
     </dc-type>
     <dc-type>
         <schema>relation</schema>
+        <element>isPublicationOfOrgUnit</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
         <element>isProjectOfPerson</element>
         <scope_note></scope_note>
     </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProjectOfPerson</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
     <dc-type>
         <schema>relation</schema>
         <element>isPersonOfProject</element>
@@ -52,9 +100,23 @@
     </dc-type>
     <dc-type>
         <schema>relation</schema>
+        <element>isPersonOfProject</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
         <element>isOrgUnitOfPerson</element>
         <scope_note></scope_note>
     </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isOrgUnitOfPerson</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
     <dc-type>
         <schema>relation</schema>
         <element>isPersonOfOrgUnit</element>
@@ -62,15 +124,34 @@
     </dc-type>
     <dc-type>
         <schema>relation</schema>
+        <element>isPersonOfOrgUnit</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
         <element>isOrgUnitOfProject</element>
         <scope_note></scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
-        <element>isProjectOfOrgUnit</element>
+        <element>isOrgUnitOfProject</element>
+        <qualifier>latestForDiscovery</qualifier>
         <scope_note></scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProjectOfOrgUnit</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProjectOfOrgUnit</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
 
     <dc-type>
         <schema>relation</schema>
@@ -79,9 +160,23 @@
     </dc-type>
     <dc-type>
         <schema>relation</schema>
+        <element>isVolumeOfJournal</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
         <element>isJournalOfVolume</element>
         <scope_note></scope_note>
     </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isJournalOfVolume</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
     <dc-type>
         <schema>relation</schema>
         <element>isIssueOfJournalVolume</element>
@@ -89,12 +184,32 @@
     </dc-type>
     <dc-type>
         <schema>relation</schema>
+        <element>isIssueOfJournalVolume</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
         <element>isJournalVolumeOfIssue</element>
         <scope_note></scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
+        <element>isJournalVolumeOfIssue</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
         <element>isJournalOfPublication</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isJournalOfPublication</element>
+        <qualifier>latestForDiscovery</qualifier>
         <scope_note></scope_note>
     </dc-type>
 
@@ -103,17 +218,27 @@
         <element>isJournalIssueOfPublication</element>
         <scope_note></scope_note>
     </dc-type>
-
+    <dc-type>
+        <schema>relation</schema>
+        <element>isJournalIssueOfPublication</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isPublicationOfJournalIssue</element>
         <scope_note></scope_note>
     </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfJournalIssue</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
 
-    <!--
-      OpenAIRE4 Guidelines
-      required relationships -->
+    <!-- OpenAIRE4 Guidelines - required relationships -->
+
     <dc-type>
         <schema>relation</schema>
         <element>isContributorOfPublication</element>
@@ -121,9 +246,23 @@
     </dc-type>
     <dc-type>
         <schema>relation</schema>
+        <element>isContributorOfPublication</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
         <element>isPublicationOfContributor</element>
         <scope_note></scope_note>
     </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfContributor</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
     <dc-type>
         <schema>relation</schema>
         <element>isFundingAgencyOfProject</element>
@@ -131,7 +270,20 @@
     </dc-type>
     <dc-type>
         <schema>relation</schema>
+        <element>isFundingAgencyOfProject</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>relation</schema>
         <element>isProjectOfFundingAgency</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProjectOfFundingAgency</element>
+        <qualifier>latestForDiscovery</qualifier>
         <scope_note></scope_note>
     </dc-type>
 

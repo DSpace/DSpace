@@ -11,18 +11,22 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.Query;
+import javax.persistence.Tuple;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.dspace.content.Item;
+import org.dspace.content.Item_;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.RelationshipType_;
 import org.dspace.content.Relationship_;
 import org.dspace.content.dao.RelationshipDAO;
+import org.dspace.content.dao.pojo.ItemUuidAndRelationshipId;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.AbstractHibernateDAO;
@@ -243,6 +247,85 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         }
 
         return list(context, criteriaQuery, true, Relationship.class, limit, offset);
+    }
+
+    @Override
+    public List<ItemUuidAndRelationshipId> findByLatestItemAndRelationshipType(
+        Context context, Item latestItem, RelationshipType relationshipType, boolean isLeft
+    ) throws SQLException {
+        final String relationshipIdAlias = "relationshipId";
+        final String itemUuidAlias = "itemUuid";
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Tuple> criteriaQuery = criteriaBuilder.createTupleQuery();
+        Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
+
+        ArrayList<Predicate> predicates = new ArrayList<>();
+
+        // all relationships should have the specified relationship type
+        predicates.add(
+            criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType)
+        );
+
+        if (isLeft) {
+            // match relationships based on the left item
+            predicates.add(
+                criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), latestItem)
+            );
+
+            // the left item has to have "latest status" => accept BOTH and LEFT_ONLY
+            predicates.add(
+                criteriaBuilder.notEqual(
+                    relationshipRoot.get(Relationship_.LATEST_VERSION_STATUS),
+                    Relationship.LatestVersionStatus.RIGHT_ONLY
+                )
+            );
+
+            // return the UUIDs of the right item
+            criteriaQuery.multiselect(
+                relationshipRoot.get(Relationship_.id).alias(relationshipIdAlias),
+                relationshipRoot.get(Relationship_.rightItem).get(Item_.id).alias(itemUuidAlias)
+            );
+        } else {
+            // match relationships based on the right item
+            predicates.add(
+                criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), latestItem)
+            );
+
+            // the right item has to have "latest status" => accept BOTH and RIGHT_ONLY
+            predicates.add(
+                criteriaBuilder.notEqual(
+                    relationshipRoot.get(Relationship_.LATEST_VERSION_STATUS),
+                    Relationship.LatestVersionStatus.LEFT_ONLY
+                )
+            );
+
+            // return the UUIDs of the left item
+            criteriaQuery.multiselect(
+                relationshipRoot.get(Relationship_.id).alias(relationshipIdAlias),
+                relationshipRoot.get(Relationship_.leftItem).get(Item_.id).alias(itemUuidAlias)
+            );
+        }
+
+        // all predicates are chained with the AND operator
+        criteriaQuery.where(predicates.toArray(new Predicate[]{}));
+
+        // deduplicate result
+        criteriaQuery.distinct(true);
+
+        // execute query
+        Query query = this.getHibernateSession(context).createQuery(criteriaQuery);
+        query.setHint("org.hibernate.cacheable", true);
+        List<?> resultList = query.getResultList();
+
+        // convert types
+        return resultList.stream()
+            .map(Tuple.class::cast)
+            .map(t -> new ItemUuidAndRelationshipId(
+                (UUID) t.get(itemUuidAlias),
+                (Integer) t.get(relationshipIdAlias)
+            ))
+            .collect(Collectors.toList());
     }
 
     @Override
