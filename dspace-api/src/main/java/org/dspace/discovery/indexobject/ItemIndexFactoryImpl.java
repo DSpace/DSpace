@@ -189,12 +189,23 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             return true;
         }
 
+        // start with the very latest version of the given item (may still be in workspace)
         Version latestVersion = versionHistoryService.getLatestVersion(context, history);
+
+        // find the latest version of the given item that is archived
+        while (latestVersion != null && !latestVersion.getItem().isArchived()) {
+            latestVersion = versionHistoryService.getPrevious(context, history, latestVersion);
+        }
+
+        // could not find an archived version of the given item
         if (latestVersion == null) {
             // this scenario should never happen, but let's err on the side of showing too many items vs. to little
             // (see discovery.xml, a lot of discovery configs filter out all items that are not the latest version)
             return true;
         }
+
+        // sanity check
+        assert latestVersion.getItem().isArchived();
 
         return item.equals(latestVersion.getItem());
     }
