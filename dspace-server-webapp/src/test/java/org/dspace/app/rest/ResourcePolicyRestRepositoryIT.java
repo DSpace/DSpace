@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -2762,7 +2763,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                              .andExpect(jsonPath("$._embedded.group", nullValue()));
 
         // update eperson of the resourcePolicy
-        getClient(tokenAdmin).perform(post("/api/authz/resourcepolicies/" + resourcePolicy.getID() + "/eperson")
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + resourcePolicy.getID() + "/eperson")
                              .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                              .content("/api/eperson/epersons/" + newEPerson.getID()))
                              .andExpect(status().isNoContent());
@@ -2812,7 +2813,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                              .andExpect(jsonPath("$._embedded.eperson", nullValue()));
 
         // update group of the resourcePolicy
-        getClient(tokenAdmin).perform(post("/api/authz/resourcepolicies/" + resourcePolicy.getID() + "/group")
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + resourcePolicy.getID() + "/group")
                              .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                              .content("/api/eperson/groups/" + newGroup.getID()))
                              .andExpect(status().isNoContent());
@@ -2852,7 +2853,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                             + resourcePolicyOfEPerson.getID())));
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(post("/api/authz/resourcepolicies/" + resourcePolicyOfEPerson.getID() + "/group")
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + resourcePolicyOfEPerson.getID() + "/group")
                              .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                              .content("/api/eperson/groups/" + group.getID()))
                              .andExpect(status().isUnprocessableEntity());
@@ -2888,7 +2889,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                      "api/authz/resourcepolicies/search/group")))
                  .andExpect(jsonPath("$.page.totalElements", is(1)));
 
-        getClient(tokenAdmin).perform(post("/api/authz/resourcepolicies/" + resourcePolicyOfGroup.getID() + "/eperson")
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + resourcePolicyOfGroup.getID() + "/eperson")
                              .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                              .content("/api/eperson/epersons/" + eperson.getID()))
                              .andExpect(status().isUnprocessableEntity());
@@ -2897,7 +2898,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     @Test
     public void updateEPersonOfNotExistingResourcePolicyTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(post("/api/authz/resourcepolicies/" + Integer.MAX_VALUE + "/eperson")
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + Integer.MAX_VALUE + "/eperson")
                              .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                              .content("/api/eperson/epersons/" + eperson.getID()))
                              .andExpect(status().isNotFound());
@@ -2914,7 +2915,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(post("/api/authz/resourcepolicies/" + Integer.MAX_VALUE + "/group")
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + Integer.MAX_VALUE + "/group")
                              .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                              .content("/api/eperson/groups/" + group.getID()))
                              .andExpect(status().isNotFound());
@@ -2940,7 +2941,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(post("/api/authz/resourcepolicies/" + resourcePolicyOfGroup.getID() + "/group")
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + resourcePolicyOfGroup.getID() + "/group")
                              .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                              .content(StringUtils.EMPTY))
                              .andExpect(status().isUnprocessableEntity());
@@ -2964,7 +2965,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(post("/api/authz/resourcepolicies/" + resourcePolicyOfGroup.getID() + "/group")
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + resourcePolicyOfGroup.getID() + "/group")
                              .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                              .content("/api/eperson/groups/" + group1.getID() +
                                       "\n/api/eperson/groups/" + group2.getID()))
@@ -2985,7 +2986,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(post("/api/authz/resourcepolicies/" + rpOfEPerson.getID() + "/eperson")
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + rpOfEPerson.getID() + "/eperson")
                              .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                              .content(StringUtils.EMPTY))
                              .andExpect(status().isUnprocessableEntity());
@@ -3014,7 +3015,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(post("/api/authz/resourcepolicies/" + rpOfEPerson.getID() + "/eperson")
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + rpOfEPerson.getID() + "/eperson")
                              .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                              .content("/api/eperson/epersons/" + eperson1.getID() +
                                       "\n/api/eperson/epersons/" + eperson2.getID()))
