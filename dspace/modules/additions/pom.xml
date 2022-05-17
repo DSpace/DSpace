@@ -279,6 +279,12 @@
          <groupId>cas</groupId>
          <artifactId>casclient</artifactId>
          <version>2.1.1</version>
+         <exclusions>
+            <exclusion>
+               <groupId>javax.servlet</groupId>
+               <artifactId>servlet-api</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
       <dependency>
          <groupId>org.marc4j</groupId>
