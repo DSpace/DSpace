@@ -48,10 +48,6 @@ public class ResearcherProfile {
         return UUIDUtils.fromString(dspaceObjectOwner.getAuthority());
     }
 
-    public String getFullName() {
-        return dspaceObjectOwner.getValue();
-    }
-
     /**
      * A profile is considered visible if accessible by anonymous users. This method
      * returns true if the given item has a READ policy related to ANONYMOUS group,
