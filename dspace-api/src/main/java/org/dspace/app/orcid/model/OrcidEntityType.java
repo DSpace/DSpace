@@ -18,17 +18,23 @@ import java.util.Arrays;
 public enum OrcidEntityType {
 
     /**
-     * The publication/work activity.
+     * The ORCID publication/work activity.
      */
     PUBLICATION("Publication", "/work"),
 
     /**
-     * The funding activity.
+     * The ORCID funding activity.
      */
     FUNDING("Project", "/funding");
 
+    /**
+     * The DSpace entity type.
+     */
     private final String entityType;
 
+    /**
+     * The subpath of the activity on ORCID API.
+     */
     private final String path;
 
     private OrcidEntityType(String entityType, String path) {
@@ -44,11 +50,22 @@ public enum OrcidEntityType {
         return path;
     }
 
+    /**
+     * Check if the given DSpace entity type is valid.
+     * @param  entityType the entity type to check
+     * @return            true if valid, false otherwise
+     */
     public static boolean isValidEntityType(String entityType) {
         return Arrays.stream(OrcidEntityType.values())
             .anyMatch(orcidEntityType -> orcidEntityType.getEntityType().equalsIgnoreCase(entityType));
     }
 
+    /**
+     * Returns an ORCID entity type from a DSpace entity type.
+     *
+     * @param  entityType the DSpace entity type to search for
+     * @return            the ORCID entity type, if any
+     */
     public static OrcidEntityType fromEntityType(String entityType) {
         return Arrays.stream(OrcidEntityType.values())
             .filter(orcidEntityType -> orcidEntityType.getEntityType().equalsIgnoreCase(entityType))

@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -26,8 +27,14 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.orcid.OrcidHistory;
+import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.OrcidToken;
+import org.dspace.app.orcid.service.OrcidHistoryService;
+import org.dspace.app.orcid.service.OrcidQueueService;
+import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.app.orcid.service.OrcidTokenService;
+import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -124,6 +131,18 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired
     private OrcidTokenService orcidTokenService;
+
+    @Autowired(required = true)
+    private OrcidHistoryService orcidHistoryService;
+
+    @Autowired(required = true)
+    private OrcidQueueService orcidQueueService;
+
+    @Autowired(required = true)
+    private OrcidSynchronizationService orcidSynchronizationService;
+
+    @Autowired(required = true)
+    private ResearcherProfileService researcherProfileService;
 
     protected ItemServiceImpl() {
         super();
@@ -741,6 +760,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // remove version attached to the item
         removeVersion(context, item);
+
+        removeOrcidSynchronizationStuff(context, item);
 
         // Also delete the item if it appears in a harvested collection.
         HarvestedItem hi = harvestedItemService.find(context, item);
@@ -1592,6 +1613,59 @@ prevent the generation of resource policy entry values with null dspace_object a
     @Override
     public String getEntityType(Item item) {
         return getMetadataFirstValue(item, new MetadataFieldName("dspace.entity.type"), Item.ANY);
+    }
+
+    private void removeOrcidSynchronizationStuff(Context context, Item item) throws SQLException, AuthorizeException {
+
+        try {
+
+            context.turnOffAuthorisationSystem();
+
+            createOrcidQueueRecordsToDeleteOnOrcid(context, item);
+            deleteOrcidHistoryRecords(context, item);
+            deleteOrcidQueueRecords(context, item);
+
+        } finally {
+            context.restoreAuthSystemState();
+        }
+
+    }
+
+    private void createOrcidQueueRecordsToDeleteOnOrcid(Context context, Item entity) throws SQLException {
+
+        String entityType = getEntityType(entity);
+        if (researcherProfileService.getProfileType().equals(entityType)) {
+            return;
+        }
+
+        Map<Item, String> ownerAndPutCodeMap = orcidHistoryService.findLastPutCodes(context, entity);
+        for (Item owner : ownerAndPutCodeMap.keySet()) {
+            if (orcidSynchronizationService.isSynchronizationEnabled(owner, entity)) {
+                String putCode = ownerAndPutCodeMap.get(owner);
+                String title = getMetadataFirstValue(entity, "dc", "title", null, Item.ANY);
+                orcidQueueService.createEntityDeletionRecord(context, owner, title, entityType, putCode);
+            }
+        }
+
+    }
+
+    private void deleteOrcidHistoryRecords(Context context, Item item) throws SQLException {
+        List<OrcidHistory> historyRecords = orcidHistoryService.findByOwnerOrEntity(context, item);
+        for (OrcidHistory historyRecord : historyRecords) {
+            if (historyRecord.getOwner().equals(item)) {
+                orcidHistoryService.delete(context, historyRecord);
+            } else {
+                historyRecord.setEntity(null);
+                orcidHistoryService.update(context, historyRecord);
+            }
+        }
+    }
+
+    private void deleteOrcidQueueRecords(Context context, Item item) throws SQLException {
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findByOwnerOrEntity(context, item);
+        for (OrcidQueue orcidQueueRecord : orcidQueueRecords) {
+            orcidQueueService.delete(context, orcidQueueRecord);
+        }
     }
 
 }

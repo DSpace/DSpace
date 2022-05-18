@@ -49,7 +49,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The consumer to fill the ORCID queue.
+ * The consumer to fill the ORCID queue. The addition to the queue is made for
+ * all archived items that meet one of these conditions:
+ * <ul>
+ * <li>are profiles already linked to orcid that have some modified sections to
+ * be synchronized (based on the preferences set by the user)</li>
+ * <li>are publications/fundings related to profile items linked to orcid (based
+ * on the preferences set by the user)</li>
+ * 
+ * </ul>
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
@@ -115,6 +123,9 @@ public class OrcidQueueConsumer implements Consumer {
         }
     }
 
+    /**
+     * Consume the item if it is a profile or an ORCID entity.
+     */
     private void consumeItem(Context context, Item item) throws SQLException {
 
         String entityType = itemService.getEntityType(item);
@@ -132,6 +143,11 @@ public class OrcidQueueConsumer implements Consumer {
 
     }
 
+    /**
+     * Search for all related items to the given entity and create a new ORCID queue
+     * record if one of this is a profile linked with ORCID and the entity item must
+     * be synchronized with ORCID.
+     */
     private void consumeEntity(Context context, Item entity) throws SQLException {
 
         List<Item> relatedItems = findAllRelatedItems(context, entity);
@@ -162,6 +178,10 @@ public class OrcidQueueConsumer implements Consumer {
         return item.equals(relationship.getLeftItem()) ? relationship.getRightItem() : relationship.getLeftItem();
     }
 
+    /**
+     * If the given profile item is linked with ORCID recalculate all the ORCID
+     * queue records of the configured profile sections that can be synchronized.
+     */
     private void consumeProfile(Context context, Item item) throws SQLException {
 
         if (isNotLinkedToOrcid(context, item)) {
@@ -193,6 +213,10 @@ public class OrcidQueueConsumer implements Consumer {
         return !preferences.contains(factory.getSynchronizationPreference());
     }
 
+    /**
+     * Add new INSERTION record in the ORCID queue based on the metadata signatures
+     * calculated from the current item state.
+     */
     private void createInsertionRecordForNewSignatures(Context context, Item item, List<OrcidHistory> historyRecords,
         OrcidProfileSectionFactory factory, List<String> signatures) throws SQLException {
 
@@ -209,6 +233,11 @@ public class OrcidQueueConsumer implements Consumer {
 
     }
 
+    /**
+     * Add new DELETION records in the ORCID queue for metadata signature presents
+     * in the ORCID history no more present in the metadata signatures calculated
+     * from the current item state.
+     */
     private void createDeletionRecordForNoMorePresentSignatures(Context context, Item profile,
         List<OrcidHistory> historyRecords, OrcidProfileSectionFactory factory, List<String> signatures)
         throws SQLException {

@@ -27,6 +27,20 @@ import org.dspace.content.Item;
 import org.dspace.core.ReloadableEntity;
 import org.hibernate.annotations.Type;
 
+/**
+ * The ORCID history entity that it contains information relating to an attempt
+ * to synchronize the DSpace items and information on ORCID. While the entity
+ * {@link OrcidQueue} contains the data to be synchronized with ORCID, this
+ * entity instead contains the data synchronized with ORCID, with the result of
+ * the synchronization. Each record in this table is associated with an owner
+ * (the profile item) and the entity synchronized (which can be the profile
+ * itself, a publication or a project/funding). If the entity is the profile
+ * itself then the metadata field contains the signature of the information
+ * synchronized.
+ * 
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 @Entity
 @Table(name = "orcid_history")
 public class OrcidHistory implements ReloadableEntity<Integer> {
@@ -36,41 +50,72 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
     @SequenceGenerator(name = "orcid_history_id_seq", sequenceName = "orcid_history_id_seq", allocationSize = 1)
     private Integer id;
 
+    /**
+     * The profile item.
+     */
     @ManyToOne
     @JoinColumn(name = "owner_id")
     protected Item owner;
 
+    /**
+     * The synchronized item.
+     */
     @ManyToOne
     @JoinColumn(name = "entity_id")
     private Item entity;
 
+    /**
+     * The identifier of the synchronized resource on ORCID side.
+     */
     @Column(name = "put_code")
     private String putCode;
 
+    /**
+     * The record type. Could be publication, funding or a profile's section.
+     */
     @Column(name = "record_type")
     private String recordType;
 
+    /**
+     * A description of the synchronized resource.
+     */
     @Column(name = "description")
     private String description;
 
+    /**
+     * The signature of the synchronized metadata. This is used when the entity is
+     * the owner itself.
+     */
     @Lob
     @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
     @Column(name = "metadata")
     private String metadata;
 
+    /**
+     * The operation performed on ORCID.
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "operation")
     private OrcidOperation operation;
 
+    /**
+     * The response message incoming from ORCID.
+     */
     @Lob
     @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
     @Column(name = "response_message")
     private String responseMessage;
 
+    /**
+     * The timestamp of the synchronization attempt.
+     */
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "timestamp_last_attempt")
     private Date timestamp = new Date();
 
+    /**
+     * The HTTP status incoming from ORCID.
+     */
     @Column(name = "status")
     private Integer status;
 

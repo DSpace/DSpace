@@ -29,7 +29,11 @@ import org.dspace.core.ReloadableEntity;
 import org.hibernate.annotations.Type;
 
 /**
- * Entity that model a record on the ORCID synchronization queue.
+ * Entity that model a record on the ORCID synchronization queue. Each record in
+ * this table is associated with an owner (the profile item) and the entity to
+ * be synchronized (which can be the profile itself, a publication or a
+ * project/funding). If the entity is the profile itself then the metadata field
+ * contains the signature of the information to be synchronized.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
@@ -43,32 +47,58 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
     @SequenceGenerator(name = "orcid_queue_id_seq", sequenceName = "orcid_queue_id_seq", allocationSize = 1)
     private Integer id;
 
+    /**
+     * The profile item.
+     */
     @ManyToOne
     @JoinColumn(name = "owner_id")
     protected Item owner;
 
+    /**
+     * The entity to be synchronized.
+     */
     @ManyToOne
     @JoinColumn(name = "entity_id")
     private Item entity;
 
+    /**
+     * A description of the resource to be synchronized.
+     */
     @Column(name = "description")
     private String description;
 
+    /**
+     * The identifier of the resource to be synchronized on ORCID side (in case of
+     * update or deletion).
+     */
     @Column(name = "put_code")
     private String putCode;
 
+    /**
+     * The record type. Could be publication, funding or a profile's section.
+     */
     @Column(name = "record_type")
     private String recordType;
 
+    /**
+     * The signature of the metadata to be synchronized. This is used when the
+     * entity is the owner itself.
+     */
     @Lob
     @Column(name = "metadata")
     @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
     private String metadata;
 
+    /**
+     * The operation to be performed on ORCID.
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "operation")
     private OrcidOperation operation;
 
+    /**
+     * Synchronization attempts already made for a particular record.
+     */
     @Column(name = "attempts")
     private Integer attempts = 0;
 

@@ -20,6 +20,9 @@ import org.orcid.jaxb.model.v3.release.record.Activity;
  */
 public interface OrcidEntityFactory {
 
+    /**
+     * Placeholder used to refer the item handle on fields mapping.
+     */
     String SIMPLE_HANDLE_PLACEHOLDER = "$simple-handle";
 
     /**

@@ -21,7 +21,7 @@ import org.dspace.util.SimpleMapConverter;
 import org.orcid.jaxb.model.common.FundingContributorRole;
 
 /**
- * Class that contains all the mapping between {@link Funding} and DSpaceCris
+ * Class that contains all the mapping between {@link Funding} and DSpace
  * metadata fields.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
