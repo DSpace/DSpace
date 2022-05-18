@@ -103,7 +103,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
 
     @Override
     public Iterator<IndexableItem> findAll(Context context) throws SQLException {
-        Iterator<Item> items = itemService.findAllUnfiltered(context);
+        Iterator<Item> items = itemService.findAllRegularItems(context);
         return new Iterator<IndexableItem>() {
             @Override
             public boolean hasNext() {

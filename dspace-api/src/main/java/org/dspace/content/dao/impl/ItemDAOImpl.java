@@ -80,6 +80,13 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
+    public Iterator<Item> findAllRegularItems(Context context) throws SQLException {
+        // TODO exclude workspace, workflow, template items
+        Query query = createQuery(context, "FROM Item ORDER BY id");
+        return iterate(query);
+    }
+
+    @Override
     public Iterator<Item> findAll(Context context, boolean archived,
                                   boolean withdrawn, boolean discoverable, Date lastModified)
         throws SQLException {
