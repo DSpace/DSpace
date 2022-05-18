@@ -31,6 +31,7 @@ import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -61,6 +62,8 @@ public class OrcidQueueConsumer implements Consumer {
 
     private OrcidHistoryService orcidHistoryService;
 
+    private OrcidTokenService orcidTokenService;
+
     private OrcidSynchronizationService orcidSynchronizationService;
 
     private ItemService itemService;
@@ -81,6 +84,7 @@ public class OrcidQueueConsumer implements Consumer {
         this.orcidQueueService = orcidServiceFactory.getOrcidQueueService();
         this.orcidHistoryService = orcidServiceFactory.getOrcidHistoryService();
         this.orcidSynchronizationService = orcidServiceFactory.getOrcidSynchronizationService();
+        this.orcidTokenService = orcidServiceFactory.getOrcidTokenService();
         this.profileSectionFactoryService = orcidServiceFactory.getOrcidProfileSectionFactoryService();
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
@@ -134,7 +138,7 @@ public class OrcidQueueConsumer implements Consumer {
 
         for (Item relatedItem : relatedItems) {
 
-            if (isNotProfileItem(relatedItem) || isNotLinkedToOrcid(relatedItem)) {
+            if (isNotProfileItem(relatedItem) || isNotLinkedToOrcid(context, relatedItem)) {
                 continue;
             }
 
@@ -160,7 +164,7 @@ public class OrcidQueueConsumer implements Consumer {
 
     private void consumeProfile(Context context, Item item) throws SQLException {
 
-        if (isNotLinkedToOrcid(item)) {
+        if (isNotLinkedToOrcid(context, item)) {
             return;
         }
 
@@ -270,9 +274,13 @@ public class OrcidQueueConsumer implements Consumer {
         return isNotEmpty(orcidQueueService.findByOwnerAndEntity(context, owner, entity));
     }
 
-    private boolean isNotLinkedToOrcid(Item ownerItem) {
-        return getMetadataValue(ownerItem, "dspace.orcid.access-token") == null
+    private boolean isNotLinkedToOrcid(Context context, Item ownerItem) {
+        return hasNotOrcidAccessToken(context, ownerItem)
             || getMetadataValue(ownerItem, "person.identifier.orcid") == null;
+    }
+
+    private boolean hasNotOrcidAccessToken(Context context, Item ownerItem) {
+        return orcidTokenService.findByProfileItem(context, ownerItem) == null;
     }
 
     private boolean shouldNotBeSynchronized(Item owner, Item entity) {

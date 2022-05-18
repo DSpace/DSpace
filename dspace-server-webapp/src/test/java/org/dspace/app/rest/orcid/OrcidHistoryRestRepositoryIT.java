@@ -41,6 +41,7 @@ import org.dspace.app.orcid.exception.OrcidClientException;
 import org.dspace.app.orcid.service.impl.OrcidHistoryServiceImpl;
 import org.dspace.app.rest.matcher.OrcidHistoryMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
@@ -48,6 +49,7 @@ import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.OrcidHistoryBuilder;
 import org.dspace.builder.OrcidQueueBuilder;
+import org.dspace.builder.OrcidTokenBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.EntityType;
@@ -97,7 +99,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
     private OrcidClient orcidClientMock;
 
     @Before
-    public void setup() throws SQLException {
+    public void setup() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
 
         researcher = EPersonBuilder.createEPerson(context)
@@ -126,7 +128,10 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withPersonCountry("IT")
             .withDspaceObjectOwner(researcher.getFullName(), researcher.getID().toString())
             .withOrcidIdentifier(ORCID)
-            .withOrcidAccessToken(ACCESS_TOKEN)
+            .build();
+
+        OrcidTokenBuilder.create(context, researcher, ACCESS_TOKEN)
+            .withProfileItem(profile)
             .build();
 
         publication = ItemBuilder.createItem(context, publications)

@@ -198,8 +198,20 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "person", "identifier", "orcid", orcid);
     }
 
-    public ItemBuilder withOrcidAccessToken(String accessToken) {
-        return addMetadataValue(item, "dspace", "orcid", "access-token", accessToken);
+    public ItemBuilder withOrcidAccessToken(String accessToken, EPerson owner) {
+
+        try {
+
+            OrcidTokenBuilder.create(context, owner, accessToken)
+                .withProfileItem(item)
+                .build();
+
+        } catch (SQLException | AuthorizeException e) {
+            throw new RuntimeException(e);
+        }
+
+        return this;
+
     }
 
     public ItemBuilder withOrcidAuthenticated(String authenticated) {

@@ -41,6 +41,7 @@ import org.dspace.app.orcid.service.MetadataSignatureGenerator;
 import org.dspace.app.orcid.service.OrcidEntityFactoryService;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidProfileSectionFactoryService;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataValue;
@@ -85,6 +86,9 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
     @Autowired
     private OrcidValidator orcidValidator;
+
+    @Autowired
+    private OrcidTokenService orcidTokenService;
 
     @Override
     public OrcidHistory find(Context context, int id) throws SQLException {
@@ -161,11 +165,11 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
         Item owner = orcidQueue.getOwner();
 
-        String orcid = getMetadataValue(orcidQueue.getOwner(), "person.identifier.orcid")
+        String orcid = getMetadataValue(owner, "person.identifier.orcid")
             .orElseThrow(() -> new IllegalArgumentException(
                 format("The related owner item (id = %s) does not have an orcid", owner.getID())));
 
-        String token = getMetadataValue(orcidQueue.getOwner(), "dspace.orcid.access-token")
+        String token = getAccessToken(context, owner)
             .orElseThrow(() -> new IllegalArgumentException(
                 format("The related owner item (id = %s) does not have an access token", owner.getID())));
 
@@ -314,6 +318,11 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     private Optional<String> getMetadataValue(Item item, String metadataField) {
         return ofNullable(itemService.getMetadataFirstValue(item, new MetadataFieldName(metadataField), Item.ANY))
             .filter(StringUtils::isNotBlank);
+    }
+
+    private Optional<String> getAccessToken(Context context, Item item) {
+        return ofNullable(orcidTokenService.findByProfileItem(context, item))
+            .map(orcidToken -> orcidToken.getAccessToken());
     }
 
     private boolean isProfileSectionType(OrcidQueue orcidQueue) {

@@ -49,7 +49,6 @@ import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
@@ -161,7 +160,7 @@ public abstract class AbstractBuilder<T, S> {
         workflowItemRoleService = XmlWorkflowServiceFactory.getInstance().getWorkflowItemRoleService();
         orcidHistoryService = OrcidServiceFactory.getInstance().getOrcidHistoryService();
         orcidQueueService = OrcidServiceFactory.getInstance().getOrcidQueueService();
-        orcidTokenService = new DSpace().getSingletonService(OrcidTokenService.class);
+        orcidTokenService = OrcidServiceFactory.getInstance().getOrcidTokenService();
     }
 
 

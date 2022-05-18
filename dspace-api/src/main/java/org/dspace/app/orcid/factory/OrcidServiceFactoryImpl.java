@@ -15,6 +15,7 @@ import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -49,6 +50,9 @@ public class OrcidServiceFactoryImpl extends OrcidServiceFactory {
     @Autowired
     private OrcidConfiguration orcidConfiguration;
 
+    @Autowired
+    private OrcidTokenService orcidTokenService;
+
     @Override
     public OrcidHistoryService getOrcidHistoryService() {
         return orcidHistoryService;
@@ -77,6 +81,11 @@ public class OrcidServiceFactoryImpl extends OrcidServiceFactory {
     @Override
     public OrcidEntityFactoryService getOrcidEntityFactoryService() {
         return orcidEntityFactoryService;
+    }
+
+    @Override
+    public OrcidTokenService getOrcidTokenService() {
+        return orcidTokenService;
     }
 
     @Override
