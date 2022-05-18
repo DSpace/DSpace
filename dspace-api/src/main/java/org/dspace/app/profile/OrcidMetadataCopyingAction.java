@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.dspace.app.orcid.OrcidToken;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.app.profile.service.AfterResearcherProfileCreationAction;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
@@ -45,17 +47,23 @@ public class OrcidMetadataCopyingAction implements AfterResearcherProfileCreatio
     @Autowired
     private EPersonService ePersonService;
 
+    @Autowired
+    private OrcidTokenService orcidTokenService;
+
     @Override
     public void perform(Context context, ResearcherProfile researcherProfile, EPerson owner) throws SQLException {
 
         Item item = researcherProfile.getItem();
 
         copyMetadataValues(context, owner, "eperson.orcid", item, "person.identifier.orcid");
-        copyMetadataValues(context, owner, "eperson.orcid.access-token", item, "dspace.orcid.access-token");
-        copyMetadataValues(context, owner, "eperson.orcid.refresh-token", item, "dspace.orcid.refresh-token");
         copyMetadataValues(context, owner, "eperson.orcid.scope", item, "dspace.orcid.scope");
 
-        if (isLinkedToOrcid(owner)) {
+        OrcidToken orcidToken = orcidTokenService.findByEPerson(context, owner);
+        if (orcidToken != null) {
+            orcidToken.setProfileItem(item);
+        }
+
+        if (isLinkedToOrcid(owner, orcidToken)) {
             String currentDate = ISO_DATE_TIME.format(now());
             itemService.setMetadataSingleValue(context, item, "dspace", "orcid", "authenticated", null, currentDate);
         }
@@ -76,9 +84,8 @@ public class OrcidMetadataCopyingAction implements AfterResearcherProfileCreatio
 
     }
 
-    private boolean isLinkedToOrcid(EPerson ePerson) {
-        return isNotEmpty(getMetadataValues(ePerson, "eperson.orcid"))
-            && isNotEmpty(getMetadataValues(ePerson, "eperson.orcid.access-token"));
+    private boolean isLinkedToOrcid(EPerson ePerson, OrcidToken orcidToken) {
+        return isNotEmpty(getMetadataValues(ePerson, "eperson.orcid")) && orcidToken != null;
     }
 
     private List<String> getMetadataValues(EPerson ePerson, String metadataField) {

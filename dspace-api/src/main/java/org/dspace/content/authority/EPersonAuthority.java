@@ -9,16 +9,20 @@ package org.dspace.content.authority;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.util.UUIDUtils;
+import org.dspace.web.ContextUtil;
 
 /**
  * Implementation of {@link ChoiceAuthority} based on EPerson. Allows you to set
@@ -38,6 +42,8 @@ public class EPersonAuthority implements ChoiceAuthority {
 
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
+    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
     @Override
     public Choices getBestMatch(String text, String locale) {
         return getMatches(text, 0, 2, locale);
@@ -45,18 +51,14 @@ public class EPersonAuthority implements ChoiceAuthority {
 
     @Override
     public Choices getMatches(String text, int start, int limit, String locale) {
-        Context context = null;
         if (limit <= 0) {
             limit = 20;
         }
-        context = new Context();
-        List<EPerson> ePersons = null;
-        try {
-            ePersons = ePersonService.search(context, text, start, limit);
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
-        }
+
+        Context context = getContext();
+
+        List<EPerson> ePersons = searchEPersons(context, text, start, limit);
+
         List<Choice> choiceList = new ArrayList<Choice>();
         for (EPerson eperson : ePersons) {
             choiceList.add(new Choice(eperson.getID().toString(), eperson.getFullName(), eperson.getFullName()));
@@ -74,7 +76,7 @@ public class EPersonAuthority implements ChoiceAuthority {
             return null;
         }
 
-        Context context = new Context();
+        Context context = getContext();
         try {
             EPerson ePerson = ePersonService.find(context, uuid);
             return ePerson != null ? ePerson.getFullName() : null;
@@ -83,6 +85,34 @@ public class EPersonAuthority implements ChoiceAuthority {
             throw new RuntimeException(e.getMessage(), e);
         }
 
+    }
+
+    private List<EPerson> searchEPersons(Context context, String text, int start, int limit) {
+
+        if (!isCurrentUserAdminOrAccessGroupManager(context)) {
+            return Collections.emptyList();
+        }
+
+        try {
+            return ePersonService.search(context, text, start, limit);
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
+    }
+
+    private Context getContext() {
+        Context context = ContextUtil.obtainCurrentRequestContext();
+        return context != null ? context : new Context();
+    }
+
+    private boolean isCurrentUserAdminOrAccessGroupManager(Context context) {
+        try {
+            return authorizeService.isAdmin(context) || authorizeService.isAccountManager(context);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

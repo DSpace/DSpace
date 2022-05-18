@@ -23,10 +23,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.orcid.OrcidToken;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.client.OrcidConfiguration;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.authorize.AuthorizeException;
@@ -73,6 +75,9 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
     @Autowired
     private OrcidSynchronizationService orcidSynchronizationService;
 
+    @Autowired
+    private OrcidTokenService orcidTokenService;
+
     @Override
     public int authenticate(Context context, String username, String password, String realm, HttpServletRequest request)
         throws SQLException {
@@ -87,7 +92,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
             LOGGER.warn("The incoming request has not code parameter");
             return NO_SUCH_USER;
         }
-
+        request.setAttribute(ORCID_AUTH_ATTRIBUTE, true);
         return authenticateWithOrcid(context, code, request);
     }
 
@@ -243,15 +248,19 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
         String orcid = token.getOrcid();
         String accessToken = token.getAccessToken();
-        String refreshToken = token.getRefreshToken();
         String[] scopes = token.getScopeAsArray();
 
         ePersonService.setMetadataSingleValue(context, person, "eperson", "orcid", null, null, orcid);
-        ePersonService.setMetadataSingleValue(context, person, "eperson", "orcid", "access-token", null, accessToken);
-        ePersonService.setMetadataSingleValue(context, person, "eperson", "orcid", "refresh-token", null, refreshToken);
         ePersonService.clearMetadata(context, person, "eperson", "orcid", "scope", ANY);
         for (String scope : scopes) {
             ePersonService.addMetadata(context, person, "eperson", "orcid", "scope", null, scope);
+        }
+
+        OrcidToken orcidToken = orcidTokenService.findByEPerson(context, person);
+        if (orcidToken == null) {
+            orcidTokenService.create(context, person, accessToken);
+        } else {
+            orcidToken.setAccessToken(accessToken);
         }
 
     }

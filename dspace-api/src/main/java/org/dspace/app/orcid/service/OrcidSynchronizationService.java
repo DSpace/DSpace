@@ -31,10 +31,11 @@ public interface OrcidSynchronizationService {
     /**
      * Check if the given item is linked to an ORCID profile.
      *
-     * @param  item the item to check
-     * @return      true if the given item is linked to ORCID
+     * @param  context the relevant DSpace Context.
+     * @param  item    the item to check
+     * @return         true if the given item is linked to ORCID
      */
-    boolean isLinkedToOrcid(Item item);
+    boolean isLinkedToOrcid(Context context, Item item);
 
     /**
      * Configure the given profile with the data present in the given ORCID token.

@@ -47,20 +47,6 @@
     <dc-type>
         <schema>eperson</schema>
         <element>orcid</element>
-        <qualifier>access-token</qualifier>
-        <scope_note>Metadata field used for the ORCID access token</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>eperson</schema>
-        <element>orcid</element>
-        <qualifier>refresh-token</qualifier>
-        <scope_note>Metadata field used for the ORCID refresh token</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>eperson</schema>
-        <element>orcid</element>
         <qualifier>scope</qualifier>
         <scope_note>Metadata field used for the granted ORCID scopes</scope_note>
     </dc-type>

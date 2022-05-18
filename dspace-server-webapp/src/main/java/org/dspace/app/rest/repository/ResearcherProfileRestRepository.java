@@ -78,6 +78,9 @@ public class ResearcherProfileRestRepository extends DSpaceRestRepository<Resear
         }
     }
 
+    /**
+     * Create a new researcher profile from scratch.
+     */
     @Override
     @PreAuthorize("isAuthenticated()")
     protected ResearcherProfileRest createAndReturn(Context context) throws AuthorizeException, SQLException {
@@ -101,6 +104,9 @@ public class ResearcherProfileRestRepository extends DSpaceRestRepository<Resear
 
     }
 
+    /**
+     * Create a new researcher profile claiming an already existing item.
+     */
     @Override
     protected ResearcherProfileRest createAndReturn(final Context context, final List<String> list)
         throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {

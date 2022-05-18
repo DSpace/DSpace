@@ -36,10 +36,13 @@ import javax.servlet.http.Cookie;
 import com.jayway.jsonpath.JsonPath;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
+import org.dspace.app.orcid.OrcidToken;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.exception.OrcidClientException;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.app.rest.model.AuthnRest;
+import org.dspace.app.rest.security.OrcidLoginFilter;
 import org.dspace.app.rest.security.jwt.EPersonClaimProvider;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authenticate.OrcidAuthenticationBean;
@@ -67,18 +70,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
 /**
- * Integration tests for {@link OrcidAuthenticationRestController}.
+ * Integration tests for {@link OrcidLoginFilter}.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class OrcidAuthenticationRestControllerIT extends AbstractControllerIntegrationTest {
+public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
+
+    public static final String[] PASSWORD_ONLY = { "org.dspace.authenticate.PasswordAuthentication" };
 
     private final static String ORCID = "0000-1111-2222-3333";
     private final static String CODE = "123456";
 
     private final static String ACCESS_TOKEN = "c41e37e5-c2de-4177-91d6-ed9e9d1f31bf";
-    private final static String REFRESH_TOKEN = "0062a9eb-d4ec-4d94-9491-95dd75376d3e";
     private final static String[] ORCID_SCOPES = { "FirstScope", "SecondScope" };
 
     private OrcidClient originalOrcidClient;
@@ -99,6 +103,9 @@ public class OrcidAuthenticationRestControllerIT extends AbstractControllerInteg
     @Autowired
     private ItemService itemService;
 
+    @Autowired
+    private OrcidTokenService orcidTokenService;
+
     @Before
     public void setup() {
         originalOrcidClient = orcidAuthentication.getOrcidClient();
@@ -117,6 +124,16 @@ public class OrcidAuthenticationRestControllerIT extends AbstractControllerInteg
             ePersonService.delete(context, createdEperson);
             context.restoreAuthSystemState();
         }
+        orcidTokenService.deleteAll(context);
+    }
+
+    @Test
+    public void testNoRedirectIfOrcidDisabled() throws Exception {
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASSWORD_ONLY);
+
+        getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
+            .param("code", CODE))
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -145,10 +162,10 @@ public class OrcidAuthenticationRestControllerIT extends AbstractControllerInteg
         assertThat(createdEperson.getNetid(), equalTo(ORCID));
         assertThat(createdEperson.canLogIn(), equalTo(true));
         assertThat(createdEperson.getMetadata(), hasItem(with("eperson.orcid", ORCID)));
-        assertThat(createdEperson.getMetadata(), hasItem(with("eperson.orcid.access-token", ACCESS_TOKEN)));
-        assertThat(createdEperson.getMetadata(), hasItem(with("eperson.orcid.refresh-token", REFRESH_TOKEN)));
         assertThat(createdEperson.getMetadata(), hasItem(with("eperson.orcid.scope", ORCID_SCOPES[0], 0)));
         assertThat(createdEperson.getMetadata(), hasItem(with("eperson.orcid.scope", ORCID_SCOPES[1], 1)));
+
+        assertThat(getOrcidAccessToken(createdEperson), is(ACCESS_TOKEN));
     }
 
     @Test
@@ -429,10 +446,69 @@ public class OrcidAuthenticationRestControllerIT extends AbstractControllerInteg
         Item profileItem = itemService.find(context, UUID.fromString(profileItemId));
         assertThat(profileItem, notNullValue());
         assertThat(profileItem.getMetadata(), hasItem(with("person.identifier.orcid", ORCID)));
-        assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.access-token", ACCESS_TOKEN)));
-        assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.refresh-token", REFRESH_TOKEN)));
         assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.scope", ORCID_SCOPES[0], 0)));
         assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.scope", ORCID_SCOPES[1], 1)));
+
+        assertThat(getOrcidAccessToken(profileItem), is(ACCESS_TOKEN));
+
+    }
+
+    @Test
+    public void testRedirectToGivenTrustedUrl() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPersonBuilder.createEPerson(context)
+            .withEmail("test@email.it")
+            .withNetId(ORCID)
+            .withNameInMetadata("Test", "User")
+            .withCanLogin(true)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
+
+        String token = getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
+            .param("redirectUrl", "http://localhost:8080/server/api/authn/status")
+            .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("http://localhost:8080/server/api/authn/status"))
+            .andReturn().getResponse().getHeader("Authorization");
+
+        getClient(token).perform(get("/api/authn/status"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.authenticated", is(true)))
+            .andExpect(jsonPath("$.authenticationMethod", is("orcid")));
+
+        verify(orcidClientMock).getAccessToken(CODE);
+        verifyNoMoreInteractions(orcidClientMock);
+
+    }
+
+    @Test
+    public void testRedirectToGivenUntrustedUrl() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPersonBuilder.createEPerson(context)
+            .withEmail("test@email.it")
+            .withNetId(ORCID)
+            .withNameInMetadata("Test", "User")
+            .withCanLogin(true)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
+
+        getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
+            .param("redirectUrl", "http://dspace.org")
+            .param("code", CODE))
+            .andExpect(status().isBadRequest());
+
+        verify(orcidClientMock).getAccessToken(CODE);
+        verifyNoMoreInteractions(orcidClientMock);
 
     }
 
@@ -441,7 +517,6 @@ public class OrcidAuthenticationRestControllerIT extends AbstractControllerInteg
         token.setAccessToken(accessToken);
         token.setOrcid(orcid);
         token.setTokenType("Bearer");
-        token.setRefreshToken(REFRESH_TOKEN);
         token.setName("Test User");
         token.setScope(String.join(" ", ORCID_SCOPES));
         return token;
@@ -486,5 +561,15 @@ public class OrcidAuthenticationRestControllerIT extends AbstractControllerInteg
                                            .andReturn();
 
         return JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+    }
+
+    private String getOrcidAccessToken(EPerson ePerson) {
+        OrcidToken orcidToken = orcidTokenService.findByEPerson(context, ePerson);
+        return orcidToken != null ? orcidToken.getAccessToken() : null;
+    }
+
+    private String getOrcidAccessToken(Item item) {
+        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context, item);
+        return orcidToken != null ? orcidToken.getAccessToken() : null;
     }
 }

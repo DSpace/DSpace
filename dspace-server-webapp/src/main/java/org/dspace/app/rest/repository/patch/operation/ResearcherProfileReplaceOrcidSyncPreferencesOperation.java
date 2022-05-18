@@ -72,6 +72,7 @@ public class ResearcherProfileReplaceOrcidSyncPreferencesOperation extends Patch
 
         Item profileItem = profile.getItem();
 
+        // Permission check already performed on patch endpoint invocation
         context.turnOffAuthorisationSystem();
 
         try {

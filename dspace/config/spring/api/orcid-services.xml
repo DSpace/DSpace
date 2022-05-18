@@ -14,6 +14,10 @@
     
     <bean class="org.dspace.app.orcid.service.impl.OrcidSynchronizationServiceImpl"/>
     
+    <bean class="org.dspace.app.orcid.dao.impl.OrcidTokenDAOImpl"/>
+    
+    <bean id="org.dspace.app.orcid.service.OrcidTokenService" class="org.dspace.app.orcid.service.impl.OrcidTokenServiceImpl"/>
+    
     <bean class="org.dspace.authenticate.OrcidAuthenticationBean" id="orcidAuthentication"/>
     
     <bean class="org.dspace.app.orcid.client.OrcidConfiguration">
