@@ -37,7 +37,7 @@ public class OrcidTokenBuilder extends AbstractBuilder<OrcidToken, OrcidTokenSer
     }
 
     private void create(EPerson ePerson, String accessToken) {
-        orcidTokenService.create(context, ePerson, accessToken);
+        orcidToken = orcidTokenService.create(context, ePerson, accessToken);
     }
 
     public OrcidTokenBuilder withProfileItem(Item profileItem) {
