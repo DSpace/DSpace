@@ -78,7 +78,7 @@ public class SolrDatabaseResyncCli extends DSpaceRunnable<SolrDatabaseResyncCliS
 
     @Override
     public void internalRun() throws Exception {
-        logInfoAndOut("Starting Item Database Status update...");
+        logInfoAndOut("Starting Item resync of Solr and Database...");
 
         timeUntilReindex = getTimeUntilReindex();
         maxTime = getMaxTime();
