@@ -21,7 +21,9 @@ WORKDIR /app
 USER dspace
 
 # Copy the DSpace source code into the workdir (excluding .dockerignore contents)
+RUN rm -rf /app/dspace/modules/additions /app/dspace/modules/server
 ADD --chown=dspace dspace/modules/additions /app/dspace/modules/additions
+ADD --chown=dspace dspace/modules/server /app/dspace/modules/server
 COPY dspace/src/main/docker/local.cfg /app/local.cfg
 
 # Build DSpace.  Copy the dspace-install directory to /install.  Clean up the build to keep the docker image small
