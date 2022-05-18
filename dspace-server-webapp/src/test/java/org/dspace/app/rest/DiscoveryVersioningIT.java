@@ -1675,4 +1675,108 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         );
     }
 
+    @Test
+    public void test_rebuildIndexAllVersionsShouldStillBePresentInSolrCore() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication")
+            .build();
+
+        EntityType projectEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project")
+            .build();
+
+        RelationshipType isProjectOfPublication = RelationshipTypeBuilder.createRelationshipTypeBuilder(
+                context, publicationEntityType, projectEntityType,
+                "isProjectOfPublication", "isPublicationOfProject",
+                null, null, null, null
+            )
+            .withCopyToLeft(false)
+            .withCopyToRight(false)
+            .build();
+
+        Collection publicationCollection = createCollection(publicationEntityType.getLabel());
+
+        Collection projectCollection = createCollection(projectEntityType.getLabel());
+
+        // create publication 1.1
+        Item pub1_1 = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("pub 1.1")
+            // NOTE: entity type is inherited from collection
+            .build();
+
+        // create project 1.1
+        Item pro1_1 = ItemBuilder.createItem(context, projectCollection)
+            .withTitle("pro 1.1")
+            // NOTE: entity type is inherited from collection
+            .build();
+
+        // create relationship between publication 1.1 and project 1.1
+        RelationshipBuilder.createRelationshipBuilder(context, pub1_1, pro1_1, isProjectOfPublication)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        // create new version of publication 1.1 => publication 1.2
+        Item pub1_2 = createNewVersion(context.reloadEntity(pub1_1), "pub 1.2");
+
+        // create new version of publication 1.2 => publication 1.3
+        Item pub1_3 = createNewVersion(context.reloadEntity(pub1_2), "pub 1.3");
+
+        // create new version of publication 1.3 => publication 1.4
+        Item pub1_4 = createNewVersion(context.reloadEntity(pub1_3), "pub 1.4");
+
+        // cache busting
+        pub1_1 = context.reloadEntity(pub1_1);
+        pub1_2 = context.reloadEntity(pub1_2);
+        pub1_3 = context.reloadEntity(pub1_3);
+        pub1_4 = context.reloadEntity(pub1_4);
+        pro1_1 = context.reloadEntity(pro1_1);
+
+        // before reindex - verify publication 1.1
+        verifyIndexed(pub1_1);
+        // TODO check archived, latestVersion, relation.*, relation.*.latestForDiscovery for each solr doc
+
+        // before reindex - verify publication 1.2
+        verifyIndexed(pub1_2);
+        // TODO
+
+        // before reindex - verify publication 1.3
+        verifyIndexed(pub1_3);
+        // TODO
+
+        // before reindex - verify publication 1.4
+        verifyIndexed(pub1_4);
+        // TODO
+
+        // before reindex - verify project 1.1
+        verifyIndexed(pro1_1);
+        // TODO
+
+        // force reindex all items
+        indexingService.deleteIndex();
+        indexingService.createIndex(context);
+
+        // TODO make sure workflow, workspace and template items are still excluded!
+
+        // after reindex - verify publication 1.1
+        verifyIndexed(pub1_1);
+        // TODO
+
+        // after reindex - verify publication 1.2
+        verifyIndexed(pub1_2);
+        // TODO
+
+        // after reindex - verify publication 1.3
+        verifyIndexed(pub1_3);
+        // TODO
+
+        // after reindex - verify publication 1.4
+        verifyIndexed(pub1_4);
+        // TODO
+
+        // after reindex - verify project 1.1
+        verifyIndexed(pro1_1);
+        // TODO
+    }
+
 }
