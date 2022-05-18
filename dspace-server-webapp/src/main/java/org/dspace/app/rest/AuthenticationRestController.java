@@ -164,7 +164,6 @@ public class AuthenticationRestController implements InitializingBean {
                 methodOn(AuthenticationRestController.class).retrieveSpecialGroups(page, assembler, request, response))
                         .withSelfRel();
 
-        //PagedModel<GroupResource> result = assembler.toModel(resources, link);
         return EntityModel.of(new EmbeddedPage(link.getHref(),
                 groupPage.map(converter::toResource), null, "specialGroups"));
     }
