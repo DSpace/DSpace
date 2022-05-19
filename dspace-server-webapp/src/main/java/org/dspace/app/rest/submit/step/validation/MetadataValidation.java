@@ -141,8 +141,8 @@ public class MetadataValidation extends AbstractValidation {
                         if (input.isAllowedFor(documentTypeValue)) {
                             // since this field is missing add to list of error
                             // fields
-                            addError(errors, ERROR_VALIDATION_REQUIRED,
-                                    "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                            addError(errors, ERROR_VALIDATION_REQUIRED, "/"
+                                    + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
                                             input.getFieldName());
                         }
                     }
