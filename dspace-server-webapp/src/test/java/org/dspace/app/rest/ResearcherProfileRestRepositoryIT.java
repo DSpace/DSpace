@@ -993,10 +993,12 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         final Item person = ItemBuilder.createItem(context, personCollection)
                                       .withTitle("Test User 1")
+                                      .withPersonEmail(user.getEmail())
                                       .build();
 
         final Item otherPerson = ItemBuilder.createItem(context, personCollection)
                                        .withTitle("Test User 2")
+                                       .withPersonEmail(user.getEmail())
                                        .build();
 
         context.restoreAuthSystemState();
@@ -1052,6 +1054,26 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         getClient(authToken).perform(delete("/api/eperson/profiles/{id}", id))
                             .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void researcherProfileClaimWithDifferentEmail() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        final Item person = ItemBuilder.createItem(context, personCollection)
+            .withTitle("Test User 1")
+            .withPersonEmail(eperson.getEmail())
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+            .contentType(TEXT_URI_LIST)
+            .content("http://localhost:8080/server/api/core/items/" + person.getID().toString()))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
