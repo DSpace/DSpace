@@ -12,4 +12,9 @@ package org.dspace.app.bulkedit;
  * The cli version of the {@link MetadataExportSearch} script
  */
 public class MetadataExportSearchCli extends MetadataExportSearch {
+
+    @Override
+    protected String getFileNameOrExportFile() {
+        return commandLine.getOptionValue('n');
+    }
 }

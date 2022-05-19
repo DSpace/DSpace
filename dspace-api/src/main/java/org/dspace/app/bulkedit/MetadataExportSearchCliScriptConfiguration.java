@@ -8,6 +8,8 @@
 
 package org.dspace.app.bulkedit;
 
+import org.apache.commons.cli.Options;
+
 /**
  * This is the CLI version of the {@link MetadataExportSearchScriptConfiguration} class that handles the
  * configuration for the {@link MetadataExportSearchCli} script
@@ -15,4 +17,10 @@ package org.dspace.app.bulkedit;
 public class MetadataExportSearchCliScriptConfiguration
     extends MetadataExportSearchScriptConfiguration<MetadataExportSearchCli> {
 
+    @Override
+    public Options getOptions() {
+        Options options = super.getOptions();
+        options.addOption("n", "filename", true, "the filename to export to");
+        return super.getOptions();
+    }
 }
