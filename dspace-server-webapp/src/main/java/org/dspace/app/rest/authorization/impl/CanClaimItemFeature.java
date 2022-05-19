@@ -18,8 +18,10 @@ import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +62,10 @@ public class CanClaimItemFeature implements AuthorizationFeature {
         String id = ((ItemRest) object).getId();
         Item item = itemService.find(context, UUID.fromString(id));
 
-        return researcherProfileService.hasProfileType(item) && hasNotOwner(item) && hasNotAlreadyAProfile(context);
+        return researcherProfileService.hasProfileType(item)
+            && hasNotOwner(item)
+            && hasNotAlreadyAProfile(context)
+            && haveSameEmail(item, context.getCurrentUser());
     }
 
     private boolean hasNotAlreadyAProfile(Context context) {
@@ -74,6 +79,13 @@ public class CanClaimItemFeature implements AuthorizationFeature {
 
     private boolean hasNotOwner(Item item) {
         return StringUtils.isBlank(itemService.getMetadata(item, "dspace.object.owner"));
+    }
+
+    private boolean haveSameEmail(Item item, EPerson currentUser) {
+        return itemService.getMetadataByMetadataString(item, "person.email").stream()
+            .map(MetadataValue::getValue)
+            .filter(StringUtils::isNotBlank)
+            .anyMatch(email -> email.equalsIgnoreCase(currentUser.getEmail()));
     }
 
     @Override
