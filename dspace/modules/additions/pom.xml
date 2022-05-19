@@ -57,6 +57,29 @@
                </execution>
             </executions>
          </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+               <debug>true</debug>
+               <showDeprecation>true</showDeprecation>
+               <annotationProcessorPaths>
+                  <!-- Enable Hibernate's Metamodel Generator to generate metadata model classes
+                       (ending in _ suffix) for more type-safe Criteria queries -->
+                  <path>
+                     <groupId>org.hibernate</groupId>
+                     <artifactId>hibernate-jpamodelgen</artifactId>
+                     <version>${hibernate.version}</version>
+                  </path>
+                  <!-- Enable http://errorprone.info -->
+                  <path>
+                     <groupId>com.google.errorprone</groupId>
+                     <artifactId>error_prone_core</artifactId>
+                     <version>${errorprone.version}</version>
+                  </path>
+               </annotationProcessorPaths>
+            </configuration>
+         </plugin>
       </plugins>
    </build>
 
