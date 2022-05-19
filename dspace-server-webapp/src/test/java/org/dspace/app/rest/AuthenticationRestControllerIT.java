@@ -1610,7 +1610,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("WWW-Authenticate",
                     "orcid realm=\"DSpace REST API\", " +
-                        "location=\"https://orcid.org//oauth/authorize?client_id=CLIENT-ID&response_type=code"
+                        "location=\"https://sandbox.orcid.org/oauth/authorize?client_id=CLIENT-ID&response_type=code"
                         + "&scope=/authenticate+/read-limited+/activities/update+/person/update&redirect_uri"
                         + "=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Forcid\""));
 
