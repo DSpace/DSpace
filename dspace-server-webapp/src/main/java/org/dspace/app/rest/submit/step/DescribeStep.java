@@ -8,7 +8,9 @@
 package org.dspace.app.rest.submit.step;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -76,6 +78,27 @@ public class DescribeStep extends AbstractProcessingStep {
         if (documentType.size() > 0) {
             documentTypeValue = documentType.get(0).getValue();
         }
+        Map<String, Boolean> isAllowedLookup = new HashMap<>();
+        for (DCInput[] row : inputConfig.getFields()) {
+            for (DCInput input : row) {
+                if (input.isQualdropValue()) {
+                    List<Object> inputPairs = input.getPairs();
+                    //starting from the second element of the list and skipping one every time because the display
+                    // values are also in the list and before the stored values.
+                    for (int i = 1; i < inputPairs.size(); i += 2) {
+                        String fullFieldname = input.getFieldName() + "." + inputPairs.get(i);
+                        if (input.isAllowedFor(documentTypeValue)) {
+                            isAllowedLookup.put(fullFieldname, true);
+                        }
+                    }
+                } else {
+                    if (input.isAllowedFor(documentTypeValue)) {
+                        isAllowedLookup.put(input.getFieldName(), true);
+                    }
+                }
+            }
+        }
+
         for (DCInput[] row : inputConfig.getFields()) {
             for (DCInput input : row) {
                 // Is this input allowed for the document type, as per type bind config? If there is no type
@@ -108,7 +131,7 @@ public class DescribeStep extends AbstractProcessingStep {
                             Utils.standardize(metadataToCheck[0], metadataToCheck[1], metadataToCheck[2], "."))) {
                             // If field is allowed by type bind, add value to existing field set, otherwise remove
                             // all values for this field
-                            if (allowed) {
+                            if (isAllowedLookup.containsKey(fieldName)) {
                                 data.getMetadata()
                                         .get(Utils.standardize(md.getMetadataField().getMetadataSchema().getName(),
                                                 md.getMetadataField().getElement(),
@@ -121,7 +144,7 @@ public class DescribeStep extends AbstractProcessingStep {
                             }
                         } else {
                             // Add values only if allowed by type bind
-                            if (allowed) {
+                            if (isAllowedLookup.containsKey(fieldName)) {
                                 List<MetadataValueRest> listDto = new ArrayList<>();
                                 listDto.add(dto);
                                 data.getMetadata()
