@@ -143,7 +143,8 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         context.restoreAuthSystemState();
 
         String[] args =
-            new String[] {"metadata-export-search", "-q", "subject: " + subject1, "-s", collection2.getID().toString(), "-n", filename};
+            new String[] {"metadata-export-search", "-q", "subject: " + subject1, "-s", collection2.getID().toString(),
+                "-n", filename};
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
         checkItemsPresentInFile(filename, itemsDifferentCollection);
     }
@@ -159,7 +160,8 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
     @Test
     public void exportMetadataSearchFilterDate()
         throws InstantiationException, IllegalAccessException, IOException, CsvException {
-        String[] args = new String[] {"metadata-export-search", "-f", "dateIssued,equals=[2000 TO 2020]", "-n", filename};
+        String[] args = new String[] {"metadata-export-search", "-f", "dateIssued,equals=[2000 TO 2020]",
+            "-n", filename};
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
         checkItemsPresentInFile(filename, itemsSubject1);
     }
@@ -208,7 +210,8 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
     @Test
     public void exportMetadataSearchNoResultsTest()
         throws InstantiationException, IllegalAccessException, IOException, CsvException {
-        String[] args = new String[] {"metadata-export-search", "-f", "subject,equals=notExistingSubject", "-n", filename};
+        String[] args = new String[] {"metadata-export-search", "-f", "subject,equals=notExistingSubject",
+            "-n", filename};
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
         Item[] items = {};
         checkItemsPresentInFile(filename, items);
