@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
@@ -284,7 +284,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             getClient(token)
                     .perform(multipart("/api/system/scripts/mock-script/processes")
-                                 .param("properties", new Gson().toJson(list)))
+                                 .param("properties", new ObjectMapper().writeValueAsString(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -328,7 +328,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             getClient(token)
                     .perform(multipart("/api/system/scripts/mock-script/processes")
-                                 .param("properties", new Gson().toJson(list)))
+                                 .param("properties", new ObjectMapper().writeValueAsString(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -365,7 +365,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             getClient(token)
                     .perform(multipart("/api/system/scripts/mock-script/processes")
-                                 .param("properties", new Gson().toJson(list)))
+                                 .param("properties", new ObjectMapper().writeValueAsString(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
@@ -473,7 +473,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                     .perform(multipart("/api/system/scripts/mock-script/processes")
                                  .file(bitstreamFile)
                                  .characterEncoding("UTF-8")
-                                 .param("properties", new Gson().toJson(list)))
+                                 .param("properties", new ObjectMapper().writeValueAsString(list)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("mock-script",
