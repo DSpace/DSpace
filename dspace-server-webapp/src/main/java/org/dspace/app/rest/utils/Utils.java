@@ -288,7 +288,7 @@ public class Utils {
         if (StringUtils.equals(modelPlural, "vocabularies")) {
             return VocabularyRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "orcidqueues")) {
+        if (StringUtils.equals(modelPlural, OrcidQueueRest.PLURAL_NAME)) {
             return OrcidQueueRest.NAME;
         }
         if (StringUtils.equals(modelPlural, "orcidhistories")) {

@@ -18,6 +18,7 @@ public class OrcidQueueRest extends BaseObjectRest<Integer> {
 
     public static final String CATEGORY = RestModel.EPERSON;
     public static final String NAME = "orcidqueue";
+    public static final String PLURAL_NAME = "orcidqueues";
 
     private UUID ownerId;
 
