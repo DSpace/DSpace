@@ -6,8 +6,8 @@ DRUM extensions.
 ## Useful Resources
 
 * <https://wiki.lyrasis.org/display/DSDOC7x/Advanced+Customisation>
-* https://wiki.lyrasis.org/display/DSDOC7x/Configuration+Reference
-* https://wiki.lyrasis.org/display/DSDOC7x/Storage+Layer
+* <https://wiki.lyrasis.org/display/DSDOC7x/Configuration+Reference>
+* <https://wiki.lyrasis.org/display/DSDOC7x/Storage+Layer>
 
 ## dspace/modules/additions
 
@@ -172,7 +172,7 @@ For example,
 ALTER TABLE etdunit ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
 ```
 
-would be convertd to:
+would be converted to:
 
 ```sql
 ALTER TABLE etdunit ADD COLUMN uuid UUID DEFAULT random_uuid();
