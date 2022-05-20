@@ -53,6 +53,7 @@ import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.matcher.AuthenticationStatusMatcher;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.matcher.EPersonMatcher;
+import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.app.rest.model.EPersonRest;
@@ -120,6 +121,10 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         "org.dspace.authenticate.IPAuthentication",
         "org.dspace.authenticate.ShibAuthentication"
     };
+    public static final String[] PASS_AND_IP = {
+            "org.dspace.authenticate.PasswordAuthentication",
+            "org.dspace.authenticate.IPAuthentication"
+        };
 
     // see proxies.trusted.ipranges in local.cfg
     public static final String TRUSTED_IP = "7.7.7.7";
@@ -172,6 +177,101 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         // Logout
         getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
+    }
+
+    /**
+     * This test verifies:
+     * - that a logged in via password user finds the expected specialGroupPwd in _embedded.specialGroups;
+     * - that a logged in via password and specific IP user finds the expected specialGroupPwd and specialGroupIP
+     *   in _embedded.specialGroups;
+     * - that a not logged in user with a specific IP finds the expected specialGroupIP in _embedded.specialGroups;
+     * @throws Exception
+     */
+    @Test
+    public void testStatusGetSpecialGroups() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group specialGroupPwd = GroupBuilder.createGroup(context)
+                .withName("specialGroupPwd")
+                .build();
+        Group specialGroupIP = GroupBuilder.createGroup(context)
+               .withName("specialGroupIP")
+               .build();
+
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_AND_IP);
+        configurationService.setProperty("authentication-password.login.specialgroup","specialGroupPwd");
+        configurationService.setProperty("authentication-ip.specialGroupIP", "123.123.123.123");
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/authn/status").param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.okay", is(true)))
+            .andExpect(jsonPath("$.authenticated", is(true)))
+            .andExpect(jsonPath("$.authenticationMethod", is("password")))
+            .andExpect(jsonPath("$.type", is("status")))
+            .andExpect(jsonPath("$._links.specialGroups.href", startsWith(REST_SERVER_URL)))
+            .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
+                Matchers.containsInAnyOrder(
+                        GroupMatcher.matchGroupWithName("specialGroupPwd"))));
+
+        // try the special groups link endpoint in the same scenario than above
+        getClient(token).perform(get("/api/authn/status/specialGroups").param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.specialGroups",
+                Matchers.containsInAnyOrder(
+                        GroupMatcher.matchGroupWithName("specialGroupPwd"))));
+
+        getClient(token).perform(get("/api/authn/status").param("projection", "full")
+                .with(ip("123.123.123.123")))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.okay", is(true)))
+            .andExpect(jsonPath("$.authenticated", is(true)))
+            .andExpect(jsonPath("$.authenticationMethod", is("password")))
+            .andExpect(jsonPath("$.type", is("status")))
+            .andExpect(jsonPath("$._links.specialGroups.href", startsWith(REST_SERVER_URL)))
+            .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
+                    Matchers.containsInAnyOrder(
+                            GroupMatcher.matchGroupWithName("specialGroupPwd"),
+                            GroupMatcher.matchGroupWithName("specialGroupIP"))));
+
+        // try the special groups link endpoint in the same scenario than above
+        getClient(token).perform(get("/api/authn/status/specialGroups").param("projection", "full")
+                .with(ip("123.123.123.123")))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.specialGroups",
+                Matchers.containsInAnyOrder(
+                        GroupMatcher.matchGroupWithName("specialGroupPwd"),
+                        GroupMatcher.matchGroupWithName("specialGroupIP"))));
+
+        getClient().perform(get("/api/authn/status").param("projection", "full").with(ip("123.123.123.123")))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+            // fails due to bug https://github.com/DSpace/DSpace/issues/8274
+            //.andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.okay", is(true)))
+            .andExpect(jsonPath("$.authenticated", is(false)))
+            .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
+                    Matchers.containsInAnyOrder(GroupMatcher.matchGroupWithName("specialGroupIP"))));
+
+        // try the special groups link endpoint in the same scenario than above
+        getClient().perform(get("/api/authn/status/specialGroups").param("projection", "full")
+                .with(ip("123.123.123.123")))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.specialGroups",
+                Matchers.containsInAnyOrder(
+                        GroupMatcher.matchGroupWithName("specialGroupIP"))));
     }
 
     @Test
