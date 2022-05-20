@@ -558,6 +558,24 @@
                                     </descriptors>
                                 </configuration>
                             </execution>
+                            <!--
+                                Test configuration for dspace/modules/additions.
+                                This "additions" module needs a separate test environment because it
+                                loads additional Hibernate entities, which must be configured via
+                                the XML files.
+                            -->
+                            <execution>
+                                <phase>generate-test-resources</phase>
+                                <id>testEnvironment-additons</id>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/testEnvironment-additions.xml</descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
                         </executions>
                         <inherited>false</inherited>
                     </plugin>

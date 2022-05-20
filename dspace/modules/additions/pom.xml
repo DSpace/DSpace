@@ -112,10 +112,12 @@
          </activation>
          <build>
             <plugins>
-               <!-- Unit Testing setup: This plugin unzips the
-                    'testEnvironment.zip' file (created by dspace-parent POM), into
-                    the 'target/testing/' folder, to essentially create a test
-                    install of DSpace, against which Tests can be run. -->
+               <!--
+                   Unit Testing setup: This plugin unzips the
+                   'testEnvironment-additions.zip' file (created by dspace-parent POM), into
+                   the 'target/testing/' folder, to create a test install of DSpace,
+                   against which Tests can be run.
+               -->
                <plugin>
                   <artifactId>maven-dependency-plugin</artifactId>
                   <configuration>
@@ -126,7 +128,7 @@
                            <artifactId>dspace-parent</artifactId>
                            <version>${project.version}</version>
                            <type>zip</type>
-                           <classifier>testEnvironment</classifier>
+                           <classifier>testEnvironment-additions</classifier>
                         </artifactItem>
                      </artifactItems>
                   </configuration>
@@ -181,10 +183,12 @@
          </activation>
          <build>
             <plugins>
-               <!-- Integration Testing setup: This plugin unzips the
-                    'testEnvironment.zip' file (created by dspace-parent POM), into
-                    the 'target/testing/' folder, to essentially create a test
-                    install of DSpace, against which Tests can be run. -->
+               <!--
+                   Integration Testing setup: This plugin unzips the
+                   'testEnvironment-additions.zip' file (created by dspace-parent POM), into
+                   the 'target/testing/' folder, to create a test install of DSpace,
+                   against which Tests can be run.
+               -->
                <plugin>
                   <artifactId>maven-dependency-plugin</artifactId>
                   <configuration>
@@ -195,7 +199,7 @@
                            <artifactId>dspace-parent</artifactId>
                            <version>${project.version}</version>
                            <type>zip</type>
-                           <classifier>testEnvironment</classifier>
+                           <classifier>testEnvironment-additions</classifier>
                         </artifactItem>
                      </artifactItems>
                   </configuration>
