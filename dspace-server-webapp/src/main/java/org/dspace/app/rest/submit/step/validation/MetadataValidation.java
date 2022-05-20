@@ -83,6 +83,9 @@ public class MetadataValidation extends AbstractValidation {
                         String fullFieldname = input.getFieldName() + "." + inputPairs.get(i);
                         if (input.isAllowedFor(documentTypeValue)) {
                             isAllowedLookup.put(fullFieldname, true);
+                            // For the purposes of qualdrop, we have to add the field name without the qualifier
+                            // too, or a required qualdrop will get confused and incorrectly reject a value
+                            isAllowedLookup.put(input.getFieldName(), true);
                         }
                     }
                 } else {
@@ -103,12 +106,32 @@ public class MetadataValidation extends AbstractValidation {
                 List<String> fieldsName = new ArrayList<String>();
 
                 if (input.isQualdropValue()) {
+                    boolean foundResult = false;
                     List<Object> inputPairs = input.getPairs();
                     //starting from the second element of the list and skipping one every time because the display
                     // values are also in the list and before the stored values.
                     for (int i = 1; i < inputPairs.size(); i += 2) {
                         String fullFieldname = input.getFieldName() + "." + (String) inputPairs.get(i);
-                        fieldsName.add(fullFieldname);
+                        List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fullFieldname);
+
+                        // Check the lookup list. If no other inputs of the same field name allow this type,
+                        // then remove. This includes field name without qualifier.
+                        if (!input.isAllowedFor(documentTypeValue) &&  (!isAllowedLookup.containsKey(fullFieldname)
+                                && !isAllowedLookup.containsKey(input.getFieldName()))) {
+                            itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
+                                        obj.getItem(), mdv);
+                        } else {
+                            validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
+                            if (mdv.size() > 0 && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
+                                foundResult = true;
+                            }
+                        }
+                    }
+                    if (input.isRequired() && !foundResult) {
+                        // for this required qualdrop no value was found, add to the list of error fields
+                        addError(errors, ERROR_VALIDATION_REQUIRED,
+                                "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                                        input.getFieldName());
                     }
                 } else {
                     fieldsName.add(input.getFieldName());
