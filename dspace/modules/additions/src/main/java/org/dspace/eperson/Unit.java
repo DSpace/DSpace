@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 The University of Maryland. All Rights Reserved.
- * 
+ *
  */
 
 package org.dspace.eperson;
@@ -28,7 +28,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Class representing a campus unit.
- * 
+ *
  * @author Ben Wallberg
  */
 
@@ -68,7 +68,7 @@ public class Unit extends DSpaceObject
 
     /**
      * get name of unit
-     * 
+     *
      * @return name
      */
     public String getName()
@@ -78,7 +78,7 @@ public class Unit extends DSpaceObject
 
     /**
      * set name of unit
-     * 
+     *
      * @param name
      *            new unit name
      */
@@ -90,7 +90,7 @@ public class Unit extends DSpaceObject
 
     /**
      * set faculty requirement
-     * 
+     *
      * @param login
      *            boolean yes/no
      */
@@ -102,7 +102,7 @@ public class Unit extends DSpaceObject
 
     /**
      * faculty only?
-     * 
+     *
      * @return boolean, yes/no
      */
     public boolean getFacultyOnly()
@@ -113,10 +113,10 @@ public class Unit extends DSpaceObject
     /**
      * Return <code>true</code> if <code>other</code> is the same Unit as this
      * object, <code>false</code> otherwise
-     * 
+     *
      * @param other
      *            object to compare to
-     * 
+     *
      * @return <code>true</code> if object passed in represents the same unit as
      *         this object
      */
@@ -128,6 +128,16 @@ public class Unit extends DSpaceObject
         }
 
         return (getID() == ((Unit) other).getID());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        if (id != null)
+        {
+            return id.hashCode();
+        }
+        return 0;
     }
 
     public int getType()
@@ -142,7 +152,7 @@ public class Unit extends DSpaceObject
 
     /**
      * Get the groups this unit maps to
-     * 
+     *
      * @return array of <code>Group</code> s this unit maps to
      * @throws SQLException
      */
@@ -153,7 +163,7 @@ public class Unit extends DSpaceObject
 
     /**
      * Add an existing group to this unit
-     * 
+     *
      * @param group
      *            the group to add
      */
@@ -165,7 +175,7 @@ public class Unit extends DSpaceObject
 
     /**
      * Remove a group from this unit
-     * 
+     *
      * @param group
      *            the group to remove
      */

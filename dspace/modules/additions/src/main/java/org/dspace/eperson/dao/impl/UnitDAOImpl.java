@@ -8,6 +8,7 @@
 package org.dspace.eperson.dao.impl;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 import org.dspace.eperson.Group;
@@ -37,59 +38,66 @@ public class UnitDAOImpl extends AbstractHibernateDSODAO<Unit> implements UnitDA
 
     @Override
     public List<Unit> findAllByGroup(Context context, Group group) throws SQLException {
-      Criteria criteria = createCriteria(context, Unit.class);
-      criteria.setFetchMode("Group", FetchMode.JOIN)
-              .add(Restrictions.eq("id", group.getID()));
-      return list(criteria);
+//      Criteria criteria = createCriteria(context, Unit.class);
+//      criteria.setFetchMode("Group", FetchMode.JOIN)
+//              .add(Restrictions.eq("id", group.getID()));
+//      return list(criteria);
+        return Collections.EMPTY_LIST;
     }
 
     @Override
     public Unit findByName(Context context, String name) throws SQLException {
-      Criteria criteria = createCriteria(context, Unit.class);
-      criteria.add(Restrictions.eq("name", name))
-              .setFirstResult(0)
-              .setMaxResults(1);
-      List<Unit> units = list(criteria);
-      if (units.isEmpty()) {
+//      Criteria criteria = createCriteria(context, Unit.class);
+//      criteria.add(Restrictions.eq("name", name))
+//              .setFirstResult(0)
+//              .setMaxResults(1);
+//      List<Unit> units = list(criteria);
+//      if (units.isEmpty()) {
+//        return null;
+//      }
+//      return units.get(0);
         return null;
-      }
-      return units.get(0);
     }
 
     @Override
     public List<Unit> searchByName(Context context, String query, int offset, int limit) throws SQLException {
-      Criteria criteria = searchByNameCriteria(context, query);
-      if (offset > 0) {
-        criteria.setFirstResult(offset);
-      }
-      if (limit > 0) {
-        criteria.setMaxResults(limit);
-      }
-
-      return list(criteria);
+//      Criteria criteria = searchByNameCriteria(context, query);
+//      if (offset > 0) {
+//        criteria.setFirstResult(offset);
+//      }
+//      if (limit > 0) {
+//        criteria.setMaxResults(limit);
+//      }
+//
+//      return list(criteria);
+        return Collections.EMPTY_LIST;
     }
 
     @Override
     public int searchByNameResultCount(Context context, String query) throws SQLException {
-      return count(searchByNameCriteria(context, query));
+//      return count(searchByNameCriteria(context, query));
+        return -1;
     }
 
     @Override
     public List<Unit> findAllSortedByName(Context context) throws SQLException
     {
-      Criteria criteria = createCriteria(context, Unit.class);
-      criteria.addOrder(Order.asc("name.value"));
-      return list(criteria);
+//      Criteria criteria = createCriteria(context, Unit.class);
+//      criteria.addOrder(Order.asc("name.value"));
+//      return list(criteria);
+        return Collections.EMPTY_LIST;
     }
 
     @Override
     public int countRows(Context context) throws SQLException {
-        return count(createQuery(context, "SELECT count(*) FROM Unit"));
+//        return count(createQuery(context, "SELECT count(*) FROM Unit"));
+        return -1;
     }
 
     private Criteria searchByNameCriteria(Context context, String query) throws SQLException {
-      Criteria criteria = createCriteria(context, Unit.class);
-      criteria.add(Restrictions.like("name", query, MatchMode.ANYWHERE));
-      return criteria;
+//      Criteria criteria = createCriteria(context, Unit.class);
+//      criteria.add(Restrictions.like("name", query, MatchMode.ANYWHERE));
+//      return criteria;
+        return null;
     }
 }
