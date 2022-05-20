@@ -59,11 +59,6 @@
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.PoolTaskDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.WorkflowItemRoleDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.XmlWorkflowItemDAOImpl"/>
-
-    <!-- Begin UMD Customization -->
-    <!-- <bean class="org.dspace.content.dao.impl.EtdUnitDAOImpl"/> -->
-    <bean class="org.dspace.eperson.dao.impl.UnitDAOImpl"/>
-    <!-- End UMD Customization -->
     <bean class="org.dspace.statistics.export.dao.impl.OpenURLTrackerDAOImpl"/>
 
 

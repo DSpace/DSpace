@@ -84,10 +84,5 @@
 
         <mapping class="org.dspace.statistics.export.OpenURLTracker"/>
 
-        <!-- Begin UMD Customization -->
-        <!-- Mappings for UMD entities -->
-        <!-- <mapping class="org.dspace.content.EtdUnit"/>  -->
-        <mapping class="org.dspace.eperson.Unit"/>
-        <!-- End UMD Customization -->
     </session-factory>
 </hibernate-configuration>
