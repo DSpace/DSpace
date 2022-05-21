@@ -141,13 +141,13 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
 
     // Begin UMD Customization
     // Add EtdUnitService to the factory
-    @Autowired(required = true)
-    private EtdUnitService etdunitService;
+    // @Autowired(required = true)
+    // private EtdUnitService etdunitService;
 
-    @Override
-    public EtdUnitService getEtdUnitService() {
-        return etdunitService;
-    }
+    // @Override
+    // public EtdUnitService getEtdUnitService() {
+    //     return etdunitService;
+    // }
 
     // Add CommunityGroup to the factory
     @Autowired(required = true)

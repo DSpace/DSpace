@@ -103,7 +103,7 @@ public abstract class ContentServiceFactory {
     }
 
     // Begin UMD Customization
-    public abstract EtdUnitService getEtdUnitService();
+    // public abstract EtdUnitService getEtdUnitService();
     public abstract CommunityGroupService getCommunityGroupService();
     // End UMD Customization
 }
