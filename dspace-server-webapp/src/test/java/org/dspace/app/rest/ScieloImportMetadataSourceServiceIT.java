@@ -9,7 +9,6 @@ package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
@@ -17,7 +16,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import javax.el.MethodNotFoundException;
 
@@ -65,10 +63,10 @@ public class ScieloImportMetadataSourceServiceIT extends AbstractLiveImportInteg
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
-            Collection<ImportRecord> collection2match = getRecords();
+            ArrayList<ImportRecord> collection2match = getRecords();
             Collection<ImportRecord> recordsImported = scieloServiceImpl.getRecords("test query", 0, 2);
             assertEquals(2, recordsImported.size());
-            assertTrue(matchRecords(recordsImported, collection2match));
+            matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
         }
@@ -134,19 +132,19 @@ public class ScieloImportMetadataSourceServiceIT extends AbstractLiveImportInteg
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
-            Collection<ImportRecord> collection2match = getRecords();
-            Collection<ImportRecord> firstRecord = Arrays.asList(collection2match.iterator().next());
+            ArrayList<ImportRecord> collection2match = getRecords();
+            collection2match.remove(1);
             ImportRecord record = scieloServiceImpl.getRecord("S0185-30582021000200231-mex");
             assertNotNull(record);
             Collection<ImportRecord> recordsImported = Arrays.asList(record);
-            assertTrue(matchRecords(recordsImported, firstRecord));
+            matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
         }
     }
 
-    private Collection<ImportRecord> getRecords() {
-        Collection<ImportRecord> records = new LinkedList<ImportRecord>();
+    private ArrayList<ImportRecord> getRecords() {
+        ArrayList<ImportRecord> records = new ArrayList<>();
         //define first record
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
         MetadatumDTO ispartof = createMetadatumDTO("dc", "relation", "ispartof", "Nova tellus");

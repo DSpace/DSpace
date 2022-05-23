@@ -29,7 +29,6 @@ public class DoiCheck {
                                                                "|10.1207/[\\w\\d]+\\&\\d+_\\d+",
                                                            Pattern.CASE_INSENSITIVE);
 
-
     private DoiCheck() {}
 
     public static boolean isDoi(final String value) {
