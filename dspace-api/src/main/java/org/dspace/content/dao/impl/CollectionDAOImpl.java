@@ -9,7 +9,7 @@ package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
 import java.util.AbstractMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.Query;
@@ -34,7 +34,7 @@ import org.dspace.eperson.Group;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Collection object.
- * This class is responsible for all database calls for the Collection object and is autowired by spring
+ * This class is responsible for all database calls for the Collection object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -95,7 +95,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         Root<Collection> collectionRoot = criteriaQuery.from(Collection.class);
         criteriaQuery.select(collectionRoot);
         criteriaQuery.where(criteriaBuilder.equal(collectionRoot.get(Collection_.template), item));
-        return uniqueResult(context, criteriaQuery, false, Collection.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, Collection.class);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Collection.class);
         Root<Collection> collectionRoot = criteriaQuery.from(Collection.class);
         Join<Collection, ResourcePolicy> join = collectionRoot.join("resourcePolicies");
-        List<Predicate> orPredicates = new LinkedList<Predicate>();
+        List<Predicate> orPredicates = new ArrayList<>(actions.size());
         for (Integer action : actions) {
             orPredicates.add(criteriaBuilder.equal(join.get(ResourcePolicy_.actionId), action));
         }
@@ -176,7 +176,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         Query query = createQuery(context, q);
 
         List<Object[]> list = query.getResultList();
-        List<Map.Entry<Collection, Long>> returnList = new LinkedList<>();
+        List<Map.Entry<Collection, Long>> returnList = new ArrayList<>(list.size());
         for (Object[] o : list) {
             returnList.add(new AbstractMap.SimpleEntry<>((Collection) o[0], (Long) o[1]));
         }

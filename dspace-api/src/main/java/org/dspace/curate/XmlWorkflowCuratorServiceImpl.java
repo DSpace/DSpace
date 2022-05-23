@@ -19,7 +19,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.curate.service.XmlWorkflowCuratorService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -107,7 +107,7 @@ public class XmlWorkflowCuratorServiceImpl
         if (wfi != null) {
             return curate(curator, c, wfi);
         } else {
-            LOG.warn(LogManager.getHeader(c, "No workflow item found for id: {}", null), wfId);
+            LOG.warn(LogHelper.getHeader(c, "No workflow item found for id: {}", null), wfId);
         }
         return false;
     }

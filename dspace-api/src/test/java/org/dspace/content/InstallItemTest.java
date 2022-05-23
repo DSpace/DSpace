@@ -11,8 +11,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,7 +24,6 @@ import java.util.TimeZone;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -38,7 +35,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Unit Tests for class InstallItem
@@ -56,12 +52,6 @@ public class InstallItemTest extends AbstractUnitTest {
 
     private Collection collection;
     private Community owningCommunity;
-
-    /**
-     * Spy of AuthorizeService to use for tests
-     * (initialized / setup in @Before method)
-     */
-    private AuthorizeService authorizeServiceSpy;
 
     /**
      * log4j category
@@ -84,14 +74,6 @@ public class InstallItemTest extends AbstractUnitTest {
             this.owningCommunity = communityService.create(null, context);
             this.collection = collectionService.create(context, owningCommunity);
             context.restoreAuthSystemState();
-
-            // Initialize our spy of the autowired (global) authorizeService bean.
-            // This allows us to customize the bean's method return values in tests below
-            authorizeServiceSpy = spy(authorizeService);
-            // "Wire" our spy to be used by the current loaded workspaceItemService and collectionService
-            // (To ensure it uses the spy instead of the real service)
-            ReflectionTestUtils.setField(workspaceItemService, "authorizeService", authorizeServiceSpy);
-            ReflectionTestUtils.setField(collectionService, "authorizeService", authorizeServiceSpy);
         } catch (SQLException | AuthorizeException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
@@ -154,23 +136,23 @@ public class InstallItemTest extends AbstractUnitTest {
     /**
      * Test of installItem method (with an invalid handle), of class InstallItem.
      */
-    @Test(expected = AuthorizeException.class)
+    @Test(expected = IllegalStateException.class)
     public void testInstallItem_invalidHandle() throws Exception {
-        // Allow full Admin rights
-        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
-
         // create two items for tests
         context.turnOffAuthorisationSystem();
-        WorkspaceItem is = workspaceItemService.create(context, collection, false);
-        WorkspaceItem is2 = workspaceItemService.create(context, collection, false);
-        context.restoreAuthSystemState();
+        try {
+            WorkspaceItem is = workspaceItemService.create(context, collection, false);
+            WorkspaceItem is2 = workspaceItemService.create(context, collection, false);
 
-        //Test assigning the same Handle to two different items
-        String handle = "123456789/56789";
-        installItemService.installItem(context, is, handle);
+            //Test assigning the same Handle to two different items
+            String handle = "123456789/56789";
+            installItemService.installItem(context, is, handle);
 
-        // Assigning the same handle again should throw a RuntimeException
-        installItemService.installItem(context, is2, handle);
+            // Assigning the same handle again should throw a RuntimeException
+            installItemService.installItem(context, is2, handle);
+        } finally {
+            context.restoreAuthSystemState();
+        }
         fail("Exception expected");
     }
 

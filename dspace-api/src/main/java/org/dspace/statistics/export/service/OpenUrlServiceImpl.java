@@ -9,13 +9,16 @@ package org.dspace.statistics.export.service;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
@@ -57,21 +60,23 @@ public class OpenUrlServiceImpl implements OpenUrlService {
     }
 
     /**
-     * Returns the response code from accessing the url
+     * Returns the response code from accessing the url. Returns a http status 408 when the external service doesn't
+     * reply in 10 seconds
+     *
      * @param urlStr
      * @return response code from the url
      * @throws IOException
      */
     protected int getResponseCodeFromUrl(final String urlStr) throws IOException {
-        URLConnection conn;
-        URL url = new URL(urlStr);
-        conn = url.openConnection();
+        HttpGet httpGet = new HttpGet(urlStr);
+        RequestConfig requestConfig = getRequestConfigBuilder().setConnectTimeout(10 * 1000).build();
+        HttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
+        HttpResponse httpResponse = httpClient.execute(httpGet);
+        return httpResponse.getStatusLine().getStatusCode();
+    }
 
-        HttpURLConnection httpURLConnection = (HttpURLConnection) conn;
-        int responseCode = httpURLConnection.getResponseCode();
-        httpURLConnection.disconnect();
-
-        return responseCode;
+    protected RequestConfig.Builder getRequestConfigBuilder() {
+        return RequestConfig.custom();
     }
 
     /**

@@ -10,6 +10,8 @@ package org.dspace.content.dao.impl;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -262,6 +264,39 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.where(relationshipRoot.get(Relationship_.relationshipType).in(ids));
         return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
+    }
+
+    @Override
+    public List<Relationship> findByItemAndRelationshipTypeAndList(Context context, UUID focusUUID,
+            RelationshipType relationshipType, List<UUID> items, boolean isLeft,
+            int offset, int limit) throws SQLException {
+        String side = isLeft ? "left_id" : "right_id";
+        String otherSide = !isLeft ? "left_id" : "right_id";
+        Query query = createQuery(context, "FROM " + Relationship.class.getSimpleName() +
+                                          " WHERE type_id = (:typeId) " +
+                                           "AND " + side + " = (:focusUUID) " +
+                                           "AND " + otherSide + " in (:list) " +
+                                           "ORDER BY id");
+        query.setParameter("typeId", relationshipType.getID());
+        query.setParameter("focusUUID", focusUUID);
+        query.setParameter("list", items);
+        return list(query, limit, offset);
+    }
+
+    @Override
+    public int countByItemAndRelationshipTypeAndList(Context context, UUID focusUUID, RelationshipType relationshipType,
+            List<UUID> items, boolean isLeft) throws SQLException {
+        String side = isLeft ? "left_id" : "right_id";
+        String otherSide = !isLeft ? "left_id" : "right_id";
+        Query query = createQuery(context, "SELECT count(*) " +
+                                           "FROM " + Relationship.class.getSimpleName() +
+                                          " WHERE type_id = (:typeId) " +
+                                           "AND " + side + " = (:focusUUID) " +
+                                           "AND " + otherSide + " in (:list)");
+        query.setParameter("typeId", relationshipType.getID());
+        query.setParameter("focusUUID", focusUUID);
+        query.setParameter("list", items);
+        return count(query);
     }
 
 }

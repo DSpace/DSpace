@@ -10,6 +10,7 @@ package org.dspace.statistics;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author kevinvandevelde at atmire.com
- * Date: 21-jan-2009
+ * Date: 21-Jan-2009
  * Time: 13:44:48
  */
 public class Dataset {
@@ -66,20 +67,20 @@ public class Dataset {
     }
 
     private void initRowLabels(int rows) {
-        rowLabels = new ArrayList<String>(rows);
-        rowLabelsAttrs = new ArrayList<Map<String, String>>();
+        rowLabels = new ArrayList<>(rows);
+        rowLabelsAttrs = new ArrayList<>();
         for (int i = 0; i < rows; i++) {
             rowLabels.add("Row " + (i + 1));
-            rowLabelsAttrs.add(new HashMap<String, String>());
+            rowLabelsAttrs.add(new HashMap<>());
         }
     }
 
     private void initColumnLabels(int nbCols) {
-        colLabels = new ArrayList<String>(nbCols);
-        colLabelsAttrs = new ArrayList<Map<String, String>>();
+        colLabels = new ArrayList<>(nbCols);
+        colLabelsAttrs = new ArrayList<>();
         for (int i = 0; i < nbCols; i++) {
             colLabels.add("Column " + (i + 1));
-            colLabelsAttrs.add(new HashMap<String, String>());
+            colLabelsAttrs.add(new HashMap<>());
         }
     }
 
@@ -233,7 +234,9 @@ public class Dataset {
 
     public ByteArrayOutputStream exportAsCSV() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ICSVWriter ecsvp = new CSVWriterBuilder(new OutputStreamWriter(baos)).withSeparator(';').build();
+        ICSVWriter ecsvp = new CSVWriterBuilder(new OutputStreamWriter(baos, StandardCharsets.UTF_8))
+                .withSeparator(';')
+                .build();
         //Generate the item row
         List<String> colLabels = getColLabels();
         colLabels.add(0, "");

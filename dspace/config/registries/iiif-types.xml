@@ -1,0 +1,66 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace IIIF Schema</title>
+        <contributor.author>Andrea Bollini</contributor.author>
+    </dspace-header>
+
+    <dc-schema>
+        <name>iiif</name>
+        <namespace>http://dspace.org/iiif</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>iiif</schema>
+        <element>label</element>
+        <scope_note>Metadata field used to set the IIIF label associated with the resource otherwise the system will derive one according to the configuration and metadata</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>iiif</schema>
+        <element>description</element>
+        <scope_note>Metadata field used to set the IIIF description associated with the resource</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>iiif</schema>
+        <element>toc</element>
+        <scope_note>Metadata field used to set the position of the iiif resource in the structure. Levels are separated by triple pipe ||| can be applied to Bundles and Bitstreams</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>iiif</schema>
+        <element>canvas</element>
+        <qualifier>naming</qualifier>
+        <scope_note>Metadata field used to set the base label used to name all the canvas in the Item. The canvas label will be generated using the value of this metadata as prefix and the canvas position</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>iiif</schema>
+        <element>viewing</element>
+        <qualifier>hint</qualifier>
+        <scope_note>Metadata field used to set the viewing hint overriding the configuration value if any</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>iiif</schema>
+        <element>image</element>
+        <qualifier>width</qualifier>
+        <scope_note>Metadata field used to store the width of an image in px</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>iiif</schema>
+        <element>image</element>
+        <qualifier>height</qualifier>
+        <scope_note>Metadata field used to store the height of an image in px</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>iiif</schema>
+        <element>search</element>
+        <qualifier>enabled</qualifier>
+        <scope_note>Metadata field used to enable the IIIF Search service at the item level</scope_note>
+    </dc-type>
+
+</dspace-dc-types>

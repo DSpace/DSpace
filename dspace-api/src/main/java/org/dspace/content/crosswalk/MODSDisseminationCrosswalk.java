@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -42,16 +41,18 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.jdom.Text;
-import org.jdom.Verifier;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-import org.jdom.xpath.XPath;
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
+import org.jdom2.Text;
+import org.jdom2.Verifier;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 
 /**
  * Configurable MODS Crosswalk
@@ -156,7 +157,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     static class modsTriple {
         public String qdc = null;
         public Element xml = null;
-        public XPath xpath = null;
+        public XPathExpression xpath = null;
 
         /**
          * Initialize from text versions of QDC, XML and XPath.
@@ -171,9 +172,9 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             final String postlog = "</mods>";
             try {
                 result.qdc = qdc;
-                result.xpath = XPath.newInstance(xpath);
-                result.xpath.addNamespace(MODS_NS.getPrefix(), MODS_NS.getURI());
-                result.xpath.addNamespace(XLINK_NS);
+                result.xpath =
+                    XPathFactory.instance()
+                        .compile(xpath, Filters.fpassthrough(), null, MODS_NS, XLINK_NS);
                 Document d = builder.build(new StringReader(prolog + xml + postlog));
                 result.xml = (Element) d.getRootElement().getContent(0);
             } catch (JDOMException | IOException je) {
@@ -295,6 +296,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      * @throws IOException        if IO error
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
+     * @return List of Elements
      */
     @Override
     public List<Element> disseminateList(Context context, DSpaceObject dso)
@@ -352,37 +354,29 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             if (trip == null) {
                 log.warn("WARNING: " + getPluginInstanceName() + ": No MODS mapping for \"" + qdc + "\"");
             } else {
-                try {
-                    Element me = (Element) trip.xml.clone();
-                    if (addSchema) {
-                        me.setAttribute("schemaLocation", schemaLocation, XSI_NS);
-                    }
-                    Iterator ni = trip.xpath.selectNodes(me).iterator();
-                    if (!ni.hasNext()) {
-                        log.warn("XPath \"" + trip.xpath.getXPath() +
-                                     "\" found no elements in \"" +
-                                     outputUgly.outputString(me) +
-                                     "\", qdc=" + qdc);
-                    }
-                    while (ni.hasNext()) {
-                        Object what = ni.next();
-                        if (what instanceof Element) {
-                            ((Element) what).setText(checkedString(value));
-                        } else if (what instanceof Attribute) {
-                            ((Attribute) what).setValue(checkedString(value));
-                        } else if (what instanceof Text) {
-                            ((Text) what).setText(checkedString(value));
-                        } else {
-                            log.warn("Got unknown object from XPath, class=" + what.getClass().getName());
-                        }
-                    }
-                    result.add(me);
-                } catch (JDOMException je) {
-                    log.error("Error following XPath in modsTriple: context=" +
-                                  outputUgly.outputString(trip.xml) +
-                                  ", xpath=" + trip.xpath.getXPath() + ", exception=" +
-                                  je.toString());
+                Element me = (Element) trip.xml.clone();
+                if (addSchema) {
+                    me.setAttribute("schemaLocation", schemaLocation, XSI_NS);
                 }
+                List<Object> matches = trip.xpath.evaluate(me);
+                if (matches.isEmpty()) {
+                    log.warn("XPath \"" + trip.xpath.getExpression() +
+                                 "\" found no elements in \"" +
+                                 outputUgly.outputString(me) +
+                                 "\", qdc=" + qdc);
+                }
+                for (Object match: matches) {
+                    if (match instanceof Element) {
+                        ((Element) match).setText(checkedString(value));
+                    } else if (match instanceof Attribute) {
+                        ((Attribute) match).setValue(checkedString(value));
+                    } else if (match instanceof Text) {
+                        ((Text) match).setText(checkedString(value));
+                    } else {
+                        log.warn("Got unknown object from XPath, class=" + match.getClass().getName());
+                    }
+                }
+                result.add(me);
             }
         }
         return result;

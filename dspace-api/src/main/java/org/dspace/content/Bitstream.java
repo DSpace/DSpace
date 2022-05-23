@@ -21,8 +21,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
@@ -37,17 +35,10 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * the contents of a bitstream; you need to create a new bitstream.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 @Entity
 @Table(name = "bitstream")
 public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport {
-
-    /**
-     * log4j logger
-     */
-    private static final Logger log = LogManager.getLogger();
-
     @Column(name = "bitstream_id", insertable = false, updatable = false)
     private Integer legacyId;
 
@@ -412,7 +403,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     @Override
     public boolean equals(Object other) {
-        if (other == null) {
+        if (!(other instanceof Bitstream)) {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(other);
@@ -420,11 +411,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
             return false;
         }
         final Bitstream otherBitstream = (Bitstream) other;
-        if (!this.getID().equals(otherBitstream.getID())) {
-            return false;
-        }
-
-        return true;
+        return this.getID().equals(otherBitstream.getID());
     }
 
     @Override

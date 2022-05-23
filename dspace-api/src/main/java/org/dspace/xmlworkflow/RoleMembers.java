@@ -30,8 +30,8 @@ import org.dspace.eperson.service.GroupService;
 public class RoleMembers {
 
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-    private ArrayList<Group> groups;
-    private ArrayList<EPerson> epersons;
+    private final ArrayList<Group> groups;
+    private final ArrayList<EPerson> epersons;
 
     public RoleMembers() {
         this.groups = new ArrayList<>();
@@ -55,11 +55,7 @@ public class RoleMembers {
     }
 
     public void removeEperson(EPerson epersonToRemove) {
-        for (EPerson eperson : epersons) {
-            if (eperson.equals(epersonToRemove)) {
-                epersons.remove(eperson);
-            }
-        }
+        epersons.removeIf(eperson -> eperson.equals(epersonToRemove));
     }
 
     public ArrayList<EPerson> getAllUniqueMembers(Context context) throws SQLException {

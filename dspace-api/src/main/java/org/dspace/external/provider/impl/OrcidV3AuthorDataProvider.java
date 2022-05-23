@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.model.ExternalDataObject;
-import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
 import org.json.JSONObject;
 import org.orcid.jaxb.model.v3.release.common.OrcidIdentifier;
@@ -41,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * This class is the implementation of the ExternalDataProvider interface that will deal with the OrcidV3 External
  * Data lookup
  */
-public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
+public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
 
     private static final Logger log = LogManager.getLogger(OrcidV3AuthorDataProvider.class);
 
@@ -217,11 +218,10 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
-        if (bios == null) {
+        if (Objects.isNull(bios)) {
             return Collections.emptyList();
-        } else {
-            return bios.stream().map(bio -> convertToExternalDataObject(bio)).collect(Collectors.toList());
         }
+        return bios.stream().map(bio -> convertToExternalDataObject(bio)).collect(Collectors.toList());
     }
 
     @Override

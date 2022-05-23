@@ -34,6 +34,7 @@ public class BitstreamFormatBuilder extends AbstractCRUDBuilder<BitstreamFormat>
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
+            c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             bitstreamFormat = c.reloadEntity(bitstreamFormat);

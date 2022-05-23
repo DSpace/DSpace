@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
@@ -137,7 +137,7 @@ public class RestartWorkflow {
                 WorkspaceItem wsi = workflowService
                     .sendWorkflowItemBackSubmission(context, workflowItem, myEPerson, provenance, "");
 
-                log.info(LogManager.getHeader(context, "restart_workflow", "workflow_item_id="
+                log.info(LogHelper.getHeader(context, "restart_workflow", "workflow_item_id="
                     + workflowItem.getID() + "item_id=" + workflowItem.getItem().getID()
                     + "collection_id=" + workflowItem.getCollection().getID()));
 
