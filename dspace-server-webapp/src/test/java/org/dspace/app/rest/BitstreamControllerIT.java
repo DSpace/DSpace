@@ -627,7 +627,7 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                  )).andExpect(status().isOk());
 
         // at this moment the bitstream should NOT be marked as deleted, because it has been attached to target bundle
-        assertFalse(bitstream.isDeleted());
+        assertFalse(context.reloadEntity(bitstream).isDeleted());
 
         targetBundle = bundleService.find(context, targetBundle.getID());
         String name = targetBundle.getName();

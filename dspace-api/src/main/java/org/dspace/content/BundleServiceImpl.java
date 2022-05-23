@@ -158,6 +158,9 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         }
 
         bundle.addBitstream(bitstream);
+        if (bitstream.isDeleted()) {
+            bitstream.setDeleted(false);
+        }
         bitstream.getBundles().add(bundle);
 
 
