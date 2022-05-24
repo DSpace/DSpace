@@ -27,7 +27,7 @@ ADD --chown=dspace dspace/modules/server /app/dspace/modules/server
 COPY dspace/src/main/docker/local.cfg /app/local.cfg
 
 # Build DSpace.  Copy the dspace-install directory to /install.  Clean up the build to keep the docker image small
-RUN mvn package -rf org.dspace.modules:additions -pl '!org.dspace:dspace-iiif,!org.dspace:dspace-oai,!org.dspace:dspace-rdf,!org.dspace:dspace-sword,!org.dspace:dspace-swordv2' && \
+RUN mvn package -rf org.dspace:modules -pl '!org.dspace:dspace-iiif,!org.dspace:dspace-oai,!org.dspace:dspace-rdf,!org.dspace:dspace-sword,!org.dspace:dspace-swordv2' && \
 # RUN mvn package -Pdspace-rest && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
