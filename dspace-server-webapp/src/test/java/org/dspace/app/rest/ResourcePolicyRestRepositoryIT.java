@@ -2230,7 +2230,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        int action = Constants.WRITE;
+        //Patch with a write action
+        String action = Constants.actionText[1];
         List<Operation> ops = new ArrayList<Operation>();
         AddOperation addOperation = new AddOperation("/action", action);
         ops.add(addOperation);
@@ -2242,12 +2243,12 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", Matchers.allOf(
-                hasJsonPath("$.action", is(Constants.actionText[action])))));
+                hasJsonPath("$.action", is(action)))));
 
         getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", Matchers.allOf(
-                hasJsonPath("$.action", is(Constants.actionText[action])))));
+                hasJsonPath("$.action", is(action)))));
     }
 
     @Test
@@ -2279,7 +2280,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        int newAction = Constants.WRITE;
+        String newAction = Constants.actionText[1];
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/action", newAction);
         ops.add(replaceOperation);
@@ -2291,12 +2292,12 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", Matchers.allOf(
-                hasJsonPath("$.action", is(Constants.actionText[newAction])))));
+                hasJsonPath("$.action", is(newAction)))));
 
         getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", Matchers.allOf(
-                hasJsonPath("$.action", is(Constants.actionText[newAction])))));
+                hasJsonPath("$.action", is(newAction)))));
     }
 
     @Test

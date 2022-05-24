@@ -53,7 +53,7 @@ public class ResourcePolicyActionAddOrReplaceOperation<R> extends PatchOperation
      * @param operation      patch operation
      */
     private void replace(ResourcePolicy resourcePolicy, Operation operation) {
-        int action = (int) operation.getValue();
+        int action = Constants.getActionID(operation.getValue().toString());
         if (action < 0 || action > Constants.actionText.length) {
             throw new UnprocessableEntityException(action + "is not defined");
         }
