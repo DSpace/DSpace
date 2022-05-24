@@ -1756,7 +1756,9 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         context.restoreAuthSystemState();
 
         // Check relationship order
+        // NOTE: since R1 has been removed, but copied to left, this place remains at 2 (instead of 1)
         assertLeftPlace(r2, 2);
+        // NOTE: since R1 has been removed, but copied to left, this place remains at 4 (instead of 3)
         assertLeftPlace(r3, 4);
         assertRelationMetadataOrder(publication1, isAuthorOfPublication, Arrays.asList(null, r2, r3));
         assertMetadataOrder(publication1, "dc.contributor.author", List.of(
@@ -1812,6 +1814,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         // Check relationship order
         assertLeftPlace(r1, 0);
+        // NOTE: since R2 has been removed, but copied to left, this place remains at 4 (instead of 3)
         assertLeftPlace(r3, 4);
         assertRelationMetadataOrder(publication1, isAuthorOfPublication, Arrays.asList(r1, null, r3));
         assertMetadataOrder(publication1, "dc.contributor.author", List.of(
