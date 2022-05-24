@@ -720,38 +720,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void createFirstVersionItemWithentityTypeByAdminAndPropertyBlockEntityEnableTest() throws Exception {
-        configurationService.setProperty("versioning.block.entity", true);
-        context.turnOffAuthorisationSystem();
-        Community rootCommunity = CommunityBuilder.createCommunity(context)
-                                                  .withName("Parent Community")
-                                                  .build();
-
-        Collection col = CollectionBuilder.createCollection(context, rootCommunity)
-                                          .withName("Collection 1")
-                                          .withEntityType("Publication")
-                                          .build();
-
-        Item itemA = ItemBuilder.createItem(context, col)
-                               .withTitle("Public item")
-                               .withIssueDate("2021-04-19")
-                               .withAuthor("Doe, John")
-                               .withSubject("ExtraEntry")
-                               .build();
-
-        context.restoreAuthSystemState();
-
-        String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(adminToken).perform(post("/api/versioning/versions")
-                             .param("summary", "test summary!")
-                             .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                             .content("/api/core/items/" + itemA.getID()))
-                             .andExpect(status().isForbidden());
-    }
-
-    @Test
-    public void createFirstVersionItemWithEntityTypeAndPropertyBlockEntityDisabledTest() throws Exception {
-        configurationService.setProperty("versioning.block.entity", false);
+    public void createFirstVersionItemWithEntityTypeTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
@@ -793,9 +762,8 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void createFirstVersionItemWithEntityTypeBySubmitterAndPropertyBlockEntityDisabledTest() throws Exception {
+    public void createFirstVersionItemWithEntityTypeBySubmitterTest() throws Exception {
         configurationService.setProperty("versioning.submitterCanCreateNewVersion", true);
-        configurationService.setProperty("versioning.block.entity", false);
         context.turnOffAuthorisationSystem();
         Community rootCommunity = CommunityBuilder.createCommunity(context)
                                                   .withName("Parent Community")

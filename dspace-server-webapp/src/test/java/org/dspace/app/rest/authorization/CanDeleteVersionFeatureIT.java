@@ -28,7 +28,6 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.EPerson;
-import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -46,8 +45,6 @@ public class CanDeleteVersionFeatureIT extends AbstractControllerIntegrationTest
     private VersionConverter versionConverter;
     @Autowired
     private WorkspaceItemService workspaceItemService;
-    @Autowired
-    private ConfigurationService configurationService;
     @Autowired
     private AuthorizationFeatureService authorizationFeatureService;
     @Autowired
@@ -259,58 +256,8 @@ public class CanDeleteVersionFeatureIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void canDeleteVersionFeatureAndPropertyBlockEntityEnableTest() throws Exception {
+    public void canDeleteVersionFeatureTest() throws Exception {
         context.turnOffAuthorisationSystem();
-
-        configurationService.setProperty("versioning.block.entity", true);
-
-        Community rootCommunity = CommunityBuilder.createCommunity(context)
-                                                  .withName("Parent Community")
-                                                  .build();
-
-        Collection col = CollectionBuilder.createCollection(context, rootCommunity)
-                                          .withName("Collection 1")
-                                          .withEntityType("Publication")
-                                          .build();
-
-        Item itemA = ItemBuilder.createItem(context, col)
-                                .withTitle("Public item")
-                                .withIssueDate("2021-04-19")
-                                .withAuthor("Doe, John")
-                                .withSubject("ExtraEntry")
-                                .build();
-
-        Version version = VersionBuilder.createVersion(context, itemA, "My test summary").build();
-        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, version.getItem());
-        installItemService.installItem(context, workspaceItem);
-
-        context.restoreAuthSystemState();
-
-        VersionRest versionRest = versionConverter.convert(version, DefaultProjection.DEFAULT);
-
-        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-
-        // define authorization that we know not exists
-        Authorization admin2ItemA = new Authorization(admin, canDeleteVersionFeature, versionRest);
-        Authorization eperson2ItemA = new Authorization(eperson, canDeleteVersionFeature, versionRest);
-        Authorization anonymous2ItemA = new Authorization(null, canDeleteVersionFeature, versionRest);
-
-        getClient(tokenAdmin).perform(get("/api/authz/authorizations/" + admin2ItemA.getID()))
-                             .andExpect(status().isNotFound());
-
-        getClient(tokenEPerson).perform(get("/api/authz/authorizations/" + eperson2ItemA.getID()))
-                               .andExpect(status().isNotFound());
-
-        getClient().perform(get("/api/authz/authorizations/" + anonymous2ItemA.getID()))
-                   .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void canDeleteVersionFeatureAndPropertyBlockEntityDisabledTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        configurationService.setProperty("versioning.block.entity", false);
 
         Community rootCommunity = CommunityBuilder.createCommunity(context)
                                                   .withName("Parent Community")
