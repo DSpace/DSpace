@@ -136,7 +136,7 @@ public class ResourcePolicyUtils {
         String dateS = (String) operation.getValue();
         try {
             Date date = simpleDateFormat.parse(dateS);
-            if (resource.getEndDate() != null && resource.getStartDate().after(date)) {
+            if (resource.getStartDate() != null && resource.getStartDate().after(date)) {
                 throw new DSpaceBadRequestException("Attempting to set an invalid endDate smaller than the startDate.");
             }
         } catch (ParseException e) {
