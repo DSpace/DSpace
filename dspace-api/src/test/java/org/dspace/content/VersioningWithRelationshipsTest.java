@@ -10,7 +10,7 @@ package org.dspace.content;
 import static org.dspace.content.Relationship.LatestVersionStatus.BOTH;
 import static org.dspace.content.Relationship.LatestVersionStatus.LEFT_ONLY;
 import static org.dspace.content.Relationship.LatestVersionStatus.RIGHT_ONLY;
-import static org.dspace.util.RelationshipVersioningUtils.isRel;
+import static org.dspace.util.RelationshipVersioningTestUtils.isRel;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;

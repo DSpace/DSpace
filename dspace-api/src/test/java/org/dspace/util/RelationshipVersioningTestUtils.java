@@ -20,9 +20,9 @@ import org.hamcrest.Matcher;
 /**
  * Methods for testing relationships and their behavior with versioned items.
  */
-public class RelationshipVersioningUtils {
+public class RelationshipVersioningTestUtils {
 
-    private RelationshipVersioningUtils() {}
+    private RelationshipVersioningTestUtils() {}
 
     public static Matcher<Object> isRel(
         Item leftItem, RelationshipType relationshipType, Item rightItem, LatestVersionStatus latestVersionStatus,
