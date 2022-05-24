@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.dao.pojo.ItemUuidAndRelationshipId;
-import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
@@ -45,7 +45,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
     protected RelationshipTypeService relationshipTypeService;
 
     @Autowired(required = true)
-    protected EntityTypeService entityTypeService;
+    protected ItemService itemService;
 
     @Autowired(required = true)
     protected VirtualMetadataPopulator virtualMetadataPopulator;
@@ -58,7 +58,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         Context context = new Context();
         List<RelationshipMetadataValue> fullMetadataValueList = new LinkedList<>();
         try {
-            EntityType entityType = getEntityTypeFromMetadata(context, item);
+            EntityType entityType = itemService.getEntityType(context, item);
             if (entityType != null) {
                 // NOTE: The following code will add metadata fields of type relation.*.latestForDiscovery
                 //       (e.g. relation.isAuthorOfPublication.latestForDiscovery).
@@ -167,25 +167,10 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
             .collect(Collectors.toUnmodifiableList());
     }
 
+    @Override
+    @Deprecated
     public String getEntityTypeStringFromMetadata(Item item) {
-        List<MetadataValue> list = item.getMetadata();
-        for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getMetadataField().getMetadataSchema().getName(), "dspace")
-                && StringUtils.equals(mdv.getMetadataField().getElement(), "entity")
-                && StringUtils.equals(mdv.getMetadataField().getQualifier(), "type")) {
-                return mdv.getValue();
-            }
-        }
-        return null;
-    }
-
-    public EntityType getEntityTypeFromMetadata(Context context, Item item) throws SQLException {
-        String entityTypeString = getEntityTypeStringFromMetadata(item);
-        if (StringUtils.isBlank(entityTypeString)) {
-            return null;
-        }
-
-        return entityTypeService.findByEntityType(context, entityTypeString);
+        return itemService.getEntityTypeLabel(item);
     }
 
     @Override

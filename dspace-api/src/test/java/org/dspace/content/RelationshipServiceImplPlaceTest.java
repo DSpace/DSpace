@@ -2753,7 +2753,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     }
 
     private String getRelationshipTypeStringForEntity(RelationshipType relationshipType, Item item) {
-        String entityType = relationshipMetadataService.getEntityTypeStringFromMetadata(item);
+        String entityType = itemService.getEntityTypeLabel(item);
 
         if (StringUtils.equals(entityType, relationshipType.getLeftType().getLabel())) {
             return relationshipType.getLeftwardType();

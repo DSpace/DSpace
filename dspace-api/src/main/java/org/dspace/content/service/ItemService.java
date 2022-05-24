@@ -21,6 +21,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
@@ -782,5 +783,20 @@ public interface ItemService
      */
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier,
                                            String lang, boolean enableVirtualMetadata);
+
+    /**
+     * Retrieve the label of the entity type of the given item.
+     * @param item the item.
+     * @return the label of the entity type, taken from the item metadata, or null if not found.
+     */
+    public String getEntityTypeLabel(Item item);
+
+    /**
+     * Retrieve the entity type of the given item.
+     * @param context the DSpace context.
+     * @param item the item.
+     * @return the entity type of the given item, or null if not found.
+     */
+    public EntityType getEntityType(Context context, Item item) throws SQLException;
 
 }

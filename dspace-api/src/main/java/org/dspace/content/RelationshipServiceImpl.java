@@ -792,7 +792,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                     + item.getID() + " due to " + currentDepth + " depth");
             return;
         }
-        String entityTypeStringFromMetadata = relationshipMetadataService.getEntityTypeStringFromMetadata(item);
+        String entityTypeStringFromMetadata = itemService.getEntityTypeLabel(item);
         EntityType actualEntityType = entityTypeService.findByEntityType(context, entityTypeStringFromMetadata);
         // Get all types of relations for the current item
         List<RelationshipType> relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType);
@@ -865,8 +865,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                                     boolean copyToRightItem)
         throws SQLException, AuthorizeException {
         if (copyToLeftItem) {
-            String entityTypeString = relationshipMetadataService
-                .getEntityTypeStringFromMetadata(relationship.getLeftItem());
+            String entityTypeString = itemService.getEntityTypeLabel(relationship.getLeftItem());
             List<RelationshipMetadataValue> relationshipMetadataValues =
                 relationshipMetadataService.findRelationshipMetadataValueForItemRelationship(context,
                     relationship.getLeftItem(), entityTypeString, relationship, true);
@@ -892,8 +891,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             itemService.update(context, relationship.getLeftItem());
         }
         if (copyToRightItem) {
-            String entityTypeString = relationshipMetadataService
-                .getEntityTypeStringFromMetadata(relationship.getRightItem());
+            String entityTypeString = itemService.getEntityTypeLabel(relationship.getRightItem());
             List<RelationshipMetadataValue> relationshipMetadataValues =
                 relationshipMetadataService.findRelationshipMetadataValueForItemRelationship(context,
                     relationship.getRightItem(), entityTypeString, relationship, true);

@@ -21,7 +21,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -299,8 +298,8 @@ public class VersioningConsumer implements Consumer {
      * @return true if the entity types of both items are non-null and equal, false otherwise.
      */
     protected boolean doEntityTypesMatch(Item latestItem, Item previousItem) {
-        String latestItemEntityType = getEntityType(latestItem);
-        String previousItemEntityType = getEntityType(previousItem);
+        String latestItemEntityType = itemService.getEntityTypeLabel(latestItem);
+        String previousItemEntityType = itemService.getEntityTypeLabel(previousItem);
 
         // check if both items have an entity type
         if (latestItemEntityType == null || previousItemEntityType == null) {
@@ -341,46 +340,15 @@ public class VersioningConsumer implements Consumer {
     /**
      * Get the entity type (stored in metadata field dspace.entity.type) of any item.
      * @param item the item.
-     * @return the label of the entity type.
-     */
-    protected String getEntityType(Item item) {
-        List<MetadataValue> mdvs = itemService.getMetadata(item, "dspace", "entity", "type", Item.ANY, false);
-        if (mdvs.isEmpty()) {
-            return null;
-        }
-        if (mdvs.size() > 1) {
-            log.warn(
-                "Item with uuid {}, handle {} has {} entity types ({}), expected 1 entity type",
-                item.getID(), item.getHandle(), mdvs.size(),
-                mdvs.stream().map(MetadataValue::getValue).collect(Collectors.toUnmodifiableList())
-            );
-        }
-
-        String entityType = mdvs.get(0).getValue();
-        if (StringUtils.isBlank(entityType)) {
-            return null;
-        }
-
-        return entityType;
-    }
-
-    /**
-     * Get the entity type (stored in metadata field dspace.entity.type) of any item.
-     * @param item the item.
      * @return the entity type.
      */
     protected EntityType getEntityType(Context ctx, Item item) {
-        String entityTypeStr = getEntityType(item);
-        if (entityTypeStr == null) {
-            return null;
-        }
-
         try {
-            return entityTypeService.findByEntityType(ctx, entityTypeStr);
+            return itemService.getEntityType(ctx, item);
         } catch (SQLException e) {
             log.error(
                 "Exception occurred when trying to obtain entity type with label {} of item with uuid {}, handle {}",
-                entityTypeStr, item.getID(), item.getHandle(), e
+                itemService.getEntityTypeLabel(item), item.getID(), item.getHandle(), e
             );
             return null;
         }
