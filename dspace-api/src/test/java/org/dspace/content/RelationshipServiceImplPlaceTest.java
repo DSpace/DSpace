@@ -636,7 +636,6 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         context.restoreAuthSystemState();
 
         // Check relationship order
-        // Check relationship order
         assertLeftPlace(r1, 0);
         assertLeftPlace(r2, 1);
         assertLeftPlace(r3, 2);
