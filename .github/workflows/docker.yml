@@ -74,7 +74,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.dependencies
-          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          platforms: linux/amd64,linux/arm64
           # For pull requests, we run the Docker build (to ensure no PR changes break the build),
           # but we ONLY do an image push to DockerHub if it's NOT a PR
           push: ${{ github.event_name != 'pull_request' }}
@@ -100,7 +100,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          platforms: linux/amd64,linux/arm64
           # For pull requests, we run the Docker build (to ensure no PR changes break the build),
           # but we ONLY do an image push to DockerHub if it's NOT a PR
           push: ${{ github.event_name != 'pull_request' }}
@@ -129,7 +129,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.test
-          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          platforms: linux/amd64,linux/arm64
           # For pull requests, we run the Docker build (to ensure no PR changes break the build),
           # but we ONLY do an image push to DockerHub if it's NOT a PR
           push: ${{ github.event_name != 'pull_request' }}
@@ -155,7 +155,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.cli
-          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          platforms: linux/amd64,linux/arm64
           # For pull requests, we run the Docker build (to ensure no PR changes break the build),
           # but we ONLY do an image push to DockerHub if it's NOT a PR
           push: ${{ github.event_name != 'pull_request' }}
