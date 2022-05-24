@@ -305,12 +305,12 @@ public class VersioningConsumer implements Consumer {
         // check if both items have an entity type
         if (latestItemEntityType == null || previousItemEntityType == null) {
             if (previousItemEntityType != null) {
-                log.warn(String.format(
-                    "Inconsistency: Item with uuid %s, handle %s has NO entity type, " +
-                    "but the previous version of that item with uuid %s, handle %s has entity type %s",
+                log.warn(
+                    "Inconsistency: Item with uuid {}, handle {} has NO entity type, " +
+                    "but the previous version of that item with uuid {}, handle {} has entity type {}",
                     latestItem.getID(), latestItem.getHandle(),
                     previousItem.getID(), previousItem.getHandle(), previousItemEntityType
-                ));
+                );
             }
 
             // one or both items do not have an entity type, so comparing is pointless
@@ -319,22 +319,22 @@ public class VersioningConsumer implements Consumer {
 
         // check if the entity types are equal
         if (!StringUtils.equals(latestItemEntityType, previousItemEntityType)) {
-            log.warn(String.format(
-                "Inconsistency: Item with uuid %s, handle %s has entity type %s, " +
-                "but the previous version of that item with uuid %s, handle %s has entity type %s",
+            log.warn(
+                "Inconsistency: Item with uuid {}, handle {} has entity type {}, " +
+                "but the previous version of that item with uuid {}, handle {} has entity type {}",
                 latestItem.getID(), latestItem.getHandle(), latestItemEntityType,
                 previousItem.getID(), previousItem.getHandle(), previousItemEntityType
-            ));
+            );
             return false;
         }
 
         // success - the entity types of both items are non-null and equal
-        log.info(String.format(
-            "Item with uuid %s, handle %s and the previous version of that item with uuid %s, handle %s " +
-            "have the same entity type: %s",
+        log.info(
+            "Item with uuid {}, handle {} and the previous version of that item with uuid {}, handle {} " +
+            "have the same entity type: {}",
             latestItem.getID(), latestItem.getHandle(), previousItem.getID(), previousItem.getHandle(),
             latestItemEntityType
-        ));
+        );
         return true;
     }
 
@@ -349,11 +349,11 @@ public class VersioningConsumer implements Consumer {
             return null;
         }
         if (mdvs.size() > 1) {
-            log.warn(String.format(
-                "Item with uuid %s, handle %s has %s entity types (%s), expected 1 entity type",
+            log.warn(
+                "Item with uuid {}, handle {} has {} entity types ({}), expected 1 entity type",
                 item.getID(), item.getHandle(), mdvs.size(),
                 mdvs.stream().map(MetadataValue::getValue).collect(Collectors.toUnmodifiableList())
-            ));
+            );
         }
 
         String entityType = mdvs.get(0).getValue();
@@ -378,10 +378,10 @@ public class VersioningConsumer implements Consumer {
         try {
             return entityTypeService.findByEntityType(ctx, entityTypeStr);
         } catch (SQLException e) {
-            log.error(String.format(
-                "Exception occurred when trying to obtain entity type with label %s of item with uuid %s, handle %s",
-                entityTypeStr, item.getID(), item.getHandle()
-            ), e);
+            log.error(
+                "Exception occurred when trying to obtain entity type with label {} of item with uuid {}, handle {}",
+                entityTypeStr, item.getID(), item.getHandle(), e
+            );
             return null;
         }
     }
@@ -396,10 +396,10 @@ public class VersioningConsumer implements Consumer {
         try {
             return relationshipTypeService.findByEntityType(ctx, entityType);
         } catch (SQLException e) {
-            log.error(String.format(
-                "Exception occurred when trying to obtain relationship types via entity type with id %s, label %s",
-                entityType.getID(), entityType.getLabel()
-            ), e);
+            log.error(
+                "Exception occurred when trying to obtain relationship types via entity type with id {}, label {}",
+                entityType.getID(), entityType.getLabel(), e
+            );
             return null;
         }
     }
@@ -415,11 +415,11 @@ public class VersioningConsumer implements Consumer {
         try {
             return relationshipService.findByItemAndRelationshipType(ctx, item, relationshipType, -1, -1, false);
         } catch (SQLException e) {
-            log.error(String.format(
-                "Exception occurred when trying to obtain relationships of type with id %s, rightward name %s " +
-                "for item with uuid %s, handle %s",
-                relationshipType.getID(), relationshipType.getRightwardType(), item.getID(), item.getHandle()
-            ), e);
+            log.error(
+                "Exception occurred when trying to obtain relationships of type with id {}, rightward name {} " +
+                "for item with uuid {}, handle {}",
+                relationshipType.getID(), relationshipType.getRightwardType(), item.getID(), item.getHandle(), e
+            );
             return null;
         }
     }

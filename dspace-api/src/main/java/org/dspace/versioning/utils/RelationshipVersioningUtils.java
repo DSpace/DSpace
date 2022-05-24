@@ -99,13 +99,13 @@ public class RelationshipVersioningUtils {
             throw new IllegalStateException(msg);
         }
 
-        log.info(String.format(
-            "set latest version status from %s to %s for relationship with id %s, rightward name %s " +
-            "between left item with uuid %s, handle %s and right item with uuid %s, handle %s",
+        log.info(
+            "set latest version status from {} to {} for relationship with id {}, rightward name {} " +
+            "between left item with uuid {}, handle {} and right item with uuid {}, handle {}",
             lvs, newVersionStatus, relationship.getID(), relationship.getRelationshipType().getRightwardType(),
             relationship.getLeftItem().getID(), relationship.getLeftItem().getHandle(),
             relationship.getRightItem().getID(), relationship.getRightItem().getHandle()
-        ));
+        );
         relationship.setLatestVersionStatus(newVersionStatus);
 
         return updateLeftSide ? LEFT_SIDE_CHANGED : RIGHT_SIDE_CHANGED;
