@@ -232,8 +232,8 @@ public class VersioningConsumer implements Consumer {
                 // the other side of the relationship should be "latest", otherwise the relationship could not have been
                 // copied to the new item in the first place (by DefaultVersionProvider#copyRelationships)
                 if (relationshipVersioningUtils.otherSideIsLatest(
-                    isLeft, previousItemRelationship.getLatestVersionStatus())
-                ) {
+                    isLeft, previousItemRelationship.getLatestVersionStatus()
+                )) {
                     // Set the previous version of the item to non-latest. This implies that the previous version
                     // of the item will not be shown anymore on the page of the third-party item. That makes sense,
                     // because either the relationship has been deleted from the new version of the item (no match),
