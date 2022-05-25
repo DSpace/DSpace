@@ -2277,6 +2277,474 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
+    public void patchAddActionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .withAdminGroup(eperson)
+            .build();
+
+        Item myItem = ItemBuilder.createItem(context, collection)
+            .withTitle("Public item")
+            .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withAction(Constants.READ)
+            .withDspaceObject(myItem)
+            .withUser(eperson)
+            .withName("My Name")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        //Patch with a write action
+        String action = Constants.actionText[1];
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation addOperation = new AddOperation("/action", action);
+        ops.add(addOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.allOf(
+                hasJsonPath("$.action", is(action)))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.allOf(
+                hasJsonPath("$.action", is(action)))));
+    }
+
+    @Test
+    public void patchReplaceActionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .withAdminGroup(eperson)
+            .build();
+
+        Item myItem = ItemBuilder.createItem(context, collection)
+            .withTitle("Public item")
+            .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withAction(Constants.READ)
+            .withDspaceObject(myItem)
+            .withUser(eperson)
+            .withName("My name")
+            .withPolicyType(ResourcePolicy.TYPE_SUBMISSION)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String newAction = Constants.actionText[1];
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/action", newAction);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.allOf(
+                hasJsonPath("$.action", is(newAction)))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.allOf(
+                hasJsonPath("$.action", is(newAction)))));
+    }
+
+    @Test
+    public void patchReplaceActionUnauthenticatedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+
+        Item item = ItemBuilder.createItem(context, collection).build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withAction(Constants.WRITE)
+            .withDspaceObject(item)
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        int newAction = Constants.ADD;
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/action", newAction);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient().perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isUnauthorized());
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.allOf(
+                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])))));
+    }
+
+    @Test
+    public void patchReplaceActionForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Public item")
+            .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withAction(Constants.READ)
+            .withDspaceObject(item)
+            .withUser(eperson)
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        int newAction = Constants.WRITE;
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/action", newAction);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void patchReplaceActionNotFoundTest() throws Exception {
+        int action = Constants.WRITE;
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/policyType", action);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + Integer.MAX_VALUE)
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void patchReplaceActionUnprocessableEntityTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .withAdminGroup(eperson)
+            .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+            .withTitle("Public item")
+            .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withAction(Constants.READ)
+            .withDspaceObject(publicItem1)
+            .withUser(eperson)
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        int newAction = -1;
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/action", newAction);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void patchAddPolicyTypeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .withAdminGroup(eperson)
+            .build();
+
+        Item myItem = ItemBuilder.createItem(context, collection)
+            .withTitle("Public item")
+            .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withAction(Constants.READ)
+            .withDspaceObject(myItem)
+            .withUser(eperson)
+            .withName("My Name")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String policyType = ResourcePolicy.TYPE_CUSTOM;
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation addOperation = new AddOperation("/policyType", policyType);
+        ops.add(addOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.allOf(
+                hasJsonPath("$.policyType", is(policyType)),
+                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.allOf(
+                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                hasJsonPath("$.policyType", is(policyType)))));
+    }
+
+    @Test
+    public void patchRemovePolicyTypeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .withAdminGroup(eperson)
+            .build();
+
+        Item myItem = ItemBuilder.createItem(context, collection)
+            .withTitle("Public item")
+            .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withAction(Constants.READ)
+            .withDspaceObject(myItem)
+            .withUser(eperson)
+            .withName("My Name")
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation removeOperation = new RemoveOperation("/policyType");
+        ops.add(removeOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.allOf(
+                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])))))
+            .andExpect(jsonPath("$.policyType").doesNotExist());
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.allOf(
+                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])))))
+            .andExpect(jsonPath("$.policyType").doesNotExist());
+    }
+
+    @Test
+    public void patchReplacePolicyTypeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .withAdminGroup(eperson)
+            .build();
+
+        Item myItem = ItemBuilder.createItem(context, collection)
+            .withTitle("Public item")
+            .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withAction(Constants.READ)
+            .withDspaceObject(myItem)
+            .withUser(eperson)
+            .withName("My name")
+            .withPolicyType(ResourcePolicy.TYPE_SUBMISSION)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String newPolicyType = ResourcePolicy.TYPE_CUSTOM;
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/policyType", newPolicyType);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.allOf(
+                hasJsonPath("$.policyType", is(newPolicyType)),
+                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])))));
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.allOf(
+                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                hasJsonPath("$.policyType", is(newPolicyType)))));
+    }
+
+    @Test
+    public void patchReplacePolicyTypeUnauthenticatedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+
+        Item item = ItemBuilder.createItem(context, collection).build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withAction(Constants.WRITE)
+            .withDspaceObject(item)
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String newPolicyType = ResourcePolicy.TYPE_SUBMISSION;
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/policyType", newPolicyType);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient().perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isUnauthorized());
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.allOf(
+                hasJsonPath("$.action", is(Constants.actionText[resourcePolicy.getAction()])),
+                hasJsonPath("$.policyType", is(resourcePolicy.getRpType())))));
+    }
+
+    @Test
+    public void patchReplacePolicyTypeForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+
+        Item item = ItemBuilder.createItem(context, collection)
+            .withTitle("Public item")
+            .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withAction(Constants.READ)
+            .withDspaceObject(item)
+            .withUser(eperson)
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String newPolicyType = ResourcePolicy.TYPE_SUBMISSION;
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/policyType", newPolicyType);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void patchRemovePolicyTypeNotFoundTest() throws Exception {
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation removeOperation = new RemoveOperation("/policyType");
+        ops.add(removeOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + Integer.MAX_VALUE)
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void patchReplacePolicyTypeBadRequestTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .withAdminGroup(eperson)
+            .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+            .withTitle("Public item")
+            .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withAction(Constants.READ)
+            .withDspaceObject(publicItem1)
+            .withUser(eperson)
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String newPolicyType = "";
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/policyType", newPolicyType);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void patchAddNameBadRequestTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -3058,7 +3526,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     @Test
     public void updateResourcePolicyOfGroupToEPersonTest() throws Exception {
         context.turnOffAuthorisationSystem();
-
         Group group = GroupBuilder.createGroup(context)
                                   .withName("My group")
                                   .build();
@@ -3137,6 +3604,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
         getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + resourcePolicyOfGroup.getID() + "/group")
                              .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                              .content(StringUtils.EMPTY))
