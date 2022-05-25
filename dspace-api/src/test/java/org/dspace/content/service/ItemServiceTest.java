@@ -64,6 +64,9 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
     String authorQualifier = "author";
     String contributorElement = "contributor";
     String dcSchema = "dc";
+    String subjectElement = "subject";
+    String descriptionElement = "description";
+    String abstractQualifier = "abstract";
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -153,6 +156,111 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void InsertAndMoveMetadataShiftPlaceTest_complex() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Here we add the first set of metadata to the item
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one");
+
+        // NOTE: dc.subject should NOT affect dc.contributor.author
+        itemService.addMetadata(context, item, dcSchema, subjectElement, null, null, "test, sub1");
+        // NOTE: dc.subject should NOT affect dc.contributor.author
+        itemService.addMetadata(context, item, dcSchema, subjectElement, null, null, "test, sub2");
+
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, two");
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, three");
+
+        // NOTE: dc.description.abstract should NOT affect dc.contributor.author
+        itemService.addMetadata(context, item, dcSchema, descriptionElement, abstractQualifier, null, "test, abs1");
+
+        context.restoreAuthSystemState();
+
+        // The code below performs the mentioned assertions to ensure the place is correct
+        List<MetadataValue> list1 = itemService
+            .getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
+        assertThat(list1.size(), equalTo(3));
+
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 0, list1.get(0));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, two", null, 1, list1.get(1));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 2, list1.get(2));
+
+        List<MetadataValue> list2 = itemService
+            .getMetadata(item, dcSchema, subjectElement, null, Item.ANY);
+        assertThat(list2.size(), equalTo(2));
+
+        assertMetadataValue(null, subjectElement, dcSchema, "test, sub1", null, 0, list2.get(0));
+        assertMetadataValue(null, subjectElement, dcSchema, "test, sub2", null, 1, list2.get(1));
+
+        List<MetadataValue> list3 = itemService
+            .getMetadata(item, dcSchema, descriptionElement, abstractQualifier, Item.ANY);
+        assertThat(list3.size(), equalTo(1));
+
+        assertMetadataValue(abstractQualifier, descriptionElement, dcSchema, "test, abs1", null, 0, list3.get(0));
+
+        context.turnOffAuthorisationSystem();
+
+        // This is where we add metadata at place=1
+        itemService.addAndShiftRightMetadata(
+            context, item, dcSchema, contributorElement, authorQualifier, null, "test, four", null, -1, 1
+        );
+
+        // Here we retrieve the list of metadata again to perform the assertions on the places below as mentioned
+        List<MetadataValue> list4 = itemService
+            .getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY)
+            .stream()
+            .sorted(Comparator.comparingInt(MetadataValue::getPlace))
+            .collect(Collectors.toList());
+        assertThat(list4.size(), equalTo(4));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 0, list4.get(0));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, four", null, 1, list4.get(1));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, two", null, 2, list4.get(2));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 3, list4.get(3));
+
+        List<MetadataValue> list5 = itemService
+            .getMetadata(item, dcSchema, subjectElement, null, Item.ANY);
+        assertThat(list5.size(), equalTo(2));
+
+        assertMetadataValue(null, subjectElement, dcSchema, "test, sub1", null, 0, list5.get(0));
+        assertMetadataValue(null, subjectElement, dcSchema, "test, sub2", null, 1, list5.get(1));
+
+        List<MetadataValue> list6 = itemService
+            .getMetadata(item, dcSchema, descriptionElement, abstractQualifier, Item.ANY);
+        assertThat(list3.size(), equalTo(1));
+
+        assertMetadataValue(abstractQualifier, descriptionElement, dcSchema, "test, abs1", null, 0, list6.get(0));
+
+        // And move metadata from place=2 to place=0
+        itemService.moveMetadata(context, item, dcSchema, contributorElement, authorQualifier, 2, 0);
+
+        context.restoreAuthSystemState();
+
+        // Here we retrieve the list of metadata again to perform the assertions on the places below as mentioned
+        List<MetadataValue> list7 = itemService
+            .getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY)
+            .stream()
+            .sorted(Comparator.comparingInt(MetadataValue::getPlace))
+            .collect(Collectors.toList());
+        assertThat(list7.size(), equalTo(4));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, two", null, 0, list7.get(0));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 1, list7.get(1));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, four", null, 2, list7.get(2));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 3, list7.get(3));
+
+        List<MetadataValue> list8 = itemService
+            .getMetadata(item, dcSchema, subjectElement, null, Item.ANY);
+        assertThat(list8.size(), equalTo(2));
+
+        assertMetadataValue(null, subjectElement, dcSchema, "test, sub1", null, 0, list8.get(0));
+        assertMetadataValue(null, subjectElement, dcSchema, "test, sub2", null, 1, list8.get(1));
+
+        List<MetadataValue> list9 = itemService
+            .getMetadata(item, dcSchema, descriptionElement, abstractQualifier, Item.ANY);
+        assertThat(list9.size(), equalTo(1));
+
+        assertMetadataValue(abstractQualifier, descriptionElement, dcSchema, "test, abs1", null, 0, list9.get(0));
+    }
+
+    @Test
     public void InsertAndMoveMetadataOnePlaceForwardTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -205,6 +313,112 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, two", null, 1, list.get(1));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, four", null, 2, list.get(2));
         assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 3, list.get(3));
+    }
+
+    @Test
+    public void InsertAndMoveMetadataOnePlaceForwardTest_complex() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // NOTE: dc.description.abstract should NOT affect dc.contributor.author
+        itemService.addMetadata(context, item, dcSchema, descriptionElement, abstractQualifier, null, "test, abs1");
+
+        // Here we add the first set of metadata to the item
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one");
+
+        // NOTE: dc.subject should NOT affect dc.contributor.author
+        itemService.addMetadata(context, item, dcSchema, subjectElement, null, null, "test, sub1");
+
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, two");
+        itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, three");
+
+        // NOTE: dc.subject should NOT affect dc.contributor.author
+        itemService.addMetadata(context, item, dcSchema, subjectElement, null, null, "test, sub2");
+
+        context.restoreAuthSystemState();
+
+        // The code below performs the mentioned assertions to ensure the place is correct
+        List<MetadataValue> list1 = itemService
+            .getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
+        assertThat(list1.size(), equalTo(3));
+
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 0, list1.get(0));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, two", null, 1, list1.get(1));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 2, list1.get(2));
+
+        List<MetadataValue> list2 = itemService
+            .getMetadata(item, dcSchema, subjectElement, null, Item.ANY);
+        assertThat(list2.size(), equalTo(2));
+
+        assertMetadataValue(null, subjectElement, dcSchema, "test, sub1", null, 0, list2.get(0));
+        assertMetadataValue(null, subjectElement, dcSchema, "test, sub2", null, 1, list2.get(1));
+
+        List<MetadataValue> list3 = itemService
+            .getMetadata(item, dcSchema, descriptionElement, abstractQualifier, Item.ANY);
+        assertThat(list3.size(), equalTo(1));
+
+        assertMetadataValue(abstractQualifier, descriptionElement, dcSchema, "test, abs1", null, 0, list3.get(0));
+
+        context.turnOffAuthorisationSystem();
+
+        // This is where we add metadata at place=1
+        itemService.addAndShiftRightMetadata(
+            context, item, dcSchema, contributorElement, authorQualifier, null, "test, four", null, -1, 1
+        );
+
+        // Here we retrieve the list of metadata again to perform the assertions on the places below as mentioned
+        List<MetadataValue> list4 = itemService
+            .getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY)
+            .stream()
+            .sorted(Comparator.comparingInt(MetadataValue::getPlace))
+            .collect(Collectors.toList());
+        assertThat(list4.size(), equalTo(4));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 0, list4.get(0));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, four", null, 1, list4.get(1));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, two", null, 2, list4.get(2));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 3, list4.get(3));
+
+        List<MetadataValue> list5 = itemService
+            .getMetadata(item, dcSchema, subjectElement, null, Item.ANY);
+        assertThat(list5.size(), equalTo(2));
+
+        assertMetadataValue(null, subjectElement, dcSchema, "test, sub1", null, 0, list5.get(0));
+        assertMetadataValue(null, subjectElement, dcSchema, "test, sub2", null, 1, list5.get(1));
+
+        List<MetadataValue> list6 = itemService
+            .getMetadata(item, dcSchema, descriptionElement, abstractQualifier, Item.ANY);
+        assertThat(list6.size(), equalTo(1));
+
+        assertMetadataValue(abstractQualifier, descriptionElement, dcSchema, "test, abs1", null, 0, list6.get(0));
+
+        // And move metadata from place=1 to place=2
+        itemService.moveMetadata(context, item, dcSchema, contributorElement, authorQualifier, 1, 2);
+
+        context.restoreAuthSystemState();
+
+        // Here we retrieve the list of metadata again to perform the assertions on the places below as mentioned
+        List<MetadataValue> list7 = itemService
+            .getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY)
+            .stream()
+            .sorted(Comparator.comparingInt(MetadataValue::getPlace))
+            .collect(Collectors.toList());
+        assertThat(list7.size(), equalTo(4));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, one", null, 0, list7.get(0));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, two", null, 1, list7.get(1));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, four", null, 2, list7.get(2));
+        assertMetadataValue(authorQualifier, contributorElement, dcSchema, "test, three", null, 3, list7.get(3));
+
+        List<MetadataValue> list8 = itemService
+            .getMetadata(item, dcSchema, subjectElement, null, Item.ANY);
+        assertThat(list8.size(), equalTo(2));
+
+        assertMetadataValue(null, subjectElement, dcSchema, "test, sub1", null, 0, list8.get(0));
+        assertMetadataValue(null, subjectElement, dcSchema, "test, sub2", null, 1, list8.get(1));
+
+        List<MetadataValue> list9 = itemService
+            .getMetadata(item, dcSchema, descriptionElement, abstractQualifier, Item.ANY);
+        assertThat(list9.size(), equalTo(1));
+
+        assertMetadataValue(abstractQualifier, descriptionElement, dcSchema, "test, abs1", null, 0, list9.get(0));
     }
 
     @Test
