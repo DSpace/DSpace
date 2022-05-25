@@ -71,7 +71,7 @@ public class ResourcePolicyEPersonReplaceRestController {
         }
 
         if (Objects.isNull(resourcePolicy.getEPerson())) {
-            throw new UnprocessableEntityException("ResourcePolicy with id:" + id + " doesn't linked to an EPerson");
+            throw new UnprocessableEntityException("ResourcePolicy with id:" + id + " doesn't link to an EPerson");
         }
         EPerson newEPerson = (EPerson) dsoList.get(0);
         resourcePolicy.setEPerson(newEPerson);
