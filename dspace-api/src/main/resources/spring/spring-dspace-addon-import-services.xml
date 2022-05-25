@@ -132,6 +132,7 @@
 
     <bean id="ScieloImportService" class="org.dspace.importer.external.scielo.service.ScieloImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="scieloMetadataFieldMapping"/>
+        <property name="url" value="${scielo.url}"/>
     </bean>
     <bean id="scieloMetadataFieldMapping" class="org.dspace.importer.external.scielo.service.ScieloFieldMapping"/>
 
