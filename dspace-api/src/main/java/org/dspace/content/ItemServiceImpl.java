@@ -40,6 +40,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSchemaService;
@@ -119,6 +120,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired(required = true)
     private RelationshipMetadataService relationshipMetadataService;
+
+    @Autowired(required = true)
+    private EntityTypeService entityTypeService;
 
     protected ItemServiceImpl() {
         super();
@@ -1535,5 +1539,37 @@ prevent the generation of resource policy entry values with null dspace_object a
                 .stream().findFirst().orElse(null);
     }
 
+    @Override
+    public String getEntityTypeLabel(Item item) {
+        List<MetadataValue> mdvs = getMetadata(item, "dspace", "entity", "type", Item.ANY, false);
+        if (mdvs.isEmpty()) {
+            return null;
+        }
+
+        if (mdvs.size() > 1) {
+            log.warn(
+                "Item with uuid {}, handle {} has {} entity types ({}), expected 1 entity type",
+                item.getID(), item.getHandle(), mdvs.size(),
+                mdvs.stream().map(MetadataValue::getValue).collect(Collectors.toList())
+            );
+        }
+
+        String entityType = mdvs.get(0).getValue();
+        if (StringUtils.isBlank(entityType)) {
+            return null;
+        }
+
+        return entityType;
+    }
+
+    @Override
+    public EntityType getEntityType(Context context, Item item) throws SQLException {
+        String entityTypeString = getEntityTypeLabel(item);
+        if (StringUtils.isBlank(entityTypeString)) {
+            return null;
+        }
+
+        return entityTypeService.findByEntityType(context, entityTypeString);
+    }
 
 }

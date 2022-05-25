@@ -80,6 +80,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     Item project6;
 
     RelationshipType isAuthorOfPublication;
+    RelationshipType isProjectOfPublication;
     RelationshipType isProjectOfPerson;
 
     EntityType publicationEntityType;
@@ -220,6 +221,10 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
                 .create(context, publicationEntityType, personEntityType,
                         "isAuthorOfPublication", "isPublicationOfAuthor",
                         null, null, null, null);
+            isProjectOfPublication = relationshipTypeService
+                .create(context, publicationEntityType, projectEntityType,
+                    "isProjectOfPublication", "isPublicationOfProject",
+                    null, null, null, null);
             isProjectOfPerson = relationshipTypeService
                 .create(context, personEntityType, projectEntityType,
                         "isProjectOfPerson", "isPersonOfProject",
@@ -742,6 +747,52 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     }
 
     @Test
+    public void createUseForPlaceRelationshipWithLeftPlaceInTheMiddleWithMetadataTest_ignoreOtherRels(
+    ) throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Add a dc.contributor.author MDV
+        itemService.addMetadata(context, publication1, dcSchema, contributorElement, authorQualifier, null, "MDV 1");
+
+        // Add two Authors to the same Publication, appending to the end
+        Relationship r1 = relationshipService.create(context, publication1, author1, isAuthorOfPublication, -1, -1);
+        Relationship r2 = relationshipService.create(context, publication1, author2, isAuthorOfPublication, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur1 = relationshipService.create(context, publication1, project1, isProjectOfPublication, -1, -1);
+
+        // Add another dc.contributor.author MDV
+        itemService.addMetadata(context, publication1, dcSchema, contributorElement, authorQualifier, null, "MDV 2");
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur2 = relationshipService.create(context, author2, project2, isProjectOfPerson, -1, -1);
+
+        // Add another Author @ leftPlace 2. All MDVs & relationships after it should get pushed by one place
+        Relationship r3 = relationshipService.create(context, publication1, author3, isAuthorOfPublication, 2, -1);
+
+        context.restoreAuthSystemState();
+
+        // Check relationship order
+        assertLeftPlace(r1, 1);
+        assertLeftPlace(r3, 2);
+        assertLeftPlace(r2, 3);
+        assertRelationMetadataOrder(publication1, isAuthorOfPublication, List.of(r1, r3, r2));
+        assertMetadataOrder(publication1, "dc.contributor.author", List.of(
+            "MDV 1",
+            "Author, First",
+            "Author, Third",
+            "Author, Second",
+            "MDV 2"
+        ));
+
+        // check unaffected relationships
+        assertLeftPlace(ur1, 0);
+        assertRightPlace(ur1, 0);
+        assertLeftPlace(ur2, 0);
+        assertRightPlace(ur2, 0);
+    }
+
+    @Test
     public void createUseForPlaceRelationshipWithLeftPlaceAtTheEndWithMetadataTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -833,6 +884,39 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     }
 
     @Test
+    public void createUseForPlaceRelationshipWithRightPlaceInTheMiddleNoMetadataTest_ignoreOtherRels(
+    ) throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Add two Publications to the same Author, appending to the end
+        Relationship r1 = relationshipService.create(context, publication1, author1, isAuthorOfPublication, -1, -1);
+        Relationship r2 = relationshipService.create(context, publication2, author1, isAuthorOfPublication, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur1 = relationshipService.create(context, author1, project1, isProjectOfPerson, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur2 = relationshipService.create(context, author1, project2, isProjectOfPerson, -1, -1);
+
+        // Add another Publication @ rightPlace 1. The second relationship should get pushed by one place
+        Relationship r3 = relationshipService.create(context, publication3, author1, isAuthorOfPublication, -1, 1);
+
+        context.restoreAuthSystemState();
+
+        // Check relationship order
+        assertRightPlace(r1, 0);
+        assertRightPlace(r3, 1);
+        assertRightPlace(r2, 2);
+        assertRelationMetadataOrder(author1, isAuthorOfPublication, List.of(r1, r3, r2));
+
+        // check unaffected relationships
+        assertLeftPlace(ur1, 0);
+        assertRightPlace(ur1, 0);
+        assertLeftPlace(ur2, 1);
+        assertRightPlace(ur2, 0);
+    }
+
+    @Test
     public void createUseForPlaceRelationshipWithRightPlaceAtTheEndNoMetadataTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -911,6 +995,33 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     }
 
     @Test
+    public void createNonUseForPlaceRelationshipWithLeftPlaceInTheMiddleTest_ignoreOtherRels() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Add two Projects to the same Author, appending to the end
+        Relationship r1 = relationshipService.create(context, author1, project1, isProjectOfPerson, -1, -1);
+        Relationship r2 = relationshipService.create(context, author1, project2, isProjectOfPerson, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur1 = relationshipService.create(context, publication1, author1, isAuthorOfPublication, -1, -1);
+
+        // Add another Project @ leftPlace 1. The second relationship should get pushed by one place
+        Relationship r3 = relationshipService.create(context, author1, project3, isProjectOfPerson, 1, -1);
+
+        context.restoreAuthSystemState();
+
+        // Check relationship order
+        assertLeftPlace(r1, 0);
+        assertLeftPlace(r3, 1);
+        assertLeftPlace(r2, 2);
+        assertRelationMetadataOrder(author1, isProjectOfPerson, List.of(r1, r3, r2));
+
+        // check unaffected relationships
+        assertLeftPlace(ur1, 0);
+        assertRightPlace(ur1, 0);
+    }
+
+    @Test
     public void createNonUseForPlaceRelationshipWithLeftPlaceAtTheEndTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -986,6 +1097,33 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         assertRightPlace(r3, 1);
         assertRightPlace(r2, 2);
         assertRelationMetadataOrder(project1, isProjectOfPerson, List.of(r1, r3, r2));
+    }
+
+    @Test
+    public void createNonUseForPlaceRelationshipWithRightPlaceInTheMiddleTest_ignoreOtherRels() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Add two Authors to the same Project, appending to the end
+        Relationship r1 = relationshipService.create(context, author1, project1, isProjectOfPerson, -1, -1);
+        Relationship r2 = relationshipService.create(context, author2, project1, isProjectOfPerson, -1, -1);
+
+        // Add another Author @ rightPlace 1. The second relationship should get pushed by one place
+        Relationship r3 = relationshipService.create(context, author3, project1, isProjectOfPerson, -1, 1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur1 = relationshipService.create(context, publication1, project1, isProjectOfPublication, -1, -1);
+
+        context.restoreAuthSystemState();
+
+        // Check relationship order
+        assertRightPlace(r1, 0);
+        assertRightPlace(r3, 1);
+        assertRightPlace(r2, 2);
+        assertRelationMetadataOrder(project1, isProjectOfPerson, List.of(r1, r3, r2));
+
+        // check unaffected relationships
+        assertLeftPlace(ur1, 0);
+        assertRightPlace(ur1, 0);
     }
 
     @Test
@@ -1220,6 +1358,42 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     }
 
     @Test
+    public void moveUseForPlaceRelationshipUpToLeftPlaceInTheMiddleWithTest_ignoreOtherRels() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur1 = relationshipService.create(context, publication1, project1, isProjectOfPublication, -1, -1);
+
+        // Initialize MDVs and Relationships
+        itemService.addMetadata(context, publication1, dcSchema, contributorElement, authorQualifier, null, "MDV 1");
+        Relationship r1 = relationshipService.create(context, publication1, author1, isAuthorOfPublication, -1, -1);
+        Relationship r2 = relationshipService.create(context, publication1, author2, isAuthorOfPublication, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur2 = relationshipService.create(context, publication1, project2, isProjectOfPublication, -1, -1);
+
+        itemService.addMetadata(context, publication1, dcSchema, contributorElement, authorQualifier, null, "MDV 2");
+        Relationship r3 = relationshipService.create(context, publication1, author3, isAuthorOfPublication, -1, -1);
+
+        // Move the first Author to leftPlace=3
+        relationshipService.move(context, r1, 3, null);
+
+        context.restoreAuthSystemState();
+
+        // Check relationship order
+        assertLeftPlace(r2, 1);
+        assertLeftPlace(r1, 3);
+        assertLeftPlace(r3, 4);
+        assertRelationMetadataOrder(publication1, isAuthorOfPublication, List.of(r2, r1, r3));
+
+        // check unaffected relationships
+        assertLeftPlace(ur1, 0);
+        assertRightPlace(ur1, 0);
+        assertLeftPlace(ur2, 1);
+        assertRightPlace(ur2, 0);
+    }
+
+    @Test
     public void moveUseForPlaceRelationshipDownToLeftPlaceInTheMiddleWithMetadataTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -1240,6 +1414,43 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         assertLeftPlace(r3, 2);
         assertLeftPlace(r2, 3);
         assertRelationMetadataOrder(publication1, isAuthorOfPublication, List.of(r1, r3, r2));
+    }
+
+    @Test
+    public void moveUseForPlaceRelationshipDownToLeftPlaceInTheMiddleWithMetadataTest_ignoreOtherRels(
+    ) throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Initialize MDVs and Relationships
+        itemService.addMetadata(context, publication1, dcSchema, contributorElement, authorQualifier, null, "MDV 1");
+        Relationship r1 = relationshipService.create(context, publication1, author1, isAuthorOfPublication, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur1 = relationshipService.create(context, publication1, project1, isProjectOfPublication, -1, -1);
+
+        Relationship r2 = relationshipService.create(context, publication1, author2, isAuthorOfPublication, -1, -1);
+        itemService.addMetadata(context, publication1, dcSchema, contributorElement, authorQualifier, null, "MDV 2");
+        Relationship r3 = relationshipService.create(context, publication1, author3, isAuthorOfPublication, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur2 = relationshipService.create(context, author2, project2, isProjectOfPerson, -1, -1);
+
+        // Move the last Author to leftPlace=2
+        relationshipService.move(context, r3, 2, null);
+
+        context.restoreAuthSystemState();
+
+        // Check relationship order
+        assertLeftPlace(r1, 1);
+        assertLeftPlace(r3, 2);
+        assertLeftPlace(r2, 3);
+        assertRelationMetadataOrder(publication1, isAuthorOfPublication, List.of(r1, r3, r2));
+
+        // check unaffected relationships
+        assertLeftPlace(ur1, 0);
+        assertRightPlace(ur1, 0);
+        assertLeftPlace(ur2, 0);
+        assertRightPlace(ur2, 0);
     }
 
     @Test
@@ -1610,6 +1821,47 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     }
 
     @Test
+    public void moveNonUseForPlaceRelationshipUpToRightPlaceInTheMiddleNoMetadataTest_ignoreOtherRels(
+    ) throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Add three Authors to the same Project, appending to the end
+        Relationship r1 = relationshipService.create(context, author1, project1, isProjectOfPerson, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur1 = relationshipService.create(context, publication1, project1, isProjectOfPublication, -1, -1);
+
+        Relationship r2 = relationshipService.create(context, author2, project1, isProjectOfPerson, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur2 = relationshipService.create(context, publication2, project1, isProjectOfPublication, -1, -1);
+
+        Relationship r3 = relationshipService.create(context, author3, project1, isProjectOfPerson, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur3 = relationshipService.create(context, publication3, project1, isProjectOfPublication, -1, -1);
+
+        // Move the first Author to leftPlace=1
+        relationshipService.move(context, r1, null, 1);
+
+        context.restoreAuthSystemState();
+
+        // Check relationship order
+        assertRightPlace(r2, 0);
+        assertRightPlace(r1, 1);
+        assertRightPlace(r3, 2);
+        assertRelationMetadataOrder(project1, isProjectOfPerson, List.of(r2, r1, r3));
+
+        // check unaffected relationships
+        assertLeftPlace(ur1, 0);
+        assertRightPlace(ur1, 0);
+        assertLeftPlace(ur2, 0);
+        assertRightPlace(ur2, 1);
+        assertLeftPlace(ur3, 0);
+        assertRightPlace(ur3, 2);
+    }
+
+    @Test
     public void moveNonUseForPlaceRelationshipDownToRightPlaceInTheMiddleNoMetadataTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -1628,6 +1880,36 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         assertRightPlace(r3, 1);
         assertRightPlace(r2, 2);
         assertRelationMetadataOrder(project1, isProjectOfPerson, List.of(r1, r3, r2));
+    }
+
+    @Test
+    public void moveNonUseForPlaceRelationshipDownToRightPlaceInTheMiddleNoMetadataTest_ignoreOtherRels(
+    ) throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Add three Authors to the same Project, appending to the end
+        Relationship r1 = relationshipService.create(context, author1, project1, isProjectOfPerson, -1, -1);
+        Relationship r2 = relationshipService.create(context, author2, project1, isProjectOfPerson, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur1 = relationshipService.create(context, publication1, project1, isProjectOfPublication, -1, -1);
+
+        Relationship r3 = relationshipService.create(context, author3, project1, isProjectOfPerson, -1, -1);
+
+        // Move the last Author to leftPlace=1
+        relationshipService.move(context, r3, null, 1);
+
+        context.restoreAuthSystemState();
+
+        // Check relationship order
+        assertRightPlace(r1, 0);
+        assertRightPlace(r3, 1);
+        assertRightPlace(r2, 2);
+        assertRelationMetadataOrder(project1, isProjectOfPerson, List.of(r1, r3, r2));
+
+        // check unaffected relationships
+        assertLeftPlace(ur1, 0);
+        assertRightPlace(ur1, 0);
     }
 
     @Test
@@ -1798,6 +2080,41 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     }
 
     @Test
+    public void deleteUseForPlaceRelationshipFromLeftMiddleWithMetadataNoCopyTest_ignoreOtherRels() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Initialize MDVs and Relationships
+        Relationship r1 = relationshipService.create(context, publication1, author1, isAuthorOfPublication, -1, -1);
+        itemService.addMetadata(context, publication1, dcSchema, contributorElement, authorQualifier, null, "MDV 1");
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur1 = relationshipService.create(context, publication1, project1, isProjectOfPublication, -1, -1);
+
+        Relationship r2 = relationshipService.create(context, publication1, author2, isAuthorOfPublication, -1, -1);
+        itemService.addMetadata(context, publication1, dcSchema, contributorElement, authorQualifier, null, "MDV 2");
+        Relationship r3 = relationshipService.create(context, publication1, author3, isAuthorOfPublication, -1, -1);
+
+        relationshipService.delete(context, r2, false, false);
+
+        context.restoreAuthSystemState();
+
+        // Check relationship order
+        assertLeftPlace(r1, 0);
+        assertLeftPlace(r3, 3);
+        assertRelationMetadataOrder(publication1, isAuthorOfPublication, Arrays.asList(r1, r3));
+        assertMetadataOrder(publication1, "dc.contributor.author", List.of(
+            "Author, First",
+            "MDV 1",
+            "MDV 2",
+            "Author, Third"
+        ));
+
+        // check unaffected relationships
+        assertLeftPlace(ur1, 0);
+        assertRightPlace(ur1, 0);
+    }
+
+    @Test
     public void deleteUseForPlaceRelationshipFromLeftMiddleWithMetadataCopyTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -1824,6 +2141,55 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
             "MDV 2",
             "Author, Third"
         ));
+    }
+
+    @Test
+    public void deleteUseForPlaceRelationshipFromLeftMiddleWithMetadataCopyTest_ignoreOtherRels() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Initialize MDVs and Relationships
+        Relationship r1 = relationshipService.create(context, publication1, author1, isAuthorOfPublication, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur1 = relationshipService.create(context, publication1, project1, isProjectOfPublication, -1, -1);
+
+        itemService.addMetadata(context, publication1, dcSchema, contributorElement, authorQualifier, null, "MDV 1");
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur2 = relationshipService.create(context, publication1, project2, isProjectOfPublication, -1, -1);
+
+        Relationship r2 = relationshipService.create(context, publication1, author2, isAuthorOfPublication, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur3 = relationshipService.create(context, author2, project1, isProjectOfPerson, -1, -1);
+
+        itemService.addMetadata(context, publication1, dcSchema, contributorElement, authorQualifier, null, "MDV 2");
+        Relationship r3 = relationshipService.create(context, publication1, author3, isAuthorOfPublication, -1, -1);
+
+        relationshipService.delete(context, r2, true, false);
+
+        context.restoreAuthSystemState();
+
+        // Check relationship order
+        assertLeftPlace(r1, 0);
+        // NOTE: since R2 has been removed, but copied to left, this place remains at 4 (instead of 3)
+        assertLeftPlace(r3, 4);
+        assertRelationMetadataOrder(publication1, isAuthorOfPublication, Arrays.asList(r1, null, r3));
+        assertMetadataOrder(publication1, "dc.contributor.author", List.of(
+            "Author, First",
+            "MDV 1",
+            "Author, Second",   // this is not longer a relationship
+            "MDV 2",
+            "Author, Third"
+        ));
+
+        // check unaffected relationships
+        assertLeftPlace(ur1, 0);
+        assertRightPlace(ur1, 0);
+        assertLeftPlace(ur2, 1);
+        assertRightPlace(ur2, 0);
+        assertLeftPlace(ur3, 0);
+        assertRightPlace(ur3, 0);
     }
 
     @Test
@@ -2043,6 +2409,34 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     }
 
     @Test
+    public void deleteNonUseForPlaceRelationshipFromRightMiddleNoMetadataTest_ignoreOtherRels() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Add three Authors to the same Project, appending to the end
+        Relationship r1 = relationshipService.create(context, author1, project1, isProjectOfPerson, -1, -1);
+        Relationship r2 = relationshipService.create(context, author2, project1, isProjectOfPerson, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur1 = relationshipService.create(context, publication1, project1, isProjectOfPublication, -1, -1);
+
+        Relationship r3 = relationshipService.create(context, author3, project1, isProjectOfPerson, -1, -1);
+
+        // Delete the second Publication
+        relationshipService.delete(context, r2);
+
+        context.restoreAuthSystemState();
+
+        // Check relationship order
+        assertRightPlace(r1, 0);
+        assertRightPlace(r3, 1);
+        assertRelationMetadataOrder(project1, isProjectOfPerson, List.of(r1, r3));
+
+        // check unaffected relationships
+        assertLeftPlace(ur1, 0);
+        assertRightPlace(ur1, 0);
+    }
+
+    @Test
     public void deleteNonUseForPlaceRelationshipFromRightEndNoMetadataTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -2259,6 +2653,81 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     }
 
     @Test
+    public void changeLeftItemInUseForPlaceRelationshipInTheMiddleWithMetadataTest_ignoreOtherRels() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Add three Authors to publication1, with regular MDVs in between
+        Relationship r1 = relationshipService.create(context, publication1, author1, isAuthorOfPublication, -1, -1);
+        itemService.addMetadata(context, publication1, dcSchema, contributorElement, authorQualifier, null, "MDV 1");
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur1 = relationshipService.create(context, publication1, project1, isProjectOfPublication, -1, -1);
+
+        Relationship r2 = relationshipService.create(context, publication1, author2, isAuthorOfPublication, -1, -1);
+        itemService.addMetadata(context, publication1, dcSchema, contributorElement, authorQualifier, null, "MDV 2");
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur2 = relationshipService.create(context, publication1, project3, isProjectOfPublication, -1, -1);
+
+        Relationship r3 = relationshipService.create(context, publication1, author3, isAuthorOfPublication, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur3 = relationshipService.create(context, publication2, project2, isProjectOfPublication, -1, -1);
+
+        // Add three Authors to publication2, with regular MDVs in between
+        itemService.addMetadata(context, publication2, dcSchema, contributorElement, authorQualifier, null, "MDV 3");
+        Relationship r4 = relationshipService.create(context, publication2, author4, isAuthorOfPublication, -1, -1);
+        Relationship r5 = relationshipService.create(context, publication2, author5, isAuthorOfPublication, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur4 = relationshipService.create(context, publication2, project1, isProjectOfPublication, -1, -1);
+
+        itemService.addMetadata(context, publication2, dcSchema, contributorElement, authorQualifier, null, "MDV 4");
+        Relationship r6 = relationshipService.create(context, publication2, author6, isAuthorOfPublication, -1, -1);
+
+        // Move r2 to publication 2
+        relationshipService.move(context, r2, publication2, null);
+
+        context.restoreAuthSystemState();
+
+        // Check relationship order for publication1
+        assertLeftPlace(r1, 0);     // should both move down as the first Relationship was removed
+        assertLeftPlace(r3, 3);
+        assertRelationMetadataOrder(publication1, isAuthorOfPublication, List.of(r1, r3));
+        assertMetadataOrder(publication1, "dc.contributor.author", List.of(
+            "Author, First",
+            "MDV 1",
+            "MDV 2",
+            "Author, Third"
+        ));
+
+        // Check relationship order for publication2
+        assertLeftPlace(r4, 1);     // previous Relationships should stay where they were
+        assertLeftPlace(r5, 2);
+        assertLeftPlace(r6, 4);
+        assertLeftPlace(r2, 5);     // moved Relationship should be appended to the end
+        assertRelationMetadataOrder(publication2, isAuthorOfPublication, List.of(r4, r5, r6, r2));
+        assertMetadataOrder(publication2, "dc.contributor.author", List.of(
+            "MDV 3",
+            "Author, Fourth",
+            "Author, Fifth",
+            "MDV 4",
+            "Author, Sixth",
+            "Author, Second"
+        ));
+
+        // check unaffected relationships
+        assertLeftPlace(ur1, 0);
+        assertRightPlace(ur1, 0);
+        assertLeftPlace(ur2, 1);
+        assertRightPlace(ur2, 0);
+        assertLeftPlace(ur3, 0);
+        assertRightPlace(ur3, 0);
+        assertLeftPlace(ur4, 1);
+        assertRightPlace(ur4, 1);
+    }
+
+    @Test
     public void changeLeftItemInUseForPlaceRelationshipAtTheEndWithMetadataTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -2370,6 +2839,51 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
         assertRightPlace(r6, 2);
         assertRightPlace(r2, 3);     // moved Relationship should be appended to the end
         assertRelationMetadataOrder(author2, isAuthorOfPublication, List.of(r4, r5, r6, r2));
+    }
+
+    @Test
+    public void changeRightItemInUseForPlaceRelationshipInTheMiddleNoMetadataTest_ignoreOtherRels() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Add three Publications to author1, appending to the end
+        Relationship r1 = relationshipService.create(context, publication1, author1, isAuthorOfPublication, -1, -1);
+        Relationship r2 = relationshipService.create(context, publication2, author1, isAuthorOfPublication, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur1 = relationshipService.create(context, author1, project1, isProjectOfPerson, -1, -1);
+
+        Relationship r3 = relationshipService.create(context, publication3, author1, isAuthorOfPublication, -1, -1);
+
+        // Add three Publications to author2, appending to the end
+        Relationship r4 = relationshipService.create(context, publication4, author2, isAuthorOfPublication, -1, -1);
+        Relationship r5 = relationshipService.create(context, publication5, author2, isAuthorOfPublication, -1, -1);
+        Relationship r6 = relationshipService.create(context, publication6, author2, isAuthorOfPublication, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur2 = relationshipService.create(context, author2, project1, isProjectOfPerson, -1, -1);
+
+        // Move r2 to author2
+        relationshipService.move(context, r2, null, author2);
+
+        context.restoreAuthSystemState();
+
+        // Check relationship order for author1
+        assertRightPlace(r1, 0);
+        assertRightPlace(r3, 1);    // should move down as the first Relationship was removed
+        assertRelationMetadataOrder(author1, isAuthorOfPublication, List.of(r1, r3));
+
+        // Check relationship order for author2
+        assertRightPlace(r4, 0);     // previous Relationships should stay where they were
+        assertRightPlace(r5, 1);
+        assertRightPlace(r6, 2);
+        assertRightPlace(r2, 3);     // moved Relationship should be appended to the end
+        assertRelationMetadataOrder(author2, isAuthorOfPublication, List.of(r4, r5, r6, r2));
+
+        // check unaffected relationships
+        assertLeftPlace(ur1, 0);
+        assertRightPlace(ur1, 0);
+        assertLeftPlace(ur2, 0);
+        assertRightPlace(ur2, 1);
     }
 
     @Test
@@ -2565,6 +3079,57 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     }
 
     @Test
+    public void changeRightItemInNonUseForPlaceRelationshipInTheMiddleTest_ignoreOtherRels() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // Add three Authors to project1, appending to the end
+        Relationship r1 = relationshipService.create(context, author1, project1, isProjectOfPerson, -1, -1);
+        Relationship r2 = relationshipService.create(context, author2, project1, isProjectOfPerson, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur1 = relationshipService.create(context, publication1, project1, isProjectOfPublication, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur2 = relationshipService.create(context, publication2, project1, isProjectOfPublication, -1, -1);
+
+        Relationship r3 = relationshipService.create(context, author3, project1, isProjectOfPerson, -1, -1);
+
+        // Add three Authors to project2, appending to the end
+        Relationship r4 = relationshipService.create(context, author4, project2, isProjectOfPerson, -1, -1);
+        Relationship r5 = relationshipService.create(context, author5, project2, isProjectOfPerson, -1, -1);
+
+        // NOTE: unrelated relationship => should not be affected
+        Relationship ur3 = relationshipService.create(context, author5, project3, isProjectOfPerson, -1, -1);
+
+        Relationship r6 = relationshipService.create(context, author6, project2, isProjectOfPerson, -1, -1);
+
+        // Move r2 to project2
+        relationshipService.move(context, r2, null, project2);
+
+        context.restoreAuthSystemState();
+
+        // Check relationship order for project1
+        assertRightPlace(r1, 0);
+        assertRightPlace(r3, 1);    // should move down as the first Relationship was removed
+        assertRelationMetadataOrder(project1, isProjectOfPerson, List.of(r1, r3));
+
+        // Check relationship order for project2
+        assertRightPlace(r4, 0);     // previous Relationships should stay where they were
+        assertRightPlace(r5, 1);
+        assertRightPlace(r6, 2);
+        assertRightPlace(r2, 3);     // moved Relationship should be appended to the end
+        assertRelationMetadataOrder(project2, isProjectOfPerson, List.of(r4, r5, r6, r2));
+
+        // check unaffected relationships
+        assertLeftPlace(ur1, 0);
+        assertRightPlace(ur1, 0);
+        assertLeftPlace(ur2, 0);
+        assertRightPlace(ur2, 1);
+        assertLeftPlace(ur3, 1);
+        assertRightPlace(ur3, 0);
+    }
+
+    @Test
     public void changeRightItemInNonUseForPlaceRelationshipAtTheEndTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -2753,7 +3318,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
     }
 
     private String getRelationshipTypeStringForEntity(RelationshipType relationshipType, Item item) {
-        String entityType = relationshipMetadataService.getEntityTypeStringFromMetadata(item);
+        String entityType = itemService.getEntityTypeLabel(item);
 
         if (StringUtils.equals(entityType, relationshipType.getLeftType().getLabel())) {
             return relationshipType.getLeftwardType();
