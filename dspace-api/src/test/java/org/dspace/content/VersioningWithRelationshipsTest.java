@@ -10,15 +10,21 @@ package org.dspace.content;
 import static org.dspace.content.Relationship.LatestVersionStatus.BOTH;
 import static org.dspace.content.Relationship.LatestVersionStatus.LEFT_ONLY;
 import static org.dspace.content.Relationship.LatestVersionStatus.RIGHT_ONLY;
-import static org.dspace.util.RelationshipVersioningUtils.isRel;
+import static org.dspace.util.RelationshipVersioningTestUtils.isRel;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
@@ -31,6 +37,10 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.function.FailableRunnable;
 import org.apache.commons.lang3.function.FailableSupplier;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
@@ -42,18 +52,20 @@ import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.content.virtual.Collected;
 import org.dspace.content.virtual.VirtualMetadataConfiguration;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
+import org.dspace.core.Constants;
+import org.dspace.discovery.SolrSearchCore;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersioningService;
 import org.hamcrest.Matcher;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -70,8 +82,8 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         ContentServiceFactory.getInstance().getInstallItemService();
     private final ItemService itemService =
         ContentServiceFactory.getInstance().getItemService();
-    private final MetadataValueService metadataValueService =
-        ContentServiceFactory.getInstance().getMetadataValueService();
+    private final SolrSearchCore solrSearchCore =
+        DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrSearchCore.class).get(0);
 
     protected Community community;
     protected Collection collection;
@@ -3360,6 +3372,24 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         itemService.delete(context, context.reloadEntity(v1_2));
     }
 
+    protected void verifySolrField(Item item, String fieldName, List<Object> expectedValues) throws Exception {
+        QueryResponse result = solrSearchCore.getSolr().query(new SolrQuery(String.format(
+            "search.resourcetype:\"Item\" AND search.resourceid:\"%s\"", item.getID()
+        )));
+
+        SolrDocumentList docs = result.getResults();
+        Assert.assertEquals(1, docs.size());
+        SolrDocument doc = docs.get(0);
+
+        java.util.Collection<Object> actualValues = doc.getFieldValues(fieldName);
+
+        if (expectedValues == null) {
+            assertNull(actualValues);
+        } else {
+            assertThat(actualValues, containsInAnyOrder(expectedValues.toArray()));
+        }
+    }
+
     /**
      * Setup:
      * - two people are linked to one publication
@@ -3422,6 +3452,10 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("Doe, J.", mdvs1.get(1).getValue());
         assertEquals(1, mdvs1.get(1).getPlace());
 
+        verifySolrField(publication1V1, "dc.contributor.author", List.of(
+            "Smith, Donald", "Doe, J."
+        ));
+
         ////////////////////////////////////////////////////////
         // test relation.isAuthorOfPublication of publication //
         ////////////////////////////////////////////////////////
@@ -3438,6 +3472,38 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertTrue(mdvsR1.get(1) instanceof RelationshipMetadataValue);
         assertEquals(person2V1.getID().toString(), mdvsR1.get(1).getValue());
         assertEquals(1, mdvsR1.get(1).getPlace());
+
+        verifySolrField(publication1V1, "relation.isAuthorOfPublication", List.of(
+            person1V1.getID().toString(), person2V1.getID().toString()
+        ));
+
+        ///////////////////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication.latestForDiscovery of publication //
+        ///////////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            itemService.getMetadata(
+                publication1V1, "relation", "isAuthorOfPublication", "latestForDiscovery", Item.ANY
+            ),
+            containsInAnyOrder(
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person1V1.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                ),
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person2V1.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                )
+            )
+        );
+
+        verifySolrField(publication1V1, "relation.isAuthorOfPublication.latestForDiscovery", List.of(
+            person1V1.getID().toString(), person2V1.getID().toString()
+        ));
 
         ///////////////////////////////////////////////////////
         // create a new version of publication 1 and archive //
@@ -3458,6 +3524,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
             null, -1, 0
         );
         itemService.update(context, person1V2);
+        context.dispatchEvents();
 
         ///////////////////
         // cache busting //
@@ -3494,6 +3561,10 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("Doe, J.", mdvs2.get(1).getValue());
         assertEquals(1, mdvs2.get(1).getPlace());
 
+        verifySolrField(publication1V1, "dc.contributor.author", List.of(
+            "Smith, Donald", "Doe, J."
+        ));
+
         ////////////////////////////////////////////////////////////
         // test relation.isAuthorOfPublication of old publication //
         ////////////////////////////////////////////////////////////
@@ -3510,6 +3581,23 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertTrue(mdvsR2.get(1) instanceof RelationshipMetadataValue);
         assertEquals(person2V1.getID().toString(), mdvsR2.get(1).getValue());
         assertEquals(1, mdvsR2.get(1).getPlace());
+
+        verifySolrField(publication1V1, "relation.isAuthorOfPublication", List.of(
+            person1V1.getID().toString(), person2V1.getID().toString()
+        ));
+
+        ///////////////////////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication.latestForDiscovery of old publication //
+        ///////////////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            itemService.getMetadata(
+                publication1V1, "relation", "isAuthorOfPublication", "latestForDiscovery", Item.ANY
+            ),
+            containsInAnyOrder()
+        );
+
+        verifySolrField(publication1V1, "relation.isAuthorOfPublication.latestForDiscovery", null);
 
         ///////////////////////////////////////////////////
         // test dc.contributor.author of new publication //
@@ -3537,6 +3625,10 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("Doe, J.", mdvs3.get(1).getValue());
         assertEquals(1, mdvs3.get(1).getPlace());
 
+        verifySolrField(publication1V2, "dc.contributor.author", List.of(
+            "Smith, Donald", "Doe, J."
+        ));
+
         ////////////////////////////////////////////////////////////
         // test relation.isAuthorOfPublication of new publication //
         ////////////////////////////////////////////////////////////
@@ -3544,7 +3636,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         List<MetadataValue> mdvsR3 = itemService.getMetadata(
             publication1V2, "relation", "isAuthorOfPublication", null, Item.ANY
         );
-        assertEquals(2, mdvsR3.size());// TODO expect 3
+        assertEquals(2, mdvsR3.size());
 
         assertTrue(mdvsR3.get(0) instanceof RelationshipMetadataValue);
         assertEquals(person1V1.getID().toString(), mdvsR3.get(0).getValue());
@@ -3553,6 +3645,44 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertTrue(mdvsR3.get(1) instanceof RelationshipMetadataValue);
         assertEquals(person2V1.getID().toString(), mdvsR3.get(1).getValue());
         assertEquals(1, mdvsR3.get(1).getPlace());
+
+        verifySolrField(publication1V2, "relation.isAuthorOfPublication", List.of(
+            person1V1.getID().toString(), person2V1.getID().toString()
+        ));
+
+        ///////////////////////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication.latestForDiscovery of new publication //
+        ///////////////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            itemService.getMetadata(
+                publication1V2, "relation", "isAuthorOfPublication", "latestForDiscovery", Item.ANY
+            ),
+            containsInAnyOrder(
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person1V1.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                ),
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person1V2.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                ),
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person2V1.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                )
+            )
+        );
+
+        verifySolrField(publication1V2, "relation.isAuthorOfPublication.latestForDiscovery", List.of(
+            person1V1.getID().toString(), person1V2.getID().toString(), person2V1.getID().toString()
+        ));
 
         /////////////////////////////////////
         // archive new version of person 1 //
@@ -3596,11 +3726,43 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("Doe, J.", mdvs4.get(1).getValue());
         assertEquals(1, mdvs4.get(1).getPlace());
 
-        ////////////////////////////////////////////////////////////
-        // test relation.isAuthorOfPublication of old publication //
-        ////////////////////////////////////////////////////////////
+        verifySolrField(publication1V1, "dc.contributor.author", List.of(
+            "Smith, Donald", "Doe, J."
+        ));
 
-        // TODO
+        ////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication of publication //
+        ////////////////////////////////////////////////////////
+
+        List<MetadataValue> mdvsR4 = itemService.getMetadata(
+            publication1V1, "relation", "isAuthorOfPublication", null, Item.ANY
+        );
+        assertEquals(2, mdvsR4.size());
+
+        assertTrue(mdvsR4.get(0) instanceof RelationshipMetadataValue);
+        assertEquals(person1V1.getID().toString(), mdvsR4.get(0).getValue());
+        assertEquals(0, mdvsR4.get(0).getPlace());
+
+        assertTrue(mdvsR4.get(1) instanceof RelationshipMetadataValue);
+        assertEquals(person2V1.getID().toString(), mdvsR4.get(1).getValue());
+        assertEquals(1, mdvsR4.get(1).getPlace());
+
+        verifySolrField(publication1V1, "relation.isAuthorOfPublication", List.of(
+            person1V1.getID().toString(), person2V1.getID().toString()
+        ));
+
+        ///////////////////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication.latestForDiscovery of publication //
+        ///////////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            itemService.getMetadata(
+                publication1V1, "relation", "isAuthorOfPublication", "latestForDiscovery", Item.ANY
+            ),
+            containsInAnyOrder()
+        );
+
+        verifySolrField(publication1V1, "relation.isAuthorOfPublication.latestForDiscovery", null);
 
         ///////////////////////////////////////////////////
         // test dc.contributor.author of new publication //
@@ -3628,11 +3790,64 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("Doe, J.", mdvs5.get(1).getValue());
         assertEquals(1, mdvs5.get(1).getPlace());
 
+        verifySolrField(publication1V2, "dc.contributor.author", List.of(
+            "Smith, D.", "Doe, J."
+        ));
+
         ////////////////////////////////////////////////////////////
         // test relation.isAuthorOfPublication of new publication //
         ////////////////////////////////////////////////////////////
 
-        // TODO
+        List<MetadataValue> mdvsR5 = itemService.getMetadata(
+            publication1V2, "relation", "isAuthorOfPublication", null, Item.ANY
+        );
+        assertEquals(2, mdvsR5.size());
+
+        assertTrue(mdvsR5.get(0) instanceof RelationshipMetadataValue);
+        assertEquals(person1V2.getID().toString(), mdvsR5.get(0).getValue());
+        assertEquals(0, mdvsR5.get(0).getPlace());
+
+        assertTrue(mdvsR5.get(1) instanceof RelationshipMetadataValue);
+        assertEquals(person2V1.getID().toString(), mdvsR5.get(1).getValue());
+        assertEquals(1, mdvsR5.get(1).getPlace());
+
+        verifySolrField(publication1V2, "relation.isAuthorOfPublication", List.of(
+            person1V2.getID().toString(), person2V1.getID().toString()
+        ));
+
+        ///////////////////////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication.latestForDiscovery of new publication //
+        ///////////////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            itemService.getMetadata(
+                publication1V2, "relation", "isAuthorOfPublication", "latestForDiscovery", Item.ANY
+            ),
+            containsInAnyOrder(
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person1V1.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                ),
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person1V2.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                ),
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person2V1.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                )
+            )
+        );
+
+        verifySolrField(publication1V2, "relation.isAuthorOfPublication.latestForDiscovery", List.of(
+            person1V1.getID().toString(), person1V2.getID().toString(), person2V1.getID().toString()
+        ));
 
         ////////////////////////////////////
         // create new version of person 2 //
@@ -3643,6 +3858,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertNotNull(rel1);
         rel1.setRightwardValue("Doe, Jane Jr");
         relationshipService.update(context, rel1);
+        context.dispatchEvents();
 
         ///////////////////
         // cache busting //
@@ -3679,11 +3895,43 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("Doe, J.", mdvs6.get(1).getValue());
         assertEquals(1, mdvs6.get(1).getPlace());
 
+        verifySolrField(publication1V1, "dc.contributor.author", List.of(
+            "Smith, Donald", "Doe, J."
+        ));
+
         ////////////////////////////////////////////////////////////
         // test relation.isAuthorOfPublication of old publication //
         ////////////////////////////////////////////////////////////
 
-        // TODO
+        List<MetadataValue> mdvsR6 = itemService.getMetadata(
+            publication1V1, "relation", "isAuthorOfPublication", null, Item.ANY
+        );
+        assertEquals(2, mdvsR6.size());
+
+        assertTrue(mdvsR6.get(0) instanceof RelationshipMetadataValue);
+        assertEquals(person1V1.getID().toString(), mdvsR6.get(0).getValue());
+        assertEquals(0, mdvsR6.get(0).getPlace());
+
+        assertTrue(mdvsR6.get(1) instanceof RelationshipMetadataValue);
+        assertEquals(person2V1.getID().toString(), mdvsR6.get(1).getValue());
+        assertEquals(1, mdvsR6.get(1).getPlace());
+
+        verifySolrField(publication1V1, "relation.isAuthorOfPublication", List.of(
+            person1V1.getID().toString(), person2V1.getID().toString()
+        ));
+
+        ///////////////////////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication.latestForDiscovery of old publication //
+        ///////////////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            itemService.getMetadata(
+                publication1V1, "relation", "isAuthorOfPublication", "latestForDiscovery", Item.ANY
+            ),
+            containsInAnyOrder()
+        );
+
+        verifySolrField(publication1V1, "relation.isAuthorOfPublication.latestForDiscovery", null);
 
         ///////////////////////////////////////////////////
         // test dc.contributor.author of new publication //
@@ -3712,11 +3960,71 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("Doe, J.", mdvs7.get(1).getValue());
         assertEquals(1, mdvs7.get(1).getPlace());
 
+        verifySolrField(publication1V2, "dc.contributor.author", List.of(
+            "Smith, D.", "Doe, J."
+        ));
+
         ////////////////////////////////////////////////////////////
         // test relation.isAuthorOfPublication of new publication //
         ////////////////////////////////////////////////////////////
 
-        // TODO
+        List<MetadataValue> mdvsR7 = itemService.getMetadata(
+            publication1V2, "relation", "isAuthorOfPublication", null, Item.ANY
+        );
+        assertEquals(2, mdvsR7.size());
+
+        assertTrue(mdvsR7.get(0) instanceof RelationshipMetadataValue);
+        assertEquals(person1V2.getID().toString(), mdvsR7.get(0).getValue());
+        assertEquals(0, mdvsR7.get(0).getPlace());
+
+        assertTrue(mdvsR7.get(1) instanceof RelationshipMetadataValue);
+        assertEquals(person2V1.getID().toString(), mdvsR7.get(1).getValue());
+        assertEquals(1, mdvsR7.get(1).getPlace());
+
+        verifySolrField(publication1V2, "relation.isAuthorOfPublication", List.of(
+            person1V2.getID().toString(), person2V1.getID().toString()
+        ));
+
+        ///////////////////////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication.latestForDiscovery of new publication //
+        ///////////////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            itemService.getMetadata(
+                publication1V2, "relation", "isAuthorOfPublication", "latestForDiscovery", Item.ANY
+            ),
+            containsInAnyOrder(
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person1V1.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                ),
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person1V2.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                ),
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person2V1.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                ),
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person2V2.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                )
+            )
+        );
+
+        verifySolrField(publication1V2, "relation.isAuthorOfPublication.latestForDiscovery", List.of(
+            person1V1.getID().toString(), person1V2.getID().toString(),
+            person2V1.getID().toString(), person2V2.getID().toString()
+        ));
 
         /////////////////////////////////////
         // archive new version of person 2 //
@@ -3760,11 +4068,43 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("Doe, J.", mdvs8.get(1).getValue());
         assertEquals(1, mdvs8.get(1).getPlace());
 
+        verifySolrField(publication1V1, "dc.contributor.author", List.of(
+            "Smith, Donald", "Doe, J."
+        ));
+
         ////////////////////////////////////////////////////////////
         // test relation.isAuthorOfPublication of old publication //
         ////////////////////////////////////////////////////////////
 
-        // TODO
+        List<MetadataValue> mdvsR8 = itemService.getMetadata(
+            publication1V1, "relation", "isAuthorOfPublication", null, Item.ANY
+        );
+        assertEquals(2, mdvsR8.size());
+
+        assertTrue(mdvsR8.get(0) instanceof RelationshipMetadataValue);
+        assertEquals(person1V1.getID().toString(), mdvsR8.get(0).getValue());
+        assertEquals(0, mdvsR8.get(0).getPlace());
+
+        assertTrue(mdvsR8.get(1) instanceof RelationshipMetadataValue);
+        assertEquals(person2V1.getID().toString(), mdvsR8.get(1).getValue());
+        assertEquals(1, mdvsR8.get(1).getPlace());
+
+        verifySolrField(publication1V1, "relation.isAuthorOfPublication", List.of(
+            person1V1.getID().toString(), person2V1.getID().toString()
+        ));
+
+        ///////////////////////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication.latestForDiscovery of old publication //
+        ///////////////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            itemService.getMetadata(
+                publication1V1, "relation", "isAuthorOfPublication", "latestForDiscovery", Item.ANY
+            ),
+            containsInAnyOrder()
+        );
+
+        verifySolrField(publication1V1, "relation.isAuthorOfPublication.latestForDiscovery", null);
 
         ///////////////////////////////////////////////////
         // test dc.contributor.author of new publication //
@@ -3793,12 +4133,71 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         assertEquals("Doe, Jane Jr", mdvs9.get(1).getValue());
         assertEquals(1, mdvs9.get(1).getPlace());
 
+        verifySolrField(publication1V2, "dc.contributor.author", List.of(
+            "Smith, D.", "Doe, Jane Jr"
+        ));
+
         ////////////////////////////////////////////////////////////
         // test relation.isAuthorOfPublication of new publication //
         ////////////////////////////////////////////////////////////
 
-        // TODO
+        List<MetadataValue> mdvsR9 = itemService.getMetadata(
+            publication1V2, "relation", "isAuthorOfPublication", null, Item.ANY
+        );
+        assertEquals(2, mdvsR9.size());
+
+        assertTrue(mdvsR9.get(0) instanceof RelationshipMetadataValue);
+        assertEquals(person1V2.getID().toString(), mdvsR9.get(0).getValue());
+        assertEquals(0, mdvsR9.get(0).getPlace());
+
+        assertTrue(mdvsR9.get(1) instanceof RelationshipMetadataValue);
+        assertEquals(person2V2.getID().toString(), mdvsR9.get(1).getValue());
+        assertEquals(1, mdvsR9.get(1).getPlace());
+
+        verifySolrField(publication1V2, "relation.isAuthorOfPublication", List.of(
+            person1V2.getID().toString(), person2V2.getID().toString()
+        ));
+
+        ///////////////////////////////////////////////////////////////////////////////
+        // test relation.isAuthorOfPublication.latestForDiscovery of new publication //
+        ///////////////////////////////////////////////////////////////////////////////
+
+        assertThat(
+            itemService.getMetadata(
+                publication1V2, "relation", "isAuthorOfPublication", "latestForDiscovery", Item.ANY
+            ),
+            containsInAnyOrder(
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person1V1.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                ),
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person1V2.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                ),
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person2V1.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                ),
+                allOf(
+                    instanceOf(RelationshipMetadataValue.class),
+                    hasProperty("value", is(person2V2.getID().toString())),
+                    hasProperty("place", is(-1)),
+                    hasProperty("authority", startsWith(Constants.VIRTUAL_AUTHORITY_PREFIX))
+                )
+            )
+        );
+
+        verifySolrField(publication1V2, "relation.isAuthorOfPublication.latestForDiscovery", List.of(
+            person1V1.getID().toString(), person1V2.getID().toString(),
+            person2V1.getID().toString(), person2V2.getID().toString()
+        ));
     }
 
-    // TODO
 }

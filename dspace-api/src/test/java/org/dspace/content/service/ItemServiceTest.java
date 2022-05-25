@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
@@ -55,7 +57,7 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
     protected VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
 
     Community community;
-    Collection col;
+    Collection collection1;
 
     Item item;
 
@@ -73,14 +75,17 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
         super.setUp();
         try {
             context.turnOffAuthorisationSystem();
-            community = communityService.create(null, context);
 
-            col = collectionService.create(context, community);
-            WorkspaceItem is = workspaceItemService.create(context, col, false);
-            WorkspaceItem authorIs = workspaceItemService.create(context, col, false);
+            community = CommunityBuilder.createCommunity(context)
+                .build();
+
+            collection1 = CollectionBuilder.createCollection(context, community)
+                .withEntityType("Publication")
+                .build();
+
+            WorkspaceItem is = workspaceItemService.create(context, collection1, false);
 
             item = installItemService.installItem(context, is);
-            itemService.addMetadata(context, item, "dspace", "entity", "type", null, "Publication");
 
             context.restoreAuthSystemState();
         } catch (AuthorizeException ex) {
@@ -220,14 +225,18 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
             .withCopyToRight(false)
             .build();
 
-        Item publication1 = ItemBuilder.createItem(context, col)
-            .withTitle("publication 1")
-            .withEntityType("Publication")
+        Collection collection2 = CollectionBuilder.createCollection(context, community)
+            .withEntityType("Person")
             .build();
 
-        Item person1 = ItemBuilder.createItem(context, col)
+        Item publication1 = ItemBuilder.createItem(context, collection1)
+            .withTitle("publication 1")
+            // NOTE: entity type comes from collection
+            .build();
+
+        Item person1 = ItemBuilder.createItem(context, collection2)
             .withTitle("person 2")
-            .withEntityType("Person")
+            // NOTE: entity type comes from collection
             .build();
 
         RelationshipBuilder.createRelationshipBuilder(context, publication1, person1, isAuthorOfPublication);

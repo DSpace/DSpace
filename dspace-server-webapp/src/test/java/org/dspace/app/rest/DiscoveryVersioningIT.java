@@ -12,7 +12,7 @@ import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.content.Relationship.LatestVersionStatus.BOTH;
 import static org.dspace.content.Relationship.LatestVersionStatus.LEFT_ONLY;
 import static org.dspace.content.Relationship.LatestVersionStatus.RIGHT_ONLY;
-import static org.dspace.util.RelationshipVersioningUtils.isRel;
+import static org.dspace.util.RelationshipVersioningTestUtils.isRel;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -96,7 +96,6 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     private RelationshipService relationshipService;
 
     protected Community community;
-    protected Collection collection;
 
     @Override
     @Before
@@ -107,10 +106,6 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         community = CommunityBuilder.createCommunity(context)
             .withName("community")
-            .build();
-
-        collection = CollectionBuilder.createCollection(context, community)
-            .withName("collection")
             .build();
 
         context.restoreAuthSystemState();
@@ -261,9 +256,39 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         return newItem;
     }
 
+    protected Collection createCollection() {
+        return createCollection("collection without entity type", null);
+    }
+
+    protected Collection createCollection(String entityType) {
+        return createCollection("collection: " + entityType, entityType);
+    }
+
+    protected Collection createCollection(String name, String entityType) {
+        context.turnOffAuthorisationSystem();
+
+        CollectionBuilder builder = CollectionBuilder.createCollection(context, community);
+
+        if (name != null) {
+            builder.withName(name);
+        }
+
+        if (entityType != null) {
+            builder.withEntityType(entityType);
+        }
+
+        Collection collection = builder.build();
+
+        context.restoreAuthSystemState();
+
+        return collection;
+    }
+
     @Test
     public void test_discoveryXml_default_expectLatestVersionsOnly() throws Exception {
         final String configuration = null;
+
+        Collection collection = createCollection();
 
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
@@ -300,6 +325,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     @Test
     public void test_discoveryXml_defaultRelationships_allVersions() throws Exception {
         final String configuration = "default-relationships";
+
+        Collection collection = createCollection();
 
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
@@ -338,6 +365,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_site_expectLatestVersionsOnly() throws Exception {
         final String configuration = "site";
 
+        Collection collection = createCollection();
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
@@ -373,6 +402,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     @Test
     public void test_discoveryXml_workspace_expectLatestVersionsOnly() throws Exception {
         final String configuration = "workspace";
+
+        Collection collection = createCollection();
 
         // NOTE: this makes sure that the admin user is the creator of the item, so the "submitter_authority"
         //       filter passes (see SolrServiceWorkspaceWorkflowRestrictionPlugin)
@@ -414,6 +445,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_undiscoverable_expectLatestVersionsOnly() throws Exception {
         final String configuration = "undiscoverable";
 
+        Collection collection = createCollection();
+
         // NOTE: needed to avoid NOT(discoverable:false) filter on solr queries (see SolrServicePrivateItemPlugin)
         //       when using the searchService directly
         context.setCurrentUser(admin);
@@ -453,6 +486,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_administrativeView_expectLatestVersionsOnly() throws Exception {
         final String configuration = "administrativeView";
 
+        Collection collection = createCollection();
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
@@ -485,12 +520,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_publication_expectLatestVersionsOnly() throws Exception {
         final String configuration = "publication";
 
+        Collection collection = createCollection("Publication");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("Publication")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -519,12 +555,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_publicationRelationships_allVersions() throws Exception {
         final String configuration = "publication-relationships";
 
+        Collection collection = createCollection("Publication");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("Publication")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -554,12 +591,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_person_expectLatestVersionsOnly() throws Exception {
         final String configuration = "person";
 
+        Collection collection = createCollection("Person");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("Person")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -588,12 +626,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_personRelationships_allVersions() throws Exception {
         final String configuration = "person-relationships";
 
+        Collection collection = createCollection("Person");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("Person")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -623,12 +662,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_orgunit_expectLatestVersionsOnly() throws Exception {
         final String configuration = "orgunit";
 
+        Collection collection = createCollection("OrgUnit");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("OrgUnit")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -657,12 +697,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_orgunitRelationships_allVersions() throws Exception {
         final String configuration = "orgunit-relationships";
 
+        Collection collection = createCollection("OrgUnit");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("OrgUnit")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -692,12 +733,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_journalissue_expectLatestVersionsOnly() throws Exception {
         final String configuration = "journalissue";
 
+        Collection collection = createCollection("JournalIssue");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("JournalIssue")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -726,12 +768,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_journalissueRelationships_allVersions() throws Exception {
         final String configuration = "journalissue-relationships";
 
+        Collection collection = createCollection("JournalIssue");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("JournalIssue")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -761,12 +804,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_journalvolume_expectLatestVersionsOnly() throws Exception {
         final String configuration = "journalvolume";
 
+        Collection collection = createCollection("JournalVolume");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("JournalVolume")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -795,12 +839,14 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_journalvolumeRelationships_allVersions() throws Exception {
         final String configuration = "journalvolume-relationships";
 
+
+        Collection collection = createCollection("JournalVolume");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("JournalVolume")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -830,12 +876,14 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_journal_expectLatestVersionsOnly() throws Exception {
         final String configuration = "journal";
 
+
+        Collection collection = createCollection("Journal");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("Journal")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -864,12 +912,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_journalRelationships_allVersions() throws Exception {
         final String configuration = "journal-relationships";
 
+        Collection collection = createCollection("Journal");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("Journal")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -899,12 +948,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_project_expectLatestVersionsOnly() throws Exception {
         final String configuration = "project";
 
+        Collection collection = createCollection("Project");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("Project")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -933,12 +983,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_projectRelationships_allVersions() throws Exception {
         final String configuration = "project-relationships";
 
+        Collection collection = createCollection("Project");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("Project")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -968,12 +1019,13 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_personOrOrgunit_expectLatestVersionsOnly() throws Exception {
         final String configuration = "personOrOrgunit";
 
+        Collection collection = createCollection("Person");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("Person")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             .build();
         context.restoreAuthSystemState();
 
@@ -1002,12 +1054,14 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     public void test_discoveryXml_openAIREFundingAgency_expectLatestVersionsOnly() throws Exception {
         final String configuration = "openAIREFundingAgency";
 
+
+        Collection collection = createCollection("OrgUnit");
+
         // create item 1.1 (first version of item 1)
         context.turnOffAuthorisationSystem();
         Item i1_1 = ItemBuilder.createItem(context, collection)
             .withTitle("item 1.1")
-            // NOTE: necessary to get past the default filter query
-            .withEntityType("OrgUnit")
+            // NOTE: entity type inherited from collection, necessary to get past the default filter query
             // NOTE: necessary to get past the default filter query
             .withType("FundingOrganization")
             .build();
@@ -1056,17 +1110,19 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
             .withCopyToRight(false)
             .build();
 
+        Collection publicationCollection = createCollection(publicationEntityType.getLabel());
+
         // create publication 1.1
-        Item pub1_1 = ItemBuilder.createItem(context, collection)
+        Item pub1_1 = ItemBuilder.createItem(context, publicationCollection)
             .withTitle("publication 1")
-            .withMetadata("dspace", "entity", "type", publicationEntityType.getLabel())
             .build();
         String idPub1_1 = pub1_1.getID().toString();
 
+        Collection projectCollection = createCollection(projectEntityType.getLabel());
+
         // create project 1.1
-        Item pro1_1 = ItemBuilder.createItem(context, collection)
+        Item pro1_1 = ItemBuilder.createItem(context, projectCollection)
             .withTitle("project 1")
-            .withMetadata("dspace", "entity", "type", projectEntityType.getLabel())
             .build();
         String idPro1_1 = pro1_1.getID().toString();
 

@@ -12,229 +12,229 @@
     <dc-type>
         <schema>relation</schema>
         <element>isAuthorOfPublication</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all AUTHOR uuids that are related to the current PUBLICATION, from the point of view of current PUBLICATION. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isAuthorOfPublication</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all AUTHOR uuids that are related to the current PUBLICATION, from the point of view of the respective AUTHOR. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isPublicationOfAuthor</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all PUBLICATION uuids that are related to the current AUTHOR, from the point of view of current AUTHOR. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isPublicationOfAuthor</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all PUBLICATION uuids that are related to the current AUTHOR, from the point of view of the respective PUBLICATION. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isProjectOfPublication</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all PROJECT uuids that are related to the current PUBLICATION, from the point of view of current PUBLICATION. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isProjectOfPublication</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all PROJECT uuids that are related to the current PUBLICATION, from the point of view of the respective PROJECT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isPublicationOfProject</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all PUBLICATION uuids that are related to the current PROJECT, from the point of view of current PROJECT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isPublicationOfProject</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all PUBLICATION uuids that are related to the current PROJECT, from the point of view of the respective PROJECT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isOrgUnitOfPublication</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all ORGUNIT uuids that are related to the current PUBLICATION, from the point of view of current PUBLICATION. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isOrgUnitOfPublication</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all ORGUNIT uuids that are related to the current PUBLICATION, from the point of view of the respective ORGUNIT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isPublicationOfOrgUnit</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all PUBLICATION uuids that are related to the current ORGUNIT, from the point of view of current ORGUNIT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isPublicationOfOrgUnit</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all PUBLICATION uuids that are related to the current ORGUNIT, from the point of view of the respective ORGUNIT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isProjectOfPerson</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all PROJECT uuids that are related to the current PERSON, from the point of view of current PERSON. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isProjectOfPerson</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all PROJECT uuids that are related to the current PERSON, from the point of view of the respective PROJECT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isPersonOfProject</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all PERSON uuids that are related to the current PROJECT, from the point of view of current PROJECT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isPersonOfProject</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all PERSON uuids that are related to the current PROJECT, from the point of view of the respective PERSON. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isOrgUnitOfPerson</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all ORGUNIT uuids that are related to the current PERSON, from the point of view of current PERSON. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isOrgUnitOfPerson</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all ORGUNIT uuids that are related to the current PERSON, from the point of view of the respective ORGUNIT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isPersonOfOrgUnit</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all PERSON uuids that are related to the current ORGUNIT, from the point of view of current ORGUNIT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isPersonOfOrgUnit</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all PERSON uuids that are related to the current ORGUNIT, from the point of view of the respective PERSON. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isOrgUnitOfProject</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all ORGUNIT uuids that are related to the current PROJECT, from the point of view of current PROJECT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isOrgUnitOfProject</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all ORGUNIT uuids that are related to the current PROJECT, from the point of view of the respective ORGUNIT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isProjectOfOrgUnit</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all PROJECT uuids that are related to the current ORGUNIT, from the point of view of current ORGUNIT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isProjectOfOrgUnit</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all PROJECT uuids that are related to the current ORGUNIT, from the point of view of the respective PROJECT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isVolumeOfJournal</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all VOLUME uuids that are related to the current JOURNAL, from the point of view of current JOURNAL. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isVolumeOfJournal</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all VOLUME uuids that are related to the current JOURNAL, from the point of view of the respective VOLUME. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isJournalOfVolume</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all JOURNAL uuids that are related to the current VOLUME, from the point of view of current VOLUME. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isJournalOfVolume</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all JOURNAL uuids that are related to the current VOLUME, from the point of view of the respective JOURNAL. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isIssueOfJournalVolume</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all ISSUE uuids that are related to the current VOLUME, from the point of view of current VOLUME. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isIssueOfJournalVolume</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all ISSUE uuids that are related to the current VOLUME, from the point of view of the respective ISSUE. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isJournalVolumeOfIssue</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all VOLUME uuids that are related to the current ISSUE, from the point of view of current ISSUE. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isJournalVolumeOfIssue</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all VOLUME uuids that are related to the current ISSUE, from the point of view of the respective VOLUME. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isJournalOfPublication</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all JOURNAL uuids that are related to the current PUBLICATION, from the point of view of current PUBLICATION. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isJournalOfPublication</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all JOURNAL uuids that are related to the current PUBLICATION, from the point of view of the respective JOURNAL. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isJournalIssueOfPublication</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all ISSUE uuids that are related to the current PUBLICATION, from the point of view of current PUBLICATION. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isJournalIssueOfPublication</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all ISSUE uuids that are related to the current PUBLICATION, from the point of view of the respective ISSUE. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isPublicationOfJournalIssue</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all PUBLICATION uuids that are related to the current ISSUE, from the point of view of current ISSUE. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isPublicationOfJournalIssue</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all PUBLICATION uuids that are related to the current ISSUE, from the point of view of the respective PUBLICATION. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <!-- OpenAIRE4 Guidelines - required relationships -->
@@ -242,49 +242,49 @@
     <dc-type>
         <schema>relation</schema>
         <element>isContributorOfPublication</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all PERSON uuids that are related to the current PUBLICATION, from the point of view of current PUBLICATION. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isContributorOfPublication</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all PERSON uuids that are related to the current PUBLICATION, from the point of view of the respective PERSON. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isPublicationOfContributor</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all PUBLICATION uuids that are related to the current PERSON, from the point of view of current PERSON. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isPublicationOfContributor</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all PUBLICATION uuids that are related to the current PERSON, from the point of view of the respective PUBLICATION. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isFundingAgencyOfProject</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all ORGUNIT uuids that are related to the current PROJECT, from the point of view of current PROJECT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isFundingAgencyOfProject</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all ORGUNIT uuids that are related to the current PROJECT, from the point of view of the respective ORGUNIT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
     <dc-type>
         <schema>relation</schema>
         <element>isProjectOfFundingAgency</element>
-        <scope_note></scope_note>
+        <scope_note>Contains all PROJECT uuids that are related to the current ORGUNIT, from the point of view of current ORGUNIT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
     <dc-type>
         <schema>relation</schema>
         <element>isProjectOfFundingAgency</element>
         <qualifier>latestForDiscovery</qualifier>
-        <scope_note></scope_note>
+        <scope_note>Contains all PROJECT uuids that are related to the current ORGUNIT, from the point of view of the respective PROJECT. Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
 </dspace-dc-types>

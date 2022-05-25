@@ -172,7 +172,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                              .withAuthor("Smith, Maria")
                              .withPersonIdentifierLastName("Smith")
                              .withPersonIdentifierFirstName("Maria")
-                             .withEntityType("Person")
+                             .withMetadata("dspace", "entity", "type", "Person")
                              .build();
 
         author3 = ItemBuilder.createItem(context, col1)
