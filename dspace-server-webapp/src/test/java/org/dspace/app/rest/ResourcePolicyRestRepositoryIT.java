@@ -2278,15 +2278,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void patchAddActionTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
-            .withEmail("eperson1@mail.com")
-            .withPassword("qwerty01")
-            .build();
-
         Community community = CommunityBuilder.createCommunity(context).build();
 
         Collection collection = CollectionBuilder.createCollection(context, community)
-            .withAdminGroup(eperson1)
+            .withAdminGroup(eperson)
             .build();
 
         Item myItem = ItemBuilder.createItem(context, collection)
@@ -2296,7 +2291,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withUser(eperson1)
+            .withUser(eperson)
             .withName("My Name")
             .build();
 
@@ -2309,7 +2304,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ops.add(addOperation);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -2327,15 +2322,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void patchReplaceActionTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
-            .withEmail("eperson1@mail.com")
-            .withPassword("qwerty01")
-            .build();
-
         Community community = CommunityBuilder.createCommunity(context).build();
 
         Collection collection = CollectionBuilder.createCollection(context, community)
-            .withAdminGroup(eperson1)
+            .withAdminGroup(eperson)
             .build();
 
         Item myItem = ItemBuilder.createItem(context, collection)
@@ -2345,7 +2335,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withUser(eperson1)
+            .withUser(eperson)
             .withName("My name")
             .withPolicyType(ResourcePolicy.TYPE_SUBMISSION)
             .build();
@@ -2358,7 +2348,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -2413,11 +2403,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void patchReplaceActionForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
-            .withEmail("eperson1@mail.com")
-            .withPassword("qwerty01")
-            .build();
-
         Community community = CommunityBuilder.createCommunity(context).build();
 
         Collection collection = CollectionBuilder.createCollection(context, community).build();
@@ -2429,7 +2414,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(item)
-            .withUser(eperson1)
+            .withUser(eperson)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -2441,7 +2426,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -2467,15 +2452,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void patchReplaceActionUnprocessableEntityTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
-            .withEmail("eperson1@mail.com")
-            .withPassword("qwerty01")
-            .build();
-
         Community community = CommunityBuilder.createCommunity(context).build();
 
         Collection collection = CollectionBuilder.createCollection(context, community)
-            .withAdminGroup(eperson1)
+            .withAdminGroup(eperson)
             .build();
 
         Item publicItem1 = ItemBuilder.createItem(context, collection)
@@ -2485,7 +2465,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withUser(eperson1)
+            .withUser(eperson)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -2508,15 +2488,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void patchAddPolicyTypeTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
-            .withEmail("eperson1@mail.com")
-            .withPassword("qwerty01")
-            .build();
-
         Community community = CommunityBuilder.createCommunity(context).build();
 
         Collection collection = CollectionBuilder.createCollection(context, community)
-            .withAdminGroup(eperson1)
+            .withAdminGroup(eperson)
             .build();
 
         Item myItem = ItemBuilder.createItem(context, collection)
@@ -2526,7 +2501,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withUser(eperson1)
+            .withUser(eperson)
             .withName("My Name")
             .build();
 
@@ -2538,7 +2513,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ops.add(addOperation);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -2558,15 +2533,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void patchRemovePolicyTypeTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
-            .withEmail("eperson1@mail.com")
-            .withPassword("qwerty01")
-            .build();
-
         Community community = CommunityBuilder.createCommunity(context).build();
 
         Collection collection = CollectionBuilder.createCollection(context, community)
-            .withAdminGroup(eperson1)
+            .withAdminGroup(eperson)
             .build();
 
         Item myItem = ItemBuilder.createItem(context, collection)
@@ -2576,7 +2546,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withUser(eperson1)
+            .withUser(eperson)
             .withName("My Name")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -2588,7 +2558,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ops.add(removeOperation);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -2608,15 +2578,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void patchReplacePolicyTypeTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
-            .withEmail("eperson1@mail.com")
-            .withPassword("qwerty01")
-            .build();
-
         Community community = CommunityBuilder.createCommunity(context).build();
 
         Collection collection = CollectionBuilder.createCollection(context, community)
-            .withAdminGroup(eperson1)
+            .withAdminGroup(eperson)
             .build();
 
         Item myItem = ItemBuilder.createItem(context, collection)
@@ -2626,7 +2591,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withUser(eperson1)
+            .withUser(eperson)
             .withName("My name")
             .withPolicyType(ResourcePolicy.TYPE_SUBMISSION)
             .build();
@@ -2639,7 +2604,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -2697,11 +2662,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void patchReplacePolicyTypeForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
-            .withEmail("eperson1@mail.com")
-            .withPassword("qwerty01")
-            .build();
-
         Community community = CommunityBuilder.createCommunity(context).build();
 
         Collection collection = CollectionBuilder.createCollection(context, community).build();
@@ -2713,7 +2673,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(item)
-            .withUser(eperson1)
+            .withUser(eperson)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -2725,7 +2685,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -2750,15 +2710,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void patchReplacePolicyTypeBadRequestTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
-            .withEmail("eperson1@mail.com")
-            .withPassword("qwerty01")
-            .build();
-
         Community community = CommunityBuilder.createCommunity(context).build();
 
         Collection collection = CollectionBuilder.createCollection(context, community)
-            .withAdminGroup(eperson1)
+            .withAdminGroup(eperson)
             .build();
 
         Item publicItem1 = ItemBuilder.createItem(context, collection)
@@ -2768,7 +2723,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withUser(eperson1)
+            .withUser(eperson)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -2780,7 +2735,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
+        String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(patch("/api/authz/resourcepolicies/" + resourcePolicy.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
