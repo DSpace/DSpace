@@ -11,10 +11,13 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
+import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,6 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.matcher.ResourcePolicyMatcher;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.patch.AddOperation;
@@ -2723,4 +2727,495 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                              .andExpect(jsonPath("$._links.resource.href", Matchers.allOf(
                                         Matchers.containsString("/api/authz/resourcepolicies/search/resource"))));
     }
+
+    @Test
+    public void patchReplaceEPersonAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson newEPerson = EPersonBuilder.createEPerson(context)
+                                           .withEmail("newEPerson@mail.com")
+                                           .withPassword(password)
+                                           .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection 1")
+                                          .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                                            .withAction(Constants.ADD)
+                                            .withDspaceObject(col)
+                                            .withUser(eperson)
+                                            .withDescription("My Description")
+                                            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                                            .build();
+
+        context.restoreAuthSystemState();
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        // verify origin resourcepolicy
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.eperson.id", is(eperson.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.group", nullValue()));
+
+        // update eperson of the resourcePolicy
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + resourcePolicy.getID() + "/eperson")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content("/api/eperson/epersons/" + newEPerson.getID()))
+                             .andExpect(status().isNoContent());
+
+        // verify that the resourcePolicy is related to new eperson
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.eperson.id", is(newEPerson.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.group", nullValue()));
+    }
+
+    @Test
+    public void patchReplaceEPersonForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson newEPerson = EPersonBuilder.createEPerson(context)
+                                           .withEmail("newEPerson@mail.com")
+                                           .withPassword(password)
+                                           .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection 1")
+                                          .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                                            .withAction(Constants.ADD)
+                                            .withDspaceObject(col)
+                                            .withUser(eperson)
+                                            .withDescription("My Description")
+                                            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                                            .build();
+
+        context.restoreAuthSystemState();
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+
+        // verify origin resourcepolicy
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.eperson.id", is(eperson.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.group", nullValue()));
+
+        // try to update eperson of resourcepolicy with normal user
+        getClient(tokenEPerson).perform(put("/api/authz/resourcepolicies/" + resourcePolicy.getID() + "/eperson")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content("/api/eperson/epersons/" + newEPerson.getID()))
+                             .andExpect(status().isForbidden());
+
+        // verify that resourcepolicy hasn't been changed
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.eperson.id", is(eperson.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.group", nullValue()));
+    }
+
+    @Test
+    public void patchReplaceEPersonUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson newEPerson = EPersonBuilder.createEPerson(context)
+                                           .withEmail("newEPerson@mail.com")
+                                           .withPassword(password)
+                                           .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection 1")
+                                          .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                                            .withAction(Constants.ADD)
+                                            .withDspaceObject(col)
+                                            .withUser(eperson)
+                                            .withDescription("My Description")
+                                            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                                            .build();
+
+        context.restoreAuthSystemState();
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        // verify origin resourcepolicy
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.eperson.id", is(eperson.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.group", nullValue()));
+
+        // try to update eperson of resourcepolicy with anonymous user
+        getClient().perform(put("/api/authz/resourcepolicies/" + resourcePolicy.getID() + "/eperson")
+                   .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                   .content("/api/eperson/epersons/" + newEPerson.getID()))
+                   .andExpect(status().isUnauthorized());
+
+        // verify that resourcepolicy hasn't been changed
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.eperson.id", is(eperson.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.group", nullValue()));
+    }
+
+    @Test
+    public void patchReplaceGroupAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group originGroup = GroupBuilder.createGroup(context)
+                                        .withName("origin Test Group")
+                                        .build();
+
+        Group newGroup = GroupBuilder.createGroup(context)
+                                     .withName("testGroupName")
+                                     .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection 1")
+                                          .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                                            .withAction(Constants.ADD)
+                                            .withDspaceObject(col)
+                                            .withGroup(originGroup)
+                                            .withDescription("My Description")
+                                            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                                            .build();
+
+        context.restoreAuthSystemState();
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        // verify origin resourcepolicy
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.group.id", is(originGroup.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.eperson", nullValue()));
+
+        // update group of the resourcePolicy
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + resourcePolicy.getID() + "/group")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content("/api/eperson/groups/" + newGroup.getID()))
+                             .andExpect(status().isNoContent());
+
+        // verify that the resourcePolicy is related to new group
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.group.id", is(newGroup.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.eperson", nullValue()));
+    }
+
+    @Test
+    public void patchReplaceGroupForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group originGroup = GroupBuilder.createGroup(context)
+                                        .withName("origin Test Group")
+                                        .build();
+
+        Group newGroup = GroupBuilder.createGroup(context)
+                                     .withName("testGroupName")
+                                     .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection 1")
+                                          .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                                            .withAction(Constants.ADD)
+                                            .withDspaceObject(col)
+                                            .withGroup(originGroup)
+                                            .withDescription("My Description")
+                                            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                                            .build();
+
+        context.restoreAuthSystemState();
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+
+        // verify origin resourcepolicy
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.group.id", is(originGroup.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.eperson", nullValue()));
+
+        // try to update group of resourcepolicy with normal user
+        getClient(tokenEPerson).perform(put("/api/authz/resourcepolicies/" + resourcePolicy.getID() + "/group")
+                               .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                               .content("/api/eperson/groups/" + newGroup.getID()))
+                               .andExpect(status().isForbidden());
+
+        // verify that resourcepolicy hasn't been changed
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.group.id", is(originGroup.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.eperson", nullValue()));
+    }
+
+    @Test
+    public void patchReplaceGroupUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group originGroup = GroupBuilder.createGroup(context)
+                                        .withName("origin Test Group")
+                                        .build();
+
+        Group newGroup = GroupBuilder.createGroup(context)
+                                     .withName("testGroupName")
+                                     .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection 1")
+                                          .build();
+
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+                                            .withAction(Constants.ADD)
+                                            .withDspaceObject(col)
+                                            .withGroup(originGroup)
+                                            .withDescription("My Description")
+                                            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                                            .build();
+
+        context.restoreAuthSystemState();
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        // verify origin resourcepolicy
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.group.id", is(originGroup.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.eperson", nullValue()));
+
+        // try to update group of resourcepolicy with anonymous user
+        getClient().perform(put("/api/authz/resourcepolicies/" + resourcePolicy.getID() + "/group")
+                   .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                   .content("/api/eperson/groups/" + newGroup.getID()))
+                   .andExpect(status().isUnauthorized());
+
+        // verify that resourcepolicy hasn't been changed
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.group.id", is(originGroup.getID().toString())))
+                             .andExpect(jsonPath("$._embedded.eperson", nullValue()));
+    }
+
+    @Test
+    public void updateResourcePolicyOfEPersonToGroupTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("My group")
+                                  .build();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("My community")
+                                              .build();
+
+        ResourcePolicy resourcePolicyOfEPerson = ResourcePolicyBuilder.createResourcePolicy(context)
+                                                             .withDspaceObject(community)
+                                                             .withAction(Constants.READ)
+                                                             .withUser(eperson)
+                                                             .build();
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicyOfEPerson.getID()))
+                       .andExpect(status().isOk())
+                       .andExpect(content().contentType(contentType))
+                       .andExpect(jsonPath("$", is(ResourcePolicyMatcher.matchResourcePolicy(resourcePolicyOfEPerson))))
+                       .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/resourcepolicies/"
+                                            + resourcePolicyOfEPerson.getID())));
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + resourcePolicyOfEPerson.getID() + "/group")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content("/api/eperson/groups/" + group.getID()))
+                             .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void updateResourcePolicyOfGroupToEPersonTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("My group")
+                                  .build();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("My community")
+                                              .build();
+
+        ResourcePolicy resourcePolicyOfGroup = ResourcePolicyBuilder.createResourcePolicy(context)
+                                                                    .withDspaceObject(community)
+                                                                    .withAction(Constants.ADD)
+                                                                    .withGroup(group).build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/search/group")
+                 .param("uuid", group.getID().toString()))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.containsInAnyOrder(
+                            ResourcePolicyMatcher.matchResourcePolicy(resourcePolicyOfGroup))))
+                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString(
+                                     "api/authz/resourcepolicies/search/group")))
+                 .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + resourcePolicyOfGroup.getID() + "/eperson")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content("/api/eperson/epersons/" + eperson.getID()))
+                             .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void updateEPersonOfNotExistingResourcePolicyTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + Integer.MAX_VALUE + "/eperson")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content("/api/eperson/epersons/" + eperson.getID()))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void updateGroupOfNotExistingResourcePolicyTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("My group")
+                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + Integer.MAX_VALUE + "/group")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content("/api/eperson/groups/" + group.getID()))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void updateResourcePolicyOfGroupWithEmptyTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("My group")
+                                  .build();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("My community")
+                                              .build();
+
+
+        ResourcePolicy resourcePolicyOfGroup = ResourcePolicyBuilder.createResourcePolicy(context)
+                                                                    .withDspaceObject(community)
+                                                                    .withAction(Constants.ADD)
+                                                                    .withGroup(group).build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + resourcePolicyOfGroup.getID() + "/group")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content(StringUtils.EMPTY))
+                             .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void updateResourcePolicyOfGroupWithMultipleGroupsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group1 = GroupBuilder.createGroup(context).withName("My group").build();
+        Group group2 = GroupBuilder.createGroup(context).withName("My group2").build();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("My community")
+                                              .build();
+
+        ResourcePolicy resourcePolicyOfGroup = ResourcePolicyBuilder.createResourcePolicy(context)
+                                                                    .withDspaceObject(community)
+                                                                    .withAction(Constants.ADD)
+                                                                    .withGroup(group1).build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + resourcePolicyOfGroup.getID() + "/group")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content("/api/eperson/groups/" + group1.getID() +
+                                      "\n/api/eperson/groups/" + group2.getID()))
+                             .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void updateResourcePolicyOfEPersonWithEmptyTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
+
+        ResourcePolicy rpOfEPerson = ResourcePolicyBuilder.createResourcePolicy(context)
+                                                          .withDspaceObject(community)
+                                                          .withAction(Constants.READ)
+                                                          .withUser(eperson)
+                                                          .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + rpOfEPerson.getID() + "/eperson")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content(StringUtils.EMPTY))
+                             .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void updateResourcePolicyOfEPersonWithMultipleEPersonsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("eperson1@mail.com")
+                                         .withPassword(password)
+                                         .build();
+        EPerson eperson2 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("eperson2@mail.com")
+                                         .withPassword(password)
+                                         .build();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
+
+        ResourcePolicy rpOfEPerson = ResourcePolicyBuilder.createResourcePolicy(context)
+                                                          .withDspaceObject(community)
+                                                          .withAction(Constants.READ)
+                                                          .withUser(eperson)
+                                                          .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(put("/api/authz/resourcepolicies/" + rpOfEPerson.getID() + "/eperson")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content("/api/eperson/epersons/" + eperson1.getID() +
+                                      "\n/api/eperson/epersons/" + eperson2.getID()))
+                             .andExpect(status().isUnprocessableEntity());
+    }
+
 }
