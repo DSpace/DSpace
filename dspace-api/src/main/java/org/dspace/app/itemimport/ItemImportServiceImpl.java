@@ -264,10 +264,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 // sneaky isResume == true means open file in append mode
                 outFile = new File(mapFile);
                 mapOut = new PrintWriter(new FileWriter(outFile, isResume));
-
-                if (mapOut == null) {
-                    throw new Exception("can't open mapfile: " + mapFile);
-                }
             }
 
             // open and process the source directory
@@ -644,10 +640,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
              * the original item */
             File handleFile = new File(sourceDir + File.separatorChar + newItemName + File.separatorChar + "handle");
             PrintWriter handleOut = new PrintWriter(new FileWriter(handleFile, true));
-
-            if (handleOut == null) {
-                throw new Exception("can't open handle file: " + handleFile.getCanonicalPath());
-            }
 
             handleOut.println(oldHandle);
             handleOut.close();
@@ -1911,66 +1903,68 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         ZipFile zf = new ZipFile(zipfile);
         ZipEntry entry;
         Enumeration<? extends ZipEntry> entries = zf.entries();
-        while (entries.hasMoreElements()) {
-            entry = entries.nextElement();
-            if (entry.isDirectory()) {
-                if (!new File(zipDir + entry.getName()).mkdirs()) {
-                    log.error("Unable to create contents directory: " + zipDir + entry.getName());
-                }
-            } else {
-                String entryName = entry.getName();
-                File outFile = new File(zipDir + entryName);
-                // Verify that this file will be extracted into our zipDir (and not somewhere else!)
-                if (!outFile.toPath().normalize().startsWith(zipDir)) {
-                    throw new IOException("Bad zip entry: '" + entryName
-                                              + "' in file '" + zipfile.getAbsolutePath() + "'!"
-                                              + " Cannot process this file.");
-                } else {
-                    System.out.println("Extracting file: " + entryName);
-                    log.info("Extracting file: " + entryName);
-
-                    int index = entryName.lastIndexOf('/');
-                    if (index == -1) {
-                        // Was it created on Windows instead?
-                        index = entryName.lastIndexOf('\\');
+        try {
+            while (entries.hasMoreElements()) {
+                entry = entries.nextElement();
+                if (entry.isDirectory()) {
+                    if (!new File(zipDir + entry.getName()).mkdirs()) {
+                        log.error("Unable to create contents directory: " + zipDir + entry.getName());
                     }
-                    if (index > 0) {
-                        File dir = new File(zipDir + entryName.substring(0, index));
-                        if (!dir.exists() && !dir.mkdirs()) {
-                            log.error("Unable to create directory: " + dir.getAbsolutePath());
+                } else {
+                    String entryName = entry.getName();
+                    File outFile = new File(zipDir + entryName);
+                    // Verify that this file will be extracted into our zipDir (and not somewhere else!)
+                    if (!outFile.toPath().normalize().startsWith(zipDir)) {
+                        throw new IOException("Bad zip entry: '" + entryName
+                                                  + "' in file '" + zipfile.getAbsolutePath() + "'!"
+                                                  + " Cannot process this file.");
+                    } else {
+                        System.out.println("Extracting file: " + entryName);
+                        log.info("Extracting file: " + entryName);
+
+                        int index = entryName.lastIndexOf('/');
+                        if (index == -1) {
+                            // Was it created on Windows instead?
+                            index = entryName.lastIndexOf('\\');
                         }
+                        if (index > 0) {
+                            File dir = new File(zipDir + entryName.substring(0, index));
+                            if (!dir.exists() && !dir.mkdirs()) {
+                                log.error("Unable to create directory: " + dir.getAbsolutePath());
+                            }
 
-                        //Entries could have too many directories, and we need to adjust the sourcedir
-                        // file1.zip (SimpleArchiveFormat / item1 / contents|dublin_core|...
-                        //            SimpleArchiveFormat / item2 / contents|dublin_core|...
-                        // or
-                        // file2.zip (item1 / contents|dublin_core|...
-                        //            item2 / contents|dublin_core|...
+                            //Entries could have too many directories, and we need to adjust the sourcedir
+                            // file1.zip (SimpleArchiveFormat / item1 / contents|dublin_core|...
+                            //            SimpleArchiveFormat / item2 / contents|dublin_core|...
+                            // or
+                            // file2.zip (item1 / contents|dublin_core|...
+                            //            item2 / contents|dublin_core|...
 
-                        //regex supports either windows or *nix file paths
-                        String[] entryChunks = entryName.split("/|\\\\");
-                        if (entryChunks.length > 2) {
-                            if (StringUtils.equals(sourceDirForZip, sourcedir)) {
-                                sourceDirForZip = sourcedir + "/" + entryChunks[0];
+                            //regex supports either windows or *nix file paths
+                            String[] entryChunks = entryName.split("/|\\\\");
+                            if (entryChunks.length > 2) {
+                                if (StringUtils.equals(sourceDirForZip, sourcedir)) {
+                                    sourceDirForZip = sourcedir + "/" + entryChunks[0];
+                                }
                             }
                         }
+                        byte[] buffer = new byte[1024];
+                        int len;
+                        InputStream in = zf.getInputStream(entry);
+                        BufferedOutputStream out = new BufferedOutputStream(
+                            new FileOutputStream(outFile));
+                        while ((len = in.read(buffer)) >= 0) {
+                            out.write(buffer, 0, len);
+                        }
+                        in.close();
+                        out.close();
                     }
-                    byte[] buffer = new byte[1024];
-                    int len;
-                    InputStream in = zf.getInputStream(entry);
-                    BufferedOutputStream out = new BufferedOutputStream(
-                        new FileOutputStream(outFile));
-                    while ((len = in.read(buffer)) >= 0) {
-                        out.write(buffer, 0, len);
-                    }
-                    in.close();
-                    out.close();
                 }
             }
+        } finally {
+            //Close zip file
+            zf.close();
         }
-
-        //Close zip file
-        zf.close();
 
         if (!StringUtils.equals(sourceDirForZip, sourcedir)) {
             sourcedir = sourceDirForZip;

@@ -14,11 +14,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.content.Collection;
@@ -31,6 +28,8 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.utils.DSpace;
 
 /**
  * Import items into DSpace. The conventional use is upload files by copying
@@ -48,348 +47,276 @@ import org.dspace.handle.service.HandleService;
  * Modified by David Little, UCSD Libraries 12/21/04 to
  * allow the registration of files (bitstreams) into DSpace.
  */
-public class ItemImportCLITool {
+public class ItemImportCLITool extends DSpaceRunnable<ItemImportScriptConfiguration> {
 
-    private static boolean template = false;
+    private boolean template = false;
+    private String command = null;
+    private String sourcedir = null;
+    private String mapfile = null;
+    private String eperson = null;
+    private String[] collections = null;
+    private boolean isTest = false;
+    private boolean isResume = false;
+    private boolean useWorkflow = false;
+    private boolean useWorkflowSendEmail = false;
+    private boolean isQuiet = false;
+    private boolean commandLineCollections = false;
+    private boolean zip = false;
+    private String zipfilename = null;
+    private boolean help = false;
 
     private static final CollectionService collectionService = ContentServiceFactory.getInstance()
                                                                                     .getCollectionService();
     private static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
-    /**
-     * Default constructor
-     */
-    private ItemImportCLITool() { }
+    @Override
+    public ItemImportScriptConfiguration getScriptConfiguration() {
+        return new DSpace().getServiceManager()
+                .getServiceByName("import", ItemImportScriptConfiguration.class);
+    }
 
-    public static void main(String[] argv) throws Exception {
+    @Override
+    public void setup() throws ParseException {
+        help = commandLine.hasOption('h');
+
+        if (commandLine.hasOption('a')) {
+            command = "add";
+        }
+
+        if (commandLine.hasOption('r')) {
+            command = "replace";
+        }
+
+        if (commandLine.hasOption('d')) {
+            command = "delete";
+        }
+
+        if (commandLine.hasOption('w')) {
+            useWorkflow = true;
+            if (commandLine.hasOption('n')) {
+                useWorkflowSendEmail = true;
+            }
+        }
+
+        if (commandLine.hasOption('t')) {
+            isTest = true;
+            handler.logInfo("**Test Run** - not actually importing items.");
+        }
+
+        if (commandLine.hasOption('p')) {
+            template = true;
+        }
+
+        if (commandLine.hasOption('s')) { // source
+            sourcedir = commandLine.getOptionValue('s');
+        }
+
+        if (commandLine.hasOption('m')) { // mapfile
+            mapfile = commandLine.getOptionValue('m');
+        }
+
+        if (commandLine.hasOption('e')) { // eperson
+            eperson = commandLine.getOptionValue('e');
+        }
+
+        if (commandLine.hasOption('c')) { // collections
+            collections = commandLine.getOptionValues('c');
+            commandLineCollections = true;
+        } else {
+            handler.logInfo("No collections given. Assuming 'collections' file inside item directory");
+        }
+
+        if (commandLine.hasOption('R')) {
+            isResume = true;
+            handler.logInfo("**Resume import** - attempting to import items not already imported");
+        }
+
+        if (commandLine.hasOption('q')) {
+            isQuiet = true;
+        }
+
+        if (commandLine.hasOption('z')) {
+            zip = true;
+            zipfilename = commandLine.getOptionValue('z');
+        }
+    }
+
+    @Override
+    public void internalRun() throws Exception {
+        if (help) {
+            printHelp();
+            handler.logInfo("adding items: ItemImport -a -e eperson -c collection -s sourcedir -m mapfile");
+            handler.logInfo("adding items from zip file: ItemImport -a -e eperson -c collection -s sourcedir "
+                    + "-z filename.zip -m mapfile");
+            handler.logInfo("replacing items: ItemImport -r -e eperson -c collection -s sourcedir -m mapfile");
+            handler.logInfo("deleting items: ItemImport -d -e eperson -m mapfile");
+            handler.logInfo("If multiple collections are specified, the first collection will be the one "
+                    + "that owns the item.");
+            return;
+        }
+
+        // validation
+        // can only resume for adds
+        if (isResume && !"add".equals(command)) {
+            handler.logError("Resume option only works with the --add command (run with -h flag for details)");
+            throw new UnsupportedOperationException("Resume option only works with the --add command");
+        }
+
+        File myFile = new File(mapfile);
+
+        if (!isResume && "add".equals(command) && myFile.exists()) {
+            handler.logError("The mapfile " + mapfile + " already exists. "
+                    + "Either delete it or use --resume if attempting to resume an aborted import. "
+                    + "(run with -h flag for details)");
+            throw new UnsupportedOperationException("The mapfile " + mapfile + " already exists");
+        }
+
+        if (command == null) {
+            handler.logError("Must run with either add, replace, or remove (run with -h flag for details)");
+            throw new UnsupportedOperationException("Must run with either add, replace, or remove");
+        } else if ("add".equals(command) || "replace".equals(command)) {
+            if (sourcedir == null) {
+                handler.logError("A source directory containing items must be set (run with -h flag for details)");
+                throw new UnsupportedOperationException("A source directory containing items must be set");
+            }
+
+            if (mapfile == null) {
+                handler.logError(
+                        "A map file to hold importing results must be specified (run with -h flag for details)");
+                throw new UnsupportedOperationException("A map file to hold importing results must be specified");
+            }
+        } else if ("delete".equals(command)) {
+            if (mapfile == null) {
+                handler.logError("A map file must be specified (run with -h flag for details)");
+                throw new UnsupportedOperationException("A map file must be specified");
+            }
+        }
+
+        if (eperson == null) {
+            handler.logError("An eperson to do the importing must be specified (run with -h flag for details)");
+            throw new UnsupportedOperationException("An eperson to do the importing must be specified");
+        }
+
         Date startTime = new Date();
-        int status = 0;
+        Context context = new Context(Context.Mode.BATCH_EDIT);
 
+        // check eperson
+        EPerson myEPerson = null;
+        if (StringUtils.contains(eperson, '@')) {
+            // @ sign, must be an email
+            myEPerson = epersonService.findByEmail(context, eperson);
+        } else {
+            myEPerson = epersonService.find(context, UUID.fromString(eperson));
+        }
+
+        if (myEPerson == null) {
+            handler.logError("EPerson cannot be found: " + eperson + " (run with -h flag for details)");
+            throw new UnsupportedOperationException("EPerson cannot be found: " + eperson);
+        }
+        context.setCurrentUser(myEPerson);
+
+        // check collection
+        List<Collection> mycollections = null;
+        // don't need to validate collections set if command is "delete"
+        // also if no collections are given in the command line
+        if (!"delete".equals(command) && commandLineCollections) {
+            handler.logInfo("Destination collections:");
+
+            mycollections = new ArrayList<>();
+
+            // validate each collection arg to see if it's a real collection
+            for (int i = 0; i < collections.length; i++) {
+                Collection collection = null;
+                if (collections[i] != null) {
+                    // is the ID a handle?
+                    if (collections[i].indexOf('/') != -1) {
+                        // string has a / so it must be a handle - try and resolve
+                        // it
+                        collection = ((Collection) handleService
+                            .resolveToObject(context, collections[i]));
+                    } else {
+                        // not a handle, try and treat it as an integer collection database ID
+                        collection = collectionService.find(context, UUID.fromString(collections[i]));
+                    }
+                }
+
+                // was the collection valid?
+                if (collection == null
+                        || collection.getType() != Constants.COLLECTION) {
+                    throw new IllegalArgumentException("Cannot resolve "
+                            + collections[i] + " to collection");
+                }
+
+                // add resolved collection to list
+                mycollections.add(collection);
+
+                // print progress info
+                handler.logInfo((i == 0 ? "Owning " : "") + "Collection: " + collection.getName());
+            }
+        }
+        // end validation
+
+        // start
+        ItemImportService itemImportService = ItemImportServiceFactory.getInstance()
+                .getItemImportService();
         try {
-            // create an options object and populate it
-            CommandLineParser parser = new DefaultParser();
-
-            Options options = new Options();
-
-            options.addOption("a", "add", false, "add items to DSpace");
-            options.addOption("r", "replace", false, "replace items in mapfile");
-            options.addOption("d", "delete", false,
-                              "delete items listed in mapfile");
-            options.addOption("s", "source", true, "source of items (directory)");
-            options.addOption("z", "zip", true, "name of zip file");
-            options.addOption("c", "collection", true,
-                              "destination collection(s) Handle or database ID");
-            options.addOption("m", "mapfile", true, "mapfile items in mapfile");
-            options.addOption("e", "eperson", true,
-                              "email of eperson doing importing");
-            options.addOption("w", "workflow", false,
-                              "send submission through collection's workflow");
-            options.addOption("n", "notify", false,
-                              "if sending submissions through the workflow, send notification emails");
-            options.addOption("t", "test", false,
-                              "test run - do not actually import items");
-            options.addOption("p", "template", false, "apply template");
-            options.addOption("R", "resume", false,
-                              "resume a failed import (add only)");
-            options.addOption("q", "quiet", false, "don't display metadata");
-
-            options.addOption("h", "help", false, "help");
-
-            CommandLine line = parser.parse(options, argv);
-
-            String command = null; // add replace remove, etc
-            String sourcedir = null;
-            String mapfile = null;
-            String eperson = null; // db ID or email
-            String[] collections = null; // db ID or handles
-            boolean isTest = false;
-            boolean isResume = false;
-            boolean useWorkflow = false;
-            boolean useWorkflowSendEmail = false;
-            boolean isQuiet = false;
-
-            if (line.hasOption('h')) {
-                HelpFormatter myhelp = new HelpFormatter();
-                myhelp.printHelp("ItemImport\n", options);
-                System.out
-                    .println("\nadding items:    ItemImport -a -e eperson -c collection -s sourcedir -m mapfile");
-                System.out
-                    .println(
-                        "\nadding items from zip file:    ItemImport -a -e eperson -c collection -s sourcedir -z " +
-                            "filename.zip -m mapfile");
-                System.out
-                    .println("replacing items: ItemImport -r -e eperson -c collection -s sourcedir -m mapfile");
-                System.out
-                    .println("deleting items:  ItemImport -d -e eperson -m mapfile");
-                System.out
-                    .println(
-                        "If multiple collections are specified, the first collection will be the one that owns the " +
-                            "item.");
-
-                System.exit(0);
-            }
-
-            if (line.hasOption('a')) {
-                command = "add";
-            }
-
-            if (line.hasOption('r')) {
-                command = "replace";
-            }
-
-            if (line.hasOption('d')) {
-                command = "delete";
-            }
-
-            if (line.hasOption('w')) {
-                useWorkflow = true;
-                if (line.hasOption('n')) {
-                    useWorkflowSendEmail = true;
-                }
-            }
-
-            if (line.hasOption('t')) {
-                isTest = true;
-                System.out.println("**Test Run** - not actually importing items.");
-            }
-
-            if (line.hasOption('p')) {
-                template = true;
-            }
-
-            if (line.hasOption('s')) { // source
-                sourcedir = line.getOptionValue('s');
-            }
-
-            if (line.hasOption('m')) { // mapfile
-                mapfile = line.getOptionValue('m');
-            }
-
-            if (line.hasOption('e')) { // eperson
-                eperson = line.getOptionValue('e');
-            }
-
-            if (line.hasOption('c')) { // collections
-                collections = line.getOptionValues('c');
-            }
-
-            if (line.hasOption('R')) {
-                isResume = true;
-                System.out
-                    .println("**Resume import** - attempting to import items not already imported");
-            }
-
-            if (line.hasOption('q')) {
-                isQuiet = true;
-            }
-
-            boolean zip = false;
-            String zipfilename = "";
-            if (line.hasOption('z')) {
-                zip = true;
-                zipfilename = line.getOptionValue('z');
-            }
-
-            //By default assume collections will be given on the command line
-            boolean commandLineCollections = true;
-            // now validate
-            // must have a command set
-            if (command == null) {
-                System.out
-                    .println("Error - must run with either add, replace, or remove (run with -h flag for details)");
-                System.exit(1);
-            } else if ("add".equals(command) || "replace".equals(command)) {
-                if (sourcedir == null) {
-                    System.out
-                        .println("Error - a source directory containing items must be set");
-                    System.out.println(" (run with -h flag for details)");
-                    System.exit(1);
-                }
-
-                if (mapfile == null) {
-                    System.out
-                        .println("Error - a map file to hold importing results must be specified");
-                    System.out.println(" (run with -h flag for details)");
-                    System.exit(1);
-                }
-
-                if (eperson == null) {
-                    System.out
-                        .println("Error - an eperson to do the importing must be specified");
-                    System.out.println(" (run with -h flag for details)");
-                    System.exit(1);
-                }
-
-                if (collections == null) {
-                    System.out.println("No collections given. Assuming 'collections' file inside item directory");
-                    commandLineCollections = false;
-                }
-            } else if ("delete".equals(command)) {
-                if (eperson == null) {
-                    System.out
-                        .println("Error - an eperson to do the importing must be specified");
-                    System.exit(1);
-                }
-
-                if (mapfile == null) {
-                    System.out.println("Error - a map file must be specified");
-                    System.exit(1);
-                }
-            }
-
-            // can only resume for adds
-            if (isResume && !"add".equals(command)) {
-                System.out
-                    .println("Error - resume option only works with the --add command");
-                System.exit(1);
-            }
-
-            // do checks around mapfile - if mapfile exists and 'add' is selected,
-            // resume must be chosen
-            File myFile = new File(mapfile);
-
-            if (!isResume && "add".equals(command) && myFile.exists()) {
-                System.out.println("Error - the mapfile " + mapfile
-                                       + " already exists.");
-                System.out
-                    .println("Either delete it or use --resume if attempting to resume an aborted import.");
-                System.exit(1);
-            }
-
-            ItemImportService myloader = ItemImportServiceFactory.getInstance().getItemImportService();
-            myloader.setTest(isTest);
-            myloader.setResume(isResume);
-            myloader.setUseWorkflow(useWorkflow);
-            myloader.setUseWorkflowSendEmail(useWorkflowSendEmail);
-            myloader.setQuiet(isQuiet);
-
-            // create a context
-            Context c = new Context(Context.Mode.BATCH_EDIT);
-
-            // find the EPerson, assign to context
-            EPerson myEPerson = null;
-
-            if (eperson.indexOf('@') != -1) {
-                // @ sign, must be an email
-                myEPerson = epersonService.findByEmail(c, eperson);
-            } else {
-                myEPerson = epersonService.find(c, UUID.fromString(eperson));
-            }
-
-            if (myEPerson == null) {
-                System.out.println("Error, eperson cannot be found: " + eperson);
-                System.exit(1);
-            }
-
-            c.setCurrentUser(myEPerson);
-
-            // find collections
-            List<Collection> mycollections = null;
-
-            // don't need to validate collections set if command is "delete"
-            // also if no collections are given in the command line
-            if (!"delete".equals(command) && commandLineCollections) {
-                System.out.println("Destination collections:");
-
-                mycollections = new ArrayList<>();
-
-                // validate each collection arg to see if it's a real collection
-                for (int i = 0; i < collections.length; i++) {
-
-                    Collection resolved = null;
-
-                    if (collections[i] != null) {
-
-                        // is the ID a handle?
-                        if (collections[i].indexOf('/') != -1) {
-                            // string has a / so it must be a handle - try and resolve
-                            // it
-                            resolved = ((Collection) handleService
-                                .resolveToObject(c, collections[i]));
-
-                        } else {
-                            // not a handle, try and treat it as an integer collection database ID
-                            resolved = collectionService.find(c, UUID.fromString(collections[i]));
-
-                        }
-
-                    }
-
-                    // was the collection valid?
-                    if ((resolved == null)
-                            || (resolved.getType() != Constants.COLLECTION)) {
-                        throw new IllegalArgumentException("Cannot resolve "
-                                                               + collections[i] + " to collection");
-                    }
-
-                    // add resolved collection to list
-                    mycollections.add(resolved);
-
-                    // print progress info
-                    String owningPrefix = "";
-
-                    if (i == 0) {
-                        owningPrefix = "Owning ";
-                    }
-
-                    System.out.println(owningPrefix + " Collection: "
-                                           + resolved.getName());
-                }
-            } // end of validating collections
+            itemImportService.setTest(isTest);
+            itemImportService.setResume(isResume);
+            itemImportService.setUseWorkflow(useWorkflow);
+            itemImportService.setUseWorkflowSendEmail(useWorkflowSendEmail);
+            itemImportService.setQuiet(isQuiet);
 
             try {
                 // If this is a zip archive, unzip it first
                 if (zip) {
-                    sourcedir = myloader.unzip(sourcedir, zipfilename);
+                    sourcedir = itemImportService.unzip(sourcedir, zipfilename);
                 }
 
-
-                c.turnOffAuthorisationSystem();
+                context.turnOffAuthorisationSystem();
 
                 if ("add".equals(command)) {
-                    myloader.addItems(c, mycollections, sourcedir, mapfile, template);
+                    itemImportService.addItems(context, mycollections, sourcedir, mapfile, template);
                 } else if ("replace".equals(command)) {
-                    myloader.replaceItems(c, mycollections, sourcedir, mapfile, template);
+                    itemImportService.replaceItems(context, mycollections, sourcedir, mapfile, template);
                 } else if ("delete".equals(command)) {
-                    myloader.deleteItems(c, mapfile);
+                    itemImportService.deleteItems(context, mapfile);
                 }
 
                 // complete all transactions
-                c.complete();
+                context.complete();
             } catch (Exception e) {
-                c.abort();
-                e.printStackTrace();
-                System.out.println(e);
-                status = 1;
+                context.abort();
+                throw new Exception(
+                    "Error committing changes to database: " + e.getMessage() + ", aborting most recent changes", e);
             }
 
             // Delete the unzipped file
             try {
                 if (zip) {
                     System.gc();
-                    System.out.println(
-                        "Deleting temporary zip directory: " + myloader.getTempWorkDirFile().getAbsolutePath());
-                    myloader.cleanupZipTemp();
+                    handler.logInfo(
+                        "Deleting temporary zip directory: "
+                        + itemImportService.getTempWorkDirFile().getAbsolutePath());
+                    itemImportService.cleanupZipTemp();
                 }
             } catch (IOException ex) {
-                System.out.println("Unable to delete temporary zip archive location: " + myloader.getTempWorkDirFile()
-                                                                                                 .getAbsolutePath());
+                handler.logError("Unable to delete temporary zip archive location: "
+                        + itemImportService.getTempWorkDirFile().getAbsolutePath());
+                throw new IOException("Unable to delete temporary zip archive location: "
+                        + itemImportService.getTempWorkDirFile().getAbsolutePath(), ex);
             }
 
-
             if (isTest) {
-                System.out.println("***End of Test Run***");
+                handler.logInfo("***End of Test Run***");
             }
         } finally {
             Date endTime = new Date();
-            System.out.println("Started: " + startTime.getTime());
-            System.out.println("Ended: " + endTime.getTime());
-            System.out.println(
+            handler.logInfo("Started: " + startTime.getTime());
+            handler.logInfo("Ended: " + endTime.getTime());
+            handler.logInfo(
                 "Elapsed time: " + ((endTime.getTime() - startTime.getTime()) / 1000) + " secs (" + (endTime
                     .getTime() - startTime.getTime()) + " msecs)");
         }
-
-        System.exit(status);
     }
 }
