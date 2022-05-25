@@ -685,6 +685,52 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void restrictedSpecialGroupBitstreamTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Collection 1")
+            .build();
+
+        Group restrictedGroup = GroupBuilder.createGroup(context)
+            .withName("Restricted Group")
+            .build();
+
+        String bitstreamContent = "Private!";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+
+            Item item = ItemBuilder.createItem(context, col1)
+                .withTitle("item 1")
+                .withIssueDate("2013-01-17")
+                .withAuthor("Doe, John")
+                .build();
+
+            bitstream = BitstreamBuilder
+                .createBitstream(context, item, is)
+                .withName("Test Embargoed Bitstream")
+                .withDescription("This bitstream is embargoed")
+                .withMimeType("text/plain")
+                .withReaderGroup(restrictedGroup)
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        configurationService.setProperty("authentication-password.login.specialgroup", "Restricted Group");
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+            .andExpect(status().isOk());
+
+        checkNumberOfStatsRecords(bitstream, 1);
+
+    }
+
+    @Test
     public void restrictedGroupBitstreamAccessGrantByAdminsTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
