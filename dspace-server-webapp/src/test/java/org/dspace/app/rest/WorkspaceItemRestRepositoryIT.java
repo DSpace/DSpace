@@ -7436,66 +7436,53 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                               )))
                              .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
-    
+
     @Test
     public void verifyBitstreamPolicyNotDuplicatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Group adminGroup = EPersonServiceFactory.getInstance().getGroupService()
-                .findByName(context, Group.ADMIN);
-        
-        Community community = CommunityBuilder.createCommunity(context)
-                .withName("Com")
-                .build();
-        Collection collection = CollectionBuilder.createCollection(context, community)
-                   .withName("Col")
-                   .build();
-        
-        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                .withTitle("Workspace Item")
-                .withIssueDate("2019-01-01")
-                .grantLicense()
-                .build();
+        Group adminGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ADMIN);
+
+        Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Col").build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection).withTitle("Workspace Item")
+                .withIssueDate("2019-01-01").grantLicense().build();
 
         Item item = witem.getItem();
 
-        //Add a bitstream to the item
+        // Add a bitstream to the item
         String bitstreamContent = "ThisIsSomeDummyText";
         Bitstream bitstream = null;
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, StandardCharsets.UTF_8)) {
-            bitstream = BitstreamBuilder
-                    .createBitstream(context, item, is)
-                    .withName("Bitstream")
+            bitstream = BitstreamBuilder.createBitstream(context, item, is).withName("Bitstream")
                     .withMimeType("text/plain").build();
         }
-        
+
         context.restoreAuthSystemState();
-        
+
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        
+
         Map<String, String> accessCondition = new HashMap<>();
         accessCondition.put("name", "openaccess");
         List<Operation> addAccessCondition = new ArrayList<>();
         addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions/-", accessCondition));
-        
+
         String patchBody = getPatchContent(addAccessCondition);
         // add access conditions
-        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
-                               .content(patchBody)
-                               .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                               .andExpect(status().isOk());
-        
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID()).content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)).andExpect(status().isOk());
+
         getClient(tokenAdmin).perform(post("/api/workflow/workflowitems")
-                .content("/api/submission/workspaceitems/" + witem.getID())
-                .contentType(textUriContentType))
+                .content("/api/submission/workspaceitems/" + witem.getID()).contentType(textUriContentType))
                 .andExpect(status().isCreated());
 
-        getClient(tokenAdmin).perform(get("/api/authz/resourcepolicies/search/resource")
-                .param("uuid", bitstream.getID().toString()))
+        getClient(tokenAdmin)
+                .perform(get("/api/authz/resourcepolicies/search/resource").param("uuid", bitstream.getID().toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.containsInAnyOrder(
-                        ResourcePolicyMatcher.matchResourcePolicyProperties(adminGroup, null,
-                                bitstream, ResourcePolicy.TYPE_CUSTOM, Constants.READ, "openaccess"))))
+                .andExpect(jsonPath("$._embedded.resourcepolicies",
+                        Matchers.containsInAnyOrder(ResourcePolicyMatcher.matchResourcePolicyProperties(adminGroup,
+                                null, bitstream, ResourcePolicy.TYPE_CUSTOM, Constants.READ, "openaccess"))))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 

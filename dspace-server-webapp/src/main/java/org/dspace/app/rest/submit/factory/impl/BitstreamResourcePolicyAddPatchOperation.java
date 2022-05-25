@@ -50,30 +50,32 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
     void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object value)
             throws Exception {
         //"path": "/sections/upload/files/0/accessConditions"
-        String[] split = getAbsolutePath(path).split("/");
+        //TODO extract the correct upload configuration via split
+        String[] splitAbsPath = getAbsolutePath(path).split("/");
+        String[] splitPath = path.split("/");
         Item item = source.getItem();
 
         List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
         ;
-        Collection<UploadConfiguration>  uploadConfigsCollection = uploadConfigurationService.getMap().values();
-        Iterator<UploadConfiguration> uploadConfigs = uploadConfigsCollection.iterator();
+        UploadConfiguration  uploadConfig = uploadConfigurationService.getMap().get(splitPath[2]);
+        //TODO find the correct value via uploadConfigurationService.getMap() using "upload" as key
         for (Bundle bb : bundle) {
             int idx = 0;
             for (Bitstream bitstream : bb.getBitstreams()) {
-                if (idx == Integer.parseInt(split[1])) {
+                if (idx == Integer.parseInt(splitAbsPath[1])) {
 
                     List<AccessConditionDTO> newAccessConditions = new ArrayList<AccessConditionDTO>();
-                    if (split.length == 3) {
+                    if (splitAbsPath.length == 3) {
                         resourcePolicyService.removePolicies(context, bitstream, ResourcePolicy.TYPE_CUSTOM);
                         newAccessConditions = evaluateArrayObject((LateObjectEvaluator) value);
-                    } else if (split.length == 4) {
+                    } else if (splitAbsPath.length == 4) {
                         // contains "-", call index-based accessConditions it make not sense
                         newAccessConditions.add(evaluateSingleObject((LateObjectEvaluator) value));
                     }
 
                     // TODO manage duplicate policy
                     if (CollectionUtils.isNotEmpty(newAccessConditions)) {
-                        BitstreamResourcePolicyUtils.findApplyResourcePolicy(context, uploadConfigs, bitstream,
+                        BitstreamResourcePolicyUtils.findApplyResourcePolicy(context, uploadConfig, bitstream,
                                                                              newAccessConditions);
                     }
                 }

@@ -37,27 +37,25 @@ public class BitstreamResourcePolicyUtils {
      * This function applies the resource policies.
      *
      * @param context               The relevant DSpace Context.
-     * @param uploadConfigs         The configured UploadConfigurations
+     * @param uploadConfig          The configured UploadConfiguration
      * @param obj                   The applicable DSpace object whose policies should be determined
      * @param newAccessCondition    The access condition containing the details for the desired policies
      * @throws SQLException         If a database error occurs
      * @throws AuthorizeException   If the user is not authorized
      */
-    public static void findApplyResourcePolicy(Context context, Iterator<UploadConfiguration> uploadConfigs,
+    public static void findApplyResourcePolicy(Context context, UploadConfiguration uploadConfiguration,
             DSpaceObject obj, List<AccessConditionDTO> newAccessConditions)
             throws SQLException, AuthorizeException, ParseException {
-        while (uploadConfigs.hasNext()) {
-            UploadConfiguration uploadConfiguration = uploadConfigs.next();
-            for (AccessConditionDTO newAccessCondition : newAccessConditions) {
-                String name = newAccessCondition.getName();
-                String description = newAccessCondition.getDescription();
+        for (AccessConditionDTO newAccessCondition : newAccessConditions) {
+            String name = newAccessCondition.getName();
+            String description = newAccessCondition.getDescription();
 
-                Date startDate = newAccessCondition.getStartDate();
-                Date endDate = newAccessCondition.getEndDate();
+            Date startDate = newAccessCondition.getStartDate();
+            Date endDate = newAccessCondition.getEndDate();
 
-                findApplyResourcePolicy(context, uploadConfiguration, obj, name, description, startDate, endDate);
-            }
+            findApplyResourcePolicy(context, uploadConfiguration, obj, name, description, startDate, endDate);
         }
+
     }
 
     /**
