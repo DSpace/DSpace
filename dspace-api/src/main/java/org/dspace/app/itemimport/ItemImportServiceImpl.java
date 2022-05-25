@@ -1335,7 +1335,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             String[] dirListing = dir.list();
             for (String fileName : dirListing) {
                 if (!"dublin_core.xml".equals(fileName) && !fileName.equals("handle") && !metadataFileFilter
-                    .accept(dir, fileName)) {
+                    .accept(dir, fileName) && !"collections".equals(fileName) && !"relationships".equals(fileName)) {
                     throw new FileNotFoundException("No contents file found");
                 }
             }
