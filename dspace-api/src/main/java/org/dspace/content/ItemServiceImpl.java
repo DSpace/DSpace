@@ -1544,7 +1544,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             log.warn(
                 "Item with uuid {}, handle {} has {} entity types ({}), expected 1 entity type",
                 item.getID(), item.getHandle(), mdvs.size(),
-                mdvs.stream().map(MetadataValue::getValue).collect(Collectors.toUnmodifiableList())
+                mdvs.stream().map(MetadataValue::getValue).collect(Collectors.toList())
             );
         }
 
