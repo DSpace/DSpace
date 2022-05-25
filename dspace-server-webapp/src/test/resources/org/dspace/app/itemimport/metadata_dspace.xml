@@ -1,0 +1,3 @@
+<dublin_core schema="dspace">
+    <dcvalue element="entity" qualifier="type">Person</dcvalue>
+</dublin_core>

@@ -10,6 +10,8 @@ package org.dspace.app.itemimport;
 import static com.jayway.jsonpath.JsonPath.read;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -27,9 +29,10 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.file.PathUtils;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
+import org.dspace.app.rest.matcher.RelationshipMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
@@ -37,8 +40,11 @@ import org.dspace.builder.ProcessBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.Relationship;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,12 +56,14 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
-public class ItemImportCLIToolIT extends AbstractControllerIntegrationTest {
+public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
 
     private static final String title = "A Tale of Two Cities";
 
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private RelationshipService relationshipService;
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
     private Collection collection;
@@ -63,6 +71,7 @@ public class ItemImportCLIToolIT extends AbstractControllerIntegrationTest {
 
     @Before
     public void setup() throws Exception {
+        super.setUp();
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
@@ -150,6 +159,43 @@ public class ItemImportCLIToolIT extends AbstractControllerIntegrationTest {
 
         checkMetadata();
         checkMetadataWithAnotherSchema();
+    }
+
+    @Test
+    public void importItemsBySafWithRelationships() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // create collection that contains person
+        Collection collectionPerson = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection Person")
+                .withEntityType("Person")
+                .build();
+        context.restoreAuthSystemState();
+        // create simple SAF
+        Path safDir = Files.createDirectory(Path.of(tempDir.toString() + "/test"));
+        Path itemDir1 = Files.createDirectory(Path.of(safDir.toString() + "/item_000"));
+        Files.writeString(Path.of(itemDir1.toString() + "/collections"),
+                collectionPerson.getID().toString());
+        Files.copy(getClass().getResourceAsStream("dublin_core-person.xml"),
+                Path.of(itemDir1.toString() + "/dublin_core.xml"));
+        Files.copy(getClass().getResourceAsStream("relationships"),
+                Path.of(itemDir1.toString() + "/relationships"));
+        Files.copy(getClass().getResourceAsStream("metadata_dspace.xml"),
+                Path.of(itemDir1.toString() + "/metadata_dspace.xml"));
+        Path itemDir2 = Files.createDirectory(Path.of(safDir.toString() + "/item_001"));
+        Files.writeString(Path.of(itemDir2.toString() + "/collections"),
+                collection.getID().toString());
+        Files.copy(getClass().getResourceAsStream("dublin_core.xml"),
+                Path.of(itemDir2.toString() + "/dublin_core.xml"));
+
+        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
+        parameters.add(new DSpaceCommandLineParameter("-a", ""));
+        parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
+        parameters.add(new DSpaceCommandLineParameter("-s", safDir.toString()));
+        parameters.add(new DSpaceCommandLineParameter("-m", tempDir.toString() + "/mapfile.out"));
+        perfomImportScript(parameters);
+
+        checkMetadata();
+        checkRelationship();
     }
 
     @Test
@@ -498,6 +544,23 @@ public class ItemImportCLIToolIT extends AbstractControllerIntegrationTest {
     private void checkItemDeletion() throws Exception {
         Iterator<Item> itemIterator = itemService.findByMetadataField(context, "dc", "title", null, title);
         assertEquals(itemIterator.hasNext(), false);
+    }
+
+    /**
+     * Check relationships between imported items
+     * @throws Exception
+     */
+    private void checkRelationship() throws Exception {
+        Item item = itemService.findByMetadataField(context, "dc", "title", null, title).next();
+        Item author = itemService.findByMetadataField(context, "dc", "title", null, "First Author").next();
+        List<Relationship> relationships = relationshipService.findByItem(context, item);
+        assertEquals(1, relationships.size());
+        getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID()).param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.leftPlace", is(0)))
+                   .andExpect(jsonPath("$._links.rightItem.href", containsString(author.getID().toString())))
+                   .andExpect(jsonPath("$.rightPlace", is(1)))
+                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(0)))));
     }
 
     private void perfomImportScript(LinkedList<DSpaceCommandLineParameter> parameters)
