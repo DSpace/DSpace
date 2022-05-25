@@ -10,7 +10,7 @@ package org.dspace.app.rest;
 import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT;
 import static org.dspace.core.Constants.GROUP;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -53,7 +53,7 @@ public class ResourcePolicyGroupReplaceRestController {
     private ResourcePolicyService resourcePolicyService;
 
     @PreAuthorize("hasPermission(#id, 'resourcepolicy', 'ADMIN')")
-    @RequestMapping(method = POST, consumes = {"text/uri-list"})
+    @RequestMapping(method = PUT, consumes = {"text/uri-list"})
     public ResponseEntity<RepresentationModel<?>> replaceGroupOfResourcePolicy(@PathVariable Integer id,
             HttpServletResponse response, HttpServletRequest request) throws SQLException, AuthorizeException {
 
@@ -70,7 +70,7 @@ public class ResourcePolicyGroupReplaceRestController {
         }
 
         if (Objects.isNull(resourcePolicy.getGroup())) {
-            throw new UnprocessableEntityException("ResourcePolicy doesn't linked to Group");
+            throw new UnprocessableEntityException("ResourcePolicy with id:" + id + "  doesn't link to a Group");
         }
 
         Group newGroup = (Group) dsoList.get(0);

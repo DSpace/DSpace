@@ -1174,7 +1174,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 //DO NOT ESCAPE RANGE QUERIES !
                 if (!value.matches("\\[.*TO.*\\]")) {
                     value = ClientUtils.escapeQueryChars(value);
-                    filterQuery.append("(").append(value).append(")");
+                    filterQuery.append("\"").append(value).append("\"");
                 } else {
                     filterQuery.append(value);
                 }
