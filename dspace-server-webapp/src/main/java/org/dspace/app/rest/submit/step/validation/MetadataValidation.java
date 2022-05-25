@@ -9,9 +9,7 @@ package org.dspace.app.rest.submit.step.validation;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -68,33 +66,9 @@ public class MetadataValidation extends AbstractValidation {
         if (documentType.size() > 0) {
             documentTypeValue = documentType.get(0).getValue();
         }
-        Map<String, Boolean> isAllowedLookup = new HashMap<>();
-        // Before iterating each input for validation, run through all inputs + fields and populate a lookup
-        // map with inputs for this type. Because an input can be configured repeatedly in a form (for example
-        // it could be required for type Book, and allowed but not required for type Article), allowed=true will
-        // always take precedence
-        for (DCInput[] row : inputConfig.getFields()) {
-            for (DCInput input : row) {
-                if (input.isQualdropValue()) {
-                    List<Object> inputPairs = input.getPairs();
-                    //starting from the second element of the list and skipping one every time because the display
-                    // values are also in the list and before the stored values.
-                    for (int i = 1; i < inputPairs.size(); i += 2) {
-                        String fullFieldname = input.getFieldName() + "." + inputPairs.get(i);
-                        if (input.isAllowedFor(documentTypeValue)) {
-                            isAllowedLookup.put(fullFieldname, true);
-                            // For the purposes of qualdrop, we have to add the field name without the qualifier
-                            // too, or a required qualdrop will get confused and incorrectly reject a value
-                            isAllowedLookup.put(input.getFieldName(), true);
-                        }
-                    }
-                } else {
-                    if (input.isAllowedFor(documentTypeValue)) {
-                        isAllowedLookup.put(input.getFieldName(), true);
-                    }
-                }
-            }
-        }
+
+        // Get list of all field names (including qualdrop names) allowed for this dc.type
+        List<String> allowedFieldNames = inputConfig.populateAllowedFieldNames(documentTypeValue);
 
         // Begin the actual validation loop
         for (DCInput[] row : inputConfig.getFields()) {
@@ -116,8 +90,8 @@ public class MetadataValidation extends AbstractValidation {
 
                         // Check the lookup list. If no other inputs of the same field name allow this type,
                         // then remove. This includes field name without qualifier.
-                        if (!input.isAllowedFor(documentTypeValue) &&  (!isAllowedLookup.containsKey(fullFieldname)
-                                && !isAllowedLookup.containsKey(input.getFieldName()))) {
+                        if (!input.isAllowedFor(documentTypeValue) &&  (!allowedFieldNames.contains(fullFieldname)
+                                && !allowedFieldNames.contains(input.getFieldName()))) {
                             itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
                                         obj.getItem(), mdv);
                         } else {
@@ -143,7 +117,7 @@ public class MetadataValidation extends AbstractValidation {
                     if (!input.isAllowedFor(documentTypeValue)) {
                         // Check the lookup list. If no other inputs of the same field name allow this type,
                         // then remove. Otherwise, do not
-                        if (!(isAllowedLookup.containsKey(fieldName))) {
+                        if (!(allowedFieldNames.contains(fieldName))) {
                             itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
                                     obj.getItem(), mdv);
                             valuesRemoved = true;

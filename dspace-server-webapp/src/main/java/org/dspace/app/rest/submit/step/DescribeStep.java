@@ -8,9 +8,7 @@
 package org.dspace.app.rest.submit.step;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -78,33 +76,13 @@ public class DescribeStep extends AbstractProcessingStep {
         if (documentType.size() > 0) {
             documentTypeValue = documentType.get(0).getValue();
         }
-        Map<String, Boolean> isAllowedLookup = new HashMap<>();
+
+        // Get list of all field names (including qualdrop names) allowed for this dc.type
+        List<String> allowedFieldNames = inputConfig.populateAllowedFieldNames(documentTypeValue);
+
+        // Loop input rows and process submitted metadata
         for (DCInput[] row : inputConfig.getFields()) {
             for (DCInput input : row) {
-                if (input.isQualdropValue()) {
-                    List<Object> inputPairs = input.getPairs();
-                    //starting from the second element of the list and skipping one every time because the display
-                    // values are also in the list and before the stored values.
-                    for (int i = 1; i < inputPairs.size(); i += 2) {
-                        String fullFieldname = input.getFieldName() + "." + inputPairs.get(i);
-                        if (input.isAllowedFor(documentTypeValue)) {
-                            isAllowedLookup.put(fullFieldname, true);
-                        }
-                    }
-                } else {
-                    if (input.isAllowedFor(documentTypeValue)) {
-                        isAllowedLookup.put(input.getFieldName(), true);
-                    }
-                }
-            }
-        }
-
-        for (DCInput[] row : inputConfig.getFields()) {
-            for (DCInput input : row) {
-                // Is this input allowed for the document type, as per type bind config? If there is no type
-                // bind set, this is always true
-                boolean allowed = input.isAllowedFor(documentTypeValue);
-
                 List<String> fieldsName = new ArrayList<String>();
                 if (input.isQualdropValue()) {
                     for (Object qualifier : input.getPairs()) {
@@ -131,7 +109,7 @@ public class DescribeStep extends AbstractProcessingStep {
                             Utils.standardize(metadataToCheck[0], metadataToCheck[1], metadataToCheck[2], "."))) {
                             // If field is allowed by type bind, add value to existing field set, otherwise remove
                             // all values for this field
-                            if (isAllowedLookup.containsKey(fieldName)) {
+                            if (allowedFieldNames.contains(fieldName)) {
                                 data.getMetadata()
                                         .get(Utils.standardize(md.getMetadataField().getMetadataSchema().getName(),
                                                 md.getMetadataField().getElement(),
@@ -144,7 +122,7 @@ public class DescribeStep extends AbstractProcessingStep {
                             }
                         } else {
                             // Add values only if allowed by type bind
-                            if (isAllowedLookup.containsKey(fieldName)) {
+                            if (allowedFieldNames.contains(fieldName)) {
                                 List<MetadataValueRest> listDto = new ArrayList<>();
                                 listDto.add(dto);
                                 data.getMetadata()
