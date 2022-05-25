@@ -50,7 +50,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     private String identifier;
     private String discoveryConfigName;
     private String[] filterQueryStrings;
-    private boolean exportAllItems = true;
+    private boolean hasScope = false;
     private String query;
 
     private SearchService searchService = SearchUtils.getSearchService();
@@ -83,7 +83,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
         }
 
         if (commandLine.hasOption('s')) {
-            exportAllItems = false;
+            hasScope = true;
             identifier = commandLine.getOptionValue('s');
         }
 
@@ -108,7 +108,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
         Context context = new Context();
         context.setCurrentUser(ePersonService.find(context, this.getEpersonIdentifier()));
 
-        if (! exportAllItems) {
+        if (hasScope) {
             dso = resolveScope(context, identifier);
         }
 
@@ -144,8 +144,12 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     }
 
     protected String getFileNameOrExportFile() {
-        String dspaceDir = configurationService.getProperty("dspace.dir");
-        String path = String.format("%s%smetadataExportSearch.csv", dspaceDir, File.separator);
+        String exportDir = configurationService.getProperty("csvexport.dir");
+        File f = new File(exportDir);
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+        String path = String.format("%s%smetadataExportSearch.csv", exportDir, File.separator);
         return path;
     }
 

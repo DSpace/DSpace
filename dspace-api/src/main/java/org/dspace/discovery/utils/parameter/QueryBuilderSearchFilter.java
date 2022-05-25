@@ -38,10 +38,6 @@ public class QueryBuilderSearchFilter {
         return value;
     }
 
-    public boolean hasAuthorityOperator() {
-        return StringUtils.equals(operator, "authority");
-    }
-
     public String toString() {
         return "QueryBuilderSearchFilter{" +
                 "name='" + name + '\'' +
