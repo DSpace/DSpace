@@ -720,9 +720,13 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+            .andExpect(status().isForbidden());
+
         configurationService.setProperty("authentication-password.login.specialgroup", "Restricted Group");
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
             .andExpect(status().isOk());
 
