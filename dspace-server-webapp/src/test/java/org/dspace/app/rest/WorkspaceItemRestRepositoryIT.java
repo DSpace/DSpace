@@ -1956,6 +1956,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(eperson.getEmail(), password);
 
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withSubmitter(eperson)
                 .withTitle("Workspace Item 1")
                 .withIssueDate("2017-10-17")
                 .withSubject("ExtraEntry")
@@ -2068,6 +2069,167 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(jsonPath("$",
                         Matchers.is(WorkspaceItemMatcher.matchItemWithTypeAndSeries(witem, "Article",
                                 null))));
+
+        // Submit the workspace item to complete the deposit (as there is no workflow configured) and ensure a
+        // successful result with no validation errors
+        getClient(authToken)
+                .perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                        .content("/api/submission/workspaceitems/" + witem.getID())
+                        .contentType(textUriContentType))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    /**
+     * Test the update of metadata for fields configured with type-bind in the specific case where
+     * a field is configured more than once and could be bound to one type in a certain case, and another type
+     * later on (perhaps with a different label or validation rules)
+     *
+     * @throws Exception
+     */
+    public void patchUpdateMetadataWithBindForRepeatedFieldConfigurationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String testIsbnString = "978-3-16-148410-0";
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/typebind-test")
+                .withName("Collection 1").build();
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withSubmitter(eperson)
+                .withTitle("Workspace Item 1")
+                .withIssueDate("2017-10-17")
+                .withSubject("ExtraEntry")
+                .grantLicense()
+                .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.restoreAuthSystemState();
+
+        // Try to add ISBN (type bound to book and book chapter) - this should not work and instead we'll get
+        // no JSON path for that field, because this item has no type yet
+        List<Operation> updateOperations = new ArrayList<Operation>();
+        List<Map<String, String>> updateValues = new ArrayList<>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "978-3-16-148410-0");
+        updateValues.add(value);
+        updateOperations.add(new AddOperation("/sections/typebindtest/dc.identifier.isbn", updateValues));
+
+        String patchBody = getPatchContent(updateOperations);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        // Check this - we should match an item with no series or ISBN
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeFieldAndValue
+                                (witem, "typebindtest",null, "dc.identifier.isbn", null))));
+
+        // Verify that the metadata isn't in the workspace item
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeFieldAndValue
+                                (witem, "typebindtest", null, "dc.identifier.isbn", null))));
+
+        // Set the type to Book (which ISBN is bound to, in one of the two configurations)
+        List<Operation> updateType = new ArrayList<>();
+        List<Map<String, String>> typeValues = new ArrayList<>();
+        value = new HashMap<String, String>();
+        value.put("value", "Book");
+        typeValues.add(value);
+        updateType.add(new AddOperation("/sections/typebindtest/dc.type", typeValues));
+        patchBody = getPatchContent(updateType);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        // Check this - we should now match an item with the expected type and no ISBN
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeFieldAndValue(witem,
+                                "typebindtest","Book", "dc.identifier.isbn", null))));
+
+        // Fetch workspace item and confirm type has persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeFieldAndValue(witem,
+                                "typebindtest", "Book", "dc.identifier.isbn", null))));
+
+        // Now we test that the validate process does NOT strip out ISBN metadata while it's analysing the
+        // Book Chapter input config, even though that <type-bind> won't match the current item type (Book)
+        patchBody = getPatchContent(updateOperations);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        // Check this - we should now match an item with the expected type and the test ISBN
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeFieldAndValue(witem, "typebindtest",
+                                "Book", "dc.identifier.isbn", testIsbnString))));
+
+        // Verify that the metadata is persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeFieldAndValue(witem, "typebindtest",
+                                "Book","dc.identifier.isbn", testIsbnString))));
+
+        // Switch type to "Book chapter" - this is also bound to ISBN in a second configuration of the field
+        // And should allow us to preserve the ISBN that was set while the type was Book
+        updateType = new ArrayList<>();
+        typeValues = new ArrayList<>();
+        value = new HashMap<String, String>();
+        value.put("value", "Book chapter");
+        typeValues.add(value);
+        updateType.add(new AddOperation("/sections/typebindtest/dc.type", typeValues));
+        patchBody = getPatchContent(updateType);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        // Check this - we should now match an item with the expected type and no ISBN
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeFieldAndValue(witem,"typebindtest",
+                                "Book chapter", "dc.identifier.isbn", testIsbnString))));
+
+        // Fetch workspace item and confirm type has persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$",
+                        Matchers.is(WorkspaceItemMatcher.matchItemWithTypeFieldAndValue(witem,
+                                "typebindtest", "Book chapter", "dc.identifier.isbn", testIsbnString))));
+
+        // Submit the workspace item to complete the deposit (as there is no workflow configured) and ensure a
+        // successful result with no validation errors
+        getClient(authToken)
+                .perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                        .content("/api/submission/workspaceitems/" + witem.getID())
+                        .contentType(textUriContentType))
+                .andExpect(status().isCreated());
     }
 
     @Test
