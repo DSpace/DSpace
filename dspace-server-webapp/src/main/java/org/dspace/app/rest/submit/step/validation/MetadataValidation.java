@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
 import org.dspace.app.rest.submit.SubmissionService;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
@@ -25,6 +26,7 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.services.ConfigurationService;
 
 /**
  * Execute three validation check on fields validation:
@@ -50,12 +52,25 @@ public class MetadataValidation extends AbstractValidation {
 
     private MetadataAuthorityService metadataAuthorityService;
 
+    private ConfigurationService configurationService;
+
     @Override
     public List<ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
                                     SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
 
         List<ErrorRest> errors = new ArrayList<>();
+        String documentTypeValue = "";
         DCInputSet inputConfig = getInputReader().getInputsByFormName(config.getId());
+        List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(),
+                configurationService.getProperty("submit.type-bind.field", "dc.type"));
+        if (documentType.size() > 0) {
+            documentTypeValue = documentType.get(0).getValue();
+        }
+
+        // Get list of all field names (including qualdrop names) allowed for this dc.type
+        List<String> allowedFieldNames = inputConfig.populateAllowedFieldNames(documentTypeValue);
+
+        // Begin the actual validation loop
         for (DCInput[] row : inputConfig.getFields()) {
             for (DCInput input : row) {
                 String fieldKey =
@@ -63,6 +78,7 @@ public class MetadataValidation extends AbstractValidation {
                 boolean isAuthorityControlled = metadataAuthorityService.isAuthorityControlled(fieldKey);
 
                 List<String> fieldsName = new ArrayList<String>();
+
                 if (input.isQualdropValue()) {
                     boolean foundResult = false;
                     List<Object> inputPairs = input.getPairs();
@@ -71,37 +87,68 @@ public class MetadataValidation extends AbstractValidation {
                     for (int i = 1; i < inputPairs.size(); i += 2) {
                         String fullFieldname = input.getFieldName() + "." + (String) inputPairs.get(i);
                         List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fullFieldname);
-                        validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
-                        if (mdv.size() > 0 && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
-                            foundResult = true;
+
+                        // Check the lookup list. If no other inputs of the same field name allow this type,
+                        // then remove. This includes field name without qualifier.
+                        if (!input.isAllowedFor(documentTypeValue) &&  (!allowedFieldNames.contains(fullFieldname)
+                                && !allowedFieldNames.contains(input.getFieldName()))) {
+                            itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
+                                        obj.getItem(), mdv);
+                        } else {
+                            validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
+                            if (mdv.size() > 0 && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
+                                foundResult = true;
+                            }
                         }
                     }
-                    if (input.isRequired() && ! foundResult) {
+                    if (input.isRequired() && !foundResult) {
                         // for this required qualdrop no value was found, add to the list of error fields
                         addError(errors, ERROR_VALIDATION_REQUIRED,
-                            "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                                input.getFieldName());
+                                "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                                        input.getFieldName());
                     }
-
                 } else {
                     fieldsName.add(input.getFieldName());
                 }
 
                 for (String fieldName : fieldsName) {
+                    boolean valuesRemoved = false;
                     List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fieldName);
+                    if (!input.isAllowedFor(documentTypeValue)) {
+                        // Check the lookup list. If no other inputs of the same field name allow this type,
+                        // then remove. Otherwise, do not
+                        if (!(allowedFieldNames.contains(fieldName))) {
+                            itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
+                                    obj.getItem(), mdv);
+                            valuesRemoved = true;
+                            log.debug("Stripping metadata values for " + input.getFieldName() + " on type "
+                                    + documentTypeValue + " as it is allowed by another input of the same field " +
+                                    "name");
+                        } else {
+                            log.debug("Not removing unallowed metadata values for " + input.getFieldName() + " on type "
+                                    + documentTypeValue + " as it is allowed by another input of the same field " +
+                                    "name");
+                        }
+                    }
                     validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
-                    if ((input.isRequired() && mdv.size() == 0) && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
-                        // since this field is missing add to list of error
-                        // fields
-                        addError(errors, ERROR_VALIDATION_REQUIRED,
-                            "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                                input.getFieldName());
+                    if ((input.isRequired() && mdv.size() == 0) && input.isVisible(DCInput.SUBMISSION_SCOPE)
+                                                                && !valuesRemoved) {
+                        // Is the input required for *this* type? In other words, are we looking at a required
+                        // input that is also allowed for this document type
+                        if (input.isAllowedFor(documentTypeValue)) {
+                            // since this field is missing add to list of error
+                            // fields
+                            addError(errors, ERROR_VALIDATION_REQUIRED, "/"
+                                    + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                                            input.getFieldName());
+                        }
                     }
                 }
             }
         }
         return errors;
     }
+
 
     private void validateMetadataValues(List<MetadataValue> mdv, DCInput input, SubmissionStepConfig config,
                                         boolean isAuthorityControlled, String fieldKey,
@@ -122,6 +169,10 @@ public class MetadataValidation extends AbstractValidation {
                 }
             }
         }
+    }
+
+    public void setConfigurationService(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
     }
 
     public void setItemService(ItemService itemService) {
