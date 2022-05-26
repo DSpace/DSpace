@@ -1,0 +1,141 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+
+    <context:annotation-config/>
+    <!-- allows us to use spring annotations in beans -->
+
+    <util:map id="crossrefMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="crossref.title" value-ref="crossrefTitleContrib"/>
+        <entry key-ref="crossref.authors" value-ref="crossrefAuthorContrib"/>
+        <entry key-ref="crossref.isbn" value-ref="crossrefISBNContrib"/>
+        <entry key-ref="crossref.year" value-ref="crossrefYearContrib"/>
+        <entry key-ref="crossref.editors" value-ref="crossrefEditorsContrib"/>
+        <entry key-ref="crossref.type" value-ref="crossrefDoiTypeContrib"/>
+        <entry key-ref="crossref.journal" value-ref="crossrefJournalContrib"/>
+        <entry key-ref="crossref.id" value-ref="crossrefIDContrib"/>
+        <entry key-ref="crossref.issn" value-ref="crossrefIdentifierISSN" />
+        <entry key-ref="crossref.volume" value-ref="crossrefVolume" />
+        <entry key-ref="crossref.issue" value-ref="crossrefIssue" />
+        <entry key-ref="crossref.abstract" value-ref="crossrefAbstract" />
+    </util:map>
+
+    <bean id="crossrefIDContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="crossref.id"/>
+        <property name="query" value="/DOI"/>
+    </bean>
+    <bean id="crossref.id" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.doi"/>
+    </bean>
+
+    <bean id="crossrefJournalContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="crossref.journal"/>
+        <property name="query" value="/container-title"/>
+    </bean>
+    <bean id="crossref.journal" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.relation.ispartof"/>
+    </bean>
+
+    <bean id="crossrefDoiTypeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="crossref.type"/>
+        <property name="query" value="/type"/>
+    </bean>
+    <bean id="crossref.type" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.type"/>
+    </bean>
+
+    <bean id="crossrefEditorsContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="crossref.editors"/>
+        <property name="metadataProcessor" ref="crossrefEditorMetadataProcessor"></property>
+    </bean>
+    <bean name="crossrefEditorMetadataProcessor" class="org.dspace.importer.external.crossref.CrossRefAuthorMetadataProcessor">
+        <property name="pathToArray" value="/editor"></property>
+	</bean>
+    <bean id="crossref.editors" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.contributor.editor"/>
+    </bean>
+
+    <bean id="crossrefYearContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="crossref.year"/>
+        <property name="query" value="/issued/date-parts/0/0"/>
+    </bean>
+    <bean id="crossref.year" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.date.issued"/>
+    </bean>
+
+    <bean id="crossrefISBNContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="crossref.isbn"/>
+        <property name="query" value="/ISBN"/>
+    </bean>
+    <bean id="crossref.isbn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.isbn"/>
+    </bean>
+
+    <bean id="crossrefAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="crossref.authors"/>
+        <property name="metadataProcessor" ref="crossrefAuthorMetadataProcessor"></property>
+    </bean>
+	<bean name="crossrefAuthorMetadataProcessor" class="org.dspace.importer.external.crossref.CrossRefAuthorMetadataProcessor">
+	    <property name="pathToArray" value="/author"></property>
+	</bean>
+    <bean id="crossref.authors" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.contributor.author"/>
+    </bean>
+
+    <bean id="crossrefTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="crossref.title"/>
+        <property name="query" value="/title"/>
+    </bean>
+    <bean id="crossref.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.title"/>
+    </bean>
+
+    <bean id="crossrefIdentifierISSN" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="crossref.issn"/>
+        <property name="query" value="/ISSN"/>
+    </bean>
+    <bean id="crossref.issn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.issn"/>
+    </bean>
+
+    <bean id="crossrefVolume" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="crossref.volume"/>
+        <property name="query" value="/volume"/>
+    </bean>
+    <bean id="crossref.volume" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.volume"/>
+    </bean>
+
+    <bean id="crossrefIssue" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="crossref.issue"/>
+        <property name="query" value="/journal-issue/issue"/>
+    </bean>
+    <bean id="crossref.issue" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.issue"/>
+    </bean>
+
+    <bean id="crossrefAbstract" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="crossref.abstract"/>
+        <property name="query" value="/abstract"/>
+    </bean>
+    <bean id="crossref.abstract" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.description.abstract"/>
+    </bean>
+
+    <bean class="java.lang.Integer" id="maxRetry">
+        <constructor-arg value="3"/>
+    </bean>
+
+</beans>

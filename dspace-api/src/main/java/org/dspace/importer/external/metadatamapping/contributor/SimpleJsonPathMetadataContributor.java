@@ -53,6 +53,10 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
         this.field = field;
     }
 
+
+    /**
+     * Unused by this implementation
+     */
     @Override
     public void setMetadataFieldMapping(MetadataFieldMapping<String, MetadataContributor<String>> rt) {
 
@@ -134,7 +138,7 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
                         metadataValue.add(nodeValue);
                     }
                 }
-            } else {
+            } else if (!node.isNull() && StringUtils.isNotBlank(node.toString())) {
                 String nodeValue = getStringValue(node);
                 if (StringUtils.isNotBlank(nodeValue)) {
                     metadataValue.add(nodeValue);
@@ -155,7 +159,8 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
     private String getStringValue(JsonNode node) {
         if (node.isTextual()) {
             return node.textValue();
-        } else if (node.isNumber()) {
+        }
+        if (node.isNumber()) {
             return node.numberValue().toString();
         }
         log.error("It wasn't possible to convert the value of the following JsonNode:" + node.asText());
@@ -163,12 +168,14 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
     }
 
     private JsonNode convertStringJsonToJsonNode(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode body = null;
         try {
-            return new ObjectMapper().readTree(json);
+            body = mapper.readTree(json);
         } catch (JsonProcessingException e) {
             log.error("Unable to process json response.", e);
         }
-        return null;
+        return body;
     }
 
 }

@@ -36,5 +36,4 @@ public interface LiveImportClient {
      * @return         the response in String type converted from InputStream
      */
     public String executeHttpPostRequest(String URL, Map<String, Map<String, String>> params, String entry);
-
 }

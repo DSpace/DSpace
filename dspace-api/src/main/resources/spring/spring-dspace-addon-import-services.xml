@@ -115,6 +115,11 @@
           </property>
     </bean>
 
+    <bean id="CrossRefImportService" class="org.dspace.importer.external.crossref.CrossRefImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="CrossRefMetadataFieldMapping"/>
+        <property name="url" value="${crossref.url}"/>
+    </bean>
+    <bean id="CrossRefMetadataFieldMapping" class="org.dspace.importer.external.crossref.CrossRefFieldMapping"/>
     <bean id="EpoImportService" class="org.dspace.importer.external.epo.service.EpoImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="epoMetadataFieldMapping"/>
         <property name="consumerKey" value="${epo.consumerKey}" />
@@ -127,6 +132,21 @@
         <property name="applicationNumber" ref="epo.dc.identifier.applicationnumber" />
     </bean>
     <bean id="epoMetadataFieldMapping" class="org.dspace.importer.external.epo.service.EpoFieldMapping"/>
+
+    <bean id="vufindImportService" class="org.dspace.importer.external.vufind.VuFindImportMetadataSourceServiceImpl" scope="singleton">
+          <!-- Set to empty to use the default set of fields  -->
+          <constructor-arg type="java.lang.String" value=""/>
+          <property name="metadataFieldMapping" ref="vufindMetadataFieldMapping"/>
+          <property name="url" value="${vufind.url}"/>
+          <property name="urlSearch" value="${vufind.url.search}"/>
+    </bean>
+    <bean id="vufindMetadataFieldMapping" class="org.dspace.importer.external.vufind.metadatamapping.VuFindFieldMapping"/>
+
+    <bean id="ScieloImportService" class="org.dspace.importer.external.scielo.service.ScieloImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="scieloMetadataFieldMapping"/>
+        <property name="url" value="${scielo.url}"/>
+    </bean>
+    <bean id="scieloMetadataFieldMapping" class="org.dspace.importer.external.scielo.service.ScieloFieldMapping"/>
 
     <bean id="ADSImportService" class="org.dspace.importer.external.ads.ADSImportMetadataSourceServiceImpl" scope="singleton">
         <property name="apiKey" value="${submission.lookup.ads.key}" />
