@@ -914,6 +914,38 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     }
 
     @Test
+    public void testNoAutomaticProfileClaimOccursIfItemHasNotAnEmail() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withNameInMetadata("Test", "User")
+            .withPassword(password)
+            .withEmail("test@email.it")
+            .build();
+
+        ItemBuilder.createItem(context, personCollection)
+            .withPersonIdentifierFirstName("Test")
+            .withPersonIdentifierLastName("User")
+            .build();
+
+        ItemBuilder.createItem(context, personCollection)
+            .withPersonIdentifierFirstName("Test")
+            .withPersonIdentifierLastName("User")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String epersonId = ePerson.getID().toString();
+
+        getClient(getAuthToken(ePerson.getEmail(), password))
+            .perform(get("/api/eperson/profiles/{id}", epersonId))
+            .andExpect(status().isNotFound());
+
+    }
+
+    @Test
     public void testNoAutomaticProfileClaimOccursIfTheUserHasAlreadyAProfile() throws Exception {
 
         context.turnOffAuthorisationSystem();
