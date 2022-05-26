@@ -171,7 +171,7 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO author4 = createMetadatumDTO("dc", "contributor", "author", "Virgo Collaboration");
         MetadatumDTO doi = createMetadatumDTO("dc", "identifier", "doi", "10.1103/PhysRevLett.116.061102");
         MetadatumDTO type = createMetadatumDTO("dc", "type", null, "article");
-        MetadatumDTO adsbibcode = createMetadatumDTO("dc", "identifier", "adsbibcode", "2016PhRvL.116f1102A");
+        MetadatumDTO adsbibcode = createMetadatumDTO("dc", "identifier", "other", "2016PhRvL.116f1102A");
         MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2016");
         MetadatumDTO subject = createMetadatumDTO("dc", "subject", null, "General Relativity and Quantum Cosmology");
         MetadatumDTO subject2 = createMetadatumDTO("dc", "subject", null,
@@ -222,7 +222,7 @@ public class ADSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO author8 = createMetadatumDTO("dc", "contributor", "author", "Wade, M.");
         MetadatumDTO doi2 = createMetadatumDTO("dc", "identifier", "doi", "10.1103/PhysRevLett.119.161101");
         MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "article");
-        MetadatumDTO adsbibcode2 = createMetadatumDTO("dc", "identifier", "adsbibcode", "2017PhRvL.119p1101A");
+        MetadatumDTO adsbibcode2 = createMetadatumDTO("dc", "identifier", "other", "2017PhRvL.119p1101A");
         MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2017");
         MetadatumDTO subject3 = createMetadatumDTO("dc", "subject", null, "General Relativity and Quantum Cosmology");
         MetadatumDTO subject4 = createMetadatumDTO("dc", "subject", null,
