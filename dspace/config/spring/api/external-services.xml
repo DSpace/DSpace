@@ -132,10 +132,11 @@
     <bean id="adsLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="ADSImportService"/>
         <property name="sourceIdentifier" value="ads"/>
-        <property name="recordIdMetadata" value="dc.identifier.adsbibcode"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>
+                <value>none</value>
             </list>
         </property>
     </bean>
