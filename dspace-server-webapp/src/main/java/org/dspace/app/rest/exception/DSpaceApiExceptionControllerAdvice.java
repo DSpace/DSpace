@@ -156,6 +156,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         RESTEmptyWorkflowGroupException.class,
         EPersonNameNotProvidedException.class,
         GroupNameNotProvidedException.class,
+        GroupHasPendingWorkflowTasksException.class,
     })
     protected void handleCustomUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
                                                             TranslatableException ex) throws IOException {
