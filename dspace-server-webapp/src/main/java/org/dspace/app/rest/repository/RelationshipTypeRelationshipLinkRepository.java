@@ -25,7 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * Link repository for "relationships" subresource of an individual Relationship.
+ * Link repository for "relationshipType" subresource of an individual Relationship.
  */
 @Component(RelationshipRest.CATEGORY + "." + RelationshipRest.NAME + "." + RelationshipRest.RELATIONSHIP_TYPE)
 public class RelationshipTypeRelationshipLinkRepository extends AbstractDSpaceRestRepository
