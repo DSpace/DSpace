@@ -24,8 +24,8 @@
  * <dl>
  *   <dt>{@link org.dspace.usage.PassiveUsageEventListener PassiveUsageEventListener}</dt>
  *   <dd>absorbs events without taking action, resulting in behavior identical
- *		to that of DSpace before this package was added.  This is the default
- *		if no plugin is configured.</dd>
+ *              to that of DSpace before this package was added.  This is the default
+ *              if no plugin is configured.</dd>
  *   <dt>{@link org.dspace.usage.TabFileUsageEventListener TabFileUsageEventListener}</dt>
  *   <dd>writes event records to a file in Tab Separated Values format.</dd>
  *   <dt>{@link org.dspace.usage.LoggerUsageEventListener LoggerUsageEventListener}</dt>
