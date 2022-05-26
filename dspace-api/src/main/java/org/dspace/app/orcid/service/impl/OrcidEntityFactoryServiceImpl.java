@@ -30,6 +30,10 @@ import org.orcid.jaxb.model.v3.release.record.Activity;
  */
 public class OrcidEntityFactoryServiceImpl implements OrcidEntityFactoryService {
 
+    /**
+     * Message of the exception thrown if the given item is not a valid entity for
+     * ORCID (defined with the entityFactories map).
+     */
     private final String INVALID_ENTITY_MSG = "The item with id %s is not a configured Orcid entity";
 
     private final Map<OrcidEntityType, OrcidEntityFactory> entityFactories;

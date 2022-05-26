@@ -31,39 +31,65 @@ import org.orcid.jaxb.model.common.ContributorRole;
  */
 public class OrcidWorkFieldMapping {
 
+    /**
+     * The metadata fields related to the work contributors.
+     */
     private Map<String, ContributorRole> contributorFields = new HashMap<>();
 
+    /**
+     * The metadata fields related to the work external identifiers.
+     */
     private Map<String, String> externalIdentifierFields = new HashMap<>();
 
+    /**
+     * The metadata field related to the work publication date.
+     */
     private String publicationDateField;
 
+    /**
+     * The metadata field related to the work title.
+     */
     private String titleField;
 
+    /**
+     * The metadata field related to the work type.
+     */
     private String typeField;
 
+    /**
+     * The metadata field related to the work journal title.
+     */
     private String journalTitleField;
 
+    /**
+     * The metadata field related to the work description.
+     */
     private String shortDescriptionField;
 
+    /**
+     * The metadata field related to the work language.
+     */
     private String languageField;
 
+    /**
+     * The metadata field related to the work sub title.
+     */
     private String subTitleField;
 
+    /**
+     * The configured citation type.
+     */
     private CitationType citationType;
 
+    /**
+     * The work type converter.
+     */
     private SimpleMapConverter typeConverter;
 
+    /**
+     * The work language converter.
+     */
     private SimpleMapConverter languageConverter;
-
-    private String fundingField;
-
-    private String fundingExternalIdType;
-
-    private String fundingExternalId;
-
-    private String fundingEntityExternalId;
-
-    private String fundingUrlField;
 
     public String convertType(String type) {
         return typeConverter != null ? typeConverter.getValue(type) : type;
@@ -159,46 +185,6 @@ public class OrcidWorkFieldMapping {
 
     public void setSubTitleField(String subTitleField) {
         this.subTitleField = subTitleField;
-    }
-
-    public String getFundingField() {
-        return fundingField;
-    }
-
-    public void setFundingField(String fundingField) {
-        this.fundingField = fundingField;
-    }
-
-    public String getFundingExternalIdType() {
-        return fundingExternalIdType;
-    }
-
-    public void setFundingExternalIdType(String fundingExternalIdType) {
-        this.fundingExternalIdType = fundingExternalIdType;
-    }
-
-    public String getFundingExternalId() {
-        return fundingExternalId;
-    }
-
-    public void setFundingExternalId(String fundingExternalId) {
-        this.fundingExternalId = fundingExternalId;
-    }
-
-    public String getFundingEntityExternalId() {
-        return fundingEntityExternalId;
-    }
-
-    public void setFundingEntityExternalId(String fundingEntityExternalId) {
-        this.fundingEntityExternalId = fundingEntityExternalId;
-    }
-
-    public String getFundingUrlField() {
-        return fundingUrlField;
-    }
-
-    public void setFundingUrlField(String fundingUrlField) {
-        this.fundingUrlField = fundingUrlField;
     }
 
     private Map<String, ContributorRole> parseContributors(String contributors) {

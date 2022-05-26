@@ -63,11 +63,6 @@
 		<property name="languageConverter" ref="${orcid.mapping.work.language.converter}" />
 		<property name="typeField" value="${orcid.mapping.work.type}" />
 		<property name="typeConverter" ref="${orcid.mapping.work.type.converter}" />
-		<property name="fundingField" value="${orcid.mapping.work.funding}" />
-		<property name="fundingUrlField" value="${orcid.mapping.work.funding.url}" />
-		<property name="fundingExternalIdType" value="${orcid.mapping.work.funding.external-id.type}" />
-		<property name="fundingExternalId" value="${orcid.mapping.work.funding.external-id.value}" />
-		<property name="fundingEntityExternalId" value="${orcid.mapping.work.funding.external-id.entity-value}" />
 		<property name="citationType" value="${orcid.mapping.work.citation.type}" />
 	</bean>
 	
