@@ -1,3 +1,16 @@
+## E-mail sent to a restricted Item's author when a user requests a copy.
+##
+## Parameters: 0 requester's name
+##             1 requester's address
+##             2 name of a single bitstream, or "all"
+##             3 item Handle
+##             4 item title
+##             5 message from requester
+##             6 link back to DSpace for action
+##             7 corresponding author name
+##             8 corresponding author email
+##             9 configuration property "dspace.name"
+##             10 configuration property "mail.helpdesk"
 #set($subject = 'Request copy of document')
 
 Dear ${params[7]},

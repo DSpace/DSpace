@@ -68,6 +68,11 @@ public class GroupRestPermissionEvaluatorPlugin extends RestObjectPermissionEval
 
             Group group = groupService.find(context, dsoId);
 
+            // if the group is one of the special groups of the context it is readable
+            if (context.getSpecialGroups().contains(group)) {
+                return true;
+            }
+
             // anonymous user
             if (ePerson == null) {
                 return false;
