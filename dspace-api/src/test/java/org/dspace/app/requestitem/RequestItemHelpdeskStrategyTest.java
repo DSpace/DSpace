@@ -7,8 +7,10 @@
  */
 package org.dspace.app.requestitem;
 
-import java.sql.SQLException;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.sql.SQLException;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.builder.AbstractBuilder;
@@ -26,7 +28,6 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.AfterClass;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
