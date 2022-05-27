@@ -13,7 +13,9 @@ import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -79,8 +81,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // Configure authentication requirements for ${dspace.server.url}/api/ URL only
-        // NOTE: REST API is hardcoded to respond on /api/. Other modules (OAI, SWORD, etc) use other root paths.
-        http.antMatcher("/api/**")
+        // NOTE: REST API is hardcoded to respond on /api/. Other modules (OAI, SWORD, IIIF, etc) use other root paths.
+        http.requestMatchers()
+            .antMatchers("/api/**", "/iiif/**")
+            .and()
             // Enable Spring Security authorization on these paths
             .authorizeRequests()
                 // Allow POST by anyone on the login endpoint
@@ -100,7 +104,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             // (both are defined below as methods).
             // While we primarily use JWT in headers, CSRF protection is needed because we also support JWT via Cookies
             .csrf()
-                .csrfTokenRepository(this.getCsrfTokenRepository())
+                .csrfTokenRepository(this.csrfTokenRepository())
                 .sessionAuthenticationStrategy(this.sessionAuthenticationStrategy())
             .and()
             .exceptionHandling()
@@ -132,7 +136,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                              LogoutFilter.class)
             // Add a filter before our shibboleth endpoints to do the authentication based on the data in the
             // HTTP request
-            .addFilterBefore(new ShibbolethAuthenticationFilter("/api/authn/shibboleth", authenticationManager(),
+            .addFilterBefore(new ShibbolethLoginFilter("/api/authn/shibboleth", authenticationManager(),
+                                                       restAuthenticationService),
+                             LogoutFilter.class)
+            //Add a filter before our OIDC endpoints to do the authentication based on the data in the
+            // HTTP request
+            .addFilterBefore(new OidcLoginFilter("/api/authn/oidc", authenticationManager(),
                                                       restAuthenticationService),
                              LogoutFilter.class)
             // Add a custom Token based authentication filter based on the token previously given to the client
@@ -161,7 +170,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
      *
      * @return CsrfTokenRepository as described above
      */
-    public CsrfTokenRepository getCsrfTokenRepository() {
+    @Lazy
+    @Bean
+    public CsrfTokenRepository csrfTokenRepository() {
         return new DSpaceCsrfTokenRepository();
     }
 
@@ -170,7 +181,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
      * is only refreshed when it is used (or attempted to be used) by the client.
      */
     private SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-        return new DSpaceCsrfAuthenticationStrategy(getCsrfTokenRepository());
+        return new DSpaceCsrfAuthenticationStrategy(csrfTokenRepository());
     }
 
 }

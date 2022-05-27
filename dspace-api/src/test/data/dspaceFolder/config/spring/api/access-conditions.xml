@@ -60,4 +60,31 @@
         </property>
     </bean>
 
+    <bean id="accessConditionConfigurationService" class="org.dspace.submit.model.AccessConditionConfigurationService" />
+
+    <bean id="accessConditionConfigurationDefault" class="org.dspace.submit.model.AccessConditionConfiguration">
+        <!-- This name must match the id of the step as defined in the item-submission.xml -->
+        <property name="name" value="defaultAC"></property>
+        <property name="canChangeDiscoverable" value="true"></property>
+        <property name="options">
+            <list>
+                <ref bean="openAccess"/>
+                <ref bean="embargoed" />
+                <ref bean="administrator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="accessConditionConfigurationNotDiscoverable" class="org.dspace.submit.model.AccessConditionConfiguration">
+        <!-- This name must match the id of the step as defined in the item-submission.xml -->
+        <property name="name" value="notDiscoverable"></property>
+        <property name="canChangeDiscoverable" value="false"></property>
+        <property name="options">
+            <list>
+                <ref bean="embargoed" />
+                <ref bean="administrator"/>
+            </list>
+        </property>
+    </bean>
+
 </beans>

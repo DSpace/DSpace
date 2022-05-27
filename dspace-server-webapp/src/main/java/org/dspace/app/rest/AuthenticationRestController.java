@@ -7,8 +7,13 @@
  */
 package org.dspace.app.rest;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,9 +24,11 @@ import org.dspace.app.rest.model.AuthenticationStatusRest;
 import org.dspace.app.rest.model.AuthenticationTokenRest;
 import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.hateoas.AuthenticationStatusResource;
 import org.dspace.app.rest.model.hateoas.AuthenticationTokenResource;
 import org.dspace.app.rest.model.hateoas.AuthnResource;
+import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.security.RestAuthenticationService;
@@ -34,6 +41,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +91,7 @@ public class AuthenticationRestController implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         discoverableEndpointsService
-            .register(this, Arrays.asList(new Link("/api/" + AuthnRest.CATEGORY, AuthnRest.NAME)));
+            .register(this, Arrays.asList(Link.of("/api/" + AuthnRest.CATEGORY, AuthnRest.NAME)));
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -109,6 +120,8 @@ public class AuthenticationRestController implements InitializingBean {
         if (context.getCurrentUser() != null) {
             ePersonRest = converter.toRest(context.getCurrentUser(), projection);
         }
+        List<GroupRest> groupList = context.getSpecialGroups().stream()
+                .map(g -> (GroupRest) converter.toRest(g, projection)).collect(Collectors.toList());
 
         AuthenticationStatusRest authenticationStatusRest = new AuthenticationStatusRest(ePersonRest);
         // When not authenticated add WWW-Authenticate so client can retrieve all available authentication methods
@@ -118,10 +131,41 @@ public class AuthenticationRestController implements InitializingBean {
 
             response.setHeader("WWW-Authenticate", authenticateHeaderValue);
         }
+        authenticationStatusRest.setAuthenticationMethod(context.getAuthenticationMethod());
         authenticationStatusRest.setProjection(projection);
+        authenticationStatusRest.setSpecialGroups(groupList);
+
         AuthenticationStatusResource authenticationStatusResource = converter.toResource(authenticationStatusRest);
 
         return authenticationStatusResource;
+    }
+
+    /**
+     * Check the current user's authentication status (i.e. whether they are authenticated or not) and,
+     * if authenticated, retrieves the current context's special groups.
+     * @param page
+     * @param assembler
+     * @param request
+     * @param response
+     * @return
+     * @throws SQLException
+     */
+    @RequestMapping(value = "/status/specialGroups", method = RequestMethod.GET)
+    public EntityModel retrieveSpecialGroups(Pageable page, PagedResourcesAssembler assembler,
+                HttpServletRequest request, HttpServletResponse response)
+            throws SQLException {
+        Context context = ContextUtil.obtainContext(request);
+        Projection projection = utils.obtainProjection();
+
+        List<GroupRest> groupList = context.getSpecialGroups().stream()
+                .map(g -> (GroupRest) converter.toRest(g, projection)).collect(Collectors.toList());
+        Page<GroupRest> groupPage = (Page<GroupRest>) utils.getPage(groupList, page);
+        Link link = linkTo(
+                methodOn(AuthenticationRestController.class).retrieveSpecialGroups(page, assembler, request, response))
+                        .withSelfRel();
+
+        return EntityModel.of(new EmbeddedPage(link.getHref(),
+                groupPage.map(converter::toResource), null, "specialGroups"));
     }
 
     /**

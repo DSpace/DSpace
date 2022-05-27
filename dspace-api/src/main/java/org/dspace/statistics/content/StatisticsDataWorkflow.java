@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -158,8 +159,8 @@ public class StatisticsDataWorkflow extends StatisticsData {
     }
 
     private long getMonthsDifference(Date date1, Date date2) {
-        LocalDate earlier = LocalDate.from(date1.toInstant());
-        LocalDate later = LocalDate.from(date2.toInstant());
+        LocalDate earlier = LocalDate.ofInstant(date1.toInstant(), ZoneOffset.UTC);
+        LocalDate later = LocalDate.ofInstant(date2.toInstant(), ZoneOffset.UTC);
         return Period.between(earlier, later).toTotalMonths();
     }
 

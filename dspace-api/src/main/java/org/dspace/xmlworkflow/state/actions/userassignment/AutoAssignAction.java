@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.xmlworkflow.Role;
@@ -82,22 +82,22 @@ public class AutoAssignAction extends UserSelectionAction {
                         workflowItemRoleService.delete(c, workflowItemRole);
                     }
                 } else {
-                    log.warn(LogManager.getHeader(c, "Error while executing auto assign action",
+                    log.warn(LogHelper.getHeader(c, "Error while executing auto assign action",
                                                   "No valid next action. Workflow item:" + wfi.getID()));
                 }
             }
         } catch (SQLException e) {
-            log.error(LogManager.getHeader(c, "Error while executing auto assign action",
+            log.error(LogHelper.getHeader(c, "Error while executing auto assign action",
                                            "Workflow item: " + wfi.getID() + " step :" + getParent().getStep().getId()),
                       e);
             throw e;
         } catch (AuthorizeException e) {
-            log.error(LogManager.getHeader(c, "Error while executing auto assign action",
+            log.error(LogHelper.getHeader(c, "Error while executing auto assign action",
                                            "Workflow item: " + wfi.getID() + " step :" + getParent().getStep().getId()),
                       e);
             throw e;
         } catch (IOException e) {
-            log.error(LogManager.getHeader(c, "Error while executing auto assign action",
+            log.error(LogHelper.getHeader(c, "Error while executing auto assign action",
                                            "Workflow item: " + wfi.getID() + " step :" + getParent().getStep().getId()),
                       e);
             throw e;

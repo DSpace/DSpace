@@ -10,7 +10,7 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -95,7 +95,11 @@ public class CCLicenseRemovePatchOperationIT extends AbstractControllerIntegrati
                                               .content(removePatch)
                                               .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isOk())
-                             .andExpect(jsonPath("$.sections", not(hasJsonPath("cclicense"))));
+                             .andExpect(jsonPath("$.sections.cclicense", allOf(
+                                     hasJsonPath("$.uri", nullValue()),
+                                     hasJsonPath("$.rights",nullValue()),
+                                     hasJsonPath("$.file", nullValue())
+                             )));
     }
 
 

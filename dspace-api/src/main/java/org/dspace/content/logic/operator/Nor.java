@@ -15,10 +15,9 @@ import org.dspace.content.logic.LogicalStatementException;
 import org.dspace.core.Context;
 
 /**
- * An operator that implements NIR by negating an OR operation
+ * An operator that implements NOR by negating an OR operation.
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class Nor extends AbstractOperator {
 

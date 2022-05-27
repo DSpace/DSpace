@@ -23,8 +23,8 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * This is the base converter from/to objects in the DSpace API data model and
@@ -39,6 +39,8 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
 
     private static final Logger log = LogManager.getLogger(DSpaceObjectConverter.class);
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
     @Autowired
     ConverterService converter;
 
@@ -62,7 +64,8 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
         }
         resource.setName(obj.getName());
 
-        MetadataValueList metadataValues = getPermissionFilteredMetadata(getContext(), obj);
+        MetadataValueList metadataValues = getPermissionFilteredMetadata(
+                ContextUtil.obtainCurrentRequestContext(), obj);
         resource.setMetadata(converter.toRest(metadataValues, projection));
         return resource;
     }
@@ -99,16 +102,4 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
         return new MetadataValueList(visibleMetadata);
     }
 
-    /**
-     * Retrieves the context from the request
-     * If not request is found, will return null
-     * @return  The context retrieved form the current request or null when no context
-     */
-    private Context getContext() {
-        Request currentRequest = requestService.getCurrentRequest();
-        if (currentRequest != null) {
-            return ContextUtil.obtainContext(currentRequest.getServletRequest());
-        }
-        return null;
-    }
 }

@@ -171,6 +171,7 @@ public class MockSolrServer {
      * Discard the embedded Solr container.
      */
     private static synchronized void destroyContainer() {
+        container.shutdown();
         container = null;
         log.info("SOLR CoreContainer destroyed");
     }

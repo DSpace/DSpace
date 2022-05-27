@@ -15,7 +15,6 @@ import static org.hamcrest.Matchers.is;
 import org.dspace.content.EntityType;
 import org.dspace.content.RelationshipType;
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 
 public class RelationshipTypeMatcher {
 
@@ -81,12 +80,17 @@ public class RelationshipTypeMatcher {
             hasJsonPath("$.rightMaxCardinality", is(rightMaxCardinality)),
             hasJsonPath("$.type", is("relationshiptype")),
             hasJsonPath("$._links.self.href", containsString("/api/core/relationshiptypes/" + id)),
-            hasJsonPath("$._embedded.leftType", Matchers.allOf(
-                EntityTypeMatcher.matchEntityTypeExplicitValuesEntry(leftEntityTypeId, leftEntityTypeLabel)
-            )),
-            hasJsonPath("$._embedded.rightType", Matchers.is(
-                EntityTypeMatcher.matchEntityTypeExplicitValuesEntry(rightEntityTypeId, rightEntityTypeLabel)
-            ))
+            hasJsonPath("$._links.leftType.href", containsString("/api/core/entitytypes/" + leftEntityTypeId)),
+            hasJsonPath("$._links.rightType.href", containsString("/api/core/entitytypes/" + rightEntityTypeId))
         );
     }
+
+    public static Matcher<? super Object> matchExplicitRestrictedRelationshipTypeValues(
+                                              String leftwardType, String rightwardType) {
+        return allOf(
+                     hasJsonPath("$.leftwardType", is(leftwardType)),
+                     hasJsonPath("$.rightwardType", is(rightwardType))
+                     );
+    }
+
 }

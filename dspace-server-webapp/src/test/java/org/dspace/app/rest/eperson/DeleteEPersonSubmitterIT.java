@@ -374,7 +374,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
 
     private void cleanupVersion(int id) throws SQLException {
         Version version = versioningService.getVersion(context, id);
-        versioningService.removeVersion(context, version);
+        versioningService.delete(context, version);
 
     }
 

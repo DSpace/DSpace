@@ -1,0 +1,165 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config/>
+    <!-- allows us to use spring annotations in beans -->
+
+    <util:map id="vufindMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="vufind.id" value-ref="vufindIDContrib"/>
+        <entry key-ref="vufind.dc.language.iso" value-ref="vufindLanguages"/>
+        <entry key-ref="vufind.dc.publisher" value-ref="vufindPublisher"/>
+        <entry key-ref="vufind.dc.title" value-ref="vufindTitle"/>
+        <entry key-ref="vufind.dc.identifier" value-ref="vufindIdentifier"/>
+        <entry key-ref="vufind.dc.contributor.author" value-ref="vufindAuthors"/>
+        <entry key-ref="vufind.dc.subject" value-ref="vufindSubject"/>
+        <entry key-ref="vufind.dc.description.abstract" value-ref="vufindAbstract"/>
+        <entry key-ref="vufind.dc.titlealternative" value-ref="vufindTitleAlternative"/>
+        <entry key-ref="vufind.dc.contributor.editor" value-ref="vufindContributorEditor"/>
+        <entry key-ref="vufind.dc.date.issued" value-ref="vufindDateIssued"/>
+        <entry key-ref="vufind.dc.identifier.doi" value-ref="vufindIdentifierDoi"/>
+        <entry key-ref="vufind.dc.identifier.isbn" value-ref="vufindIdentifierIsbn"/>
+    </util:map>
+
+    <bean id="vufindIDContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="vufind.id"/>
+        <property name="query" value="/id"/>
+    </bean>
+    <bean id="vufind.id" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.other"/>
+    </bean>
+
+    <bean id="vufindLanguages" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="vufind.dc.language.iso"/>
+        <property name="query" value="/languages"/>
+    </bean>
+    <bean id="vufind.dc.language.iso" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.language.iso"/>
+    </bean>
+
+    <bean id="vufindTitle" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="vufind.dc.title"/>
+        <property name="query" value="/title"/>
+    </bean>
+    <bean id="vufind.dc.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.title"/>
+    </bean>
+
+    <bean id="vufindIdentifier" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="vufind.dc.identifier"/>
+        <property name="metadataProcessor" ref="vufindUriProcessor"></property>
+    </bean>
+    <bean name="vufindUriProcessor" class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+        <property name="pathToArray" value="/urls"></property>
+        <property name="elementAttribute" value="/url"></property>
+	</bean>
+    <bean id="vufind.dc.identifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier"/>
+    </bean>
+
+    <bean id="vufindSubject" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="vufind.dc.subject"/>
+        <property name="metadataProcessor" ref="vufindSubjectsProcessor"></property>
+    </bean>
+    <bean name="vufindSubjectsProcessor" class="org.dspace.importer.external.metadatamapping.contributor.MatrixElementProcessor">
+        <property name="pathToMatrix" value="/subjects"></property>
+	</bean>
+    <bean id="vufind.dc.subject" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.subject"/>
+    </bean>
+
+    <bean id="vufindAuthors" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="vufind.dc.contributor.author"/>
+        <property name="query" value="/dcContributorAuthor"/>
+    </bean>
+
+	<util:list id="vufindAuthorsList">
+	    <bean id="vufindPrimaryAuthors" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+	        <property name="field" ref="vufind.dc.contributor.author"/>
+	        <property name="query" value="/authors/primary" />
+	    </bean>
+	    <bean id="vufindSecondaryAuthors" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+	        <property name="field" ref="vufind.dc.contributor.author"/>
+	        <property name="query" value="/authors/secondary" />
+	    </bean>
+	</util:list>
+
+    <bean id="vufind.dc.contributor.author" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.contributor.author"/>
+    </bean>
+
+    <bean class="java.lang.Integer" id="maxRetry">
+        <constructor-arg value="3"/>
+    </bean>
+
+    <!-- Below there are other mapping that apply to an extended configuration in use for instance at the vuFind installation
+         of ALICIA https://alicia.concytec.gob.pe/vufind/Search/Results?type=AllFields -->
+
+    <bean id="vufindIdentifierIsbn" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="vufind.dc.identifier.isbn"/>
+        <property name="query" value="/dcIdentifierIsbn"/>
+    </bean>
+    <bean id="vufind.dc.identifier.isbn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.isbn"/>
+    </bean>
+
+    <bean id="vufindIdentifierDoi" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="vufind.dc.identifier.doi"/>
+        <property name="query" value="/dcIdentifierDoi"/>
+    </bean>
+    <bean id="vufind.dc.identifier.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.doi"/>
+    </bean>
+
+    <bean id="vufindDateIssued" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="vufind.dc.date.issued"/>
+        <property name="query" value="/dcDateIssued"/>
+    </bean>
+    <bean id="vufind.dc.date.issued" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.date.issued"/>
+    </bean>
+
+    <bean id="vufindContributorEditor" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="vufind.dc.contributor.editor"/>
+        <property name="query" value="/dcContributorEditor"/>
+    </bean>
+    <bean id="vufind.dc.contributor.editor" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.contributor.editor"/>
+    </bean>
+
+    <bean id="vufindTitleAlternative" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="vufind.dc.titlealternative"/>
+        <property name="query" value="/dcTitleAlternative"/>
+    </bean>
+    <bean id="vufind.dc.titlealternative" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.title.alternative"/>
+    </bean>
+
+    <bean id="vufindAbstract" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="vufind.dc.description.abstract"/>
+        <property name="query" value="/dcDescriptionAbstract"/>
+    </bean>
+    <bean id="vufind.dc.description.abstract" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.description.abstract"/>
+    </bean>
+
+    <bean id="vufindPublisher" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="vufind.dc.publisher"/>
+        <property name="query" value="/dcPublisher"/>
+    </bean>
+    <bean id="vufind.dc.publisher" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.publisher"/>
+    </bean>
+
+</beans>

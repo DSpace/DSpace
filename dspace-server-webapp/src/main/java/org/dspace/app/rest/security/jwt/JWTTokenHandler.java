@@ -36,7 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
@@ -155,12 +154,11 @@ public abstract class JWTTokenHandler {
      * @param context current Context
      * @param request current Request
      * @param previousLoginDate date of last login (before this one)
-     * @param groups List of user Groups
      * @return string version of signed JWT
      * @throws JOSEException
      */
-    public String createTokenForEPerson(Context context, HttpServletRequest request, Date previousLoginDate,
-                                        List<Group> groups) throws JOSEException, SQLException {
+    public String createTokenForEPerson(Context context, HttpServletRequest request, Date previousLoginDate)
+        throws JOSEException, SQLException {
 
         // Verify that the user isn't trying to use a short lived token to generate another token
         if (StringUtils.isNotBlank(request.getParameter(AUTHORIZATION_TOKEN_PARAMETER))) {
@@ -412,7 +410,7 @@ public abstract class JWTTokenHandler {
             if (StringUtils.isBlank(ePerson.getSessionSalt())
                 || previousLoginDate == null
                 || (ePerson.getLastActive().getTime() - previousLoginDate.getTime() > getExpirationPeriod())) {
-
+                log.debug("Regenerating auth token as session salt was either empty or expired..");
                 ePerson.setSessionSalt(generateRandomKey());
                 ePersonService.update(context, ePerson);
             }

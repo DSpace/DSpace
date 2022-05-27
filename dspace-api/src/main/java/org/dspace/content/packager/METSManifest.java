@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,15 +35,17 @@ import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Content;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.jdom.xpath.XPath;
+import org.jdom2.Content;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 
 /**
  * <P>
@@ -381,15 +384,12 @@ public class METSManifest {
     public List getMdFiles()
         throws MetadataValidationException {
         if (mdFiles == null) {
-            try {
-                // Use a special namespace with known prefix
-                // so we get the right prefix.
-                XPath xpath = XPath.newInstance("descendant::mets:mdRef");
-                xpath.addNamespace(metsNS);
-                mdFiles = xpath.selectNodes(mets);
-            } catch (JDOMException je) {
-                throw new MetadataValidationException("Failed while searching for mdRef elements in manifest: ", je);
-            }
+            // Use a special namespace with known prefix
+            // so we get the right prefix.
+            XPathExpression<Element> xpath =
+                XPathFactory.instance()
+                            .compile("descendant::mets:mdRef", Filters.element(), null, metsNS);
+            mdFiles = xpath.evaluate(mets);
         }
         return mdFiles;
     }
@@ -413,25 +413,22 @@ public class METSManifest {
             return null;
         }
 
-        try {
-            XPath xpath = XPath.newInstance(
-                "mets:fileSec/mets:fileGrp[@USE=\"CONTENT\"]/mets:file[@GROUPID=\"" + groupID + "\"]");
-            xpath.addNamespace(metsNS);
-            List oFiles = xpath.selectNodes(mets);
-            if (oFiles.size() > 0) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Got ORIGINAL file for derived=" + file.toString());
-                }
-                Element flocat = ((Element) oFiles.get(0)).getChild("FLocat", metsNS);
-                if (flocat != null) {
-                    return flocat.getAttributeValue("href", xlinkNS);
-                }
+        XPathExpression<Element> xpath =
+            XPathFactory.instance()
+                        .compile(
+                            "mets:fileSec/mets:fileGrp[@USE=\"CONTENT\"]/mets:file[@GROUPID=\"" + groupID + "\"]",
+                            Filters.element(), null, metsNS);
+        List<Element> oFiles = xpath.evaluate(mets);
+        if (oFiles.size() > 0) {
+            if (log.isDebugEnabled()) {
+                log.debug("Got ORIGINAL file for derived=" + file.toString());
             }
-            return null;
-        } catch (JDOMException je) {
-            log.warn("Got exception on XPATH looking for Original file, " + je.toString());
-            return null;
+            Element flocat = oFiles.get(0).getChild("FLocat", metsNS);
+            if (flocat != null) {
+                return flocat.getAttributeValue("href", xlinkNS);
+            }
         }
+        return null;
     }
 
     // translate bundle name from METS to DSpace; METS may be "CONTENT"
@@ -656,7 +653,7 @@ public class METSManifest {
 
                         String mimeType = mdWrap.getAttributeValue("MIMETYPE");
                         if (mimeType != null && mimeType.equalsIgnoreCase("text/xml")) {
-                            byte value[] = Base64.decodeBase64(bin.getText().getBytes());
+                            byte value[] = Base64.decodeBase64(bin.getText().getBytes(StandardCharsets.UTF_8));
                             Document mdd = parser.build(new ByteArrayInputStream(value));
                             List<Element> result = new ArrayList<>(1);
                             result.add(mdd.getRootElement());
@@ -724,13 +721,13 @@ public class METSManifest {
                     throw new MetadataValidationException(
                         "Invalid METS Manifest: mdWrap element with neither xmlData nor binData child.");
                 } else {
-                    byte value[] = Base64.decodeBase64(bin.getText().getBytes());
+                    byte value[] = Base64.decodeBase64(bin.getText().getBytes(StandardCharsets.UTF_8));
                     return new ByteArrayInputStream(value);
                 }
             } else {
                 XMLOutputter outputPretty = new XMLOutputter(Format.getPrettyFormat());
                 return new ByteArrayInputStream(
-                    outputPretty.outputString(xmlData.getChildren()).getBytes());
+                    outputPretty.outputString(xmlData.getChildren()).getBytes(StandardCharsets.UTF_8));
             }
         } else {
             mdRef = mdSec.getChild("mdRef", metsNS);
@@ -887,20 +884,16 @@ public class METSManifest {
     // use only when path varies each time you call it.
     protected Element getElementByXPath(String path, boolean nullOk)
         throws MetadataValidationException {
-        try {
-            XPath xpath = XPath.newInstance(path);
-            xpath.addNamespace(metsNS);
-            xpath.addNamespace(xlinkNS);
-            Object result = xpath.selectSingleNode(mets);
-            if (result == null && nullOk) {
-                return null;
-            } else if (result instanceof Element) {
-                return (Element) result;
-            } else {
-                throw new MetadataValidationException("METSManifest: Failed to resolve XPath, path=\"" + path + "\"");
-            }
-        } catch (JDOMException je) {
-            throw new MetadataValidationException("METSManifest: Failed to resolve XPath, path=\"" + path + "\"", je);
+        XPathExpression<Element> xpath =
+            XPathFactory.instance()
+                        .compile(path, Filters.element(), null, metsNS, xlinkNS);
+        Element result = xpath.evaluateFirst(mets);
+        if (result == null && nullOk) {
+            return null;
+        } else if (result == null && !nullOk) {
+            throw new MetadataValidationException("METSManifest: Failed to resolve XPath, path=\"" + path + "\"");
+        } else {
+            return result;
         }
     }
 
@@ -1176,7 +1169,7 @@ public class METSManifest {
                                     "Invalid METS Manifest: mdWrap element for streaming crosswalk without binData " +
                                         "child.");
                             } else {
-                                byte value[] = Base64.decodeBase64(bin.getText().getBytes());
+                                byte value[] = Base64.decodeBase64(bin.getText().getBytes(StandardCharsets.UTF_8));
                                 sxwalk.ingest(context, dso,
                                               new ByteArrayInputStream(value),
                                               mdWrap.getAttributeValue("MIMETYPE"));
@@ -1302,6 +1295,6 @@ public class METSManifest {
         XMLOutputter outputPretty = new XMLOutputter(Format.getPrettyFormat());
 
         return new ByteArrayInputStream(
-            outputPretty.outputString(mets).getBytes());
+            outputPretty.outputString(mets).getBytes(StandardCharsets.UTF_8));
     }
 }

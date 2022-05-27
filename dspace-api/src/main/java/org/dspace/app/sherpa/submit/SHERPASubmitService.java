@@ -18,7 +18,7 @@ import org.dspace.app.sherpa.SHERPAService;
 import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 
 /**
  * SHERPASubmitService is
@@ -115,7 +115,7 @@ public class SHERPASubmitService {
     public Set<String> getISSNs(Context context, Item item) {
         Set<String> issns = new LinkedHashSet<String>();
         if (configuration.getIssnItemExtractors() == null) {
-            log.warn(LogManager.getHeader(context, "searchRelatedJournals",
+            log.warn(LogHelper.getHeader(context, "searchRelatedJournals",
                                           "no issnItemExtractors defined"));
             return null;
         }

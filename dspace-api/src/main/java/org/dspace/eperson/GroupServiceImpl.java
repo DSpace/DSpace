@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,7 +35,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.dao.Group2GroupCacheDAO;
 import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -110,7 +111,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         // Create a table row
         Group g = groupDAO.create(context, new Group());
 
-        log.info(LogManager.getHeader(context, "create_group", "group_id="
+        log.info(LogHelper.getHeader(context, "create_group", "group_id="
             + g.getID()));
 
         context.addEvent(new Event(Event.CREATE, Constants.GROUP, g.getID(), null, getIdentifiers(context, g)));
@@ -502,7 +503,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         groupDAO.delete(context, group);
         rethinkGroupCache(context, false);
 
-        log.info(LogManager.getHeader(context, "delete_group", "group_id="
+        log.info(LogHelper.getHeader(context, "delete_group", "group_id="
             + group.getID()));
     }
 
@@ -595,7 +596,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             group.clearGroupsChanged();
         }
 
-        log.info(LogManager.getHeader(context, "update_group", "group_id="
+        log.info(LogHelper.getHeader(context, "update_group", "group_id="
             + group.getID()));
     }
 
@@ -735,13 +736,24 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                             groups.add(group);
                             List<ResourcePolicy> policies = resourcePolicyService.find(context, null, groups,
                                                             Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);
-                            if (policies.size() > 0) {
-                                return policies.get(0).getdSpaceObject();
+
+                            Optional<ResourcePolicy> defaultPolicy = policies.stream().filter(p -> StringUtils.equals(
+                                    collectionService.getDefaultReadGroupName((Collection) p.getdSpaceObject(), "ITEM"),
+                                    group.getName())).findFirst();
+
+                            if (defaultPolicy.isPresent()) {
+                                return defaultPolicy.get().getdSpaceObject();
                             }
                             policies = resourcePolicyService.find(context, null, groups,
                                                              Constants.DEFAULT_BITSTREAM_READ, Constants.COLLECTION);
-                            if (policies.size() > 0) {
-                                return policies.get(0).getdSpaceObject();
+
+                            defaultPolicy = policies.stream()
+                                    .filter(p -> StringUtils.equals(collectionService.getDefaultReadGroupName(
+                                            (Collection) p.getdSpaceObject(), "BITSTREAM"), group.getName()))
+                                    .findFirst();
+
+                            if (defaultPolicy.isPresent()) {
+                                return defaultPolicy.get().getdSpaceObject();
                             }
                         }
                     }

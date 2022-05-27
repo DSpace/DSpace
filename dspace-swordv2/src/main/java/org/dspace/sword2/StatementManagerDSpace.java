@@ -21,7 +21,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.Statement;
 import org.swordapp.server.StatementManager;
@@ -49,7 +49,7 @@ public class StatementManagerDSpace extends DSpaceSwordAPI
             Context context = sc.getContext();
 
             if (log.isDebugEnabled()) {
-                log.debug(LogManager
+                log.debug(LogHelper
                               .getHeader(context, "sword_get_statement", ""));
             }
 
@@ -60,7 +60,7 @@ public class StatementManagerDSpace extends DSpaceSwordAPI
             String obo = authCredentials.getOnBehalfOf() != null ?
                 authCredentials.getOnBehalfOf() :
                 "NONE";
-            log.info(LogManager.getHeader(context, "sword_get_statement",
+            log.info(LogHelper.getHeader(context, "sword_get_statement",
                                           "username=" + un + ",on_behalf_of=" + obo));
 
             // first thing is to figure out what we're being asked to work on

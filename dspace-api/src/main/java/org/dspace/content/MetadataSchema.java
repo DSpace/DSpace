@@ -30,7 +30,6 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * </p>
  *
  * @author Martin Hald
- * @version $Revision$
  * @see org.dspace.content.MetadataValue
  * @see org.dspace.content.MetadataField
  */
@@ -129,6 +128,7 @@ public class MetadataSchema implements ReloadableEntity<Integer> {
      *
      * @return schema record key
      */
+    @Override
     public Integer getID() {
         return id;
     }

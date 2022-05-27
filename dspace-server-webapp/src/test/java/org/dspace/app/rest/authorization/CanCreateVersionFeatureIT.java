@@ -150,7 +150,6 @@ public class CanCreateVersionFeatureIT extends AbstractControllerIntegrationTest
     public void submitterItemWithPropertySubmitterCanCreateNewVersionIsFalseTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        configurationService.setProperty("versioning.submitterCanCreateNewVersion", false);
         itemA.setSubmitter(user);
 
         context.restoreAuthSystemState();
@@ -166,7 +165,6 @@ public class CanCreateVersionFeatureIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void checkCanCreateVersionsFeatureTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -214,6 +212,235 @@ public class CanCreateVersionFeatureIT extends AbstractControllerIntegrationTest
 
         getClient(tokenUser).perform(get("/api/authz/authorizations/" + user2ItemB.getID()))
                             .andExpect(status().isNotFound());
-
     }
+
+    @Test
+    public void checkCanCreateVersionsFeatureAdminsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson adminComA = EPersonBuilder.createEPerson(context)
+                                          .withEmail("testComAdminA@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson adminComB = EPersonBuilder.createEPerson(context)
+                                          .withEmail("testComBdminA@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson adminCol1 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("testCol1Admin@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+        EPerson adminCol2 = EPersonBuilder.createEPerson(context)
+                                          .withEmail("testCol2Admin@test.com")
+                                          .withPassword(password)
+                                          .build();
+
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Parent Community")
+                                                  .build();
+
+        Community subCommunityA = CommunityBuilder.createSubCommunity(context, rootCommunity)
+                                                  .withName("Sub Community A")
+                                                  .withAdminGroup(adminComA)
+                                                  .build();
+
+        CommunityBuilder.createSubCommunity(context, rootCommunity)
+                        .withName("Sub Community B")
+                        .withAdminGroup(adminComB)
+                        .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, subCommunityA)
+                                          .withName("Collection 1")
+                                          .withSubmitterGroup(eperson)
+                                          .withAdminGroup(adminCol1)
+                                          .build();
+
+        CollectionBuilder.createCollection(context, subCommunityA)
+                         .withName("Collection 2")
+                         .withAdminGroup(adminCol2)
+                         .build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withTitle("Public item")
+                                .withIssueDate("2021-04-19")
+                                .withAuthor("Doe, John")
+                                .withSubject("ExtraEntry")
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
+
+        String tokenAdminComA = getAuthToken(adminComA.getEmail(), password);
+        String tokenAdminComB = getAuthToken(adminComB.getEmail(), password);
+        String tokenAdminCol1 = getAuthToken(adminCol1.getEmail(), password);
+        String tokenAdminCol2 = getAuthToken(adminCol2.getEmail(), password);
+
+        // define authorizations that we know must exists
+        Authorization adminOfComAToItemA = new Authorization(adminComA, canCreateVersionFeature, itemRestA);
+        Authorization adminOfCol1ToItemA = new Authorization(adminCol1, canCreateVersionFeature, itemRestA);
+
+        // define authorization that we know not exists
+        Authorization adminOfComBToItemA = new Authorization(adminComB, canCreateVersionFeature, itemRestA);
+        Authorization adminOfCol2ToItemA = new Authorization(adminCol2, canCreateVersionFeature, itemRestA);
+
+        getClient(tokenAdminComA).perform(get("/api/authz/authorizations/" + adminOfComAToItemA.getID()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$", Matchers.is(
+                                            AuthorizationMatcher.matchAuthorization(adminOfComAToItemA))));
+
+        getClient(tokenAdminCol1).perform(get("/api/authz/authorizations/" + adminOfCol1ToItemA.getID()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$", Matchers.is(
+                                            AuthorizationMatcher.matchAuthorization(adminOfCol1ToItemA))));
+
+        getClient(tokenAdminComB).perform(get("/api/authz/authorizations/" + adminOfComBToItemA.getID()))
+                                 .andExpect(status().isNotFound());
+
+        getClient(tokenAdminCol2).perform(get("/api/authz/authorizations/" + adminOfCol2ToItemA.getID()))
+                                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void checkCanCreateVersionFeatureAndPropertyBlockEntityEnableTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        configurationService.setProperty("versioning.block.entity", true);
+
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Parent Community")
+                                                  .build();
+
+        Collection col = CollectionBuilder.createCollection(context, rootCommunity)
+                                          .withName("Collection 1")
+                                          .withEntityType("Publication")
+                                          .withAdminGroup(eperson)
+                                          .build();
+
+        Item itemA = ItemBuilder.createItem(context, col)
+                                .withTitle("Public item")
+                                .withIssueDate("2021-04-19")
+                                .withAuthor("Doe, John")
+                                .withSubject("ExtraEntry")
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenUser = getAuthToken(user.getEmail(), password);
+
+        // define authorization that we know not exists
+        Authorization user2ItemA = new Authorization(user, canCreateVersionFeature, itemRestA);
+        Authorization admin2ItemA = new Authorization(admin, canCreateVersionFeature, itemRestA);
+        Authorization eperson2ItemA = new Authorization(eperson, canCreateVersionFeature, itemRestA);
+
+        getClient(tokenAdmin).perform(get("/api/authz/authorizations/" + admin2ItemA.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenUser).perform(get("/api/authz/authorizations/" + user2ItemA.getID()))
+                            .andExpect(status().isNotFound());
+
+        getClient(tokenEPerson).perform(get("/api/authz/authorizations/" + eperson2ItemA.getID()))
+                               .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void checkCanCreateVersionFeatureAndPropertyBlockEntityDisabledTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        configurationService.setProperty("versioning.block.entity", false);
+
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Parent Community")
+                                                  .build();
+
+        Collection col = CollectionBuilder.createCollection(context, rootCommunity)
+                                          .withName("Collection 1")
+                                          .withEntityType("Publication")
+                                          .build();
+
+        Item itemA = ItemBuilder.createItem(context, col)
+                                .withTitle("Public item")
+                                .withIssueDate("2021-04-19")
+                                .withAuthor("Doe, John")
+                                .withSubject("ExtraEntry")
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenUser = getAuthToken(user.getEmail(), password);
+
+        // define authorization that we know not exists
+        Authorization user2ItemA = new Authorization(user, canCreateVersionFeature, itemRestA);
+        Authorization admin2ItemA = new Authorization(admin, canCreateVersionFeature, itemRestA);
+        Authorization eperson2ItemA = new Authorization(eperson, canCreateVersionFeature, itemRestA);
+
+        getClient(tokenAdmin).perform(get("/api/authz/authorizations/" + admin2ItemA.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$", Matchers.is(
+                                        AuthorizationMatcher.matchAuthorization(admin2ItemA))));
+
+        getClient(tokenUser).perform(get("/api/authz/authorizations/" + user2ItemA.getID()))
+                            .andExpect(status().isNotFound());
+
+        getClient(tokenEPerson).perform(get("/api/authz/authorizations/" + eperson2ItemA.getID()))
+                               .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void checkCanCreateVersionFeatureAndPropertyBlockEntityUnsetedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        configurationService.setProperty("versioning.submitterCanCreateNewVersion", true);
+        configurationService.setProperty("versioning.block.entity", null);
+
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                                                  .withName("Parent Community")
+                                                  .build();
+
+        Collection col = CollectionBuilder.createCollection(context, rootCommunity)
+                                          .withName("Collection 1")
+                                          .withEntityType("Publication")
+                                          .withSubmitterGroup(eperson)
+                                          .build();
+
+        Item itemA = ItemBuilder.createItem(context, col)
+                                .withTitle("Public item")
+                                .withIssueDate("2021-04-19")
+                                .withAuthor("Doe, John")
+                                .withSubject("ExtraEntry")
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenUser = getAuthToken(user.getEmail(), password);
+
+        // define authorization that we know not exists
+        Authorization user2ItemA = new Authorization(user, canCreateVersionFeature, itemRestA);
+        Authorization admin2ItemA = new Authorization(admin, canCreateVersionFeature, itemRestA);
+        Authorization eperson2ItemA = new Authorization(eperson, canCreateVersionFeature, itemRestA);
+
+        getClient(tokenAdmin).perform(get("/api/authz/authorizations/" + admin2ItemA.getID()))
+                             .andExpect(status().isNotFound());
+
+        getClient(tokenUser).perform(get("/api/authz/authorizations/" + user2ItemA.getID()))
+                            .andExpect(status().isNotFound());
+
+        getClient(tokenEPerson).perform(get("/api/authz/authorizations/" + eperson2ItemA.getID()))
+                               .andExpect(status().isNotFound());
+    }
+
 }

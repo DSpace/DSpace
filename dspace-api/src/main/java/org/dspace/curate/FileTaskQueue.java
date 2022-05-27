@@ -13,15 +13,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.factory.DSpaceServicesFactory;
-
 
 /**
  * FileTaskQueue provides a TaskQueue implementation based on flat files
@@ -30,14 +31,16 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @author richardrodgers
  */
 public class FileTaskQueue implements TaskQueue {
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(TaskQueue.class);
+    private static final Logger log = LogManager.getLogger(TaskQueue.class);
+
     // base directory for curation task queues
     protected String tqDir;
 
     // ticket for queue readers
     protected long readTicket = -1L;
+
     // list of queues owned by reader
-    protected List<Integer> readList = new ArrayList<Integer>();
+    protected List<Integer> readList = new ArrayList<>();
 
     public FileTaskQueue() {
         tqDir = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.taskqueue.dir");
@@ -72,7 +75,7 @@ public class FileTaskQueue implements TaskQueue {
                 BufferedWriter writer = null;
                 try {
                     File queue = new File(qDir, "queue" + Integer.toString(queueIdx));
-                    writer = new BufferedWriter(new FileWriter(queue, true));
+                    writer = new BufferedWriter(new FileWriter(queue, StandardCharsets.UTF_8, true));
                     Iterator<TaskQueueEntry> iter = entrySet.iterator();
                     while (iter.hasNext()) {
                         writer.write(iter.next().toString());
@@ -96,7 +99,7 @@ public class FileTaskQueue implements TaskQueue {
     @Override
     public synchronized Set<TaskQueueEntry> dequeue(String queueName, long ticket)
         throws IOException {
-        Set<TaskQueueEntry> entrySet = new HashSet<TaskQueueEntry>();
+        Set<TaskQueueEntry> entrySet = new HashSet<>();
         if (readTicket == -1L) {
             // hold the ticket & copy all Ids available, locking queues
             // stop when no more queues or one found locked
@@ -113,8 +116,8 @@ public class FileTaskQueue implements TaskQueue {
                     // read contents from file
                     BufferedReader reader = null;
                     try {
-                        reader = new BufferedReader(new FileReader(queue));
-                        String entryStr = null;
+                        reader = new BufferedReader(new FileReader(queue, StandardCharsets.UTF_8));
+                        String entryStr;
                         while ((entryStr = reader.readLine()) != null) {
                             entryStr = entryStr.trim();
                             if (entryStr.length() > 0) {

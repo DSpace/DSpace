@@ -20,7 +20,7 @@ import org.dspace.core.Context;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the RequestItem object.
- * This class is responsible for all database calls for the RequestItem object and is autowired by spring
+ * This class is responsible for all database calls for the RequestItem object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -39,6 +39,4 @@ public class RequestItemDAOImpl extends AbstractHibernateDAO<RequestItem> implem
         criteriaQuery.where(criteriaBuilder.equal(requestItemRoot.get(RequestItem_.token), token));
         return uniqueResult(context, criteriaQuery, false, RequestItem.class);
     }
-
-
 }

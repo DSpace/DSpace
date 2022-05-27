@@ -20,7 +20,6 @@ import org.dspace.core.Context;
  * logical statement that shouldn't be use as root element. A filter may contain only one substatement.
  *
  * @author Kim Shepherd
- * @version $Revision$
  * @see org.dspace.content.logic.DefaultFilter
  */
 public interface Filter extends LogicalStatement {
@@ -31,5 +30,6 @@ public interface Filter extends LogicalStatement {
      * @return boolean
      * @throws LogicalStatementException
      */
+    @Override
     boolean getResult(Context context, Item item) throws LogicalStatementException;
 }
