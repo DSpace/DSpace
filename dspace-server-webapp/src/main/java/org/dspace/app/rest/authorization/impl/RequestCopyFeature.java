@@ -8,6 +8,7 @@
 package org.dspace.app.rest.authorization.impl;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,12 +19,16 @@ import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.BitstreamRest;
+import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -62,6 +67,12 @@ public class RequestCopyFeature implements AuthorizationFeature {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private Utils utils;
+
+    @Autowired
+    private ContentServiceFactory contentServiceFactory;
+
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         String requestType = configurationService.getProperty("request.item.type");
@@ -76,6 +87,30 @@ public class RequestCopyFeature implements AuthorizationFeature {
             log.warn("The configuration parameter \"request.item.type\" contains an invalid value.");
             return false;
         }
+        String[] restrictions = configurationService.getArrayProperty("request.item.restricted");
+        if (restrictions != null && restrictions.length > 0) {
+            if (object instanceof DSpaceObjectRest) {
+                DSpaceObjectRest dspaceObjectRest = (DSpaceObjectRest) object;
+                String uuid = dspaceObjectRest.getUuid();
+                if (Arrays.stream(restrictions).anyMatch(uuid::equals)) {
+                    return false;
+                }
+                // Security in case we encounter an infinite loop.
+                DSpaceObject previousParent = null;
+                DSpaceObject parent = (DSpaceObject) utils.getDSpaceAPIObjectFromRest(context, object);
+                do {
+                    previousParent = parent;
+                    parent = getParentObject(context, parent);
+                    if (parent == null) {
+                        break;
+                    }
+                    String parentUUID = parent.getID().toString();
+                    if (Arrays.stream(restrictions).anyMatch(parentUUID::equals)) {
+                        return false;
+                    }
+                } while (parent != previousParent);
+            }
+        }
         if (object instanceof ItemRest) {
             ItemRest itemRest = (ItemRest) object;
             String id = itemRest.getId();
@@ -84,7 +119,6 @@ public class RequestCopyFeature implements AuthorizationFeature {
                 return false;
             }
             List<Bundle> bunds = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
-
             for (Bundle bund : bunds) {
                 List<Bitstream> bitstreams = bund.getBitstreams();
                 for (Bitstream bitstream : bitstreams) {
@@ -97,7 +131,6 @@ public class RequestCopyFeature implements AuthorizationFeature {
         } else if (object instanceof BitstreamRest) {
             BitstreamRest bitstreamRest = (BitstreamRest) object;
             Bitstream bitstream = bitstreamService.find(context, UUID.fromString(bitstreamRest.getId()));
-
             DSpaceObject parentObject = bitstreamService.getParentObject(context, bitstream);
             if (parentObject instanceof Item) {
                 if (((Item) parentObject).isArchived()) {
@@ -106,6 +139,23 @@ public class RequestCopyFeature implements AuthorizationFeature {
             }
         }
         return false;
+    }
+
+    private DSpaceObject getParentObject(Context context, DSpaceObject object) throws SQLException {
+        DSpaceObject parentObject = contentServiceFactory
+            .getDSpaceObjectService(object.getType())
+            .getParentObject(context, object);
+        if (object.getType() == Constants.ITEM && parentObject == null) {
+            Item item = (Item) object;
+            parentObject = item.getOwningCollection();
+            WorkspaceItem byItem = contentServiceFactory
+                .getWorkspaceItemService()
+                .findByItem(context, item);
+            if (byItem != null) {
+                parentObject = byItem.getCollection();
+            }
+        }
+        return parentObject;
     }
 
     @Override
