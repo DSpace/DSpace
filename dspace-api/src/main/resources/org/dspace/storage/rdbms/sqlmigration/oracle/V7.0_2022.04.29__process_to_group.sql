@@ -7,11 +7,12 @@
 --
 
 -------------------------------------------------------------------------------
--- Sequences for Process within Group feature
+-- Table to store Groups related to a Process on its creation
 -------------------------------------------------------------------------------
 
 CREATE TABLE Process2Group
 (
     process_id INTEGER REFERENCES Process(process_id),
-    group_id UUID REFERENCES epersongroup (uuid) ON DELETE CASCADE
+    group_id UUID REFERENCES epersongroup (uuid) ON DELETE CASCADE,
+    CONSTRAINT PK_Process2Group PRIMARY KEY (process_id, group_id)
 );

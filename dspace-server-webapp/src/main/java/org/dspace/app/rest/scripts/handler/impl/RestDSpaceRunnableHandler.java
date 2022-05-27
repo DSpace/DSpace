@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.cli.HelpFormatter;
@@ -65,7 +66,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
      *                      creating process at process creation time
      */
     public RestDSpaceRunnableHandler(EPerson ePerson, String scriptName, List<DSpaceCommandLineParameter> parameters,
-                                     final List<Group> specialGroups) {
+                                     final Set<Group> specialGroups) {
         Context context = new Context();
         try {
             ePersonId = ePerson.getID();
@@ -317,7 +318,6 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         try {
             Process process = processService.find(context, processId);
             for (Group group : process.getGroups()) {
-                context.setSpecialGroup(group.getID());
                 specialGroups.add(group.getID());
             }
         } catch (SQLException e) {

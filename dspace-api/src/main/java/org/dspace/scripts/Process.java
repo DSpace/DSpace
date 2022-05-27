@@ -79,6 +79,9 @@ public class Process implements ReloadableEntity<Integer> {
     )
     private List<Bitstream> bitstreams;
 
+    /*
+     * Special Groups associated with this Process
+     */
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinTable(
         name = "process2group",
@@ -221,10 +224,17 @@ public class Process implements ReloadableEntity<Integer> {
         return creationTime;
     }
 
+    /**
+     * This method sets the special groups associated with the Process.
+     */
     public List<Group> getGroups() {
         return groups;
     }
 
+    /**
+     * This method will return special groups associated with the Process.
+     * @return The special groups of this process.
+     */
     public void setGroups(List<Group> groups) {
         this.groups = groups;
     }
