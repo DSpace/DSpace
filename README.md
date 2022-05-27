@@ -35,7 +35,7 @@ Documentation for each release may be viewed online or downloaded via our [Docum
 The latest DSpace Installation instructions are available at:
 https://wiki.lyrasis.org/display/DSDOC7x/Installing+DSpace
 
-Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL or Oracle)
+Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL)
 and a servlet container (usually Tomcat) in order to function.
 More information about these and all other prerequisites can be found in the Installation instructions above.
 
