@@ -364,50 +364,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                             throw new Exception("Could not find item for " + itemIdentifier);
                         }
 
-                        //get entity type of entity and item
-                        String itemEntityType = getEntityType(item);
-                        String relatedEntityType = getEntityType(relationItem);
-
-                        //find matching relationship type
-                        List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(
-                            c, relationshipType);
-                        RelationshipType foundRelationshipType = RelationshipUtils.matchRelationshipType(
-                            relTypes, relatedEntityType, itemEntityType, relationshipType);
-
-                        if (foundRelationshipType == null) {
-                            throw new Exception("No Relationship type found for:\n" +
-                                "Target type: " + relatedEntityType + "\n" +
-                                "Origin referer type: " + itemEntityType + "\n" +
-                                "with typeName: " + relationshipType
-                            );
-                        }
-
-                        boolean left = false;
-                        if (foundRelationshipType.getLeftwardType().equalsIgnoreCase(relationshipType)) {
-                            left = true;
-                        }
-
-                        // Placeholder items for relation placing
-                        Item leftItem = null;
-                        Item rightItem = null;
-                        if (left) {
-                            leftItem = item;
-                            rightItem = relationItem;
-                        } else {
-                            leftItem = relationItem;
-                            rightItem = item;
-                        }
-
-                        // Create the relationship
-                        int leftPlace = relationshipService.findNextLeftPlaceByLeftItem(c, leftItem);
-                        int rightPlace = relationshipService.findNextRightPlaceByRightItem(c, rightItem);
-                        Relationship persistedRelationship = relationshipService.create(
-                            c, leftItem, rightItem, foundRelationshipType, leftPlace, rightPlace);
-                        // relationshipService.update(c, persistedRelationship);
-
-                        System.out.println("\tAdded relationship (type: " + relationshipType + ") from " +
-                            leftItem.getHandle() + " to " + rightItem.getHandle());
-
+                        addRelationship(c, item, relationItem, relationshipType);
                     }
 
                 }
@@ -419,12 +376,68 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     }
 
     /**
+     * Add relationship.
+     * @param c the context
+     * @param item the item
+     * @param typeName the relation type name
+     * @param value the value of the related item
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    protected void addRelationship(Context c, Item item, Item relationItem, String relationshipType)
+            throws SQLException, AuthorizeException {
+        // get entity type of entity and item
+        String itemEntityType = getEntityType(item);
+        String relatedEntityType = getEntityType(relationItem);
+
+        // find matching relationship type
+        List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(
+            c, relationshipType);
+        RelationshipType foundRelationshipType = RelationshipUtils.matchRelationshipType(
+            relTypes, relatedEntityType, itemEntityType, relationshipType);
+
+        if (foundRelationshipType == null) {
+            throw new IllegalArgumentException("No Relationship type found for:\n" +
+                "Target type: " + relatedEntityType + "\n" +
+                "Origin referer type: " + itemEntityType + "\n" +
+                "with typeName: " + relationshipType
+            );
+        }
+
+        boolean left = false;
+        if (foundRelationshipType.getLeftwardType().equalsIgnoreCase(relationshipType)) {
+            left = true;
+        }
+
+        // placeholder items for relation placing
+        Item leftItem = null;
+        Item rightItem = null;
+        if (left) {
+            leftItem = item;
+            rightItem = relationItem;
+        } else {
+            leftItem = relationItem;
+            rightItem = item;
+        }
+
+        // create the relationship
+        int leftPlace = relationshipService.findNextLeftPlaceByLeftItem(c, leftItem);
+        int rightPlace = relationshipService.findNextRightPlaceByRightItem(c, rightItem);
+        Relationship persistedRelationship = relationshipService.create(
+            c, leftItem, rightItem, foundRelationshipType, leftPlace, rightPlace);
+        // relationshipService.update(c, persistedRelationship);
+
+        System.out.println("\tAdded relationship (type: " + relationshipType + ") from " +
+            leftItem.getHandle() + " to " + rightItem.getHandle());
+    }
+
+    /**
      * Get the item's entity type from meta.
      * 
      * @param item
      * @return
      */
-    protected String getEntityType(Item item) throws Exception {
+    protected String getEntityType(Item item) {
         return itemService.getMetadata(item, "dspace", "entity", "type", Item.ANY).get(0).getValue();
     }
 
@@ -540,17 +553,32 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             }
 
-        } else if (itemIdentifier.indexOf('/') != -1) {
-            //resolve by handle
-            return (Item) handleService.resolveToObject(c, itemIdentifier);
-
-        } else {
-            //try to resolve by UUID
-            return itemService.findByIdOrLegacyId(c, itemIdentifier);
         }
 
-        return null;
+        // resolve item by handle or UUID
+        return resolveItem(c, itemIdentifier);
 
+    }
+
+    /**
+     * Resolve an item identifier.
+     * 
+     * @param c Context
+     * @param itemIdentifier The identifier string found in the import file (handle or UUID)
+     * @return Item if found, or null.
+     * @throws SQLException
+     * @throws IllegalStateException
+     * @throws Exception
+     */
+    protected Item resolveItem(Context c, String itemIdentifier)
+            throws IllegalStateException, SQLException {
+        if (itemIdentifier.indexOf('/') != -1) {
+            // resolve by handle
+            return (Item) handleService.resolveToObject(c, itemIdentifier);
+        }
+
+        // resolve by UUID
+        return itemService.findByIdOrLegacyId(c, itemIdentifier);
     }
 
     /**
@@ -932,7 +960,15 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
         // only add metadata if it is no test and there is an actual value
         if (!isTest && !value.equals("")) {
-            itemService.addMetadata(c, i, schema, element, qualifier, language, value);
+            if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
+                Item relationItem = resolveItem(c, value);
+                if (relationItem == null) {
+                    throw new IllegalArgumentException("No item found with id=" + value);
+                }
+                addRelationship(c, i, relationItem, element);
+            } else {
+                itemService.addMetadata(c, i, schema, element, qualifier, language, value);
+            }
         } else {
             // If we're just test the import, let's check that the actual metadata field exists.
             MetadataSchema foundSchema = metadataSchemaService.find(c, schema);

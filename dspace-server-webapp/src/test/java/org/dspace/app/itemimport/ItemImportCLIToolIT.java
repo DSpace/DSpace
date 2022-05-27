@@ -58,7 +58,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
 
-    private static final String title = "A Tale of Two Cities";
+    private static final String publicationTitle = "A Tale of Two Cities";
+    private static final String personTitle = "Person Test";
 
     @Autowired
     private ItemService itemService;
@@ -172,20 +173,18 @@ public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
         context.restoreAuthSystemState();
         // create simple SAF
         Path safDir = Files.createDirectory(Path.of(tempDir.toString() + "/test"));
-        Path itemDir1 = Files.createDirectory(Path.of(safDir.toString() + "/item_000"));
-        Files.writeString(Path.of(itemDir1.toString() + "/collections"),
-                collectionPerson.getID().toString());
-        Files.copy(getClass().getResourceAsStream("dublin_core-person.xml"),
-                Path.of(itemDir1.toString() + "/dublin_core.xml"));
-        Files.copy(getClass().getResourceAsStream("relationships"),
-                Path.of(itemDir1.toString() + "/relationships"));
-        Files.copy(getClass().getResourceAsStream("metadata_dspace.xml"),
-                Path.of(itemDir1.toString() + "/metadata_dspace.xml"));
-        Path itemDir2 = Files.createDirectory(Path.of(safDir.toString() + "/item_001"));
-        Files.writeString(Path.of(itemDir2.toString() + "/collections"),
+        Path publicationDir = Files.createDirectory(Path.of(safDir.toString() + "/item_000"));
+        Files.writeString(Path.of(publicationDir.toString() + "/collections"),
                 collection.getID().toString());
         Files.copy(getClass().getResourceAsStream("dublin_core.xml"),
-                Path.of(itemDir2.toString() + "/dublin_core.xml"));
+                Path.of(publicationDir.toString() + "/dublin_core.xml"));
+        Files.copy(getClass().getResourceAsStream("relationships"),
+                Path.of(publicationDir.toString() + "/relationships"));
+        Path personDir = Files.createDirectory(Path.of(safDir.toString() + "/item_001"));
+        Files.writeString(Path.of(personDir.toString() + "/collections"),
+                collectionPerson.getID().toString());
+        Files.copy(getClass().getResourceAsStream("dublin_core-person.xml"),
+                Path.of(personDir.toString() + "/dublin_core.xml"));
 
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
         parameters.add(new DSpaceCommandLineParameter("-a", ""));
@@ -195,6 +194,39 @@ public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
         perfomImportScript(parameters);
 
         checkMetadata();
+        checkRelationship();
+    }
+
+    @Test
+    public void importItemsBySafWithRelationshipsByRelationSchema() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // create collection that contains person
+        Collection collectionPerson = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection Person")
+                .withEntityType("Person")
+                .build();
+        Item person = ItemBuilder.createItem(context, collectionPerson)
+                .withTitle(personTitle)
+                .build();
+        context.restoreAuthSystemState();
+        // create simple SAF
+        Path safDir = Files.createDirectory(Path.of(tempDir.toString() + "/test"));
+        Path itemDir = Files.createDirectory(Path.of(safDir.toString() + "/item_000"));
+        Files.copy(getClass().getResourceAsStream("dublin_core.xml"),
+                Path.of(itemDir.toString() + "/dublin_core.xml"));
+        Files.writeString(Path.of(itemDir.toString() + "/metadata_relation.xml"),
+                "<dublin_core schema=\"relation\">\n" +
+                "    <dcvalue element=\"isAuthorOfPublication\">" + person.getID() + "</dcvalue>\n" +
+                "</dublin_core>");
+
+        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
+        parameters.add(new DSpaceCommandLineParameter("-a", ""));
+        parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
+        parameters.add(new DSpaceCommandLineParameter("-c", collection.getID().toString()));
+        parameters.add(new DSpaceCommandLineParameter("-s", safDir.toString()));
+        parameters.add(new DSpaceCommandLineParameter("-m", tempDir.toString() + "/mapfile.out"));
+        perfomImportScript(parameters);
+
         checkRelationship();
     }
 
@@ -482,7 +514,7 @@ public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
         // create item
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
-                .withTitle(title)
+                .withTitle(publicationTitle)
                 .build();
         context.restoreAuthSystemState();
         // add mapfile
@@ -503,11 +535,11 @@ public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
      * @throws Exception
      */
     private void checkMetadata() throws Exception {
-        Item item = itemService.findByMetadataField(context, "dc", "title", null, title).next();
+        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
         getClient().perform(get("/api/core/items/" + item.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.metadata", allOf(
-                        matchMetadata("dc.title", title),
+                        matchMetadata("dc.title", publicationTitle),
                         matchMetadata("dc.date.issued", "1990"),
                         matchMetadata("dc.title.alternative", "J'aime les Printemps"))));
     }
@@ -517,11 +549,11 @@ public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
      * @throws Exception
      */
     private void checkMetadataWithAnotherSchema() throws Exception {
-        Item item = itemService.findByMetadataField(context, "dc", "title", null, title).next();
+        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
         getClient().perform(get("/api/core/items/" + item.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.metadata", allOf(
-                        matchMetadata("dcterms.title", title))));
+                        matchMetadata("dcterms.title", publicationTitle))));
     }
 
     /**
@@ -529,7 +561,7 @@ public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
      * @throws Exception
      */
     private void checkBitstream() throws Exception {
-        Bitstream bitstream = itemService.findByMetadataField(context, "dc", "title", null, title).next()
+        Bitstream bitstream = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next()
                 .getBundles("ORIGINAL").get(0).getBitstreams().get(0);
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
                 .andExpect(status().isOk())
@@ -542,7 +574,7 @@ public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
      * @throws Exception
      */
     private void checkItemDeletion() throws Exception {
-        Iterator<Item> itemIterator = itemService.findByMetadataField(context, "dc", "title", null, title);
+        Iterator<Item> itemIterator = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle);
         assertEquals(itemIterator.hasNext(), false);
     }
 
@@ -551,15 +583,15 @@ public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
      * @throws Exception
      */
     private void checkRelationship() throws Exception {
-        Item item = itemService.findByMetadataField(context, "dc", "title", null, title).next();
-        Item author = itemService.findByMetadataField(context, "dc", "title", null, "First Author").next();
+        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
+        Item author = itemService.findByMetadataField(context, "dc", "title", null, personTitle).next();
         List<Relationship> relationships = relationshipService.findByItem(context, item);
         assertEquals(1, relationships.size());
         getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID()).param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftPlace", is(0)))
                    .andExpect(jsonPath("$._links.rightItem.href", containsString(author.getID().toString())))
-                   .andExpect(jsonPath("$.rightPlace", is(1)))
+                   .andExpect(jsonPath("$.rightPlace", is(0)))
                    .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(0)))));
     }
 
