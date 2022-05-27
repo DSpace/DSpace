@@ -8,8 +8,6 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -49,16 +47,15 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
     @Override
     void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object value)
             throws Exception {
+        //"absolutePath": "files/0/accessConditions"
         //"path": "/sections/upload/files/0/accessConditions"
-        //TODO extract the correct upload configuration via split
         String[] splitAbsPath = getAbsolutePath(path).split("/");
         String[] splitPath = path.split("/");
         Item item = source.getItem();
 
         List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
         ;
-        UploadConfiguration  uploadConfig = uploadConfigurationService.getMap().get(splitPath[2]);
-        //TODO find the correct value via uploadConfigurationService.getMap() using "upload" as key
+        UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(splitPath[2]);
         for (Bundle bb : bundle) {
             int idx = 0;
             for (Bitstream bitstream : bb.getBitstreams()) {

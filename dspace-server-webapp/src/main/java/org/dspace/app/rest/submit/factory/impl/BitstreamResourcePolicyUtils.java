@@ -10,9 +10,9 @@ package org.dspace.app.rest.submit.factory.impl;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -77,11 +77,17 @@ public class BitstreamResourcePolicyUtils {
             DSpaceObject obj, String name, String description,
                                                Date startDate, Date endDate)
             throws SQLException, AuthorizeException, ParseException {
+        boolean found = false;
         for (AccessConditionOption aco : uploadConfiguration.getOptions()) {
             if (aco.getName().equalsIgnoreCase(name)) {
                 aco.createResourcePolicy(context, obj, name, description, startDate, endDate);
-                return;
+                found = true;
             }
         }
+        // unexisting/unconfigured access conditions are no longer accepted
+        if (!found) {
+            throw new UnprocessableEntityException("The provided access condition: " + name + " is not supported!");
+        }
+        return;
     }
 }
