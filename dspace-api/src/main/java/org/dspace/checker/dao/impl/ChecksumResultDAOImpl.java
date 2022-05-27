@@ -21,7 +21,7 @@ import org.dspace.core.Context;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the ChecksumResult object.
- * This class is responsible for all database calls for the ChecksumResult object and is autowired by spring
+ * This class is responsible for all database calls for the ChecksumResult object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -39,6 +39,6 @@ public class ChecksumResultDAOImpl extends AbstractHibernateDAO<ChecksumResult> 
         Root<ChecksumResult> checksumResultRoot = criteriaQuery.from(ChecksumResult.class);
         criteriaQuery.select(checksumResultRoot);
         criteriaQuery.where(criteriaBuilder.equal(checksumResultRoot.get(ChecksumResult_.resultCode), code));
-        return uniqueResult(context, criteriaQuery, false, ChecksumResult.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, ChecksumResult.class);
     }
 }

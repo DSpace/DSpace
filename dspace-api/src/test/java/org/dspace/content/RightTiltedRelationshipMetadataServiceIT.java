@@ -12,6 +12,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
@@ -29,12 +31,22 @@ public class RightTiltedRelationshipMetadataServiceIT extends RelationshipMetada
     @Override
     protected void initJournalVolumeIssue() throws Exception {
         context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).build();
+
+        Collection col = CollectionBuilder.createCollection(context, community)
+                               .withEntityType("JournalIssue")
+                               .build();
+        Collection col2 = CollectionBuilder.createCollection(context, community)
+                                .withEntityType("JournalVolume")
+                                .build();
+
         EntityType journalIssueEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
         EntityType publicationVolumeEntityType =
             EntityTypeBuilder.createEntityTypeBuilder(context, "JournalVolume").build();
-        leftItem = ItemBuilder.createItem(context, col).withEntityType("JournalIssue")
+        leftItem = ItemBuilder.createItem(context, col)
             .withPublicationIssueNumber("2").build();
-        rightItem = ItemBuilder.createItem(context, col).withEntityType("JournalVolume")
+        rightItem = ItemBuilder.createItem(context, col2)
             .withPublicationVolumeNumber("30").build();
         RelationshipType isIssueOfVolume =
             RelationshipTypeBuilder

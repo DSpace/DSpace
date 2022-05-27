@@ -15,8 +15,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
@@ -31,8 +29,6 @@ public class BitStoreMigrate {
      */
     private static final Logger log = LogManager.getLogger(BitStoreMigrate.class);
 
-    private static final BitstreamService bitstreamService
-            = ContentServiceFactory.getInstance().getBitstreamService();
     private static final BitstreamStorageService bitstreamStorageService
             = StorageServiceFactory.getInstance().getBitstreamStorageService();
 

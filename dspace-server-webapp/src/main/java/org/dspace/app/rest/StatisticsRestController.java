@@ -20,7 +20,6 @@ import org.dspace.app.rest.model.hateoas.ViewEventResource;
 import org.dspace.app.rest.repository.SearchEventRestRepository;
 import org.dspace.app.rest.repository.StatisticsRestRepository;
 import org.dspace.app.rest.repository.ViewEventRestRepository;
-import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
@@ -38,9 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/" + RestAddressableModel.STATISTICS)
 public class StatisticsRestController implements InitializingBean {
-
-    @Autowired
-    private Utils utils;
 
     @Autowired
     private DiscoverableEndpointsService discoverableEndpointsService;
@@ -61,7 +57,7 @@ public class StatisticsRestController implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService
             .register(this, Arrays
-                .asList(new Link("/api/" + RestAddressableModel.STATISTICS, RestAddressableModel.STATISTICS)));
+                .asList(Link.of("/api/" + RestAddressableModel.STATISTICS, RestAddressableModel.STATISTICS)));
     }
 
     @RequestMapping(method = RequestMethod.GET)

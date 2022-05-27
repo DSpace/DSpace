@@ -35,7 +35,7 @@ Documentation for each release may be viewed online or downloaded via our [Docum
 The latest DSpace Installation instructions are available at:
 https://wiki.lyrasis.org/display/DSDOC7x/Installing+DSpace
 
-Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL or Oracle)
+Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL)
 and a servlet container (usually Tomcat) in order to function.
 More information about these and all other prerequisites can be found in the Installation instructions above.
 
@@ -136,3 +136,6 @@ run automatically by [GitHub Actions](https://github.com/DSpace/DSpace/actions?q
 
 DSpace source code is freely available under a standard [BSD 3-Clause license](https://opensource.org/licenses/BSD-3-Clause).
 The full license is available in the [LICENSE](LICENSE) file or online at http://www.dspace.org/license/
+
+DSpace uses third-party libraries which may be distributed under different licenses. Those licenses are listed
+in the [LICENSES_THIRD_PARTY](LICENSES_THIRD_PARTY) file.

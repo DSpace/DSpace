@@ -127,6 +127,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
         collectionARest = collectionConverter.convert(collectionA, Projection.DEFAULT);
         itemARest = itemConverter.convert(itemA, Projection.DEFAULT);
         bitstreamARest = bitstreamConverter.convert(bitstreamA, Projection.DEFAULT);
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", true);
     }
 
     @Test

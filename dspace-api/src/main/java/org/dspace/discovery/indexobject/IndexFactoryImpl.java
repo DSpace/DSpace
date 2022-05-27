@@ -95,7 +95,6 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
                                                                            100000);
 
                 // Use Tika's Text parser as the streams are always from the TEXT bundle (i.e. already extracted text)
-                // TODO: We may wish to consider using Tika to extract the text in the future.
                 TextAndCSVParser tikaParser = new TextAndCSVParser();
                 BodyContentHandler tikaHandler = new BodyContentHandler(charLimit);
                 Metadata tikaMetadata = new Metadata();

@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -38,6 +39,7 @@ import java.util.regex.Pattern;
 import com.coverity.security.Escape;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -46,13 +48,12 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * Utility functions for DSpace.
  *
  * @author Peter Breton
- * @version $Revision$
  */
 public final class Utils {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Utils.class);
+    private static final Logger log = LogManager.getLogger(Utils.class);
 
     private static final Pattern DURATION_PATTERN = Pattern
         .compile("(\\d+)([smhdwy])");
@@ -71,12 +72,12 @@ public final class Utils {
 
     private static int counter = 0;
 
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
-    private static VMID vmid = new VMID();
+    private static final VMID vmid = new VMID();
 
     // for parseISO8601Date
-    private static SimpleDateFormat parseFmt[]  = {
+    private static final SimpleDateFormat[] parseFmt = {
         // first try at parsing, has milliseconds (note General time zone)
         new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSz"),
 
@@ -86,17 +87,21 @@ public final class Utils {
         // finally, try without any timezone (defaults to current TZ)
         new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS"),
 
-        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss")
+        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss"),
+
+        new SimpleDateFormat("yyyy'-'MM'-'dd")
     };
 
     // for formatISO8601Date
     // output canonical format (note RFC22 time zone, easier to hack)
-    private static SimpleDateFormat outFmtSecond = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ssZ");
+    private static final SimpleDateFormat outFmtSecond
+            = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ssZ");
 
     // output format with millsecond precision
-    private static SimpleDateFormat outFmtMillisec = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ");
+    private static final SimpleDateFormat outFmtMillisec
+            = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ");
 
-    private static Calendar outCal = GregorianCalendar.getInstance();
+    private static final Calendar outCal = GregorianCalendar.getInstance();
 
     /**
      * Private constructor
@@ -110,7 +115,7 @@ public final class Utils {
      * @return MD5 checksum for the data in hex format.
      */
     public static String getMD5(String data) {
-        return getMD5(data.getBytes());
+        return getMD5(data.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -153,14 +158,14 @@ public final class Utils {
             return null;
         }
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         // This is far from the most efficient way to do things...
-        for (int i = 0; i < data.length; i++) {
-            int low = (int) (data[i] & 0x0F);
-            int high = (int) (data[i] & 0xF0);
+        for (byte datum : data) {
+            int low = datum & 0x0F;
+            int high = datum & 0xF0;
 
-            result.append(Integer.toHexString(high).substring(0, 1));
+            result.append(Integer.toHexString(high).charAt(0));
             result.append(Integer.toHexString(low));
         }
 
@@ -196,11 +201,9 @@ public final class Utils {
         byte[] junk = new byte[16];
 
         random.nextBytes(junk);
+        String input = String.valueOf(vmid) + new Date() + Arrays.toString(junk) + counter++;
 
-        String input = new StringBuffer().append(vmid).append(
-            new java.util.Date()).append(Arrays.toString(junk)).append(counter++).toString();
-
-        return getMD5Bytes(input.getBytes());
+        return getMD5Bytes(input.getBytes(StandardCharsets.UTF_8));
     }
 
     // The following two methods are taken from the Jakarta IOUtil class.
@@ -287,7 +290,7 @@ public final class Utils {
         }
 
         String units = m.group(2);
-        long multiplier = MS_IN_SECOND;
+        long multiplier;
 
         if ("s".equals(units)) {
             multiplier = MS_IN_SECOND;
@@ -327,16 +330,16 @@ public final class Utils {
         char tzSign = s.charAt(s.length() - 6);
         if (s.endsWith("Z")) {
             s = s.substring(0, s.length() - 1) + "GMT+00:00";
-        } else if (tzSign == '-' || tzSign == '+') {
+        } else if ((tzSign == '-' || tzSign == '+') && s.length() > 10) {
             // check for trailing timezone
             s = s.substring(0, s.length() - 6) + "GMT" + s.substring(s.length() - 6);
         }
 
         // try to parse without milliseconds
         ParseException lastError = null;
-        for (int i = 0; i < parseFmt.length; ++i) {
+        for (SimpleDateFormat simpleDateFormat : parseFmt) {
             try {
-                return parseFmt[i].parse(s);
+                return simpleDateFormat.parse(s);
             } catch (ParseException e) {
                 lastError = e;
             }
@@ -369,7 +372,7 @@ public final class Utils {
     }
 
     public static <E> java.util.Collection<E> emptyIfNull(java.util.Collection<E> collection) {
-        return collection == null ? Collections.<E>emptyList() : collection;
+        return collection == null ? Collections.emptyList() : collection;
     }
 
     /**
@@ -450,7 +453,7 @@ public final class Utils {
             if (hostname != null) {
                 return hostname.startsWith("www.") ? hostname.substring(4) : hostname;
             }
-            return hostname;
+            return null;
         } catch (URISyntaxException e) {
             return null;
         }

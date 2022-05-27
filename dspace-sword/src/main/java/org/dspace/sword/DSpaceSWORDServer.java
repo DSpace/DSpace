@@ -9,7 +9,7 @@ package org.dspace.sword;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.purl.sword.base.AtomDocumentRequest;
 import org.purl.sword.base.AtomDocumentResponse;
 import org.purl.sword.base.Deposit;
@@ -56,12 +56,12 @@ public class DSpaceSWORDServer implements SWORDServer {
             Context context = sc.getContext();
 
             if (log.isDebugEnabled()) {
-                log.debug(LogManager
+                log.debug(LogHelper
                               .getHeader(context, "sword_do_service_document", ""));
             }
 
             // log the request
-            log.info(LogManager
+            log.info(LogHelper
                          .getHeader(context, "sword_service_document_request",
                                     "username=" + request.getUsername() +
                                         ",on_behalf_of=" +
@@ -105,12 +105,11 @@ public class DSpaceSWORDServer implements SWORDServer {
             Context context = sc.getContext();
 
             if (log.isDebugEnabled()) {
-                log.debug(
-                    LogManager.getHeader(context, "sword_do_deposit", ""));
+                log.debug(LogHelper.getHeader(context, "sword_do_deposit", ""));
             }
 
             // log the request
-            log.info(LogManager.getHeader(context, "sword_deposit_request",
+            log.info(LogHelper.getHeader(context, "sword_deposit_request",
                                           "username=" + deposit.getUsername() + ",on_behalf_of=" +
                                               deposit.getOnBehalfOf()));
 
@@ -155,12 +154,12 @@ public class DSpaceSWORDServer implements SWORDServer {
             Context context = sc.getContext();
 
             if (log.isDebugEnabled()) {
-                log.debug(LogManager
+                log.debug(LogHelper
                               .getHeader(context, "sword_do_atom_document", ""));
             }
 
             // log the request
-            log.info(LogManager
+            log.info(LogHelper
                          .getHeader(context, "sword_atom_document_request",
                                     "username=" + adr.getUsername()));
 

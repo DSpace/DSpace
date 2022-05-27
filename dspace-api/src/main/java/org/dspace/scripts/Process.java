@@ -7,8 +7,8 @@
  */
 package org.dspace.scripts;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -91,6 +91,7 @@ public class Process implements ReloadableEntity<Integer> {
      * This method returns the ID that the Process holds within the Database
      * @return  The ID that the process holds within the database
      */
+    @Override
     public Integer getID() {
         return processId;
     }
@@ -162,7 +163,8 @@ public class Process implements ReloadableEntity<Integer> {
 
     /**
      * To get the parameters, use ProcessService.getParameters() to get a parsed list of DSpaceCommandLineParameters
-     * This String representation is the parameter in an unparsed fashion. For example "-c test"
+     * This String representation is the parameter in an unparsed fashion.For example "-c test"
+     * @return the raw parameter string.
      */
     protected String getParameters() {
         return parameters;
@@ -179,7 +181,7 @@ public class Process implements ReloadableEntity<Integer> {
      */
     public List<Bitstream> getBitstreams() {
         if (bitstreams == null) {
-            bitstreams = new LinkedList<>();
+            bitstreams = new ArrayList<>();
         }
         return bitstreams;
     }

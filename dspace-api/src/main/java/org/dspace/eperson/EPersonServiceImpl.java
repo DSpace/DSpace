@@ -36,7 +36,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
 import org.dspace.eperson.dao.EPersonDAO;
 import org.dspace.eperson.service.EPersonService;
@@ -220,7 +220,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         // Create a table row
         EPerson e = ePersonDAO.create(context, new EPerson());
 
-        log.info(LogManager.getHeader(context, "create_eperson", "eperson_id="
+        log.info(LogHelper.getHeader(context, "create_eperson", "eperson_id="
                 + e.getID()));
 
         context.addEvent(new Event(Event.CREATE, Constants.EPERSON, e.getID(),
@@ -385,7 +385,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         // Remove ourself
         ePersonDAO.delete(context, ePerson);
 
-        log.info(LogManager.getHeader(context, "delete_eperson",
+        log.info(LogHelper.getHeader(context, "delete_eperson",
                 "eperson_id=" + ePerson.getID()));
     }
 
@@ -486,7 +486,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
         ePersonDAO.save(context, ePerson);
 
-        log.info(LogManager.getHeader(context, "update_eperson",
+        log.info(LogHelper.getHeader(context, "update_eperson",
                 "eperson_id=" + ePerson.getID()));
 
         if (ePerson.isModified()) {

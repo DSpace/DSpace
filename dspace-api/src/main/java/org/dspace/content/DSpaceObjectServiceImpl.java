@@ -13,11 +13,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.NotImplementedException;
@@ -93,20 +93,6 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             if (dso.getHandle() != null) {
                 identifiers.add(handleService.getCanonicalForm(dso.getHandle()));
             }
-        }
-
-        if (log.isDebugEnabled()) {
-            StringBuilder dbgMsg = new StringBuilder();
-            for (String id : identifiers) {
-                if (dbgMsg.capacity() == 0) {
-                    dbgMsg.append("This DSO's Identifiers are: ");
-                } else {
-                    dbgMsg.append(", ");
-                }
-                dbgMsg.append(id);
-            }
-            dbgMsg.append(".");
-            log.debug(dbgMsg.toString());
         }
 
         return identifiers;
@@ -257,67 +243,64 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
         boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
-        List<MetadataValue> newMetadata = new ArrayList<>(values.size());
+        List<MetadataValue> newMetadata = new ArrayList<>();
         // We will not verify that they are valid entries in the registry
         // until update() is called.
         for (int i = 0; i < values.size(); i++) {
-
-            if (authorities != null && authorities.size() >= i) {
-                if (StringUtils.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
-                    continue;
-                }
-            }
-            MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
-            newMetadata.add(metadataValue);
-
-            metadataValue.setPlace(placeSupplier.get());
-
-            metadataValue.setLanguage(lang == null ? null : lang.trim());
-
-            // Logic to set Authority and Confidence:
-            //  - normalize an empty string for authority to NULL.
-            //  - if authority key is present, use given confidence or NOVALUE if not given
-            //  - otherwise, preserve confidence if meaningful value was given since it may document a failed
-            // authority lookup
-            //  - CF_UNSET signifies no authority nor meaningful confidence.
-            //  - it's possible to have empty authority & CF_ACCEPTED if e.g. user deletes authority key
-            if (authorityControlled) {
-                if (authorities != null && authorities.get(i) != null && authorities.get(i).length() > 0) {
-                    metadataValue.setAuthority(authorities.get(i));
-                    metadataValue.setConfidence(confidences == null ? Choices.CF_NOVALUE : confidences.get(i));
-                } else {
-                    metadataValue.setAuthority(null);
-                    metadataValue.setConfidence(confidences == null ? Choices.CF_UNSET : confidences.get(i));
-                }
-                // authority sanity check: if authority is required, was it supplied?
-                // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so
-                // use a runtime exception
-                if (authorityRequired && (metadataValue.getAuthority() == null || metadataValue.getAuthority()
-                                                                                               .length() == 0)) {
-                    throw new IllegalArgumentException("The metadata field \"" + metadataField
-                        .toString() + "\" requires an authority key but none was provided. Value=\"" + values
-                        .get(i) + "\"");
-                }
-            }
             if (values.get(i) != null) {
+                if (authorities != null && authorities.size() >= i) {
+                    if (StringUtils.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+                        continue;
+                    }
+                }
+                MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
+                newMetadata.add(metadataValue);
+
+                metadataValue.setPlace(placeSupplier.get());
+
+                metadataValue.setLanguage(lang == null ? null : lang.trim());
+
+                // Logic to set Authority and Confidence:
+                //  - normalize an empty string for authority to NULL.
+                //  - if authority key is present, use given confidence or NOVALUE if not given
+                //  - otherwise, preserve confidence if meaningful value was given since it may document a failed
+                // authority lookup
+                //  - CF_UNSET signifies no authority nor meaningful confidence.
+                //  - it's possible to have empty authority & CF_ACCEPTED if e.g. user deletes authority key
+                if (authorityControlled) {
+                    if (authorities != null && authorities.get(i) != null && authorities.get(i).length() > 0) {
+                        metadataValue.setAuthority(authorities.get(i));
+                        metadataValue.setConfidence(confidences == null ? Choices.CF_NOVALUE : confidences.get(i));
+                    } else {
+                        metadataValue.setAuthority(null);
+                        metadataValue.setConfidence(confidences == null ? Choices.CF_UNSET : confidences.get(i));
+                    }
+                    // authority sanity check: if authority is required, was it supplied?
+                    // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so
+                    // use a runtime exception
+                    if (authorityRequired && (metadataValue.getAuthority() == null || metadataValue.getAuthority()
+                                                                                                   .length() == 0)) {
+                        throw new IllegalArgumentException("The metadata field \"" + metadataField
+                                .toString() + "\" requires an authority key but none was provided. Value=\"" + values
+                                .get(i) + "\"");
+                    }
+                }
                 // remove control unicode char
                 String temp = values.get(i).trim();
                 char[] dcvalue = temp.toCharArray();
                 for (int charPos = 0; charPos < dcvalue.length; charPos++) {
                     if (Character.isISOControl(dcvalue[charPos]) &&
-                        !String.valueOf(dcvalue[charPos]).equals("\u0009") &&
-                        !String.valueOf(dcvalue[charPos]).equals("\n") &&
-                        !String.valueOf(dcvalue[charPos]).equals("\r")) {
+                            !String.valueOf(dcvalue[charPos]).equals("\u0009") &&
+                            !String.valueOf(dcvalue[charPos]).equals("\n") &&
+                            !String.valueOf(dcvalue[charPos]).equals("\r")) {
                         dcvalue[charPos] = ' ';
                     }
                 }
                 metadataValue.setValue(String.valueOf(dcvalue));
-            } else {
-                metadataValue.setValue(null);
-            }
-            //An update here isn't needed, this is persited upon the merge of the owning object
+                //An update here isn't needed, this is persited upon the merge of the owning object
 //            metadataValueService.update(context, metadataValue);
-            dso.addDetails(metadataField.toString());
+                dso.addDetails(metadataField.toString());
+            }
         }
         setMetadataModified(dso);
         return newMetadata;
@@ -435,7 +418,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public String getMetadataFirstValue(T dso, MetadataFieldName field, String language) {
         List<MetadataValue> metadataValues
-                = getMetadata(dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER, language);
+                = getMetadata(dso, field.schema, field.element, field.qualifier, language);
         if (CollectionUtils.isNotEmpty(metadataValues)) {
             return metadataValues.get(0).getValue();
         }
@@ -462,11 +445,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             String language, String value)
             throws SQLException {
         if (value != null) {
-            clearMetadata(context, dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER,
+            clearMetadata(context, dso, field.schema, field.element, field.qualifier,
                     language);
 
-            String newValueLanguage = (Item.ANY.equals(language)) ? null : language;
-            addMetadata(context, dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER,
+            String newValueLanguage = Item.ANY.equals(language) ? null : language;
+            addMetadata(context, dso, field.schema, field.element, field.qualifier,
                     newValueLanguage, value);
             dso.setMetadataModified();
         }
@@ -610,7 +593,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
              */
             // A map created to store the latest place for each metadata field
             Map<MetadataField, Integer> fieldToLastPlace = new HashMap<>();
-            List<MetadataValue> metadataValues = new LinkedList<>();
+            List<MetadataValue> metadataValues;
             if (dso.getType() == Constants.ITEM) {
                 metadataValues = getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             } else {
@@ -625,7 +608,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 public int compare(MetadataValue o1, MetadataValue o2) {
                     int compare = o1.getPlace() - o2.getPlace();
                     if (compare == 0) {
-                        if (o1 instanceof RelationshipMetadataValue) {
+                        if (o1 instanceof RelationshipMetadataValue && o2 instanceof RelationshipMetadataValue) {
+                            return compare;
+                        } else if (o1 instanceof RelationshipMetadataValue) {
                             return 1;
                         } else if (o2 instanceof RelationshipMetadataValue) {
                             return -1;
@@ -643,7 +628,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     String authority = metadataValue.getAuthority();
                     String relationshipId = StringUtils.split(authority, "::")[1];
                     Relationship relationship = relationshipService.find(context, Integer.parseInt(relationshipId));
-                    if (relationship.getLeftItem() == (Item) dso) {
+                    if (relationship.getLeftItem().equals((Item) dso)) {
                         relationship.setLeftPlace(mvPlace);
                     } else {
                         relationship.setRightPlace(mvPlace);
@@ -742,12 +727,15 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to)
             throws SQLException, IllegalArgumentException {
-
         if (from == to) {
             throw new IllegalArgumentException("The \"from\" location MUST be different from \"to\" location");
         }
 
-        List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
+        List<MetadataValue> list =
+            getMetadata(dso, schema, element, qualifier).stream()
+                                                        .sorted(Comparator.comparing(MetadataValue::getPlace))
+                                                        .collect(Collectors.toList());
+
 
         if (from >= list.size() || to >= list.size() || to < 0 || from < 0) {
             throw new IllegalArgumentException(

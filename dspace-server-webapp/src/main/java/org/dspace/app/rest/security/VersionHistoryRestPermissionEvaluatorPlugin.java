@@ -53,7 +53,7 @@ public class VersionHistoryRestPermissionEvaluatorPlugin extends RestObjectPermi
         }
 
         Request request = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext(request.getServletRequest());
+        Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
 
         try {
             if (configurationService.getBooleanProperty("versioning.item.history.view.admin")

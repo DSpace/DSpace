@@ -28,7 +28,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.discovery.indexobject.IndexableClaimedTask;
 import org.dspace.discovery.indexobject.IndexableDSpaceObject;
 import org.dspace.discovery.indexobject.IndexableInProgressSubmission;
@@ -129,7 +129,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                     dso = ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getParentObject(context, dso);
                 }
             } catch (SQLException e) {
-                log.error(LogManager.getHeader(context, "Error while indexing resource policies",
+                log.error(LogHelper.getHeader(context, "Error while indexing resource policies",
                                                "DSpace object: (id " + dso.getID() + " type " + dso.getType() + ")"
                 ));
             }
@@ -175,7 +175,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                 solrQuery.addFilterQuery(resourceQuery.toString());
             }
         } catch (SQLException e) {
-            log.error(LogManager.getHeader(context, "Error while adding resource policy information to query", ""), e);
+            log.error(LogHelper.getHeader(context, "Error while adding resource policy information to query", ""), e);
         }
     }
 }

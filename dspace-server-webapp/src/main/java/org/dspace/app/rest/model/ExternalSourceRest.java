@@ -12,11 +12,20 @@ import org.dspace.app.rest.RestResourceController;
 /**
  * This class serves as a REST representation for an External Source
  */
+@LinksRest(links = {
+        @LinkRest(
+                name = ExternalSourceRest.ENTITY_TYPES,
+                method = "getSupportedEntityTypes"
+        )
+})
 public class ExternalSourceRest extends BaseObjectRest<String> {
+
+    private static final long serialVersionUID = 6951711935287912124L;
 
     public static final String NAME = "externalsource";
     public static final String PLURAL_NAME = "externalsources";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
+    public static final String ENTITY_TYPES = "entityTypes";
 
     @Override
     public String getCategory() {

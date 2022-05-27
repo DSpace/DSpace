@@ -738,18 +738,22 @@
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_language.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']"
         mode="dc">
-        <dc:language>
-            <xsl:value-of select="./doc:element/doc:field[@name='value']"/>
-        </dc:language>
+        <xsl:for-each select="./doc:element/doc:field[@name='value']">
+	        <dc:language>
+	            <xsl:value-of select="./text()"/>
+	        </dc:language>
+        </xsl:for-each>
     </xsl:template>
 
 
     <!-- dc:publisher -->
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publisher.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='publisher']" mode="dc">
-        <dc:publisher>
-            <xsl:value-of select="./doc:element/doc:field[@name='value']"/>
-        </dc:publisher>
+    	<xsl:for-each select="./doc:element/doc:field[@name='value']">
+	       <dc:publisher>
+	           <xsl:value-of select="./text()"/>
+	       </dc:publisher>
+        </xsl:for-each>
     </xsl:template>
 
 

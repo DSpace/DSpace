@@ -16,7 +16,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.1-SNAPSHOT</version>
+        <version>7.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -202,6 +202,11 @@
                 <dependency>
                     <groupId>org.dspace</groupId>
                     <artifactId>dspace-rdf</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-iiif</artifactId>
                     <scope>compile</scope>
                 </dependency>
                 <dependency>
