@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -41,7 +40,7 @@ public interface ProcessService {
      */
     public Process create(Context context, EPerson ePerson, String scriptName,
                           List<DSpaceCommandLineParameter> parameters,
-                          final Set<Group> specialGroups) throws SQLException;
+                          final List<Group> specialGroups) throws SQLException;
 
     /**
      * This method will retrieve a Process object from the Database with the given ID
