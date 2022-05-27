@@ -8,19 +8,15 @@
 package org.dspace.eperson.dao.impl;
 
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
+import javax.persistence.Query;
+import org.apache.commons.lang3.StringUtils;
 
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Unit;
 import org.dspace.eperson.dao.UnitDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Context;
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Unit object.
@@ -29,75 +25,76 @@ import org.hibernate.criterion.Restrictions;
  *
  * @author mohideen at umd.edu
  */
-public class UnitDAOImpl extends AbstractHibernateDSODAO<Unit> implements UnitDAO
-{
-    protected UnitDAOImpl()
-    {
+public class UnitDAOImpl extends AbstractHibernateDSODAO<Unit> implements UnitDAO {
+    protected UnitDAOImpl() {
         super();
     }
 
     @Override
-    public List<Unit> findAllByGroup(Context context, Group group) throws SQLException {
-//      Criteria criteria = createCriteria(context, Unit.class);
-//      criteria.setFetchMode("Group", FetchMode.JOIN)
-//              .add(Restrictions.eq("id", group.getID()));
-//      return list(criteria);
-        return Collections.EMPTY_LIST;
-    }
-
-    @Override
     public Unit findByName(Context context, String name) throws SQLException {
-//      Criteria criteria = createCriteria(context, Unit.class);
-//      criteria.add(Restrictions.eq("name", name))
-//              .setFirstResult(0)
-//              .setMaxResults(1);
-//      List<Unit> units = list(criteria);
-//      if (units.isEmpty()) {
-//        return null;
-//      }
-//      return units.get(0);
-        return null;
+        Query query = createQuery(context,
+                                  "SELECT u from Unit u " +
+                                      "where u.name = :name ");
+
+        query.setParameter("name", name);
+        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
+
+        return singleResult(query);
     }
 
     @Override
-    public List<Unit> searchByName(Context context, String query, int offset, int limit) throws SQLException {
-//      Criteria criteria = searchByNameCriteria(context, query);
-//      if (offset > 0) {
-//        criteria.setFirstResult(offset);
-//      }
-//      if (limit > 0) {
-//        criteria.setMaxResults(limit);
-//      }
-//
-//      return list(criteria);
-        return Collections.EMPTY_LIST;
+    public List<Unit> findByNameLike(final Context context, final String unitName, final int offset, final int limit)
+        throws SQLException {
+        Query query = createQuery(context,
+                                  "SELECT u FROM Unit u WHERE lower(u.name) LIKE lower(:name)");
+        query.setParameter("name", "%" + StringUtils.trimToEmpty(unitName) + "%");
+
+        if (0 <= offset) {
+            query.setFirstResult(offset);
+        }
+        if (0 <= limit) {
+            query.setMaxResults(limit);
+        }
+
+        return list(query);
     }
 
     @Override
-    public int searchByNameResultCount(Context context, String query) throws SQLException {
-//      return count(searchByNameCriteria(context, query));
-        return -1;
+    public int countByNameLike(final Context context, final String unitName) throws SQLException {
+        Query query = createQuery(context,
+                                  "SELECT count(*) FROM Unit u WHERE lower(u.name) LIKE lower(:name)");
+        query.setParameter("name", "%" + unitName + "%");
+
+        return count(query);
     }
 
     @Override
-    public List<Unit> findAllSortedByName(Context context) throws SQLException
-    {
-//      Criteria criteria = createCriteria(context, Unit.class);
-//      criteria.addOrder(Order.asc("name.value"));
-//      return list(criteria);
-        return Collections.EMPTY_LIST;
+    public List<Unit> findAll(Context context, int pageSize, int offset) throws SQLException {
+        Query query = createQuery(context,
+                                  "SELECT u FROM Unit u ORDER BY u.name ASC");
+        if (pageSize > 0) {
+            query.setMaxResults(pageSize);
+        }
+        if (offset > 0) {
+            query.setFirstResult(offset);
+        }
+        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
+
+        return list(query);
+    }
+
+    @Override
+    public List<Unit> findByGroup(Context context, Group group) throws SQLException {
+        Query query = createQuery(context,
+                                  "from Unit where (from Group g where g.id = :group_id) in elements(group)");
+        query.setParameter("group_id", group.getID());
+        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
+
+        return list(query);
     }
 
     @Override
     public int countRows(Context context) throws SQLException {
-//        return count(createQuery(context, "SELECT count(*) FROM Unit"));
-        return -1;
-    }
-
-    private Criteria searchByNameCriteria(Context context, String query) throws SQLException {
-//      Criteria criteria = createCriteria(context, Unit.class);
-//      criteria.add(Restrictions.like("name", query, MatchMode.ANYWHERE));
-//      return criteria;
-        return null;
+      return count(createQuery(context, "SELECT count(*) FROM Unit"));
     }
 }

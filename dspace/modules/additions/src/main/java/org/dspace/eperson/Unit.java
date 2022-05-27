@@ -19,11 +19,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.core.Constants;
-import org.dspace.eperson.service.UnitService;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
@@ -36,8 +35,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name="unit")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class Unit extends DSpaceObject
-{
+public class Unit extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     @Column(name="unit_id", insertable = false, updatable = false)
     private Integer legacyId;
@@ -56,14 +54,16 @@ public class Unit extends DSpaceObject
     )
     private Set<Group> groups = new HashSet<>();
 
-    @Transient
-    private boolean unitChanged;
+    /**
+     * Protected constructor, create object using:
+     * {@link org.dspace.eperson.service.UnitService#create(Context)}
+     */
+    protected Unit () {
+    }
 
-    @Transient
-    protected transient UnitService unitService;
-
-    Unit () {
-
+    @Override
+    public Integer getLegacyId() {
+        return legacyId;
     }
 
     /**
@@ -71,6 +71,7 @@ public class Unit extends DSpaceObject
      *
      * @return name
      */
+    @Override
     public String getName()
     {
         return this.name == null ? "" : this.name;
@@ -89,10 +90,9 @@ public class Unit extends DSpaceObject
     }
 
     /**
-     * set faculty requirement
+     * Sets whether this unit is faculty-only
      *
-     * @param login
-     *            boolean yes/no
+     * @param facultyOnly true if the unit it faculty-only, false otherwise.
      */
     public void setFacultyOnly(boolean facultyOnly)
     {
@@ -101,9 +101,7 @@ public class Unit extends DSpaceObject
     }
 
     /**
-     * faculty only?
-     *
-     * @return boolean, yes/no
+     * @return true if this is a faculty-only unit, false otherwise.
      */
     public boolean getFacultyOnly()
     {
@@ -120,6 +118,7 @@ public class Unit extends DSpaceObject
      * @return <code>true</code> if object passed in represents the same unit as
      *         this object
      */
+    @Override
     public boolean equals(Object other)
     {
         if (!(other instanceof Unit))
@@ -140,11 +139,13 @@ public class Unit extends DSpaceObject
         return 0;
     }
 
+    @Override
     public int getType()
     {
         return Constants.UNIT;
     }
 
+    @Override
     public String getHandle()
     {
         return null;
@@ -187,7 +188,8 @@ public class Unit extends DSpaceObject
     }
 
     /**
-     * Returns true or false based on whether a given group is a member.
+     * @param group the group to check for membership in this unit.
+     * @return true if the given Group is a member of this unit, false otherwise
      */
     public boolean isMember(Group group)
     {

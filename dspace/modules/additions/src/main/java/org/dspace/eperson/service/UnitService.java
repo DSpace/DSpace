@@ -10,7 +10,6 @@ package org.dspace.eperson.service;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.Group;
@@ -30,9 +29,7 @@ public interface UnitService extends DSpaceObjectService<Unit>, DSpaceObjectLega
     /**
      * Create a new unit, with a new ID.
      *
-     * @param parent parent unit
-     * @param context
-     *            DSpace context object
+     * @param context DSpace context object
      *
      * @return the newly created unit
      * @throws SQLException if database error
@@ -41,73 +38,68 @@ public interface UnitService extends DSpaceObjectService<Unit>, DSpaceObjectLega
     public Unit create(Context context) throws SQLException, AuthorizeException;
 
     /**
-     * find the unit by its ID
+     * set name of unit
      *
-     * @param context
-     * @param id
-     *
-     * @return the unit with the given id
+     * @param unit DSpace unit
+     * @param name  new unit name
      * @throws SQLException if database error
      */
-    public Unit find(Context context, UUID id) throws SQLException;
+    public void setName(Unit unit, String name) throws SQLException;
 
     /**
      * Find the unit by its name - assumes name is unique
      *
      * @param context
-     * @param name
+     * @param name the name of the unit to find
      *
-     * @return Unit
+     * @return the Unit with the given name, or null if the name is not found.
+     * @throws SQLException if error
      */
     public Unit findByName(Context context, String name) throws SQLException;
 
     /**
-     * Finds all units in the site
+     * Finds all units in the site, sorted by name
      *
-     * @param context
-     *            DSpace context
-     *
+     * @param context DSpace context
+     * @param pageSize           how many results return
+     * @param offset             the position of the first result to return
      * @return list of all units in the site
+     * @throws SQLException if error
      */
-    public List<Unit> findAll(Context context) throws SQLException;
+    public List<Unit> findAll(Context context, int pageSize, int offset) throws SQLException;
 
     /**
      * Finds all units that are mapped to the group
      *
-     * @param context
-     *            DSpace context
-     * @param group
-     *            group
+     * @param context DSpace context
+     * @param group group the Group to find
      *
      * @return list of all units mapped to the given group
+     * @throws SQLException if error
      */
     public List<Unit> findAllByGroup(Context context, Group group) throws SQLException;
 
      /**
      * Find the units that match the search query across unit_id or name
      *
-     * @param context
-     *            DSpace context
-     * @param query
-     *            The search string
+     * @param context DSpace context
+     * @param query The search string
      *
      * @return array of Unit objects
+     * @throws SQLException if error
      */
     public List<Unit> search(Context context, String query) throws SQLException;
 
     /**
      * Find the units that match the search query across unit_id or name
      *
-     * @param context
-     *            DSpace context
-     * @param query
-     *            The search string
-     * @param offset
-     *            Inclusive offset
-     * @param limit
-     *            Maximum number of matches returned
+     * @param context DSpace context
+     * @param query The search string
+     * @param offset Inclusive offset
+     * @param limit Maximum number of matches returned
      *
      * @return list of Unit objects
+     * @throws SQLException if error
      */
     public List<Unit> search(Context context, String query, int offset, int limit) throws SQLException;
 
@@ -122,10 +114,11 @@ public interface UnitService extends DSpaceObjectService<Unit>, DSpaceObjectLega
      *            The search string
      *
      * @return the number of units mathching the query
+     * @throws SQLException if error
      */
     public int searchResultCount(Context context, String query) throws SQLException;
 
-   
+
     /**
      * Return an list of groups of this unit and its subcommunities
      *
@@ -140,7 +133,7 @@ public interface UnitService extends DSpaceObjectService<Unit>, DSpaceObjectLega
 
 
     /**
-     * Add an exisiting group to the unit
+     * Add an existing group to the unit
      *
      * @param context context
      * @param unit unit
@@ -162,7 +155,6 @@ public interface UnitService extends DSpaceObjectService<Unit>, DSpaceObjectLega
      * @param unit unit
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
-     * @throws IOException if IO error
      */
     public void removeGroup(Context context, Unit unit, Group group)
             throws SQLException, AuthorizeException;
@@ -170,10 +162,10 @@ public interface UnitService extends DSpaceObjectService<Unit>, DSpaceObjectLega
     /**
      * Returns true or false based on whether a given group is a member
      * to the unit.
-     * 
+     *
      * @param unit unit
      * @param group group
-     * 
+     *
      * @return true if group is a member of the unit, false otherwise
      */
     public boolean isMember(Unit unit, Group group);
@@ -190,5 +182,5 @@ public interface UnitService extends DSpaceObjectService<Unit>, DSpaceObjectLega
     public void canEdit(Context context) throws AuthorizeException, SQLException;
 
     int countTotal(Context context) throws SQLException;
-    
+
 }
