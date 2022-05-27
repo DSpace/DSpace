@@ -1,10 +1,3 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
- *
- * http://www.dspace.org/license/
- */
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
@@ -23,12 +16,23 @@ public class UnitMatcher {
 
     private UnitMatcher() { }
 
+    /**
+     * Returns a Matcher based on the given UUID and name.
+     * @param uuid the UUID of the Unit being matched
+     * @param name the name of the Unit being matched
+     * @return a Matcher based on the given UUID and name.
+     */
     public static Matcher<? super Object> matchUnitEntry(UUID uuid, String name) {
         return allOf(
                 matchProperties(uuid, name)
         );
     }
 
+    /**
+     * Returns a Matcher for a Unit based on the given name
+     * @param name the name of Unit being matched
+     * @return a Matcher for a Unit based on the given name
+     */
     public static Matcher<? super Object> matchUnitWithName(String name) {
         return allOf(
             hasJsonPath("$.name", is(name)),
@@ -39,7 +43,10 @@ public class UnitMatcher {
     }
 
     /**
-     * Gets a matcher for all expected embeds when the full projection is requested.
+     * Returns a Matcher for all expected embeds when the full projection is
+     * requested.
+     *
+     * @return a Matcher for all expected embeds
      */
     public static Matcher<? super Object> matchFullEmbeds() {
         return matchEmbeds(
@@ -48,7 +55,10 @@ public class UnitMatcher {
     }
 
     /**
-     * Gets a matcher for all expected links.
+     * Returns a Matcher for all expected links.
+     *
+     * @param uuid the UUID of the Unit
+     * @return a Matcher for all expected links
      */
     public static Matcher<? super Object> matchLinks(UUID uuid) {
         return HalMatcher.matchLinks(REST_SERVER_URL + "eperson/units/" + uuid,
@@ -57,6 +67,14 @@ public class UnitMatcher {
         );
     }
 
+    /**
+     * GReturns a Matcher for all expected properties, based on the given UUID
+     * and name.
+     *
+     * @param uuid the UUID of the Unit being matched
+     * @param name the name of the Unit being matched
+     * @return a Matcher for all expected properties
+     */
     private static Matcher<? super Object> matchProperties(UUID uuid, String name) {
         return allOf(
                 hasJsonPath("$.uuid", is(uuid.toString())),
@@ -67,4 +85,3 @@ public class UnitMatcher {
         );
     }
 }
-

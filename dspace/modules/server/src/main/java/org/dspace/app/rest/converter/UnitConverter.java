@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class UnitConverter extends DSpaceObjectConverter<Unit, UnitRest> {
-
     @Override
     public UnitRest convert(Unit obj, Projection projection) {
         UnitRest unitRest = super.convert(obj, projection);
@@ -28,5 +27,4 @@ public class UnitConverter extends DSpaceObjectConverter<Unit, UnitRest> {
     public Class<Unit> getModelClass() {
         return Unit.class;
     }
-
 }

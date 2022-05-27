@@ -1,10 +1,3 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
- *
- * http://www.dspace.org/license/
- */
 package org.dspace.app.rest.repository;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -18,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnitNameNotProvidedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -27,7 +19,6 @@ import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.Unit;
 import org.dspace.eperson.service.UnitService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +29,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * This is the repository responsible to manage Group Rest object
- *
- * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * This is the repository responsible for managing the Unit Rest object
  */
-
 @Component(UnitRest.CATEGORY + "." + UnitRest.NAME)
 public class UnitRestRepository extends DSpaceObjectRestRepository<Unit, UnitRest> {
     @Autowired
@@ -53,9 +41,6 @@ public class UnitRestRepository extends DSpaceObjectRestRepository<Unit, UnitRes
         super(dsoService);
         this.unitService = dsoService;
     }
-
-    @Autowired
-    MetadataConverter metadataConverter;
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -90,7 +75,6 @@ public class UnitRestRepository extends DSpaceObjectRestRepository<Unit, UnitRes
     }
 
     @Override
-//    @PreAuthorize("hasPermission(#id, 'UNIT', 'READ')")
     @PreAuthorize("hasAuthority('ADMIN')")
     public UnitRest findOne(Context context, UUID id) {
         Unit unit = null;
@@ -118,20 +102,7 @@ public class UnitRestRepository extends DSpaceObjectRestRepository<Unit, UnitRes
         }
     }
 
-//    @Override
-//    public Page<UnitRest> findAll(Context context, Pageable pageable) {
-//        try {
-//            long total = unitService.countTotal(context);
-//            List<Unit> units = unitService.findAll(context, pageable.getPageSize(),
-//                                            Math.toIntExact(pageable.getOffset()));
-//            return converter.toRestPage(units, pageable, total, utils.obtainProjection());
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e.getMessage(), e);
-//        }
-//    }
-
     @Override
-    //@PreAuthorize("hasPermission(#id, 'UNIT', 'WRITE')")
     @PreAuthorize("hasAuthority('ADMIN')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
                          Patch patch) throws AuthorizeException, SQLException {
@@ -145,9 +116,8 @@ public class UnitRestRepository extends DSpaceObjectRestRepository<Unit, UnitRes
      *
      * @param query    is the *required* query string
      * @param pageable contains the pagination information
-     * @return a Page of GroupRest instances matching the user query
+     * @return a Page of UnitRest instances matching the user query
      */
-    //@PreAuthorize("hasAuthority('ADMIN') || hasAuthority('MANAGE_ACCESS_GROUP')")
     @PreAuthorize("hasAuthority('ADMIN')")
     @SearchRestMethod(name = "byMetadata")
     public Page<UnitRest> findByMetadata(@Parameter(value = "query", required = true) String query,
@@ -172,7 +142,7 @@ public class UnitRestRepository extends DSpaceObjectRestRepository<Unit, UnitRes
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected void delete(Context context, UUID uuid) throws AuthorizeException {
-        Unit unit = null;
+        Unit unit;
         try {
             unit = unitService.find(context, uuid);
             if (unit == null) {
@@ -185,7 +155,7 @@ public class UnitRestRepository extends DSpaceObjectRestRepository<Unit, UnitRes
                 final DSpaceObject parentObject = unitService.getParentObject(context, unit);
                 if (parentObject != null) {
                     throw new UnprocessableEntityException(
-                            "This group cannot be deleted"
+                            "This unit cannot be deleted"
                                     + " as it has a parent " + parentObject.getType()
                                     + " with id " + parentObject.getID());
                 }

@@ -25,7 +25,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.UnitService;
 import org.junit.After;
@@ -33,10 +32,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit tests for the Unit class
+ * Unit tests for the UnitServiceImpl class
  */
 public class UnitServiceImplTest extends AbstractUnitTest {
-
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UnitServiceImplTest.class);
 
     //TODO: test duplicate names ?
@@ -45,10 +43,8 @@ public class UnitServiceImplTest extends AbstractUnitTest {
     private Unit unit2;
     private Unit unit3;
 
-    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();
-
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -62,19 +58,9 @@ public class UnitServiceImplTest extends AbstractUnitTest {
     public void init() {
         super.init();
         try {
-            //Only admins can perform unit operations, so add as default user
-            context.turnOffAuthorisationSystem();
-
-            unit1 = createUnit("Unit One", true);
-            unit2 = createUnit("Unit Two", false);
-            unit3 = createUnit("Unit Three", false);
-
-            unitService.update(context, unit1);
-            unitService.update(context, unit2);
-            unitService.update(context, unit3);
-            context.restoreAuthSystemState();
-
-
+            unit1 = UnitTestUtils.createUnit(context, "Unit One", true);
+            unit2 = UnitTestUtils.createUnit(context, "Unit Two", false);
+            unit3 = UnitTestUtils.createUnit(context, "Unit Three", false);
         } catch (SQLException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
@@ -88,20 +74,9 @@ public class UnitServiceImplTest extends AbstractUnitTest {
     @Override
     public void destroy() {
         try {
-            context.turnOffAuthorisationSystem();
-            if (unit3 != null) {
-                unitService.delete(context, unit3);
-                unit3 = null;
-            }
-            if (unit2 != null) {
-                unitService.delete(context, unit2);
-                unit2 = null;
-            }
-            if (unit1 != null) {
-                unitService.delete(context, unit1);
-                unit1 = null;
-            }
-            context.restoreAuthSystemState();
+            UnitTestUtils.deleteUnit(context, unit3);
+            UnitTestUtils.deleteUnit(context, unit2);
+            UnitTestUtils.deleteUnit(context, unit1);
             super.destroy();
         } catch (SQLException ex) {
             log.error("SQL Error in init", ex);
@@ -116,7 +91,7 @@ public class UnitServiceImplTest extends AbstractUnitTest {
     }
 
     @Test
-    public void createUnit() throws SQLException, AuthorizeException, IOException {
+    public void testCreateUnit() throws SQLException, AuthorizeException, IOException {
         Unit unit = null;
         try {
             context.turnOffAuthorisationSystem();
@@ -176,8 +151,8 @@ public class UnitServiceImplTest extends AbstractUnitTest {
         List<String> names = new ArrayList<>();
         List<String> sortedNames = new ArrayList<>();
         for (Unit unit : units) {
-            // Ignore any unnamed units. This is only necessary when running unit tests via a persistent database (e
-            // .g. Postgres) as unnamed groups may be created by other tests.
+            // Ignore any unnamed units. This is only necessary when running unit tests via a persistent database
+            // (e.g. Postgres) as unnamed groups may be created by other tests.
             if (unit.getName() == null) {
                 continue;
             }
@@ -224,7 +199,8 @@ public class UnitServiceImplTest extends AbstractUnitTest {
 
     @Test
     public void searchByIdResultCount() throws SQLException {
-        assertThat("searchByIdResultCount", unitService.searchResultCount(context, String.valueOf(unit1.getID())), equalTo(1));
+        assertThat("searchByIdResultCount",
+                   unitService.searchResultCount(context, String.valueOf(unit1.getID())), equalTo(1));
     }
 
     @Test
@@ -239,7 +215,7 @@ public class UnitServiceImplTest extends AbstractUnitTest {
     }
 
     @Test
-    public void removGroupGroup() throws SQLException, AuthorizeException {
+    public void removeGroup() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
         Group group = groupService.findByName(context, "Administrator");
         unitService.addGroup(context, unit1, group);
@@ -279,17 +255,17 @@ public class UnitServiceImplTest extends AbstractUnitTest {
     }
 
     @Test
-    public void isPermanent()
+    public void isFacultyOnly()
         throws SQLException {
-        Unit unit1 = unitService.findByName(context, "Unit One");
-        assertTrue(unit1.getFacultyOnly());
+        Unit u1 = unitService.findByName(context, "Unit One");
+        assertTrue(u1.getFacultyOnly());
 
-        Unit unit2 = unitService.findByName(context, "Unit Two");
-        assertFalse(unit2.getFacultyOnly());
+        Unit u2 = unitService.findByName(context, "Unit Two");
+        assertFalse(u2.getFacultyOnly());
     }
 
     @Test
-    public void setPermanent()
+    public void setFacultyOnly()
         throws SQLException, AuthorizeException, IOException {
         context.turnOffAuthorisationSystem();
         assertTrue(unit1.getFacultyOnly());
@@ -297,18 +273,8 @@ public class UnitServiceImplTest extends AbstractUnitTest {
 
         unitService.update(context, unit1);
 
-        unit1 = unitService.find(context, unit1.getID());
-        assertFalse(unit1.getFacultyOnly());
+        Unit u1 = unitService.find(context, unit1.getID());
+        assertFalse(u1.getFacultyOnly());
         context.restoreAuthSystemState();
-    }
-
-    protected Unit createUnit(String name, boolean facultyOnly) throws SQLException, AuthorizeException {
-        context.turnOffAuthorisationSystem();
-        Unit unit = unitService.create(context);
-        unit.setName(name);
-        unit.setFacultyOnly(facultyOnly);
-        unitService.update(context, unit);
-        context.restoreAuthSystemState();
-        return unit;
     }
 }

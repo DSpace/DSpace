@@ -9,12 +9,12 @@ package org.dspace.eperson.dao;
 
 import java.sql.SQLException;
 import java.util.List;
-import org.dspace.content.dao.DSpaceObjectDAO;
 
-import org.dspace.eperson.Group;
-import org.dspace.eperson.Unit;
+import org.dspace.content.dao.DSpaceObjectDAO;
 import org.dspace.content.dao.DSpaceObjectLegacySupportDAO;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.Unit;
 
 /**
  * Database Access Object interface class for the Unit object.

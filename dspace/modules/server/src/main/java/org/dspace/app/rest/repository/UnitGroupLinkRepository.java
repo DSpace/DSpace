@@ -1,10 +1,3 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
- *
- * http://www.dspace.org/license/
- */
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
@@ -12,14 +5,11 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.model.UnitRest;
 import org.dspace.app.rest.model.GroupRest;
+import org.dspace.app.rest.model.UnitRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Unit;
-import org.dspace.eperson.service.EPersonService;
-import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.UnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,10 +28,7 @@ public class UnitGroupLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     UnitService unitService;
 
-    @Autowired
-    GroupService groupService;
-
-    @PreAuthorize("hasPermission(#unitId, 'UNIT', 'READ')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<GroupRest> getGroups(@Nullable HttpServletRequest request,
                                      UUID unitId,
                                      @Nullable Pageable optionalPageable,
@@ -58,4 +45,3 @@ public class UnitGroupLinkRepository extends AbstractDSpaceRestRepository
         }
     }
 }
-

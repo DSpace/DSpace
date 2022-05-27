@@ -1,14 +1,8 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
- *
- * http://www.dspace.org/license/
- */
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -27,8 +21,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -36,96 +31,72 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import static com.jayway.jsonpath.JsonPath.read;
-import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
-import java.sql.SQLException;
-import java.util.Collections;
-import org.dspace.app.rest.exception.GroupNameNotProvidedException;
 import org.dspace.app.rest.exception.UnitNameNotProvidedException;
-import org.dspace.app.rest.matcher.EPersonMatcher;
-import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.UnitMatcher;
-import org.dspace.app.rest.model.GroupRest;
-import org.dspace.app.rest.model.MetadataRest;
-import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.UnitRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
-import org.dspace.app.rest.test.MetadataPatchSuite;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.authorize.service.ResourcePolicyService;
-import org.dspace.builder.CollectionBuilder;
-import org.dspace.builder.CommunityBuilder;
-import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.GroupBuilder;
-import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.builder.UnitBuilder;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
-import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Unit;
 import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.UnitService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
-import static org.springframework.http.MediaType.parseMediaType;
 import org.springframework.test.web.servlet.ResultActions;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * @author Jonas Van Goolen - (jonas@atmire.com)
+ * Integration test for UnitRestRepository
  */
-
 public class UnitRestRepositoryIT extends AbstractControllerIntegrationTest {
-//    @Autowired
-//    ResourcePolicyService resourcePolicyService;
     @Autowired
     private ConfigurationService configurationService;
-//    @Autowired
-//    private CollectionService collectionService;
-//
-//    @Autowired
-//    private AuthorizeService authorizeService;
-//
-    Collection collection;
 
     @Before
     public void setup() {
-//        context.turnOffAuthorisationSystem();
-//        parentCommunity = CommunityBuilder.createCommunity(context).withName("test").build();
-//        collection = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
-//
-//        context.restoreAuthSystemState();
+    }
+
+    /**
+     * Populates the database with sample units
+     *
+     * @throws SQLException if a database error occurs.
+     */
+    private void createSampleUnits() throws SQLException {
+        createUnit("testUnit1", Collections.EMPTY_LIST);
+        createUnit("testUnit2", Collections.EMPTY_LIST);
+    }
+
+    /**
+     * Creates a unit with the given name and group members using UnitBuilder
+     *
+     * @param name the name of the Unit to create
+     * @param groupMembers an (possibly empty) list of Groups to associate with
+     * the unit.
+     * @return the create Unit
+     * @throws SQLException if a database error occurs.
+     */
+    private Unit createUnit(String name, List<Group> groupMembers) throws SQLException {
+        Context localContext = new Context();
+        localContext.turnOffAuthorisationSystem();
+        UnitBuilder unitBuilder = UnitBuilder.createUnit(localContext).withName(name);
+        for (Group groupMember : groupMembers) {
+            unitBuilder.addGroup(groupMember);
+
+        }
+        Unit unit = unitBuilder.build();
+
+        localContext.complete();
+        localContext.restoreAuthSystemState();
+        return unit;
     }
 
     @Test
@@ -148,8 +119,8 @@ public class UnitRestRepositoryIT extends AbstractControllerIntegrationTest {
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$", UnitMatcher.matchFullEmbeds()))
                     .andDo(result -> idRef
-                            .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id")))
-            );
+                            .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))))
+            ;
 
             // Verify unit exists in list of all units
             getClient(authToken).perform(get("/api/eperson/units"))
@@ -158,7 +129,8 @@ public class UnitRestRepositoryIT extends AbstractControllerIntegrationTest {
                        .andExpect(content().contentType(contentType))
                        .andExpect(jsonPath("$._embedded.units", Matchers.contains(
                                UnitMatcher.matchUnitWithName(unitName)
-                       )));
+                       )))
+            ;
 
             // Verify unit can be found by id
             UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();
@@ -252,31 +224,6 @@ public class UnitRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(status().reason(not(startsWith("[PL]"))));
     }
 
-    /**
-     * Populates the database with sample units
-     *
-     * @throws SQLException if a database error occurs.
-     */
-    private void createSampleUnits() throws SQLException {
-        createUnit("testUnit1", Collections.EMPTY_LIST);
-        createUnit("testUnit2", Collections.EMPTY_LIST);
-    }
-
-    private Unit createUnit(String name, List<Group> groupMembers) throws SQLException {
-        Context localContext = new Context();
-        localContext.turnOffAuthorisationSystem();
-        UnitBuilder unitBuilder = UnitBuilder.createUnit(localContext).withName(name);
-        for (Group groupMember : groupMembers) {
-            unitBuilder.addGroup(groupMember);
-
-        }
-        Unit unit = unitBuilder.build();
-
-        localContext.complete();
-        localContext.restoreAuthSystemState();
-        return unit;
-    }
-
     @Test
     public void findAllTest() throws Exception {
         createSampleUnits();
@@ -333,20 +280,6 @@ public class UnitRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findOneTest() throws Exception {
-//        context.turnOffAuthorisationSystem();
-//
-//        String testGroupName = "Test group";
-//        Group group = GroupBuilder.createGroup(context)
-//                                  .withName(testGroupName)
-//                                  .build();
-//
-//        context.restoreAuthSystemState();
-
-//        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-//        Group adminGroup = groupService.findByName(context, "Administrator");
-//        List<Group> groupList = new ArrayList<>();
-//        groupList.add(adminGroup);
-//        Unit unit = createUnit("findOneTest Unit", groupList);
         Unit unit = createUnit("findOneTest Unit", Collections.EMPTY_LIST);
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -381,15 +314,6 @@ public class UnitRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findOneForbiddenTest() throws Exception {
-//        context.turnOffAuthorisationSystem();
-//
-//        Group privateGroup = GroupBuilder.createGroup(context)
-//                .withName("Private Group")
-//                .build();
-//
-//        resourcePolicyService.removePolicies(context, privateGroup, Constants.READ);
-//        context.restoreAuthSystemState();
-
         // Individual units are only viewable by admins
         Unit unit = createUnit("findOneForbidden", Collections.EMPTY_LIST);
 
@@ -502,27 +426,6 @@ public class UnitRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(authToken).perform(get("/api/eperson/units/search/byMetadata"))
                             .andExpect(status().isBadRequest());
     }
-
-
-//    @Test
-//    public void patchGroupMetadataAuthorized() throws Exception {
-//        runPatchMetadataTests(admin, 200);
-//    }
-//
-//    @Test
-//    public void patchGroupMetadataUnauthorized() throws Exception {
-//        runPatchMetadataTests(eperson, 403);
-//    }
-//
-//    private void runPatchMetadataTests(EPerson asUser, int expectedStatus) throws Exception {
-//        context.turnOffAuthorisationSystem();
-//        Group group = GroupBuilder.createGroup(context).withName("Group").build();
-//        context.restoreAuthSystemState();
-//        String token = getAuthToken(asUser.getEmail(), password);
-//
-//        new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/groups/" + group.getID(), expectedStatus);
-//    }
-
 
     @Test
     public void patchUnitName() throws Exception {
@@ -734,7 +637,7 @@ public class UnitRestRepositoryIT extends AbstractControllerIntegrationTest {
         String authToken = getAuthToken(admin.getEmail(), password);
 
         getClient(authToken).perform(
-                delete("/api/eperson/units/" + UUID.randomUUID() + "/subgroups/" + adminGroup.getID())
+                delete("/api/eperson/units/" + UUID.randomUUID() + "/groups/" + adminGroup.getID())
         ).andExpect(status().isNotFound());
     }
 
@@ -830,11 +733,11 @@ public class UnitRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findByMetadataPaginationTest() throws Exception {
-        Unit unit1 = createUnit("Test unit", Collections.EMPTY_LIST);
-        Unit unit2 = createUnit("Test unit 2", Collections.EMPTY_LIST);
-        Unit unit3 = createUnit("Test unit 3", Collections.EMPTY_LIST);
-        Unit unit4 = createUnit("Test unit 4", Collections.EMPTY_LIST);
-        Unit unit5 = createUnit("Test other unit", Collections.EMPTY_LIST);
+        createUnit("Test unit", Collections.EMPTY_LIST);
+        createUnit("Test unit 2", Collections.EMPTY_LIST);
+        createUnit("Test unit 3", Collections.EMPTY_LIST);
+        createUnit("Test unit 4", Collections.EMPTY_LIST);
+        createUnit("Test other unit", Collections.EMPTY_LIST);
 
         String authTokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(authTokenAdmin).perform(get("/api/eperson/units/search/byMetadata")
@@ -884,7 +787,6 @@ public class UnitRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void patchFacultyOnly() throws Exception {
         Unit unit = createUnit("patchFacultyOnly Unit", Collections.EMPTY_LIST);
         assertFalse(unit.getFacultyOnly());
-
 
         List<Operation> ops = new ArrayList<>();
         // Boolean operations should accept either string or boolean as value. Try boolean.
@@ -945,4 +847,3 @@ public class UnitRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 UnitMatcher.matchUnitEntry(unit.getID(), unit.getName()))));
     }
 }
-

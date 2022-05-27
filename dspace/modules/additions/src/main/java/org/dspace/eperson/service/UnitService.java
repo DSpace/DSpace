@@ -7,25 +7,24 @@
  */
 package org.dspace.eperson.service;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.eperson.Group;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.eperson.Unit;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.Unit;
 
 /**
  * Service interface class for the Unit object.
- * The implementation of this class is responsible for all business logic calls for the Unit object and is autowired by spring
+ * The implementation of this class is responsible for all business logic calls
+ * for the Unit object and is autowired by spring
  *
  * @author mohideen at umd.edu
  */
-public interface UnitService extends DSpaceObjectService<Unit>, DSpaceObjectLegacySupportService<Unit>
-{
+public interface UnitService extends DSpaceObjectService<Unit>, DSpaceObjectLegacySupportService<Unit> {
     /**
      * Create a new unit, with a new ID.
      *
@@ -49,7 +48,7 @@ public interface UnitService extends DSpaceObjectService<Unit>, DSpaceObjectLega
     /**
      * Find the unit by its name - assumes name is unique
      *
-     * @param context
+     * @param context the DSpace context
      * @param name the name of the unit to find
      *
      * @return the Unit with the given name, or null if the name is not found.
@@ -113,7 +112,7 @@ public interface UnitService extends DSpaceObjectService<Unit>, DSpaceObjectLega
      * @param query
      *            The search string
      *
-     * @return the number of units mathching the query
+     * @return the number of units matching the query
      * @throws SQLException if error
      */
     public int searchResultCount(Context context, String query) throws SQLException;
@@ -127,7 +126,6 @@ public interface UnitService extends DSpaceObjectService<Unit>, DSpaceObjectLega
      * @return an array of groups
      * @throws SQLException if database error
      */
-
     public List<Group> getAllGroups(Context context, Unit unit)
             throws SQLException;
 
@@ -171,16 +169,30 @@ public interface UnitService extends DSpaceObjectService<Unit>, DSpaceObjectLega
     public boolean isMember(Unit unit, Group group);
 
     /**
-     * return TRUE if context's user can edit unit, false otherwise
+     * return true if context's user can edit unit, false otherwise
      *
      * @param context context
-     * @return boolean true = current user can edit unit
+     * @return true if the current user can edit the unit, false otherwise
      * @throws SQLException if database error
      */
     public boolean canEditBoolean(Context context) throws SQLException;
 
+    /**
+     * Throws an AuthorizeException if the given context is not allowed to
+     * edit the unit.
+     *
+     * @param context the DSpace context
+     * @throws AuthorizeException if editing the unit is not allowed
+     * @throws SQLException if database error
+     */
     public void canEdit(Context context) throws AuthorizeException, SQLException;
 
+    /**
+     * Return the total number of units
+     *
+     * @param context the DSpace context
+     * @return the total number of units
+     * @throws SQLException if database error
+     */
     int countTotal(Context context) throws SQLException;
-
 }

@@ -10,13 +10,13 @@ package org.dspace.eperson.dao.impl;
 import java.sql.SQLException;
 import java.util.List;
 import javax.persistence.Query;
-import org.apache.commons.lang3.StringUtils;
 
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.core.AbstractHibernateDSODAO;
+import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Unit;
 import org.dspace.eperson.dao.UnitDAO;
-import org.dspace.core.AbstractHibernateDSODAO;
-import org.dspace.core.Context;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Unit object.
@@ -95,6 +95,6 @@ public class UnitDAOImpl extends AbstractHibernateDSODAO<Unit> implements UnitDA
 
     @Override
     public int countRows(Context context) throws SQLException {
-      return count(createQuery(context, "SELECT count(*) FROM Unit"));
+        return count(createQuery(context, "SELECT count(*) FROM Unit"));
     }
 }

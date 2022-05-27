@@ -1,20 +1,21 @@
 package org.dspace.app.rest.repository.patch.operation;
 
+import static org.dspace.app.rest.repository.patch.operation.PatchOperation.OPERATION_REPLACE;
+
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.Operation;
-import static org.dspace.app.rest.repository.patch.operation.PatchOperation.OPERATION_REPLACE;
 import org.dspace.core.Context;
 import org.dspace.eperson.Unit;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation for Unit facultyOnly patches.
+ * Implementation for Unit facultyOnly patches.Example: <code>
+ curl -X PATCH http://${dspace.server.url}/api/epersons/units/<:id-unit> -H "
+ Content-Type: application/json" -d '[{ "op": "replace", "path": "
+ /facultyOnly", "value": true|false]'
+ </code>
  *
- * Example: <code>
- * curl -X PATCH http://${dspace.server.url}/api/epersons/units/<:id-unit> -H "
- * Content-Type: application/json" -d '[{ "op": "replace", "path": "
- * /facultyOnly", "value": true|false]'
- * </code>
+ * @param <R> the type of object being patched
  */
 @Component
 public class UnitFacultyOnlyReplaceOperation<R> extends PatchOperation<R> {
@@ -43,4 +44,3 @@ public class UnitFacultyOnlyReplaceOperation<R> extends PatchOperation<R> {
                 && operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_FACULTY_ONLY));
     }
 }
-

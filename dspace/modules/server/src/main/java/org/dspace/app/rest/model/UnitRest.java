@@ -1,10 +1,3 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
- *
- * http://www.dspace.org/license/
- */
 package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -41,18 +34,30 @@ public class UnitRest extends DSpaceObjectRest {
         return NAME;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Returns true if this is a faculty-only Unit, false otherwise.
+     *
+     * @return true if this is a faculty-only Unit, false otherwise.
+     */
     public boolean isFacultyOnly() {
         return facultyOnly;
     }
 
+    /**
+     * Sets whether the Unit is faculty-only
+     *
+     * @param facultyOnly true if this is a faculty-only Unit, false otherwise.
+     */
     public void setFacultyOnly(boolean facultyOnly) {
         this.facultyOnly = facultyOnly;
     }
@@ -63,4 +68,3 @@ public class UnitRest extends DSpaceObjectRest {
         return RestResourceController.class;
     }
 }
-

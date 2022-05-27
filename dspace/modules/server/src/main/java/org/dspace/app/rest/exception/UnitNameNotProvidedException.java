@@ -9,13 +9,19 @@ import org.dspace.core.I18nUtil;
  * hence it should not contain sensitive or security-compromising info.</p>
  */
 public class UnitNameNotProvidedException extends UnprocessableEntityException implements TranslatableException {
-
     public static final String MESSAGE_KEY = "org.dspace.app.rest.exception.UnitNameNotProvidedException.message";
 
+    /**
+     * Default constructor
+     */
     public UnitNameNotProvidedException() {
         super(I18nUtil.getMessage(MESSAGE_KEY));
     }
 
+    /**
+     * Constructs instance with given Throwable
+     * @param cause a Throwable indicating the cause of the exception.
+     */
     public UnitNameNotProvidedException(Throwable cause) {
         super(I18nUtil.getMessage(MESSAGE_KEY), cause);
     }
@@ -25,4 +31,3 @@ public class UnitNameNotProvidedException extends UnprocessableEntityException i
         return MESSAGE_KEY;
     }
 }
-

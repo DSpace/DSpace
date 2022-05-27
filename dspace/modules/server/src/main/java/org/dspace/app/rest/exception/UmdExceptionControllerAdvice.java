@@ -1,9 +1,12 @@
 package org.dspace.app.rest.exception;
 
+import static org.springframework.web.servlet.DispatcherServlet.EXCEPTION_ATTRIBUTE;
+
 import java.io.IOException;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -11,7 +14,6 @@ import org.dspace.core.Context;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import static org.springframework.web.servlet.DispatcherServlet.EXCEPTION_ATTRIBUTE;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
@@ -22,7 +24,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  */
 @ControllerAdvice
 public class UmdExceptionControllerAdvice extends ResponseEntityExceptionHandler {
-    private static final Logger log = LogManager.getLogger(org.dspace.app.rest.exception.UmdExceptionControllerAdvice.class);
+    private static final Logger log =
+            LogManager.getLogger(org.dspace.app.rest.exception.UmdExceptionControllerAdvice.class);
 
     /**
      * Set of HTTP error codes to log as ERROR with full stacktrace.
@@ -33,6 +36,11 @@ public class UmdExceptionControllerAdvice extends ResponseEntityExceptionHandler
      * Add user-friendly error messages to the response body for selected errors.
      * Since the error messages will be exposed to the API user, the exception classes are expected to implement
      * {@link TranslatableException} such that the error messages can be translated.
+     *
+     * @param request the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @param ex the TranslatableException to translate
+     * @throws IOException if an I/O error occurs
      */
     @ExceptionHandler({
         UnitNameNotProvidedException.class,
@@ -55,7 +63,7 @@ public class UmdExceptionControllerAdvice extends ResponseEntityExceptionHandler
      * @param ex Exception thrown
      * @param message message to log or send in response
      * @param statusCode status code to send in response
-     * @throws IOException
+     * @throws IOException is an I/O error occurs
      */
     private void sendErrorResponse(final HttpServletRequest request, final HttpServletResponse response,
                                    final Exception ex, final String message, final int statusCode) throws IOException {

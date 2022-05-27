@@ -1,10 +1,11 @@
 package org.dspace.app.rest.repository.patch.operation;
 
+import static org.dspace.app.rest.repository.patch.operation.PatchOperation.OPERATION_REPLACE;
+
 import java.sql.SQLException;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.Operation;
-import static org.dspace.app.rest.repository.patch.operation.PatchOperation.OPERATION_REPLACE;
 import org.dspace.core.Context;
 import org.dspace.eperson.Unit;
 import org.dspace.eperson.service.UnitService;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Component;
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /name", "value": "new name"]'
  * </code>
+ *
+ * @param <R> the type of object being patched
  */
 @Component
 public class UnitNameReplaceOperation<R> extends PatchOperation<R> {
@@ -35,7 +38,6 @@ public class UnitNameReplaceOperation<R> extends PatchOperation<R> {
     public R perform(Context context, R object, Operation operation) {
         checkOperationValue(operation.getValue());
         if (supports(object, operation)) {
-            //UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();
             Unit unit = (Unit) object;
             checkModelForExistingValue(unit);
             try {
@@ -43,7 +45,7 @@ public class UnitNameReplaceOperation<R> extends PatchOperation<R> {
             } catch (SQLException e) {
                 throw new DSpaceBadRequestException(
                         "SQLException in UnitNameReplaceOperation.perform "
-                                + "trying to replace the name of the group.", e);
+                                + "trying to replace the name of the unit.", e);
             }
             return object;
         } else {
@@ -70,4 +72,3 @@ public class UnitNameReplaceOperation<R> extends PatchOperation<R> {
                 && operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_NAME));
     }
 }
-
