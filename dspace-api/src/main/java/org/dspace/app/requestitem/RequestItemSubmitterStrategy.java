@@ -9,6 +9,8 @@ package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -19,6 +21,7 @@ import org.dspace.eperson.EPerson;
  * @author Andrea Bollini
  */
 public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor {
+    private static final Logger LOG = LogManager.getLogger();
 
     public RequestItemSubmitterStrategy() {
     }
@@ -32,7 +35,7 @@ public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor 
      */
     @Override
     public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
-        throws SQLException {
+            throws SQLException {
         EPerson submitter = item.getSubmitter();
         RequestItemAuthor author = null;
         if (null != submitter) {
@@ -40,5 +43,21 @@ public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor 
                     submitter.getFullName(), submitter.getEmail());
         }
         return author;
+    }
+
+    @Override
+    public boolean isAuthorized(Context context, Item item) {
+        RequestItemAuthor authorizer;
+        try {
+            authorizer = getRequestItemAuthor(context, item);
+        } catch (SQLException ex) {
+            LOG.warn("Failed to find an authorizer:  {}", ex::getMessage);
+            return false;
+        }
+        EPerson user = context.getCurrentUser();
+        if (null == user) {
+            return false;
+        }
+        return authorizer.getEmail().equals(user.getEmail());
     }
 }

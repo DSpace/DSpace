@@ -14,14 +14,14 @@ import org.dspace.core.Context;
 
 /**
  * Interface to abstract the strategy for select the author to contact for
- * request copy
+ * request copy.
  *
  * @author Andrea Bollini
  */
 public interface RequestItemAuthorExtractor {
 
     /**
-     * Retrieve the auhtor to contact for a request copy of the give item.
+     * Retrieve the author to contact for requesting a copy of the given item.
      *
      * @param context DSpace context object
      * @param item item to request
@@ -29,5 +29,15 @@ public interface RequestItemAuthorExtractor {
      *         or null if no valid email address was found.
      * @throws SQLException if database error
      */
-    public RequestItemAuthor getRequestItemAuthor(Context context, Item item) throws SQLException;
+    public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
+            throws SQLException;
+
+    /**
+     *
+     * @param context current DSpace session.
+     * @param item the requested Item.
+     * @return true if {@link eperson} is authorized to respond to requests for
+     *          {@link item}.
+     */
+    public boolean isAuthorized(Context context, Item item);
 }
