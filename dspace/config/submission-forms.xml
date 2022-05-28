@@ -29,10 +29,10 @@
                     <dc-element>title</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Title</label>
+                    <label>submission.section.describe.bitstream.dc_title.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the file.</hint>
-                    <required>You must enter a name for this file</required>
+                    <hint>submission.section.describe.bitstream.dc_title.hint</hint>
+                    <required>submission.section.describe.bitstream.dc_title.required</required>
                 </field>
             </row>
             <row>
@@ -40,9 +40,9 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
                     <repeatable>true</repeatable>
-                    <label>Description</label>
+                    <label>submission.section.describe.bitstream.dc_description.label</label>
                     <input-type>textarea</input-type>
-                    <hint>Enter a description for the file</hint>
+                    <hint>submission.section.describe.bitstream.dc_description.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -57,9 +57,9 @@
                     <dc-element>contributor</dc-element>
                     <dc-qualifier>author</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Author</label>
+                    <label>submission.section.describe.traditionalpageone.dc_contributor_author.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the author's name (Family name, Given names).</hint>
+                    <hint>submission.section.describe.traditionalpageone.dc_contributor_author.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -69,10 +69,10 @@
                     <dc-element>title</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Title</label>
+                    <label>submission.section.describe.traditionalpageone.dc_title.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the main title of the item.</hint>
-                    <required>You must enter a main title for this item.</required>
+                    <hint>submission.section.describe.traditionalpageone.dc_title.label</hint>
+                    <required>submission.section.describe.traditionalpageone.dc_title.required</required>
                 </field>
             </row>
             <row>
@@ -81,9 +81,9 @@
                     <dc-element>title</dc-element>
                     <dc-qualifier>alternative</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Other Titles</label>
+                    <label>submission.section.describe.traditionalpageone.dc_title_alternative.label</label>
                     <input-type>onebox</input-type>
-                    <hint>If the item has any alternative titles, please enter them here.</hint>
+                    <hint>submission.section.describe.traditionalpageone.dc_title_alternative.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -93,13 +93,11 @@
                     <dc-element>date</dc-element>
                     <dc-qualifier>issued</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Date of Issue</label>
+                    <label>submission.section.describe.traditionalpageone.dc_date_issued.label</label>
                     <style>col-sm-4</style>
                     <input-type>date</input-type>
-                    <hint>Please give the date of previous publication or public distribution.
-                        You can leave out the day and/or month if they aren't applicable.
-                    </hint>
-                    <required>You must enter at least the year.</required>
+                    <hint>submission.section.describe.traditionalpageone.dc_date_issued.label</hint>
+                    <required>submission.section.describe.traditionalpageone.dc_date_issued.required</required>
                 </field>
 
                 <field>
@@ -107,10 +105,10 @@
                     <dc-element>publisher</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Publisher</label>
+                    <label>submission.section.describe.dc_publisher.label</label>
                     <style>col-sm-8</style>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
+                    <hint>submission.section.describe.dc_publisher.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -120,9 +118,9 @@
                     <dc-element>identifier</dc-element>
                     <dc-qualifier>citation</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Citation</label>
+                    <label>submission.section.describe.dc_identifier_citation.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the standard citation for the previously issued instance of this item.</hint>
+                    <hint>submission.section.describe.dc_identifier_citation.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -132,9 +130,9 @@
                     <dc-element>relation</dc-element>
                     <dc-qualifier>ispartofseries</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Series/Report No.</label>
+                    <label>submission.section.describe.dc_relation_ispartofseries.label</label>
                     <input-type>series</input-type>
-                    <hint>Enter the series and number assigned to this item by your community.</hint>
+                    <hint>submission.section.describe.dc_relation_ispartofseries.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -145,11 +143,9 @@
                     <dc-qualifier></dc-qualifier>
                     <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
                     <repeatable>true</repeatable>
-                    <label>Identifiers</label>
+                    <label>submission.section.describe.dc_identifier.label</label>
                     <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
-                    <hint>If the item has any identification numbers or codes associated with
-                        it, please enter the types and the actual numbers or codes.
-                    </hint>
+                    <hint>submission.section.describe.dc_identifier.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -159,10 +155,9 @@
                     <dc-element>type</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Type</label>
+                    <label>submission.section.describe.dc_type.label</label>
                     <input-type value-pairs-name="common_types">dropdown</input-type>
-                    <hint>Select the type of content of the item.
-                    </hint>
+                    <hint>submission.section.describe.dc_type.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -172,12 +167,9 @@
                     <dc-element>language</dc-element>
                     <dc-qualifier>iso</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Language</label>
+                    <label>submission.section.describe.journalvolume.dc_language_iso.label</label>
                     <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
-                    <hint>Select the language of the main content of the item. If the language does not appear in the
-                        list, please select 'Other'. If the content does not really have a language (for example, if it
-                        is a dataset or an image) please select 'N/A'.
-                    </hint>
+                    <hint>submission.section.describe.dc_language_iso.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -193,9 +185,9 @@
                     <dc-qualifier></dc-qualifier>
                     <!-- An input-type of tag MUST be marked as repeatable -->
                     <repeatable>true</repeatable>
-                    <label>Subject Keywords</label>
+                    <label>submission.section.describe.dc_subject.label</label>
                     <input-type>tag</input-type>
-                    <hint>Enter appropriate subject keywords or phrases.</hint>
+                    <hint>submission.section.describe.dc_subject.hint</hint>
                     <required></required>
                     <vocabulary>srsc</vocabulary>
                 </field>
@@ -206,9 +198,9 @@
                     <dc-element>description</dc-element>
                     <dc-qualifier>abstract</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Abstract</label>
+                    <label>submission.section.describe.dc_description_abstract.label</label>
                     <input-type>textarea</input-type>
-                    <hint>Enter the abstract of the item.</hint>
+                    <hint>submission.section.describe.dc_description_abstract.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -218,9 +210,9 @@
                     <dc-element>description</dc-element>
                     <dc-qualifier>sponsorship</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Sponsors</label>
+                    <label>submission.section.describe.dc_description_sponsorship.label</label>
                     <input-type>textarea</input-type>
-                    <hint>Enter the names of any sponsors and/or funding codes in the box.</hint>
+                    <hint>submission.section.describe.dc_description_sponsorship.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -230,7 +222,7 @@
                     <dc-element>description</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Description</label>
+                    <label>submission.section.describe.dc_description.label</label>
                     <input-type>textarea</input-type>
                     <hint>Enter any other description or comments in this box.</hint>
                     <required></required>
@@ -249,8 +241,8 @@
                     <relationship-type>isAuthorOfPublication</relationship-type>
                     <search-configuration>person</search-configuration>
                     <repeatable>true</repeatable>
-                    <label>Author</label>
-                    <hint>Enter the author's name (Family name, Given names).</hint>
+                    <label>submission.section.describe.dc_contributor_author.label</label>
+                    <hint>submission.section.describe.dc_contributor_author.hint</hint>
                     <linked-metadata-field>
                         <dc-schema>dc</dc-schema>
                         <dc-element>contributor</dc-element>
@@ -271,10 +263,10 @@
                     <dc-element>title</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Title</label>
+                    <label>submission.section.describe.dc_title.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the main title of the item.</hint>
-                    <required>You must enter a main title for this item.</required>
+                    <hint>submission.section.describe.dc_title.hint</hint>
+                    <required>submission.section.describe.dc_title.required</required>
                 </field>
             </row>
             <row>
@@ -283,9 +275,9 @@
                     <dc-element>title</dc-element>
                     <dc-qualifier>alternative</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Other Titles</label>
+                    <label>submission.section.describe.dc_title_alternative.label</label>
                     <input-type>onebox</input-type>
-                    <hint>If the item has any alternative titles, please enter them here.</hint>
+                    <hint>submission.section.describe.dc_title_alternative.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -295,13 +287,11 @@
                     <dc-element>date</dc-element>
                     <dc-qualifier>issued</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Date of Issue</label>
+                    <label>submission.section.describe.dc_date_issued.label</label>
                     <style>col-sm-4</style>
                     <input-type>date</input-type>
-                    <hint>Please give the date of previous publication or public distribution.
-                        You can leave out the day and/or month if they aren't applicable.
-                    </hint>
-                    <required>You must enter at least the year.</required>
+                    <hint>submission.section.describe.dc_date_issued.hint</hint>
+                    <required>submission.section.describe.dc_date_issued.required</required>
                 </field>
 
                 <field>
@@ -309,10 +299,10 @@
                     <dc-element>publisher</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Publisher</label>
+                    <label>submission.section.describe.dc_publisher.label</label>
                     <style>col-sm-8</style>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
+                    <hint>submission.section.describe.dc_publisher.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -322,9 +312,9 @@
                     <dc-element>identifier</dc-element>
                     <dc-qualifier>citation</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Citation</label>
+                    <label>submission.section.describe.dc_identifier_citation.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the standard citation for the previously issued instance of this item.</hint>
+                    <hint>submission.section.describe.dc_identifier_citation.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -334,9 +324,9 @@
                     <dc-element>relation</dc-element>
                     <dc-qualifier>ispartofseries</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Series/Report No.</label>
+                    <label>submission.section.describe.dc_relation_ispartofseries.label</label>
                     <input-type>series</input-type>
-                    <hint>Enter the series and number assigned to this item by your community.</hint>
+                    <hint>submission.section.describe.dc_relation_ispartofseries.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -347,11 +337,9 @@
                     <dc-qualifier></dc-qualifier>
                     <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
                     <repeatable>true</repeatable>
-                    <label>Identifiers</label>
+                    <label>submission.section.describe.dc_identifier.label</label>
                     <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
-                    <hint>If the item has any identification numbers or codes associated with
-                        it, please enter the types and the actual numbers or codes.
-                    </hint>
+                    <hint>submission.section.describe.dc_identifier.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -361,11 +349,9 @@
                     <dc-element>type</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Type</label>
+                    <label>submission.section.describe.dc_type.label</label>
                     <input-type value-pairs-name="common_types">dropdown</input-type>
-                    <hint>Select the type(s) of content of the item. To select more than one value in the list, you may
-                        have to hold down the "CTRL" or "Shift" key.
-                    </hint>
+                    <hint>submission.section.describe.dc_type.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -375,12 +361,9 @@
                     <dc-element>language</dc-element>
                     <dc-qualifier>iso</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Language</label>
+                    <label>submission.section.describe.dc_language_iso.label</label>
                     <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
-                    <hint>Select the language of the main content of the item. If the language does not appear in the
-                        list, please select 'Other'. If the content does not really have a language (for example, if it
-                        is a dataset or an image) please select 'N/A'.
-                    </hint>
+                    <hint>submission.section.describe.dc_language_iso.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -392,8 +375,8 @@
                 <relation-field>
                     <relationship-type>isPublicationOfAuthor</relationship-type>
                     <search-configuration>publication</search-configuration>
-                    <label>Publication</label>
-                    <hint>import a publicaton</hint>
+                    <label>submission.section.describe.isPublicationOfAuthor.label</label>
+                    <hint>submission.section.describe.isPublicationOfAuthor.hint</hint>
                     <externalsources>pubmed</externalsources>
                 </relation-field>
             </row>
@@ -401,27 +384,27 @@
                 <field>
                     <dc-schema>person</dc-schema>
                     <dc-element>familyName</dc-element>
-                    <label>Last name</label>
+                    <label>submission.section.describe.person_familyName.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the last name of the person</hint>
+                    <hint>submission.section.describe.person_familyName.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>person</dc-schema>
                     <dc-element>givenName</dc-element>
-                    <label>First name</label>
+                    <label>submission.section.describe.person_givenName.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the first name of the person</hint>
+                    <hint>submission.section.describe.person_givenName.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>person</dc-schema>
                     <dc-element>email</dc-element>
-                    <label>Email</label>
+                    <label>submission.section.describe.person_email.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the email of the person</hint>
+                    <hint>submission.section.describe.person_email.hint</hint>
                 </field>
             </row>
             <!--     <row>-->
@@ -429,18 +412,18 @@
             <!--       <dc-schema>person</dc-schema>-->
             <!--       <dc-element>identifier</dc-element>-->
             <!--       <dc-qualifier>orcid</dc-qualifier>-->
-            <!--       <label>Orcid</label>-->
+            <!--       <label>submission.section.describe.person_identifier_orcid.label</label>-->
             <!--       <input-type>onebox</input-type>-->
-            <!--       <hint>Enter the orcid of the person</hint>-->
+            <!--       <hint>submission.section.describe.person_identifier_orcid.hint</hint>-->
             <!--     </field>-->
             <!--     </row>-->
             <row>
                 <field>
                     <dc-schema>person</dc-schema>
                     <dc-element>birthDate</dc-element>
-                    <label>Birth date</label>
+                    <label>submission.section.describe.person_birthDate.label</label>
                     <input-type>date</input-type>
-                    <hint>Enter the birth date of the person</hint>
+                    <hint>submission.section.describe.person_birthDate.hint</hint>
                 </field>
             </row>
 <!--            <row>-->
@@ -448,18 +431,18 @@
 <!--                    <dc-schema>person</dc-schema>-->
 <!--                    <dc-element>identifier</dc-element>-->
 <!--                    <dc-qualifier>staffid</dc-qualifier>-->
-<!--                    <label>Staff ID</label>-->
+<!--                    <label>submission.section.describe.person_identifier_staffid.label</label>-->
 <!--                    <input-type>onebox</input-type>-->
-<!--                    <hint>Enter the staff id of the person</hint>-->
+<!--                    <hint>submission.section.describe.person_identifier_staffid.hint</hint>-->
 <!--                </field>-->
 <!--            </row>-->
             <row>
                 <field>
                     <dc-schema>person</dc-schema>
                     <dc-element>jobTitle</dc-element>
-                    <label>Job title</label>
+                    <label>submission.section.describe.person_jobTitle.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the job title of the person</hint>
+                    <hint>submission.section.describe.person_jobTitle.hint</hint>
                 </field>
             </row>
         </form>
@@ -470,18 +453,18 @@
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>title</dc-element>
-                    <label>Name</label>
+                    <label>submission.section.describe.project.dc_title.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the project</hint>
+                    <hint>submission.section.describe.project.dc_title.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>identifier</dc-element>
-                    <label>ID</label>
+                    <label>submission.section.describe.project.dc_identifier.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the id of the project</hint>
+                    <hint>submission.section.describe.project.dc_identifier.hint</hint>
                 </field>
             </row>
 <!--            <row>-->
@@ -489,9 +472,9 @@
 <!--                    <dc-schema>project</dc-schema>-->
 <!--                    <dc-element>identifier</dc-element>-->
 <!--                    <dc-qualifier>status</dc-qualifier>-->
-<!--                    <label>Status</label>-->
+<!--                    <label>submission.section.describe.project.dc_identifier_status.label</label>-->
 <!--                    <input-type value-pairs-name="project_status">dropdown</input-type>-->
-<!--                    <hint>Enter the status of the project</hint>-->
+<!--                    <hint>submission.section.describe.project.dc_identifier_status.hint</hint>-->
 <!--                </field>-->
 <!--            </row>-->
 <!--            <row>-->
@@ -499,9 +482,9 @@
 <!--                    <dc-schema>project</dc-schema>-->
 <!--                    <dc-element>identifier</dc-element>-->
 <!--                    <dc-qualifier>startdate</dc-qualifier>-->
-<!--                    <label>Start date</label>-->
+<!--                    <label>submission.section.describe.project.dc_identifier_startdate.label</label>-->
 <!--                    <input-type>date</input-type>-->
-<!--                    <hint>Enter the start date of the project</hint>-->
+<!--                    <hint>submission.section.describe.project.dc_identifier_startdate.hint</hint>-->
 <!--                </field>-->
 <!--            </row>-->
 <!--            <row>-->
@@ -509,9 +492,9 @@
 <!--                    <dc-schema>project</dc-schema>-->
 <!--                    <dc-element>identifier</dc-element>-->
 <!--                    <dc-qualifier>expectedcompletion</dc-qualifier>-->
-<!--                    <label>Expected Completion</label>-->
+<!--                    <label>submission.section.describe.project.dc_identifier_expectedcompletion.label</label>-->
 <!--                    <input-type>date</input-type>-->
-<!--                    <hint>Enter the expected completion date of the project</hint>-->
+<!--                    <hint>submission.section.describe.project.dc_identifier_expectedcompletion.hint</hint>-->
 <!--                </field>-->
 <!--            </row>-->
             <row>
@@ -519,18 +502,18 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>subject</dc-element>
                     <repeatable>true</repeatable>
-                    <label>Keywords</label>
+                    <label>submission.section.describe.project.dc_subject.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the keywords of the project</hint>
+                    <hint>submission.section.describe.project.dc_subject.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
-                    <label>Description</label>
+                    <label>submission.section.describe.project.dc_description.label</label>
                     <input-type>textarea</input-type>
-                    <hint>Enter the description of the project</hint>
+                    <hint>submission.section.describe.project.dc_description.hint</hint>
                 </field>
             </row>
         </form>
@@ -541,27 +524,27 @@
                 <field>
                     <dc-schema>organization</dc-schema>
                     <dc-element>legalName</dc-element>
-                    <label>Name</label>
+                    <label>submission.section.describe.orgUnit.organization_legalName.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the orgunit</hint>
+                    <hint>submission.section.describe.orgUnit.organization_legalName.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>identifier</dc-element>
-                    <label>ID</label>
+                    <label>submission.section.describe.orgUnit.dc_identifier.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the id of the orgunit</hint>
+                    <hint>submission.section.describe.orgUnit.dc_identifier.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>organization</dc-schema>
                     <dc-element>foundingDate</dc-element>
-                    <label>Date established</label>
+                    <label>submission.section.describe.orgUnit.organization_foundingDate.label</label>
                     <input-type>date</input-type>
-                    <hint>Enter the established date of the orgunit</hint>
+                    <hint>submission.section.describe.orgUnit.organization_foundingDate.hint</hint>
                 </field>
             </row>
             <row>
@@ -569,9 +552,9 @@
                     <dc-schema>organization</dc-schema>
                     <dc-element>address</dc-element>
                     <dc-qualifier>addressLocality</dc-qualifier>
-                    <label>City</label>
+                    <label>submission.section.describe.orgUnit.organization_address_addressLocailty.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the city of the orgunit</hint>
+                    <hint>submission.section.describe.orgUnit.organization_address_addressLocailty.hint</hint>
                 </field>
             </row>
             <row>
@@ -579,18 +562,18 @@
                     <dc-schema>organization</dc-schema>
                     <dc-element>address</dc-element>
                     <dc-qualifier>addressCountry</dc-qualifier>
-                    <label>Country</label>
+                    <label>submission.section.describe.orgUnit.organization_address_addressCountry.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the country of the orgunit</hint>
+                    <hint>submission.section.describe.orgUnit.organization_address_addressCountry.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
-                    <label>Description</label>
+                    <label>submission.section.describe.orgUnit.dc_description.label</label>
                     <input-type>textarea</input-type>
-                    <hint>Enter the description of the orgunit</hint>
+                    <hint>submission.section.describe.orgUnit.dc_description.hint</hint>
                 </field>
             </row>
         </form>
@@ -601,45 +584,45 @@
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>title</dc-element>
-                    <label>Name</label>
+                    <label>submission.section.describe.journal.dc_title.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the journal</hint>
+                    <hint>submission.section.describe.journal.dc_title.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>creativework</dc-schema>
                     <dc-element>editor</dc-element>
-                    <label>Editor</label>
+                    <label>submission.section.describe.journal.creativework_editor.label</label>
                     <input-type>name</input-type>
-                    <hint>Enter the editor of the journal</hint>
+                    <hint>submission.section.describe.journal.creativework_editor.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>creativeworkseries</dc-schema>
                     <dc-element>issn</dc-element>
-                    <label>ISSN</label>
+                    <label>submission.section.describe.journal.creativework_issn.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the issn of the journal</hint>
+                    <hint>submission.section.describe.journal.creativework_issn.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
-                    <label>Description</label>
+                    <label>submission.section.describe.journal.dc_description.label</label>
                     <input-type>textarea</input-type>
-                    <hint>Enter the description of the journal</hint>
+                    <hint>submission.section.describe.journal.dc_description.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>creativework</dc-schema>
                     <dc-element>publisher</dc-element>
-                    <label>Publisher</label>
+                    <label>submission.section.describe.journal.creativework_publisher.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the publisher of the journal</hint>
+                    <hint>submission.section.describe.journal.creativework_publisher.hint</hint>
                 </field>
             </row>
 
@@ -653,8 +636,8 @@
                     <search-configuration>journal</search-configuration>
                     <!-- example of filtering Discovery search for Journal by a specific publisher -->
                     <!--<filter>creativework.publisher:somepublishername</filter>-->
-                    <label>Journal</label>
-                    <hint>Select the journal related to this volume.</hint>
+                    <label>submission.section.describe.journalvolume.isJournalOfVolume.label</label>
+                    <hint>submission.section.describe.journalvolume.isJournalOfVolume.hint</hint>
                     <externalsources>sherpaJournal</externalsources>
                 </relation-field>
             </row>
@@ -662,36 +645,36 @@
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>title</dc-element>
-                    <label>Name</label>
+                    <label>submission.section.describe.journalvolume.dc_title.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the journal volume</hint>
+                    <hint>submission.section.describe.journalvolume.dc_title.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>publicationvolume</dc-schema>
                     <dc-element>volumeNumber</dc-element>
-                    <label>Volume</label>
+                    <label>submission.section.describe.journalvolume.publicationvolume_volumeNumber.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the volume of the journal volume</hint>
+                    <hint>submission.section.describe.journalvolume.publicationvolume_volumeNumber.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>creativework</dc-schema>
                     <dc-element>datePublished</dc-element>
-                    <label>Issue date</label>
+                    <label>submission.section.describe.journalvolume.creativework_datePublished.label</label>
                     <input-type>date</input-type>
-                    <hint>Enter the issue date of the journal volume</hint>
+                    <hint>submission.section.describe.journalvolume.creativework_datePublished.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
-                    <label>Description</label>
+                    <label>submission.section.describe.journalvolume.dc_description.label</label>
                     <input-type>textarea</input-type>
-                    <hint>Enter the description of the journal volume</hint>
+                    <hint>submission.section.describe.journalvolume.dc_description.label</hint>
                 </field>
             </row>
         </form>
@@ -702,44 +685,44 @@
                 <relation-field>
                     <relationship-type>isJournalVolumeOfIssue</relationship-type>
                     <search-configuration>journalvolume</search-configuration>
-                    <label>Journal Volume</label>
-                    <hint>Select the journal volume related to this issue.</hint>
+                    <label>submission.section.describe.journalissue.isJournalVolumeOfIssue.label</label>
+                    <hint>submission.section.describe.journalissue.isJournalVolumeOfIssue.hint</hint>
                 </relation-field>
             </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>title</dc-element>
-                    <label>Name</label>
+                    <label>submission.section.describe.journalissue.dc_title.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the journal issue</hint>
+                    <hint>submission.section.describe.journalissue.dc_title.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>publicationissue</dc-schema>
                     <dc-element>issueNumber</dc-element>
-                    <label>Number</label>
+                    <label>submission.section.describe.journalissue.publicationissue_issueNumber.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the number of the journal issue</hint>
+                    <hint>submission.section.describe.journalissue.publicationissue_issueNumber.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>creativework</dc-schema>
                     <dc-element>datePublished</dc-element>
-                    <label>Issue date</label>
+                    <label>submission.section.describe.journalissue.creativework_datePublished.label</label>
                     <input-type>date</input-type>
-                    <hint>Enter the issue date of the journal issue</hint>
+                    <hint>submission.section.describe.journalissue.creativework_datePublished.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
-                    <label>Description</label>
+                    <label>submission.section.describe.journalissue.dc_description.label</label>
                     <input-type>textarea</input-type>
-                    <hint>Enter the description of the journal issue</hint>
+                    <hint>submission.section.describe.journalissue.dc_description.hint</hint>
                 </field>
             </row>
             <row>
@@ -764,10 +747,10 @@
                     <dc-element>title</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Title</label>
+                    <label>submission.section.describe.dc_title.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the main title of the item.</hint>
-                    <required>You must enter a main title for this item.</required>
+                    <hint>submission.section.describe.dc_title.hint</hint>
+                    <required>submission.section.describe.dc_title.required</required>
                 </field>
             </row>
             <row>
@@ -776,9 +759,9 @@
                     <dc-element>title</dc-element>
                     <dc-qualifier>alternative</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Other Titles</label>
+                    <label>submission.section.describe.dc_title_alternative.label</label>
                     <input-type>onebox</input-type>
-                    <hint>If the item has any alternative titles, please enter them here.</hint>
+                    <hint>submission.section.describe.dc_title_alternative.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -788,8 +771,8 @@
                     <search-configuration>personOrOrgunit</search-configuration>
                     <repeatable>true</repeatable>
                     <name-variants>true</name-variants>
-                    <label>Author</label>
-                    <hint>Add an author</hint>
+                    <label>submission.section.describe.authorRelationship.label</label>
+                    <hint>submission.section.describe.authorRelationship.hint</hint>
                     <linked-metadata-field>
                         <dc-schema>dc</dc-schema>
                         <dc-element>contributor</dc-element>
@@ -797,7 +780,7 @@
                         <input-type>name</input-type>
                     </linked-metadata-field>
                     <externalsources>orcid</externalsources>
-                    <required>At least one author (plain text or relationship) is required</required>
+                    <required>submission.section.describe.authorRelationship.required</required>
                 </relation-field>
             </row>
 
@@ -809,14 +792,11 @@
                     <dc-element>date</dc-element>
                     <dc-qualifier>issued</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Date of Issue</label>
+                    <label>submission.section.describe.dc_date_issued.label</label>
                     <style>col-sm-4</style>
                     <input-type>date</input-type>
-                    <hint>Please give the date of previous publication or public distribution.
-                        You can leave out the day
-                        and/or month if they aren't applicable.
-                    </hint>
-                    <required>You must enter at least the year.</required>
+                    <hint>submission.section.describe.dc_date_issued.hint</hint>
+                    <required>submission.section.describe.dc_date_issued.required</required>
                 </field>
             </row>
             <row>
@@ -825,10 +805,10 @@
                     <dc-element>publisher</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Publisher</label>
+                    <label>submission.section.describe.dc_publisher.label</label>
                     <style>col-sm-8</style>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
+                    <hint>submission.section.describe.dc_publisher.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -838,9 +818,9 @@
                     <dc-element>relation</dc-element>
                     <dc-qualifier>hasversion</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Editor Version</label>
+                    <label>submission.section.describe.openairepub.dc_relation_hasversion.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the URL/DOI of the editor version of this item.</hint>
+                    <hint>submission.section.describe.openairepub.dc_relation_hasversion.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -850,9 +830,9 @@
                     <dc-element>dcterms</dc-element>
                     <dc-qualifier>references</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Related Dataset</label>
+                    <label>submission.section.describe.openairepub.dc_dcterms_references.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the URL/DOI of the related Dataset.</hint>
+                    <hint>submission.section.describe.openairepub.dc_dcterms_references.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -863,12 +843,9 @@
                     <dc-qualifier></dc-qualifier>
                     <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
                     <repeatable>true</repeatable>
-                    <label>Identifiers</label>
+                    <label>submission.section.describe.dc_identifier.label</label>
                     <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
-                    <hint>If the item has any identification numbers or codes associated with
-                        it, please enter the types
-                        and the actual numbers or codes.
-                    </hint>
+                    <hint>submission.section.describe.dc_identifier.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -878,9 +855,9 @@
                     <dc-element>citation</dc-element>
                     <dc-qualifier>title</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Title of Journal, Book or Event</label>
+                    <label>submission.section.describe.openairepub.oaire.citation.title.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Include the name of related item like the journal name, book title or event name.</hint>
+                    <hint>submission.section.describe.openairepub.oaire.citation.title.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -890,9 +867,9 @@
                     <dc-element>citation</dc-element>
                     <dc-qualifier>conferencePlace</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Event/Conference Place</label>
+                    <label>submission.section.describe.openairepub.oaire.citation.conferencePlace.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the event location.</hint>
+                    <hint>submission.section.describe.openairepub.oaire.citation.conferencePlace.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -902,9 +879,9 @@
                     <dc-element>citation</dc-element>
                     <dc-qualifier>conferenceDate</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Conference Date</label>
+                    <label>submission.section.describe.openairepub.oaire.citation.conferenceDate.label</label>
                     <input-type>date</input-type>
-                    <hint>Enter the date of the event.</hint>
+                    <hint>submission.section.describe.openairepub.oaire.citation.conferenceDate.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -914,9 +891,9 @@
                     <dc-element>citation</dc-element>
                     <dc-qualifier>volume</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Volume</label>
+                    <label>submission.section.describe.openairepub.oaire.citation.volume.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the volume of the item.</hint>
+                    <hint>submission.section.describe.openairepub.oaire.citation.volume.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -926,9 +903,9 @@
                     <dc-element>citation</dc-element>
                     <dc-qualifier>issue</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Issue</label>
+                    <label>submission.section.describe.openairepub.oaire.citation.issue.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the issue number of the item.</hint>
+                    <hint>submission.section.describe.openairepub.oaire.citation.issue.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -938,9 +915,9 @@
                     <dc-element>citation</dc-element>
                     <dc-qualifier>edition</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Edition</label>
+                    <label>submission.section.describe.openairepub.oaire.citation.edition.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the edition of the item.</hint>
+                    <hint>submission.section.describe.openairepub.oaire.citation.edition.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -972,11 +949,9 @@
                     <dc-element>type</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Type</label>
+                    <label>submission.section.describe.dc_type.label</label>
                     <input-type value-pairs-name="openaire_types">dropdown</input-type>
-                    <hint>Select the type(s) of content of the item. To select more than one value in the list, you may
-                        have to hold down the "CTRL" or "Shift" key.
-                    </hint>
+                    <hint>submission.section.describe.dc_type.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -985,10 +960,9 @@
                     <dc-schema>oaire</dc-schema>
                     <dc-element>version</dc-element>
                     <repeatable>false</repeatable>
-                    <label>Resource Version</label>
+                    <label>submission.section.describe.openairepub.oaire.version.false.label</label>
                     <input-type value-pairs-name="openaire_version_types">dropdown</input-type>
-                    <hint>Select the version of the resource. If the resource does not have that information, please
-                        select "Not Applicable (or Unknown)".</hint>
+                    <hint>submission.section.describe.openairepub.oaire.version.false.hint</hint>
                     <required></required>
                 </field>
                 <field>
@@ -996,12 +970,9 @@
                     <dc-element>language</dc-element>
                     <dc-qualifier>iso</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Language</label>
+                    <label>submission.section.describe.dc_language_iso.label</label>
                     <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
-                    <hint>Select the language of the main content of the item. If the language does not appear in the
-                        list, please select 'Other'. If the content does not really have a language (for example, if it
-                        is a dataset or an image) please select 'N/A'.
-                    </hint>
+                    <hint>submission.section.describe.dc_language_iso.label</hint>
                     <required></required>
                 </field>
             </row>
@@ -1015,9 +986,9 @@
                     <dc-qualifier></dc-qualifier>
                     <!-- An input-type of tag MUST be marked as repeatable -->
                     <repeatable>true</repeatable>
-                    <label>Subject Keywords</label>
+                    <label>submission.section.describe.dc_subject.label</label>
                     <input-type>tag</input-type>
-                    <hint>Enter appropriate subject keywords or phrases.</hint>
+                    <hint>submission.section.describe.dc_subject.hint</hint>
                     <required></required>
                     <vocabulary>srsc</vocabulary>
                 </field>
@@ -1032,9 +1003,9 @@
                     <dc-element>subject</dc-element>
                     <dc-qualifier>fos</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Subject Keywords (Fields of Science and Technology - OECD) </label>
+                    <label>submission.section.describe.openairepub.datacite.subject.fos.label</label>
                     <input-type>tag</input-type>
-                    <hint>Enter appropriate subject keywords or phrases based on the defined taxonomy.</hint>
+                    <hint>submission.section.describe.openairepub.datacite.subject.fos.hint</hint>
                     <required></required>
                     <vocabulary>fos</vocabulary>
                 </field>
@@ -1046,9 +1017,9 @@
                     <dc-element>description</dc-element>
                     <dc-qualifier>abstract</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Abstract</label>
+                    <label>submission.section.describe.dc_description_abstract.label</label>
                     <input-type>textarea</input-type>
-                    <hint>Enter the abstract of the item.</hint>
+                    <hint>submission.section.describe.dc_description_abstract.hint</hint>
                     <required></required>
                 </field>
             </row>
