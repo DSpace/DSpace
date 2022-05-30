@@ -43,7 +43,6 @@
           class="org.dspace.importer.external.arxiv.metadatamapping.ArXivFieldMapping">
     </bean>
 
-
     <bean id="pubmedImportService"
           class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl">
         <property name="metadataFieldMapping" ref="pubmedMetadataFieldMapping"/>
@@ -55,7 +54,6 @@
             </list>
         </property>
     </bean>
-
 
     <bean id="pubmedMetadataFieldMapping"
           class="org.dspace.importer.external.pubmed.metadatamapping.PubmedFieldMapping">
@@ -115,6 +113,12 @@
           </property>
     </bean>
 
+    <bean id="CrossRefImportService" class="org.dspace.importer.external.crossref.CrossRefImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="CrossRefMetadataFieldMapping"/>
+        <property name="url" value="${crossref.url}"/>
+    </bean>
+    <bean id="CrossRefMetadataFieldMapping" class="org.dspace.importer.external.crossref.CrossRefFieldMapping"/>
+
     <bean id="ScopusImportService" class="org.dspace.importer.external.scopus.service.ScopusImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="scopusMetadataFieldMapping"/>
         <property name="url" value="${scopus.url}"/>
@@ -123,6 +127,21 @@
         <property name="viewMode" value="${scopus.search-api.viewMode}"/>
     </bean>
     <bean id="scopusMetadataFieldMapping" class="org.dspace.importer.external.scopus.service.ScopusFieldMapping"/>
+
+    <bean id="vufindImportService" class="org.dspace.importer.external.vufind.VuFindImportMetadataSourceServiceImpl" scope="singleton">
+          <!-- Set to empty to use the default set of fields  -->
+          <constructor-arg type="java.lang.String" value=""/>
+          <property name="metadataFieldMapping" ref="vufindMetadataFieldMapping"/>
+          <property name="url" value="${vufind.url}"/>
+          <property name="urlSearch" value="${vufind.url.search}"/>
+    </bean>
+    <bean id="vufindMetadataFieldMapping" class="org.dspace.importer.external.vufind.metadatamapping.VuFindFieldMapping"/>
+
+    <bean id="ScieloImportService" class="org.dspace.importer.external.scielo.service.ScieloImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="scieloMetadataFieldMapping"/>
+        <property name="url" value="${scielo.url}"/>
+    </bean>
+    <bean id="scieloMetadataFieldMapping" class="org.dspace.importer.external.scielo.service.ScieloFieldMapping"/>
 
     <bean id="WosImportService" class="org.dspace.importer.external.wos.service.WOSImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="wosMetadataFieldMapping"/>

@@ -8,14 +8,12 @@
 package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.io.FileInputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -65,9 +63,9 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
 
             context.restoreAuthSystemState();
             Collection<ImportRecord> recordsImported = wosImportMetadataService.getRecords("test query", 0, 2);
-            Collection<ImportRecord> collection2match = getRecords();
+            ArrayList<ImportRecord> collection2match = getRecords();
             assertEquals(2, recordsImported.size());
-            assertTrue(matchRecords(recordsImported, collection2match));
+            matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
             wosImportMetadataService.setApiKey(originApiKey);
@@ -101,8 +99,8 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         }
     }
 
-    private Collection<ImportRecord> getRecords() {
-        Collection<ImportRecord> records = new LinkedList<ImportRecord>();
+    private ArrayList<ImportRecord> getRecords() {
+        ArrayList<ImportRecord> records = new ArrayList<>();
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
         //define first record
         MetadatumDTO edition = createMetadatumDTO("oaire","citation", "edition", "WOS.ISSHP");

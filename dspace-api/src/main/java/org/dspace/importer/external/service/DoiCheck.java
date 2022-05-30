@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Utility class that provides methods to check if a given string is a DOI and exists on CrossRef services
+ * Utility class that provides methods to check if a given string is a DOI
  *
  * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  */
@@ -36,11 +36,6 @@ public class DoiCheck {
         return m.matches();
     }
 
-    /**
-     * This method is used to purge a doi link,
-     * for example: query=https://dx.doi.org/10.1234/123
-     * the returned value will be 10.1234/123
-     */
     public static String purgeDoiValue(final String query) {
         String value = query.replaceAll(",", "");
         for (final String prefix : DOI_PREFIXES) {

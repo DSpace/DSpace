@@ -8,14 +8,12 @@
 package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.io.FileInputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -71,10 +69,10 @@ public class CiniiImportMetadataSourceServiceIT extends AbstractLiveImportIntegr
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response, response2, response3);
 
             context.restoreAuthSystemState();
-            Collection<ImportRecord> collection2match = getRecords();
+            ArrayList<ImportRecord> collection2match = getRecords();
             Collection<ImportRecord> recordsImported = ciniiServiceImpl.getRecords("test query", 0, 2);
             assertEquals(2, recordsImported.size());
-            assertTrue(matchRecords(recordsImported, collection2match));
+            matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
             if (Objects.nonNull(ciniiIds)) {
@@ -110,8 +108,8 @@ public class CiniiImportMetadataSourceServiceIT extends AbstractLiveImportIntegr
         }
     }
 
-    private Collection<ImportRecord> getRecords() {
-        Collection<ImportRecord> records = new LinkedList<ImportRecord>();
+    private ArrayList<ImportRecord> getRecords() {
+        ArrayList<ImportRecord> records = new ArrayList<>();
         //define first record
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
         MetadatumDTO title = createMetadatumDTO("dc", "title", null,

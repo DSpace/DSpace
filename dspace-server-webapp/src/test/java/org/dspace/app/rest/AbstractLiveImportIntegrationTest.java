@@ -7,12 +7,16 @@
  */
 package org.dspace.app.rest;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -27,14 +31,30 @@ import org.dspace.importer.external.metadatamapping.MetadatumDTO;
  */
 public class AbstractLiveImportIntegrationTest extends AbstractControllerIntegrationTest {
 
-    protected boolean matchRecords(Collection<ImportRecord> recordsImported, Collection<ImportRecord> records2match) {
-        ImportRecord  firstImported = recordsImported.iterator().next();
-        ImportRecord  secondImported = recordsImported.iterator().next();
-        ImportRecord  first2match = recordsImported.iterator().next();
-        ImportRecord  second2match = recordsImported.iterator().next();
-        boolean checkFirstRecord = first2match.getValueList().containsAll(firstImported.getValueList());
-        boolean checkSecondRecord = second2match.getValueList().containsAll(secondImported.getValueList());
-        return checkFirstRecord && checkSecondRecord;
+    protected void matchRecords(ArrayList<ImportRecord> recordsImported, ArrayList<ImportRecord> records2match) {
+        assertEquals(records2match.size(), recordsImported.size());
+        for (int i = 0; i < recordsImported.size(); i++) {
+            ImportRecord firstImported = recordsImported.get(i);
+            ImportRecord first2match = records2match.get(i);
+            checkMetadataValue(firstImported.getValueList(), first2match.getValueList());
+        }
+    }
+
+    private void checkMetadataValue(List<MetadatumDTO> list, List<MetadatumDTO> list2) {
+        assertEquals(list.size(), list2.size());
+        for (int i = 0; i < list.size(); i++) {
+            assertTrue(sameMetadatum(list.get(i), list2.get(i)));
+        }
+    }
+
+    private boolean sameMetadatum(MetadatumDTO metadatum, MetadatumDTO metadatum2) {
+        if (StringUtils.equals(metadatum.getSchema(), metadatum2.getSchema()) &&
+            StringUtils.equals(metadatum.getElement(), metadatum2.getElement()) &&
+            StringUtils.equals(metadatum.getQualifier(), metadatum2.getQualifier()) &&
+            StringUtils.equals(metadatum.getValue(), metadatum2.getValue())) {
+            return true;
+        }
+        return false;
     }
 
     protected MetadatumDTO createMetadatumDTO(String schema, String element, String qualifier, String value) {

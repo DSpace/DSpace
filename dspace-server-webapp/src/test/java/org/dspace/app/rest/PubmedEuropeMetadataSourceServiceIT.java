@@ -8,14 +8,12 @@
 package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.io.FileInputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -64,10 +62,10 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response, response2);
 
             context.restoreAuthSystemState();
+            ArrayList<ImportRecord> collection2match = getRecords();
             Collection<ImportRecord> recordsImported = pubmedEuropeMetadataServiceImpl.getRecords("test query", 0, 3);
-            Collection<ImportRecord> collection2match = getRecords();
             assertEquals(3, recordsImported.size());
-            assertTrue(matchRecords(recordsImported, collection2match));
+            matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
         }
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
@@ -96,8 +94,8 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
         }
     }
 
-    private Collection<ImportRecord> getRecords() {
-        Collection<ImportRecord> records = new LinkedList<ImportRecord>();
+    private ArrayList<ImportRecord> getRecords() {
+        ArrayList<ImportRecord> records = new ArrayList<>();
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
         //define first record
         MetadatumDTO title = createMetadatumDTO("dc","title", null,

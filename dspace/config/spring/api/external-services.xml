@@ -5,7 +5,7 @@
 
     <bean class="org.dspace.external.service.impl.ExternalDataServiceImpl"/>
 
-    <bean class="org.dspace.importer.external.scopus.service.LiveImportClientImpl"/>
+    <bean class="org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl"/>
 
     <bean class="org.dspace.external.provider.impl.SHERPAv2JournalISSNDataProvider" init-method="init">
         <property name="sherpaService">
@@ -94,6 +94,18 @@
         </property>
     </bean>
 
+    <bean id="crossRefLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="CrossRefImportService"/>
+        <property name="sourceIdentifier" value="crossref"/>
+        <property name="recordIdMetadata" value="dc.identifier.doi"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
     <bean id="scopusLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="ScopusImportService"/>
         <property name="sourceIdentifier" value="scopus"/>
@@ -127,5 +139,27 @@
         </property>
     </bean>
 
-</beans>
+    <bean id="vufindLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="vufindImportService"/>
+        <property name="sourceIdentifier" value="vufind"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
 
+    <bean id="scieloLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="ScieloImportService"/>
+        <property name="sourceIdentifier" value="scielo"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+            </list>
+        </property>
+    </bean>
+
+</beans>

@@ -15,7 +15,6 @@ import java.io.FileInputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -62,10 +61,10 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
-            Collection<ImportRecord> collection2match = getRecords();
+            ArrayList<ImportRecord> collection2match = getRecords();
             Collection<ImportRecord> recordsImported = scopusServiceImpl.getRecords("test query", 0, 2);
             assertEquals(2, recordsImported.size());
-            assertTrue(matchRecords(recordsImported, collection2match));
+            matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
             scopusServiceImpl.setApiKey(originApiKey);
@@ -125,8 +124,8 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         }
     }
 
-    private Collection<ImportRecord> getRecords() {
-        Collection<ImportRecord> records = new LinkedList<ImportRecord>();
+    private ArrayList<ImportRecord> getRecords() {
+        ArrayList<ImportRecord> records = new ArrayList<>();
         //define first record
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
         MetadatumDTO doi = createMetadatumDTO("dc", "identifier", "doi", "10.3934/mine.2023004");
