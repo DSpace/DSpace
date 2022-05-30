@@ -70,7 +70,6 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
                         newAccessConditions.add(evaluateSingleObject((LateObjectEvaluator) value));
                     }
 
-                    // TODO manage duplicate policy
                     if (CollectionUtils.isNotEmpty(newAccessConditions)) {
                         BitstreamResourcePolicyUtils.findApplyResourcePolicy(context, uploadConfig, bitstream,
                                                                              newAccessConditions);

@@ -42,6 +42,7 @@ public class BitstreamResourcePolicyUtils {
      * @param newAccessCondition    The access condition containing the details for the desired policies
      * @throws SQLException         If a database error occurs
      * @throws AuthorizeException   If the user is not authorized
+     * @throws ParseException       If parse error
      */
     public static void findApplyResourcePolicy(Context context, UploadConfiguration uploadConfiguration,
             DSpaceObject obj, List<AccessConditionDTO> newAccessConditions)
@@ -64,7 +65,7 @@ public class BitstreamResourcePolicyUtils {
      * The description, start date and end date are applied as well
      *
      * @param context               The relevant DSpace Context.
-     * @param uploadConfigs         The configured UploadConfigurations
+     * @param uploadConfiguration   The configured UploadConfiguration
      * @param obj                   The applicable DSpace object whose policies should be determined
      * @param name                  The name of the access condition matching the desired policies
      * @param description           An optional description for the policies
@@ -72,6 +73,7 @@ public class BitstreamResourcePolicyUtils {
      * @param endDate               An optional end date for the policies
      * @throws SQLException         If a database error occurs
      * @throws AuthorizeException   If the user is not authorized
+     * @throws ParseException       If parse error
      */
     public static void findApplyResourcePolicy(Context context, UploadConfiguration uploadConfiguration,
             DSpaceObject obj, String name, String description,
