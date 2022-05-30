@@ -92,12 +92,14 @@ public class RequestCopyFeature implements AuthorizationFeature {
             if (object instanceof DSpaceObjectRest) {
                 DSpaceObjectRest dspaceObjectRest = (DSpaceObjectRest) object;
                 String uuid = dspaceObjectRest.getUuid();
+                // Look if the object itself is restricted.
                 if (Arrays.stream(restrictions).anyMatch(uuid::equals)) {
                     return false;
                 }
                 // Security in case we encounter an infinite loop.
                 DSpaceObject previousParent = null;
                 DSpaceObject parent = (DSpaceObject) utils.getDSpaceAPIObjectFromRest(context, object);
+                // Look if any parent in the hierarchy is restricted.
                 do {
                     previousParent = parent;
                     parent = getParentObject(context, parent);
