@@ -144,7 +144,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     }
 
     protected String getFileNameOrExportFile() {
-        String exportDir = configurationService.getProperty("csvexport.dir");
+        String exportDir = System.getProperty("java.io.tmpdir");
         File f = new File(exportDir);
         if (!f.exists()) {
             f.mkdirs();
