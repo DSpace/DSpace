@@ -113,6 +113,7 @@
         <property name="supportedEntityTypes">
             <list>
                 <value>Patent</value>
+                <value>none</value>
             </list>
         </property>
     </bean>

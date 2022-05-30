@@ -174,7 +174,8 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 String bearer = login();
                 return retry(new CountRecordsCallable(query, bearer));
             } catch (IOException | HttpException e) {
-                e.printStackTrace();
+                log.warn(e.getMessage());
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
         return 0;
@@ -202,7 +203,8 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 String bearer = login();
                 return retry(new SearchByQueryCallable(query, bearer, start, count));
             } catch (IOException | HttpException e) {
-                e.printStackTrace();
+                log.warn(e.getMessage());
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
         return new ArrayList<ImportRecord>();
@@ -216,7 +218,8 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 String bearer = login();
                 return retry(new SearchByQueryCallable(query, bearer));
             } catch (IOException | HttpException e) {
-                e.printStackTrace();
+                log.warn(e.getMessage());
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
         return new ArrayList<ImportRecord>();
@@ -228,13 +231,10 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             try {
                 String bearer = login();
                 List<ImportRecord> list = retry(new SearchByIdCallable(id, bearer));
-                if (list == null || list.isEmpty()) {
-                    return null;
-                } else {
-                    return list.get(0);
-                }
+                return CollectionUtils.isNotEmpty(list) ? list.get(0) : null;
             } catch (IOException | HttpException e) {
-                e.printStackTrace();
+                log.warn(e.getMessage());
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
         return null;

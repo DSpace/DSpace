@@ -149,7 +149,7 @@
     <bean id="scieloMetadataFieldMapping" class="org.dspace.importer.external.scielo.service.ScieloFieldMapping"/>
 
     <bean id="ADSImportService" class="org.dspace.importer.external.ads.ADSImportMetadataSourceServiceImpl" scope="singleton">
-        <property name="apiKey" value="${submission.lookup.ads.key}" />
+        <property name="apiKey" value="${ads.key}" />
         <property name="url" value="${ads.url}" />
         <property name="resultFieldList" value="${ads.resultFieldList}" />
         <property name="metadataFieldMapping" ref="ADSMetadataFieldMapping"/>

@@ -18,25 +18,26 @@
             what metadatafield is generated.
         </description>
         <entry key-ref="epo.identifier.other" value-ref="epoIDContrib"/>
-        <entry key-ref="epo.dc.identifier.patentno" value-ref="epoPublicationNumberContrib"/>
-        <entry key-ref="epo.dc.identifier.applicationnumber" value-ref="epoApplicationNumberContrib"/>
         <entry key-ref="epo.dc.date.issued" value-ref="epoDateContrib"/>
-        <entry key-ref="epo.dc.date.filed" value-ref="epoDateFiledContrib"/>
         <entry key-ref="epo.dc.contributor.applicant" value-ref="epoApplicantContrib"/>
         <entry key-ref="epo.dc.contributor.author" value-ref="epoInventorContrib"/>
         <entry key-ref="epo.dc.title" value-ref="epoInventionTitleContrib"/>
         <entry key-ref="epo.dc.subject.ipc" value-ref="epoIpcContrib"/>
         <entry key-ref="epo.dc.description.abstract" value-ref="epoAbstractContrib"/>
+
+     <!--  These configurations can only be used if the MetadataFieldConfigs have been placed in the registers  -->
+     <!--   <entry key-ref="epo.dc.identifier.patentno" value-ref="epoPublicationNumberContrib"/> -->
+     <!--   <entry key-ref="epo.dc.identifier.applicationnumber" value-ref="epoApplicationNumberContrib"/> -->
+     <!--   <entry key-ref="epo.dc.date.filed" value-ref="epoDateFiledContrib"/> -->
     </util:map>
-    
-    
+        
     <bean id="epoIpcContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="epo.dc.subject.ipc"/>
         <property name="query" value="//ns:classification-ipcr/ns:text"/>
         <property name="prefixToNamespaceMapping" ref="nsEpoPrefixToNamespaceMapping"/>
     </bean>
     <bean id="epo.dc.subject.ipc" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.subject.ipc"/>
+        <constructor-arg value="dc.subject"/>
     </bean>
     
         <bean id="epoAbstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
@@ -82,7 +83,7 @@
         <property name="prefixToNamespaceMapping" ref="nsEpoPrefixToNamespaceMapping"/>
     </bean>
     <bean id="epo.dc.contributor.applicant" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.contributor.applicant"/>
+        <constructor-arg value="dc.contributor"/>
     </bean>
     
     <bean id="epoPublicationNumberContrib" class="org.dspace.importer.external.metadatamapping.contributor.EpoIdMetadataContributor">
