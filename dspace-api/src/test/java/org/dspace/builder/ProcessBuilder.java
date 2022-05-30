@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Set;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.ProcessStatus;
@@ -39,14 +40,14 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
 
     public static ProcessBuilder createProcess(Context context, EPerson ePerson, String scriptName,
                                                List<DSpaceCommandLineParameter> parameters,
-                                               List<Group> specialGroups)
+                                               Set<Group> specialGroups)
         throws SQLException {
         ProcessBuilder processBuilder = new ProcessBuilder(context);
         return processBuilder.create(context, ePerson, scriptName, parameters, specialGroups);
     }
 
     private ProcessBuilder create(Context context, EPerson ePerson, String scriptName,
-                                  List<DSpaceCommandLineParameter> parameters, final List<Group> specialGroups)
+                                  List<DSpaceCommandLineParameter> parameters, final Set<Group> specialGroups)
         throws SQLException {
         this.context = context;
         this.process = processService.create(context, ePerson, scriptName, parameters, specialGroups);

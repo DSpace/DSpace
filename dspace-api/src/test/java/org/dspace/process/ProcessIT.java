@@ -10,9 +10,10 @@ package org.dspace.process;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -27,7 +28,7 @@ import org.dspace.scripts.service.ProcessService;
 import org.junit.Test;
 
 /**
- * This class will aim to test Proccess related use cases
+ * This class will aim to test Process related use cases
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
@@ -44,9 +45,12 @@ public class ProcessIT extends AbstractIntegrationTestWithDatabase {
             .addMember(admin)
             .build();
 
+        Set<Group> groupSet = new HashSet<>();
+        groupSet.add(groupA);
+
         Process processA = ProcessBuilder.createProcess(context, admin, "mock-script",
                                                         new LinkedList<>(),
-                                                        Collections.singletonList(groupA)).build();
+                                                        groupSet).build();
 
         context.restoreAuthSystemState();
         Process process = processService.find(context, processA.getID());
@@ -63,9 +67,12 @@ public class ProcessIT extends AbstractIntegrationTestWithDatabase {
             .withName("Group A")
             .addMember(admin).build();
 
+        Set<Group> groupSet = new HashSet<>();
+        groupSet.add(groupA);
+
         UUID groupUuid = groupA.getID();
         Process processA = ProcessBuilder.createProcess(context, admin, "mock-script", new LinkedList<>(),
-                                                        Collections.singletonList(groupA)).build();
+                                                        groupSet).build();
 
         context.restoreAuthSystemState();
 

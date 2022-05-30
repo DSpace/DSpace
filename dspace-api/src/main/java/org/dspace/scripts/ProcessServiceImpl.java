@@ -77,7 +77,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public Process create(Context context, EPerson ePerson, String scriptName,
                           List<DSpaceCommandLineParameter> parameters,
-                          final List<Group> specialGroups) throws SQLException {
+                          final Set<Group> specialGroups) throws SQLException {
 
         Process process = new Process();
         process.setEPerson(ePerson);
