@@ -43,11 +43,8 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
         return list;
     }
 
-
     protected <T> Link buildLink(String rel, T data) {
-        UriComponentsBuilder uriComponentsBuilder = uriBuilder(data);
-
-        return buildLink(rel, uriComponentsBuilder.build().toUriString());
+        return linkTo(data).withRel(rel);
     }
 
     protected <T> UriComponentsBuilder uriBuilder(T data) {
