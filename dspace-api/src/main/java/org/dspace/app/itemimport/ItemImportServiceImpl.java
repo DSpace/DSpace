@@ -379,8 +379,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      * Add relationship.
      * @param c the context
      * @param item the item
-     * @param typeName the relation type name
-     * @param value the value of the related item
+     * @param relationItem the related item
+     * @param relationshipType the relation type name
      * @throws SQLException
      * @throws AuthorizeException
      */
