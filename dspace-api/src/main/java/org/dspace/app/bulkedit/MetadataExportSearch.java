@@ -133,6 +133,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
             "Item", 10, Long.getLong("0"), null, "ASC");
         Iterator<Item> itemIterator = searchService.iteratorSearch(context, dso, discoverQuery);
         DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService.export(context, itemIterator, true);
+        handler.logDebug("writing to file " + getFileNameOrExportFile());
         handler.writeFilestream(context, getFileNameOrExportFile(), dSpaceCSV.getInputStream(), EXPORT_CSV);
         context.restoreAuthSystemState();
         context.complete();
