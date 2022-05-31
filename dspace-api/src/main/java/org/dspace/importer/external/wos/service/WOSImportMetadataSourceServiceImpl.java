@@ -27,7 +27,7 @@ import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
-import org.dspace.importer.external.scopus.service.LiveImportClient;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.DoiCheck;
 import org.dspace.importer.external.service.components.QuerySource;
