@@ -2025,7 +2025,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         assertEquals(0, mdvs8.get(0).getPlace());
         verifySolrField(pro1_1, "relation.isPublicationOfProject", List.of(pub1_2.getID().toString()));
         verifySolrField(pro1_1, "archived", List.of("true"));
-        verifySolrField(pro1_1, "latestVersion", List.of(true));// TODO expect failure here
+        verifySolrField(pro1_1, "latestVersion", List.of(true));
 
         // after create pro 1.2 - test relation.*.latestForDiscovery metadata of project 1.1
         List<MetadataValue> mdvs8a = itemService
