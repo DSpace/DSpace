@@ -7,10 +7,7 @@
  */
 package org.dspace.app.rest.repository.handler.service;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -59,7 +56,7 @@ public class UriListHandlerService {
                 // Can the class handle the given uri list and can the given class, params and authorization be handled
                 if (uriListHandler.validate(context, request, uriList)) {
                     // If all these things succeed, call handle
-                    return (T) uriListHandler.handle(context, request, decodeUri(uriList));
+                    return (T) uriListHandler.handle(context, request, uriList);
                 } else {
                     throw new DSpaceBadRequestException("The input given to the UriListHandler was invalid");
                 }
@@ -67,18 +64,6 @@ public class UriListHandlerService {
         }
 
         throw new DSpaceBadRequestException("No UriListHandler was found that supports the inputs given");
-    }
-
-    private List<String> decodeUri(List<String> uriList) {
-        List<String> list = new ArrayList<String>();
-        for (String url : uriList) {
-            try {
-                list.add(URLDecoder.decode(url, "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                log.warn("The following url could not be decoded: " + url);
-            }
-        }
-        return list;
     }
 
 }
