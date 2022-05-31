@@ -103,6 +103,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
             printHelp();
             return;
         }
+        handler.logDebug("starting search export");
 
         IndexableObject dso = null;
         Context context = new Context();
