@@ -193,9 +193,10 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
         Version latestVersion = versionHistoryService.getLatestVersion(context, history);
 
         // find the latest version of the given item that is archived
-        while (latestVersion != null && !latestVersion.getItem().isArchived()) {
-            latestVersion = versionHistoryService.getPrevious(context, history, latestVersion);
-        }
+        // TODO temp disabled
+        //while (latestVersion != null && !latestVersion.getItem().isArchived()) {
+        //    latestVersion = versionHistoryService.getPrevious(context, history, latestVersion);
+        //}
 
         // could not find an archived version of the given item
         if (latestVersion == null) {
@@ -205,7 +206,8 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
         }
 
         // sanity check
-        assert latestVersion.getItem().isArchived();
+        // TODO temp disabled
+        //assert latestVersion.getItem().isArchived();
 
         return item.equals(latestVersion.getItem());
     }
