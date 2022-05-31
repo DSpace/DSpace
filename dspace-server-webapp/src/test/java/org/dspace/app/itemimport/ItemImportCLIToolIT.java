@@ -231,6 +231,56 @@ public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
     }
 
     @Test
+    public void importItemByZipSafWithBitstreams() throws Exception {
+        // use simple SAF in zip format
+        Files.copy(getClass().getResourceAsStream("saf-bitstreams.zip"),
+                Path.of(tempDir.toString() + "/saf.zip"));
+
+        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
+        parameters.add(new DSpaceCommandLineParameter("-a", ""));
+        parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
+        parameters.add(new DSpaceCommandLineParameter("-c", collection.getID().toString()));
+        parameters.add(new DSpaceCommandLineParameter("-s", tempDir.toString()));
+        parameters.add(new DSpaceCommandLineParameter("-z", "saf.zip"));
+        parameters.add(new DSpaceCommandLineParameter("-m", tempDir.toString() + "/mapfile.out"));
+        perfomImportScript(parameters);
+
+        checkMetadata();
+        checkMetadataWithAnotherSchema();
+        checkBitstream();
+    }
+
+    @Test
+    public void importItemByZipSafWithRelationships() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // create collection that contains person
+        Collection collectionPerson = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection Person")
+                .withEntityType("Person")
+                .build();
+        // create person
+        Item person = ItemBuilder.createItem(context, collectionPerson)
+                .withTitle(personTitle)
+                .build();
+        context.restoreAuthSystemState();
+        // use simple SAF in zip format
+        Files.copy(getClass().getResourceAsStream("saf-relationships.zip"),
+                Path.of(tempDir.toString() + "/saf.zip"));
+
+        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
+        parameters.add(new DSpaceCommandLineParameter("-a", ""));
+        parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
+        parameters.add(new DSpaceCommandLineParameter("-c", collection.getID().toString()));
+        parameters.add(new DSpaceCommandLineParameter("-s", tempDir.toString()));
+        parameters.add(new DSpaceCommandLineParameter("-z", "saf.zip"));
+        parameters.add(new DSpaceCommandLineParameter("-m", tempDir.toString() + "/mapfile.out"));
+        perfomImportScript(parameters);
+
+        checkMetadata();
+        checkRelationship();
+    }
+
+    @Test
     public void resumeImportItemBySafWithMetadataOnly() throws Exception {
         // create simple SAF
         Path safDir = Files.createDirectory(Path.of(tempDir.toString() + "/test"));
