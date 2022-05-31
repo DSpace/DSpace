@@ -1734,49 +1734,85 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // before reindex - verify publication 1.1
         verifyIndexed(pub1_1);
-        // TODO check archived, latestVersion, relation.*, relation.*.latestForDiscovery for each solr doc
+        verifySolrField(pub1_1, "archived", List.of("false"));
+        verifySolrField(pub1_1, "latestVersion", List.of(false));
+        verifySolrField(pub1_1, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
+        verifySolrField(pub1_1, "relation.isProjectOfPublication.latestForDiscovery", null);
 
         // before reindex - verify publication 1.2
         verifyIndexed(pub1_2);
-        // TODO
+        verifySolrField(pub1_2, "archived", List.of("false"));
+        verifySolrField(pub1_2, "latestVersion", List.of(false));
+        verifySolrField(pub1_2, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
+        verifySolrField(pub1_2, "relation.isProjectOfPublication.latestForDiscovery", null);
 
         // before reindex - verify publication 1.3
         verifyIndexed(pub1_3);
-        // TODO
+        verifySolrField(pub1_3, "archived", List.of("false"));
+        verifySolrField(pub1_3, "latestVersion", List.of(false));
+        verifySolrField(pub1_3, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
+        verifySolrField(pub1_3, "relation.isProjectOfPublication.latestForDiscovery", null);
 
         // before reindex - verify publication 1.4
         verifyIndexed(pub1_4);
-        // TODO
+        verifySolrField(pub1_4, "archived", List.of("true"));
+        verifySolrField(pub1_4, "latestVersion", List.of(true));
+        verifySolrField(pub1_4, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
+        verifySolrField(pub1_4, "relation.isProjectOfPublication.latestForDiscovery", List.of(
+            pro1_1.getID().toString()
+        ));
 
         // before reindex - verify project 1.1
         verifyIndexed(pro1_1);
-        // TODO
+        verifySolrField(pro1_1, "archived", List.of("true"));
+        verifySolrField(pro1_1, "latestVersion", List.of(true));
+        verifySolrField(pro1_1, "relation.isPublicationOfProject", List.of(pub1_4.getID().toString()));
+        verifySolrField(pro1_1, "relation.isPublicationOfProject.latestForDiscovery", List.of(
+            pub1_1.getID().toString(), pub1_2.getID().toString(), pub1_3.getID().toString(), pub1_4.getID().toString()
+        ));
 
         // force reindex all items
         indexingService.deleteIndex();
         indexingService.createIndex(context);
 
-        // TODO make sure workflow, workspace and template items are still excluded!
-
         // after reindex - verify publication 1.1
         verifyIndexed(pub1_1);
-        // TODO
+        verifySolrField(pub1_1, "archived", List.of("false"));
+        verifySolrField(pub1_1, "latestVersion", List.of(false));
+        verifySolrField(pub1_1, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
+        verifySolrField(pub1_1, "relation.isProjectOfPublication.latestForDiscovery", null);
 
         // after reindex - verify publication 1.2
         verifyIndexed(pub1_2);
-        // TODO
+        verifySolrField(pub1_2, "archived", List.of("false"));
+        verifySolrField(pub1_2, "latestVersion", List.of(false));
+        verifySolrField(pub1_2, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
+        verifySolrField(pub1_2, "relation.isProjectOfPublication.latestForDiscovery", null);
 
         // after reindex - verify publication 1.3
         verifyIndexed(pub1_3);
-        // TODO
+        verifySolrField(pub1_3, "archived", List.of("false"));
+        verifySolrField(pub1_3, "latestVersion", List.of(false));
+        verifySolrField(pub1_3, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
+        verifySolrField(pub1_3, "relation.isProjectOfPublication.latestForDiscovery", null);
 
         // after reindex - verify publication 1.4
         verifyIndexed(pub1_4);
-        // TODO
+        verifySolrField(pub1_4, "archived", List.of("true"));
+        verifySolrField(pub1_4, "latestVersion", List.of(true));
+        verifySolrField(pub1_4, "relation.isProjectOfPublication", List.of(pro1_1.getID().toString()));
+        verifySolrField(pub1_4, "relation.isProjectOfPublication.latestForDiscovery", List.of(
+            pro1_1.getID().toString()
+        ));
 
         // after reindex - verify project 1.1
         verifyIndexed(pro1_1);
-        // TODO
+        verifySolrField(pro1_1, "archived", List.of("true"));
+        verifySolrField(pro1_1, "latestVersion", List.of(true));
+        verifySolrField(pro1_1, "relation.isPublicationOfProject", List.of(pub1_4.getID().toString()));
+        verifySolrField(pro1_1, "relation.isPublicationOfProject.latestForDiscovery", List.of(
+            pub1_1.getID().toString(), pub1_2.getID().toString(), pub1_3.getID().toString(), pub1_4.getID().toString()
+        ));
     }
 
 }
