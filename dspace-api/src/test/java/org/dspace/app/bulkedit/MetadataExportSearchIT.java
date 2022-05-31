@@ -23,6 +23,7 @@ import java.util.List;
 import com.google.common.io.Files;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
+import org.apache.log4j.Logger;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
@@ -47,6 +48,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
     private Item[] itemsSubject2 = new Item[numberItemsSubject2];
     private String filename;
     private Collection collection;
+    private Logger  logger = Logger.getLogger(MetadataExportSearchIT.class);
     TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
@@ -93,9 +95,9 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
 
         List<String> ids = new ArrayList<>();
         //ignoring the first row as this only contains headers;
+        logger.debug("checking content of lines");
         for (int i = 1; i < lines.size(); i++) {
-            String line = String.join(", ", lines.get(i));
-            System.out.println(line);
+            logger.debug(String.join(", ", lines.get(i)));
             ids.add(lines.get(i)[0]);
         }
 
