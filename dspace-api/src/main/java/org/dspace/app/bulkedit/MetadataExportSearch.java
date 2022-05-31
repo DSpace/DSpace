@@ -113,12 +113,12 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
             dso = resolveScope(context, identifier);
         }
 
-
         DiscoveryConfiguration discoveryConfiguration =
             discoveryConfigurationService.getDiscoveryConfiguration(discoveryConfigName);
 
         List<QueryBuilderSearchFilter> queryBuilderSearchFilters = new ArrayList<>();
 
+        handler.logDebug("processing filter queries");
         if (filterQueryStrings != null) {
             for (String filterQueryString: filterQueryStrings) {
                 String field = filterQueryString.split(",", 2)[0];
@@ -129,10 +129,13 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
                 queryBuilderSearchFilters.add(queryBuilderSearchFilter);
             }
         }
+        handler.logDebug("building query");
         DiscoverQuery discoverQuery =
             queryBuilder.buildQuery(context, dso, discoveryConfiguration, query, queryBuilderSearchFilters,
             "Item", 10, Long.getLong("0"), null, "ASC");
+        handler.logDebug("creating iterator");
         Iterator<Item> itemIterator = searchService.iteratorSearch(context, dso, discoverQuery);
+        handler.logDebug("creating dspacecsv");
         DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService.export(context, itemIterator, true);
         handler.logDebug("writing to file " + getFileNameOrExportFile());
         handler.writeFilestream(context, getFileNameOrExportFile(), dSpaceCSV.getInputStream(), EXPORT_CSV);
