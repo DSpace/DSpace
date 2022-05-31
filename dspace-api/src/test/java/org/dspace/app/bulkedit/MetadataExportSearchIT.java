@@ -94,6 +94,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         List<String> ids = new ArrayList<>();
         //ignoring the first row as this only contains headers;
         for (int i = 1; i < lines.size(); i++) {
+            System.out.println(lines.get(i));
             ids.add(lines.get(i)[0]);
         }
 
