@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,8 +52,7 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         }
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.scopus").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
+        try (InputStream file = getClass().getResourceAsStream("scopus-ex.xml")) {
             String scopusXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
@@ -80,8 +79,7 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         }
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.scopus").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
+        try (InputStream file = getClass().getResourceAsStream("scopus-ex.xml")) {
             String scopusXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
@@ -106,8 +104,7 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         }
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.scopus-empty").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
+        try (InputStream file = getClass().getResourceAsStream("scopus-empty-resp.xml")) {
             String scopusXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
@@ -158,8 +155,8 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
 
         metadatums.add(doi);
         metadatums.add(title);
-        metadatums.add(date);
         metadatums.add(type);
+        metadatums.add(date);
         metadatums.add(citationVolume);
         metadatums.add(citationIssue);
         metadatums.add(scopusId);
@@ -168,8 +165,8 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         metadatums.add(subject);
         metadatums.add(author);
         metadatums.add(scopusAuthorId);
-        metadatums.add(orcid);
         metadatums.add(orgunit);
+        metadatums.add(orcid);
         metadatums.add(author2);
         metadatums.add(scopusAuthorId2);
         metadatums.add(orcid2);

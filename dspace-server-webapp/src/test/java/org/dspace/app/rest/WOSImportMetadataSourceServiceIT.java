@@ -10,7 +10,7 @@ package org.dspace.app.rest;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,8 +51,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         }
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path2file = testProps.get("test.wos").toString();
-        try (FileInputStream file = new FileInputStream(path2file)) {
+        try (InputStream file = getClass().getResourceAsStream("wos-responce.xml")) {
             String wosXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
@@ -81,8 +80,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         }
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.wos").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
+        try (InputStream file = getClass().getResourceAsStream("wos-responce.xml")) {
             String wosXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);

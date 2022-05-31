@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WosSearchResponse
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+ <Data>
+  <Records>
+   <records>
+    <REC>
+     <UID>WOS:000551093100034</UID>
+     <static_data>
+      <summary>
+       <EWUID>
+        <WUID coll_id="WOS"></WUID>
+        <edition value="WOS.ISSHP"></edition>
+       </EWUID>
+       <pub_info sortdate="2019-01-01" pubyear="2019"
+        has_abstract="Y" coverdate="2019" pubtype="Book in series">
+        <page begin="225" end="234" page_count="10">225-234</page>
+       </pub_info>
+       <titles count="7">
+        <title type="source">EDULEARN19: 11TH INTERNATIONAL CONFERENCE ON
+         EDUCATION AND NEW LEARNING TECHNOLOGIES</title>
+        <title type="series">EDULEARN Proceedings</title>
+        <title type="source_abbrev">EDULEARN PROC</title>
+        <title type="abbrev_11">EDULEARN PR</title>
+        <title type="abbrev_29">EDULEARN PROC</title>
+        <title type="item">MENTORING IN EDUCATION. FEMALE ROLE MODELS IN
+         ITALIAN DESIGN ACADEMIC CULTURE</title>
+        <title type="book_series" translated="N">EDULEARN Proceedings</title>
+       </titles>
+       <names count="4">
+        <name seq_no="1" role="author" reprint="Y" addr_no="1"
+         daisng_id="41178110">
+         <display_name>Bollini, Letizia</display_name>
+         <full_name>Bollini, Letizia</full_name>
+         <wos_standard>Bollini, L</wos_standard>
+         <first_name>Letizia</first_name>
+         <last_name>Bollini</last_name>
+        </name>
+        <name seq_no="2" role="book_editor">
+         <display_name>Chova, LG</display_name>
+         <full_name>Chova, LG</full_name>
+         <wos_standard>Chova, LG</wos_standard>
+         <first_name>LG</first_name>
+         <last_name>Chova</last_name>
+        </name>
+        <name seq_no="3" role="book_editor">
+         <display_name>Martinez, AL</display_name>
+         <full_name>Martinez, AL</full_name>
+         <wos_standard>Martinez, AL</wos_standard>
+         <first_name>AL</first_name>
+         <last_name>Martinez</last_name>
+        </name>
+        <name seq_no="4" role="book_editor">
+         <display_name>Torres, IC</display_name>
+         <full_name>Torres, IC</full_name>
+         <wos_standard>Torres, IC</wos_standard>
+         <first_name>IC</first_name>
+         <last_name>Torres</last_name>
+        </name>
+       </names>
+       <doctypes count="1">
+        <doctype>Proceedings Paper</doctype>
+       </doctypes>
+       <conferences count="1">
+        <conference conf_id="336545">
+         <conf_infos count="1">
+          <conf_info>11th International Conference on Education and New
+           Learning Technologies (EDULEARN), JUL 01-03, 2019, Palma,
+           SPAIN</conf_info>
+         </conf_infos>
+         <conf_titles count="1">
+          <conf_title>11th International Conference on Education and New
+           Learning Technologies (EDULEARN)</conf_title>
+         </conf_titles>
+         <conf_dates count="1">
+          <conf_date conf_start="20190701" conf_end="20190703">JUL 01-03,
+           2019</conf_date>
+         </conf_dates>
+         <conf_locations count="1">
+          <conf_location>
+           <conf_city>Palma</conf_city>
+           <conf_state>SPAIN</conf_state>
+          </conf_location>
+         </conf_locations>
+        </conference>
+       </conferences>
+       <publishers>
+        <publisher>
+         <address_spec addr_no="1">
+          <full_address>LAURI VOLPI 6, VALENICA, BURJASSOT 46100, SPAIN</full_address>
+          <city>VALENICA</city>
+         </address_spec>
+         <names count="1">
+          <name role="publisher" seq_no="1" addr_no="1">
+           <display_name>IATED-INT ASSOC TECHNOLOGY EDUCATION &amp;
+            DEVELOPMENT</display_name>
+           <full_name>IATED-INT ASSOC TECHNOLOGY EDUCATION &amp;
+            DEVELOPMENT</full_name>
+          </name>
+         </names>
+        </publisher>
+       </publishers>
+      </summary>
+      <fullrecord_metadata>
+       <languages count="1">
+        <language type="primary">English</language>
+       </languages>
+       <normalized_languages count="1">
+        <language type="primary">English</language>
+       </normalized_languages>
+       <normalized_doctypes count="1">
+        <doctype>Meeting</doctype>
+       </normalized_doctypes>
+       <refs count="33"></refs>
+       <addresses count="1">
+        <address_name>
+         <address_spec addr_no="1">
+          <full_address>Univ Milano Bicocca, Dept Psychol, Milan, Italy</full_address>
+          <organizations count="2">
+           <organization>Univ Milano Bicocca</organization>
+           <organization pref="Y">University of Milano-Bicocca</organization>
+          </organizations>
+          <suborganizations count="1">
+           <suborganization>Dept Psychol</suborganization>
+          </suborganizations>
+          <city>Milan</city>
+          <country>Italy</country>
+         </address_spec>
+         <names count="1">
+          <name seq_no="1" role="author" reprint="Y" addr_no="1"
+           daisng_id="41178110">
+           <display_name>Bollini, Letizia</display_name>
+           <full_name>Bollini, Letizia</full_name>
+           <wos_standard>Bollini, L</wos_standard>
+           <first_name>Letizia</first_name>
+           <last_name>Bollini</last_name>
+          </name>
+         </names>
+        </address_name>
+       </addresses>
+       <reprint_addresses count="1">
+        <address_name>
+         <address_spec addr_no="1">
+          <full_address>Univ Milano Bicocca, Dept Psychol, Milan, Italy</full_address>
+          <organizations count="2">
+           <organization>Univ Milano Bicocca</organization>
+           <organization pref="Y">University of Milano-Bicocca</organization>
+          </organizations>
+          <suborganizations count="1">
+           <suborganization>Dept Psychol</suborganization>
+          </suborganizations>
+          <city>Milan</city>
+          <country>Italy</country>
+         </address_spec>
+         <names count="1">
+          <name seq_no="1" role="author" reprint="Y" addr_no="1">
+           <display_name>Bollini, Letizia</display_name>
+           <full_name>Bollini, Letizia</full_name>
+           <wos_standard>Bollini, L</wos_standard>
+           <first_name>Letizia</first_name>
+           <last_name>Bollini</last_name>
+          </name>
+         </names>
+        </address_name>
+       </reprint_addresses>
+       <category_info>
+        <headings count="1">
+         <heading>Social Sciences</heading>
+        </headings>
+        <subjects count="2">
+         <subject ascatype="traditional" code="HA">Education &amp;
+          Educational Research</subject>
+         <subject ascatype="extended">Education &amp; Educational Research</subject>
+        </subjects>
+       </category_info>
+       <keywords count="3">
+        <keyword>Design education</keyword>
+        <keyword>female role models</keyword>
+        <keyword>mentoring in education</keyword>
+       </keywords>
+       <abstracts count="1">
+        <abstract>
+         <abstract_text count="1">
+          <p>It is widely recognized that mentors and tutors are
+           empowering roles in education systems. Students can benefit
+           to be raised in an inclusive environment in which senior
+           peers or professors play a positive and significant role
+           model. In particular, looking at the field of design studies,
+           a tradition of collaborative and collective culture shared
+           between students and teachers can be identified both in the
+           Bauhaus and in the Hochschule fur Gestaltung Ulm experiences.
+           In more recent time, studies show how junior designers
+           benefit from the presence, and the confront of significant
+           grown-up or more experienced figures able to listen to, to
+           coach and to mentor them. Nevertheless, when we look at the
+           issue from a gender perspective, we may notice a lack of
+           examples and reference figures, even if female students are a
+           significant percentage, when not the majority, in the
+           design&apos;s bachelors and masters degrees university
+           courses. Moreover, in Italy - at the 82 place on 144 in the
+           worldwide ranking for gender equality and women rights
+           according to the &quot;Global Gender Gap Index 2017&quot; -
+           the situation seems to be more difficult than in the other
+           European or developed countries, also due to the
+           representation of female roles in society and female bodies
+           in mass media. On the one hand, the paper offers a deeper
+           insight into the problem. The results of a census in the
+           field of digital product design - including human-centered,
+           interaction, user experience and interface design - are
+           mapped and discussed to understand the presence of female
+           professors and their role in BA/BS and MD courses. On the
+           other hand, the paper proposes some possible initiatives to
+           spread consciousness and participation and to improve some
+           changes in academic design culture.</p>
+         </abstract_text>
+        </abstract>
+       </abstracts>
+      </fullrecord_metadata>
+      <item xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:type="itemType_wos" coll_id="WOS">
+       <ids avail="N">BP4FG</ids>
+       <bib_id>: 225-234 2019</bib_id>
+       <bib_pagecount type="Book">5526</bib_pagecount>
+       <keywords_plus count="2">
+        <keyword>VISUAL DESIGN</keyword>
+        <keyword>EXPERIENCE</keyword>
+       </keywords_plus>
+       <book_pages>5526</book_pages>
+       <book_notes count="3">
+        <book_note>Figures</book_note>
+        <book_note>Plates</book_note>
+        <book_note>Color plates</book_note>
+       </book_notes>
+       <book_desc>
+        <bk_binding>P</bk_binding>
+        <bk_publisher>IATED-INT ASSOC TECHNOLOGY EDUCATION &amp;
+         DEVELOPMENT, LAURI VOLPI 6, VALENICA, BURJASSOT 46100, SPAIN</bk_publisher>
+        <bk_prepay>N</bk_prepay>
+       </book_desc>
+      </item>
+     </static_data>
+     <dynamic_data>
+      <citation_related>
+       <tc_list>
+        <silo_tc coll_id="WOS" local_count="0"></silo_tc>
+       </tc_list>
+      </citation_related>
+      <cluster_related>
+       <identifiers>
+        <identifier type="issn" value="2340-1117"></identifier>
+        <identifier type="eisbn" value="978-84-09-12031-4"></identifier>
+       </identifiers>
+      </cluster_related>
+     </dynamic_data>
+    </REC>
+    <REC>
+     <UID>WOS:000551093100033</UID>
+     <static_data>
+      <summary>
+       <EWUID>
+        <WUID coll_id="WOS"></WUID>
+        <edition value="WOS.ISSHP"></edition>
+       </EWUID>
+       <pub_info sortdate="2019-01-01" pubyear="2019"
+        has_abstract="N" coverdate="2019" pubtype="Book in series">
+        <page begin="224" end="224" page_count="1">224-224</page>
+       </pub_info>
+       <titles count="7">
+        <title type="source">EDULEARN19: 11TH INTERNATIONAL CONFERENCE ON
+         EDUCATION AND NEW LEARNING TECHNOLOGIES</title>
+        <title type="series">EDULEARN Proceedings</title>
+        <title type="source_abbrev">EDULEARN PROC</title>
+        <title type="abbrev_11">EDULEARN PR</title>
+        <title type="abbrev_29">EDULEARN PROC</title>
+        <title type="item">DYSLEXIA AND TYPOGRAPHY: HOW TO IMPROVE
+         EDUCATIONAL PUBLISHING FOR INCLUSIVE DESIGN - A CRITICAL REVIEW</title>
+        <title type="book_series" translated="N">EDULEARN Proceedings</title>
+       </titles>
+       <names count="4">
+        <name seq_no="1" role="author" reprint="Y" addr_no="1"
+         daisng_id="41178110">
+         <display_name>Bollini, L.</display_name>
+         <full_name>Bollini, L.</full_name>
+         <wos_standard>Bollini, L</wos_standard>
+         <first_name>L.</first_name>
+         <last_name>Bollini</last_name>
+        </name>
+        <name seq_no="2" role="book_editor">
+         <display_name>Chova, LG</display_name>
+         <full_name>Chova, LG</full_name>
+         <wos_standard>Chova, LG</wos_standard>
+         <first_name>LG</first_name>
+         <last_name>Chova</last_name>
+        </name>
+        <name seq_no="3" role="book_editor">
+         <display_name>Martinez, AL</display_name>
+         <full_name>Martinez, AL</full_name>
+         <wos_standard>Martinez, AL</wos_standard>
+         <first_name>AL</first_name>
+         <last_name>Martinez</last_name>
+        </name>
+        <name seq_no="4" role="book_editor">
+         <display_name>Torres, IC</display_name>
+         <full_name>Torres, IC</full_name>
+         <wos_standard>Torres, IC</wos_standard>
+         <first_name>IC</first_name>
+         <last_name>Torres</last_name>
+        </name>
+       </names>
+       <doctypes count="1">
+        <doctype>Proceedings Paper</doctype>
+       </doctypes>
+       <conferences count="1">
+        <conference conf_id="336545">
+         <conf_infos count="1">
+          <conf_info>11th International Conference on Education and New
+           Learning Technologies (EDULEARN), JUL 01-03, 2019, Palma,
+           SPAIN</conf_info>
+         </conf_infos>
+         <conf_titles count="1">
+          <conf_title>11th International Conference on Education and New
+           Learning Technologies (EDULEARN)</conf_title>
+         </conf_titles>
+         <conf_dates count="1">
+          <conf_date conf_start="20190701" conf_end="20190703">JUL 01-03,
+           2019</conf_date>
+         </conf_dates>
+         <conf_locations count="1">
+          <conf_location>
+           <conf_city>Palma</conf_city>
+           <conf_state>SPAIN</conf_state>
+          </conf_location>
+         </conf_locations>
+        </conference>
+       </conferences>
+       <publishers>
+        <publisher>
+         <address_spec addr_no="1">
+          <full_address>LAURI VOLPI 6, VALENICA, BURJASSOT 46100, SPAIN</full_address>
+          <city>VALENICA</city>
+         </address_spec>
+         <names count="1">
+          <name role="publisher" seq_no="1" addr_no="1">
+           <display_name>IATED-INT ASSOC TECHNOLOGY EDUCATION &amp;
+            DEVELOPMENT</display_name>
+           <full_name>IATED-INT ASSOC TECHNOLOGY EDUCATION &amp;
+            DEVELOPMENT</full_name>
+          </name>
+         </names>
+        </publisher>
+       </publishers>
+      </summary>
+      <fullrecord_metadata>
+       <languages count="1">
+        <language type="primary">English</language>
+       </languages>
+       <normalized_languages count="1">
+        <language type="primary">English</language>
+       </normalized_languages>
+       <normalized_doctypes count="1">
+        <doctype>Meeting</doctype>
+       </normalized_doctypes>
+       <refs count="0"></refs>
+       <addresses count="1">
+        <address_name>
+         <address_spec addr_no="1">
+          <full_address>Univ Milano Bicocca, Milan, Italy</full_address>
+          <organizations count="2">
+           <organization>Univ Milano Bicocca</organization>
+           <organization pref="Y">University of Milano-Bicocca</organization>
+          </organizations>
+          <city>Milan</city>
+          <country>Italy</country>
+         </address_spec>
+         <names count="1">
+          <name seq_no="1" role="author" reprint="Y" addr_no="1"
+           daisng_id="41178110">
+           <display_name>Bollini, L.</display_name>
+           <full_name>Bollini, L.</full_name>
+           <wos_standard>Bollini, L</wos_standard>
+           <first_name>L.</first_name>
+           <last_name>Bollini</last_name>
+          </name>
+         </names>
+        </address_name>
+       </addresses>
+       <reprint_addresses count="1">
+        <address_name>
+         <address_spec addr_no="1">
+          <full_address>Univ Milano Bicocca, Milan, Italy</full_address>
+          <organizations count="2">
+           <organization>Univ Milano Bicocca</organization>
+           <organization pref="Y">University of Milano-Bicocca</organization>
+          </organizations>
+          <city>Milan</city>
+          <country>Italy</country>
+         </address_spec>
+         <names count="1">
+          <name seq_no="1" role="author" reprint="Y" addr_no="1">
+           <display_name>Bollini, L.</display_name>
+           <full_name>Bollini, L.</full_name>
+           <wos_standard>Bollini, L</wos_standard>
+           <first_name>L.</first_name>
+           <last_name>Bollini</last_name>
+          </name>
+         </names>
+        </address_name>
+       </reprint_addresses>
+       <category_info>
+        <headings count="1">
+         <heading>Social Sciences</heading>
+        </headings>
+        <subjects count="2">
+         <subject ascatype="traditional" code="HA">Education &amp;
+          Educational Research</subject>
+         <subject ascatype="extended">Education &amp; Educational Research</subject>
+        </subjects>
+       </category_info>
+       <keywords count="5">
+        <keyword>Dyslexia and Typography</keyword>
+        <keyword>Font design</keyword>
+        <keyword>educational publishing</keyword>
+        <keyword>Design for all</keyword>
+        <keyword>Universal design</keyword>
+       </keywords>
+      </fullrecord_metadata>
+      <item xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:type="itemType_wos" coll_id="WOS">
+       <ids avail="N">BP4FG</ids>
+       <bib_id>: 224-224 2019</bib_id>
+       <bib_pagecount type="Book">5526</bib_pagecount>
+       <book_pages>5526</book_pages>
+       <book_notes count="3">
+        <book_note>Figures</book_note>
+        <book_note>Plates</book_note>
+        <book_note>Color plates</book_note>
+       </book_notes>
+       <book_desc>
+        <bk_binding>P</bk_binding>
+        <bk_publisher>IATED-INT ASSOC TECHNOLOGY EDUCATION &amp;
+         DEVELOPMENT, LAURI VOLPI 6, VALENICA, BURJASSOT 46100, SPAIN</bk_publisher>
+        <bk_prepay>N</bk_prepay>
+       </book_desc>
+      </item>
+     </static_data>
+     <dynamic_data>
+      <citation_related>
+       <tc_list>
+        <silo_tc coll_id="WOS" local_count="0"></silo_tc>
+       </tc_list>
+      </citation_related>
+      <cluster_related>
+       <identifiers>
+        <identifier type="issn" value="2340-1117"></identifier>
+        <identifier type="eisbn" value="978-84-09-12031-4"></identifier>
+       </identifiers>
+      </cluster_related>
+     </dynamic_data>
+    </REC>
+   </records>
+  </Records>
+ </Data>
+ <QueryResult>
+  <QueryID>1</QueryID>
+  <RecordsSearched>64666906</RecordsSearched>
+  <RecordsFound>2</RecordsFound>
+ </QueryResult>
+ undefined
+</WosSearchResponse>

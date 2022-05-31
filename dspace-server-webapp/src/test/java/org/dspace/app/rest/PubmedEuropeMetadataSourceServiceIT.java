@@ -10,11 +10,12 @@ package org.dspace.app.rest;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -47,10 +48,11 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
 
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.pubmedeurope").toString();
-        String path2file = testProps.get("test.pubmedeurope-empty").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
-        try (FileInputStream file2 = new FileInputStream(path2file)) {
+        InputStream file = null;
+        InputStream file2 = null;
+        try {
+            file = getClass().getResourceAsStream("pubmedeurope-test.xml");
+            file2 = getClass().getResourceAsStream("pubmedeurope-empty.xml");
             String pubmedEuropeXmlResp = IOUtils.toString(file, Charset.defaultCharset());
             String pubmedEuropeXmlResp2 = IOUtils.toString(file2, Charset.defaultCharset());
 
@@ -66,9 +68,14 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
             Collection<ImportRecord> recordsImported = pubmedEuropeMetadataServiceImpl.getRecords("test query", 0, 3);
             assertEquals(3, recordsImported.size());
             matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
-        }
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
+            if (Objects.nonNull(file)) {
+                file.close();
+            }
+            if (Objects.nonNull(file2)) {
+                file2.close();
+            }
         }
     }
 
@@ -78,8 +85,7 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
 
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.pubmedeurope").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
+        try (InputStream file = getClass().getResourceAsStream("pubmedeurope-test.xml")) {
             String pubmedEuropeXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
@@ -130,20 +136,20 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
                 + " determination of affinities will depend on the soft-part morphology of the cephalic segment,"
                 + " which has not been revealed in the present material.");
 
+        metadatums.add(doi);
         metadatums.add(title);
         metadatums.add(contributor);
         metadatums.add(contributor2);
         metadatums.add(contributor3);
-        metadatums.add(doi);
         metadatums.add(source);
         metadatums.add(date);
         metadatums.add(language);
         metadatums.add(type);
         metadatums.add(type2);
         metadatums.add(type3);
+        metadatums.add(description);
         metadatums.add(issn);
         metadatums.add(pmid);
-        metadatums.add(description);
         ImportRecord firstrRecord = new ImportRecord(metadatums);
 
         //define second record
@@ -167,15 +173,15 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
         metadatums2.add(contributor7);
         metadatums2.add(language2);
         metadatums2.add(type4);
-        metadatums2.add(pmid2);
         metadatums2.add(description2);
+        metadatums2.add(pmid2);
         ImportRecord secondRecord = new ImportRecord(metadatums2);
 
         //define second record
         List<MetadatumDTO> metadatums3  = new ArrayList<MetadatumDTO>();
         MetadatumDTO title3 = createMetadatumDTO("dc","title", null, "A VODKA CHARKA");
         MetadatumDTO contributor8 = createMetadatumDTO("dc", "contributor", "author", "BARANOV VALENTYN VOLODYMYROVYC");
-        MetadatumDTO contributor9 = createMetadatumDTO("dc", "contributor", "author", "HDANCHAK ROMAN ADAMOVYCH");
+        MetadatumDTO contributor9 = createMetadatumDTO("dc", "contributor", "author", "DANCHAK ROMAN ADAMOVYCH");
         MetadatumDTO contributor10 = createMetadatumDTO("dc", "contributor", "author", "FEDORCHUK NATALIIA HRYHORIVNA");
         MetadatumDTO contributor11 = createMetadatumDTO("dc", "contributor", "author", "FEDOREIKO LIUBOV ROMANIVNA");
         MetadatumDTO language3 = createMetadatumDTO("dc", "language", "iso", "eng");
@@ -198,8 +204,8 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
         metadatums3.add(contributor11);
         metadatums3.add(language3);
         metadatums3.add(type5);
-        metadatums3.add(pmid3);
         metadatums3.add(description3);
+        metadatums3.add(pmid3);
         ImportRecord thirdRecord = new ImportRecord(metadatums3);
 
         records.add(firstrRecord);

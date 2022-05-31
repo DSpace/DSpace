@@ -10,7 +10,7 @@ package org.dspace.app.rest;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,20 +47,17 @@ public class CiniiImportMetadataSourceServiceIT extends AbstractLiveImportIntegr
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.ciniiIds").toString();
-        String path2 = testProps.get("test.ciniiFirst").toString();
-        String path3 = testProps.get("test.ciniiSecond").toString();
-        FileInputStream ciniiIds = null;
-        FileInputStream ciniiFirst = null;
-        FileInputStream ciniiSecond = null;
+        InputStream ciniiRefResp = null;
+        InputStream ciniiRefResp2 = null;
+        InputStream ciniiRefResp3 = null;
         try {
-            ciniiIds = new FileInputStream(path);
-            ciniiFirst = new FileInputStream(path2);
-            ciniiSecond = new FileInputStream(path3);
+            ciniiRefResp = getClass().getResourceAsStream("cinii-responce-ids.xml");
+            ciniiRefResp2 = getClass().getResourceAsStream("cinii-first.xml");
+            ciniiRefResp3 = getClass().getResourceAsStream("cinii-second.xml");
 
-            String ciniiIdsXmlResp = IOUtils.toString(ciniiIds, Charset.defaultCharset());
-            String ciniiFirstXmlResp = IOUtils.toString(ciniiFirst, Charset.defaultCharset());
-            String ciniiSecondXmlResp = IOUtils.toString(ciniiSecond, Charset.defaultCharset());
+            String ciniiIdsXmlResp = IOUtils.toString(ciniiRefResp, Charset.defaultCharset());
+            String ciniiFirstXmlResp = IOUtils.toString(ciniiRefResp2, Charset.defaultCharset());
+            String ciniiSecondXmlResp = IOUtils.toString(ciniiRefResp3, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
             CloseableHttpResponse response = mockResponse(ciniiIdsXmlResp, 200, "OK");
@@ -75,14 +72,14 @@ public class CiniiImportMetadataSourceServiceIT extends AbstractLiveImportIntegr
             matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
-            if (Objects.nonNull(ciniiIds)) {
-                ciniiIds.close();
+            if (Objects.nonNull(ciniiRefResp)) {
+                ciniiRefResp.close();
             }
-            if (Objects.nonNull(ciniiFirst)) {
-                ciniiFirst.close();
+            if (Objects.nonNull(ciniiRefResp2)) {
+                ciniiRefResp2.close();
             }
-            if (Objects.nonNull(ciniiSecond)) {
-                ciniiSecond.close();
+            if (Objects.nonNull(ciniiRefResp3)) {
+                ciniiRefResp3.close();
             }
         }
     }
@@ -92,8 +89,7 @@ public class CiniiImportMetadataSourceServiceIT extends AbstractLiveImportIntegr
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        String path = testProps.get("test.ciniiIds").toString();
-        try (FileInputStream file = new FileInputStream(path)) {
+        try (InputStream file = getClass().getResourceAsStream("cinii-responce-ids.xml")) {
             String ciniiXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
@@ -145,8 +141,8 @@ public class CiniiImportMetadataSourceServiceIT extends AbstractLiveImportIntegr
         metadatums.add(source);
         metadatums.add(date);
         metadatums.add(language);
-        metadatums.add(identifier);
         metadatums.add(description);
+        metadatums.add(identifier);
 
         ImportRecord firstrRecord = new ImportRecord(metadatums);
 
@@ -161,9 +157,9 @@ public class CiniiImportMetadataSourceServiceIT extends AbstractLiveImportIntegr
         MetadatumDTO identifier2 = createMetadatumDTO("dc", "identifier", "other", "210000159181");
 
         metadatums2.add(title2);
+        metadatums2.add(issn);
         metadatums2.add(source2);
         metadatums2.add(date2);
-        metadatums2.add(issn);
         metadatums2.add(identifier2);
 
         ImportRecord secondRecord = new ImportRecord(metadatums2);
