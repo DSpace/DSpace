@@ -59,8 +59,8 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         collection = CollectionBuilder.createCollection(context, community).build();
-        String exportDir = System.getProperty("java.io.tmpdir");
-        filename = String.format("%s%smetadataExportSearch.csv", exportDir, File.separator);
+        filename = configurationService.getProperty("dspace.dir")
+            + testProps.get("test.exportcsv").toString();
 
 
         for (int i = 0; i < numberItemsSubject1; i++) {
