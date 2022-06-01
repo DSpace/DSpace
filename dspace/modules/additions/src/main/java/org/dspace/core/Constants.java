@@ -21,7 +21,7 @@ public class Constants {
     public static final int UNIT = 666;
 
     public static final int ETDUNIT = 667;
-  
+
     /**
      * Type of bitstream objects
      */

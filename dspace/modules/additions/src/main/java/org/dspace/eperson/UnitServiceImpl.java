@@ -9,6 +9,7 @@ package org.dspace.eperson;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,9 +22,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.dao.UnitDAO;
-import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.UnitService;
 import org.dspace.event.Event;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -34,21 +35,16 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author mohideen at umd.edu
  */
 public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements UnitService {
-
     /** log4j category */
-    private static Logger log = Logger.getLogger(UnitServiceImpl.class);
+    private static final Logger log = Logger.getLogger(UnitServiceImpl.class);
 
     @Autowired(required = true)
     protected UnitDAO unitDAO;
     @Autowired(required = true)
-    protected GroupService groupService;
-    @Autowired(required = true)
     protected AuthorizeService authorizeService;
 
-    protected UnitServiceImpl()
-    {
+    protected UnitServiceImpl() {
         super();
-
     }
 
     @Override
@@ -58,14 +54,16 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
 
         Unit newUnit = unitDAO.create(context, new Unit());
 
-        unitDAO.save(context, newUnit);
+        log.info(LogHelper.getHeader(context, "create_unit", "unit_id=" + newUnit.getID()));
 
         context.addEvent(new Event(Event.CREATE, Constants.UNIT, newUnit.getID(), newUnit.getName()));
 
-        log.info(LogHelper.getHeader(context, "create_unit",
-                "unit_id=" + newUnit.getID()));
-
         return newUnit;
+    }
+
+    @Override
+    public void setName(Unit unit, String name) throws SQLException {
+        unit.setName(name);
     }
 
     @Override
@@ -75,95 +73,113 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
 
     @Override
     public Unit findByName(Context context, String name) throws SQLException {
-      return unitDAO.findByName(context, name);
+        return unitDAO.findByName(context, name);
     }
 
     @Override
-    public List<Unit> findAll(Context context) throws SQLException {
-        return unitDAO.findAllSortedByName(context);
+    public List<Unit> findAll(Context context, int pageSize, int offset) throws SQLException {
+        return unitDAO.findAll(context, pageSize, offset);
     }
 
     @Override
     public List<Unit> findAllByGroup(Context context, Group group) throws SQLException {
-      return unitDAO.findAllByGroup(context, group);
+        return unitDAO.findByGroup(context, group);
     }
 
     @Override
     public List<Unit> search(Context context, String query) throws SQLException {
-      return search(context, query, -1, -1);
+        return search(context, query, -1, -1);
     }
 
     @Override
     public List<Unit> search(Context context, String query, int offset, int limit) throws SQLException {
-      return unitDAO.searchByName(context, query, offset, limit);
+        List<Unit> units = new ArrayList<>();
+        UUID uuid = UUIDUtils.fromString(query);
+        if (uuid == null) {
+            // Search by unit name
+            units = unitDAO.findByNameLike(context, query, offset, limit);
+        } else {
+            // Search by unit id
+            Unit unit = find(context, uuid);
+            if (unit != null) {
+                units.add(unit);
+            }
+        }
+        return units;
     }
 
     @Override
     public int searchResultCount(Context context, String query) throws SQLException {
-      return unitDAO.searchByNameResultCount(context, query);
+        UUID uuid = UUIDUtils.fromString(query);
+        if (uuid == null) {
+            // Search by unit name
+            return unitDAO.countByNameLike(context, query);
+        } else {
+            // Search by unit id
+            Unit unit = find(context, uuid);
+            if (unit != null) {
+                return 1;
+            }
+        }
+        return 0;
     }
 
-    
     @Override
     public void update(Context context, Unit unit) throws SQLException, AuthorizeException {
         // Authorize
         canEdit(context);
 
-        log.info(LogHelper.getHeader(context, "update_unit",
-                "unit_id=" + unit.getID()));
-
         super.update(context, unit);
 
         unitDAO.save(context, unit);
-        if (unit.isModified())
-        {
+
+        log.info(LogHelper.getHeader(context, "update_unit", "unit_id=" + unit.getID()));
+
+        if (unit.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.UNIT, unit.getID(), unit.getName()));
             unit.clearModified();
         }
         unit.clearDetails();
     }
 
-   
     @Override
     public List<Group> getAllGroups(Context context, Unit unit) throws SQLException {
         return unit.getGroups();
     }
-    
+
     @Override
     public void addGroup(Context context, Unit unit, Group group) throws SQLException, AuthorizeException {
-         // Authorize
+        // Authorize
         canEdit(context);
 
         log.info(LogHelper.getHeader(context, "add_group",
                 "unit_id=" + unit.getID() + ",group_id=" + group.getID()));
 
         unit.addGroup(group);
-        
-        context.addEvent(new Event(Event.ADD, Constants.UNIT, unit.getID(),
-        Constants.COLLECTION, group.getID(), unit.getName()));
-    }
 
+        context.addEvent(new Event(Event.ADD, Constants.UNIT, unit.getID(),
+            Constants.COLLECTION, group.getID(), unit.getName()));
+    }
 
     @Override
     public void removeGroup(Context context, Unit unit, Group group) throws SQLException, AuthorizeException {
-         // Authorize
+        // Authorize
         canEdit(context);
 
         log.info(LogHelper.getHeader(context, "add_group",
                 "unit_id=" + unit.getID() + ",group_id=" + group.getID()));
 
         unit.removeGroup(group);
-        
+
         context.addEvent(new Event(Event.REMOVE, Constants.UNIT, unit.getID(),
-        Constants.COLLECTION, group.getID(), unit.getName()));
+            Constants.COLLECTION, group.getID(), unit.getName()));
     }
 
     @Override
     public boolean isMember(Unit unit, Group group) {
-      return unit.isMember(group);
+        return unit.isMember(group);
     }
 
-   
     @Override
     public void delete(Context context, Unit unit) throws SQLException, AuthorizeException, IOException {
         // Authorize
@@ -184,18 +200,13 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
         return Constants.UNIT;
     }
 
-
-
     @Override
     public boolean canEditBoolean(Context context) throws SQLException {
-        try
-        {
+        try {
             canEdit(context);
 
             return true;
-        }
-        catch (AuthorizeException e)
-        {
+        } catch (AuthorizeException e) {
             return false;
         }
     }
@@ -203,8 +214,7 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
     @Override
     public void canEdit(Context context) throws AuthorizeException, SQLException {
         // Check authorisation
-        if (!(authorizeService.isAdmin(context)))
-        {
+        if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException("Only administrators can create or modify units and its associations");
         }
     }
@@ -214,17 +224,13 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
         //Also fire a modified event since the unit HAS been modified
         context.addEvent(new Event(Event.MODIFY, Constants. UNIT,
                 unit.getID(), unit.getName()));
-
     }
 
     @Override
     public Unit findByIdOrLegacyId(Context context, String id) throws SQLException {
-        if(StringUtils.isNumeric(id))
-        {
+        if (StringUtils.isNumeric(id)) {
             return findByLegacyId(context, Integer.parseInt(id));
-        }
-        else
-        {
+        } else {
             return find(context, UUID.fromString(id));
         }
     }
