@@ -37,6 +37,9 @@ import org.json.JSONTokener;
  *
  */
 public class SHERPAResponse implements Serializable {
+
+    private static final long serialVersionUID = 2732963970169240597L;
+
     // Is this response to be treated as an error?
     private boolean error;
 
@@ -489,6 +492,12 @@ public class SHERPAResponse implements Serializable {
             }
         }
         permittedVersion.setLicenses(sherpaLicenses);
+
+        if (permitted.has("embargo")) {
+            JSONObject embargo = permitted.getJSONObject("embargo");
+            SHERPAEmbargo SHERPAEmbargo = new SHERPAEmbargo(embargo.getInt("amount"), embargo.getString("units"));
+            permittedVersion.setEmbargo(SHERPAEmbargo);
+        }
 
         return permittedVersion;
     }

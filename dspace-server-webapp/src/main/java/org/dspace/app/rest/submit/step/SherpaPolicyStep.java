@@ -31,6 +31,8 @@ import org.dspace.web.ContextUtil;
  */
 public class SherpaPolicyStep extends AbstractProcessingStep {
 
+    public static final String SHERPA_RETRIEVAL_TIME = "retrievalTime";
+
     private SherpaCacheEvictService sherpaCacheEvictService = new DSpace().getSingletonService(
                 SherpaCacheEvictService.class);
     private SHERPASubmitService sherpaSubmitService = new DSpace().getSingletonService(SHERPASubmitService.class);

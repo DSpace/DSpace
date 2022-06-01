@@ -31,6 +31,8 @@ import java.util.List;
  */
 public class SHERPAPermittedVersion implements Serializable {
 
+    private static final long serialVersionUID = 4992181606327727442L;
+
     // Version (submitted, accepted, published)
     private String articleVersion;
 
@@ -47,11 +49,6 @@ public class SHERPAPermittedVersion implements Serializable {
     private List<String> licenses;
     // Embargo
     private SHERPAEmbargo embargo;
-
-    protected static class SHERPAEmbargo implements Serializable {
-        String units;
-        int amount;
-    }
 
     public String getArticleVersion() {
         return articleVersion;

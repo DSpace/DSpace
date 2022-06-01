@@ -38,7 +38,6 @@ public interface DataProcessingStep extends RestProcessingStep {
     public static final String CCLICENSE_STEP_OPERATION_ENTRY = "cclicense/uri";
     public static final String ACCESS_CONDITION_STEP_OPERATION_ENTRY = "discoverable";
     public static final String ACCESS_CONDITION_POLICY_STEP_OPERATION_ENTRY = "accessConditions";
-    public static final String SHERPA_RETRIEVAL_TIME = "retrievalTime";
 
     public static final String UPLOAD_STEP_METADATA_PATH = "metadata";
 
