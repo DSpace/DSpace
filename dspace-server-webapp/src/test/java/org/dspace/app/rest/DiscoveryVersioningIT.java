@@ -37,16 +37,20 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EntityTypeBuilder;
+import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.VersionBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.RelationshipType;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
@@ -58,6 +62,7 @@ import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SolrSearchCore;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.versioning.Version;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -2410,6 +2415,74 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         ));
     }
 
-    // TODO make sure workflow, workspace and template items are still excluded!
+    // NOTE: this test makes sure that the changes to ItemIndexFactoryImpl don't break old behavior
+    @Test
+    public void test_rebuildIndex_itemInWorkspaceNotIndexed() throws Exception {
+        Collection collection = createCollection();
+
+        context.turnOffAuthorisationSystem();
+        WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+            .withTitle("item 1")
+            .build();
+        context.restoreAuthSystemState();
+
+        verifyNotIndexed(wsi.getItem());
+
+        // force reindex all items
+        indexingService.deleteIndex();
+        indexingService.createIndex(context);
+
+        verifyNotIndexed(wsi.getItem());
+    }
+
+    // NOTE: this test makes sure that the changes to ItemIndexFactoryImpl don't break old behavior
+    @Test
+    public void test_rebuildIndex_itemInWorkflowNotIndexed() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // NOTE: this collection uses the "selectSingleReviewer" workflow, see workflow.xml
+        Collection collection = CollectionBuilder.createCollection(context, community, "123456789/workflow-test-1")
+            .withName("collection")
+            .build();
+
+        // NOTE: the "selectSingleReviewer" requires the "ReviewManagers" group to be present and
+        //       contain at least one member
+        GroupBuilder.createGroup(context)
+            .withName("ReviewManagers")
+            .addMember(admin)
+            .build();
+
+        XmlWorkflowItem wfi = WorkflowItemBuilder.createWorkflowItem(context, collection)
+            .withTitle("item 1")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        verifyNotIndexed(wfi.getItem());
+
+        // force reindex all items
+        indexingService.deleteIndex();
+        indexingService.createIndex(context);
+
+        verifyNotIndexed(wfi.getItem());
+    }
+
+    // NOTE: this test makes sure that the changes to ItemIndexFactoryImpl don't break old behavior
+    @Test
+    public void test_rebuildIndex_templateItemNotIndexed() throws Exception {
+        Collection collection = createCollection();
+
+        context.turnOffAuthorisationSystem();
+        Item templateItem = itemService.createTemplateItem(context, collection);
+        context.restoreAuthSystemState();
+
+        verifyNotIndexed(templateItem);
+
+        // force reindex all items
+        indexingService.deleteIndex();
+        indexingService.createIndex(context);
+
+        verifyNotIndexed(templateItem);
+    }
 
 }
