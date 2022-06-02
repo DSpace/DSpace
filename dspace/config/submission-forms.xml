@@ -57,9 +57,9 @@
                     <dc-element>contributor</dc-element>
                     <dc-qualifier>author</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>submission.section.describe.traditionalpageone.dc_contributor_author.label</label>
+                    <label>submission.section.describe.dc_contributor_author.label</label>
                     <input-type>onebox</input-type>
-                    <hint>submission.section.describe.traditionalpageone.dc_contributor_author.hint</hint>
+                    <hint>submission.section.describe.dc_contributor_author.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -69,10 +69,10 @@
                     <dc-element>title</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>submission.section.describe.traditionalpageone.dc_title.label</label>
+                    <label>submission.section.describe.dc_title.label</label>
                     <input-type>onebox</input-type>
-                    <hint>submission.section.describe.traditionalpageone.dc_title.label</hint>
-                    <required>submission.section.describe.traditionalpageone.dc_title.required</required>
+                    <hint>submission.section.describe.dc_title.label</hint>
+                    <required>submission.section.describe.dc_title.required</required>
                 </field>
             </row>
             <row>
@@ -81,9 +81,9 @@
                     <dc-element>title</dc-element>
                     <dc-qualifier>alternative</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>submission.section.describe.traditionalpageone.dc_title_alternative.label</label>
+                    <label>submission.section.describe.dc_title_alternative.label</label>
                     <input-type>onebox</input-type>
-                    <hint>submission.section.describe.traditionalpageone.dc_title_alternative.hint</hint>
+                    <hint>submission.section.describe.dc_title_alternative.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -93,11 +93,11 @@
                     <dc-element>date</dc-element>
                     <dc-qualifier>issued</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>submission.section.describe.traditionalpageone.dc_date_issued.label</label>
+                    <label>submission.section.describe.dc_date_issued.label</label>
                     <style>col-sm-4</style>
                     <input-type>date</input-type>
-                    <hint>submission.section.describe.traditionalpageone.dc_date_issued.label</hint>
-                    <required>submission.section.describe.traditionalpageone.dc_date_issued.required</required>
+                    <hint>submission.section.describe.dc_date_issued.label</hint>
+                    <required>submission.section.describe.dc_date_issued.required</required>
                 </field>
 
                 <field>
@@ -167,7 +167,7 @@
                     <dc-element>language</dc-element>
                     <dc-qualifier>iso</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>submission.section.describe.journalvolume.dc_language_iso.label</label>
+                    <label>submission.section.describe.dc_language_iso.label</label>
                     <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
                     <hint>submission.section.describe.dc_language_iso.hint</hint>
                     <required></required>
@@ -730,9 +730,9 @@
                     <dc-schema>creativework</dc-schema>
                     <dc-element>keywords</dc-element>
                     <repeatable>true</repeatable>
-                    <label>Keywords</label>
+                    <label>submission.section.describe.journalvolume.creativework_keywords.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the keywords of the journal issue</hint>
+                    <hint>submission.section.describe.journalvolume.creativework_keywords.hint</hint>
                 </field>
             </row>
 
@@ -855,9 +855,9 @@
                     <dc-element>citation</dc-element>
                     <dc-qualifier>title</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>submission.section.describe.openairepub.oaire.citation.title.label</label>
+                    <label>submission.section.describe.openairepub.oaire_citation_title.label</label>
                     <input-type>onebox</input-type>
-                    <hint>submission.section.describe.openairepub.oaire.citation.title.hint</hint>
+                    <hint>submission.section.describe.openairepub.oaire_citation_title.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -867,9 +867,9 @@
                     <dc-element>citation</dc-element>
                     <dc-qualifier>conferencePlace</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>submission.section.describe.openairepub.oaire.citation.conferencePlace.label</label>
+                    <label>submission.section.describe.openairepub.oaire_citation_conferencePlace.label</label>
                     <input-type>onebox</input-type>
-                    <hint>submission.section.describe.openairepub.oaire.citation.conferencePlace.hint</hint>
+                    <hint>submission.section.describe.openairepub.oaire_citation_conferencePlace.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -879,9 +879,9 @@
                     <dc-element>citation</dc-element>
                     <dc-qualifier>conferenceDate</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>submission.section.describe.openairepub.oaire.citation.conferenceDate.label</label>
+                    <label>submission.section.describe.openairepub.oaire_citation_conferenceDate.label</label>
                     <input-type>date</input-type>
-                    <hint>submission.section.describe.openairepub.oaire.citation.conferenceDate.hint</hint>
+                    <hint>submission.section.describe.openairepub.oaire_citation_conferenceDate.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -891,9 +891,9 @@
                     <dc-element>citation</dc-element>
                     <dc-qualifier>volume</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>submission.section.describe.openairepub.oaire.citation.volume.label</label>
+                    <label>submission.section.describe.openairepub.oaire_citation_volume.label</label>
                     <input-type>onebox</input-type>
-                    <hint>submission.section.describe.openairepub.oaire.citation.volume.hint</hint>
+                    <hint>submission.section.describe.openairepub.oaire_citation_volume.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -903,9 +903,9 @@
                     <dc-element>citation</dc-element>
                     <dc-qualifier>issue</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>submission.section.describe.openairepub.oaire.citation.issue.label</label>
+                    <label>submission.section.describe.openairepub.oaire_citation._issue.label</label>
                     <input-type>onebox</input-type>
-                    <hint>submission.section.describe.openairepub.oaire.citation.issue.hint</hint>
+                    <hint>submission.section.describe.openairepub.oaire_citation_issue.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -915,9 +915,9 @@
                     <dc-element>citation</dc-element>
                     <dc-qualifier>edition</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>submission.section.describe.openairepub.oaire.citation.edition.label</label>
+                    <label>submission.section.describe.openairepub.oaire_citation_edition.label</label>
                     <input-type>onebox</input-type>
-                    <hint>submission.section.describe.openairepub.oaire.citation.edition.hint</hint>
+                    <hint>submission.section.describe.openairepub.oaire_citation_edition.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -927,9 +927,9 @@
                     <dc-element>citation</dc-element>
                     <dc-qualifier>startPage</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>First Page</label>
+                    <label>submission.section.describe.openairepub.oaire_citation_startPage.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the start page number.</hint>
+                    <hint>submission.section.describe.openairepub.oaire_citation_startPage.hint</hint>
                     <required></required>
                 </field>
                 <field>
@@ -937,9 +937,9 @@
                     <dc-element>citation</dc-element>
                     <dc-qualifier>endPage</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Last Page</label>
+                    <label>submission.section.describe.openairepub.oaire_citation_endPage.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the last page number.</hint>
+                    <hint>submission.section.describe.openairepub.oaire_citation_endPage.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -960,9 +960,9 @@
                     <dc-schema>oaire</dc-schema>
                     <dc-element>version</dc-element>
                     <repeatable>false</repeatable>
-                    <label>submission.section.describe.openairepub.oaire.version.false.label</label>
+                    <label>submission.section.describe.openairepub.oaire_version_false.label</label>
                     <input-type value-pairs-name="openaire_version_types">dropdown</input-type>
-                    <hint>submission.section.describe.openairepub.oaire.version.false.hint</hint>
+                    <hint>submission.section.describe.openairepub.oaire_version_false.hint</hint>
                     <required></required>
                 </field>
                 <field>
@@ -1029,8 +1029,8 @@
                     <search-configuration>project</search-configuration>
                     <repeatable>true</repeatable>
                     <name-variants>false</name-variants>
-                    <label>Funding</label>
-                    <hint>Add a related Funding</hint>
+                    <label>submission.section.describe.openairepub.isPublicationOfProject.label</label>
+                    <hint>submission.section.describe.openairepub.isPublicationOfProject.hint</hint>
                     <linked-metadata-field>
                         <dc-schema>dc</dc-schema>
                         <dc-element>relation</dc-element>
@@ -1045,9 +1045,9 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>rights</dc-element>
                     <repeatable>false</repeatable>
-                    <label>Access Type</label>
+                    <label>submission.section.describe.dc_rights.label</label>
                     <input-type value-pairs-name="openaire_rights">dropdown</input-type>
-                    <hint>Select the access type of the resource.</hint>
+                    <hint>submission.section.describe.dc_rights.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -1057,9 +1057,9 @@
                     <dc-element>license</dc-element>
                     <dc-qualifier>condition</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>License</label>
+                    <label>submission.section.describe.openairepub.oaire_license_condition.label</label>
                     <input-type value-pairs-name="openaire_license_types">dropdown</input-type>
-                    <hint>Select the license of the resource.</hint>
+                    <hint>submission.section.describe.openairepub.oaire_license_condition.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -1069,9 +1069,9 @@
                     <dc-element>coverage</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Coverage</label>
+                    <label>submission.section.describe.dc_coverage.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the coverage of the item, like a period, jurisdiction, etc.</hint>
+                    <hint>submission.section.describe.dc_coverage.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -1081,9 +1081,9 @@
                     <dc-element>description</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Description</label>
+                    <label>submission.section.describe.dc_description.label</label>
                     <input-type>textarea</input-type>
-                    <hint>Enter any other description or comments in this box.</hint>
+                    <hint>submission.section.describe.dc_description.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -1094,25 +1094,25 @@
                 <field>
                     <dc-schema>person</dc-schema>
                     <dc-element>familyName</dc-element>
-                    <label>Last name</label>
+                    <label>submission.section.describe.person_familyName.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter surname or last name of the person</hint>
+                    <hint>submission.section.describe.person_familyName.hint</hint>
                 </field>
                 <field>
                     <dc-schema>person</dc-schema>
                     <dc-element>givenName</dc-element>
-                    <label>First name</label>
+                    <label>submission.section.describe.person_givenName.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter personal or first name of the person</hint>
+                    <hint>submission.section.describe.person_givenName.hint</hint>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>title</dc-element>
-                    <label>Author preferred name</label>
+                    <label>submission.section.describe.openaireperson.dc_title.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the preferred name of this person regarding the authorship</hint>
+                    <hint>submission.section.describe.openaireperson.dc_title.hint</hint>
                 </field>
             </row>
             <row>
@@ -1121,9 +1121,9 @@
                     <dc-element>affiliation</dc-element>
                     <dc-qualifier>name</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Affiliation Name</label>
+                    <label>submission.section.describe.openaireperson.person_affiliation_name.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the organizational or institutional affiliation of this person</hint>
+                    <hint>submission.section.describe.openaireperson.person_affiliation_name.hint</hint>
                 </field>
             </row>
             <row>
@@ -1131,9 +1131,9 @@
                     <dc-schema>person</dc-schema>
                     <dc-element>email</dc-element>
                     <repeatable>true</repeatable>
-                    <label>Email</label>
+                    <label>submission.section.describe.person_email.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the email of the person</hint>
+                    <hint>submission.section.describe.person_email.hint</hint>
                 </field>
             </row>
             <row>
@@ -1143,11 +1143,9 @@
                     <dc-qualifier></dc-qualifier>
                     <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
                     <repeatable>true</repeatable>
-                    <label>Author identifier</label>
+                    <label>submission.section.describe.openaireperson.person_identifier.label</label>
                     <input-type value-pairs-name="openaire_author_identifier_types">qualdrop_value</input-type>
-                    <hint>If the author has any identifiers or codes associated with
-                        it, please enter the types and the actual numbers or codes.
-                    </hint>
+                    <hint>submission.section.describe.openaireperson.person_identifier.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -1158,9 +1156,9 @@
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>title</dc-element>
-                    <label>Project name</label>
+                    <label>submission.section.describe.project.dc_title.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the project</hint>
+                    <hint>submission.section.describe.project.dc_title.hint</hint>
                 </field>
             </row>
             <row>
@@ -1168,9 +1166,9 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>identifier</dc-element>
                     <dc-qualifier>uri</dc-qualifier>
-                    <label>Project web page</label>
+                    <label>submission.section.describe.openaireproject.dc_identifier_uri.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the URL of the project webpage</hint>
+                    <hint>submission.section.describe.openaireproject.dc_identifier_uri.hint</hint>
                 </field>
             </row>
             <row>
@@ -1195,16 +1193,16 @@
                 <field>
                     <dc-schema>oaire</dc-schema>
                     <dc-element>fundingStream</dc-element>
-                    <label>Name of the Funding Stream</label>
+                    <label>submission.section.describe.openaireproject.oaire_fundingStream.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the funding stream of the project</hint>
+                    <hint>submission.section.describe.openaireproject.oaire_fundingStream.hint</hint>
                 </field>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>identifier</dc-element>
-                    <label>Award number</label>
+                    <label>submission.section.describe.openaireproject.dc_identifier.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the identifier of the project</hint>
+                    <hint>submission.section.describe.openaireproject.dc_identifier.hint</hint>
                 </field>
             </row>
         </form>
@@ -1214,9 +1212,9 @@
                 <field>
                     <dc-schema>organization</dc-schema>
                     <dc-element>legalName</dc-element>
-                    <label>Organization name</label>
+                    <label>submission.section.describe.openaireorg.organization_legalName.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the orgunit or organization</hint>
+                    <hint>submission.section.describe.openaireorg.organization_legalName.hint</hint>
                 </field>
             </row>
             <row>
@@ -1226,11 +1224,9 @@
                     <dc-qualifier></dc-qualifier>
                     <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
                     <repeatable>true</repeatable>
-                    <label>Organization identifier</label>
+                    <label>submission.section.describe.openaireorg.dc_identifier.label</label>
                     <input-type value-pairs-name="openaire_organization_identifier_types">qualdrop_value</input-type>
-                    <hint>If the organization has any identifiers or codes associated with
-                        it, please enter the types and the actual numbers or codes.
-                    </hint>
+                    <hint>submission.section.describe.openaireorg.dc_identifier.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -1238,9 +1234,9 @@
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>type</dc-element>
-                    <label>Organization type</label>
+                    <label>submission.section.describe.openaireorg.dc_type.label</label>
                     <input-type value-pairs-name="openaire_organization_types">dropdown</input-type>
-                    <hint>Choose the attributes of the Organization</hint>
+                    <hint>submission.section.describe.openaireorg.dc_type.hint</hint>
                     <required></required>
                 </field>
             </row>
@@ -1248,9 +1244,9 @@
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
-                    <label>Description</label>
+                    <label>submission.section.describe.orgUnit.dc_description.label</label>
                     <input-type>textarea</input-type>
-                    <hint>Enter the description of the orgunit</hint>
+                    <hint>submission.section.describe.orgUnit.dc_description.hint</hint>
                 </field>
             </row>
         </form>
@@ -1403,7 +1399,7 @@
                 <stored-value>en_US</stored-value>
             </pair>
             <pair>
-                <displayed-value>English</displayed-value>
+                <displayed-value>submission.section.describe.value-pairs.common_iso_languages.english</displayed-value>
                 <stored-value>en</stored-value>
             </pair>
             <pair>
