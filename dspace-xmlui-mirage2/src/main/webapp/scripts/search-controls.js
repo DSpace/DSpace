@@ -278,7 +278,8 @@
     }
 
     function restoreOriginalFilters() {
-        DSpace.discovery.filters = DSpace.discovery.orig_filters.slice(0);
+        DSpace.discovery.filters = [];
+        $('#filters-overview-wrapper').remove();
     }
 
 })(jQuery);
