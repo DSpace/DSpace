@@ -11,22 +11,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.SortedMap;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.apache.lucene.util.ArrayUtil;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
@@ -34,7 +29,6 @@ import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ErrorRest;
-import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
@@ -76,9 +70,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
-
-import static org.apache.logging.log4j.web.WebLoggerContextUtils.getServletContext;
 
 /**
  * This is the repository responsible to manage WorkspaceItem Rest object
@@ -211,45 +202,10 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return wsi;
     }
 
-    private void uploadFileFromURL(Context context, HttpServletRequest request, Integer id) throws SQLException,
-            AuthorizeException, IOException, URISyntaxException {
-        WorkspaceItem witem = wis.find(context, id);
-        List<MetadataValue> mdv = itemService.getMetadataByMetadataString(witem.getItem(),
-                "local.bitstream.redirectToURL");
-
-        if (ArrayUtils.isEmpty(mdv.toArray())) {
-            return;
-        }
-
-        String fileName = mdv.get(0).getValue();
-        if (StringUtils.isBlank(fileName)) {
-            return;
-        }
-
-        String TMP_DIR = System.getProperty("java.io.tmpdir");
-        File file = new File(TMP_DIR, fileName);
-        String mimeType = URLConnection.guessContentTypeFromName(file.getName());
-        MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(), mimeType,
-                new FileInputStream(file));
-
-        upload(request, "wokspaceitems", "submission", id, multipartFile);
-
-        wis.update(context, witem);
-    }
-
     @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
                       Patch patch) throws SQLException, AuthorizeException {
-        try {
-            uploadFileFromURL(context, request, id);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
         List<Operation> operations = patch.getOperations();
         WorkspaceItemRest wsi = findOne(context, id);
         WorkspaceItem source = wis.find(context, id);
@@ -265,6 +221,12 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             }
         }
         wis.update(context, source);
+
+        try {
+            uploadFileFromURL(context, request, id);
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'DELETE')")
@@ -436,5 +398,40 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                 }
             }
         }
+    }
+
+    /**
+     * If the admin writes path/filename in the `local.bitstream.redirectToURL` input field, from the tomcat
+     * temp directory will be loaded file which will be converted to the MultipartFile and uploaded as normal bitstream.
+     * The uploaded bitstream will be showed in the UI.
+     *
+     * @param context from the servlet
+     * @param request current patch request
+     * @param id of the workspace item
+     */
+    private void uploadFileFromURL(Context context, HttpServletRequest request, Integer id) throws SQLException,
+            AuthorizeException, IOException, URISyntaxException {
+        WorkspaceItem witem = wis.find(context, id);
+        List<MetadataValue> mdv = itemService.getMetadataByMetadataString(witem.getItem(),
+                "local.bitstream.redirectToURL");
+
+        if (ArrayUtils.isEmpty(mdv.toArray())) {
+            return;
+        }
+
+        String fileName = mdv.get(0).getValue();
+        if (StringUtils.isBlank(fileName)) {
+            return;
+        }
+
+        String TMP_DIR = System.getProperty("java.io.tmpdir");
+        File file = new File(TMP_DIR, fileName);
+        String mimeType = URLConnection.guessContentTypeFromName(file.getName());
+        MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(), mimeType,
+                new FileInputStream(file));
+
+        upload(request, "wokspaceitems", "submission", id, multipartFile);
+
+        wis.update(context, witem);
     }
 }
