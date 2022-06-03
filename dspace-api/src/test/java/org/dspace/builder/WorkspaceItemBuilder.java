@@ -219,4 +219,9 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         }
         return this;
     }
+
+    public WorkspaceItemBuilder withMetadata(final String schema, final String element, final String qualifier,
+                                    final String value) {
+        return addMetadataValue(schema, element, qualifier, value);
+    }
 }

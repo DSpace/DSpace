@@ -196,7 +196,7 @@
                     <label>Bitstream redirect URL</label>
                     <input-type>onebox</input-type>
                     <hint>
-                        The bitstream will be loaded from this URL.
+                        The bitstream will be loaded from this URL. Example: /temp/file.png
                     </hint>
                     <required></required>
                     <acl>
