@@ -35,6 +35,7 @@ import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
+import org.dspace.app.rest.utils.BigMultipartFile;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
@@ -64,7 +65,6 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -423,10 +423,10 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             return;
         }
 
-        String TMP_DIR = System.getProperty("java.io.tmpdir");
-        File file = new File(TMP_DIR, fileName);
+        File file = new File(fileName);
         String mimeType = URLConnection.guessContentTypeFromName(file.getName());
-        MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(), mimeType,
+
+        BigMultipartFile multipartFile = new BigMultipartFile(file.getName(), file.getName(), mimeType,
                 new FileInputStream(file));
 
         upload(request, "wokspaceitems", "submission", id, multipartFile);
