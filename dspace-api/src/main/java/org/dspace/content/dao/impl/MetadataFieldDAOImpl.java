@@ -78,7 +78,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     {
         Query query;
 
-        if(qualifier != null) {
+        if(qualifier != null && !qualifier.isEmpty()) {
             query = createQuery(context, "SELECT mf " +
                     "FROM MetadataField mf " +
                     "JOIN FETCH mf.metadataSchema ms " +
@@ -95,7 +95,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
         query.setParameter("name", metadataSchema);
         query.setParameter("element", element);
 
-        if(qualifier != null) {
+        if(qualifier != null && !qualifier.isEmpty()) {
             query.setParameter("qualifier", qualifier);
         }
 
