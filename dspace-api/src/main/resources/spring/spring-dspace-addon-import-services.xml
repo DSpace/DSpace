@@ -47,7 +47,8 @@
     <bean id="pubmedImportService"
           class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl">
         <property name="metadataFieldMapping" ref="pubmedMetadataFieldMapping"/>
-        <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
+        <property name="urlFetch" value="${pabmed.url.fetch}"/>
+        <property name="urlSearch" value="${pabmed.url.search}"/>
         <property name="generateQueryForItem" ref="pubmedService"></property>
         <property name="supportedExtensions">
             <list>
