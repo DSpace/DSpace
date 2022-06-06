@@ -880,6 +880,7 @@
             <version>5.11.2</version>
             <scope>test</scope>
             <exclusions>
+                <!-- Exclude snakeyaml to avoid conflicts with: spring-boot-starter-cache -->
             	<exclusion>
             		<groupId>org.yaml</groupId>
             		<artifactId>snakeyaml</artifactId>
