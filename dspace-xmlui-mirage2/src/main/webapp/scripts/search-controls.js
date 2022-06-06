@@ -26,10 +26,6 @@
         });
     }
 
-
-
-
-
     function getAdvancedFiltersTemplate() {
         if (!advanced_filters_template) {
             advanced_filters_template = DSpace.getTemplate('discovery_advanced_filters');
@@ -157,11 +153,11 @@
     }
 
     function assignSimpleFilterEventHandlers() {
-        $('#filters-overview-wrapper .label').click(function (e) {
+        $('#filters-overview-wrapper .label').on('click', function (e) {
             var index = $(this).data('index');
             removeFilterAtIndex(index);
             renderAdvancedFilterSection();
-            $('#aspect_discovery_SimpleSearch_div_search-filters').submit();
+            $('#aspect_discovery_SimpleSearch_div_search-filters').trigger('submit');
             return false;
         });
     }
@@ -172,18 +168,18 @@
 
     function assignAdvancedFilterEventHandlers() {
         var $filters = $('.search-filter');
-        $filters.find('select, input').change(function() {
+        $filters.find('select, input').on('change', function() {
             updateFilterValues($(this).closest('.search-filter'));
             renderAdvancedFilterSection();
         });
-        $filters.find('.filter-control.filter-add').click(function (e) {
+        $filters.find('.filter-control.filter-add').on('click', function (e) {
             var index = getIndexFromFilterRow($(this).closest('.search-filter'));
             addNewFilter(index + 1, null, null, '');
             renderAdvancedFilterSection();
             return false;
         });
         var $removeButtons = $filters.find('.filter-control.filter-remove');
-        $removeButtons.click(function (e) {
+        $removeButtons.on('click', function (e) {
             var index = getIndexFromFilterRow($(this).closest('.search-filter'));
             removeFilterAtIndex(index);
             renderAdvancedFilterSection();
@@ -199,7 +195,7 @@
     }
 
     function assignGlobalEventHandlers() {
-        $('.show-advanced-filters').click(function () {
+        $('.show-advanced-filters').on('click', function () {
             var wrapper = $('#aspect_discovery_SimpleSearch_div_discovery-filters-wrapper');
             wrapper.parent().find('.discovery-filters-wrapper-head').hide().removeClass('hidden').fadeIn(200);
             wrapper.hide().removeClass('hidden').slideDown(200);
@@ -208,7 +204,7 @@
             return false;
         });
 
-        $('.hide-advanced-filters').click(function () {
+        $('.hide-advanced-filters').on('click', function () {
             var wrapper = $('#aspect_discovery_SimpleSearch_div_discovery-filters-wrapper');
             wrapper.parent().find('.discovery-filters-wrapper-head').fadeOut(200, function() {
                 $(this).addClass('hidden').removeAttr('style');
@@ -221,20 +217,20 @@
             return false;
         });
 
-        $('#aspect_discovery_SimpleSearch_field_submit_reset_filter').click(function() {
+        $('#aspect_discovery_SimpleSearch_field_submit_reset_filter').on('click', function() {
             restoreOriginalFilters();
             calculateFilterIndices();
             renderAdvancedFilterSection();
             return false;
         });
 
-        $('.discovery-add-filter-button').click(function() {
+        $('.discovery-add-filter-button').on('click', function() {
             addNewFilter(null, null, null, '');
             renderAdvancedFilterSection();
             return false;
         });
 
-        $('.controls-gear-wrapper').find('li.gear-option,li.gear-option a').click(function(event){
+        $('.controls-gear-wrapper').find('li.gear-option,li.gear-option a').on('click', function(event){
             var value, param, mainForm, params, listItem, $this;
             event.stopPropagation();
             $this = $(this);
@@ -271,7 +267,7 @@
             //Clear the page param
             mainForm.find('input[name="page"]').val('1');
 
-            mainForm.submit();
+            mainForm.trigger('submit');
             $this.closest('.open').removeClass('open');
             return false;
         });
@@ -282,7 +278,8 @@
     }
 
     function restoreOriginalFilters() {
-        DSpace.discovery.filters = DSpace.discovery.orig_filters.slice(0);
+        DSpace.discovery.filters = [];
+        $('#filters-overview-wrapper').remove();
     }
 
 })(jQuery);
