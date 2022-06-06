@@ -14,6 +14,13 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Implementation of the MultipartFile.
+ * This implementation doesn't support content in bytes[] because converting the big file to the bytes[]
+ * could throw array size errors.
+ *
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
+ */
 public class BigMultipartFile implements MultipartFile {
 
     private final String name;
