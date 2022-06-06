@@ -38,15 +38,16 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -7200,7 +7201,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // Create a big file in the /temp folder
         String TMP_DIR = System.getProperty("java.io.tmpdir");
         String FILE_NAME = "test.txt";
-        long SIZE_IN_BYTES = 2000000000;
+        Long SIZE_IN_BYTES = 2000000000L;
         File file = null;
 
         try {
@@ -7216,7 +7217,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             parentCommunity = CommunityBuilder.createCommunity(context)
                     .withName("Parent Community")
                     .build();
-            Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection").build();
+            Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                    .withName("Collection").build();
 
             WorkspaceItem wItem = WorkspaceItemBuilder.createWorkspaceItem(context, col)
                     .withTitle("Test WorkspaceItem")
@@ -7237,6 +7239,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             addAccessCondition.add(new AddOperation("/sections/defaultAC/accessConditions",
                     accessConditions));
 
+            Set ss = new HashSet<String>();
+            ss.add(String.valueOf(SIZE_IN_BYTES));
             String patchBody = getPatchContent(addAccessCondition);
             // add access conditions
             getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + wItem.getID())
@@ -7247,7 +7251,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                     + ".metadata['dc.title'][0].value",
                             is(FILE_NAME)))
                     .andExpect(jsonPath("$.sections.upload.files[0].sizeBytes",
-                            is(String.valueOf(SIZE_IN_BYTES))));
+                            is(SIZE_IN_BYTES.intValue())));
         } catch (Exception e) {
             if (!ObjectUtils.isEmpty(file) && file.exists()) {
                 try {
@@ -7259,6 +7263,5 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             }
             throw new Exception(e);
         }
-
     }
 }
