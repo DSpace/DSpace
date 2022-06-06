@@ -13,7 +13,10 @@ import org.ehcache.event.CacheEvent;
 import org.ehcache.event.CacheEventListener;
 
 /**
- * Log Sherpa cache events
+ * This is a EHCache listner responsible for logging sherpa cache events. It is
+ * bound to the sherpa cache via the dspace/config/ehcache.xml file. We need a
+ * dedicated Logger for each cache as the CacheEvent doesn't include details
+ * about where the event occur
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  *
