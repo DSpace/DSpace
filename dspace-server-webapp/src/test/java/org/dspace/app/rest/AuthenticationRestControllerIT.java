@@ -889,7 +889,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testLoginLogoutStatusLink() throws Exception {
         getClient().perform(get("/api/authn"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$._links.login.href", endsWith("login{?user,password}")))
+                   .andExpect(jsonPath("$._links.login.href", endsWith("login")))
                    .andExpect(jsonPath("$._links.logout.href", endsWith("logout")))
                    .andExpect(jsonPath("$._links.status.href", endsWith("status")));
     }
