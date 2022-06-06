@@ -70,6 +70,16 @@ public class OrcidLoginFilter extends StatelessLoginFilter {
         redirectAfterSuccess(req, res);
     }
 
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+        AuthenticationException failed) throws IOException, ServletException {
+
+        String baseRediredirectUrl = configurationService.getProperty("dspace.ui.url");
+        String redirectUrl = baseRediredirectUrl + "/error?status=401&code=orcid.generic-error";
+        response.sendRedirect(redirectUrl);
+
+    }
+
     /**
      * After successful login, redirect to the DSpace URL specified by this Orcid
      * request (in the "redirectUrl" request parameter). If that 'redirectUrl' is

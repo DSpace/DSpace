@@ -10,7 +10,6 @@ package org.dspace.app.rest;
 import static java.util.Arrays.asList;
 import static org.dspace.app.matcher.MetadataValueMatcher.with;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
@@ -23,7 +22,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -112,8 +110,8 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         orcidAuthentication.setOrcidClient(orcidClientMock);
 
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod",
-                                         asList("org.dspace.authenticate.OrcidAuthentication",
-                                                "org.dspace.authenticate.PasswordAuthentication"));
+            asList("org.dspace.authenticate.OrcidAuthentication",
+                "org.dspace.authenticate.PasswordAuthentication"));
     }
 
     @After
@@ -133,7 +131,8 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
             .param("code", CODE))
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("http://localhost:4000/error?status=401&code=orcid.generic-error"));
     }
 
     @Test
@@ -143,11 +142,11 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(buildPerson("Test", "User", "test@email.it"));
 
         MvcResult mvcResult = getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
-                                                      .param("code", CODE))
-                                         .andExpect(status().is3xxRedirection())
-                                         .andExpect(redirectedUrl(configurationService.getProperty("dspace.ui.url")))
-                                         .andExpect(cookie().exists("Authorization-cookie"))
-                                         .andReturn();
+            .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl(configurationService.getProperty("dspace.ui.url")))
+            .andExpect(cookie().exists("Authorization-cookie"))
+            .andReturn();
 
         verify(orcidClientMock).getAccessToken(CODE);
         verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
@@ -176,7 +175,8 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
             .param("code", CODE))
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("http://localhost:4000/error?status=401&code=orcid.generic-error"));
 
         verify(orcidClientMock).getAccessToken(CODE);
         verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
@@ -191,15 +191,12 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         when(orcidClientMock.getAccessToken(CODE)).thenReturn(buildOrcidTokenResponse(ORCID, ACCESS_TOKEN));
         when(orcidClientMock.getPerson(ACCESS_TOKEN, ORCID)).thenReturn(buildPerson("Test", "User"));
 
-        MvcResult mvcResult = getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
-                                                      .param("code", CODE))
-                                         .andExpect(status().isUnauthorized())
-                                         .andExpect(cookie().doesNotExist("Authorization-cookie"))
-                                         .andExpect(header().exists("WWW-Authenticate"))
-                                         .andReturn();
-
-        String authenticateHeader = mvcResult.getResponse().getHeader("WWW-Authenticate");
-        assertThat(authenticateHeader, containsString("orcid realm=\"DSpace REST API\""));
+        getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
+            .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("http://localhost:4000/error?status=401&code=orcid.generic-error"))
+            .andExpect(cookie().doesNotExist("Authorization-cookie"))
+            .andReturn();
 
         verify(orcidClientMock).getAccessToken(CODE);
         verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
@@ -211,9 +208,9 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
     public void testWithoutAuthorizationCode() throws Exception {
 
         getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid"))
-                   .andExpect(status().isUnauthorized())
-                   .andExpect(cookie().doesNotExist("Authorization-cookie"))
-                   .andExpect(header().exists("WWW-Authenticate"));
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("http://localhost:4000/error?status=401&code=orcid.generic-error"))
+            .andExpect(cookie().doesNotExist("Authorization-cookie"));
 
         verifyNoInteractions(orcidClientMock);
 
@@ -227,20 +224,20 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)
-                                        .withEmail("test@email.it")
-                                        .withNetId(ORCID)
-                                        .withNameInMetadata("Test", "User")
-                                        .withCanLogin(true)
-                                        .build();
+            .withEmail("test@email.it")
+            .withNetId(ORCID)
+            .withNameInMetadata("Test", "User")
+            .withCanLogin(true)
+            .build();
 
         context.restoreAuthSystemState();
 
         MvcResult mvcResult = getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
-                                                      .param("code", CODE))
-                                         .andExpect(status().is3xxRedirection())
-                                         .andExpect(redirectedUrl(configurationService.getProperty("dspace.ui.url")))
-                                         .andExpect(cookie().exists("Authorization-cookie"))
-                                         .andReturn();
+            .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl(configurationService.getProperty("dspace.ui.url")))
+            .andExpect(cookie().exists("Authorization-cookie"))
+            .andReturn();
 
         verify(orcidClientMock).getAccessToken(CODE);
         verifyNoMoreInteractions(orcidClientMock);
@@ -259,19 +256,19 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         EPersonBuilder.createEPerson(context)
-                      .withEmail("test@email.it")
-                      .withNetId(ORCID)
-                      .withNameInMetadata("Test", "User")
-                      .withCanLogin(false)
-                      .build();
+            .withEmail("test@email.it")
+            .withNetId(ORCID)
+            .withNameInMetadata("Test", "User")
+            .withCanLogin(false)
+            .build();
 
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
-                                .param("code", CODE))
-                   .andExpect(status().isUnauthorized())
-                   .andExpect(cookie().doesNotExist("Authorization-cookie"))
-                   .andExpect(header().exists("WWW-Authenticate"));
+            .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("http://localhost:4000/error?status=401&code=orcid.generic-error"))
+            .andExpect(cookie().doesNotExist("Authorization-cookie"));
 
         verify(orcidClientMock).getAccessToken(CODE);
         verifyNoMoreInteractions(orcidClientMock);
@@ -287,19 +284,19 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)
-                                        .withEmail("test@email.it")
-                                        .withNameInMetadata("Test", "User")
-                                        .withCanLogin(true)
-                                        .build();
+            .withEmail("test@email.it")
+            .withNameInMetadata("Test", "User")
+            .withCanLogin(true)
+            .build();
 
         context.restoreAuthSystemState();
 
         MvcResult mvcResult = getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
-                                                      .param("code", CODE))
-                                         .andExpect(status().is3xxRedirection())
-                                         .andExpect(redirectedUrl(configurationService.getProperty("dspace.ui.url")))
-                                         .andExpect(cookie().exists("Authorization-cookie"))
-                                         .andReturn();
+            .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl(configurationService.getProperty("dspace.ui.url")))
+            .andExpect(cookie().exists("Authorization-cookie"))
+            .andReturn();
 
         verify(orcidClientMock).getAccessToken(CODE);
         verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
@@ -320,18 +317,18 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         EPersonBuilder.createEPerson(context)
-                      .withEmail("test@email.it")
-                      .withNameInMetadata("Test", "User")
-                      .withCanLogin(false)
-                      .build();
+            .withEmail("test@email.it")
+            .withNameInMetadata("Test", "User")
+            .withCanLogin(false)
+            .build();
 
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
-                                .param("code", CODE))
-                   .andExpect(status().isUnauthorized())
-                   .andExpect(cookie().doesNotExist("Authorization-cookie"))
-                   .andExpect(header().exists("WWW-Authenticate"));
+            .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("http://localhost:4000/error?status=401&code=orcid.generic-error"))
+            .andExpect(cookie().doesNotExist("Authorization-cookie"));
 
         verify(orcidClientMock).getAccessToken(CODE);
         verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
@@ -347,18 +344,18 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         EPersonBuilder.createEPerson(context)
-                      .withEmail("test@email.it")
-                      .withNameInMetadata("Test", "User")
-                      .withCanLogin(false)
-                      .build();
+            .withEmail("test@email.it")
+            .withNameInMetadata("Test", "User")
+            .withCanLogin(false)
+            .build();
 
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
-                                .param("code", CODE))
-                   .andExpect(status().isUnauthorized())
-                   .andExpect(cookie().doesNotExist("Authorization-cookie"))
-                   .andExpect(header().exists("WWW-Authenticate"));
+            .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("http://localhost:4000/error?status=401&code=orcid.generic-error"))
+            .andExpect(cookie().doesNotExist("Authorization-cookie"));
 
         verify(orcidClientMock).getAccessToken(CODE);
         verifyNoMoreInteractions(orcidClientMock);
@@ -374,18 +371,18 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         EPersonBuilder.createEPerson(context)
-                      .withEmail("test@email.it")
-                      .withNameInMetadata("Test", "User")
-                      .withCanLogin(false)
-                      .build();
+            .withEmail("test@email.it")
+            .withNameInMetadata("Test", "User")
+            .withCanLogin(false)
+            .build();
 
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
-                                .param("code", CODE))
-                   .andExpect(status().isUnauthorized())
-                   .andExpect(cookie().doesNotExist("Authorization-cookie"))
-                   .andExpect(header().exists("WWW-Authenticate"));
+            .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("http://localhost:4000/error?status=401&code=orcid.generic-error"))
+            .andExpect(cookie().doesNotExist("Authorization-cookie"));
 
         verify(orcidClientMock).getAccessToken(CODE);
         verify(orcidClientMock).getPerson(ACCESS_TOKEN, ORCID);
@@ -401,39 +398,39 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         Community community = CommunityBuilder.createCommunity(context)
-                                              .withName("Community")
-                                              .build();
+            .withName("Community")
+            .build();
 
         CollectionBuilder.createCollection(context, community)
-                         .withName("Persons")
-                         .withEntityType("Person")
-                         .build();
+            .withName("Persons")
+            .withEntityType("Person")
+            .build();
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)
-                                        .withEmail("test@email.it")
-                                        .withPassword(password)
-                                        .withNetId(ORCID)
-                                        .withNameInMetadata("Test", "User")
-                                        .withCanLogin(true)
-                                        .build();
+            .withEmail("test@email.it")
+            .withPassword(password)
+            .withNetId(ORCID)
+            .withNameInMetadata("Test", "User")
+            .withCanLogin(true)
+            .build();
 
         context.restoreAuthSystemState();
 
         String ePersonToken = getAuthToken("test@email.it", password);
 
         getClient(ePersonToken).perform(post("/api/eperson/profiles/")
-                                            .contentType(MediaType.APPLICATION_JSON_VALUE))
-                               .andExpect(status().isCreated())
-                               .andExpect(jsonPath("$.id", is(ePerson.getID().toString())))
-                               .andExpect(jsonPath("$.visible", is(false)))
-                               .andExpect(jsonPath("$.type", is("profile")));
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id", is(ePerson.getID().toString())))
+            .andExpect(jsonPath("$.visible", is(false)))
+            .andExpect(jsonPath("$.type", is("profile")));
 
         MvcResult mvcResult = getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
-                                                      .param("code", CODE))
-                                         .andExpect(status().is3xxRedirection())
-                                         .andExpect(redirectedUrl(configurationService.getProperty("dspace.ui.url")))
-                                         .andExpect(cookie().exists("Authorization-cookie"))
-                                         .andReturn();
+            .param("code", CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl(configurationService.getProperty("dspace.ui.url")))
+            .andExpect(cookie().exists("Authorization-cookie"))
+            .andReturn();
 
         verify(orcidClientMock).getAccessToken(CODE);
         verifyNoMoreInteractions(orcidClientMock);
@@ -557,8 +554,8 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
 
     private String getItemIdByProfileId(String token, String id) throws SQLException, Exception {
         MvcResult result = getClient(token).perform(get("/api/eperson/profiles/{id}/item", id))
-                                           .andExpect(status().isOk())
-                                           .andReturn();
+            .andExpect(status().isOk())
+            .andReturn();
 
         return JsonPath.read(result.getResponse().getContentAsString(), "$.id");
     }
