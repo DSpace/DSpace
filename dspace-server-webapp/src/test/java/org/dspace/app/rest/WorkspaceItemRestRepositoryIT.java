@@ -38,10 +38,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
@@ -7239,8 +7237,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             addAccessCondition.add(new AddOperation("/sections/defaultAC/accessConditions",
                     accessConditions));
 
-            Set ss = new HashSet<String>();
-            ss.add(String.valueOf(SIZE_IN_BYTES));
             String patchBody = getPatchContent(addAccessCondition);
             // add access conditions
             getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + wItem.getID())
