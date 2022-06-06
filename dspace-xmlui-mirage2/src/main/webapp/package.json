@@ -3,23 +3,29 @@
   "version": "0.1.2",
   "dependencies": {},
   "devDependencies": {
-    "bower": "1.8.8",
-    "grunt": "~1.0.1",
-    "grunt-cli": "1.2.0",
-    "grunt-contrib-coffee": "~1.0.0",
-    "grunt-contrib-compass": "^1.1.1",
-    "grunt-contrib-concat": "~1.0.1",
+    "bootstrap-sass": "3.3.0",
+    "compass-mixins": "^0.12.11",
+    "datatables": "1.10.5",
+    "handlebars": "4.0.11",
+    "holderjs": "2.6.0",
+    "html5shiv": "3.7.3",
+    "grunt": "^1.5.2",
+    "grunt-cli": "^1.4.3",
+    "grunt-contrib-coffee": "^2.1.0",
+    "grunt-contrib-concat": "^2.1.0",
     "grunt-contrib-copy": "~1.0.0",
     "grunt-contrib-handlebars": "1.0.0",
-    "grunt-contrib-uglify": "~2.0.0",
+    "grunt-contrib-uglify": "^5.2.0",
+    "grunt-sass": "^3.1.0",
+    "node-sass": "^7.0.1",
     "grunt-usemin": "~3.1.1",
-    "load-grunt-tasks": "~3.5.2",
-    "time-grunt": "~1.4.0"
-  },
-  "scripts": {
-    "postinstall": "bower install"
+    "jquery": "~3.4.1",
+    "jquery-ui-dist": "^1.12.1",
+    "respond.min.js": "1.4.2",
+    "load-grunt-tasks": "^5.1.0",
+    "time-grunt": "^2.0.0"
   },
   "engines": {
-    "node": ">=6.0.0 <7.0.0"
+    "node": ">=6.0.0 <13.0.0-0"
   }
 }
