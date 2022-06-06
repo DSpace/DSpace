@@ -229,11 +229,9 @@ public class GenerateSitemaps
                 {
                     sitemapsOrg.addURL(url, lastMod);
                 }
-
-                c.uncacheEntity(i);
-
                 itemCount++;
             }
+			c.uncacheEntity(i);
         }
 
         if (makeHTMLMap)
