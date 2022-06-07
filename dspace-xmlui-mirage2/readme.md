@@ -43,16 +43,16 @@ First download and install nvm:
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 ```
 
-Then, close and reopen your terminal, and install a node version. We used v6.5.0 during the development of the theme, but it builds successfully with current [long-term support version](https://github.com/nodejs/Release#release-schedule) 12.x as well.
+Then, close and reopen your terminal, and install a node version. We used v6.5.0 during the development of the theme, but it builds successfully with current [long-term support version](https://github.com/nodejs/Release#release-schedule) 14.x as well.
 
 ```bash
-nvm install 12
+nvm install 14
 ```
 
 Set the node version you installed as the default version.
 
 ```bash
-nvm alias default 12
+nvm alias default 14
 ```
 
 ### Grunt ###
