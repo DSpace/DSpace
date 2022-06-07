@@ -530,6 +530,22 @@
                 </relation-field>
             </row>
             <row>
+                <relation-field>
+                    <relationship-type>isProjectOfOrgUnit</relationship-type>
+                    <search-configuration>orgunit</search-configuration>
+                    <repeatable>false</repeatable>
+                    <label>Organization</label>
+                    <hint>Enter the organization's name</hint>
+                    <linked-metadata-field>
+                        <dc-schema>project</dc-schema>
+                        <dc-element>funder</dc-element>
+                        <dc-qualifier>name</dc-qualifier>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                    <externalsources/>
+                </relation-field>
+            </row>
+            <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>subject</dc-element>
