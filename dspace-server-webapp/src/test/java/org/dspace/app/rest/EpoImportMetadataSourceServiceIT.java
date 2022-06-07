@@ -147,7 +147,9 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         //define first record
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
         MetadatumDTO identifierOther = createMetadatumDTO("dc", "identifier", "other", "epodoc:ES2902749T");
+        MetadatumDTO identifier = createMetadatumDTO("dc", "identifier", null, "18705153");
         MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2022-01-29");
+        MetadatumDTO dateSubmitted = createMetadatumDTO("dc", "date", "submitted", "2018-01-19");
         MetadatumDTO applicant = createMetadatumDTO("dc", "contributor", null, "PANKA BLOOD TEST GMBH");
         MetadatumDTO applicant2 = createMetadatumDTO("dc", "contributor", null, "Panka Blood Test GmbH");
         MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "PANTEL KLAUS");
@@ -155,11 +157,13 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO author3 = createMetadatumDTO("dc", "contributor", "author", "PANTEL, Klaus, ");
         MetadatumDTO author4 = createMetadatumDTO("dc", "contributor", "author", "BARTKOWIAK, Kai");
         MetadatumDTO title = createMetadatumDTO("dc", "title", null, "Método para el diagnóstico del cáncer de mama");
-        MetadatumDTO ipc = createMetadatumDTO("dc", "subject", null,
+        MetadatumDTO subject = createMetadatumDTO("dc", "subject", null,
                                               "G01N  33/   574            A I                    ");
 
         metadatums.add(identifierOther);
+        metadatums.add(identifier);
         metadatums.add(date);
+        metadatums.add(dateSubmitted);
         metadatums.add(applicant);
         metadatums.add(applicant2);
         metadatums.add(author);
@@ -167,14 +171,16 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         metadatums.add(author3);
         metadatums.add(author4);
         metadatums.add(title);
-        metadatums.add(ipc);
+        metadatums.add(subject);
 
         ImportRecord firstrRecord = new ImportRecord(metadatums);
 
         //define second record
         List<MetadatumDTO> metadatums2  = new ArrayList<MetadatumDTO>();
         MetadatumDTO identifierOther2 = createMetadatumDTO("dc", "identifier", "other", "epodoc:TW202202864");
+        MetadatumDTO identifier2 = createMetadatumDTO("dc", "identifier", null, "109122801");
         MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2022-01-16");
+        MetadatumDTO dateSubmitted2 = createMetadatumDTO("dc", "date", "submitted", "2020-01-06");
         MetadatumDTO applicant3 = createMetadatumDTO("dc", "contributor", null, "ADVANTEST CORP [JP]");
         MetadatumDTO applicant4 = createMetadatumDTO("dc", "contributor", null, "ADVANTEST CORPORATION");
         MetadatumDTO author5 = createMetadatumDTO("dc", "contributor", "author", "POEPPE OLAF [DE]");
@@ -186,12 +192,14 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO title2 = createMetadatumDTO("dc", "title", null,
                 "Automated test equipment for testing one or more devices under test, method for automated"
               + " testing of one or more devices under test, and computer program using a buffer memory");
-        MetadatumDTO ipc2 = createMetadatumDTO("dc", "subject", null,
+        MetadatumDTO subject2 = createMetadatumDTO("dc", "subject", null,
                 "G01R  31/   319            A I                    ");
-        MetadatumDTO ipc3 = createMetadatumDTO("dc", "subject", null,
+        MetadatumDTO subject3 = createMetadatumDTO("dc", "subject", null,
                 "G01R  31/  3193            A I                    ");
         metadatums2.add(identifierOther2);
+        metadatums2.add(identifier2);
         metadatums2.add(date2);
+        metadatums2.add(dateSubmitted2);
         metadatums2.add(applicant3);
         metadatums2.add(applicant4);
         metadatums2.add(author5);
@@ -201,8 +209,8 @@ public class EpoImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         metadatums2.add(author9);
         metadatums2.add(author10);
         metadatums2.add(title2);
-        metadatums2.add(ipc2);
-        metadatums2.add(ipc3);
+        metadatums2.add(subject2);
+        metadatums2.add(subject3);
 
         ImportRecord secondRecord = new ImportRecord(metadatums2);
         records.add(firstrRecord);

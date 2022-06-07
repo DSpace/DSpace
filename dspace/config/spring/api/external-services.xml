@@ -112,7 +112,7 @@
         <property name="recordIdMetadata" value="dc.identifier.other"/>
         <property name="supportedEntityTypes">
             <list>
-                <value>Patent</value>
+                <value>Publication</value>
                 <value>none</value>
             </list>
         </property>

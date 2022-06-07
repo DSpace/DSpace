@@ -129,7 +129,7 @@
         <property name="searchUrl" value="${epo.searchUrl}" />
         <!-- date filed mapped metadata, see epo-integration.xml -->
         <property name="dateFiled" ref="epo.dc.date.filed" />
-        <property name="applicationNumber" ref="epo.dc.identifier.applicationnumber" />
+        <property name="applicationNumber" ref="epo.dc.identifier" />
     </bean>
     <bean id="epoMetadataFieldMapping" class="org.dspace.importer.external.epo.service.EpoFieldMapping"/>
 
