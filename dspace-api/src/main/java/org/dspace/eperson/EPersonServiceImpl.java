@@ -587,4 +587,9 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         }
         return find(context, UUIDUtils.fromString(owners.get(0).getAuthority()));
     }
+
+    @Override
+    public String getName(EPerson dso) {
+        return dso.getName();
+    }
 }
