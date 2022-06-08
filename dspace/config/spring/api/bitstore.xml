@@ -18,6 +18,9 @@
     </bean>
 
     <bean name="s3Store" class="org.dspace.storage.bitstore.S3BitStoreService" scope="singleton">
+        <!-- If you use other S3 provider that Amazon you can configure the endpoint below -->
+        <!-- Note: The awsRegionName was ignore if awsEndPoint has a value -->
+        <property name="awsEndPoint" value="gateway.us1.storjshare.io"/>
         <!-- AWS Security credentials, with policies for specified bucket -->
         <property name="awsAccessKey" value=""/>
         <property name="awsSecretKey" value=""/>
@@ -32,6 +35,13 @@
         <!-- Subfolder to organize assets within the bucket, in case this bucket is shared  -->
         <!-- Optional, default is root level of bucket -->
         <property name="subfolder" value=""/>
+        <!-- Enable if you must use multipart upload default false-->
+        <property name="enableMultipart" value="false"/>
+        <!-- Optional, enable if you must use multipart upload -->
+        <property name="ingestLimit" value="50"/>
+        <property name="minPartSize" value="10"/>
+
+
     </bean>
 
     <!-- <bean name="localStore2 ... -->
