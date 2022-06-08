@@ -221,7 +221,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
             if (StringUtils.isBlank(response)) {
                 throw new RuntimeException("After " + attempt
-                        + " attempts to contact the PabMed service, a correct answer could not be received."
+                        + " attempts to contact the PubMed service, a correct answer could not be received."
                         + " The request was made with this URL:" + uriBuilder.toString());
             }
 
@@ -297,7 +297,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
             if (StringUtils.isBlank(response)) {
                 throw new RuntimeException("After " + attempt
-                        + " attempts to contact the PabMed service, a correct answer could not be received."
+                        + " attempts to contact the PubMed service, a correct answer could not be received."
                         + " The request was made with this URL:" + uriBuilder.toString());
             }
 
@@ -321,7 +321,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
             if (StringUtils.isBlank(response2)) {
                 throw new RuntimeException("After " + attempt
-                        + " attempts to contact the PabMed service, a correct answer could not be received."
+                        + " attempts to contact the PubMed service, a correct answer could not be received."
                         + " The request was made with this URL:" + uriBuilder2.toString());
             }
 
@@ -382,7 +382,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
             if (StringUtils.isBlank(response)) {
                 throw new RuntimeException("After " + attempt
-                        + " attempts to contact the PabMed service, a correct answer could not be received."
+                        + " attempts to contact the PubMed service, a correct answer could not be received."
                         + " The request was made with this URL:" + uriBuilder.toString());
             }
 
@@ -423,7 +423,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
             if (StringUtils.isBlank(response)) {
                 throw new RuntimeException("After " + attempt
-                        + " attempts to contact the PabMed service, a correct answer could not be received."
+                        + " attempts to contact the PubMed service, a correct answer could not be received."
                         + " The request was made with this URL:" + uriBuilder.toString());
             }
 
@@ -446,7 +446,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
             if (StringUtils.isBlank(response2)) {
                 throw new RuntimeException("After " + attempt
-                        + " attempts to contact the PabMed service, a correct answer could not be received."
+                        + " attempts to contact the PubMed service, a correct answer could not be received."
                         + " The request was made with this URL:" + uriBuilder2.toString());
             }
 
