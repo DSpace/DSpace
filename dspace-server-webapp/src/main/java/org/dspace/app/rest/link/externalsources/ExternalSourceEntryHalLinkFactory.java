@@ -8,6 +8,7 @@
 package org.dspace.app.rest.link.externalsources;
 
 import static org.springframework.hateoas.IanaLinkRelations.SELF;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.util.LinkedList;
 
@@ -31,6 +32,15 @@ public class ExternalSourceEntryHalLinkFactory
         String externalSource = halResource.getContent().getExternalSource();
         String id = halResource.getContent().getId();
         list.add(buildLink(getMethodOn().getExternalSourceEntryValue(externalSource, id), SELF.value()));
+    }
+
+    /**
+     * FIXME
+     * This custom logic should be removed when Some HAL links
+     * show a double encoding https://github.com/DSpace/DSpace/issues/8333 is fixed.
+     */
+    private <T> Link buildLink(T data, String rel) {
+        return linkTo(data).withRel(rel);
     }
 
     @Override

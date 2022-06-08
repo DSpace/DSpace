@@ -43,14 +43,13 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
         return list;
     }
 
+    /**
+     * Please note that this method could lead to double encoding.
+     * See: https://github.com/DSpace/DSpace/issues/8333
+     */
     protected <T> Link buildLink(String rel, T data) {
         UriComponentsBuilder uriComponentsBuilder = uriBuilder(data);
-
         return buildLink(rel, uriComponentsBuilder.build().toUriString());
-    }
-
-    protected <T> Link buildLink(T data, String rel) {
-        return linkTo(data).withRel(rel);
     }
 
     protected <T> UriComponentsBuilder uriBuilder(T data) {
