@@ -29,10 +29,10 @@ jobs:
       # GitHub CI already has Node.js installed, but this gives us the correct
       # version. GitHub CI also already has grunt installed so we don't need to
       # install any other pre-requisites for Mirage 2.
-      - name: Install Node.js v12 (for Mirage 2)
+      - name: Install Node.js v14 (for Mirage 2)
         uses: actions/setup-node@v3
         with:
-          node-version: 12
+          node-version: 14
 
       # https://github.com/actions/cache
       - name: Cache Maven dependencies
