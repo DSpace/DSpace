@@ -63,9 +63,9 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
     private ConfigurationService configurationService;
 
     // All OAI-PMH paths that we test against
-    private final String ROOT_PATH = "/oai";
+    private final String ROOT_PATH = "/oai/";
     private final String DEFAULT_CONTEXT_PATH = "request";
-    private final String DEFAULT_CONTEXT = ROOT_PATH + "/" + DEFAULT_CONTEXT_PATH;
+    private final String DEFAULT_CONTEXT = ROOT_PATH + DEFAULT_CONTEXT_PATH;
 
     // Mock to ensure XOAI caching is disabled for all tests (see @Before method)
     @MockBean
