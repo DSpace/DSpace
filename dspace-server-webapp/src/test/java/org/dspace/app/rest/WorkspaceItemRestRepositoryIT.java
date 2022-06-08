@@ -611,7 +611,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         Item item = witem.getItem();
 
-        //Add
+        //Add a bitstream to the item
         String bitstreamContent = "ThisIsSomeDummyText";
         Bitstream bitstream = null;
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, StandardCharsets.UTF_8)) {

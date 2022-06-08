@@ -84,6 +84,7 @@ public class BitstreamResourcePolicyUtils {
             if (aco.getName().equalsIgnoreCase(name)) {
                 aco.createResourcePolicy(context, obj, name, description, startDate, endDate);
                 found = true;
+                break;
             }
         }
         // unexisting/unconfigured access conditions are no longer accepted
