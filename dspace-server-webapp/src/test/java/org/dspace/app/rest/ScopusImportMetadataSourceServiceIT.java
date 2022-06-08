@@ -125,30 +125,25 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         ArrayList<ImportRecord> records = new ArrayList<>();
         //define first record
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
-        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", "doi", "10.3934/mine.2023004");
+        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", null, "10.3934/mine.2023004");
         MetadatumDTO title = createMetadatumDTO("dc","title", null,
                 "Hardy potential versus lower order terms in Dirichlet problems: regularizing effects<sup>†</sup>");
         MetadatumDTO type = createMetadatumDTO("dc", "type", null, "Journal");
         MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2023-01-01");
+        MetadatumDTO scopusId = createMetadatumDTO("dc", "identifier", "other", "2-s2.0-85124241875");
         MetadatumDTO citationVolume = createMetadatumDTO("oaire", "citation", "volume", "5");
         MetadatumDTO citationIssue = createMetadatumDTO("oaire", "citation", "issue", "1");
-        MetadatumDTO scopusId = createMetadatumDTO("dc", "identifier", "scopus", "2-s2.0-85124241875");
-        MetadatumDTO funding = createMetadatumDTO("dc", "relation", "funding", "Junta de Andalucía");
-        MetadatumDTO grantno = createMetadatumDTO("dc", "relation", "grantno", "PGC2018-096422-B-I00");
         MetadatumDTO subject = createMetadatumDTO("dc", "subject", null,
                                                   "Hardy potentials | Laplace equation | Summability of solutions");
         MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "Arcoya D.");
         MetadatumDTO scopusAuthorId = createMetadatumDTO("person", "identifier", "scopus-author-id", "6602330574");
-        MetadatumDTO orcid = createMetadatumDTO("person", "identifier", "orcid", "#PLACEHOLDER_PARENT_METADATA_VALUE#");
-        MetadatumDTO orgunit = createMetadatumDTO("oairecerif", "affiliation", "orgunit", "Universidad de Granada");
+        MetadatumDTO orgunit = createMetadatumDTO("person", "affiliation", "name", "Universidad de Granada");
         MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "Boccardo L.");
         MetadatumDTO scopusAuthorId2 = createMetadatumDTO("person", "identifier", "scopus-author-id", "7003612261");
-        MetadatumDTO orcid2 = createMetadatumDTO("person", "identifier", "orcid","#PLACEHOLDER_PARENT_METADATA_VALUE#");
-        MetadatumDTO orgunit2 = createMetadatumDTO("oairecerif", "affiliation","orgunit","Sapienza Università di Roma");
+        MetadatumDTO orgunit2 = createMetadatumDTO("person", "affiliation", "name","Sapienza Università di Roma");
         MetadatumDTO author3 = createMetadatumDTO("dc", "contributor", "author", "Orsina L.");
         MetadatumDTO scopusAuthorId3 = createMetadatumDTO("person", "identifier", "scopus-author-id", "6602595438");
-        MetadatumDTO orcid3 = createMetadatumDTO("person", "identifier", "orcid","#PLACEHOLDER_PARENT_METADATA_VALUE#");
-        MetadatumDTO orgunit3 = createMetadatumDTO("oairecerif", "affiliation","orgunit","Sapienza Università di Roma");
+        MetadatumDTO orgunit3 = createMetadatumDTO("person", "affiliation", "name","Sapienza Università di Roma");
         MetadatumDTO rights = createMetadatumDTO("dc", "rights", null, "open access");
         MetadatumDTO ispartof = createMetadatumDTO("dc", "relation", "ispartof", "Mathematics In Engineering");
         MetadatumDTO ispartofseries = createMetadatumDTO("dc","relation","ispartofseries","Mathematics In Engineering");
@@ -157,23 +152,18 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         metadatums.add(title);
         metadatums.add(type);
         metadatums.add(date);
+        metadatums.add(scopusId);
         metadatums.add(citationVolume);
         metadatums.add(citationIssue);
-        metadatums.add(scopusId);
-        metadatums.add(funding);
-        metadatums.add(grantno);
         metadatums.add(subject);
         metadatums.add(author);
         metadatums.add(scopusAuthorId);
         metadatums.add(orgunit);
-        metadatums.add(orcid);
         metadatums.add(author2);
         metadatums.add(scopusAuthorId2);
-        metadatums.add(orcid2);
         metadatums.add(orgunit2);
         metadatums.add(author3);
         metadatums.add(scopusAuthorId3);
-        metadatums.add(orcid3);
         metadatums.add(orgunit3);
         metadatums.add(rights);
         metadatums.add(ispartof);
@@ -182,62 +172,53 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
 
         //define second record
         List<MetadatumDTO> metadatums2  = new ArrayList<MetadatumDTO>();
-        MetadatumDTO doi2 = createMetadatumDTO("dc", "identifier", "doi", "10.3934/mine.2023001");
+        MetadatumDTO doi2 = createMetadatumDTO("dc", "identifier", null, "10.3934/mine.2023001");
         MetadatumDTO title2 = createMetadatumDTO("dc","title", null,
                 "Large deviations for a binary collision model: energy evaporation<sup>†</sup>");
         MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2023-01-01");
+        MetadatumDTO scopusId2 = createMetadatumDTO("dc", "identifier", "other", "2-s2.0-85124226483");
         MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "Journal");
         MetadatumDTO citationVolume2 = createMetadatumDTO("oaire", "citation", "volume", "5");
         MetadatumDTO citationIssue2 = createMetadatumDTO("oaire", "citation", "issue", "1");
-        MetadatumDTO scopusId2 = createMetadatumDTO("dc", "identifier", "scopus", "2-s2.0-85124226483");
-        MetadatumDTO grantno2 = createMetadatumDTO("dc", "relation", "grantno", "undefined");
+
         MetadatumDTO subject2 = createMetadatumDTO("dc", "subject", null,
         "Boltzmann equation | Discrete energy model | Kac model | Large deviations | Violation of energy conservation");
 
         MetadatumDTO author4 = createMetadatumDTO("dc", "contributor", "author", "Basile G.");
         MetadatumDTO scopusAuthorId4 = createMetadatumDTO("person", "identifier", "scopus-author-id", "55613229065");
-        MetadatumDTO orcid4 = createMetadatumDTO("person", "identifier", "orcid","#PLACEHOLDER_PARENT_METADATA_VALUE#");
-        MetadatumDTO orgunit4 = createMetadatumDTO("oairecerif", "affiliation","orgunit","Sapienza Università di Roma");
+        MetadatumDTO orgunit4 = createMetadatumDTO("person", "affiliation", "name","Sapienza Università di Roma");
         MetadatumDTO author5 = createMetadatumDTO("dc", "contributor", "author", "Benedetto D.");
         MetadatumDTO scopusAuthorId5 = createMetadatumDTO("person", "identifier", "scopus-author-id", "55893665100");
-        MetadatumDTO orcid5 = createMetadatumDTO("person", "identifier", "orcid","#PLACEHOLDER_PARENT_METADATA_VALUE#");
-        MetadatumDTO orgunit5 = createMetadatumDTO("oairecerif", "affiliation","orgunit","Sapienza Università di Roma");
+        MetadatumDTO orgunit5 = createMetadatumDTO("person", "affiliation", "name","Sapienza Università di Roma");
         MetadatumDTO author6 = createMetadatumDTO("dc", "contributor", "author", "Caglioti E.");
         MetadatumDTO scopusAuthorId6 = createMetadatumDTO("person", "identifier", "scopus-author-id", "7004588675");
-        MetadatumDTO orcid6 = createMetadatumDTO("person", "identifier", "orcid","#PLACEHOLDER_PARENT_METADATA_VALUE#");
-        MetadatumDTO orgunit6 = createMetadatumDTO("oairecerif", "affiliation","orgunit","Sapienza Università di Roma");
+        MetadatumDTO orgunit6 = createMetadatumDTO("person", "affiliation", "name","Sapienza Università di Roma");
         MetadatumDTO author7 = createMetadatumDTO("dc", "contributor", "author", "Bertini L.");
         MetadatumDTO scopusAuthorId7 = createMetadatumDTO("person", "identifier", "scopus-author-id", "7005555198");
-        MetadatumDTO orcid7 = createMetadatumDTO("person", "identifier", "orcid","#PLACEHOLDER_PARENT_METADATA_VALUE#");
-        MetadatumDTO orgunit7 = createMetadatumDTO("oairecerif", "affiliation","orgunit","Sapienza Università di Roma");
+        MetadatumDTO orgunit7 = createMetadatumDTO("person", "affiliation", "name","Sapienza Università di Roma");
         MetadatumDTO rights2 = createMetadatumDTO("dc", "rights", null, "open access");
         MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof", "Mathematics In Engineering");
         MetadatumDTO ispartofseries2 = createMetadatumDTO("dc", "relation", "ispartofseries",
                                                           "Mathematics In Engineering");
-        metadatums2.add(title2);
         metadatums2.add(doi2);
-        metadatums2.add(date2);
+        metadatums2.add(title2);
         metadatums2.add(type2);
+        metadatums2.add(date2);
+        metadatums2.add(scopusId2);
         metadatums2.add(citationVolume2);
         metadatums2.add(citationIssue2);
-        metadatums2.add(scopusId2);
-        metadatums2.add(grantno2);
         metadatums2.add(subject2);
         metadatums2.add(author4);
         metadatums2.add(scopusAuthorId4);
-        metadatums2.add(orcid4);
         metadatums2.add(orgunit4);
         metadatums2.add(author5);
         metadatums2.add(scopusAuthorId5);
-        metadatums2.add(orcid5);
         metadatums2.add(orgunit5);
         metadatums2.add(author6);
         metadatums2.add(scopusAuthorId6);
-        metadatums2.add(orcid6);
         metadatums2.add(orgunit6);
         metadatums2.add(author7);
         metadatums2.add(scopusAuthorId7);
-        metadatums2.add(orcid7);
         metadatums2.add(orgunit7);
         metadatums2.add(rights2);
         metadatums2.add(ispartof2);

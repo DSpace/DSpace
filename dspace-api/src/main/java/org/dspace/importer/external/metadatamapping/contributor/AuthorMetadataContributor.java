@@ -115,6 +115,7 @@ public class AuthorMetadataContributor extends SimpleXpathMetadatumContributor {
         metadata.setElement(metadaConfig.getElement());
         metadata.setQualifier(metadaConfig.getQualifier());
         metadata.setSchema(metadaConfig.getSchema());
+        metadata.setValue(value);
         return metadata;
     }
 
