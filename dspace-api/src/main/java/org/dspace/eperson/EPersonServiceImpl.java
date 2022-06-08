@@ -569,4 +569,9 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     public int countTotal(Context context) throws SQLException {
         return ePersonDAO.countRows(context);
     }
+
+    @Override
+    public String getName(EPerson dso) {
+        return dso.getName();
+    }
 }
