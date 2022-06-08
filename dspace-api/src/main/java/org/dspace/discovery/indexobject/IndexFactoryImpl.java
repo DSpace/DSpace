@@ -113,9 +113,11 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
                         log.info("Full text is larger than the configured limit (discovery.solr.fulltext.charLimit)."
                                      + " Only the first {} characters were indexed.", charLimit);
                     } else {
+                        log.error("Tika parsing error. Could not index full text.", saxe);
                         throw new IOException("Tika parsing error. Could not index full text.", saxe);
                     }
                 } catch (TikaException ex) {
+                    log.error("Tika parsing error. Could not index full text.", ex);
                     throw new IOException("Tika parsing error. Could not index full text.", ex);
                 }
 

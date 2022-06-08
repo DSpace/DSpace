@@ -31,6 +31,11 @@ jobs:
       # We turn off 'latest' tag by default.
       TAGS_FLAVOR: |
         latest=false
+      # Architectures / Platforms for which we will build Docker images
+      # If this is a PR, we ONLY build for AMD64. For PRs we only do a sanity check test to ensure Docker builds work.
+      # If this is NOT a PR (e.g. a tag or merge commit), also build for ARM64. NOTE: The ARM64 build takes MUCH
+      # longer (around 45mins or so) which is why we only run it when pushing a new Docker image.
+      PLATFORMS: linux/amd64${{ github.event_name != 'pull_request' && ', linux/arm64' || '' }}
 
     steps:
       # https://github.com/actions/checkout
@@ -40,6 +45,10 @@ jobs:
       # https://github.com/docker/setup-buildx-action
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v1
+
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU emulation to build for multiple architectures
+        uses: docker/setup-qemu-action@v2
 
       # https://github.com/docker/login-action
       - name: Login to DockerHub
@@ -70,6 +79,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.dependencies
+          platforms: ${{ env.PLATFORMS }}
           # For pull requests, we run the Docker build (to ensure no PR changes break the build),
           # but we ONLY do an image push to DockerHub if it's NOT a PR
           push: ${{ github.event_name != 'pull_request' }}
@@ -95,6 +105,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
+          platforms: ${{ env.PLATFORMS }}
           # For pull requests, we run the Docker build (to ensure no PR changes break the build),
           # but we ONLY do an image push to DockerHub if it's NOT a PR
           push: ${{ github.event_name != 'pull_request' }}
@@ -123,6 +134,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.test
+          platforms: ${{ env.PLATFORMS }}
           # For pull requests, we run the Docker build (to ensure no PR changes break the build),
           # but we ONLY do an image push to DockerHub if it's NOT a PR
           push: ${{ github.event_name != 'pull_request' }}
@@ -148,6 +160,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile.cli
+          platforms: ${{ env.PLATFORMS }}
           # For pull requests, we run the Docker build (to ensure no PR changes break the build),
           # but we ONLY do an image push to DockerHub if it's NOT a PR
           push: ${{ github.event_name != 'pull_request' }}

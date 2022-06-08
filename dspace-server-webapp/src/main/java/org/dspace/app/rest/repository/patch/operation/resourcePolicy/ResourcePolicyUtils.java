@@ -34,6 +34,8 @@ public class ResourcePolicyUtils {
     public static final String OPERATION_PATH_ENDDATE = "/endDate";
     public static final String OPERATION_PATH_DESCRIPTION = "/description";
     public static final String OPERATION_PATH_NAME = "/name";
+    public static final String OPERATION_PATH_POLICY_TYPE = "/policyType";
+    public static final String OPERATION_PATH_ACTION = "/action";
 
     /**
      * Throws PatchBadRequestException for missing value in the /startDate path.
