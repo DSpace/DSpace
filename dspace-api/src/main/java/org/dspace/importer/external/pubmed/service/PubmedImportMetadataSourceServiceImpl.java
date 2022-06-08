@@ -55,6 +55,8 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
     private String urlFetch;
     private String urlSearch;
 
+    private int attempt = 3;
+
     private List<String> supportedExtensions;
 
     @Autowired
@@ -210,8 +212,20 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             uriBuilder.addParameter("db", "pubmed");
             uriBuilder.addParameter("term", query.getParameterAsClass("query", String.class));
             Map<String,String> params = new HashMap<String, String>();
-            String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
-            return StringUtils.isNotBlank(response) ? Integer.parseInt(getSingleElementValue(response, "Count")) : 0;
+            String response = StringUtils.EMPTY;
+            int countAttempt = 0;
+            while (StringUtils.isBlank(response) && countAttempt <= attempt) {
+                countAttempt++;
+                response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            }
+
+            if (StringUtils.isBlank(response)) {
+                throw new RuntimeException("After " + attempt
+                        + " attempts to contact the PabMed service, a correct answer could not be received."
+                        + " The request was made with this URL:" + uriBuilder.toString());
+            }
+
+            return Integer.parseInt(getSingleElementValue(response, "Count"));
         }
     }
 
@@ -274,7 +288,18 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             uriBuilder.addParameter("usehistory", "y");
             uriBuilder.addParameter("term", queryString);
             Map<String,String> params = new HashMap<String, String>();
-            String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            String response = StringUtils.EMPTY;
+            int countAttempt = 0;
+            while (StringUtils.isBlank(response) && countAttempt <= attempt) {
+                countAttempt++;
+                response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            }
+
+            if (StringUtils.isBlank(response)) {
+                throw new RuntimeException("After " + attempt
+                        + " attempts to contact the PabMed service, a correct answer could not be received."
+                        + " The request was made with this URL:" + uriBuilder.toString());
+            }
 
             String queryKey = getSingleElementValue(response, "QueryKey");
             String webEnv = getSingleElementValue(response, "WebEnv");
@@ -287,9 +312,20 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             uriBuilder2.addParameter("query_key", queryKey);
             uriBuilder2.addParameter("retmode", "xml");
             Map<String,String> params2 = new HashMap<String, String>();
-            response = liveImportClient.executeHttpGetRequest(1000, uriBuilder2.toString(), params2);
+            String response2 = StringUtils.EMPTY;
+            countAttempt = 0;
+            while (StringUtils.isBlank(response2) && countAttempt <= attempt) {
+                countAttempt++;
+                response2 = liveImportClient.executeHttpGetRequest(1000, uriBuilder2.toString(), params2);
+            }
 
-            List<Element> elements = splitToRecords(response);
+            if (StringUtils.isBlank(response2)) {
+                throw new RuntimeException("After " + attempt
+                        + " attempts to contact the PabMed service, a correct answer could not be received."
+                        + " The request was made with this URL:" + uriBuilder2.toString());
+            }
+
+            List<Element> elements = splitToRecords(response2);
 
             for (Element record : elements) {
                 records.add(transformSourceRecords(record));
@@ -337,7 +373,18 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             uriBuilder.addParameter("id", query.getParameterAsClass("id", String.class));
 
             Map<String,String> params = new HashMap<String, String>();
-            String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            String response = StringUtils.EMPTY;
+            int countAttempt = 0;
+            while (StringUtils.isBlank(response) && countAttempt <= attempt) {
+                countAttempt++;
+                response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            }
+
+            if (StringUtils.isBlank(response)) {
+                throw new RuntimeException("After " + attempt
+                        + " attempts to contact the PabMed service, a correct answer could not be received."
+                        + " The request was made with this URL:" + uriBuilder.toString());
+            }
 
             List<Element> elements = splitToRecords(response);
 
@@ -367,7 +414,18 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             uriBuilder.addParameter("field", query.getParameterAsClass("field", String.class));
 
             Map<String,String> params = new HashMap<String, String>();
-            String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            String response = StringUtils.EMPTY;
+            int countAttempt = 0;
+            while (StringUtils.isBlank(response) && countAttempt <= attempt) {
+                countAttempt++;
+                response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            }
+
+            if (StringUtils.isBlank(response)) {
+                throw new RuntimeException("After " + attempt
+                        + " attempts to contact the PabMed service, a correct answer could not be received."
+                        + " The request was made with this URL:" + uriBuilder.toString());
+            }
 
             String webEnv = getSingleElementValue(response, "WebEnv");
             String queryKey = getSingleElementValue(response, "QueryKey");
@@ -379,9 +437,20 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             uriBuilder2.addParameter("query_key", queryKey);
 
             Map<String,String> params2 = new HashMap<String, String>();
-            response = liveImportClient.executeHttpGetRequest(1000, uriBuilder2.toString(), params2);
+            String response2 = StringUtils.EMPTY;
+            countAttempt = 0;
+            while (StringUtils.isBlank(response2) && countAttempt <= attempt) {
+                countAttempt++;
+                response2 = liveImportClient.executeHttpGetRequest(1000, uriBuilder2.toString(), params2);
+            }
 
-            return parseXMLString(response);
+            if (StringUtils.isBlank(response2)) {
+                throw new RuntimeException("After " + attempt
+                        + " attempts to contact the PabMed service, a correct answer could not be received."
+                        + " The request was made with this URL:" + uriBuilder2.toString());
+            }
+
+            return parseXMLString(response2);
         }
     }
 

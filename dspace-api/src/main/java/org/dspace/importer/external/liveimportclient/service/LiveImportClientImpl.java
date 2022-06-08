@@ -60,6 +60,7 @@ public class LiveImportClientImpl implements LiveImportClient {
 
             HttpResponse httpResponse = httpClient.execute(method);
             if (isNotSuccessfull(httpResponse)) {
+                log.error("The request failed with: " + getStatusCode(httpResponse) + " code");
                 throw new RuntimeException("The request failed with: " + getStatusCode(httpResponse) + " code");
             }
             InputStream inputStream = httpResponse.getEntity().getContent();
