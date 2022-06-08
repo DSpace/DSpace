@@ -122,8 +122,7 @@
                                         <i18n:translate>
                                             <xsl:choose>
                                                 <xsl:when test="parent::node()/@itemsTotal = -1">
-                                                    <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal
-                                                    </i18n:text>
+                                                    <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal</i18n:text>
                                                 </xsl:when>
                                                 <xsl:otherwise>
                                                     <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
@@ -223,8 +222,7 @@
                                         <i18n:translate>
                                             <xsl:choose>
                                                 <xsl:when test="parent::node()/@itemsTotal = -1">
-                                                    <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal
-                                                    </i18n:text>
+                                                    <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal</i18n:text>
                                                 </xsl:when>
                                                 <xsl:otherwise>
                                                     <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
