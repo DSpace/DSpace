@@ -76,4 +76,16 @@
         <constructor-arg value="${orcid.api.url}"/>
     </bean>
 
+    <bean id="pubmedLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="pubmedImportService"/>
+        <property name="sourceIdentifier" value="pubmed"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
 </beans>
