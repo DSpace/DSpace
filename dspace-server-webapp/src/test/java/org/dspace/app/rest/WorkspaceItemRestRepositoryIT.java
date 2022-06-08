@@ -7747,6 +7747,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isUnprocessableEntity());
     }
 
+    @Test
     public void sherpaPolicySectionCacheTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
