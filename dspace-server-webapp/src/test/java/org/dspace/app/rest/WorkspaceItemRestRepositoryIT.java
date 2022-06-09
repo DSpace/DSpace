@@ -7601,6 +7601,153 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void verifyBitstreamPolicyNotDuplicatedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Col").build();
+
+        // Create item
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                .withTitle("Workspace Item")
+                .withIssueDate("2019-01-01")
+                .grantLicense()
+                .build();
+
+        // Add a bitstream to the item
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, StandardCharsets.UTF_8)) {
+            bitstream = BitstreamBuilder.createBitstream(context, witem.getItem(), is)
+                    .withName("Bitstream")
+                    .withMimeType("text/plain").build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+
+        // Create access condition
+        Map<String, String> accessCondition = new HashMap<>();
+        accessCondition.put("name", "openaccess");
+
+        // Add access condition
+        List<Operation> addAccessCondition = new ArrayList<>();
+        addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions/-", accessCondition));
+
+        String patchBody = getPatchContent(addAccessCondition);
+        getClient(adminToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+        // Deposit the item
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + witem.getID())
+                .contentType(textUriContentType))
+                .andExpect(status().isCreated());
+
+        // Bistream access policies are as expected and there are no duplicates
+        getClient(adminToken)
+                .perform(get("/api/authz/resourcepolicies/search/resource")
+                .param("uuid", bitstream.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.resourcepolicies",
+                        Matchers.hasItems(ResourcePolicyMatcher.matchResourcePolicyProperties(anonymousGroup, null,
+                                bitstream, ResourcePolicy.TYPE_CUSTOM, Constants.READ, "openaccess"))))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void verifyUnexistingBitstreamPolicyIsDeniedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Col").build();
+
+        // Create item
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                .withTitle("Workspace Item")
+                .withIssueDate("2019-01-01")
+                .grantLicense()
+                .build();
+
+        // Add a bitstream to the item
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, StandardCharsets.UTF_8)) {
+            bitstream = BitstreamBuilder.createBitstream(context, witem.getItem(), is)
+                    .withName("Bitstream")
+                    .withMimeType("text/plain").build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+
+        // Create unexisting access condition
+        Map<String, String> accessCondition = new HashMap<>();
+        accessCondition.put("name", "t3st");
+
+        // Add access condition
+        List<Operation> addAccessCondition = new ArrayList<>();
+        addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions/-", accessCondition));
+
+        // Entity is unprocessable
+        String patchBody = getPatchContent(addAccessCondition);
+        getClient(adminToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void verifyUnconfiguredBitstreamPolicyIsDeniedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("Com").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).withName("Col").build();
+
+        // Create item
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                .withTitle("Workspace Item")
+                .withIssueDate("2019-01-01")
+                .grantLicense()
+                .build();
+
+        // Add a bitstream to the item
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, StandardCharsets.UTF_8)) {
+            bitstream = BitstreamBuilder.createBitstream(context, witem.getItem(), is)
+                    .withName("Bitstream")
+                    .withMimeType("text/plain").build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+
+        // Access condition exists but it is not configured in access-conditions.xml
+        Map<String, String> accessCondition = new HashMap<>();
+        accessCondition.put("name", "networkAdministration");
+
+        // Add access condition
+        List<Operation> addAccessCondition = new ArrayList<>();
+        addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions/-", accessCondition));
+
+        // Entity is unprocessable
+        String patchBody = getPatchContent(addAccessCondition);
+        getClient(adminToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
     public void sherpaPolicySectionCacheTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
