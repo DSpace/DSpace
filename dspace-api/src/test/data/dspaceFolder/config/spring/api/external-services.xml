@@ -15,13 +15,7 @@
     <!-- SHERPA data providers set up to use mock SHERPA service -->
     <bean class="org.dspace.external.provider.impl.SHERPAv2JournalISSNDataProvider" init-method="init">
         <property name="sourceIdentifier" value="sherpaJournalIssn"/>
-        <property name="sherpaService">
-            <bean class="org.dspace.app.sherpa.MockSHERPAService">
-                <property name="maxNumberOfTries" value="3"/>
-                <property name="sleepBetweenTimeouts" value="2000"/>
-                <property name="timeout" value="5000"/>
-            </bean>
-        </property>
+        <property name="sherpaService" ref="org.dspace.app.sherpa.MockSHERPAService" />
         <property name="supportedEntityTypes">
             <list>
                 <value>Journal</value>
@@ -30,13 +24,7 @@
     </bean>
     <bean class="org.dspace.external.provider.impl.SHERPAv2JournalDataProvider" init-method="init">
         <property name="sourceIdentifier" value="sherpaJournal"/>
-        <property name="sherpaService">
-            <bean class="org.dspace.app.sherpa.MockSHERPAService">
-                <property name="maxNumberOfTries" value="3"/>
-                <property name="sleepBetweenTimeouts" value="2000"/>
-                <property name="timeout" value="5000"/>
-            </bean>
-        </property>
+        <property name="sherpaService" ref="org.dspace.app.sherpa.MockSHERPAService" />
         <property name="supportedEntityTypes">
             <list>
                 <value>Journal</value>
@@ -45,13 +33,7 @@
     </bean>
     <bean class="org.dspace.external.provider.impl.SHERPAv2PublisherDataProvider" init-method="init">
         <property name="sourceIdentifier" value="sherpaPublisher"/>
-        <property name="sherpaService">
-            <bean class="org.dspace.app.sherpa.MockSHERPAService">
-                <property name="maxNumberOfTries" value="3"/>
-                <property name="sleepBetweenTimeouts" value="2000"/>
-                <property name="timeout" value="5000"/>
-            </bean>
-        </property>
+        <property name="sherpaService" ref="org.dspace.app.sherpa.MockSHERPAService" />
         <property name="supportedEntityTypes">
             <list>
                 <value>OrgUnit</value>

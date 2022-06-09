@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.repository.handler.UriListHandler;
 import org.dspace.authorize.AuthorizeException;
@@ -18,12 +20,15 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+
 /**
  * This class is a wrapper Service class for the {@link UriListHandler} objects. It will find the right one and try to
  * execute it for the given arguments
  */
 @Component
 public class UriListHandlerService {
+
+    private final static Logger log = LogManager.getLogger();
 
     @Autowired
     private List<UriListHandler> uriListHandlers;
@@ -60,4 +65,5 @@ public class UriListHandlerService {
 
         throw new DSpaceBadRequestException("No UriListHandler was found that supports the inputs given");
     }
+
 }

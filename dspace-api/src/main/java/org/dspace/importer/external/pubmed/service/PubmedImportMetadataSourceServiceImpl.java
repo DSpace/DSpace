@@ -211,7 +211,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             URIBuilder uriBuilder = new URIBuilder(urlSearch);
             uriBuilder.addParameter("db", "pubmed");
             uriBuilder.addParameter("term", query.getParameterAsClass("query", String.class));
-            Map<String,String> params = new HashMap<String, String>();
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
             String response = StringUtils.EMPTY;
             int countAttempt = 0;
             while (StringUtils.isBlank(response) && countAttempt <= attempt) {
@@ -287,7 +287,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             uriBuilder.addParameter("retmax", count.toString());
             uriBuilder.addParameter("usehistory", "y");
             uriBuilder.addParameter("term", queryString);
-            Map<String,String> params = new HashMap<String, String>();
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
             String response = StringUtils.EMPTY;
             int countAttempt = 0;
             while (StringUtils.isBlank(response) && countAttempt <= attempt) {
@@ -311,7 +311,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             uriBuilder2.addParameter("WebEnv", webEnv);
             uriBuilder2.addParameter("query_key", queryKey);
             uriBuilder2.addParameter("retmode", "xml");
-            Map<String,String> params2 = new HashMap<String, String>();
+            Map<String, Map<String, String>> params2 = new HashMap<String, Map<String,String>>();
             String response2 = StringUtils.EMPTY;
             countAttempt = 0;
             while (StringUtils.isBlank(response2) && countAttempt <= attempt) {
@@ -372,7 +372,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             uriBuilder.addParameter("retmode", "xml");
             uriBuilder.addParameter("id", query.getParameterAsClass("id", String.class));
 
-            Map<String,String> params = new HashMap<String, String>();
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
             String response = StringUtils.EMPTY;
             int countAttempt = 0;
             while (StringUtils.isBlank(response) && countAttempt <= attempt) {
@@ -413,7 +413,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             uriBuilder.addParameter("term", query.getParameterAsClass("term", String.class));
             uriBuilder.addParameter("field", query.getParameterAsClass("field", String.class));
 
-            Map<String,String> params = new HashMap<String, String>();
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
             String response = StringUtils.EMPTY;
             int countAttempt = 0;
             while (StringUtils.isBlank(response) && countAttempt <= attempt) {
@@ -436,7 +436,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             uriBuilder2.addParameter("WebEnv", webEnv);
             uriBuilder2.addParameter("query_key", queryKey);
 
-            Map<String,String> params2 = new HashMap<String, String>();
+            Map<String, Map<String, String>> params2 = new HashMap<String, Map<String,String>>();
             String response2 = StringUtils.EMPTY;
             countAttempt = 0;
             while (StringUtils.isBlank(response2) && countAttempt <= attempt) {
