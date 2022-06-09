@@ -658,6 +658,15 @@ public class Context implements AutoCloseable {
     }
 
     /**
+     * Get a set of all of the special groups uuids that current user is a member of.
+     *
+     * @return list of special groups uuids
+     */
+    public Set<UUID> getSpecialGroupUuids() {
+        return CollectionUtils.isEmpty(specialGroups) ? Set.of() : specialGroups;
+    }
+
+    /**
      * Temporary change the user bound to the context, empty the special groups that
      * are retained to allow subsequent restore
      *

@@ -829,4 +829,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                                            final MetadataField metadataField) throws SQLException {
         return groupDAO.findByMetadataField(context, searchValue, metadataField);
     }
+
+    @Override
+    public String getName(Group dso) {
+        return dso.getName();
+    }
 }

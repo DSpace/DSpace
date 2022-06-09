@@ -119,6 +119,19 @@
     </bean>
     <bean id="CrossRefMetadataFieldMapping" class="org.dspace.importer.external.crossref.CrossRefFieldMapping"/>
 
+    <bean id="EpoImportService" class="org.dspace.importer.external.epo.service.EpoImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="epoMetadataFieldMapping"/>
+        <property name="consumerKey" value="${epo.consumerKey}" />
+        <property name="consumerSecret" value="${epo.consumerSecretKey}" />
+        <property name="url" value="${epo.url}" />
+        <property name="authUrl" value="${epo.authUrl}" />
+        <property name="searchUrl" value="${epo.searchUrl}" />
+        <!-- date filed mapped metadata, see epo-integration.xml -->
+        <property name="dateFiled" ref="epo.dc.date.filed" />
+        <property name="applicationNumber" ref="epo.dc.identifier" />
+    </bean>
+    <bean id="epoMetadataFieldMapping" class="org.dspace.importer.external.epo.service.EpoFieldMapping"/>
+
     <bean id="ScopusImportService" class="org.dspace.importer.external.scopus.service.ScopusImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="scopusMetadataFieldMapping"/>
         <property name="url" value="${scopus.url}"/>
@@ -163,6 +176,14 @@
         <property name="urlSearch" value="${cinii.url.search}"/>
     </bean>
     <bean id="CiniiMetadataFieldMapping" class="org.dspace.importer.external.cinii.CiniiFieldMapping"/>
+
+    <bean id="ADSImportService" class="org.dspace.importer.external.ads.ADSImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="apiKey" value="${ads.key}" />
+        <property name="url" value="${ads.url}" />
+        <property name="resultFieldList" value="${ads.resultFieldList}" />
+        <property name="metadataFieldMapping" ref="ADSMetadataFieldMapping"/>
+    </bean>
+    <bean id="ADSMetadataFieldMapping" class="org.dspace.importer.external.ads.ADSFieldMapping"/>
 
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
     <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">

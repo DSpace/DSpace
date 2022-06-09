@@ -33,10 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class SimpleXpathMetadatumContributor implements MetadataContributor<Element> {
-    protected MetadataFieldConfig field;
 
-    private static final Logger log
-        = org.apache.logging.log4j.LogManager.getLogger();
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
+
+    protected MetadataFieldConfig field;
 
     /**
      * Return prefixToNamespaceMapping
@@ -154,10 +154,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<Elem
         for (String ns : prefixToNamespaceMapping.keySet()) {
             namespaces.add(Namespace.getNamespace(prefixToNamespaceMapping.get(ns), ns));
         }
-
-        XPathExpression<Object> xpath =
-            XPathFactory.instance().compile(query, Filters.fpassthrough(), null, namespaces);
-
+        XPathExpression<Object> xpath = XPathFactory.instance().compile(query, Filters.fpassthrough(), null,namespaces);
         List<Object> nodes = xpath.evaluate(t);
         for (Object el : nodes) {
             if (el instanceof Element) {
@@ -174,4 +171,5 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<Elem
         }
         return values;
     }
+
 }

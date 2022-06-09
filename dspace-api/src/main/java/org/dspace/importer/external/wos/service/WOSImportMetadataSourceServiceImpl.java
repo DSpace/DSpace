@@ -7,6 +7,8 @@
  */
 package org.dspace.importer.external.wos.service;
 
+import static org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl.URI_PARAMETERS;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URLEncoder;
@@ -136,7 +138,10 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             if (StringUtils.isNotBlank(apiKey)) {
                 String queryString = URLEncoder.encode(checkQuery(query), StandardCharsets.UTF_8);
                 String url = urlSearch + queryString + "&count=1&firstRecord=1";
-                String response = liveImportClient.executeHttpGetRequest(timeout, url, getRequestParameters());
+                Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+                params.put(URI_PARAMETERS, getRequestParameters());
+                String response = liveImportClient.executeHttpGetRequest(timeout, url, params);
+
                 SAXBuilder saxBuilder = new SAXBuilder();
                 Document document = saxBuilder.build(new StringReader(response));
                 Element root = document.getRootElement();
@@ -167,7 +172,10 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             List<ImportRecord> results = new ArrayList<>();
             if (StringUtils.isNotBlank(apiKey)) {
                 String urlString = url + this.doi + "?databaseId=WOS&lang=en&count=10&firstRecord=1";
-                String response = liveImportClient.executeHttpGetRequest(timeout, urlString, getRequestParameters());
+                Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+                params.put(URI_PARAMETERS, getRequestParameters());
+                String response = liveImportClient.executeHttpGetRequest(timeout, urlString, params);
+
                 List<Element> elements = splitToRecords(response);
                 for (Element record : elements) {
                     results.add(transformSourceRecords(record));
@@ -209,9 +217,12 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             Integer start = query.getParameterAsClass("start", Integer.class);
             Integer count = query.getParameterAsClass("count", Integer.class);
             if (StringUtils.isNotBlank(apiKey)) {
+                Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+                params.put(URI_PARAMETERS, getRequestParameters());
                 String url = urlSearch + URLEncoder.encode(queryString, StandardCharsets.UTF_8)
                                                  + "&count=" + count + "&firstRecord=" + (start + 1);
-                String response = liveImportClient.executeHttpGetRequest(timeout, url, getRequestParameters());
+                String response = liveImportClient.executeHttpGetRequest(timeout, url, params);
+
                 List<Element> omElements = splitToRecords(response);
                 for (Element el : omElements) {
                     results.add(transformSourceRecords(el));

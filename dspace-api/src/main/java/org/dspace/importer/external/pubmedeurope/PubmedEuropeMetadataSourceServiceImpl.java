@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import javax.el.MethodNotFoundException;
@@ -288,8 +289,9 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
      */
     public Integer count(String query) throws URISyntaxException, ClientProtocolException, IOException, JaxenException {
         try {
-            String response = liveImportClient.executeHttpGetRequest(1000, buildURI(1, query),
-                    new HashMap<String, String>());
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            String response = liveImportClient.executeHttpGetRequest(1000, buildURI(1, query), params);
+
             SAXBuilder saxBuilder = new SAXBuilder();
             Document document = saxBuilder.build(new StringReader(response));
             Element root = document.getRootElement();
@@ -354,11 +356,12 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
             uriBuilder.addParameter("resulttype", "core");
             uriBuilder.addParameter("pageSize", String.valueOf(count));
             uriBuilder.addParameter("query", query);
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
             boolean lastPage = false;
             int skipped = 0;
             while (!lastPage || results.size() < count) {
-                String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
-                        new HashMap<String, String>());
+                String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+
                 SAXBuilder saxBuilder = new SAXBuilder();
                 Document document = saxBuilder.build(new StringReader(response));
                 XPathFactory xpfac = XPathFactory.instance();

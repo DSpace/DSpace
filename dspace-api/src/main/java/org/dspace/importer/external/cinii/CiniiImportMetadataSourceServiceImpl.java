@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import javax.el.MethodNotFoundException;
@@ -304,8 +305,8 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
         try {
             List<ImportRecord> records = new LinkedList<ImportRecord>();
             URIBuilder uriBuilder = new URIBuilder(this.url + id + ".rdf?appid=" + appId);
-            String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
-                    new HashMap<String, String>());
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
             List<Element> elements = splitToRecords(response);
             for (Element record : elements) {
                 records.add(transformSourceRecords(record));
@@ -374,8 +375,8 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
                 uriBuilder.addParameter("year_from", String.valueOf(year));
                 uriBuilder.addParameter("year_to", String.valueOf(year));
             }
-            String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
-                    new HashMap<String, String>());
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
             int url_len = this.url.length() - 1;
             SAXBuilder saxBuilder = new SAXBuilder();
             Document document = saxBuilder.build(new StringReader(response));
@@ -435,8 +436,9 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
                 uriBuilder.addParameter("year_from", String.valueOf(year));
                 uriBuilder.addParameter("year_to", String.valueOf(year));
             }
-            String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
-                    new HashMap<String, String>());
+
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
 
             SAXBuilder saxBuilder = new SAXBuilder();
             Document document = saxBuilder.build(new StringReader(response));
