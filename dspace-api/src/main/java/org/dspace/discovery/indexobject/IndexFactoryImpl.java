@@ -76,7 +76,7 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
         try {
             writeDocument(solrInputDocument, null);
         } catch (Exception e) {
-            log.error("Error occurred while writing SOLR document for {} object {} {}",
+            log.error("Error occurred while writing SOLR document for {} object {}",
                       indexableObject.getType(), indexableObject.getID(), e);
         }
     }
