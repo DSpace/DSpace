@@ -190,4 +190,16 @@
         </property>
     </bean>
 
+    <bean id="wosLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="WosImportService"/>
+        <property name="sourceIdentifier" value="wos"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
 </beans>

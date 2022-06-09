@@ -118,10 +118,10 @@
     </util:map>
 
     <bean id="wos.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.doi"/>
+        <constructor-arg value="dc.identifier"/>
     </bean>
     <bean id="wos.issn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.relation.issn"/>
+        <constructor-arg value="dc.identifier.issn"/>
     </bean>
     <bean id="wos.isbn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.isbn"/>
@@ -262,7 +262,7 @@
         <property name="prefixToNamespaceMapping" ref="wosNs"/>
     </bean>
     <bean id="wos.wosId" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.isi"/>
+        <constructor-arg value="dc.identifier.other"/>
     </bean>
 
     <util:map id="contributorEditor2fields" map-class="java.util.HashMap"

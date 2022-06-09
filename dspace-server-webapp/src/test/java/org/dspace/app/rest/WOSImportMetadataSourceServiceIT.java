@@ -106,26 +106,56 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO startPage = createMetadatumDTO("oaire","citation", "startPage", "225");
         MetadatumDTO endPage = createMetadatumDTO("oaire","citation", "endPage", "234");
         MetadatumDTO type = createMetadatumDTO("dc", "type", null, "Book in series");
-        MetadatumDTO issn = createMetadatumDTO("dc", "relation", "issn", "2340-1117");
+        MetadatumDTO ispartof = createMetadatumDTO("dc", "relation", "ispartof",
+                "EDULEARN19: 11TH INTERNATIONAL CONFERENCE ON EDUCATION AND NEW LEARNING TECHNOLOGIES");
+        MetadatumDTO ispartofseries = createMetadatumDTO("dc", "relation", "ispartofseries",
+                "EDULEARN19: 11TH INTERNATIONAL CONFERENCE ON EDUCATION AND NEW LEARNING TECHNOLOGIES");
+        MetadatumDTO title = createMetadatumDTO("dc", "title", null,
+                "MENTORING IN EDUCATION. FEMALE ROLE MODELS IN ITALIAN DESIGN ACADEMIC CULTURE");
+        MetadatumDTO issn = createMetadatumDTO("dc", "identifier", "issn", "2340-1117");
         MetadatumDTO isbn = createMetadatumDTO("dc", "identifier", "isbn", "978-84-09-12031-4");
+        MetadatumDTO description = createMetadatumDTO("dc", "description", "abstract",
+                                         "It is widely recognized that mentors and tutors are");
         MetadatumDTO iso = createMetadatumDTO("dc", "language", "iso", "1");
         MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "Bollini, Letizia");
         MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "Chova, LG");
         MetadatumDTO author3 = createMetadatumDTO("dc", "contributor", "author", "Martinez, AL");
         MetadatumDTO author4 = createMetadatumDTO("dc", "contributor", "author", "Torres, IC");
-        MetadatumDTO isi = createMetadatumDTO("dc", "identifier", "isi", "WOS:000551093100034");
+        MetadatumDTO subject = createMetadatumDTO("dc", "subject", null, "VISUAL DESIGN");
+        MetadatumDTO subject2 = createMetadatumDTO("dc", "subject", null, "EXPERIENCE");
+        MetadatumDTO subject3 = createMetadatumDTO("dc", "subject", null, "Design education");
+        MetadatumDTO subject4 = createMetadatumDTO("dc", "subject", null, "female role models");
+        MetadatumDTO subject5 = createMetadatumDTO("dc", "subject", null, "mentoring in education");
+        MetadatumDTO subject6 = createMetadatumDTO("dc", "subject", null, "Social Sciences");
+        MetadatumDTO editor = createMetadatumDTO("dc", "contributor", "editor", "Chova, LG");
+        MetadatumDTO editor2 = createMetadatumDTO("dc", "contributor", "editor", "Martinez, AL");
+        MetadatumDTO editor3 = createMetadatumDTO("dc", "contributor", "editor", "Torres, IC");
+        MetadatumDTO isi = createMetadatumDTO("dc", "identifier", "other", "WOS:000551093100034");
         metadatums.add(edition);
         metadatums.add(date);
         metadatums.add(startPage);
         metadatums.add(endPage);
         metadatums.add(type);
+        metadatums.add(ispartof);
+        metadatums.add(ispartofseries);
+        metadatums.add(title);
         metadatums.add(issn);
         metadatums.add(isbn);
+        metadatums.add(description);
         metadatums.add(iso);
         metadatums.add(author);
         metadatums.add(author2);
         metadatums.add(author3);
         metadatums.add(author4);
+        metadatums.add(subject);
+        metadatums.add(subject2);
+        metadatums.add(subject3);
+        metadatums.add(subject4);
+        metadatums.add(subject5);
+        metadatums.add(subject6);
+        metadatums.add(editor);
+        metadatums.add(editor2);
+        metadatums.add(editor3);
         metadatums.add(isi);
         ImportRecord firstrRecord = new ImportRecord(metadatums);
 
@@ -136,19 +166,34 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO startPage2 = createMetadatumDTO("oaire","citation", "startPage", "224");
         MetadatumDTO endPage2 = createMetadatumDTO("oaire","citation", "endPage", "224");
         MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "Book in series");
-        MetadatumDTO issn2 = createMetadatumDTO("dc", "relation", "issn", "2340-1117");
+        MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof",
+                "EDULEARN19: 11TH INTERNATIONAL CONFERENCE ON EDUCATION AND NEW LEARNING TECHNOLOGIES");
+        MetadatumDTO ispartofseries2 = createMetadatumDTO("dc", "relation", "ispartofseries",
+                "EDULEARN19: 11TH INTERNATIONAL CONFERENCE ON EDUCATION AND NEW LEARNING TECHNOLOGIES");
+        MetadatumDTO title2 = createMetadatumDTO("dc", "title", null,
+        "DYSLEXIA AND TYPOGRAPHY: HOW TO IMPROVE EDUCATIONAL PUBLISHING FOR INCLUSIVE DESIGN - A CRITICAL REVIEW");
+        MetadatumDTO issn2 = createMetadatumDTO("dc", "identifier", "issn", "2340-1117");
         MetadatumDTO isbn2 = createMetadatumDTO("dc", "identifier", "isbn", "978-84-09-12031-4");
         MetadatumDTO iso2 = createMetadatumDTO("dc", "language", "iso", "1");
-        MetadatumDTO author5 = createMetadatumDTO("dc", "contributor", "author", "Bollini, Letizia");
+        MetadatumDTO author5 = createMetadatumDTO("dc", "contributor", "author", "Bollini, L.");
         MetadatumDTO author6 = createMetadatumDTO("dc", "contributor", "author", "Chova, LG");
         MetadatumDTO author7 = createMetadatumDTO("dc", "contributor", "author", "Martinez, AL");
         MetadatumDTO author8 = createMetadatumDTO("dc", "contributor", "author", "Torres, IC");
-        MetadatumDTO isi2 = createMetadatumDTO("dc", "identifier", "isi", "WOS:000551093100033");
+        MetadatumDTO subject7 = createMetadatumDTO("dc", "subject", null, "Dyslexia and Typography");
+        MetadatumDTO subject8 = createMetadatumDTO("dc", "subject", null, "Font design");
+        MetadatumDTO subject9 = createMetadatumDTO("dc", "subject", null, "educational publishing");
+        MetadatumDTO subject10 = createMetadatumDTO("dc", "subject", null, "Design for all");
+        MetadatumDTO subject11 = createMetadatumDTO("dc", "subject", null, "Universal design");
+        MetadatumDTO subject12 = createMetadatumDTO("dc", "subject", null, "Social Sciences");
+        MetadatumDTO isi2 = createMetadatumDTO("dc", "identifier", "other", "WOS:000551093100033");
         metadatums2.add(edition2);
         metadatums2.add(date2);
         metadatums2.add(startPage2);
         metadatums2.add(endPage2);
         metadatums2.add(type2);
+        metadatums2.add(ispartof2);
+        metadatums2.add(ispartofseries2);
+        metadatums2.add(title2);
         metadatums2.add(issn2);
         metadatums2.add(isbn2);
         metadatums2.add(iso2);
@@ -156,6 +201,15 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         metadatums2.add(author6);
         metadatums2.add(author7);
         metadatums2.add(author8);
+        metadatums2.add(subject7);
+        metadatums2.add(subject8);
+        metadatums2.add(subject9);
+        metadatums2.add(subject10);
+        metadatums2.add(subject11);
+        metadatums2.add(subject12);
+        metadatums2.add(editor);
+        metadatums2.add(editor2);
+        metadatums2.add(editor3);
         metadatums2.add(isi2);
         ImportRecord secondRecord = new ImportRecord(metadatums2);
 

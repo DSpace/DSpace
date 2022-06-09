@@ -90,8 +90,7 @@ public class WosAttribute2ValueContributor implements MetadataContributor<Elemen
         for (String id : attributeValue2metadata.keySet()) {
             if (StringUtils.equals(id, attributeValue)) {
                 if (this.firstChild) {
-                    String value = "";
-                            //el.getFirstChildWithName(new QName(this.childName)).getText();
+                    String value = el.getChild(this.childName).getValue();
                     values.add(metadataFieldMapping.toDCValue(attributeValue2metadata.get(id), value));
                 } else {
                     values.add(metadataFieldMapping.toDCValue(attributeValue2metadata.get(id), el.getText()));
