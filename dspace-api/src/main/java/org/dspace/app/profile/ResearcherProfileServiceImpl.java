@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 import static org.dspace.core.Constants.READ;
+import static org.dspace.core.Constants.WRITE;
 import static org.dspace.eperson.Group.ANONYMOUS;
 
 import java.io.IOException;
@@ -196,6 +197,11 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
             throw new IllegalArgumentException("The provided item has not a profile type. Item ID: " + item.getID());
         }
 
+        if (haveDifferentEmail(item, ePerson)) {
+            throw new IllegalArgumentException("The provided item is not claimable because it has a different email "
+                + "than the given user's email. Item ID: " + item.getID());
+        }
+
         String existingOwner = itemService.getMetadataFirstValue(item, "dspace", "object", "owner", Item.ANY);
 
         if (StringUtils.isNotBlank(existingOwner)) {
@@ -270,6 +276,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
         Item item = workspaceItem.getItem();
         itemService.addMetadata(context, item, "dc", "title", null, null, fullName);
+        itemService.addMetadata(context, item, "person", "email", null, null, ePerson.getEmail());
         itemService.addMetadata(context, item, "dspace", "object", "owner", null, fullName, id, CF_ACCEPTED);
 
         item = installItemService.installItem(context, workspaceItem);
@@ -280,6 +287,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         }
 
         authorizeService.addPolicy(context, item, READ, ePerson);
+        authorizeService.addPolicy(context, item, WRITE, ePerson);
 
         return reloadItem(context, item);
     }
@@ -334,6 +342,13 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
     private boolean isNotProfileCollection(Collection collection) {
         String entityType = collectionService.getMetadataFirstValue(collection, "dspace", "entity", "type", Item.ANY);
         return entityType == null || !entityType.equals(getProfileType());
+    }
+
+    private boolean haveDifferentEmail(Item item, EPerson currentUser) {
+        return itemService.getMetadataByMetadataString(item, "person.email").stream()
+            .map(MetadataValue::getValue)
+            .filter(StringUtils::isNotBlank)
+            .noneMatch(email -> email.equalsIgnoreCase(currentUser.getEmail()));
     }
 
     private void removeOwnerMetadata(Context context, Item profileItem) throws SQLException {
