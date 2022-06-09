@@ -133,7 +133,7 @@ public class AuthorMetadataContributor extends SimpleXpathMetadatumContributor {
     private void fillAffiliation2Name(Element element) throws JaxenException {
         Element affilationName = element.getChild("affilname", NAMESPACE);
         Element affilationId = element.getChild("afid", NAMESPACE);
-        if (StringUtils.isNotBlank(affilationId.getValue()) | StringUtils.isNotBlank(affilationName.getValue())) {
+        if (Objects.nonNull(affilationId) && Objects.nonNull(affilationName)) {
             affId2affName.put(affilationId.getValue(), affilationName.getValue());
         }
     }
