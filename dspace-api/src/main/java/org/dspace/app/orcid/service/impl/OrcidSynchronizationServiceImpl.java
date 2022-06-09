@@ -271,9 +271,12 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
     private void updateEPerson(Context context, EPerson ePerson) throws SQLException {
         try {
+            context.turnOffAuthorisationSystem();
             ePersonService.update(context, ePerson);
         } catch (AuthorizeException e) {
             throw new RuntimeException(e);
+        } finally {
+            context.restoreAuthSystemState();
         }
     }
 }
