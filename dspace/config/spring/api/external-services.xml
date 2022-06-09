@@ -109,7 +109,7 @@
     <bean id="scopusLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="ScopusImportService"/>
         <property name="sourceIdentifier" value="scopus"/>
-        <property name="recordIdMetadata" value="dc.identifier.scopus"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>
@@ -121,7 +121,7 @@
     <bean id="pubmedEULiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="PubmedEuropeImportService"/>
         <property name="sourceIdentifier" value="pubmedeu"/>
-        <property name="recordIdMetadata" value="dc.identifier.pmid"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>

@@ -31,7 +31,6 @@
         <entry key-ref="cinii.language" value-ref="ciniiLanguageContrib"/>
         <entry key-ref="cinii.description" value-ref="ciniiDescriptionContrib"/>
     </util:map>
-    
 
     <bean id="ciniiDescriptionContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="cinii.description"/>
@@ -41,7 +40,6 @@
     <bean id="cinii.description" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.description.abstract"/>
     </bean>
-
 
     <bean id="ciniiLanguageContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="cinii.language"/>
@@ -107,4 +105,5 @@
     <bean class="java.lang.Integer" id="maxRetry">
         <constructor-arg value="3"/>
     </bean>
+
 </beans>
