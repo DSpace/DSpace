@@ -265,7 +265,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
             args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl
         );
 
-        assertEquals(1, result);
+        assertEquals(0, result);  // exception should be handled, so the script should finish with 0
 
         Exception exception = testDSpaceRunnableHandler.getException();
         assertNotNull(exception);
