@@ -13,7 +13,6 @@ import static java.util.Comparator.reverseOrder;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.ListUtils.partition;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.dspace.content.Item.ANY;
 import static org.orcid.jaxb.model.common.CitationType.FORMATTED_UNSPECIFIED;
 
 import java.io.File;
@@ -28,15 +27,16 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.dspace.app.orcid.OrcidToken;
 import org.dspace.app.orcid.client.OrcidClient;
 import org.dspace.app.orcid.client.OrcidConfiguration;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.orcid.model.OrcidWorkFieldMapping;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.dto.MetadataValueDTO;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.AbstractExternalDataProvider;
@@ -44,6 +44,7 @@ import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.service.ImportService;
+import org.dspace.web.ContextUtil;
 import org.orcid.jaxb.model.common.ContributorRole;
 import org.orcid.jaxb.model.common.WorkType;
 import org.orcid.jaxb.model.v3.release.common.Contributor;
@@ -88,13 +89,13 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
     private OrcidConfiguration orcidConfiguration;
 
     @Autowired
-    private ItemService itemService;
-
-    @Autowired
     private OrcidSynchronizationService orcidSynchronizationService;
 
     @Autowired
     private ImportService importService;
+
+    @Autowired
+    private OrcidTokenService orcidTokenService;
 
     private OrcidWorkFieldMapping fieldMapping;
 
@@ -198,7 +199,8 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
     }
 
     private Optional<String> getAccessToken(Item item) {
-        return ofNullable(itemService.getMetadataFirstValue(item, "dspace", "orcid", "access-token", ANY));
+        return ofNullable(orcidTokenService.findByProfileItem(getContext(), item))
+            .map(OrcidToken::getAccessToken);
     }
 
     private String getReadPublicAccessToken() {
@@ -431,6 +433,11 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
             .filter(externalId -> type.equals(externalId.getType()))
             .map(externalId -> externalId.getValue())
             .collect(Collectors.toList());
+    }
+
+    private Context getContext() {
+        Context context = ContextUtil.obtainCurrentRequestContext();
+        return context != null ? context : new Context();
     }
 
     @Override

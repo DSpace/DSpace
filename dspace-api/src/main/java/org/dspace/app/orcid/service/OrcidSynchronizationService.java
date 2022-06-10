@@ -153,4 +153,13 @@ public interface OrcidSynchronizationService {
      * @return the disconnection mode
      */
     OrcidProfileDisconnectionMode getDisconnectionMode();
+
+    /**
+     * Returns all the profiles with the given orcid id.
+     *
+     * @param  context the relevant DSpace Context.
+     * @param  orcid   the orcid id to search for
+     * @return         the found profile items
+     */
+    List<Item> findProfilesByOrcid(Context context, String orcid);
 }

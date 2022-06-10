@@ -107,4 +107,8 @@ public final class OrcidConfiguration {
         this.publicUrl = publicUrl;
     }
 
+    public boolean isApiConfigured() {
+        return !StringUtils.isAnyBlank(clientId, clientSecret);
+    }
+
 }

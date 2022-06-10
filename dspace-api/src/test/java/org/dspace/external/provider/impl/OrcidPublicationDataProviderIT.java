@@ -35,7 +35,9 @@ import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.OrcidTokenBuilder;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
@@ -194,10 +196,14 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
 
         String accessToken = "95cb5ed9-c208-4bbc-bc99-aa0bd76e4452";
 
-        ItemBuilder.createItem(context, persons)
+        Item profile = ItemBuilder.createItem(context, persons)
             .withTitle("Profile")
             .withOrcidIdentifier(ORCID)
-            .withOrcidAccessToken("95cb5ed9-c208-4bbc-bc99-aa0bd76e4452")
+            .withDspaceObjectOwner(eperson.getEmail(), eperson.getID().toString())
+            .build();
+
+        OrcidTokenBuilder.create(context, eperson, accessToken)
+            .withProfileItem(profile)
             .build();
 
         context.restoreAuthSystemState();
