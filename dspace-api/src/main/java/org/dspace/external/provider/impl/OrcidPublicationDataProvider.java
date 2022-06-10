@@ -68,10 +68,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link ExternalDataProvider} that search for all the works
- * of the profile with the given orcid id that hava a source other than
- * DSpaceCris. The id of the external data objects returned by the methods of
- * this class is the concatenation of the orcid id and the put code associated
- * with the publication, separated by ::
+ * of the profile with the given orcid id that hava a source other than DSpace.
+ * The id of the external data objects returned by the methods of this class is
+ * the concatenation of the orcid id and the put code associated with the
+ * publication, separated by :: (example 0000-0000-0123-4567::123456)
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
@@ -131,11 +131,29 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
         return StringUtils.isBlank(id) || id.split("::").length != 2;
     }
 
+    /**
+     * Returns all the works related to the given ORCID in the range from start and
+     * limit.
+     *
+     * @param  orcid the ORCID ID of the author to search for works
+     * @param  start the start index
+     * @param  limit the limit index
+     * @return       the list of the works
+     */
     private List<Work> findWorks(String orcid, int start, int limit) {
         List<WorkSummary> workSummaries = findWorkSummaries(orcid, start, limit);
         return findWorks(orcid, workSummaries);
     }
 
+    /**
+     * Returns all the works summaries related to the given ORCID in the range from
+     * start and limit.
+     *
+     * @param  orcid the ORCID ID of the author to search for works summaries
+     * @param  start the start index
+     * @param  limit the limit index
+     * @return       the list of the works summaries
+     */
     private List<WorkSummary> findWorkSummaries(String orcid, int start, int limit) {
         return getWorks(orcid).getWorkGroup().stream()
             .filter(workGroup -> allWorkSummariesHaveDifferentSourceClientId(workGroup))
@@ -146,6 +164,14 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Returns all the works related to the given ORCID ID and work summaries (a
+     * work has more details than a work summary).
+     *
+     * @param  orcid         the ORCID id of the author to search for works
+     * @param  workSummaries the work summaries used to search the related works
+     * @return               the list of the works
+     */
     private List<Work> findWorks(String orcid, List<WorkSummary> workSummaries) {
 
         List<String> workPutCodes = getPutCodes(workSummaries);
@@ -164,6 +190,14 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Search a work by ORCID id and putcode, using API or PUBLIC urls based on
+     * whether the ORCID API keys are configured or not.
+     *
+     * @param  orcid   the ORCID ID
+     * @param  putCode the work's identifier on ORCID
+     * @return         the work, if any
+     */
     private Optional<Work> getWork(String orcid, String putCode) {
         if (orcidConfiguration.isApiConfigured()) {
             String accessToken = getAccessToken(orcid);
@@ -173,6 +207,12 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
         }
     }
 
+    /**
+     * Returns all the works related to the given ORCID.
+     *
+     * @param  orcid the ORCID ID of the author to search for works
+     * @return       the list of the works
+     */
     private Works getWorks(String orcid) {
         if (orcidConfiguration.isApiConfigured()) {
             String accessToken = getAccessToken(orcid);
@@ -182,6 +222,13 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
         }
     }
 
+    /**
+     * Returns all the works related to the given ORCID by the given putCodes.
+     *
+     * @param  orcid    the ORCID ID of the author to search for works
+     * @param  putCodes the work's put codes to search
+     * @return          the list of the works
+     */
     private WorkBulk getWorkBulk(String orcid, List<String> putCodes) {
         if (orcidConfiguration.isApiConfigured()) {
             String accessToken = getAccessToken(orcid);

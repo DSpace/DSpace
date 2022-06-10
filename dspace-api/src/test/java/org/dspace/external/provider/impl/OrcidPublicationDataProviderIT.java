@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -57,7 +58,7 @@ import org.orcid.jaxb.model.v3.release.record.summary.Works;
  */
 public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithDatabase {
 
-    private static final String BASE_XML_DIR_PATH = "./target/testing/dspace/assetstore/orcid-works/";
+    private static final String BASE_XML_DIR_PATH = "org/dspace/app/orcid-works/";
 
     private static final String ACCESS_TOKEN = "32c83ccb-c6d5-4981-b6ea-6a34a36de8ab";
 
@@ -103,8 +104,8 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         dataProvider.setOrcidClient(orcidClientMock);
 
         originalClientId = orcidConfiguration.getClientId();
-        orcidConfiguration.setClientId("DSPACE-CRIS-CLIENT-ID");
-        orcidConfiguration.setClientSecret("DSPACE-CRIS-CLIENT-SECRET");
+        orcidConfiguration.setClientId("DSPACE-CLIENT-ID");
+        orcidConfiguration.setClientSecret("DSPACE-CLIENT-SECRET");
 
         when(orcidClientMock.getReadPublicAccessToken()).thenReturn(buildTokenResponse(ACCESS_TOKEN));
 
@@ -387,7 +388,11 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
     private <T> T unmarshall(String fileName, Class<T> clazz) throws Exception {
         JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        return (T) unmarshaller.unmarshal(new File(BASE_XML_DIR_PATH, fileName));
+        URL resource = getClass().getClassLoader().getResource(BASE_XML_DIR_PATH + fileName);
+        if (resource == null) {
+            throw new IllegalStateException("No resource found named " + BASE_XML_DIR_PATH + fileName);
+        }
+        return (T) unmarshaller.unmarshal(new File(resource.getFile()));
     }
 
 }

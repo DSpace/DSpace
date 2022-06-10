@@ -39,8 +39,8 @@
             <common:last-modified-date>2015-06-19T19:14:26.339Z</common:last-modified-date>
             <common:source>
                 <common:source-client-id>
-                    <common:uri>https://sandbox.orcid.org/client/DSPACE-CRIS-CLIENT-ID</common:uri>
-                    <common:path>DSPACE-CRIS-CLIENT-ID</common:path>
+                    <common:uri>https://sandbox.orcid.org/client/DSPACE-CLIENT-ID</common:uri>
+                    <common:path>DSPACE-CLIENT-ID</common:path>
                     <common:host>sandbox.orcid.org</common:host>
                 </common:source-client-id>
                 <common:source-name>DSPACE-CRIS</common:source-name>
@@ -120,8 +120,8 @@
                     <common:host>sandbox.orcid.org</common:host>
                 </common:source-orcid>
                 <common:source-client-id>
-                    <common:uri>https://sandbox.orcid.org/client/DSPACE-CRIS-CLIENT-ID</common:uri>
-                    <common:path>DSPACE-CRIS-CLIENT-ID</common:path>
+                    <common:uri>https://sandbox.orcid.org/client/DSPACE-CLIENT-ID</common:uri>
+                    <common:path>DSPACE-CLIENT-ID</common:path>
                     <common:host>sandbox.orcid.org</common:host>
                 </common:source-client-id>
                 <common:source-name>DSPACE-CRIS</common:source-name>
