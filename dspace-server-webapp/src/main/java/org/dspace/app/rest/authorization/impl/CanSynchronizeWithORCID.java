@@ -42,6 +42,11 @@ public class CanSynchronizeWithORCID implements AuthorizationFeature {
     @Autowired
     private ItemService itemService;
 
+    /**
+     * This method returns true if the BaseObjectRest object is an instance of
+     * {@link ItemRest}, there is a current user in the {@link Context} and it is
+     * the owner of that item. Otherwise this method returns false.
+     */
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
 
@@ -62,6 +67,11 @@ public class CanSynchronizeWithORCID implements AuthorizationFeature {
         return new String[] { ItemRest.CATEGORY + "." + ItemRest.NAME };
     }
 
+    /**
+     * This method returns true if the given eperson is not null and if the given
+     * item has the metadata field dspace.object.owner with an authority equals to
+     * the uuid of the eperson. Otherwise this method returns false.
+     */
     private boolean isDspaceObjectOwner(EPerson eperson, Item item) {
         if (eperson == null) {
             return false;

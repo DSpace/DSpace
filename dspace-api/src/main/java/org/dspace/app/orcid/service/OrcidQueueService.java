@@ -142,10 +142,8 @@ public interface OrcidQueueService {
      * Get the orcid queue records by the owner and entity.
      *
      * @param  context      DSpace context object
-     * @param  ownerId      the owner item
-     * @param  entityId     the entity item
-     * @param  limit        limit
-     * @param  offset       offset
+     * @param  owner        the owner item
+     * @param  entity       the entity item
      * @return              the found OrcidQueue records
      * @throws SQLException if an SQL error occurs
      */
@@ -195,7 +193,7 @@ public interface OrcidQueueService {
      * Delete an OrcidQueue
      *
      * @param  context            DSpace context object
-     * @param  OrcidQueue         orcidQueue
+     * @param  orcidQueue         the orcidQueue record to delete
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
@@ -234,9 +232,9 @@ public interface OrcidQueueService {
     /**
      * Update the OrcidQueue
      *
-     * @param context             context
-     * @param OrcidQueue          orcidQueue
-     * @throws SQLException       if database error
+     * @param  context      context
+     * @param  orcidQueue   the OrcidQueue to update
+     * @throws SQLException if database error
      */
     public void update(Context context, OrcidQueue orcidQueue) throws SQLException;
 }

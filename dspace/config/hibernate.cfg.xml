@@ -91,6 +91,7 @@
         
         <mapping class="org.dspace.app.orcid.OrcidQueue" />
         <mapping class="org.dspace.app.orcid.OrcidHistory" />
+        <mapping class="org.dspace.app.orcid.OrcidToken"/>
 
     </session-factory>
 </hibernate-configuration>

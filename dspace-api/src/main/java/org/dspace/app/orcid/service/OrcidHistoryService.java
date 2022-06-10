@@ -80,18 +80,18 @@ public interface OrcidHistoryService {
     /**
      * Delete an OrcidHistory
      *
-     * @param context             context
-     * @param OrcidHistory        orcidHistory
-     * @throws SQLException       if database error
+     * @param  context      context
+     * @param  orcidHistory the OrcidHistory entity to delete
+     * @throws SQLException if database error
      */
     public void delete(Context context, OrcidHistory orcidHistory) throws SQLException;
 
     /**
      * Update the OrcidHistory
      *
-     * @param context             context
-     * @param OrcidHistory        orcidHistory
-     * @throws SQLException       if database error
+     * @param  context      context
+     * @param  orcidHistory the OrcidHistory entity to update
+     * @throws SQLException if database error
      */
     public void update(Context context, OrcidHistory orcidHistory) throws SQLException;
 

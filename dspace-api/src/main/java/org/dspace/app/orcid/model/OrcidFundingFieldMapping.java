@@ -21,7 +21,7 @@ import org.dspace.util.SimpleMapConverter;
 import org.orcid.jaxb.model.common.FundingContributorRole;
 
 /**
- * Class that contains all the mapping between {@link Funding} and DSpaceCris
+ * Class that contains all the mapping between {@link Funding} and DSpace
  * metadata fields.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
@@ -29,28 +29,64 @@ import org.orcid.jaxb.model.common.FundingContributorRole;
  */
 public class OrcidFundingFieldMapping {
 
+    /**
+     * The metadata fields related to the funding contributors.
+     */
     private Map<String, FundingContributorRole> contributorFields;
 
+    /**
+     * The metadata fields related to the funding external identifiers.
+     */
     private Map<String, String> externalIdentifierFields;
 
+    /**
+     * The metadata field related to the funding title.
+     */
     private String titleField;
 
+    /**
+     * The metadata field related to the funding type.
+     */
     private String typeField;
 
+    /**
+     * The funding type converter.
+     */
     private SimpleMapConverter typeConverter;
 
+    /**
+     * The metadata field related to the funding amount.
+     */
     private String amountField;
 
+    /**
+     * The metadata field related to the funding amount's currency.
+     */
     private String amountCurrencyField;
 
+    /**
+     * The funding amount's currency converter.
+     */
     private SimpleMapConverter amountCurrencyConverter;
 
+    /**
+     * The metadata field related to the funding start date.
+     */
     private String startDateField;
 
+    /**
+     * The metadata field related to the funding end date.
+     */
     private String endDateField;
 
+    /**
+     * The metadata field related to the funding description.
+     */
     private String descriptionField;
 
+    /**
+     * The type of the relationship between the funding and the organization.
+     */
     private String organizationRelationshipType;
 
     private Map<String, FundingContributorRole> parseContributors(String contributors) {

@@ -28,7 +28,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * 
+ * Permission evaluator plugin that check if the current user can search for
+ * ORCID queue records by owner.
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component

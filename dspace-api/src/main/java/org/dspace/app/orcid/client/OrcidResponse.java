@@ -23,6 +23,14 @@ public final class OrcidResponse {
 
     private final String content;
 
+    /**
+     * Create an ORCID response instance with the specified HTTP status, putCode and
+     * content.
+     *
+     * @param status  the HTTP status incoming from ORCID
+     * @param putCode the identifier of the resource ORCID side
+     * @param content the response body content
+     */
     public OrcidResponse(int status, String putCode, String content) {
         this.status = status;
         this.putCode = putCode;

@@ -50,9 +50,12 @@ import org.dspace.app.profile.OrcidSynchronizationMode;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.OrcidTokenBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
@@ -133,9 +136,16 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testWithManyOrcidQueueRecords() throws Exception {
 
-        Item firstOwner = createOwnerItem("0000-1111-2222-3333", BATCH);
-        Item secondOwner = createOwnerItem("1111-2222-3333-4444", MANUAL);
-        Item thirdOwner = createOwnerItem("2222-3333-4444-5555", BATCH);
+        context.turnOffAuthorisationSystem();
+
+        EPerson owner = EPersonBuilder.createEPerson(context)
+            .withEmail("owner@test.it")
+            .build();
+        context.restoreAuthSystemState();
+
+        Item firstOwner = createOwnerItem("0000-1111-2222-3333", eperson, BATCH);
+        Item secondOwner = createOwnerItem("1111-2222-3333-4444", admin, MANUAL);
+        Item thirdOwner = createOwnerItem("2222-3333-4444-5555", owner, BATCH);
 
         Item firstEntity = createPublication("First publication");
         Item secondEntity = createPublication("Second publication");
@@ -208,8 +218,8 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testWithOneValidationError() throws Exception {
 
-        Item firstOwner = createOwnerItem("0000-1111-2222-3333", BATCH);
-        Item secondOwner = createOwnerItem("1111-2222-3333-4444", BATCH);
+        Item firstOwner = createOwnerItem("0000-1111-2222-3333", eperson, BATCH);
+        Item secondOwner = createOwnerItem("1111-2222-3333-4444", admin, BATCH);
 
         Item firstEntity = createPublication("First publication");
         Item secondEntity = createPublication("");
@@ -262,8 +272,8 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testWithUnexpectedErrorForMissingOrcid() throws Exception {
 
-        Item firstOwner = createOwnerItem("0000-1111-2222-3333", BATCH);
-        Item secondOwner = createOwnerItem("", BATCH);
+        Item firstOwner = createOwnerItem("0000-1111-2222-3333", eperson, BATCH);
+        Item secondOwner = createOwnerItem("", admin, BATCH);
 
         Item firstEntity = createPublication("First publication");
         Item secondEntity = createPublication("Second publication");
@@ -307,8 +317,8 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testWithOrcidClientException() throws Exception {
 
-        Item firstOwner = createOwnerItem("0000-1111-2222-3333", BATCH);
-        Item secondOwner = createOwnerItem("1111-2222-3333-4444", BATCH);
+        Item firstOwner = createOwnerItem("0000-1111-2222-3333", eperson, BATCH);
+        Item secondOwner = createOwnerItem("1111-2222-3333-4444", admin, BATCH);
 
         Item firstEntity = createPublication("First publication");
         Item secondEntity = createPublication("Second publication");
@@ -358,7 +368,7 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
         configurationService.setProperty("orcid.bulk-synchronization.max-attempts", 2);
 
-        Item owner = createOwnerItem("0000-1111-2222-3333", BATCH);
+        Item owner = createOwnerItem("0000-1111-2222-3333", eperson, BATCH);
         Item entity = createPublication("First publication");
 
         when(orcidClientMock.push(any(), eq("0000-1111-2222-3333"), any()))
@@ -452,13 +462,20 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         return handler;
     }
 
-    private Item createOwnerItem(String orcid, OrcidSynchronizationMode mode) {
-        return ItemBuilder.createItem(context, profileCollection)
+    private Item createOwnerItem(String orcid, EPerson owner, OrcidSynchronizationMode mode) throws Exception {
+
+        Item item = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test user")
-            .withOrcidAccessToken("9c913f57-961e-48af-9223-cfad6562c925")
             .withOrcidIdentifier(orcid)
             .withOrcidSynchronizationMode(mode)
+            .withDspaceObjectOwner(owner.getFullName(), owner.getID().toString())
             .build();
+
+        OrcidTokenBuilder.create(context, owner, "9c913f57-961e-48af-9223-cfad6562c925")
+            .withProfileItem(item)
+            .build();
+
+        return item;
     }
 
     private Item createPublication(String title) {

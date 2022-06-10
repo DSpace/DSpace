@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.service.OrcidQueueService;
+import org.dspace.app.rest.model.OrcidQueueRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -27,6 +28,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
+ * Permission evaluator plugin that check if the current user can perform an
+ * ORCID synchronization.
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
@@ -59,12 +62,13 @@ public class OrcidHistorySendToOrcidRestPermissionEvaluatorPlugin extends RestOb
 
         EPerson currentUser = context.getCurrentUser();
         String url = targetId.toString();
-        Pattern pattern = Pattern.compile("\\[.*\\/api\\/eperson\\/orcidqueues\\/(.*)\\]");
+        Pattern pattern = Pattern
+            .compile("\\[.*\\/api\\/" + OrcidQueueRest.CATEGORY + "\\/" + OrcidQueueRest.PLURAL_NAME + "\\/(.*)\\]");
         Matcher matcher = pattern.matcher(url);
 
         matcher.find();
         String id = matcher.group(1);
-        Integer queueId = Integer.parseInt(id);
+        int queueId = Integer.parseInt(id);
         OrcidQueue orcidQueue = null;
         try {
             orcidQueue = orcidQueueService.find(context, queueId);

@@ -10,6 +10,7 @@ package org.dspace.app.orcid.service.impl;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static java.util.List.of;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -24,22 +25,21 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.codec.binary.StringUtils;
+import org.dspace.app.orcid.OrcidToken;
 import org.dspace.app.orcid.model.OrcidEntityType;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.app.profile.OrcidProfileDisconnectionMode;
 import org.dspace.app.profile.OrcidProfileSyncPreference;
 import org.dspace.app.profile.OrcidSynchronizationMode;
+import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.discovery.DiscoverQuery;
-import org.dspace.discovery.SearchService;
-import org.dspace.discovery.SearchServiceException;
-import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
@@ -63,19 +63,25 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     private EPersonService ePersonService;
 
     @Autowired
-    private SearchService searchService;
+    private OrcidTokenService orcidTokenService;
+
+    @Autowired
+    private ResearcherProfileService researcherProfileService;
 
     @Override
     public void linkProfile(Context context, Item profile, OrcidTokenResponseDTO token) throws SQLException {
 
+        EPerson ePerson = ePersonService.findByProfileItem(context, profile);
+        if (ePerson == null) {
+            throw new IllegalArgumentException(
+                "The given profile item is not related to any eperson. Item id: " + profile.getID());
+        }
+
         String orcid = token.getOrcid();
         String accessToken = token.getAccessToken();
-        String refreshToken = token.getRefreshToken();
         String[] scopes = token.getScopeAsArray();
 
         itemService.setMetadataSingleValue(context, profile, "person", "identifier", "orcid", null, orcid);
-        itemService.setMetadataSingleValue(context, profile, "dspace", "orcid", "access-token", null, accessToken);
-        itemService.setMetadataSingleValue(context, profile, "dspace", "orcid", "refresh-token", null, refreshToken);
         itemService.clearMetadata(context, profile, "dspace", "orcid", "scope", Item.ANY);
         for (String scope : scopes) {
             itemService.addMetadata(context, profile, "dspace", "orcid", "scope", null, scope);
@@ -86,9 +92,10 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             itemService.setMetadataSingleValue(context, profile, "dspace", "orcid", "authenticated", null, currentDate);
         }
 
-        EPerson ePerson = ePersonService.findByProfileItem(context, profile);
+        setAccessToken(context, profile, ePerson, accessToken);
+
         EPerson ePersonByOrcid = ePersonService.findByNetid(context, orcid);
-        if (ePerson != null && ePersonByOrcid == null && isBlank(ePerson.getNetid())) {
+        if (ePersonByOrcid == null && isBlank(ePerson.getNetid())) {
             ePerson.setNetid(orcid);
             updateEPerson(context, ePerson);
         }
@@ -100,11 +107,18 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     @Override
     public void unlinkProfile(Context context, Item profile) throws SQLException {
 
+        EPerson ePerson = ePersonService.findByProfileItem(context, profile);
+        if (ePerson == null) {
+            throw new IllegalArgumentException(
+                "The given profile item is not related to any eperson. Item id: " + profile.getID());
+        }
+
         itemService.clearMetadata(context, profile, "person", "identifier", "orcid", Item.ANY);
-        itemService.clearMetadata(context, profile, "dspace", "orcid", "access-token", Item.ANY);
-        itemService.clearMetadata(context, profile, "dspace", "orcid", "refresh-token", Item.ANY);
         itemService.clearMetadata(context, profile, "dspace", "orcid", "scope", Item.ANY);
         itemService.clearMetadata(context, profile, "dspace", "orcid", "authenticated", Item.ANY);
+
+        orcidTokenService.deleteByEPerson(context, ePerson);
+
         updateItem(context, profile);
 
     }
@@ -132,7 +146,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     public boolean setSynchronizationMode(Context context, Item profile, OrcidSynchronizationMode value)
         throws SQLException {
 
-        if (!isLinkedToOrcid(profile)) {
+        if (!isLinkedToOrcid(context, profile)) {
             throw new IllegalArgumentException("The given profile cannot be configured for the ORCID "
                                                    + "synchronization because it is not linked to any ORCID account: "
                                                    + profile.getID());
@@ -164,7 +178,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
                 .isPresent();
         }
 
-        if (entityType.equals(getProfileType())) {
+        if (entityType.equals(researcherProfileService.getProfileType())) {
             return profile.equals(item) && !isEmpty(getProfilePreferences(profile));
         }
 
@@ -198,8 +212,8 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     }
 
     @Override
-    public boolean isLinkedToOrcid(Item item) {
-        return getOrcidAccessToken(item).isPresent() && getOrcid(item).isPresent();
+    public boolean isLinkedToOrcid(Context context, Item item) {
+        return getOrcidAccessToken(context, item).isPresent() && getOrcid(item).isPresent();
     }
 
     @Override
@@ -211,11 +225,21 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         return OrcidProfileDisconnectionMode.fromString(value);
     }
 
+    private void setAccessToken(Context context, Item profile, EPerson ePerson, String accessToken) {
+        OrcidToken orcidToken = orcidTokenService.findByEPerson(context, ePerson);
+        if (orcidToken == null) {
+            orcidTokenService.create(context, ePerson, profile, accessToken);
+        } else {
+            orcidToken.setProfileItem(profile);
+            orcidToken.setAccessToken(accessToken);
+        }
+    }
+
     private boolean updatePreferenceForSynchronizingWithOrcid(Context context, Item profile,
                                                               String metadataQualifier,
                                                               List<String> values) throws SQLException {
 
-        if (!isLinkedToOrcid(profile)) {
+        if (!isLinkedToOrcid(context, profile)) {
             throw new IllegalArgumentException("The given profile cannot be configured for the ORCID "
                                                    + "synchronization because it is not linked to any ORCID account: "
                                                    + profile.getID());
@@ -242,9 +266,9 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         return new HashSet<>(firstList).equals(new HashSet<>(secondList));
     }
 
-    private Optional<String> getOrcidAccessToken(Item item) {
-        return getMetadataValue(item, "dspace.orcid.access-token")
-            .map(metadataValue -> metadataValue.getValue());
+    private Optional<String> getOrcidAccessToken(Context context, Item item) {
+        return ofNullable(orcidTokenService.findByProfileItem(context, item))
+            .map(orcidToken -> orcidToken.getAccessToken());
     }
 
     public Optional<String> getOrcid(Item item) {
@@ -281,21 +305,6 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             throw new RuntimeException(e);
         } finally {
             context.restoreAuthSystemState();
-        }
-    }
-
-    @Override
-    public List<Item> findProfilesByOrcid(Context context, String orcid) {
-        DiscoverQuery discoverQuery = new DiscoverQuery();
-        discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
-        discoverQuery.addFilterQueries("search.entitytype:" + getProfileType());
-        discoverQuery.addFilterQueries("person.identifier.orcid:" + orcid);
-        try {
-            return searchService.search(context, discoverQuery).getIndexableObjects().stream()
-                .map(object -> ((IndexableItem) object).getIndexedObject())
-                .collect(Collectors.toList());
-        } catch (SearchServiceException ex) {
-            throw new RuntimeException(ex);
         }
     }
 }

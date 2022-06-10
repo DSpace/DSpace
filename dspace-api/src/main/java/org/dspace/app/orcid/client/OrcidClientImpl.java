@@ -65,6 +65,9 @@ import org.orcid.jaxb.model.v3.release.record.summary.Works;
  */
 public class OrcidClientImpl implements OrcidClient {
 
+    /**
+     * Mapping between ORCID JAXB models and the sub-paths on ORCID API.
+     */
     private static final Map<Class<?>, String> PATHS_MAP = initializePathsMap();
 
     private final OrcidConfiguration orcidConfiguration;

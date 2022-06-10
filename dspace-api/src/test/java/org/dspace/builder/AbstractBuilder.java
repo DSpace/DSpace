@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.orcid.factory.OrcidServiceFactory;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.authorize.AuthorizeException;
@@ -100,6 +101,7 @@ public abstract class AbstractBuilder<T, S> {
     static VersioningService versioningService;
     static OrcidHistoryService orcidHistoryService;
     static OrcidQueueService orcidQueueService;
+    static OrcidTokenService orcidTokenService;
 
     protected Context context;
 
@@ -158,6 +160,7 @@ public abstract class AbstractBuilder<T, S> {
         workflowItemRoleService = XmlWorkflowServiceFactory.getInstance().getWorkflowItemRoleService();
         orcidHistoryService = OrcidServiceFactory.getInstance().getOrcidHistoryService();
         orcidQueueService = OrcidServiceFactory.getInstance().getOrcidQueueService();
+        orcidTokenService = OrcidServiceFactory.getInstance().getOrcidTokenService();
     }
 
 
@@ -190,6 +193,7 @@ public abstract class AbstractBuilder<T, S> {
         processService = null;
         requestItemService = null;
         versioningService = null;
+        orcidTokenService = null;
 
     }
 

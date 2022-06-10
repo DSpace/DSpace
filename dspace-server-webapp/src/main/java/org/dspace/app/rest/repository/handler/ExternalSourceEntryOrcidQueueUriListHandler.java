@@ -64,7 +64,7 @@ public class ExternalSourceEntryOrcidQueueUriListHandler
 
         matcher.find();
         String id = matcher.group(1);
-        Integer queueId = Integer.parseInt(id);
+        int queueId = Integer.parseInt(id);
         try {
             orcidQueue = orcidQueueService.find(context, queueId);
         } catch (SQLException e) {

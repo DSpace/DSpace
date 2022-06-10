@@ -35,8 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class CanClaimItemFeatureIT extends AbstractControllerIntegrationTest {
 
-    private Item collectionAProfile;
-    private Item collectionBProfile;
+    private Item profile;
 
     @Autowired
     private ItemConverter itemConverter;
@@ -51,6 +50,10 @@ public class CanClaimItemFeatureIT extends AbstractControllerIntegrationTest {
 
     private Collection personCollection;
 
+    private String epersonToken;
+
+    private String adminToken;
+
     @Override
     @Before
     public void setUp() throws Exception {
@@ -59,15 +62,15 @@ public class CanClaimItemFeatureIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Community").build();
-        personCollection =
-            CollectionBuilder.createCollection(context, parentCommunity).withEntityType("Person")
-                             .withName("claimableA").build();
-        final Collection claimableCollectionB =
-            CollectionBuilder.createCollection(context, parentCommunity).withEntityType("Person")
-                             .withName("claimableB").build();
 
-        collectionAProfile = ItemBuilder.createItem(context, personCollection).build();
-        collectionBProfile = ItemBuilder.createItem(context, claimableCollectionB).build();
+        personCollection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Person")
+            .withName("claimableA")
+            .build();
+
+        epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        adminToken = getAuthToken(admin.getEmail(), password);
 
         context.restoreAuthSystemState();
 
@@ -78,22 +81,97 @@ public class CanClaimItemFeatureIT extends AbstractControllerIntegrationTest {
     @Test
     public void testCanClaimAProfile() throws Exception {
 
-        String token = getAuthToken(context.getCurrentUser().getEmail(), password);
-        getClient(token).perform(get("/api/authz/authorizations/search/object")
-                                     .param("uri", uri(collectionAProfile))
-                                     .param("eperson", context.getCurrentUser().getID().toString())
-                                     .param("feature", canClaimProfileFeature.getName()))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded").exists())
-                        .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+        context.turnOffAuthorisationSystem();
 
-        getClient(token).perform(get("/api/authz/authorizations/search/object")
-                                     .param("uri", uri(collectionBProfile))
-                                     .param("eperson", context.getCurrentUser().getID().toString())
-                                     .param("feature", canClaimProfileFeature.getName()))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded").exists())
-                        .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+        profile = ItemBuilder.createItem(context, personCollection)
+            .withPersonEmail(eperson.getEmail())
+            .build();
+
+        context.restoreAuthSystemState();
+
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+            .param("uri", uri(profile))
+            .param("feature", canClaimProfileFeature.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded").exists())
+            .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+
+    }
+
+    @Test
+    public void testCanClaimAProfileWithAnonymousUser() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        profile = ItemBuilder.createItem(context, personCollection).build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/authz/authorizations/search/object")
+            .param("uri", uri(profile))
+            .param("feature", canClaimProfileFeature.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded").doesNotExist())
+            .andExpect(jsonPath("$.page.totalElements", equalTo(0)));
+    }
+
+    @Test
+    public void testCanClaimWithAdminUser() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        profile = ItemBuilder.createItem(context, personCollection)
+            .withPersonEmail("myemail@test.it")
+            .withPersonEmail(admin.getEmail())
+            .build();
+
+        context.restoreAuthSystemState();
+
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+            .param("uri", uri(profile))
+            .param("feature", canClaimProfileFeature.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded").exists())
+            .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+
+    }
+
+    @Test
+    public void testNotClaimableEntityForDifferentEmail() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        profile = ItemBuilder.createItem(context, personCollection)
+            .withPersonEmail(eperson.getEmail())
+            .build();
+
+        context.restoreAuthSystemState();
+
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+            .param("uri", uri(profile))
+            .param("feature", canClaimProfileFeature.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded").doesNotExist())
+            .andExpect(jsonPath("$.page.totalElements", equalTo(0)));
+
+    }
+
+    @Test
+    public void testNotClaimableEntityWithoutEmail() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        profile = ItemBuilder.createItem(context, personCollection)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+            .param("uri", uri(profile))
+            .param("feature", canClaimProfileFeature.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded").doesNotExist())
+            .andExpect(jsonPath("$.page.totalElements", equalTo(0)));
 
     }
 
@@ -103,7 +181,7 @@ public class CanClaimItemFeatureIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         Collection publicationCollection = CollectionBuilder
-            .createCollection(context, parentCommunity)
+            .createCollection(context, context.reloadEntity(parentCommunity))
             .withEntityType("Publication")
             .withName("notClaimable")
             .build();
@@ -112,15 +190,12 @@ public class CanClaimItemFeatureIT extends AbstractControllerIntegrationTest {
 
         Item publication = ItemBuilder.createItem(context, publicationCollection).build();
 
-        String token = getAuthToken(context.getCurrentUser().getEmail(), password);
-
-        getClient(token).perform(get("/api/authz/authorizations/search/object")
-                                     .param("uri", uri(publication))
-                                     .param("eperson", context.getCurrentUser().getID().toString())
-                                     .param("feature", canClaimProfileFeature.getName()))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded").doesNotExist())
-                        .andExpect(jsonPath("$.page.totalElements", equalTo(0)));
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+            .param("uri", uri(publication))
+            .param("feature", canClaimProfileFeature.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded").doesNotExist())
+            .andExpect(jsonPath("$.page.totalElements", equalTo(0)));
 
     }
 
@@ -130,18 +205,17 @@ public class CanClaimItemFeatureIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         Item ownedItem = ItemBuilder.createItem(context, personCollection)
-                                    .withDspaceObjectOwner("owner", "ownerAuthority").build();
+            .withDspaceObjectOwner("owner", "ownerAuthority")
+            .build();
+
         context.restoreAuthSystemState();
 
-        String token = getAuthToken(context.getCurrentUser().getEmail(), password);
-
-        getClient(token).perform(get("/api/authz/authorizations/search/object")
-                                     .param("uri", uri(ownedItem))
-                                     .param("eperson", context.getCurrentUser().getID().toString())
-                                     .param("feature", canClaimProfileFeature.getName()))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded").doesNotExist())
-                        .andExpect(jsonPath("$.page.totalElements", equalTo(0)));
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+            .param("uri", uri(ownedItem))
+            .param("feature", canClaimProfileFeature.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded").doesNotExist())
+            .andExpect(jsonPath("$.page.totalElements", equalTo(0)));
 
     }
 
@@ -150,17 +224,19 @@ public class CanClaimItemFeatureIT extends AbstractControllerIntegrationTest {
 
         context.turnOffAuthorisationSystem();
 
+        profile = ItemBuilder.createItem(context, personCollection)
+            .withPersonEmail(eperson.getEmail())
+            .build();
+
         ItemBuilder.createItem(context, personCollection)
             .withTitle("User")
-            .withDspaceObjectOwner("User", context.getCurrentUser().getID().toString())
+            .withDspaceObjectOwner("User", eperson.getID().toString())
             .build();
 
         context.restoreAuthSystemState();
 
-        getClient(getAuthToken(context.getCurrentUser().getEmail(), password))
-            .perform(get("/api/authz/authorizations/search/object")
-                .param("uri", uri(collectionAProfile))
-                .param("eperson", context.getCurrentUser().getID().toString())
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", uri(profile))
                 .param("feature", canClaimProfileFeature.getName()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded").doesNotExist())
@@ -169,8 +245,7 @@ public class CanClaimItemFeatureIT extends AbstractControllerIntegrationTest {
 
     private String uri(Item item) {
         ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
-        String itemRestURI = utils.linkToSingleResource(itemRest, "self").getHref();
-        return itemRestURI;
+        return utils.linkToSingleResource(itemRest, "self").getHref();
     }
 
 }

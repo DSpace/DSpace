@@ -31,10 +31,11 @@ public interface OrcidSynchronizationService {
     /**
      * Check if the given item is linked to an ORCID profile.
      *
-     * @param  item the item to check
-     * @return      true if the given item is linked to ORCID
+     * @param  context the relevant DSpace Context.
+     * @param  item    the item to check
+     * @return         true if the given item is linked to ORCID
      */
-    boolean isLinkedToOrcid(Item item);
+    boolean isLinkedToOrcid(Context context, Item item);
 
     /**
      * Configure the given profile with the data present in the given ORCID token.
@@ -81,7 +82,7 @@ public interface OrcidSynchronizationService {
      *
      * @param  context                  the relevant DSpace Context.
      * @param  profile                  the researcher profile to update
-     * @param  value                    the new synchronization preference value
+     * @param  values                   the new synchronization preference values
      * @return                          true if the value has actually been updated,
      *                                  false if the value to be set is the same as
      *                                  the one already configured
@@ -152,13 +153,4 @@ public interface OrcidSynchronizationService {
      * @return the disconnection mode
      */
     OrcidProfileDisconnectionMode getDisconnectionMode();
-
-    /**
-     * Returns all the profiles with the given orcid id.
-     *
-     * @param  context the relevant DSpace Context.
-     * @param  orcid   the orcid id to search for
-     * @return         an iterator over the found profile items
-     */
-    List<Item> findProfilesByOrcid(Context context, String orcid);
 }
