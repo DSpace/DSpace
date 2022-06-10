@@ -16,6 +16,15 @@ package org.dspace.app.profile;
  */
 public enum OrcidEntitySyncPreference {
 
+    /**
+     * Preference to be set to disable the synchronization with ORCID of the
+     * specific entity.
+     */
     DISABLED,
+
+    /**
+     * Preference to be set to enable the synchronization with ORCID of all items
+     * relating to the specific entity.
+     */
     ALL
 }
