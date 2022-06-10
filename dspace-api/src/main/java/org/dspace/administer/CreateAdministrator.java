@@ -72,8 +72,43 @@ public final class CreateAdministrator {
         options.addOption("l", "last", true, "administrator last name");
         options.addOption("c", "language", true, "administrator language");
         options.addOption("p", "password", true, "administrator password");
+        options.addOption("h", "help", false, "explain options");
 
         CommandLine line = parser.parse(options, argv);
+
+        if (line.hasOption('h')) {
+            new HelpFormatter().printHelp("create-administrator [options]", options);
+        }
+        if (!line.hasOption('p') || lStringUtils.isBlank(ine.getOptionValue("e"))) {
+             System.out.println("Password will not display on screen.");
+            System.out.print("Password: ");
+            System.out.flush();
+
+            password1 = console.readPassword();
+
+            System.out.print("Again to confirm: ");
+            System.out.flush();
+
+            password2 = console.readPassword();
+
+            //TODO real password validation
+            if (password1.length > 1 && Arrays.equals(password1, password2)) {
+                // password OK
+                System.out.print("Is the above data correct? (y or n): ");
+                System.out.flush();
+
+                String s = console.readLine();
+
+                if (s != null) {
+                    s = s.trim();
+                    if (s.toLowerCase().startsWith("y")) {
+                        dataOK = true;
+                    }
+                }
+            } else {
+                System.out.println("Passwords don't match");
+            }
+        }
 
         if (line.hasOption("e") && line.hasOption("f") && line.hasOption("l") &&
             line.hasOption("c") && line.hasOption("p")) {
