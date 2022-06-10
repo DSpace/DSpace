@@ -244,3 +244,8 @@ db.schema = public
 
 # Maximum size of a multipart request (i.e. max total size of all files in one request)
 #spring.servlet.multipart.max-request-size = 512MB
+
+#################################################
+# SOLR Path configuration  #
+#################################################
+solr.home = /opt/bin/solr/solr-8.11.1
