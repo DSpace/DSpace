@@ -134,6 +134,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
             queryBuilder.buildQuery(context, dso, discoveryConfiguration, query, queryBuilderSearchFilters,
             "Item", 10, Long.getLong("0"), null, "ASC");
         handler.logDebug("creating iterator");
+
         Iterator<Item> itemIterator = searchService.iteratorSearch(context, dso, discoverQuery);
         handler.logDebug("creating dspacecsv");
         DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService.export(context, itemIterator, true);

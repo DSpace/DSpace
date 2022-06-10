@@ -111,13 +111,21 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         throws InstantiationException, IllegalAccessException, IOException, CsvException {
         String[] args = new String[] {"metadata-export-search", "-q", "subject:" + subject1, "-n", filename};
 
-        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        int result = ScriptLauncher.handleScript(
+            args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl
+        );
+
+        assertEquals(0, result);
         checkItemsPresentInFile(filename, itemsSubject1);
 
 
         args = new String[] {"metadata-export-search", "-q", "subject: " + subject2, "-n", filename};
 
-        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        result = ScriptLauncher.handleScript(
+            args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl
+        );
+
+        assertEquals(0, result);
         checkItemsPresentInFile(filename, itemsSubject2);
     }
 
@@ -149,7 +157,11 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         String[] args =
             new String[] {"metadata-export-search", "-q", "subject: " + subject1, "-s", collection2.getID().toString(),
                 "-n", filename};
-        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        int result = ScriptLauncher.handleScript(
+            args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl
+        );
+
+        assertEquals(0, result);
         checkItemsPresentInFile(filename, itemsDifferentCollection);
     }
 
@@ -157,7 +169,11 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
     public void exportMetadataSearchFilter()
         throws InstantiationException, IllegalAccessException, IOException, CsvException {
         String[] args = new String[] {"metadata-export-search", "-f", "subject,equals=" + subject1, "-n", filename};
-        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        int result = ScriptLauncher.handleScript(
+            args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl
+        );
+
+        assertEquals(0, result);
         checkItemsPresentInFile(filename, itemsSubject1);
     }
 
@@ -166,7 +182,11 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         throws InstantiationException, IllegalAccessException, IOException, CsvException {
         String[] args = new String[] {"metadata-export-search", "-f", "dateIssued,equals=[2000 TO 2020]",
             "-n", filename};
-        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        int result = ScriptLauncher.handleScript(
+            args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl
+        );
+
+        assertEquals(0, result);
         checkItemsPresentInFile(filename, itemsSubject1);
     }
 
@@ -175,7 +195,11 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         throws InstantiationException, IllegalAccessException, IOException, CsvException {
         String[] args = new String[] {"metadata-export-search", "-f", "subject,equals=" + subject1, "-f",
             "title,equals=" + String.format("%s item %d", subject1, 0), "-n", filename};
-        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        int result = ScriptLauncher.handleScript(
+            args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl
+        );
+
+        assertEquals(0, result);
         Item[] expectedResult = Arrays.copyOfRange(itemsSubject1, 0, 1);
         checkItemsPresentInFile(filename, expectedResult);
     }
@@ -198,7 +222,11 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
 
         String[] args = new String[] {"metadata-export-search", "-f", "subject,equals=well-being", "-n", filename};
         Item[] expectedResult = new Item[] {wellBeingItem};
-        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        int result = ScriptLauncher.handleScript(
+            args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl
+        );
+
+        assertEquals(0, result);
         checkItemsPresentInFile(filename, expectedResult);
     }
 
@@ -206,7 +234,11 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
     public void exportMetadataSearchInvalidDiscoveryQueryTest()
         throws InstantiationException, IllegalAccessException, IOException, CsvException {
         String[] args = new String[] {"metadata-export-search", "-q", "blabla", "-n", filename};
-        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        int result = ScriptLauncher.handleScript(
+            args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl
+        );
+
+        assertEquals(0, result);
         Item[] items = {};
         checkItemsPresentInFile(filename, items);
     }
@@ -216,7 +248,11 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         throws InstantiationException, IllegalAccessException, IOException, CsvException {
         String[] args = new String[] {"metadata-export-search", "-f", "subject,equals=notExistingSubject",
             "-n", filename};
-        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        int result = ScriptLauncher.handleScript(
+            args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl
+        );
+
+        assertEquals(0, result);
         Item[] items = {};
         checkItemsPresentInFile(filename, items);
     }
@@ -225,7 +261,12 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
     public void exportMetadataSearchNonExistinFacetsTest() throws InstantiationException, IllegalAccessException {
         String[] args = new String[] {"metadata-export-search", "-f", "nonExisting,equals=" + subject1, "-f",
             "title,equals=" + String.format("%s item %d", subject1, 0), "-n", filename};
-        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        int result = ScriptLauncher.handleScript(
+            args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl
+        );
+
+        assertEquals(1, result);
+
         Exception exception = testDSpaceRunnableHandler.getException();
         assertNotNull(exception);
         assertEquals("nonExisting is not a valid search filter", exception.getMessage());
