@@ -253,7 +253,7 @@ public class SolrImportExport {
         String instanceIndexName = indexName.startsWith("statistics-") ? "statistics" : indexName;
 
         String solrInstanceDir = configurationService.getProperty("solr.home") + File.separator + "server"
-                                + File.separator + "solr" + File.separator + "configsets" 
+                                + File.separator + "solr" + File.separator + "configsets"
                                 + File.separator + instanceIndexName + File.separator + "conf";
         // the [dspace]/solr/[indexName]/conf directory needs to be available on the local machine for this to work
         // -- we need access to the schema.xml and solrconfig.xml file, plus files referenced from there
@@ -299,9 +299,11 @@ public class SolrImportExport {
             }
 
             // Create a temp directory to store temporary core data
-             File tempDataDir = new File(configurationService.getProperty(
-                "solr.home") + File.separator + "server" + File.separator + "solr"
-                + File.separator + "configsets" + File.separator + "statistics" + File.separator + "data" + File.separator + "data");
+             File tempDataDir = new File(configurationService.getProperty("solr.home") + File.separator + "server"
+                               + File.separator + "solr"
+                               + File.separator + "configsets" + File.separator + "statistics"
+                               + File.separator + "data"
+                               + File.separator + "data");
             boolean createdTempDataDir = tempDataDir.mkdirs();
             if (!createdTempDataDir && !tempDataDir.exists()) {
                 throw new SolrImportExportException(
