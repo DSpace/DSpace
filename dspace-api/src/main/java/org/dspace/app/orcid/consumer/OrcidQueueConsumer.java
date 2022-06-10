@@ -254,7 +254,8 @@ public class OrcidQueueConsumer implements Consumer {
             }
 
             if (StringUtils.isBlank(putCode)) {
-                LOGGER.warn("The orcid history record with id {} should have a not blank put code");
+                LOGGER.warn("The orcid history record with id {} should have a not blank put code",
+                    historyRecord.getID());
                 continue;
             }
 

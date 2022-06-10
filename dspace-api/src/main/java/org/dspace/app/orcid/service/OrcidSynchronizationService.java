@@ -82,7 +82,7 @@ public interface OrcidSynchronizationService {
      *
      * @param  context                  the relevant DSpace Context.
      * @param  profile                  the researcher profile to update
-     * @param  value                    the new synchronization preference value
+     * @param  values                   the new synchronization preference values
      * @return                          true if the value has actually been updated,
      *                                  false if the value to be set is the same as
      *                                  the one already configured

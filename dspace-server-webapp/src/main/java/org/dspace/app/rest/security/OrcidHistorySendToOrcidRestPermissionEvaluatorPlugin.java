@@ -68,7 +68,7 @@ public class OrcidHistorySendToOrcidRestPermissionEvaluatorPlugin extends RestOb
 
         matcher.find();
         String id = matcher.group(1);
-        Integer queueId = Integer.parseInt(id);
+        int queueId = Integer.parseInt(id);
         OrcidQueue orcidQueue = null;
         try {
             orcidQueue = orcidQueueService.find(context, queueId);
