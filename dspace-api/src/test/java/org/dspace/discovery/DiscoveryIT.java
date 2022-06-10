@@ -58,7 +58,6 @@ import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -68,7 +67,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
 
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected SearchService searchService;
+    protected SearchService searchService = SearchUtils.getSearchService();
 
     XmlWorkflowService workflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
 
@@ -89,12 +88,6 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
 
     MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance()
                                                                                       .getMetadataAuthorityService();
-
-    @Override
-    public void setUp() throws Exception {
-        searchService = SearchUtils.getSearchService();
-        super.setUp();
-    }
 
     @Test
     public void solrRecordsAfterDepositOrDeletionOfWorkspaceItemTest() throws Exception {
