@@ -53,16 +53,13 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     private boolean hasScope = false;
     private String query;
 
-    private SearchService searchService = SearchUtils.getSearchService();
-    private MetadataDSpaceCsvExportService metadataDSpaceCsvExportService =
-        new DSpace().getServiceManager().getServiceByName(
-            MetadataDSpaceCsvExportServiceImpl.class.getCanonicalName(), MetadataDSpaceCsvExportService.class);
-    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    private DiscoveryConfigurationService discoveryConfigurationService = SearchUtils.getConfigurationService();
-    private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    private DiscoverQueryBuilder queryBuilder = SearchUtils.getQueryBuilder();
-    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private SearchService searchService;
+    private MetadataDSpaceCsvExportService metadataDSpaceCsvExportService;
+    private EPersonService ePersonService;
+    private DiscoveryConfigurationService discoveryConfigurationService;
+    private CommunityService communityService;
+    private CollectionService collectionService;
+    private DiscoverQueryBuilder queryBuilder;
 
     @Override
     public MetadataExportSearchScriptConfiguration getScriptConfiguration() {
@@ -72,6 +69,17 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
 
     @Override
     public void setup() throws ParseException {
+        searchService = SearchUtils.getSearchService();
+        metadataDSpaceCsvExportService = new DSpace().getServiceManager()
+                                                     .getServiceByName(
+                                                         MetadataDSpaceCsvExportServiceImpl.class.getCanonicalName(),
+                                                         MetadataDSpaceCsvExportService.class
+                                                     );
+        ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+        discoveryConfigurationService = SearchUtils.getConfigurationService();
+        communityService = ContentServiceFactory.getInstance().getCommunityService();
+        collectionService = ContentServiceFactory.getInstance().getCollectionService();
+        queryBuilder = SearchUtils.getQueryBuilder();
 
         if (commandLine.hasOption('h')) {
             help = true;
