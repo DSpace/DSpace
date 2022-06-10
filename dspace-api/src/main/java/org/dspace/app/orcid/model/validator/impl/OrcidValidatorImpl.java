@@ -21,8 +21,6 @@ import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZA
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_CITY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_COUNTRY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_NAME_REQUIRED;
-import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_REQUIRED;
-import static org.dspace.app.orcid.model.validator.OrcidValidationError.START_DATE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.TITLE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.TYPE_REQUIRED;
 
@@ -36,7 +34,6 @@ import org.dspace.services.ConfigurationService;
 import org.orcid.jaxb.model.v3.release.common.DisambiguatedOrganization;
 import org.orcid.jaxb.model.v3.release.common.Organization;
 import org.orcid.jaxb.model.v3.release.common.OrganizationAddress;
-import org.orcid.jaxb.model.v3.release.record.Affiliation;
 import org.orcid.jaxb.model.v3.release.record.ExternalIDs;
 import org.orcid.jaxb.model.v3.release.record.Funding;
 import org.orcid.jaxb.model.v3.release.record.FundingTitle;
@@ -66,10 +63,6 @@ public class OrcidValidatorImpl implements OrcidValidator {
 
         if (object instanceof Funding && isFundingValidationEnabled()) {
             return validateFunding((Funding) object);
-        }
-
-        if (object instanceof Affiliation && isAffiliationValidationEnabled()) {
-            return validateAffiliation((Affiliation) object);
         }
 
         return Collections.emptyList();
@@ -121,22 +114,6 @@ public class OrcidValidatorImpl implements OrcidValidator {
 
         if (funding.getAmount() != null && isBlank(funding.getAmount().getCurrencyCode())) {
             errors.add(AMOUNT_CURRENCY_REQUIRED);
-        }
-
-        return errors;
-    }
-
-    @Override
-    public List<OrcidValidationError> validateAffiliation(Affiliation affiliation) {
-        List<OrcidValidationError> errors = new ArrayList<OrcidValidationError>();
-        if (affiliation.getStartDate() == null) {
-            errors.add(START_DATE_REQUIRED);
-        }
-
-        if (affiliation.getOrganization() == null) {
-            errors.add(ORGANIZATION_REQUIRED);
-        } else {
-            errors.addAll(validate(affiliation.getOrganization()));
         }
 
         return errors;
@@ -212,10 +189,6 @@ public class OrcidValidatorImpl implements OrcidValidator {
 
     private boolean isFundingValidationEnabled() {
         return configurationService.getBooleanProperty("orcid.validation.funding.enabled", true);
-    }
-
-    private boolean isAffiliationValidationEnabled() {
-        return configurationService.getBooleanProperty("orcid.validation.affiliation.enabled", true);
     }
 
 }

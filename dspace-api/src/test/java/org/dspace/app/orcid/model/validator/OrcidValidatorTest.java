@@ -18,8 +18,6 @@ import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZA
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_CITY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_COUNTRY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_NAME_REQUIRED;
-import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_REQUIRED;
-import static org.dspace.app.orcid.model.validator.OrcidValidationError.START_DATE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.TITLE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.TYPE_REQUIRED;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -42,19 +40,14 @@ import org.orcid.jaxb.model.common.Iso3166Country;
 import org.orcid.jaxb.model.common.Relationship;
 import org.orcid.jaxb.model.common.WorkType;
 import org.orcid.jaxb.model.v3.release.common.Amount;
-import org.orcid.jaxb.model.v3.release.common.Day;
 import org.orcid.jaxb.model.v3.release.common.DisambiguatedOrganization;
-import org.orcid.jaxb.model.v3.release.common.FuzzyDate;
-import org.orcid.jaxb.model.v3.release.common.Month;
 import org.orcid.jaxb.model.v3.release.common.Organization;
 import org.orcid.jaxb.model.v3.release.common.OrganizationAddress;
 import org.orcid.jaxb.model.v3.release.common.Title;
-import org.orcid.jaxb.model.v3.release.common.Year;
 import org.orcid.jaxb.model.v3.release.record.ExternalID;
 import org.orcid.jaxb.model.v3.release.record.ExternalIDs;
 import org.orcid.jaxb.model.v3.release.record.Funding;
 import org.orcid.jaxb.model.v3.release.record.FundingTitle;
-import org.orcid.jaxb.model.v3.release.record.Qualification;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.WorkTitle;
 
@@ -516,60 +509,6 @@ public class OrcidValidatorTest {
     }
 
     @Test
-    public void testAffiliationWithoutStartDateAndOrganization() {
-        List<OrcidValidationError> errors = validator.validateAffiliation(new Qualification());
-        assertThat(errors, hasSize(2));
-        assertThat(errors, containsInAnyOrder(START_DATE_REQUIRED, ORGANIZATION_REQUIRED));
-    }
-
-    @Test
-    public void testAffiliationWithoutStartDate() {
-
-        Qualification qualification = new Qualification();
-        qualification.setOrganization(buildValidOrganization());
-
-        List<OrcidValidationError> errors = validator.validateAffiliation(qualification);
-        assertThat(errors, hasSize(1));
-        assertThat(errors, containsInAnyOrder(START_DATE_REQUIRED));
-    }
-
-    @Test
-    public void testAffiliationWithoutOrganization() {
-        Qualification qualification = new Qualification();
-        qualification.setStartDate(new FuzzyDate(new Year(1992), new Month(4), new Day(12)));
-        List<OrcidValidationError> errors = validator.validateAffiliation(qualification);
-        assertThat(errors, hasSize(1));
-        assertThat(errors, containsInAnyOrder(ORGANIZATION_REQUIRED));
-    }
-
-    @Test
-    public void testValidAffiliation() {
-
-        Qualification qualification = new Qualification();
-        qualification.setStartDate(new FuzzyDate(new Year(1992), new Month(4), new Day(12)));
-        qualification.setOrganization(buildValidOrganization());
-
-        List<OrcidValidationError> errors = validator.validateAffiliation(qualification);
-        assertThat(errors, empty());
-    }
-
-    @Test
-    public void testAffiliationWithInvalidOrganization() {
-
-        Qualification qualification = new Qualification();
-        qualification.setStartDate(new FuzzyDate(new Year(1992), new Month(4), new Day(12)));
-        qualification.setOrganization(buildValidOrganization());
-
-        Organization organization = buildValidOrganization();
-        organization.getDisambiguatedOrganization().setDisambiguationSource("INVALID");
-        qualification.setOrganization(organization);
-
-        List<OrcidValidationError> errors = validator.validateAffiliation(qualification);
-        assertThat(errors, hasSize(1));
-        assertThat(errors, containsInAnyOrder(DISAMBIGUATION_SOURCE_INVALID));
-    }
-
-    @Test
     public void testWithWorkValidationEnabled() {
 
         Work work = new Work();
@@ -593,29 +532,6 @@ public class OrcidValidatorTest {
         work.getWorkTitle().setTitle(new Title("Work title"));
 
         List<OrcidValidationError> errors = validator.validate(work);
-        assertThat(errors, empty());
-    }
-
-    @Test
-    public void testWithAffiliationValidationEnabled() {
-
-        Qualification qualification = new Qualification();
-        qualification.setOrganization(buildValidOrganization());
-
-        List<OrcidValidationError> errors = validator.validate(qualification);
-        assertThat(errors, hasSize(1));
-        assertThat(errors, containsInAnyOrder(START_DATE_REQUIRED));
-    }
-
-    @Test
-    public void testWithAffiliationValidationDisabled() {
-
-        when(configurationService.getBooleanProperty("orcid.validation.affiliation.enabled", true)).thenReturn(false);
-
-        Qualification qualification = new Qualification();
-        qualification.setOrganization(buildValidOrganization());
-
-        List<OrcidValidationError> errors = validator.validate(qualification);
         assertThat(errors, empty());
     }
 
