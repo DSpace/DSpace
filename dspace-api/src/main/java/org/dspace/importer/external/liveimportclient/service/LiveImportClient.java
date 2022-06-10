@@ -16,6 +16,24 @@ import java.util.Map;
  */
 public interface LiveImportClient {
 
-    public String executeHttpGetRequest(int timeout, String URL, Map<String, String> requestParams);
+    /**
+     * Http GET request
+     * 
+     * @param timeout        The connect timeout in milliseconds
+     * @param URL            URL
+     * @param requestParams  This map contains the parameters to be included in the request.
+     *                       Each parameter will be added to the url?(key=value)
+     * @return               The response in String type converted from InputStream
+     */
+    public String executeHttpGetRequest(int timeout, String URL, Map<String, Map<String, String>> params);
 
+    /**
+     * Http POST request
+     * 
+     * @param URL      URL
+     * @param params   This map contains the header params to be included in the request.
+     * @param entry    the entity value
+     * @return         the response in String type converted from InputStream
+     */
+    public String executeHttpPostRequest(String URL, Map<String, Map<String, String>> params, String entry);
 }

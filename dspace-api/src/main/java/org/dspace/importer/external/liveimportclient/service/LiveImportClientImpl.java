@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
@@ -21,7 +22,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.LogManager;
@@ -38,13 +42,16 @@ public class LiveImportClientImpl implements LiveImportClient {
 
     private final static Logger log = LogManager.getLogger();
 
+    public static final String URI_PARAMETERS = "uriParameters";
+    public static final String HEADER_PARAMETERS = "headerParameters";
+
     private CloseableHttpClient httpClient;
 
     @Autowired
     private ConfigurationService configurationService;
 
     @Override
-    public String executeHttpGetRequest(int timeout, String URL, Map<String, String> requestParams) {
+    public String executeHttpGetRequest(int timeout, String URL, Map<String, Map<String, String>> params) {
         HttpGet method = null;
         try (CloseableHttpClient httpClient = Optional.ofNullable(this.httpClient)
                                                       .orElseGet(HttpClients::createDefault)) {
@@ -53,14 +60,21 @@ public class LiveImportClientImpl implements LiveImportClient {
             requestConfigBuilder.setConnectionRequestTimeout(timeout);
             RequestConfig defaultRequestConfig = requestConfigBuilder.build();
 
-            method = new HttpGet(getSearchUrl(URL, requestParams));
+            method = new HttpGet(buildUrl(URL, params.get(URI_PARAMETERS)));
             method.setConfig(defaultRequestConfig);
+
+            Map<String, String> headerParams = params.get(HEADER_PARAMETERS);
+            if (MapUtils.isNotEmpty(headerParams)) {
+                for (String param : headerParams.keySet()) {
+                    method.setHeader(param, headerParams.get(param));
+                }
+            }
 
             configureProxy(method, defaultRequestConfig);
 
             HttpResponse httpResponse = httpClient.execute(method);
             if (isNotSuccessfull(httpResponse)) {
-                throw new RuntimeException("The request failed with: " + getStatusCode(httpResponse) + " code");
+                throw new RuntimeException();
             }
             InputStream inputStream = httpResponse.getEntity().getContent();
             return IOUtils.toString(inputStream, Charset.defaultCharset());
@@ -74,7 +88,41 @@ public class LiveImportClientImpl implements LiveImportClient {
         return StringUtils.EMPTY;
     }
 
-    private void configureProxy(HttpGet method, RequestConfig defaultRequestConfig) {
+    @Override
+    public String executeHttpPostRequest(String URL, Map<String, Map<String, String>> params, String entry) {
+        HttpPost method = null;
+        try (CloseableHttpClient httpClient = Optional.ofNullable(this.httpClient)
+                                                      .orElseGet(HttpClients::createDefault)) {
+
+            Builder requestConfigBuilder = RequestConfig.custom();
+            RequestConfig defaultRequestConfig = requestConfigBuilder.build();
+
+            method = new HttpPost(buildUrl(URL, params.get(URI_PARAMETERS)));
+            method.setConfig(defaultRequestConfig);
+            if (StringUtils.isNotBlank(entry)) {
+                method.setEntity(new StringEntity(entry));
+            }
+            setHeaderParams(method, params);
+
+            configureProxy(method, defaultRequestConfig);
+
+            HttpResponse httpResponse = httpClient.execute(method);
+            if (isNotSuccessfull(httpResponse)) {
+                throw new RuntimeException();
+            }
+            InputStream inputStream = httpResponse.getEntity().getContent();
+            return IOUtils.toString(inputStream, Charset.defaultCharset());
+        } catch (Exception e1) {
+            log.error(e1.getMessage(), e1);
+        } finally {
+            if (Objects.nonNull(method)) {
+                method.releaseConnection();
+            }
+        }
+        return StringUtils.EMPTY;
+    }
+
+    private void configureProxy(HttpRequestBase method, RequestConfig defaultRequestConfig) {
         String proxyHost = configurationService.getProperty("http.proxy.host");
         String proxyPort = configurationService.getProperty("http.proxy.port");
         if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort)) {
@@ -85,10 +133,36 @@ public class LiveImportClientImpl implements LiveImportClient {
         }
     }
 
-    private String getSearchUrl(String URL, Map<String, String> requestParams) throws URISyntaxException {
+    /**
+     * Allows to set the header parameters to the HTTP Post method
+     * 
+     * @param method  HttpPost method
+     * @param params  This map contains the header params to be included in the request.
+     */
+    private void setHeaderParams(HttpPost method, Map<String, Map<String, String>> params) {
+        Map<String, String> headerParams = params.get(HEADER_PARAMETERS);
+        if (MapUtils.isNotEmpty(headerParams)) {
+            for (String param : headerParams.keySet()) {
+                method.setHeader(param, headerParams.get(param));
+            }
+        }
+    }
+
+    /**
+     * This method allows you to add the parameters contained in the requestParams map to the URL
+     * 
+     * @param URL                   URL
+     * @param requestParams         This map contains the parameters to be included in the request.
+     *                              Each parameter will be added to the url?(key=value)
+     * @return
+     * @throws URISyntaxException
+     */
+    private String buildUrl(String URL, Map<String, String> requestParams) throws URISyntaxException {
         URIBuilder uriBuilder = new URIBuilder(URL);
-        for (String param : requestParams.keySet()) {
-            uriBuilder.setParameter(param, requestParams.get(param));
+        if (MapUtils.isNotEmpty(requestParams)) {
+            for (String param : requestParams.keySet()) {
+                uriBuilder.setParameter(param, requestParams.get(param));
+            }
         }
         return uriBuilder.toString();
     }

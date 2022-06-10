@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import javax.el.MethodNotFoundException;
@@ -141,8 +142,8 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
             uriBuilder.addParameter("limit", count.toString());
             uriBuilder.addParameter("prettyPrint", String.valueOf(true));
             uriBuilder.addParameter("lookfor", query.getParameterAsClass("query", String.class));
-            String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
-                    new HashMap<String, String>());
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
             JsonNode node = convertStringJsonToJsonNode(responseString);
             JsonNode resultCountNode = node.get("resultCount");
             return resultCountNode.intValue();
@@ -180,8 +181,8 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
                     uriBuilder.addParameter("field[]", field);
                 }
             }
-            String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(),
-                    new HashMap<String, String>());
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
             return response;
         }
     }
@@ -238,7 +239,8 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
                     uriBuilder.addParameter("field[]", field);
                 }
             }
-            return liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), new HashMap<String, String>());
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            return liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
         }
 
     }
@@ -288,7 +290,8 @@ public class VuFindImportMetadataSourceServiceImpl extends AbstractImportMetadat
                 }
             }
             uriBuilder.addParameter("lookfor", filter);
-            return liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), new HashMap<String, String>());
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            return liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
         }
 
     }

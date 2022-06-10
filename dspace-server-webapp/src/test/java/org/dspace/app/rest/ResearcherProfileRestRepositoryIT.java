@@ -17,6 +17,7 @@ import static org.dspace.app.rest.matcher.HalMatcher.matchLinks;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataNotEmpty;
+import static org.dspace.app.rest.matcher.ResourcePolicyMatcher.matchResourcePolicyProperties;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,8 +45,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.jayway.jsonpath.JsonPath;
 import org.dspace.app.orcid.OrcidToken;
 import org.dspace.app.orcid.service.OrcidTokenService;
-import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
@@ -59,6 +59,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
@@ -283,6 +284,20 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("eperson")))
             .andExpect(jsonPath("$.name", is(name)));
+
+        String itemId = getItemIdByProfileId(authToken, id);
+        Item profileItem = itemService.find(context, UUIDUtils.fromString(itemId));
+
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(get("/api/authz/resourcepolicies/search/resource")
+                .param("uuid", itemId))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.resourcepolicies", containsInAnyOrder(
+                matchResourcePolicyProperties(null, user, profileItem, null, Constants.READ, null),
+                matchResourcePolicyProperties(null, user, profileItem, null, Constants.WRITE, null))))
+            .andExpect(jsonPath("$.page.totalElements", is(2)));
+
     }
 
     @Test
@@ -848,14 +863,6 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         String firstItemId = getItemIdByProfileId(adminToken, id);
 
-        MetadataValueRest valueToAdd = new MetadataValueRest(user.getEmail());
-        List<Operation> operations = asList(new AddOperation("/metadata/person.email", valueToAdd));
-
-        getClient(adminToken).perform(patch(BASE_REST_SERVER_URL + "/api/core/items/{id}", firstItemId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(getPatchContent(operations)))
-            .andExpect(status().isOk());
-
         getClient(adminToken).perform(delete("/api/eperson/profiles/{id}", id))
             .andExpect(status().isNoContent());
 
@@ -923,6 +930,33 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         ItemBuilder.createItem(context, personCollection)
             .withPersonEmail("test@email.it")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String epersonId = ePerson.getID().toString();
+
+        getClient(getAuthToken(ePerson.getEmail(), password))
+            .perform(get("/api/eperson/profiles/{id}", epersonId))
+            .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void testNoAutomaticProfileClaimOccursIfItemHasNotAnEmail() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withNameInMetadata("Test", "User")
+            .withPassword(password)
+            .withEmail("test@email.it")
+            .build();
+
+        ItemBuilder.createItem(context, personCollection)
+            .withPersonIdentifierFirstName("Test")
+            .withPersonIdentifierLastName("User")
             .build();
 
         context.restoreAuthSystemState();
@@ -1015,10 +1049,12 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         final Item person = ItemBuilder.createItem(context, personCollection)
                                       .withTitle("Test User 1")
+                                      .withPersonEmail(user.getEmail())
                                       .build();
 
         final Item otherPerson = ItemBuilder.createItem(context, personCollection)
                                        .withTitle("Test User 2")
+                                       .withPersonEmail(user.getEmail())
                                        .build();
 
         context.restoreAuthSystemState();
@@ -1074,6 +1110,45 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         getClient(authToken).perform(delete("/api/eperson/profiles/{id}", id))
                             .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void researcherProfileClaimWithoutEmail() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        final Item person = ItemBuilder.createItem(context, personCollection)
+            .withTitle("Test User 1")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+            .contentType(TEXT_URI_LIST)
+            .content("http://localhost:8080/server/api/core/items/" + person.getID().toString()))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void researcherProfileClaimWithDifferentEmail() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        final Item person = ItemBuilder.createItem(context, personCollection)
+            .withTitle("Test User 1")
+            .withPersonEmail(eperson.getEmail())
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/eperson/profiles/")
+            .contentType(TEXT_URI_LIST)
+            .content("http://localhost:8080/server/api/core/items/" + person.getID().toString()))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
