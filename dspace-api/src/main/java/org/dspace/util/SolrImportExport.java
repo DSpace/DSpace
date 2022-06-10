@@ -299,7 +299,7 @@ public class SolrImportExport {
             }
 
             // Create a temp directory to store temporary core data
-             File tempDataDir = new File(configurationService.getProperty("solr.home") + File.separator + "server"
+            File tempDataDir = new File(configurationService.getProperty("solr.home") + File.separator + "server"
                                + File.separator + "solr"
                                + File.separator + "configsets" + File.separator + "statistics"
                                + File.separator + "data"
