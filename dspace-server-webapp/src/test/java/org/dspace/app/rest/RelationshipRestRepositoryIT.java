@@ -3349,4 +3349,28 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
 
+    @Test
+    public void findTheCreatedRelationshipTypeTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Relationship relationship = RelationshipBuilder
+            .createRelationshipBuilder(context, author1, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
+
+        context.restoreAuthSystemState();
+
+        Integer relationshipId = relationship.getID();
+        getClient().perform(get("/api/core/relationships/" + relationshipId))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.id", is(relationship.getID())))
+                   .andExpect(jsonPath("$._embedded.relationships").doesNotExist())
+                   .andExpect(jsonPath("$._links.relationshipType.href",
+                       containsString("/api/core/relationships/" + relationshipId + "/relationshipType"))
+                   );
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/relationships/" + relationshipId + "/relationshipType"))
+                             .andExpect(status().isOk());
+    }
+
 }

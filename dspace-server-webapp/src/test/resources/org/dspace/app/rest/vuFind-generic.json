@@ -1,0 +1,82 @@
+{
+    "resultCount": 1994,
+    "records": [
+        {
+            "authors": {
+                "primary": [],
+                "secondary": {
+                    "Carettoni, Gianfilippo.": []
+                },
+                "corporate": []
+            },
+            "formats": [
+                "Map",
+                "Map",
+                "Book"
+            ],
+            "id": "653510",
+            "languages": [
+                "Italian"
+            ],
+            "series": [],
+            "subjects": [
+                [
+                    "Rome (Italy)",
+                    "Maps",
+                    "Early works to 1800."
+                ],
+                [
+                    "Rome (Italy)",
+                    "Antiquities",
+                    "Maps."
+                ]
+            ],
+            "title": "La pianta marmorea di Roma antica: Forma urbis Romae /",
+            "urls": [
+                {
+                    "url": "http://hdl.handle.net/20.500.12390/231",
+                    "desc": "http://hdl.handle.net/20.500.12390/231"
+                }
+                ]
+        },
+        {
+            "authors": {
+                "primary": {
+                    "Surdu, Mihai.": []
+                },
+                "secondary": [],
+                "corporate": []
+            },
+            "formats": [
+                "Online",
+                "Book"
+            ],
+            "id": "1665326",
+            "languages": [
+                "English"
+            ],
+            "series": [],
+            "subjects": [
+                [
+                    "Public opinion",
+                    "Europe."
+                ],
+                [
+                    "Stereotypes (Social psychology)"
+                ],
+                [
+                    "Romanies",
+                    "Public opinion."
+                ]
+            ],
+            "title": "Expert frames : scientific and policy practices of Roma classification /",
+            "urls": [
+                {
+                    "url": "http://ezproxy.villanova.edu/login?URL=http://www.jstor.org/stable/10.7829/j.ctt1ggjj08",
+                    "desc": "http://ezproxy.villanova.edu/login?URL=http://www.jstor.org/stable/10.7829/j.ctt1ggjj08"
+                }
+            ]
+        }
+    ],
+    "status": "OK"
+}

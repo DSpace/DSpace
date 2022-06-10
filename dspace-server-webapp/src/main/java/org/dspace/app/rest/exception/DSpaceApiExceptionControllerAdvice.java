@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.exception.ResourceAlreadyExistsException;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -115,7 +116,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
-    @ExceptionHandler( {UnprocessableEntityException.class})
+    @ExceptionHandler({ UnprocessableEntityException.class, ResourceAlreadyExistsException.class })
     protected void handleUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
                                                       Exception ex) throws IOException {
         //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
@@ -148,6 +149,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         RESTEmptyWorkflowGroupException.class,
         EPersonNameNotProvidedException.class,
         GroupNameNotProvidedException.class,
+        GroupHasPendingWorkflowTasksException.class,
     })
     protected void handleCustomUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
                                                             TranslatableException ex) throws IOException {
