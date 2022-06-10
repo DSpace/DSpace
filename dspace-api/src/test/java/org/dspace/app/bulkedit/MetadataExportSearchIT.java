@@ -33,6 +33,9 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
@@ -56,6 +59,12 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
     @Before
     public void setUp() throws Exception {
         super.setUp();
+
+        // dummy search so that the SearchService gets called in a test context first
+        SearchService searchService = SearchUtils.getSearchService();
+        DiscoverQuery query = new DiscoverQuery();
+        query.setMaxResults(0);
+        searchService.search(context, query);
 
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
