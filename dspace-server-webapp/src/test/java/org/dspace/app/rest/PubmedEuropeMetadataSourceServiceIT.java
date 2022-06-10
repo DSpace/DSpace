@@ -110,7 +110,7 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO contributor = createMetadatumDTO("dc", "contributor", "author", "Olempska E");
         MetadatumDTO contributor2 = createMetadatumDTO("dc", "contributor", "author", "Horne DJ");
         MetadatumDTO contributor3 = createMetadatumDTO("dc", "contributor", "author", "Szaniawski H");
-        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", "doi", "10.1098/rspb.2011.0943");
+        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", null, "10.1098/rspb.2011.0943");
         MetadatumDTO source = createMetadatumDTO("dc", "source", null, "Proceedings. Biological sciences");
         MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2012");
         MetadatumDTO language = createMetadatumDTO("dc", "language", "iso", "eng");
@@ -119,7 +119,7 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO type3 = createMetadatumDTO("dc", "type", null, "Journal Article");
 
         MetadatumDTO issn = createMetadatumDTO("dc", "identifier", "issn", "0962-8452");
-        MetadatumDTO pmid = createMetadatumDTO("dc", "identifier", "pmid", "21733903");
+        MetadatumDTO pmid = createMetadatumDTO("dc", "identifier", "other", "21733903");
         MetadatumDTO description = createMetadatumDTO("dc", "description", "abstract", "The metacopines represent one"
                 + " of the oldest and most important extinct groups of ostracods, with a fossil record from"
                 + " the Mid-Ordovician to the Early Jurassic. Herein, we report the discovery of a representative"
@@ -161,7 +161,7 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO contributor7 = createMetadatumDTO("dc", "contributor", "author", "FEDOREIKO LIUBOV ROMANIVNA");
         MetadatumDTO language2 = createMetadatumDTO("dc", "language", "iso", "eng");
         MetadatumDTO type4 = createMetadatumDTO("dc", "type", null, "Patent");
-        MetadatumDTO pmid2 = createMetadatumDTO("dc", "identifier", "pmid", "UA37818");
+        MetadatumDTO pmid2 = createMetadatumDTO("dc", "identifier", "other", "UA37818");
         MetadatumDTO description2 = createMetadatumDTO("dc", "description", "abstract",
                 "Vodka contains aqueous-alcoholic"
                 + " mixture, 65.8 % sugar syrup and apple vinegar."
@@ -186,7 +186,7 @@ public class PubmedEuropeMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO contributor11 = createMetadatumDTO("dc", "contributor", "author", "FEDOREIKO LIUBOV ROMANIVNA");
         MetadatumDTO language3 = createMetadatumDTO("dc", "language", "iso", "eng");
         MetadatumDTO type5 = createMetadatumDTO("dc", "type", null, "Patent");
-        MetadatumDTO pmid3 = createMetadatumDTO("dc", "identifier", "pmid", "UA37954");
+        MetadatumDTO pmid3 = createMetadatumDTO("dc", "identifier", "other", "UA37954");
         MetadatumDTO description3 = createMetadatumDTO("dc", "description", "abstract", "The invention relates to"
                 + " food industry, and particularly to liqueur and vodka industry, to vodkas compositions."
                 + " The aim of this invention is producing vodka with high organoleptic indices, and particularly"

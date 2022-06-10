@@ -41,6 +41,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Implements a data source for querying PubMed Europe
@@ -72,7 +73,7 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
     @Override
     public ImportRecord getRecord(String id) throws MetadataSourceException {
         List<ImportRecord> records = retry(new SearchByIdCallable(id));
-        return records == null || records.isEmpty() ? null : records.get(0);
+        return CollectionUtils.isEmpty(records) ? null : records.get(0);
     }
 
     /**
@@ -135,7 +136,7 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
         List<ImportRecord> records = retry(new SearchByIdCallable(query));
-        return records == null || records.isEmpty() ? null : records.get(0);
+        return CollectionUtils.isEmpty(records) ? null : records.get(0);
     }
 
     /**
