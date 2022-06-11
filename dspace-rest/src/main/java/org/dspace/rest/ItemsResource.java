@@ -992,7 +992,16 @@ public class ItemsResource extends Resource
         org.dspace.content.Item item = null;
         try
         {
-            item = itemService.findByIdOrLegacyId(context, id);
+            try
+            {
+                item = itemService.findByIdOrLegacyId(context, id);
+            }
+            catch (IllegalArgumentException e)
+            {
+                context.abort();
+                log.warn("Erroneous uuid (id=" + id + ")!");
+                throw new WebApplicationException(Response.Status.BAD_REQUEST);
+            }
 
             if (item == null)
             {
