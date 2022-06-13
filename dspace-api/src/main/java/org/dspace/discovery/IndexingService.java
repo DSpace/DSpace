@@ -9,7 +9,9 @@ package org.dspace.discovery;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Map;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.core.Context;
 
 /**
@@ -72,4 +74,15 @@ public interface IndexingService {
     void optimize() throws SearchServiceException;
 
     void buildSpellCheck() throws SearchServiceException, IOException;
+
+    /**
+     * Atomically update the index of a single field for an object
+     * @param context       The DSpace context
+     * @param uniqueIndexId The unqiue index ID of the object to update the index for
+     * @param field         The field to update
+     * @param fieldModifier The modifiers for the field to update. More information on how to atomically update a solr
+     *                      field using a field modifier can be found here: https://yonik.com/solr/atomic-updates/
+     */
+    void atomicUpdate(Context context, String uniqueIndexId, String field, Map<String,Object> fieldModifier)
+            throws SolrServerException, IOException;
 }

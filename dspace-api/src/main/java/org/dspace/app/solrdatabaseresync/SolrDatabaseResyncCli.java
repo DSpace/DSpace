@@ -13,6 +13,8 @@ import static org.dspace.discovery.indexobject.ItemIndexFactoryImpl.STATUS_FIELD
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.cli.ParseException;
@@ -139,8 +141,10 @@ public class SolrDatabaseResyncCli extends DSpaceRunnable<SolrDatabaseResyncCliS
         indexingService.commit();
     }
 
-    private void updateItem(Context context, IndexableObject indexableObject) throws SQLException {
-        indexingService.indexContent(context, indexableObject, true);
+    private void updateItem(Context context, IndexableObject indexableObject) throws SolrServerException, IOException {
+        Map<String,Object> fieldModifier = new HashMap<>(1);
+        fieldModifier.put("remove", STATUS_FIELD_PREDB);
+        indexingService.atomicUpdate(context, indexableObject.getUniqueIndexID(), STATUS_FIELD, fieldModifier);
     }
 
     private void removeItem(Context context, String uniqueId) throws IOException, SQLException {

@@ -468,6 +468,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
     }
 
+    @Override
+    public void atomicUpdate(Context context, String uniqueIndexId, String field, Map<String, Object> fieldModifier)
+            throws SolrServerException, IOException {
+        SolrInputDocument solrInputDocument = new SolrInputDocument();
+        solrInputDocument.addField(SearchUtils.RESOURCE_UNIQUE_ID, uniqueIndexId);
+        solrInputDocument.addField(field, fieldModifier);
+
+        solrSearchCore.getSolr().add(solrInputDocument);
+    }
+
     // //////////////////////////////////
     // Private
     // //////////////////////////////////
