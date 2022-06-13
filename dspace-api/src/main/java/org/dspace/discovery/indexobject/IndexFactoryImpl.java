@@ -73,7 +73,12 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
     @Override
     public void writeDocument(Context context, T indexableObject, SolrInputDocument solrInputDocument)
             throws SQLException, IOException, SolrServerException {
-        writeDocument(solrInputDocument, null);
+        try {
+            writeDocument(solrInputDocument, null);
+        } catch (Exception e) {
+            log.error("Error occurred while writing SOLR document for {} object {}",
+                      indexableObject.getType(), indexableObject.getID(), e);
+        }
     }
 
     /**
