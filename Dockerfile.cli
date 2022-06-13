@@ -8,7 +8,7 @@
 ARG JDK_VERSION=11
 
 # Step 1 - Run Maven Build
-FROM dspace/dspace-dependencies:dspace-7_x as build
+FROM docker.io/dspace/dspace-dependencies:dspace-7_x as build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
@@ -24,7 +24,7 @@ RUN mvn package && \
   mvn clean
 
 # Step 2 - Run Ant Deploy
-FROM openjdk:${JDK_VERSION}-slim as ant_build
+FROM docker.io/openjdk:${JDK_VERSION}-slim as ant_build
 ARG TARGET_DIR=dspace-installer
 # COPY the /install directory from 'build' container to /dspace-src in this container
 COPY --from=build /install /dspace-src
@@ -45,7 +45,7 @@ RUN mkdir $ANT_HOME && \
 RUN ant init_installation update_configs update_code
 
 # Step 3 - Run jdk
-FROM openjdk:${JDK_VERSION}
+FROM docker.io/openjdk:${JDK_VERSION}
 # NOTE: DSPACE_INSTALL must align with the "dspace.dir" default configuration.
 ENV DSPACE_INSTALL=/dspace
 # Copy the /dspace directory from 'ant_build' container to /dspace in this container
