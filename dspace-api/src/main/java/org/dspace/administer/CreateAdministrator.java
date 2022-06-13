@@ -25,6 +25,8 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.apache.commons.cli.HelpFormatter;
+
 
 /**
  * A command-line tool for creating an initial administrator for setting up a
