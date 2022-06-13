@@ -51,9 +51,9 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
     private Item[] itemsSubject2 = new Item[numberItemsSubject2];
     private String filename;
     private Collection collection;
-    private Logger  logger = Logger.getLogger(MetadataExportSearchIT.class);
+    private Logger logger = Logger.getLogger(MetadataExportSearchIT.class);
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-
+    private SearchService searchService = SearchUtils.getSearchService();
 
     @Override
     @Before
@@ -61,7 +61,6 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         super.setUp();
 
         // dummy search so that the SearchService gets called in a test context first
-        SearchService searchService = SearchUtils.getSearchService();
         DiscoverQuery query = new DiscoverQuery();
         query.setMaxResults(0);
         searchService.search(context, query);
