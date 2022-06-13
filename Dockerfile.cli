@@ -52,3 +52,7 @@ ENV DSPACE_INSTALL=/dspace
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 # Give java extra memory (1GB)
 ENV JAVA_OPTS=-Xmx1000m
+
+# Step 4 - copy missing jar (xalan) to the app/dspace/lib
+WORKDIR /app
+ADD /lib/* /dspace/lib/
