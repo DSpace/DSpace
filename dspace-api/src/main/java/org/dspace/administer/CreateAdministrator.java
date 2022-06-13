@@ -162,7 +162,6 @@ public final class CreateAdministrator {
                                    language, String.valueOf(password1));
           Arrays.fill(password1, ' ');
           Arrays.fill(password2, ' ');
-            }
 
         } else {
             ca.negotiateAdministratorDetails();
