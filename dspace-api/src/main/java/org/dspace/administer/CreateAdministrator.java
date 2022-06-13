@@ -69,6 +69,11 @@ public final class CreateAdministrator {
 
         CreateAdministrator ca = new CreateAdministrator();
 
+        char[] password1 = null;
+        char[] password2 = null;
+        boolean dataOK = false;
+        String language = I18nUtil.getDefaultLocale().getLanguage();
+
         options.addOption("e", "email", true, "administrator email address");
         options.addOption("f", "first", true, "administrator first name");
         options.addOption("h", "help", false, "explain create-administrator options");
