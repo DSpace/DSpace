@@ -1567,10 +1567,18 @@
                 <artifactId>ojdbc6</artifactId>
                 <version>11.2.0.4.0</version>
             </dependency>
+            <!-- Codebase at https://github.com/OCLC-Research/oaiharvester2/ -->
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>oclc-harvester2</artifactId>
                 <version>0.1.12</version>
+            </dependency>
+            <!-- Xalan is REQUIRED by 'oclc-harvester2' listed above (OAI harvesting fails without it).
+                 Please do NOT use Xalan in DSpace codebase as it is not well maintained. -->
+            <dependency>
+                <groupId>xalan</groupId>
+                <artifactId>xalan</artifactId>
+                <version>2.7.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
