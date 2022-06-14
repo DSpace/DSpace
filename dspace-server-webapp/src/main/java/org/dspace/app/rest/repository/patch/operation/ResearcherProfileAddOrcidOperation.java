@@ -63,7 +63,7 @@ public class ResearcherProfileAddOrcidOperation extends PatchOperation<Researche
         } catch (OrcidClientException ex) {
 
             if (ex.isInvalidGrantException()) {
-                throw new IllegalArgumentException("The provided ORCID authorization code is not valid", ex);
+                throw new UnprocessableEntityException("The provided ORCID authorization code is not valid", ex);
             }
 
             throw ex;

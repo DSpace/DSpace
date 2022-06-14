@@ -2288,7 +2288,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .perform(patch("/api/eperson/profiles/{id}", user.getID().toString())
                 .content(getPatchContent(asList(new AddOperation("/orcid", code))))
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isUnprocessableEntity());
 
         verify(orcidClientMock).getAccessToken(code);
         verifyNoMoreInteractions(orcidClientMock);
