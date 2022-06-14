@@ -28,6 +28,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.exception.ResourceAlreadyExistsException;
+import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.app.profile.service.AfterResearcherProfileCreationAction;
 import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.authorize.AuthorizeException;
@@ -91,6 +92,9 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
     @Autowired
     private AuthorizeService authorizeService;
 
+    @Autowired
+    private OrcidSynchronizationService orcidSynchronizationService;
+
     @Autowired(required = false)
     private List<AfterResearcherProfileCreationAction> afterCreationActions;
 
@@ -153,6 +157,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
             deleteItem(context, profileItem);
         } else {
             removeOwnerMetadata(context, profileItem);
+            orcidSynchronizationService.unlinkProfile(context, profileItem);
         }
 
     }

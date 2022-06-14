@@ -81,4 +81,12 @@ public interface OrcidTokenService {
      * @param ePerson the ePerson for the deletion
      */
     public void deleteByEPerson(Context context, EPerson ePerson);
+
+    /**
+     * Deletes the ORCID token entity related to the given profile item.
+     *
+     * @param context     the DSpace context
+     * @param profileItem the item for the deletion
+     */
+    public void deleteByProfileItem(Context context, Item profileItem);
 }

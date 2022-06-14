@@ -581,6 +581,47 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     }
 
+    @Test
+    public void testDeleteWithProfileLinkedWithOrcid() throws Exception {
+
+        configurationService.setProperty("researcher-profile.hard-delete.enabled", false);
+
+        context.turnOffAuthorisationSystem();
+
+        Item profileItem = ItemBuilder.createItem(context, personCollection)
+            .withDspaceObjectOwner(user.getEmail(), user.getID().toString())
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("access-token", eperson)
+            .withOrcidAuthenticated("authenticated")
+            .build();
+
+        String id = user.getID().toString();
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        context.restoreAuthSystemState();
+
+        getClient(authToken).perform(get("/api/eperson/profiles/{id}", id))
+            .andExpect(status().isOk());
+
+        assertThat(profileItem.getMetadata(), hasItem(with("person.identifier.orcid", "0000-1111-2222-3333")));
+        assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.authenticated", "authenticated")));
+        assertThat(getOrcidAccessToken(profileItem), notNullValue());
+
+        getClient(authToken).perform(get("/api/eperson/profiles/{id}/item", id))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasJsonPath("$.metadata", matchMetadataNotEmpty("dspace.object.owner"))));
+
+        getClient(authToken).perform(delete("/api/eperson/profiles/{id}", id))
+            .andExpect(status().isNoContent());
+
+        profileItem = context.reloadEntity(profileItem);
+
+        assertThat(profileItem.getMetadata(), not(hasItem(with("person.identifier.orcid", "0000-1111-2222-3333"))));
+        assertThat(profileItem.getMetadata(), not(hasItem(with("dspace.orcid.authenticated", "authenticated"))));
+        assertThat(getOrcidAccessToken(profileItem), nullValue());
+
+    }
+
     /**
      * Verify that an admin can delete a profile of another user using the delete
      * endpoint.
