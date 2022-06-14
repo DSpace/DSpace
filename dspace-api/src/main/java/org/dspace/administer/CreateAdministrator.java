@@ -66,6 +66,7 @@ public final class CreateAdministrator {
         throws Exception {
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
+        Console console = System.console();
 
         CreateAdministrator ca = new CreateAdministrator();
 
