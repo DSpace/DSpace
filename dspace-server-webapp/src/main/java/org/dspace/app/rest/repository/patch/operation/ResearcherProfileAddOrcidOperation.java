@@ -21,12 +21,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation for ResearcherProfile ORCID connection.
+ * Implementation of the PATCH operation used to establish the ORCID connection.
  *
  * Example: <code><br/>
  * curl -X PATCH http://${dspace.server.url}/api/eperson/profiles/<:id-eperson> -H "
  * Content-Type: application/json" -d '[{ "op": "add", "path": "/orcid", value: "code" }]'
- * </code>
+ * </code> <br/>
+ * The value to be provided is the authorization code for an ORCID iD and
+ * 3-legged access token.
  */
 @Component
 public class ResearcherProfileAddOrcidOperation extends PatchOperation<ResearcherProfile> {
