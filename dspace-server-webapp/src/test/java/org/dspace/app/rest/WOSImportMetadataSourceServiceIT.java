@@ -61,7 +61,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
-            Collection<ImportRecord> recordsImported = wosImportMetadataService.getRecords("test query", 0, 2);
+            Collection<ImportRecord> recordsImported = wosImportMetadataService.getRecords("science", 0, 2);
             ArrayList<ImportRecord> collection2match = getRecords();
             assertEquals(2, recordsImported.size());
             matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
@@ -89,8 +89,8 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
-            int tot = wosImportMetadataService.getRecordsCount("test query");
-            assertEquals(2, tot);
+            int tot = wosImportMetadataService.getRecordsCount("science");
+            assertEquals(1853785, tot);
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
             wosImportMetadataService.setApiKey(originApiKey);
@@ -101,116 +101,144 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         ArrayList<ImportRecord> records = new ArrayList<>();
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
         //define first record
-        MetadatumDTO edition = createMetadatumDTO("oaire","citation", "edition", "WOS.ISSHP");
-        MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2019");
-        MetadatumDTO startPage = createMetadatumDTO("oaire","citation", "startPage", "225");
-        MetadatumDTO endPage = createMetadatumDTO("oaire","citation", "endPage", "234");
-        MetadatumDTO type = createMetadatumDTO("dc", "type", null, "Book in series");
+        MetadatumDTO edition = createMetadatumDTO("oaire","citation", "edition", "WOS.SSCI");
+        MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2022");
+        MetadatumDTO type = createMetadatumDTO("dc", "type", null, "Journal");
         MetadatumDTO ispartof = createMetadatumDTO("dc", "relation", "ispartof",
-                "EDULEARN19: 11TH INTERNATIONAL CONFERENCE ON EDUCATION AND NEW LEARNING TECHNOLOGIES");
+                                   "ETR&D-EDUCATIONAL TECHNOLOGY RESEARCH AND DEVELOPMENT");
         MetadatumDTO ispartofseries = createMetadatumDTO("dc", "relation", "ispartofseries",
-                "EDULEARN19: 11TH INTERNATIONAL CONFERENCE ON EDUCATION AND NEW LEARNING TECHNOLOGIES");
+                                   "ETR&D-EDUCATIONAL TECHNOLOGY RESEARCH AND DEVELOPMENT");
         MetadatumDTO title = createMetadatumDTO("dc", "title", null,
-                "MENTORING IN EDUCATION. FEMALE ROLE MODELS IN ITALIAN DESIGN ACADEMIC CULTURE");
-        MetadatumDTO issn = createMetadatumDTO("dc", "identifier", "issn", "2340-1117");
-        MetadatumDTO isbn = createMetadatumDTO("dc", "identifier", "isbn", "978-84-09-12031-4");
+                "Preservice science teachers coding science simulations:"
+                + " epistemological understanding, coding skills, and lesson design");
+        MetadatumDTO issn = createMetadatumDTO("dc", "identifier", "issn", "1042-1629");
+        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", null, "10.1007/s11423-022-10119-7");
         MetadatumDTO description = createMetadatumDTO("dc", "description", "abstract",
-                                         "It is widely recognized that mentors and tutors are");
+                "National and state science learning standards urge K-12 educators to offer authentic Science,"
+                + " Technology, Engineering, and Mathematics learning experiences.");
         MetadatumDTO iso = createMetadatumDTO("dc", "language", "iso", "1");
-        MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "Bollini, Letizia");
-        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "Chova, LG");
-        MetadatumDTO author3 = createMetadatumDTO("dc", "contributor", "author", "Martinez, AL");
-        MetadatumDTO author4 = createMetadatumDTO("dc", "contributor", "author", "Torres, IC");
-        MetadatumDTO subject = createMetadatumDTO("dc", "subject", null, "VISUAL DESIGN");
-        MetadatumDTO subject2 = createMetadatumDTO("dc", "subject", null, "EXPERIENCE");
-        MetadatumDTO subject3 = createMetadatumDTO("dc", "subject", null, "Design education");
-        MetadatumDTO subject4 = createMetadatumDTO("dc", "subject", null, "female role models");
-        MetadatumDTO subject5 = createMetadatumDTO("dc", "subject", null, "mentoring in education");
-        MetadatumDTO subject6 = createMetadatumDTO("dc", "subject", null, "Social Sciences");
-        MetadatumDTO editor = createMetadatumDTO("dc", "contributor", "editor", "Chova, LG");
-        MetadatumDTO editor2 = createMetadatumDTO("dc", "contributor", "editor", "Martinez, AL");
-        MetadatumDTO editor3 = createMetadatumDTO("dc", "contributor", "editor", "Torres, IC");
-        MetadatumDTO isi = createMetadatumDTO("dc", "identifier", "other", "WOS:000551093100034");
+        MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "Vasconcelos, Lucas");
+        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "Kim, ChanMin");
+        MetadatumDTO subject = createMetadatumDTO("dc", "subject", null, "MODEL-BASED INQUIRY");
+        MetadatumDTO subject2 = createMetadatumDTO("dc", "subject", null, "COMPUTATIONAL THINKING");
+        MetadatumDTO subject3 = createMetadatumDTO("dc", "subject", null, "ELEMENTARY TEACHERS");
+        MetadatumDTO subject4 = createMetadatumDTO("dc", "subject", null, "STIMULATED-RECALL");
+        MetadatumDTO subject5 = createMetadatumDTO("dc", "subject", null, "STUDENTS");
+        MetadatumDTO subject6 = createMetadatumDTO("dc", "subject", null, "TECHNOLOGY");
+        MetadatumDTO subject7 = createMetadatumDTO("dc", "subject", null, "KNOWLEDGE");
+        MetadatumDTO subject8 = createMetadatumDTO("dc", "subject", null, "K-12");
+        MetadatumDTO subject9 = createMetadatumDTO("dc", "subject", null, "CONCEPTIONS");
+        MetadatumDTO subject10 = createMetadatumDTO("dc", "subject", null, "VIEWS");
+        MetadatumDTO subject11 = createMetadatumDTO("dc", "subject", null, "Scientific models");
+        MetadatumDTO subject12 = createMetadatumDTO("dc", "subject", null, "Scientific modeling");
+        MetadatumDTO subject13 = createMetadatumDTO("dc", "subject", null, "Block-based coding");
+        MetadatumDTO subject14 = createMetadatumDTO("dc", "subject", null, "Epistemological understanding");
+        MetadatumDTO subject15 = createMetadatumDTO("dc", "subject", null, "Coding concepts");
+        MetadatumDTO subject16 = createMetadatumDTO("dc", "subject", null, "Lesson design");
+        MetadatumDTO subject17 = createMetadatumDTO("dc", "subject", null, "Social Sciences");
+        MetadatumDTO other = createMetadatumDTO("dc", "identifier", "other", "WOS:000805105200003");
         metadatums.add(edition);
         metadatums.add(date);
-        metadatums.add(startPage);
-        metadatums.add(endPage);
         metadatums.add(type);
         metadatums.add(ispartof);
         metadatums.add(ispartofseries);
         metadatums.add(title);
         metadatums.add(issn);
-        metadatums.add(isbn);
+        metadatums.add(doi);
         metadatums.add(description);
         metadatums.add(iso);
         metadatums.add(author);
         metadatums.add(author2);
-        metadatums.add(author3);
-        metadatums.add(author4);
         metadatums.add(subject);
         metadatums.add(subject2);
         metadatums.add(subject3);
         metadatums.add(subject4);
         metadatums.add(subject5);
         metadatums.add(subject6);
-        metadatums.add(editor);
-        metadatums.add(editor2);
-        metadatums.add(editor3);
-        metadatums.add(isi);
+        metadatums.add(subject7);
+        metadatums.add(subject8);
+        metadatums.add(subject9);
+        metadatums.add(subject10);
+        metadatums.add(subject11);
+        metadatums.add(subject12);
+        metadatums.add(subject13);
+        metadatums.add(subject14);
+        metadatums.add(subject15);
+        metadatums.add(subject16);
+        metadatums.add(subject17);
+        metadatums.add(other);
         ImportRecord firstrRecord = new ImportRecord(metadatums);
 
         //define second record
         List<MetadatumDTO> metadatums2  = new ArrayList<MetadatumDTO>();
-        MetadatumDTO edition2 = createMetadatumDTO("oaire","citation", "edition", "WOS.ISSHP");
-        MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2019");
-        MetadatumDTO startPage2 = createMetadatumDTO("oaire","citation", "startPage", "224");
-        MetadatumDTO endPage2 = createMetadatumDTO("oaire","citation", "endPage", "224");
-        MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "Book in series");
-        MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof",
-                "EDULEARN19: 11TH INTERNATIONAL CONFERENCE ON EDUCATION AND NEW LEARNING TECHNOLOGIES");
-        MetadatumDTO ispartofseries2 = createMetadatumDTO("dc", "relation", "ispartofseries",
-                "EDULEARN19: 11TH INTERNATIONAL CONFERENCE ON EDUCATION AND NEW LEARNING TECHNOLOGIES");
+        MetadatumDTO edition2 = createMetadatumDTO("oaire","citation", "edition", "WOS.SCI");
+        MetadatumDTO edition3 = createMetadatumDTO("oaire","citation", "edition", "WOS.SSCI");
+        MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2022");
+        MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "Journal");
+        MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof", "NATURE HUMAN BEHAVIOUR");
+        MetadatumDTO ispartofseries2 = createMetadatumDTO("dc", "relation", "ispartofseries", "NATURE HUMAN BEHAVIOUR");
+
         MetadatumDTO title2 = createMetadatumDTO("dc", "title", null,
-        "DYSLEXIA AND TYPOGRAPHY: HOW TO IMPROVE EDUCATIONAL PUBLISHING FOR INCLUSIVE DESIGN - A CRITICAL REVIEW");
-        MetadatumDTO issn2 = createMetadatumDTO("dc", "identifier", "issn", "2340-1117");
-        MetadatumDTO isbn2 = createMetadatumDTO("dc", "identifier", "isbn", "978-84-09-12031-4");
+        "The latent structure of global scientific development");
+
+        MetadatumDTO issn2 = createMetadatumDTO("dc", "identifier", "issn", "2397-3374");
+        MetadatumDTO doi2 = createMetadatumDTO("dc", "identifier", null, "10.1038/s41562-022-01367-x");
+        MetadatumDTO description2 = createMetadatumDTO("dc", "description", "abstract",
+                "Science is essential to innovation and economic prosperity."
+                + "By examining the scientific output of each country,"
+                + " Ahn et al. reveal a three-cluster structure of global science.");
         MetadatumDTO iso2 = createMetadatumDTO("dc", "language", "iso", "1");
-        MetadatumDTO author5 = createMetadatumDTO("dc", "contributor", "author", "Bollini, L.");
-        MetadatumDTO author6 = createMetadatumDTO("dc", "contributor", "author", "Chova, LG");
-        MetadatumDTO author7 = createMetadatumDTO("dc", "contributor", "author", "Martinez, AL");
-        MetadatumDTO author8 = createMetadatumDTO("dc", "contributor", "author", "Torres, IC");
-        MetadatumDTO subject7 = createMetadatumDTO("dc", "subject", null, "Dyslexia and Typography");
-        MetadatumDTO subject8 = createMetadatumDTO("dc", "subject", null, "Font design");
-        MetadatumDTO subject9 = createMetadatumDTO("dc", "subject", null, "educational publishing");
-        MetadatumDTO subject10 = createMetadatumDTO("dc", "subject", null, "Design for all");
-        MetadatumDTO subject11 = createMetadatumDTO("dc", "subject", null, "Universal design");
-        MetadatumDTO subject12 = createMetadatumDTO("dc", "subject", null, "Social Sciences");
-        MetadatumDTO isi2 = createMetadatumDTO("dc", "identifier", "other", "WOS:000551093100033");
+        MetadatumDTO author3 = createMetadatumDTO("dc", "contributor", "author", "Miao, Lili");
+        MetadatumDTO author4 = createMetadatumDTO("dc", "contributor", "author", "Murray, Dakota");
+        MetadatumDTO author5 = createMetadatumDTO("dc", "contributor", "author", "Jung, Woo-Sung");
+        MetadatumDTO author6 = createMetadatumDTO("dc", "contributor", "author", "Lariviere, Vincent");
+        MetadatumDTO author7 = createMetadatumDTO("dc", "contributor", "author", "Sugimoto, Cassidy R.");
+        MetadatumDTO author8 = createMetadatumDTO("dc", "contributor", "author", "Ahn, Yong-Yeol");
+        MetadatumDTO subject18 = createMetadatumDTO("dc", "subject", null, "RESEARCH OUTPUT");
+        MetadatumDTO subject19 = createMetadatumDTO("dc", "subject", null, "ECONOMIC-GROWTH");
+        MetadatumDTO subject20 = createMetadatumDTO("dc", "subject", null, "SCIENCE");
+        MetadatumDTO subject21 = createMetadatumDTO("dc", "subject", null, "KNOWLEDGE");
+        MetadatumDTO subject22 = createMetadatumDTO("dc", "subject", null, "CHINA");
+        MetadatumDTO subject23 = createMetadatumDTO("dc", "subject", null, "CAUSALITY");
+        MetadatumDTO subject24 = createMetadatumDTO("dc", "subject", null, "BACKBONE");
+        MetadatumDTO subject25 = createMetadatumDTO("dc", "subject", null, "SPREAD");
+        MetadatumDTO subject26 = createMetadatumDTO("dc", "subject", null, "Social Sciences");
+        MetadatumDTO subject27 = createMetadatumDTO("dc", "subject", null, "Science & Technology");
+        MetadatumDTO subject28 = createMetadatumDTO("dc", "subject", null, "Life Sciences & Biomedicine");
+        MetadatumDTO other2 = createMetadatumDTO("dc", "identifier", "other", "WOS:000805100600001");
+        MetadatumDTO rid = createMetadatumDTO("person", "identifier", "rid", "C-6334-2011");
+        MetadatumDTO rid2 = createMetadatumDTO("person", "identifier", "rid", "B-1251-2008");
         metadatums2.add(edition2);
+        metadatums2.add(edition3);
         metadatums2.add(date2);
-        metadatums2.add(startPage2);
-        metadatums2.add(endPage2);
         metadatums2.add(type2);
         metadatums2.add(ispartof2);
         metadatums2.add(ispartofseries2);
         metadatums2.add(title2);
         metadatums2.add(issn2);
-        metadatums2.add(isbn2);
+        metadatums2.add(doi2);
+        metadatums2.add(description2);
         metadatums2.add(iso2);
+        metadatums2.add(author3);
+        metadatums2.add(author4);
         metadatums2.add(author5);
         metadatums2.add(author6);
         metadatums2.add(author7);
         metadatums2.add(author8);
-        metadatums2.add(subject7);
-        metadatums2.add(subject8);
-        metadatums2.add(subject9);
-        metadatums2.add(subject10);
-        metadatums2.add(subject11);
-        metadatums2.add(subject12);
-        metadatums2.add(editor);
-        metadatums2.add(editor2);
-        metadatums2.add(editor3);
-        metadatums2.add(isi2);
+        metadatums2.add(subject18);
+        metadatums2.add(subject19);
+        metadatums2.add(subject20);
+        metadatums2.add(subject21);
+        metadatums2.add(subject22);
+        metadatums2.add(subject23);
+        metadatums2.add(subject24);
+        metadatums2.add(subject25);
+        metadatums2.add(subject26);
+        metadatums2.add(subject27);
+        metadatums2.add(subject28);
+        metadatums2.add(other2);
+        metadatums2.add(rid);
+        metadatums2.add(rid2);
         ImportRecord secondRecord = new ImportRecord(metadatums2);
 
         records.add(firstrRecord);
