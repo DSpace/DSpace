@@ -10,7 +10,6 @@ package org.dspace.app.orcid.client;
 import static org.apache.http.client.methods.RequestBuilder.get;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
