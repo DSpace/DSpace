@@ -7,7 +7,7 @@
  */
 package org.dspace.importer.external.wos.service;
 
-import static org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl.URI_PARAMETERS;
+import static org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl.HEADER_PARAMETERS;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -18,13 +18,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.el.MethodNotFoundException;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -49,6 +51,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Element>
         implements QuerySource {
+
+    private final static Logger log = LogManager.getLogger();
 
     private static final String AI_PATTERN  = "^AI=(.*)";
     private static final Pattern ISI_PATTERN = Pattern.compile("^\\d{15}$");
@@ -139,14 +143,14 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 String queryString = URLEncoder.encode(checkQuery(query), StandardCharsets.UTF_8);
                 String url = urlSearch + queryString + "&count=1&firstRecord=1";
                 Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
-                params.put(URI_PARAMETERS, getRequestParameters());
+                params.put(HEADER_PARAMETERS, getRequestParameters());
                 String response = liveImportClient.executeHttpGetRequest(timeout, url, params);
 
                 SAXBuilder saxBuilder = new SAXBuilder();
                 Document document = saxBuilder.build(new StringReader(response));
                 Element root = document.getRootElement();
-                XPathExpression<Element> xpath = XPathFactory.instance().compile("QueryResult/RecordsFound",
-                        Filters.element(), null);
+                XPathExpression<Element> xpath = XPathFactory.instance().compile("//*[@name=\"RecordsFound\"]",
+                                                 Filters.element(), null);
                 Element tot = xpath.evaluateFirst(root);
                 return Integer.valueOf(tot.getValue());
             }
@@ -173,7 +177,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             if (StringUtils.isNotBlank(apiKey)) {
                 String urlString = url + this.doi + "?databaseId=WOS&lang=en&count=10&firstRecord=1";
                 Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
-                params.put(URI_PARAMETERS, getRequestParameters());
+                params.put(HEADER_PARAMETERS, getRequestParameters());
                 String response = liveImportClient.executeHttpGetRequest(timeout, urlString, params);
 
                 List<Element> elements = splitToRecords(response);
@@ -218,7 +222,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             Integer count = query.getParameterAsClass("count", Integer.class);
             if (StringUtils.isNotBlank(apiKey)) {
                 Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
-                params.put(URI_PARAMETERS, getRequestParameters());
+                params.put(HEADER_PARAMETERS, getRequestParameters());
                 String url = urlSearch + URLEncoder.encode(queryString, StandardCharsets.UTF_8)
                                                  + "&count=" + count + "&firstRecord=" + (start + 1);
                 String response = liveImportClient.executeHttpGetRequest(timeout, url, params);
@@ -236,7 +240,7 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     private Map<String, String> getRequestParameters() {
         Map<String, String> params = new HashMap<String, String>();
         params.put("Accept", "application/xml");
-        params.put("X-ApiKey", apiKey);
+        params.put("X-ApiKey", this.apiKey);
         return params;
     }
 
@@ -273,13 +277,16 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
             SAXBuilder saxBuilder = new SAXBuilder();
             Document document = saxBuilder.build(new StringReader(recordsSrc));
             Element root = document.getRootElement();
-            XPathExpression<Element> xpath = XPathFactory.instance().compile("Data/Records/records/REC",
-                    Filters.element(), null);
-            List<Element> records = xpath.evaluate(root);
-            if (Objects.nonNull(records)) {
+            String cData = XPathFactory.instance().compile("//*[@name=\"Records\"]",
+                           Filters.element(), null).evaluate(root).get(0).getValue().trim();
+            Document intDocument = saxBuilder.build(new StringReader(cData));
+            XPathExpression<Element> xPath = XPathFactory.instance().compile("*", Filters.element(), null);
+            List<Element> records = xPath.evaluate(intDocument.getRootElement());
+            if (CollectionUtils.isNotEmpty(records)) {
                 return records;
             }
         } catch (JDOMException | IOException e) {
+            log.error(e.getMessage());
             return new ArrayList<Element>();
         }
         return new ArrayList<Element>();
