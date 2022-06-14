@@ -2354,6 +2354,25 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         assertThat(getOrcidAccessToken(profileItem), nullValue());
     }
 
+    @Test
+    public void testLinkProfileWithEPersonWithoutProfile() throws Exception {
+
+        String code = "123456";
+        String orcid = "0000-0000-1111-2222";
+        String accessToken = "c41e37e5-c2de-4177-91d6-ed9e9d1f31bf";
+        String[] scopes = { "FirstScope", "SecondScope" };
+
+        when(orcidClientMock.getAccessToken(code)).thenReturn(buildOrcidTokenResponse(orcid, accessToken, scopes));
+
+        getClient(getAuthToken(user.getEmail(), password))
+            .perform(patch("/api/eperson/profiles/{id}", user.getID().toString())
+                .content(getPatchContent(asList(new AddOperation("/orcid", code))))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isNotFound());
+
+        verifyNoMoreInteractions(orcidClientMock);
+    }
+
     private Item createProfile(EPerson ePerson) throws Exception {
 
         String authToken = getAuthToken(ePerson.getEmail(), password);
