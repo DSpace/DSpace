@@ -35,8 +35,6 @@ public class ResearcherProfileAddOrcidOperation extends PatchOperation<Researche
 
     private static final String OPERATION_ORCID = "/orcid";
 
-    private static final String INVALID_GRANT_MESSAGE = "invalid_grant";
-
     @Autowired
     private OrcidClient orcidClient;
 
@@ -64,8 +62,8 @@ public class ResearcherProfileAddOrcidOperation extends PatchOperation<Researche
             return orcidClient.getAccessToken((String) code);
         } catch (OrcidClientException ex) {
 
-            if (ex.getMessage() != null && ex.getMessage().contains(INVALID_GRANT_MESSAGE)) {
-                throw new IllegalArgumentException("The provided ORCID authorization code is not valid");
+            if (ex.isInvalidGrantException()) {
+                throw new IllegalArgumentException("The provided ORCID authorization code is not valid", ex);
             }
 
             throw ex;
