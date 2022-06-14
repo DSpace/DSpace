@@ -131,8 +131,7 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
             .param("code", CODE))
-            .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("http://localhost:4000/error?status=401&code=orcid.generic-error"));
+            .andExpect(status().isUnauthorized());
     }
 
     @Test

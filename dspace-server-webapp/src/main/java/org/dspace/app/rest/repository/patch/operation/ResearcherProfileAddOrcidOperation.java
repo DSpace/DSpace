@@ -10,6 +10,7 @@ package org.dspace.app.rest.repository.patch.operation;
 import java.sql.SQLException;
 
 import org.dspace.app.orcid.client.OrcidClient;
+import org.dspace.app.orcid.exception.OrcidClientException;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
 import org.dspace.app.profile.ResearcherProfile;
@@ -32,6 +33,8 @@ public class ResearcherProfileAddOrcidOperation extends PatchOperation<Researche
 
     private static final String OPERATION_ORCID = "/orcid";
 
+    private static final String INVALID_GRANT_MESSAGE = "invalid_grant";
+
     @Autowired
     private OrcidClient orcidClient;
 
@@ -47,11 +50,25 @@ public class ResearcherProfileAddOrcidOperation extends PatchOperation<Researche
             throw new UnprocessableEntityException("The /code value must be a string");
         }
 
-        OrcidTokenResponseDTO token = orcidClient.getAccessToken((String) code);
+        OrcidTokenResponseDTO accessToken = getAccessToken((String) code);
 
-        orcidSynchronizationService.linkProfile(context, profile.getItem(), token);
+        orcidSynchronizationService.linkProfile(context, profile.getItem(), accessToken);
 
         return profile;
+    }
+
+    private OrcidTokenResponseDTO getAccessToken(String code) {
+        try {
+            return orcidClient.getAccessToken((String) code);
+        } catch (OrcidClientException ex) {
+
+            if (ex.getMessage() != null && ex.getMessage().contains(INVALID_GRANT_MESSAGE)) {
+                throw new IllegalArgumentException("The provided ORCID authorization code is not valid");
+            }
+
+            throw ex;
+
+        }
     }
 
     @Override

@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
@@ -134,10 +136,12 @@ public class OrcidClientImpl implements OrcidClient {
 
     @SuppressWarnings("unchecked")
     private <T> T unmarshall(HttpEntity entity, Class<T> clazz) throws Exception {
-        InputStream content = entity.getContent();
         JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(entity.getContent());
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        return (T) unmarshaller.unmarshal(content);
+        return (T) unmarshaller.unmarshal(xmlStreamReader);
     }
 
     private String formatErrorMessage(HttpResponse response) {

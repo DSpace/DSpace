@@ -49,6 +49,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.jayway.jsonpath.JsonPath;
 import org.dspace.app.orcid.OrcidToken;
 import org.dspace.app.orcid.client.OrcidClient;
+import org.dspace.app.orcid.exception.OrcidClientException;
 import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.app.rest.model.patch.AddOperation;
@@ -1573,6 +1574,79 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     }
 
     @Test
+    public void testPatchToSetOrcidSynchronizationPreferenceWithNotOwnerUser() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withOrcid("0000-1111-2222-3333")
+            .withEmail("test@email.it")
+            .withPassword(password)
+            .withNameInMetadata("Test", "User")
+            .withOrcidScope("/first-scope")
+            .withOrcidScope("/second-scope")
+            .build();
+
+        OrcidTokenBuilder.create(context, ePerson, "af097328-ac1c-4a3e-9eb4-069897874910").build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonId = ePerson.getID().toString();
+
+        getClient(getAuthToken(ePerson.getEmail(), password))
+            .perform(post("/api/eperson/profiles/")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated());
+
+        List<Operation> operations = asList(new ReplaceOperation("/orcid/publications", ALL.name()));
+
+        getClient(getAuthToken(user.getEmail(), password))
+            .perform(patch("/api/eperson/profiles/{id}", ePersonId)
+            .content(getPatchContent(operations))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isForbidden());
+
+    }
+
+    @Test
+    public void testPatchToSetOrcidSynchronizationPreferenceWithAdmin() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withOrcid("0000-1111-2222-3333")
+            .withEmail("test@email.it")
+            .withPassword(password)
+            .withNameInMetadata("Test", "User")
+            .withOrcidScope("/first-scope")
+            .withOrcidScope("/second-scope")
+            .build();
+
+        OrcidTokenBuilder.create(context, ePerson, "af097328-ac1c-4a3e-9eb4-069897874910").build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonId = ePerson.getID().toString();
+
+        getClient(getAuthToken(ePerson.getEmail(), password))
+            .perform(post("/api/eperson/profiles/")
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated());
+
+        List<Operation> operations = asList(new ReplaceOperation("/orcid/publications", ALL.name()));
+
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                .content(getPatchContent(operations))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.orcidSynchronization.publicationsPreference", is(ALL.name())));
+
+    }
+
+    @Test
     public void testOwnerPatchToDisconnectProfileFromOrcidWithDisabledConfiguration() throws Exception {
 
         configurationService.setProperty("orcid.disconnection.allowed-users", "disabled");
@@ -2154,6 +2228,97 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         user = context.reloadEntity(user);
         assertThat(user.getNetid(), is(orcid));
+    }
+
+    @Test
+    public void testLinkProfileWithAdmin() throws Exception {
+
+        String code = "123456";
+        String orcid = "0000-0000-1111-2222";
+        String accessToken = "c41e37e5-c2de-4177-91d6-ed9e9d1f31bf";
+        String[] scopes = { "FirstScope", "SecondScope" };
+
+        context.turnOffAuthorisationSystem();
+
+        Item profileItem = createProfile(user);
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.getAccessToken(code)).thenReturn(buildOrcidTokenResponse(orcid, accessToken, scopes));
+
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(patch("/api/eperson/profiles/{id}", user.getID().toString())
+                .content(getPatchContent(asList(new AddOperation("/orcid", code))))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk());
+
+        verify(orcidClientMock).getAccessToken(code);
+        verifyNoMoreInteractions(orcidClientMock);
+
+        profileItem = context.reloadEntity(profileItem);
+        assertThat(profileItem, notNullValue());
+        assertThat(profileItem.getMetadata(), hasItem(with("person.identifier.orcid", orcid)));
+        assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.scope", scopes[0], 0)));
+        assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.scope", scopes[1], 1)));
+
+        assertThat(getOrcidAccessToken(profileItem), is(accessToken));
+
+        user = context.reloadEntity(user);
+        assertThat(user.getNetid(), is(orcid));
+
+    }
+
+    @Test
+    public void testLinkProfileWithInvalidCode() throws Exception {
+
+        String code = "123456";
+
+        context.turnOffAuthorisationSystem();
+
+        Item profileItem = createProfile(user);
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.getAccessToken(code)).thenThrow(new OrcidClientException(400, "{\n" +
+            "    \"error\": \"invalid_grant\",\n" +
+            "    \"error_description\": \"Invalid authorization code: 123456\"\n" +
+            "}"));
+
+        getClient(getAuthToken(user.getEmail(), password))
+            .perform(patch("/api/eperson/profiles/{id}", user.getID().toString())
+                .content(getPatchContent(asList(new AddOperation("/orcid", code))))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isBadRequest());
+
+        verify(orcidClientMock).getAccessToken(code);
+        verifyNoMoreInteractions(orcidClientMock);
+
+        assertThat(getOrcidAccessToken(profileItem), nullValue());
+    }
+
+    @Test
+    public void testLinkProfileWithGenericError() throws Exception {
+
+        String code = "123456";
+
+        context.turnOffAuthorisationSystem();
+
+        Item profileItem = createProfile(user);
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.getAccessToken(code)).thenThrow(new OrcidClientException(401, "Forbidden"));
+
+        getClient(getAuthToken(user.getEmail(), password))
+            .perform(patch("/api/eperson/profiles/{id}", user.getID().toString())
+                .content(getPatchContent(asList(new AddOperation("/orcid", code))))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isInternalServerError());
+
+        verify(orcidClientMock).getAccessToken(code);
+        verifyNoMoreInteractions(orcidClientMock);
+
+        assertThat(getOrcidAccessToken(profileItem), nullValue());
     }
 
     @Test

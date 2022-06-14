@@ -74,9 +74,13 @@ public class OrcidLoginFilter extends StatelessLoginFilter {
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
         AuthenticationException failed) throws IOException, ServletException {
 
-        String baseRediredirectUrl = configurationService.getProperty("dspace.ui.url");
-        String redirectUrl = baseRediredirectUrl + "/error?status=401&code=orcid.generic-error";
-        response.sendRedirect(redirectUrl);
+        if (OrcidAuthentication.isEnabled()) {
+            String baseRediredirectUrl = configurationService.getProperty("dspace.ui.url");
+            String redirectUrl = baseRediredirectUrl + "/error?status=401&code=orcid.generic-error";
+            response.sendRedirect(redirectUrl); // lgtm [java/unvalidated-url-redirection]
+        } else {
+            super.unsuccessfulAuthentication(request, response, failed);
+        }
 
     }
 
