@@ -27,6 +27,10 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -44,11 +48,15 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.jayway.jsonpath.JsonPath;
 import org.dspace.app.orcid.OrcidToken;
+import org.dspace.app.orcid.client.OrcidClient;
+import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.app.orcid.service.OrcidTokenService;
+import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.repository.ResearcherProfileRestRepository;
+import org.dspace.app.rest.repository.patch.operation.ResearcherProfileAddOrcidOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -85,6 +93,14 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     @Autowired
     private OrcidTokenService orcidTokenService;
+
+    @Autowired
+    private ResearcherProfileAddOrcidOperation researcherProfileAddOrcidOperation;
+
+    @Autowired
+    private OrcidClient orcidClient;
+
+    private OrcidClient orcidClientMock = mock(OrcidClient.class);
 
     private EPerson user;
 
@@ -128,11 +144,14 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         context.restoreAuthSystemState();
 
+        researcherProfileAddOrcidOperation.setOrcidClient(orcidClientMock);
+
     }
 
     @After
     public void after() {
         orcidTokenService.deleteAll(context);
+        researcherProfileAddOrcidOperation.setOrcidClient(orcidClient);
     }
 
     /**
@@ -2100,6 +2119,76 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(status().isUnprocessableEntity());
     }
 
+    @Test
+    public void testLinkProfileWithValidCode() throws Exception {
+
+        String code = "123456";
+        String orcid = "0000-0000-1111-2222";
+        String accessToken = "c41e37e5-c2de-4177-91d6-ed9e9d1f31bf";
+        String[] scopes = { "FirstScope", "SecondScope" };
+
+        context.turnOffAuthorisationSystem();
+
+        Item profileItem = createProfile(user);
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.getAccessToken(code)).thenReturn(buildOrcidTokenResponse(orcid, accessToken, scopes));
+
+        getClient(getAuthToken(user.getEmail(), password))
+            .perform(patch("/api/eperson/profiles/{id}", user.getID().toString())
+                .content(getPatchContent(asList(new AddOperation("/orcid", code))))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk());
+
+        verify(orcidClientMock).getAccessToken(code);
+        verifyNoMoreInteractions(orcidClientMock);
+
+        profileItem = context.reloadEntity(profileItem);
+        assertThat(profileItem, notNullValue());
+        assertThat(profileItem.getMetadata(), hasItem(with("person.identifier.orcid", orcid)));
+        assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.scope", scopes[0], 0)));
+        assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.scope", scopes[1], 1)));
+
+        assertThat(getOrcidAccessToken(profileItem), is(accessToken));
+
+        user = context.reloadEntity(user);
+        assertThat(user.getNetid(), is(orcid));
+    }
+
+    @Test
+    public void testLinkProfileForbiddenForNotOwnerUser() throws Exception {
+
+        String code = "123456";
+        String orcid = "0000-0000-1111-2222";
+        String accessToken = "c41e37e5-c2de-4177-91d6-ed9e9d1f31bf";
+        String[] scopes = { "FirstScope", "SecondScope" };
+
+        context.turnOffAuthorisationSystem();
+
+        Item profileItem = createProfile(user);
+
+        context.restoreAuthSystemState();
+
+        when(orcidClientMock.getAccessToken(code)).thenReturn(buildOrcidTokenResponse(orcid, accessToken, scopes));
+
+        getClient(getAuthToken(anotherUser.getEmail(), password))
+            .perform(patch("/api/eperson/profiles/{id}", user.getID().toString())
+                .content(getPatchContent(asList(new AddOperation("/orcid", code))))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isForbidden());
+
+        verifyNoMoreInteractions(orcidClientMock);
+
+        profileItem = context.reloadEntity(profileItem);
+        assertThat(profileItem, notNullValue());
+        assertThat(profileItem.getMetadata(), not(hasItem(with("person.identifier.orcid", orcid))));
+        assertThat(profileItem.getMetadata(), not(hasItem(with("dspace.orcid.scope", scopes[0], 0))));
+        assertThat(profileItem.getMetadata(), not(hasItem(with("dspace.orcid.scope", scopes[1], 1))));
+
+        assertThat(getOrcidAccessToken(profileItem), nullValue());
+    }
+
     private Item createProfile(EPerson ePerson) throws Exception {
 
         String authToken = getAuthToken(ePerson.getEmail(), password);
@@ -2141,6 +2230,16 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     private <T> T readAttributeFromResponse(MvcResult result, String attribute) throws UnsupportedEncodingException {
         return JsonPath.read(result.getResponse().getContentAsString(), attribute);
+    }
+
+    private OrcidTokenResponseDTO buildOrcidTokenResponse(String orcid, String accessToken, String[] scopes) {
+        OrcidTokenResponseDTO token = new OrcidTokenResponseDTO();
+        token.setAccessToken(accessToken);
+        token.setOrcid(orcid);
+        token.setTokenType("Bearer");
+        token.setName("Test User");
+        token.setScope(String.join(" ", scopes));
+        return token;
     }
 
 }
