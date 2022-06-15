@@ -159,10 +159,10 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
     @Override
     public void init() throws Exception {}
 
-    public List<ImportRecord> getByPubmedEuropeID(String pubmedID, Integer start, Integer count)
+    public List<ImportRecord> getByPubmedEuropeID(String pubmedID, Integer start, Integer size)
             throws IOException, HttpException {
         String query = "(EXT_ID:" + pubmedID + ")";
-        return search(query.toString(), count, start);
+        return search(query, size < 1 ? 1 : size, start);
     }
 
     /**
@@ -345,48 +345,48 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
      * Returns a list of PubMed Europe publication records
      * 
      * @param query           A keyword or combination of keywords to be searched
-     * @param count           The number of search results per page
+     * @param size           The number of search results per page
      * @param start           Start number for the acquired search result list
      * @throws IOException    If IO error
      */
-    public List<ImportRecord> search(String query, Integer count, Integer start) throws IOException {
+    public List<ImportRecord> search(String query, Integer size, Integer start) throws IOException {
         List<ImportRecord> results = new ArrayList<>();
         try {
             URIBuilder uriBuilder = new URIBuilder(this.url);
             uriBuilder.addParameter("format", "xml");
             uriBuilder.addParameter("resulttype", "core");
-            uriBuilder.addParameter("pageSize", String.valueOf(count));
+            uriBuilder.addParameter("pageSize", String.valueOf(size));
             uriBuilder.addParameter("query", query);
             Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
             boolean lastPage = false;
             int skipped = 0;
-            while (!lastPage || results.size() < count) {
+            while (!lastPage || results.size() < size) {
                 String response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
-
-                SAXBuilder saxBuilder = new SAXBuilder();
-                Document document = saxBuilder.build(new StringReader(response));
-                XPathFactory xpfac = XPathFactory.instance();
-                XPathExpression<Element> xPath = xpfac.compile("//responseWrapper/resultList/result",Filters.element());
-                List<Element> records = xPath.evaluate(document);
-                if (records.size() > 0) {
-                    for (Element item : records) {
-                        if (start > skipped) {
-                            skipped++;
-                        } else {
-                            results.add(transformSourceRecords(item));
+                String cursorMark = StringUtils.EMPTY;
+                if (StringUtils.isNotBlank(response)) {
+                    SAXBuilder saxBuilder = new SAXBuilder();
+                    Document document = saxBuilder.build(new StringReader(response));
+                    XPathFactory xpfac = XPathFactory.instance();
+                    XPathExpression<Element> xPath = xpfac.compile("//responseWrapper/resultList/result",
+                            Filters.element());
+                    List<Element> records = xPath.evaluate(document);
+                    if (records.size() > 0) {
+                        for (Element item : records) {
+                            if (start > skipped) {
+                                skipped++;
+                            } else {
+                                results.add(transformSourceRecords(item));
+                            }
                         }
-                        if (results.size() == count) {
-                            break;
-                        }
+                    } else {
+                        lastPage = true;
+                        break;
                     }
-                } else {
-                    lastPage = true;
-                    break;
+                    Element root = document.getRootElement();
+                    Element nextCursorMark = root.getChild("nextCursorMark");
+                    cursorMark = Objects.nonNull(nextCursorMark) ? nextCursorMark.getValue() : StringUtils.EMPTY;
                 }
-                Element root = document.getRootElement();
-                Element nextCursorMark = root.getChild("nextCursorMark");
-                String cursorMark = Objects.nonNull(nextCursorMark) ? nextCursorMark.getValue() : StringUtils.EMPTY;
-                if (!"*".equals(cursorMark)) {
+                if (StringUtils.isNotBlank(cursorMark)) {
                     uriBuilder.setParameter("cursorMar", cursorMark);
                 } else {
                     lastPage = true;
