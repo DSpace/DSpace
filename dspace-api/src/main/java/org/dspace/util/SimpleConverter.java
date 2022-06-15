@@ -8,10 +8,18 @@
 package org.dspace.util;
 
 /**
+ * Interface for classes that allows to convert values or map them.
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
 public interface SimpleConverter {
 
+    /**
+     * This method return a value that map the provided key
+     * 
+     * @param key
+     * @return a value that map the key
+     */
     public String getValue(String key);
 
 }

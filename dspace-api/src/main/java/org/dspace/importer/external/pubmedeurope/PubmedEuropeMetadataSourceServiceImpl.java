@@ -313,25 +313,25 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
             query.append(")");
         }
         if (StringUtils.isNotBlank(author)) {
+            // Search for a surname and (optionally) initial(s) in publication author lists
+            // AUTH:einstein, AUTH:”Smith AB”
             String splitRegex = "(\\s*,\\s+|\\s*;\\s+|\\s*;+|\\s*,+|\\s+)";
             String[] authors = author.split(splitRegex);
-            // [FAU]
             if (query.length() > 0) {
                 query.append(" AND ");
             }
             query.append("(");
-            int x = 0;
+            int countAuthors = 0;
             for (String auth : authors) {
-                x++;
+                countAuthors++;
                 query.append("AUTH:\"").append(auth).append("\"");
-                if (x < authors.length) {
+                if (countAuthors < authors.length) {
                     query.append(" AND ");
                 }
             }
             query.append(")");
         }
         if (year != -1) {
-            // [DP]
             if (query.length() > 0) {
                 query.append(" AND ");
             }

@@ -19,9 +19,8 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 
 /**
- * Scopus specific implementation of {@link MetadataContributor}
- * Responsible for generating rights metadata value
- * if this matched in mapConverter-openAccesFlag.properties file
+ * This contributor replace metadata value using SimpleConverter,
+ * the specific implementation of SimpleConverter is configured via bean.
  * 
  * @author Boychuk Mykhaylo (boychuk.mykhaylo at 4science.com)
  */

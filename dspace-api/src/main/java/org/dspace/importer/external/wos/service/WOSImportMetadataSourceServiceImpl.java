@@ -244,6 +244,16 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         return params;
     }
 
+    /**
+     * This method check if the query contain
+     * "AI=(...)" Author Identifier or a DOI "DO=(query)"
+     * or Accession Number "UT=(query)".
+     * Otherwise the value is placed in TS=(query) tag
+     * that searches for topic terms in the following fields within a document:
+     * Title, Abstract, Author keywords, Keywords Plus
+     * 
+     * @param query
+     */
     private String checkQuery(String query) {
         Pattern risPattern = Pattern.compile(AI_PATTERN);
         Matcher risMatcher = risPattern.matcher(query.trim());

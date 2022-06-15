@@ -266,4 +266,10 @@
         <constructor-arg value="3"/>
     </bean>
 
+    <bean name="mapConverterOpenAccessScopus" class="org.dspace.util.SimpleMapConverter" init-method="init">
+       <property name="converterNameFile" value="mapConverter-openAccesFlag.properties" />
+       <property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+       <property name="defaultValue" value="Unspecified"/>
+    </bean>
+
 </beans>

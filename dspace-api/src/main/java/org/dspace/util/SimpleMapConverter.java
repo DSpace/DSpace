@@ -18,6 +18,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.services.ConfigurationService;
 
 /**
+ * Implementation of {@link SimpleConverter}.
+ * This specific implementation is configurable via file in
+ * the converterNameFile field of instance,
+ * into which the mapping (key=value) is entered.
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 public class SimpleMapConverter implements SimpleConverter {
