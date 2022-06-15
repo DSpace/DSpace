@@ -207,9 +207,7 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
     public void testWithoutAuthorizationCode() throws Exception {
 
         getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid"))
-            .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("http://localhost:4000/error?status=401&code=orcid.generic-error"))
-            .andExpect(cookie().doesNotExist("Authorization-cookie"));
+            .andExpect(status().isUnauthorized());
 
         verifyNoInteractions(orcidClientMock);
 
