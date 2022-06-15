@@ -173,7 +173,7 @@
 
     <bean id="CiniiImportService" class="org.dspace.importer.external.cinii.CiniiImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="CiniiMetadataFieldMapping"/>
-        <property name="url" value="${cinii.url.naid}"/>
+        <property name="url" value="${cinii.url}"/>
         <property name="urlSearch" value="${cinii.url.search}"/>
     </bean>
     <bean id="CiniiMetadataFieldMapping" class="org.dspace.importer.external.cinii.CiniiFieldMapping"/>

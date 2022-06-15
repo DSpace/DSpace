@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import javax.el.MethodNotFoundException;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.client.utils.URIBuilder;
@@ -76,7 +77,7 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
     @Override
     public ImportRecord getRecord(String id) throws MetadataSourceException {
         List<ImportRecord> records = retry(new SearchByIdCallable(id));
-        return records == null || records.isEmpty() ? null : records.get(0);
+        return CollectionUtils.isNotEmpty(records) ? records.get(0) : null;
     }
 
     @Override
@@ -102,7 +103,7 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
         List<ImportRecord> records = retry(new SearchByIdCallable(query));
-        return records == null || records.isEmpty() ? null : records.get(0);
+        return CollectionUtils.isNotEmpty(records) ? records.get(0) : null;
     }
 
     @Override
@@ -164,20 +165,13 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
             String queryString = query.getParameterAsClass("query", String.class);
             String appId = configurationService.getProperty("cinii.appid");
             List<String> ids = getCiniiIds(appId, count, null, null, null, start, queryString);
-            if (ids != null && ids.size() > 0) {
+            if (CollectionUtils.isNotEmpty(ids)) {
                 for (String id : ids) {
                     List<ImportRecord> tmp = search(id, appId);
-                    if (tmp != null) {
-                        MetadatumDTO metadatumDto = new MetadatumDTO();
-                        metadatumDto.setSchema("dc");
-                        metadatumDto.setElement("identifier");
-                        metadatumDto.setQualifier("other");
-                        metadatumDto.setValue(id);
-                        for (ImportRecord ir : tmp) {
-                            ir.addValue(metadatumDto);
-                        }
-                        records.addAll(tmp);
+                    if (CollectionUtils.isNotEmpty(tmp)) {
+                        tmp.forEach(x -> x.addValue(createIdentifier(id)));
                     }
+                    records.addAll(tmp);
                 }
             }
             return records;
@@ -206,13 +200,8 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
             String appId = configurationService.getProperty("cinii.appid");
             String id = query.getParameterAsClass("id", String.class);
             List<ImportRecord> importRecord = search(id, appId);
-            MetadatumDTO metadatumDto = new MetadatumDTO();
-            metadatumDto.setSchema("dc");
-            metadatumDto.setElement("identifier");
-            metadatumDto.setQualifier("other");
-            metadatumDto.setValue(id);
-            for (ImportRecord ir : importRecord) {
-                ir.addValue(metadatumDto);
+            if (CollectionUtils.isNotEmpty(importRecord)) {
+                importRecord.forEach(x -> x.addValue(createIdentifier(id)));
             }
             return importRecord;
         }
@@ -243,20 +232,13 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
             Integer start = query.getParameterAsClass("start", Integer.class);
             String appId = configurationService.getProperty("cinii.appid");
             List<String> ids = getCiniiIds(appId, maxResult, author, title, year, start, null);
-            if (ids != null && ids.size() > 0) {
+            if (CollectionUtils.isNotEmpty(ids)) {
                 for (String id : ids) {
-                    List<ImportRecord> tmp = search(id, appId);
-                    if (tmp != null) {
-                        MetadatumDTO metadatumDto = new MetadatumDTO();
-                        metadatumDto.setSchema("dc");
-                        metadatumDto.setElement("identifier");
-                        metadatumDto.setQualifier("other");
-                        metadatumDto.setValue(id);
-                        for (ImportRecord ir : tmp) {
-                            ir.addValue(metadatumDto);
-                        }
-                        records.addAll(tmp);
+                    List<ImportRecord> importRecords = search(id, appId);
+                    if (CollectionUtils.isNotEmpty(importRecords)) {
+                        importRecords.forEach(x -> x.addValue(createIdentifier(id)));
                     }
+                    records.addAll(importRecords);
                 }
             }
             return records;
@@ -323,12 +305,7 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
             SAXBuilder saxBuilder = new SAXBuilder();
             Document document = saxBuilder.build(new StringReader(recordsSrc));
             Element root = document.getRootElement();
-            List<Namespace> namespaces = Arrays
-                    .asList(Namespace.getNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
-            XPathExpression<Element> xpath = XPathFactory.instance().compile("rdf:Description", Filters.element(),
-                    null, namespaces);
-            Element record = xpath.evaluateFirst(root);
-            return Arrays.asList(record);
+            return root.getChildren();
         } catch (JDOMException | IOException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
@@ -456,6 +433,15 @@ public class CiniiImportMetadataSourceServiceImpl extends AbstractImportMetadata
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    private MetadatumDTO createIdentifier(String id) {
+        MetadatumDTO metadatumDTO = new MetadatumDTO();
+        metadatumDTO.setSchema("dc");
+        metadatumDTO.setElement("identifier");
+        metadatumDTO.setQualifier("other");
+        metadatumDTO.setValue(id);
+        return metadatumDTO;
     }
 
 }

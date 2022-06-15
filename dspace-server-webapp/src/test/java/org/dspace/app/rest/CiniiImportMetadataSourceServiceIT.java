@@ -109,39 +109,11 @@ public class CiniiImportMetadataSourceServiceIT extends AbstractLiveImportIntegr
         //define first record
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
         MetadatumDTO title = createMetadatumDTO("dc", "title", null,
-                "A Review of the Chinese Government Support and Sustainability"
-                + " Assessment for Ecovillage Development with a Global Perspective");
-        MetadatumDTO source = createMetadatumDTO("dc", "source", null,
-                "International Review for Spatial Planning and Sustainable Development");
-        MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2022");
-        MetadatumDTO language = createMetadatumDTO("dc", "language", "iso", "ENG");
-        MetadatumDTO identifier = createMetadatumDTO("dc", "identifier", "other", "130008141851");
-        MetadatumDTO description = createMetadatumDTO("dc", "description", "abstract",
-                "<p>Having achieved substantial progress in urban development over the past three decades,"
-                + " the Chinese government has turned to ecovillage development as one of the more effective"
-                + " ways to solve increasingly serious rural issues, such as poverty, rural hollowing,"
-                + " a deteriorating natural environment, and farmland abandonment. However, in spite of"
-                + " various promotional policies and substantial financial investment, there are very few"
-                + " studies assessing the impact of governmental support on ecovillage development."
-                + " This paper presents a study applying both qualitative research and quantitative analysis"
-                + " to compare the effects of the support, especially in funding and policies, on their development."
-                + " A comparison was made of three cases, one in China and two elsewhere. To provide a common basis"
-                + " for comparison, three quantification based assessments were examined with a view to applying"
-                + " them in this study.<b> </b>These were the Evaluation for Construction of Beautiful Village"
-                + " (ECBV) from China, and the BREEAM Community and LEED-ND, two well-established international"
-                + " examples. The following analyses using the three methods reveal the strengths and weaknesses"
-                + " of the Chinese government support in ecovillage development, and limitations of the"
-                + " quantification-based assessment methods. Proposals are made for improving the nature of"
-                + " government support and the use of the ECBV. These research outcomes can help formulate"
-                + " the rural development policies in the critical time of socio-economic transition in China,"
-                + " and the research process could be a reference to review quantification based assessment"
-                + " methods in other developing countries with similar levels of development. </p>");
+                "Understanding the impact of mandatory accrual accounting on management practices:"
+                + " Interpretation of Japanese local governments’ behavior");
+        MetadatumDTO identifier = createMetadatumDTO("dc", "identifier", "other", "1010572092222310146");
 
         metadatums.add(title);
-        metadatums.add(source);
-        metadatums.add(date);
-        metadatums.add(language);
-        metadatums.add(description);
         metadatums.add(identifier);
 
         ImportRecord firstrRecord = new ImportRecord(metadatums);
@@ -149,17 +121,13 @@ public class CiniiImportMetadataSourceServiceIT extends AbstractLiveImportIntegr
         //define second record
         List<MetadatumDTO> metadatums2  = new ArrayList<MetadatumDTO>();
         MetadatumDTO title2 = createMetadatumDTO("dc", "title", null,
-                "Surface Electronic States and Inclining Surfaces in MoTe2 Probed by Photoemission Spectromicroscopy");
-        MetadatumDTO source2 = createMetadatumDTO("dc", "source", null,
-                "Journal of the Physical Society of Japan");
-        MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2021-08-15");
-        MetadatumDTO issn = createMetadatumDTO("dc", "identifier", "issn", "0031-9015");
-        MetadatumDTO identifier2 = createMetadatumDTO("dc", "identifier", "other", "210000159181");
+                "Band structures of passive films on titanium in simulated bioliquids determined"
+                + " by photoelectrochemical response: principle governing the biocompatibility");
+        MetadatumDTO language = createMetadatumDTO("dc", "language", "iso", "en");
+        MetadatumDTO identifier2 = createMetadatumDTO("dc", "identifier", "other", "1050010687833449984");
 
         metadatums2.add(title2);
-        metadatums2.add(issn);
-        metadatums2.add(source2);
-        metadatums2.add(date2);
+        metadatums2.add(language);
         metadatums2.add(identifier2);
 
         ImportRecord secondRecord = new ImportRecord(metadatums2);
